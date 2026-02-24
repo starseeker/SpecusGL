@@ -59,7 +59,20 @@
  * with the real frame/renderbuffer.
  */
 static struct gl_framebuffer DummyFramebuffer;
-static struct gl_renderbuffer DummyRenderbuffer;
+
+/* Placeholder renderbuffer that has no real pixel storage.
+ * It is never rendered into; it exists only in the hash table as a
+ * sentinel so we can detect double-GenRenderbuffer vs. BindRenderbuffer. */
+struct DummyRenderbufferImpl : public gl_renderbuffer {
+    DummyRenderbufferImpl() = default;
+    void GetRow(GLcontext *, GLuint, GLint, GLint, void *) override {}
+    void GetValues(GLcontext *, GLuint, const GLint *, const GLint *, void *) override {}
+    void PutRow(GLcontext *, GLuint, GLint, GLint, const void *, const GLubyte *) override {}
+    void PutMonoRow(GLcontext *, GLuint, GLint, GLint, const void *, const GLubyte *) override {}
+    void PutValues(GLcontext *, GLuint, const GLint *, const GLint *, const void *, const GLubyte *) override {}
+    void PutMonoValues(GLcontext *, GLuint, const GLint *, const GLint *, const void *, const GLubyte *) override {}
+};
+static DummyRenderbufferImpl DummyRenderbuffer;
 
 
 #define IS_CUBE_FACE(TARGET) \
@@ -562,7 +575,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindRenderbufferEXT");
 		return;
 	    }
-	    ASSERT(newRb->AllocStorage);
+	    ASSERT(newRb);
 	    _mesa_HashInsert(ctx->Shared->RenderBuffers, renderbuffer, newRb);
 	    newRb->RefCount = 1; /* referenced by hash table */
 	}
@@ -758,8 +771,7 @@ _mesa_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
 			    rb->StencilBits = 0;
 
     /* Now allocate the storage */
-    ASSERT(rb->AllocStorage);
-    if (rb->AllocStorage(ctx, rb, internalFormat, width, height)) {
+    if (rb->AllocStorage(ctx, internalFormat, width, height)) {
 	/* No error - check/set fields now */
 	assert(rb->_ActualFormat);
 	assert(rb->Width == (GLuint) width);

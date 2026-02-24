@@ -881,7 +881,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 			}
 #  ifdef DEPTH_TYPE
 			zRow = (DEPTH_TYPE *)
-			       zrb->GetPointer(ctx, zrb, InterpToInt(fxLeftEdge), span.y);
+			       zrb->GetPointer(ctx, InterpToInt(fxLeftEdge), span.y);
 			dZRowOuter = (ctx->DrawBuffer->Width + idxOuter) * sizeof(DEPTH_TYPE);
 #  endif
 		    }

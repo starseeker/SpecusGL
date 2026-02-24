@@ -199,7 +199,7 @@ static void
 get_row_ushort(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, void *values)
 {
-    const void *src = rb->GetPointer(ctx, rb, x, y);
+    const void *src = rb->GetPointer(ctx, x, y);
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     memcpy(values, src, count * sizeof(GLushort));
 }
@@ -325,7 +325,7 @@ static void
 get_row_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	     GLint x, GLint y, void *values)
 {
-    const void *src = rb->GetPointer(ctx, rb, x, y);
+    const void *src = rb->GetPointer(ctx, x, y);
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     memcpy(values, src, count * sizeof(GLuint));
@@ -912,6 +912,42 @@ put_mono_values_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb,
 
 
 
+/*
+ * gl_renderbuffer base class virtual method bodies.
+ */
+gl_renderbuffer::~gl_renderbuffer()
+{
+    if (Data) {
+	free(Data);
+	Data = nullptr;
+    }
+}
+
+GLboolean
+gl_renderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
+			      GLuint width, GLuint height)
+{
+    (void) ctx; (void) internalFormat; (void) width; (void) height;
+    return GL_FALSE;
+}
+
+void *
+gl_renderbuffer::GetPointer(GLcontext *ctx, GLint x, GLint y)
+{
+    (void) ctx; (void) x; (void) y;
+    return nullptr;
+}
+
+void
+gl_renderbuffer::PutRowRGB(GLcontext *ctx, GLuint count, GLint x, GLint y,
+			   const void *values, const GLubyte *mask)
+{
+    /* Only RGBA formats implement this; others should not call it. */
+    (void) ctx; (void) count; (void) x; (void) y; (void) values; (void) mask;
+    _mesa_problem(nullptr, "PutRowRGB called on non-RGBA renderbuffer");
+}
+
+
 /**
  * SoftRenderbuffer – concrete renderbuffer backed by a malloc'd pixel array.
  *
@@ -1312,6 +1348,16 @@ alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
  * Now handled by AlphaRenderbuffer destructor below.
  */
 
+/* Forward declarations for alpha helper functions (defined below) */
+static void *get_pointer_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLint x, GLint y);
+static void get_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, GLint x, GLint y, void *values);
+static void get_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, const GLint x[], const GLint y[], void *values);
+static void put_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, GLint x, GLint y, const void *values, const GLubyte *mask);
+static void put_row_rgb_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, GLint x, GLint y, const void *values, const GLubyte *mask);
+static void put_mono_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, GLint x, GLint y, const void *value, const GLubyte *mask);
+static void put_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, const GLint x[], const GLint y[], const void *values, const GLubyte *mask);
+static void put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count, const GLint x[], const GLint y[], const void *value, const GLubyte *mask);
+
 
 /**
  * AlphaRenderbuffer – wraps an RGB renderbuffer to add a software alpha
@@ -1536,17 +1582,6 @@ copy_buffer_alpha8(struct gl_renderbuffer* dst, struct gl_renderbuffer* src)
 
 
 /**
- * Default GetPointer routine.  Always return nullptr to indicate that
- * direct buffer access is not supported.
- */
-static void *
-nop_get_pointer(GLcontext *ctx, struct gl_renderbuffer *rb, GLint x, GLint y)
-{
-    return nullptr;
-}
-
-
-/**
  * Initialize the fields of a gl_renderbuffer to default values.
  */
 void
@@ -1557,12 +1592,6 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
     rb->ClassID = 0;
     rb->Name = name;
     rb->RefCount = 0;
-    rb->Delete = _mesa_delete_renderbuffer;
-
-    /* The rest of these should be set later by the caller of this function or
-     * the AllocStorage method:
-     */
-    rb->AllocStorage = nullptr;
 
     rb->Width = 0;
     rb->Height = 0;
@@ -1580,15 +1609,6 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
      * all over the drivers.
      */
     rb->Wrapped = rb;
-
-    rb->GetPointer = nop_get_pointer;
-    rb->GetRow = nullptr;
-    rb->GetValues = nullptr;
-    rb->PutRow = nullptr;
-    rb->PutRowRGB = nullptr;
-    rb->PutMonoRow = nullptr;
-    rb->PutValues = nullptr;
-    rb->PutMonoValues = nullptr;
 }
 
 
@@ -1599,22 +1619,18 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 struct gl_renderbuffer *
 _mesa_new_renderbuffer(GLcontext *ctx, GLuint name)
 {
-    auto *rb = new gl_renderbuffer{};
+    auto *rb = new SoftRenderbuffer{};
     _mesa_init_renderbuffer(rb, name);
     return rb;
 }
 
 
 /**
- * Delete a gl_framebuffer.
- * This is the default function for renderbuffer->Delete().
+ * Delete a gl_renderbuffer.  Called when refcount reaches zero.
  */
 void
 _mesa_delete_renderbuffer(struct gl_renderbuffer *rb)
 {
-    if (rb->Data) {
-	free(rb->Data);
-    }
     delete rb;
 }
 
@@ -1628,15 +1644,7 @@ _mesa_delete_renderbuffer(struct gl_renderbuffer *rb)
 struct gl_renderbuffer *
 _mesa_new_soft_renderbuffer(GLcontext *ctx, GLuint name)
 {
-    struct gl_renderbuffer *rb = _mesa_new_renderbuffer(ctx, name);
-    if (rb) {
-	rb->AllocStorage = _mesa_soft_renderbuffer_storage;
-	/* Normally, one would setup the PutRow, GetRow, etc functions here.
-	 * But we're doing that in the _mesa_soft_renderbuffer_storage() function
-	 * instead.
-	 */
-    }
-    return rb;
+    return _mesa_new_renderbuffer(ctx, name);
 }
 
 
@@ -1701,7 +1709,6 @@ _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	}
 	rb->InternalFormat = rb->_ActualFormat;
 
-	rb->AllocStorage = _mesa_soft_renderbuffer_storage;
 	_mesa_add_renderbuffer(fb, b, rb);
     }
 
@@ -1757,7 +1764,6 @@ _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	rb->_ActualFormat = COLOR_INDEX32;
 	rb->InternalFormat = rb->_ActualFormat;
 
-	rb->AllocStorage = _mesa_soft_renderbuffer_storage;
 	_mesa_add_renderbuffer(fb, b, rb);
     }
 
@@ -1795,7 +1801,6 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
     /* Wrap each of the RGB color buffers with an alpha renderbuffer.
      */
     for (b = BUFFER_FRONT_LEFT; b <= BUFFER_BACK_RIGHT; b++) {
-	struct gl_renderbuffer *arb;
 
 	if (b == BUFFER_FRONT_LEFT && !frontLeft)
 	    continue;
@@ -1813,34 +1818,21 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	assert(fb->Attachment[b].Renderbuffer->DataType == GL_UNSIGNED_BYTE);
 
 	/* allocate alpha renderbuffer */
-	arb = _mesa_new_renderbuffer(ctx, 0);
+	auto *arb = new AlphaRenderbuffer{};
 	if (!arb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating alpha buffer");
 	    return GL_FALSE;
 	}
+	_mesa_init_renderbuffer(arb, 0);
 
 	/* wrap the alpha renderbuffer around the RGB renderbuffer */
 	arb->Wrapped = fb->Attachment[b].Renderbuffer;
 
-	/* Set up my alphabuffer fields and plug in my functions.
-	 * The functions will put/get the alpha values from/to RGBA arrays
-	 * and then call the wrapped buffer's functions to handle the RGB
-	 * values.
-	 */
+	/* Set up the format fields. */
 	arb->InternalFormat = arb->Wrapped->InternalFormat;
 	arb->_ActualFormat  = GL_ALPHA8;
 	arb->_BaseFormat    = arb->Wrapped->_BaseFormat;
 	arb->DataType       = arb->Wrapped->DataType;
-	arb->AllocStorage   = alloc_storage_alpha8;
-	arb->Delete         = delete_renderbuffer_alpha8;
-	arb->GetPointer     = get_pointer_alpha8;
-	arb->GetRow         = get_row_alpha8;
-	arb->GetValues      = get_values_alpha8;
-	arb->PutRow         = put_row_alpha8;
-	arb->PutRowRGB      = put_row_rgb_alpha8;
-	arb->PutMonoRow     = put_mono_row_alpha8;
-	arb->PutValues      = put_values_alpha8;
-	arb->PutMonoValues  = put_mono_values_alpha8;
 
 	/* clear the pointer to avoid assertion/sanity check failure later */
 	fb->Attachment[b].Renderbuffer = nullptr;
@@ -1911,7 +1903,6 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     }
     rb->InternalFormat = rb->_ActualFormat;
 
-    rb->AllocStorage = _mesa_soft_renderbuffer_storage;
     _mesa_add_renderbuffer(fb, BUFFER_DEPTH, rb);
 
     return GL_TRUE;
@@ -1954,7 +1945,6 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     }
     rb->InternalFormat = rb->_ActualFormat;
 
-    rb->AllocStorage = _mesa_soft_renderbuffer_storage;
     _mesa_add_renderbuffer(fb, BUFFER_STENCIL, rb);
 
     return GL_TRUE;
@@ -1992,7 +1982,6 @@ _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 
     rb->_ActualFormat = GL_RGBA16;
     rb->InternalFormat = GL_RGBA16;
-    rb->AllocStorage = _mesa_soft_renderbuffer_storage;
     _mesa_add_renderbuffer(fb, BUFFER_ACCUM, rb);
 
     return GL_TRUE;
@@ -2041,7 +2030,6 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	}
 	rb->InternalFormat = rb->_ActualFormat;
 
-	rb->AllocStorage = _mesa_soft_renderbuffer_storage;
 	_mesa_add_renderbuffer(fb, BUFFER_AUX0 + i, rb);
     }
     return GL_TRUE;
@@ -2230,7 +2218,7 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
 
 	if (deleteFlag) {
 	    oldRb->Magic = 0; /* now invalid memory! */
-	    oldRb->Delete(oldRb);
+	    delete oldRb;
 	}
 
 	*ptr = nullptr;
@@ -2267,7 +2255,6 @@ _mesa_new_depthstencil_renderbuffer(GLcontext *ctx, GLuint name)
     /* init fields not covered by _mesa_new_renderbuffer() */
     dsrb->InternalFormat = GL_DEPTH24_STENCIL8_EXT;
     dsrb->_ActualFormat = GL_DEPTH24_STENCIL8_EXT;
-    dsrb->AllocStorage = _mesa_soft_renderbuffer_storage;
 
     return dsrb;
 }

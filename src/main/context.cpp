@@ -620,18 +620,14 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
 	 * is one, but we're removing from the hashtable now.  So clear refcount.
 	 */
 	fb->RefCount = 0;
-	/* NOTE: Delete should always be defined but there are two reports
-	 * of it being nullptr (bugs 13507, 14293).  Work-around for now.
-	 */
-	if (fb->Delete)
-	    fb->Delete(fb);
+		/* Delete the framebuffer. */
+	delete fb;
     });
     _mesa_DeleteHashTable(ss->FrameBuffers);
     _mesa_HashDeleteAll(ss->RenderBuffers, [](GLuint, void *data) {
 	auto *rb = static_cast<gl_renderbuffer *>(data);
 	rb->RefCount = 0;  /* see comment for FBOs above */
-	if (rb->Delete)
-	    rb->Delete(rb);
+	delete rb;
     });
     _mesa_DeleteHashTable(ss->RenderBuffers);
 #endif

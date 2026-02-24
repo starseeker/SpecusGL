@@ -867,8 +867,8 @@ fast_copy_pixels(GLcontext *ctx,
 
     for (row = 0; row < height; row++) {
 	GLuint temp[MAX_WIDTH][4];
-	srcRb->GetRow(ctx, srcRb, width, srcX, srcY, temp);
-	dstRb->PutRow(ctx, dstRb, width, dstX, dstY, temp, NULL);
+	srcRb->GetRow(ctx, width, srcX, srcY, temp);
+	dstRb->PutRow(ctx, width, dstX, dstY, temp, NULL);
 	srcY += yStep;
 	dstY += yStep;
     }
