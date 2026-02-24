@@ -48,6 +48,8 @@
 #include "context.h"
 #include "version.h"
 
+#include <cstdlib>
+
 
 #define MAXSTRING 4000  /* for vsnprintf() */
 
@@ -73,35 +75,13 @@
 void *
 _mesa_align_malloc(size_t bytes, unsigned long alignment)
 {
-#if defined(HAVE_POSIX_MEMALIGN)
-    void *mem;
-
-    (void) posix_memalign(& mem, alignment, bytes);
-    return mem;
-#elif defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
     return _aligned_malloc(bytes, alignment);
 #else
-    uintptr_t ptr, buf;
-
-    ASSERT(alignment > 0);
-
-    ptr = (uintptr_t) malloc(bytes + alignment + sizeof(void *));
-    if (!ptr)
-	return NULL;
-
-    buf = (ptr + alignment + sizeof(void *)) & ~(uintptr_t)(alignment - 1);
-    *(uintptr_t *)(buf - sizeof(void *)) = ptr;
-
-#ifdef DEBUG
-    /* mark the non-aligned area */
-    while (ptr < buf - sizeof(void *)) {
-	*(unsigned long *)ptr = 0xcdcdcdcd;
-	ptr += sizeof(unsigned long);
-    }
+    /* std::aligned_alloc requires size to be a multiple of alignment */
+    const size_t sz = (bytes + alignment - 1) & ~(size_t)(alignment - 1);
+    return std::aligned_alloc(alignment, sz);
 #endif
-
-    return (void *) buf;
-#endif /* defined(HAVE_POSIX_MEMALIGN) */
 }
 
 /**
@@ -111,16 +91,7 @@ _mesa_align_malloc(size_t bytes, unsigned long alignment)
 void *
 _mesa_align_calloc(size_t bytes, unsigned long alignment)
 {
-#if defined(HAVE_POSIX_MEMALIGN)
-    void *mem;
-
-    mem = _mesa_align_malloc(bytes, alignment);
-    if (mem != NULL) {
-	(void) memset(mem, 0, bytes);
-    }
-
-    return mem;
-#elif defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
     void *mem;
 
     mem = _aligned_malloc(bytes, alignment);
@@ -130,27 +101,14 @@ _mesa_align_calloc(size_t bytes, unsigned long alignment)
 
     return mem;
 #else
-    uintptr_t ptr, buf;
-
-    ASSERT(alignment > 0);
-
-    ptr = (uintptr_t) calloc(1,bytes + alignment + sizeof(void *));
-    if (!ptr)
-	return NULL;
-
-    buf = (ptr + alignment + sizeof(void *)) & ~(uintptr_t)(alignment - 1);
-    *(uintptr_t *)(buf - sizeof(void *)) = ptr;
-
-#ifdef DEBUG
-    /* mark the non-aligned area */
-    while (ptr < buf - sizeof(void *)) {
-	*(unsigned long *)ptr = 0xcdcdcdcd;
-	ptr += sizeof(unsigned long);
+    const size_t sz = (bytes + alignment - 1) & ~(size_t)(alignment - 1);
+    void *mem = std::aligned_alloc(alignment, sz);
+    if (mem != NULL) {
+	(void) memset(mem, 0, bytes);
     }
-#endif
 
-    return (void *)buf;
-#endif /* defined(HAVE_POSIX_MEMALIGN) */
+    return mem;
+#endif
 }
 
 /**
@@ -163,15 +121,11 @@ _mesa_align_calloc(size_t bytes, unsigned long alignment)
 void
 _mesa_align_free(void *ptr)
 {
-#if defined(HAVE_POSIX_MEMALIGN)
-    free(ptr);
-#elif defined(_WIN32) && defined(_MSC_VER)
+#if defined(_WIN32) && defined(_MSC_VER)
     _aligned_free(ptr);
 #else
-    void **cubbyHole = (void **)((char *) ptr - sizeof(void *));
-    void *realAddr = *cubbyHole;
-    free(realAddr);
-#endif /* defined(HAVE_POSIX_MEMALIGN) */
+    std::free(ptr);
+#endif
 }
 
 /**
@@ -806,7 +760,7 @@ _mesa_warning(GLcontext *ctx, const char *fmtString, ...)
 }
 
 /**
- * Report an internla implementation problem.
+ * Report an internal implementation problem.
  * Prints the message to stderr via fprintf().
  *
  * \param ctx GL context.
@@ -943,7 +897,7 @@ _mesa_exit(int status)
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:

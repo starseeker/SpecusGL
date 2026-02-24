@@ -32,6 +32,11 @@
 #define _M_MATRIX_H
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 /**
  * \name Symbolic names to some of the entries in the matrix
@@ -191,6 +196,10 @@ do {								\
 
 /*@}*/
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

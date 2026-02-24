@@ -36,6 +36,10 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if _HAVE_FULL_GL
 
 extern void _mesa_print_tri_caps(const char *name, GLuint flags);
@@ -55,6 +59,10 @@ extern void _mesa_init_debug(GLcontext *ctx);
 /** No-op */
 #define _mesa_init_debug( c ) ((void)0)
 
+#endif /* _HAVE_FULL_GL */
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

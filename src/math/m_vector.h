@@ -34,6 +34,10 @@
 #include "glheader.h"
 #include "mtypes.h"		/* hack for GLchan */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #define VEC_DIRTY_0        0x1
 #define VEC_DIRTY_1        0x2
@@ -91,6 +95,10 @@ extern void _mesa_vector4f_clean_elem(GLvector4f *vec, GLuint nr, GLuint elt);
 #define VEC_ELT( v, type, i ) \
        ( (type *)  ( ((GLbyte *) ((v)->data)) + (i) * (v)->stride) )
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
