@@ -26,9 +26,7 @@
 #ifndef OCCLUDE_H
 #define OCCLUDE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -73,9 +71,7 @@ _mesa_GetQueryObjectui64vEXT(GLuint id, GLenum pname, GLuint64EXT *params);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* OCCLUDE_H */
 

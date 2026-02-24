@@ -27,9 +27,7 @@
 #ifndef DRAWPIXELS_H
 #define DRAWPIXELS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -58,9 +56,7 @@ _mesa_Bitmap(GLsizei width, GLsizei height,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

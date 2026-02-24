@@ -26,9 +26,7 @@
 #ifndef DEPTHSTENCIL_H
 #define DEPTHSTENCIL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -59,9 +57,7 @@ _mesa_promote_stencil(GLcontext *ctx, struct gl_renderbuffer *stencilRb);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* DEPTHSTENCIL_H */
 

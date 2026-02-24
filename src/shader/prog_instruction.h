@@ -37,9 +37,7 @@
 #ifndef PROG_INSTRUCTION_H
 #define PROG_INSTRUCTION_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /**
@@ -445,9 +443,7 @@ extern const char *
 _mesa_opcode_string(gl_inst_opcode opcode);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROG_INSTRUCTION_H */
 

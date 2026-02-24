@@ -768,13 +768,13 @@ init_matrix_stack(struct gl_matrix_stack *stack,
     stack->Depth = 0;
     stack->MaxDepth = maxDepth;
     stack->DirtyFlag = dirtyFlag;
-    /* The stack */
-    stack->Stack = (GLmatrix *) calloc(1,maxDepth * sizeof(GLmatrix));
+    /* The stack: resize to maxDepth default-constructed GLmatrix entries */
+    stack->Stack.resize(maxDepth);
     for (i = 0; i < maxDepth; i++) {
 	_math_matrix_ctr(&stack->Stack[i]);
 	_math_matrix_alloc_inv(&stack->Stack[i]);
     }
-    stack->Top = stack->Stack;
+    stack->Top = &stack->Stack[0];
 }
 
 /**
@@ -783,7 +783,7 @@ init_matrix_stack(struct gl_matrix_stack *stack,
  * \param stack matrix stack.
  *
  * Calls _math_matrix_dtr() for each element of the matrix stack and
- * frees the array.
+ * clears the vector.
  */
 static void
 free_matrix_stack(struct gl_matrix_stack *stack)
@@ -792,8 +792,8 @@ free_matrix_stack(struct gl_matrix_stack *stack)
     for (i = 0; i < stack->MaxDepth; i++) {
 	_math_matrix_dtr(&stack->Stack[i]);
     }
-    free(stack->Stack);
-    stack->Stack = stack->Top = NULL;
+    stack->Stack.clear();
+    stack->Top = NULL;
 }
 
 /*@}*/

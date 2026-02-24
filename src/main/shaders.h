@@ -26,9 +26,7 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -239,9 +237,7 @@ _mesa_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SHADERS_H */
 

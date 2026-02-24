@@ -27,9 +27,7 @@
 #ifndef S_AATRIANGLE_H
 #define S_AATRIANGLE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -40,9 +38,7 @@ extern void
 _swrast_set_aa_triangle_function(GLcontext *ctx);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

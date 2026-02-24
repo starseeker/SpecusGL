@@ -36,9 +36,7 @@
 #ifndef FOG_H
 #define FOG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -69,9 +67,7 @@ extern void _mesa_init_fog(GLcontext * ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

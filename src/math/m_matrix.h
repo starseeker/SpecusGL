@@ -32,9 +32,7 @@
 #define _M_MATRIX_H
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -197,9 +195,7 @@ do {								\
 /*@}*/
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

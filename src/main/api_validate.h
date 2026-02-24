@@ -27,9 +27,7 @@
 #ifndef API_VALIDATE_H
 #define API_VALIDATE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -52,9 +50,7 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

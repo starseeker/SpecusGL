@@ -25,9 +25,7 @@
 #ifndef SLANG_UTILITY_H
 #define SLANG_UTILITY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /* Compile-time assertions.  If the expression is zero, try to declare an
@@ -99,9 +97,7 @@ slang_atom slang_atom_pool_atom(slang_atom_pool *, const char *);
 const char *slang_atom_pool_id(slang_atom_pool *, slang_atom);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

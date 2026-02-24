@@ -30,9 +30,7 @@
 #ifndef NVFRAGPARSE_H
 #define NVFRAGPARSE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 extern void
@@ -53,9 +51,7 @@ extern const char *
 _mesa_nv_fragment_output_register_name(GLuint i);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

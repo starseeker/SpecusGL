@@ -25,9 +25,7 @@
 #ifndef SLANG_COMPILE_VARIABLE_H
 #define SLANG_COMPILE_VARIABLE_H
 
-#if defined __cplusplus
-extern "C" {
-#endif
+
 
 
     typedef enum slang_type_qualifier_ {
@@ -121,9 +119,7 @@ extern "C" {
 			   GLboolean all);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_COMPILE_VARIABLE_H */
 

@@ -34,9 +34,7 @@
 #ifndef TEXFORMAT_H
 #define TEXFORMAT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -247,9 +245,7 @@ _mesa_choose_tex_format(GLcontext *ctx, GLint internalFormat,
 			GLenum format, GLenum type);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

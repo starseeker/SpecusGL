@@ -25,9 +25,7 @@
 #ifndef PROG_EXECUTE_H
 #define PROG_EXECUTE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 typedef void (*FetchTexelLodFunc)(GLcontext *ctx, const GLfloat texcoord[4],
@@ -80,9 +78,7 @@ _mesa_execute_program(GLcontext *ctx,
 		      struct gl_program_machine *machine);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROG_EXECUTE_H */
 

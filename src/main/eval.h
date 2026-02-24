@@ -36,9 +36,7 @@
 #ifndef EVAL_H
 #define EVAL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -131,9 +129,7 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

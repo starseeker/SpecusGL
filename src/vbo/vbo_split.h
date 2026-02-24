@@ -41,9 +41,7 @@
 #ifndef _VBO_SPLIT_H
 #define _VBO_SPLIT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "vbo.h"
 
@@ -73,9 +71,7 @@ void vbo_split_copy(GLcontext *ctx,
 		    vbo_draw_func draw,
 		    const struct split_limits *limits);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

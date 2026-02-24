@@ -31,9 +31,7 @@
 #endif
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 void grammar_alloc_free(void *);
 void *grammar_alloc_malloc(size_t);
@@ -95,9 +93,7 @@ int grammar_destroy(grammar id);
 */
 void grammar_get_last_error(byte *text, unsigned int size, int *pos);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

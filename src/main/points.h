@@ -31,9 +31,7 @@
 #ifndef POINTS_H
 #define POINTS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -60,9 +58,7 @@ _mesa_init_point(GLcontext * ctx);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

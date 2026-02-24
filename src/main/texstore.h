@@ -34,9 +34,7 @@
 #ifndef TEXSTORE_H
 #define TEXSTORE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -241,9 +239,7 @@ _mesa_unmap_teximage_pbo(GLcontext *ctx,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -32,9 +32,7 @@
 #ifndef BUFFERS_H
 #define BUFFERS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -86,9 +84,7 @@ _mesa_set_scissor(GLcontext *ctx,
 extern void _mesa_resizebuffers(GLcontext *ctx);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

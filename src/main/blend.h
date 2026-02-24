@@ -32,9 +32,7 @@
 #ifndef BLEND_H
 #define BLEND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -86,9 +84,7 @@ extern void
 _mesa_init_color(GLcontext * ctx);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

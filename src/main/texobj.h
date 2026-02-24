@@ -31,9 +31,7 @@
 #ifndef TEXTOBJ_H
 #define TEXTOBJ_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -109,9 +107,7 @@ _mesa_IsTexture(GLuint texture);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

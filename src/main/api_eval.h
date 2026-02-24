@@ -27,9 +27,7 @@
 #ifndef API_EVAL_H
 #define API_EVAL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -42,9 +40,7 @@ extern void _mesa_EvalCoord1fv(const GLfloat *u);
 extern void _mesa_EvalCoord2fv(const GLfloat *u);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

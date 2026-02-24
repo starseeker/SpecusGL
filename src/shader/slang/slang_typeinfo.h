@@ -25,9 +25,7 @@
 #ifndef SLANG_TYPEINFO_H
 #define SLANG_TYPEINFO_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "imports.h"
 #include "mtypes.h"
@@ -197,9 +195,7 @@ _slang_type_dim(slang_type_specifier_type);
 extern GLenum
 _slang_gltype_from_specifier(const slang_type_specifier *type);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -25,9 +25,7 @@
 #ifndef TEXCOMPRESS_H
 #define TEXCOMPRESS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -77,9 +75,7 @@ _mesa_init_texture_fxt1(GLcontext *ctx);
 #endif /* _HAVE_FULL_GL */
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* TEXCOMPRESS_H */
 

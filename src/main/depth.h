@@ -31,9 +31,7 @@
 #ifndef DEPTH_H
 #define DEPTH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -65,9 +63,7 @@ _mesa_init_depth(GLcontext * ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

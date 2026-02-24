@@ -41,9 +41,7 @@
 #include "glheader.h"
 #include "glcontext.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /**********************************************************************/
@@ -567,9 +565,7 @@ extern void
 _mesa_exit(int status);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 
 #endif /* IMPORTS_H */

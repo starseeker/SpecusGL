@@ -26,9 +26,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -236,9 +234,7 @@ _mesa_clip_to_region(GLint xmin, GLint ymin,
 		     GLsizei *width, GLsizei *height);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

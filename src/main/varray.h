@@ -36,9 +36,7 @@
 #ifndef VARRAY_H
 #define VARRAY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -163,9 +161,7 @@ _mesa_init_varray(GLcontext * ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

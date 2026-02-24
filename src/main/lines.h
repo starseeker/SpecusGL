@@ -32,9 +32,7 @@
 #ifndef LINES_H
 #define LINES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -51,9 +49,7 @@ extern void GLAPIENTRY
 _mesa_init_line(GLcontext * ctx);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

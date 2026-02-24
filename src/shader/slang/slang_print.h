@@ -3,9 +3,7 @@
 #ifndef SLANG_PRINT
 #define SLANG_PRINT
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 extern void
 slang_print_function(const slang_function *f, GLboolean body);
@@ -29,9 +27,7 @@ _slang_print_var_scope(const slang_variable_scope *s, int indent);
 extern int
 slang_checksum_tree(const slang_operation *op);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_PRINT */
 

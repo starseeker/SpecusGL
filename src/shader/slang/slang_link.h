@@ -25,9 +25,7 @@
 #ifndef SLANG_LINK_H
 #define SLANG_LINK_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "slang_compile.h"
 
@@ -45,9 +43,7 @@ _slang_remap_attribute(struct gl_program *prog, GLuint oldAttrib,
 		       GLuint newAttrib);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

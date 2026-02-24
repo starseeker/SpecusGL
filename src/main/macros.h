@@ -31,9 +31,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "imports.h"
@@ -663,9 +661,7 @@ do {                        \
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -37,9 +37,7 @@
 #ifndef ACCUM_H
 #define ACCUM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -65,9 +63,7 @@ _mesa_init_accum(GLcontext *ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

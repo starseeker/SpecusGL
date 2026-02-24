@@ -31,9 +31,7 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -131,9 +129,7 @@ _mesa_init_pixel(GLcontext * ctx);
 /*@}*/
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

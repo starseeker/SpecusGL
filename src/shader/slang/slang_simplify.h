@@ -2,9 +2,7 @@
 #ifndef SLANG_SIMPLIFY_H
 #define SLANG_SIMPLIFY_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 extern GLint
@@ -23,9 +21,7 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 		  slang_atom_pool * atoms, slang_info_log *log);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_SIMPLIFY_H */
 

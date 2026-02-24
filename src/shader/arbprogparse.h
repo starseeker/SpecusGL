@@ -26,9 +26,7 @@
 #ifndef ARBPROGPARSE_H
 #define ARBPROGPARSE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 
@@ -42,9 +40,7 @@ _mesa_parse_arb_fragment_program(GLcontext *ctx, GLenum target,
 				 const GLvoid *str, GLsizei len,
 				 struct gl_fragment_program *program);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

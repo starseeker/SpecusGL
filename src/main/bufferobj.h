@@ -27,9 +27,7 @@
 #ifndef BUFFEROBJ_H
 #define BUFFEROBJ_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -132,9 +130,7 @@ extern void GLAPIENTRY
 _mesa_GetBufferPointervARB(GLenum target, GLenum pname, GLvoid **params);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

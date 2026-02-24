@@ -26,9 +26,7 @@
 #ifndef S_BLEND_H
 #define S_BLEND_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -43,9 +41,7 @@ extern void
 _swrast_choose_blend_func(GLcontext *ctx, GLenum chanType);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

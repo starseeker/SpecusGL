@@ -25,9 +25,7 @@
 #ifndef SLANG_EMIT_H
 #define SLANG_EMIT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "imports.h"
@@ -50,9 +48,7 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vartable,
 		 slang_info_log *log);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_EMIT_H */
 

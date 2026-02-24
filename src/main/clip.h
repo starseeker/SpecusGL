@@ -31,9 +31,7 @@
 #ifndef CLIP_H
 #define CLIP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -52,9 +50,7 @@ _mesa_CullParameterdvEXT(GLenum cap, GLdouble *v);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

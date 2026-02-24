@@ -43,9 +43,7 @@
 #ifndef S_CONTEXT_H
 #define S_CONTEXT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -302,9 +300,7 @@ _swrast_update_texture_samplers(GLcontext *ctx);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

@@ -27,9 +27,7 @@
 #ifndef API_LOOPBACK_H
 #define API_LOOPBACK_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "glheader.h"
@@ -40,9 +38,7 @@ struct _glapi_table;
 extern void _mesa_loopback_init_api_table(struct _glapi_table *dest);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 
