@@ -37,6 +37,7 @@
 #include "texcompress.h"
 #include "texformat.h"
 #include "texstore.h"
+#include <vector>
 
 typedef void (*dxtFetchTexelFuncExt)(GLint srcRowstride, GLubyte *pixdata, GLint col, GLint row, GLvoid *texelOut);
 
@@ -71,7 +72,7 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
     const GLchan *pixels;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 4 / 8; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgb_dxt1);
     ASSERT(dstXoffset % 4 == 0);
@@ -85,16 +86,16 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGB/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
     } else {
 	pixels = (const GLchan *) srcAddr;
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
@@ -113,8 +114,6 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
 	_mesa_warning(ctx, "external dxt library not available");
     }
 
-    if (tempImage)
-	free((void *) tempImage);
 
     return GL_TRUE;
 }
@@ -129,7 +128,7 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
     const GLchan *pixels;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 4 / 8; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgba_dxt1);
     ASSERT(dstXoffset % 4 == 0);
@@ -143,16 +142,16 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGBA/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
     } else {
 	pixels = (const GLchan *) srcAddr;
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
@@ -170,8 +169,6 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
 	_mesa_warning(ctx, "external dxt library not available");
     }
 
-    if (tempImage)
-	free((void*) tempImage);
 
     return GL_TRUE;
 }
@@ -186,7 +183,7 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
     const GLchan *pixels;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 4 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgba_dxt3);
     ASSERT(dstXoffset % 4 == 0);
@@ -200,16 +197,16 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGBA/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
     } else {
 	pixels = (const GLchan *) srcAddr;
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
@@ -227,8 +224,6 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
 	_mesa_warning(ctx, "external dxt library not available");
     }
 
-    if (tempImage)
-	free((void *) tempImage);
 
     return GL_TRUE;
 }
@@ -243,7 +238,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
     const GLchan *pixels;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 4 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgba_dxt5);
     ASSERT(dstXoffset % 4 == 0);
@@ -257,16 +252,16 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGBA/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
     } else {
 	pixels = (const GLchan *) srcAddr;
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
@@ -284,8 +279,6 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
 	_mesa_warning(ctx, "external dxt library not available");
     }
 
-    if (tempImage)
-	free((void *) tempImage);
 
     return GL_TRUE;
 }

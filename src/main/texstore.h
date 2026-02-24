@@ -40,6 +40,8 @@
 
 #include "mtypes.h"
 
+#include <vector>
+
 
 extern GLboolean _mesa_texstore_rgba(TEXSTORE_PARAMS);
 extern GLboolean _mesa_texstore_color_index(TEXSTORE_PARAMS);
@@ -78,7 +80,7 @@ extern GLboolean _mesa_texstore_sla8(TEXSTORE_PARAMS);
 #endif
 
 
-extern GLchan *
+extern std::vector<GLchan>
 _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 			   GLenum logicalBaseFormat,
 			   GLenum textureBaseFormat,

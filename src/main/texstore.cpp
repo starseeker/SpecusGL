@@ -66,6 +66,8 @@
 #include "texstore.h"
 #include "enums.h"
 
+#include <vector>
+
 
 enum {
     ZERO = 4,
@@ -303,7 +305,7 @@ compute_component_mapping(GLenum inFormat, GLenum outFormat,
  * \param srcPacking  source image pixel packing
  * \return resulting image with format = textureBaseFormat and type = GLfloat.
  */
-static GLfloat *
+static std::vector<GLfloat>
 make_temp_float_image(GLcontext *ctx, GLuint dims,
 		      GLenum logicalBaseFormat,
 		      GLenum textureBaseFormat,
@@ -313,7 +315,6 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 		      const struct gl_pixelstore_attrib *srcPacking)
 {
     GLuint transferOps = ctx->_ImageTransferState;
-    GLfloat *tempImage;
 
     ASSERT(dims >= 1 && dims <= 3);
 
@@ -337,6 +338,8 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 
     /* conventional color image */
 
+    std::vector<GLfloat> tempVec;
+
     if ((dims == 1 && ctx->Pixel.Convolution1DEnabled) ||
 	(dims >= 2 && ctx->Pixel.Convolution2DEnabled) ||
 	(dims >= 2 && ctx->Pixel.Separable2DEnabled)) {
@@ -349,21 +352,14 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	GLint row = 0;
 	GLint convWidth = 0;
 	GLint convHeight = 0;
-	GLfloat *convImage;
 
 	/* pre-convolution image buffer (3D) */
-	tempImage = (GLfloat *) malloc(srcWidth * srcHeight * srcDepth
-					     * 4 * sizeof(GLfloat));
-	if (!tempImage)
-	    return NULL;
+	tempVec.resize(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * 4);
+	GLfloat *tempImage = tempVec.data();
 
 	/* post-convolution image buffer (2D) */
-	convImage = (GLfloat *) malloc(srcWidth * srcHeight
-					     * 4 * sizeof(GLfloat));
-	if (!convImage) {
-	    free(tempImage);
-	    return NULL;
-	}
+	std::vector<GLfloat> convVec(static_cast<size_t>(srcWidth) * srcHeight * 4);
+	GLfloat *convImage = convVec.data();
 
 	/* loop over 3D image slices */
 	for (img = 0; img < srcDepth; img++) {
@@ -419,7 +415,7 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	    }
 	} /* loop over 3D image slices */
 
-	free(convImage);
+	/* convVec destroyed here; convImage no longer needed */
 
 	/* might need these below */
 	srcWidth = convWidth;
@@ -429,15 +425,11 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	const GLint components = _mesa_components_in_format(logicalBaseFormat);
 	const GLint srcStride = _mesa_image_row_stride(srcPacking,
 				srcWidth, srcFormat, srcType);
-	GLfloat *dst;
 	GLint img, row;
 
-	tempImage = (GLfloat *) malloc(srcWidth * srcHeight * srcDepth
-					     * components * sizeof(GLfloat));
-	if (!tempImage)
-	    return NULL;
+	tempVec.resize(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * components);
+	GLfloat *dst = tempVec.data();
 
-	dst = tempImage;
 	for (img = 0; img < srcDepth; img++) {
 	    const GLubyte *src
 		= (const GLubyte *) _mesa_image_address(dims, srcPacking, srcAddr,
@@ -458,7 +450,6 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	/* more work */
 	GLint texComponents = _mesa_components_in_format(textureBaseFormat);
 	GLint logComponents = _mesa_components_in_format(logicalBaseFormat);
-	GLfloat *newImage;
 	GLint i, n;
 	GLubyte map[6];
 
@@ -471,12 +462,8 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	 */
 	ASSERT(texComponents >= logComponents);
 
-	newImage = (GLfloat *) malloc(srcWidth * srcHeight * srcDepth
-					    * texComponents * sizeof(GLfloat));
-	if (!newImage) {
-	    free(tempImage);
-	    return NULL;
-	}
+	std::vector<GLfloat> newVec(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * texComponents);
+	const GLfloat *tempImage = tempVec.data();
 
 	compute_component_mapping(logicalBaseFormat, textureBaseFormat, map);
 
@@ -486,19 +473,18 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	    for (k = 0; k < texComponents; k++) {
 		GLint j = map[k];
 		if (j == ZERO)
-		    newImage[i * texComponents + k] = 0.0F;
+		    newVec[i * texComponents + k] = 0.0F;
 		else if (j == ONE)
-		    newImage[i * texComponents + k] = 1.0F;
+		    newVec[i * texComponents + k] = 1.0F;
 		else
-		    newImage[i * texComponents + k] = tempImage[i * logComponents + j];
+		    newVec[i * texComponents + k] = tempImage[i * logComponents + j];
 	    }
 	}
 
-	free(tempImage);
-	tempImage = newImage;
+	return newVec;
     }
 
-    return tempImage;
+    return tempVec;
 }
 
 
@@ -525,7 +511,7 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
  * \param srcPacking  source image pixel packing
  * \return resulting image with format = textureBaseFormat and type = GLchan.
  */
-GLchan *
+std::vector<GLchan>
 _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 			   GLenum logicalBaseFormat,
 			   GLenum textureBaseFormat,
@@ -536,10 +522,7 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 {
     GLuint transferOps = ctx->_ImageTransferState;
     const GLint components = _mesa_components_in_format(logicalBaseFormat);
-    GLboolean freeSrcImage = GL_FALSE;
     GLint img, row;
-    GLchan *tempImage, *dst;
-    GLfloat *convImage = NULL;
 
     ASSERT(dims >= 1 && dims <= 3);
 
@@ -557,42 +540,38 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 	   textureBaseFormat == GL_ALPHA ||
 	   textureBaseFormat == GL_INTENSITY);
 
+    /* If convolution is needed, produce a float image first then use it as
+     * the source for the GLchan unpack below. */
+    std::vector<GLfloat> convVec;
     if ((dims == 1 && ctx->Pixel.Convolution1DEnabled) ||
 	(dims >= 2 && ctx->Pixel.Convolution2DEnabled) ||
 	(dims >= 2 && ctx->Pixel.Separable2DEnabled)) {
 	/* get convolved image */
-	convImage = make_temp_float_image(ctx, dims,
+	convVec = make_temp_float_image(ctx, dims,
 			     logicalBaseFormat,
 			     logicalBaseFormat,
 			     srcWidth, srcHeight, srcDepth,
 			     srcFormat, srcType,
 			     srcAddr, srcPacking);
-	if (!convImage)
-	    return NULL;
+	if (convVec.empty())
+	    return {};
 	/* the convolved image is our new source image */
-	srcAddr = convImage;
+	srcAddr = convVec.data();
 	srcFormat = logicalBaseFormat;
 	srcType = GL_FLOAT;
 	srcPacking = &ctx->DefaultPacking;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	transferOps = 0;
-	freeSrcImage = GL_TRUE;
     }
 
     /* unpack and transfer the source image */
-    tempImage = (GLchan *) calloc(srcWidth * srcHeight * srcDepth
-					* components, sizeof(GLchan));
-    if (!tempImage) {
-	if (convImage)
-	    free(convImage);
-	return NULL;
-    }
+    std::vector<GLchan> tempVec(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * components);
+    GLchan *dst = tempVec.data();
 
-    dst = tempImage;
     for (img = 0; img < srcDepth; img++) {
 	const GLint srcStride = _mesa_image_row_stride(srcPacking,
-				srcWidth, srcFormat,
-				srcType);
+			    srcWidth, srcFormat,
+			    srcType);
 	const GLubyte *src
 	    = (const GLubyte *) _mesa_image_address(dims, srcPacking, srcAddr,
 		    srcWidth, srcHeight,
@@ -607,16 +586,12 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 	}
     }
 
-    /* If we made a temporary image for convolution, free it here */
-    if (freeSrcImage) {
-	free((void *) srcAddr);
-    }
+    /* convVec (if any) is automatically freed here when it goes out of scope */
 
     if (logicalBaseFormat != textureBaseFormat) {
 	/* one more conversion step */
 	GLint texComponents = _mesa_components_in_format(textureBaseFormat);
 	GLint logComponents = _mesa_components_in_format(logicalBaseFormat);
-	GLchan *newImage;
 	GLint i, n;
 	GLubyte map[6];
 
@@ -629,12 +604,8 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 	 */
 	ASSERT(texComponents >= logComponents);
 
-	newImage = (GLchan *) calloc(srcWidth * srcHeight * srcDepth
-					   * texComponents, sizeof(GLchan));
-	if (!newImage) {
-	    free(tempImage);
-	    return NULL;
-	}
+	std::vector<GLchan> newVec(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * texComponents);
+	const GLchan *tempImage = tempVec.data();
 
 	compute_component_mapping(logicalBaseFormat, textureBaseFormat, map);
 
@@ -644,19 +615,18 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 	    for (k = 0; k < texComponents; k++) {
 		GLint j = map[k];
 		if (j == ZERO)
-		    newImage[i * texComponents + k] = 0;
+		    newVec[i * texComponents + k] = 0;
 		else if (j == ONE)
-		    newImage[i * texComponents + k] = CHAN_MAX;
+		    newVec[i * texComponents + k] = CHAN_MAX;
 		else
-		    newImage[i * texComponents + k] = tempImage[i * logComponents + j];
+		    newVec[i * texComponents + k] = tempImage[i * logComponents + j];
 	    }
 	}
 
-	free(tempImage);
-	tempImage = newImage;
+	return newVec;
     }
 
-    return tempImage;
+    return tempVec;
 }
 
 
@@ -1103,17 +1073,17 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
+	if (tempVec.empty())
+	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
 	GLint bytesPerRow;
 	GLint img, row;
-	if (!tempImage)
-	    return GL_FALSE;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	bytesPerRow = srcWidth * components * sizeof(GLchan);
 	for (img = 0; img < srcDepth; img++) {
@@ -1128,7 +1098,6 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 	    }
 	}
 
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1285,16 +1254,16 @@ _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 	}
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1322,7 +1291,6 @@ _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1405,16 +1373,16 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1443,7 +1411,6 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1616,16 +1583,16 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1654,7 +1621,6 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1731,16 +1697,16 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = (const GLchan *) tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1775,7 +1741,6 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1852,16 +1817,16 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = (const GLchan *) tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1878,7 +1843,6 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1906,16 +1870,16 @@ _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 		       srcAddr, srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -1944,7 +1908,6 @@ _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -1973,16 +1936,16 @@ _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 		       srcAddr, srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src =tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -2011,7 +1974,6 @@ _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -2072,16 +2034,16 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -2108,7 +2070,6 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -2133,16 +2094,16 @@ _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 		       srcAddr, srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -2159,7 +2120,6 @@ _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 		dstRow += dstRowStride;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -2216,16 +2176,16 @@ _mesa_texstore_a8(TEXSTORE_PARAMS)
 				  srcPacking);
     } else {
 	/* general path */
-	const GLchan *tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	const auto tempVec = _mesa_make_temp_chan_image(ctx, dims,
 				  baseInternalFormat,
 				  dstFormat->BaseFormat,
 				  srcWidth, srcHeight, srcDepth,
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
-	const GLchan *src = tempImage;
-	GLint img, row, col;
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE;
+	const GLchan *src = tempVec.data();
+	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -2240,7 +2200,6 @@ _mesa_texstore_a8(TEXSTORE_PARAMS)
 		src += srcWidth;
 	    }
 	}
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -2448,17 +2407,15 @@ _mesa_texstore_rgba_float32(TEXSTORE_PARAMS)
 		       srcAddr, srcPacking);
     } else {
 	/* general path */
-	const GLfloat *tempImage = make_temp_float_image(ctx, dims,
+	const auto tempVec = make_temp_float_image(ctx, dims,
 				   baseInternalFormat,
 				   dstFormat->BaseFormat,
 				   srcWidth, srcHeight, srcDepth,
 				   srcFormat, srcType, srcAddr,
 				   srcPacking);
-	const GLfloat *srcRow = tempImage;
+	const GLfloat *srcRow = tempVec.data();
 	GLint bytesPerRow;
 	GLint img, row;
-	if (!tempImage)
-	    return GL_FALSE;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	bytesPerRow = srcWidth * components * sizeof(GLfloat);
 	for (img = 0; img < srcDepth; img++) {
@@ -2473,7 +2430,6 @@ _mesa_texstore_rgba_float32(TEXSTORE_PARAMS)
 	    }
 	}
 
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }
@@ -2514,16 +2470,14 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 		       srcAddr, srcPacking);
     } else {
 	/* general path */
-	const GLfloat *tempImage = make_temp_float_image(ctx, dims,
+	const auto tempVec = make_temp_float_image(ctx, dims,
 				   baseInternalFormat,
 				   dstFormat->BaseFormat,
 				   srcWidth, srcHeight, srcDepth,
 				   srcFormat, srcType, srcAddr,
 				   srcPacking);
-	const GLfloat *src = tempImage;
+	const GLfloat *src = tempVec.data();
 	GLint img, row;
-	if (!tempImage)
-	    return GL_FALSE;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	for (img = 0; img < srcDepth; img++) {
 	    GLubyte *dstRow = (GLubyte *) dstAddr
@@ -2541,7 +2495,6 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 	    }
 	}
 
-	free((void *) tempImage);
     }
     return GL_TRUE;
 }

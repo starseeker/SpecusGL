@@ -39,6 +39,7 @@
 #include "texcompress.h"
 #include "texformat.h"
 #include "texstore.h"
+#include <vector>
 
 
 static void
@@ -71,7 +72,7 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
     GLint srcRowStride;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgb_fxt1);
     ASSERT(dstXoffset % 8 == 0);
@@ -85,16 +86,16 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGB/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
 	srcRowStride = 3 * srcWidth;
     } else {
 	pixels = (const GLchan *) srcAddr;
@@ -109,8 +110,6 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
     fxt1_encode(srcWidth, srcHeight, 3, pixels, srcRowStride,
 		dst, dstRowStride);
 
-    if (tempImage)
-	free((void*) tempImage);
 
     return GL_TRUE;
 }
@@ -126,7 +125,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
     GLint srcRowStride;
     GLubyte *dst;
     GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgba_fxt1);
     ASSERT(dstXoffset % 8 == 0);
@@ -140,16 +139,16 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGBA/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
 	srcRowStride = 4 * srcWidth;
     } else {
 	pixels = (const GLchan *) srcAddr;
@@ -164,8 +163,6 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
     fxt1_encode(srcWidth, srcHeight, 4, pixels, srcRowStride,
 		dst, dstRowStride);
 
-    if (tempImage)
-	free((void*) tempImage);
 
     return GL_TRUE;
 }
