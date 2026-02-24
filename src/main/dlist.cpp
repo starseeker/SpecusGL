@@ -2350,8 +2350,10 @@ save_Map2d(GLenum target,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP2, 10);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points2d(target, ustride, uorder,
-						vstride, vorder, points);
+	auto ptsVec = _mesa_copy_map_points2d(target, ustride, uorder,
+					      vstride, vorder, points);
+	auto *pnts = new GLfloat[ptsVec.size()];
+	std::copy(ptsVec.begin(), ptsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = (GLfloat) u1;
 	n[3].f = (GLfloat) u2;
@@ -2362,7 +2364,7 @@ save_Map2d(GLenum target,
 	n[7].i = _mesa_evaluator_components(target);      /*vstride */
 	n[8].i = uorder;
 	n[9].i = vorder;
-	n[10].data = (void *) pnts;
+	n[10].data = pnts;
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map2d(ctx->Exec, (target,
@@ -2383,8 +2385,10 @@ save_Map2f(GLenum target,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP2, 10);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points2f(target, ustride, uorder,
-						vstride, vorder, points);
+	auto ptsVec = _mesa_copy_map_points2f(target, ustride, uorder,
+					      vstride, vorder, points);
+	auto *pnts = new GLfloat[ptsVec.size()];
+	std::copy(ptsVec.begin(), ptsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = u1;
 	n[3].f = u2;
@@ -2395,7 +2399,7 @@ save_Map2f(GLenum target,
 	n[7].i = _mesa_evaluator_components(target);      /*vstride */
 	n[8].i = uorder;
 	n[9].i = vorder;
-	n[10].data = (void *) pnts;
+	n[10].data = pnts;
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map2f(ctx->Exec, (target, u1, u2, ustride, uorder,

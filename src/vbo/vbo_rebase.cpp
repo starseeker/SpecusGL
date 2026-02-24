@@ -59,7 +59,7 @@ static void *rebase_##TYPE( const void *ptr,			\
 			  TYPE min_index )			\
 {								\
    const TYPE *in = (TYPE *)ptr;				\
-   TYPE *tmp_indices = static_cast<TYPE*>(malloc(count * sizeof(TYPE)));	\
+   TYPE *tmp_indices = new TYPE[count];	\
    GLuint i;							\
 								\
    for (i = 0; i < count; i++)  				\
@@ -198,8 +198,7 @@ void vbo_rebase_prims(GLcontext *ctx,
 	 0,
 	 max_index - min_index);
 
-    if (tmp_indices)
-	free(tmp_indices);
+    delete[] static_cast<GLubyte*>(tmp_indices);
 
     if (tmp_prims)
 	delete[] tmp_prims;
