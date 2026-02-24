@@ -49,7 +49,7 @@ set(osmesa_srcs
   main/framebuffer.c
   main/get.c
   main/getstring.c
-  main/hash.c
+  main/hash.cpp
   main/hint.c
   main/histogram.c
   main/image.c
@@ -188,6 +188,7 @@ set(osmesa_srcs
   )
 
 add_library(osmesa SHARED ${osmesa_srcs})
+target_compile_features(osmesa PRIVATE cxx_std_17)
 target_link_libraries(osmesa ${M_LIBRARY})
 install(TARGETS osmesa
   RUNTIME DESTINATION ${BIN_DIR}
