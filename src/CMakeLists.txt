@@ -80,9 +80,9 @@ set(osmesa_srcs
   main/texstore.c
   main/varray.c
   main/vtxfmt.c
-  math/m_debug_clip.c
-  math/m_debug_norm.c
-  math/m_debug_xform.c
+  math/m_debug_clip.cpp
+  math/m_debug_norm.cpp
+  math/m_debug_xform.cpp
   math/m_eval.cpp
   math/m_matrix.cpp
   math/m_translate.cpp
