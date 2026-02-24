@@ -70,6 +70,11 @@ struct state_key {
     } unit[8];
 };
 
+/* The unordered_map cache uses state_key bytes as a std::string key; ensure
+ * the type is trivially copyable so that is safe. */
+static_assert(std::is_trivially_copyable<state_key>::value,
+	      "state_key must be trivially copyable for binary map key");
+
 #define FOG_LINEAR  0
 #define FOG_EXP     1
 #define FOG_EXP2    2
@@ -1170,115 +1175,6 @@ create_new_program(GLcontext *ctx, struct state_key *key,
 }
 
 
-static struct gl_fragment_program *
-search_cache(const struct texenvprog_cache *cache,
-	     GLuint hash,
-	     const void *key,
-	     GLuint keysize)
-{
-    struct texenvprog_cache_item *c;
-
-    for (c = cache->items[hash % cache->size]; c; c = c->next) {
-	if (c->hash == hash && memcmp(c->key, key, keysize) == 0)
-	    return (struct gl_fragment_program *) c->data;
-    }
-
-    return NULL;
-}
-
-static void rehash(struct texenvprog_cache *cache)
-{
-    struct texenvprog_cache_item **items;
-    struct texenvprog_cache_item *c, *next;
-    GLuint size, i;
-
-    size = cache->size * 3;
-    items = (struct texenvprog_cache_item**) malloc(size * sizeof(*items));
-    memset(items, 0, size * sizeof(*items));
-
-    for (i = 0; i < cache->size; i++)
-	for (c = cache->items[i]; c; c = next) {
-	    next = c->next;
-	    c->next = items[c->hash % size];
-	    items[c->hash % size] = c;
-	}
-
-    free(cache->items);
-    cache->items = items;
-    cache->size = size;
-}
-
-static void clear_cache(struct texenvprog_cache *cache)
-{
-    struct texenvprog_cache_item *c, *next;
-    GLuint i;
-
-    for (i = 0; i < cache->size; i++) {
-	for (c = cache->items[i]; c; c = next) {
-	    next = c->next;
-	    free(c->key);
-	    cache->ctx->Driver.DeleteProgram(cache->ctx,
-					     (struct gl_program *) c->data);
-	    free(c);
-	}
-	cache->items[i] = NULL;
-    }
-
-
-    cache->n_items = 0;
-}
-
-
-static void cache_item(struct texenvprog_cache *cache,
-		       GLuint hash,
-		       const struct state_key *key,
-		       void *data)
-{
-    struct texenvprog_cache_item *c = (struct texenvprog_cache_item *) malloc(sizeof(*c));
-    c->hash = hash;
-
-    c->key = malloc(sizeof(*key));
-    memcpy(c->key, key, sizeof(*key));
-
-    c->data = (struct gl_fragment_program *) data;
-
-    if (cache->n_items > cache->size * 1.5) {
-	if (cache->size < 1000)
-	    rehash(cache);
-	else
-	    clear_cache(cache);
-    }
-
-    cache->n_items++;
-    // I think this is a false positive from clang?  % triggers a
-    // core.UndefinedBinaryOperatorResult with clang 12
-#ifndef __clang_analyzer__
-    size_t hmod = hash % cache->size;
-    c->next = cache->items[hmod];
-    cache->items[hmod] = c;
-#else
-    // Be quiet clang_analyzer...
-    free(c);
-#endif
-}
-
-static GLuint hash_key(const struct state_key *key)
-{
-    GLuint *ikey = (GLuint *)key;
-    GLuint hash = 0, i;
-
-    /* Make a slightly better attempt at a hash function:
-     */
-    for (i = 0; i < sizeof(*key)/sizeof(*ikey); i++) {
-	hash += ikey[i];
-	hash += (hash << 10);
-	hash ^= (hash >> 6);
-    }
-
-    return hash;
-}
-
-
 /**
  * If _MaintainTexEnvProgram is set we'll generate a fragment program that
  * implements the current texture env/combine mode.
@@ -1287,8 +1183,6 @@ static GLuint hash_key(const struct state_key *key)
 void
 _mesa_UpdateTexEnvProgram(GLcontext *ctx)
 {
-    struct state_key key;
-    GLuint hash;
     const struct gl_fragment_program *prev = ctx->FragmentProgram._Current;
 
     ASSERT(ctx->FragmentProgram._MaintainTexEnvProgram);
@@ -1296,30 +1190,33 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
     /* If a conventional fragment program/shader isn't in effect... */
     if (!ctx->FragmentProgram._Enabled &&
 	(!ctx->Shader.CurrentProgram || !ctx->Shader.CurrentProgram->FragmentProgram)) {
+	struct state_key key;
 	make_state_key(ctx, &key);
-	hash = hash_key(&key);
 
-	ctx->FragmentProgram._Current =
-	    ctx->FragmentProgram._TexEnvProgram =
-		search_cache(&ctx->Texture.env_fp_cache, hash, &key, sizeof(key));
+	/* Use the raw bytes of state_key as the map key */
+	std::string map_key(reinterpret_cast<const char *>(&key), sizeof(key));
 
-	if (!ctx->FragmentProgram._TexEnvProgram) {
+	auto &cache = ctx->Texture.env_fp_cache;
+	auto it = cache.map.find(map_key);
+	if (it != cache.map.end()) {
 	    if (0)
-		_mesa_printf("Building new texenv proggy for key %x\n", hash);
-
-	    /* create new tex env program */
+		_mesa_printf("Found existing texenv program\n");
 	    ctx->FragmentProgram._Current =
-		ctx->FragmentProgram._TexEnvProgram =
-		    (struct gl_fragment_program *)
-		    ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
-
-	    create_new_program(ctx, &key, ctx->FragmentProgram._TexEnvProgram);
-
-	    cache_item(&ctx->Texture.env_fp_cache, hash, &key,
-		       ctx->FragmentProgram._TexEnvProgram);
+		ctx->FragmentProgram._TexEnvProgram = it->second;
 	} else {
 	    if (0)
-		_mesa_printf("Found existing texenv program for key %x\n", hash);
+		_mesa_printf("Building new texenv proggy\n");
+
+	    /* create new tex env program */
+	    struct gl_fragment_program *prog =
+		(struct gl_fragment_program *)
+		ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
+
+	    create_new_program(ctx, &key, prog);
+	    cache.map.emplace(map_key, prog);
+
+	    ctx->FragmentProgram._Current =
+		ctx->FragmentProgram._TexEnvProgram = prog;
 	}
     } else {
 	/* _Current pointer has been updated in update_program */
@@ -1339,18 +1236,15 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
 void _mesa_TexEnvProgramCacheInit(GLcontext *ctx)
 {
     ctx->Texture.env_fp_cache.ctx = ctx;
-    ctx->Texture.env_fp_cache.size = 17;
-    ctx->Texture.env_fp_cache.n_items = 0;
-    ctx->Texture.env_fp_cache.items = (struct texenvprog_cache_item **)
-				      calloc(1,ctx->Texture.env_fp_cache.size *
-					      sizeof(struct texenvprog_cache_item *));
 }
 
 
 void _mesa_TexEnvProgramCacheDestroy(GLcontext *ctx)
 {
-    clear_cache(&ctx->Texture.env_fp_cache);
-    free(ctx->Texture.env_fp_cache.items);
+    auto &cache = ctx->Texture.env_fp_cache;
+    for (auto &entry : cache.map)
+	ctx->Driver.DeleteProgram(ctx, (struct gl_program *) entry.second);
+    cache.map.clear();
 }
 
 /*

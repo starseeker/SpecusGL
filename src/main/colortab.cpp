@@ -215,7 +215,7 @@ store_colortable_entries(GLcontext *ctx, struct gl_color_table *table,
 				      IMAGE_CLAMP_BIT); /* transfer ops */
 
 	/* the destination */
-	tableF = table->TableF;
+	tableF = table->TableF.data();
 
 	/* Apply scale & bias & clamp now */
 	switch (table->_BaseFormat) {
@@ -270,8 +270,8 @@ store_colortable_entries(GLcontext *ctx, struct gl_color_table *table,
     /* update the ubyte table */
     {
 	const GLint comps = _mesa_components_in_format(table->_BaseFormat);
-	const GLfloat *tableF = table->TableF + start * comps;
-	GLubyte *tableUB = table->TableUB + start * comps;
+	const GLfloat *tableF = table->TableF.data() + start * comps;
+	GLubyte *tableUB = table->TableUB.data() + start * comps;
 	GLint i;
 	for (i = 0; i < count * comps; i++) {
 	    CLAMPED_FLOAT_TO_UBYTE(tableUB[i], tableF[i]);
@@ -448,10 +448,10 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	_mesa_free_colortable_data(table);
 
 	if (width > 0) {
-	    table->TableF = new GLfloat[comps * width];
-	    table->TableUB = new GLubyte[comps * width];
+	    table->TableF.assign(comps * width, 0.0f);
+	    table->TableUB.assign(comps * width, 0);
 
-	    if (!table->TableF || !table->TableUB) {
+	    if (table->TableF.empty() || table->TableUB.empty()) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glColorTable");
 		return;
 	    }
@@ -570,7 +570,7 @@ _mesa_ColorSubTable(GLenum target, GLsizei start,
 	return;
     }
 
-    if (!table->TableF || !table->TableUB) {
+    if (table->TableF.empty() || table->TableUB.empty()) {
 	/* a GL_OUT_OF_MEMORY error would have been recorded previously */
 	return;
     }
@@ -732,7 +732,7 @@ _mesa_GetColorTable(GLenum target, GLenum format,
 	}
 	break;
 	case GL_RGBA:
-	    memcpy(rgba, table->TableF, 4 * table->Size * sizeof(GLfloat));
+	    memcpy(rgba, table->TableF.data(), 4 * table->Size * sizeof(GLfloat));
 	    break;
 	default:
 	    _mesa_problem(ctx, "bad table format in glGetColorTable");
@@ -1182,8 +1182,8 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 void
 _mesa_init_colortable(struct gl_color_table *p)
 {
-    p->TableF = NULL;
-    p->TableUB = NULL;
+    p->TableF.clear();
+    p->TableUB.clear();
     p->Size = 0;
     p->InternalFormat = GL_RGBA;
 }
@@ -1193,14 +1193,8 @@ _mesa_init_colortable(struct gl_color_table *p)
 void
 _mesa_free_colortable_data(struct gl_color_table *p)
 {
-    if (p->TableF) {
-	delete[] p->TableF;
-	p->TableF = NULL;
-    }
-    if (p->TableUB) {
-	delete[] p->TableUB;
-	p->TableUB = NULL;
-    }
+    p->TableF.clear();
+    p->TableUB.clear();
 }
 
 

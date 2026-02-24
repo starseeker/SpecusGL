@@ -768,12 +768,10 @@ init_matrix_stack(struct gl_matrix_stack *stack,
     stack->Depth = 0;
     stack->MaxDepth = maxDepth;
     stack->DirtyFlag = dirtyFlag;
-    /* The stack: resize to maxDepth default-constructed GLmatrix entries */
+    /* GLmatrix constructor handles m/inv initialisation; just alloc inv */
     stack->Stack.resize(maxDepth);
-    for (i = 0; i < maxDepth; i++) {
-	_math_matrix_ctr(&stack->Stack[i]);
+    for (i = 0; i < maxDepth; i++)
 	_math_matrix_alloc_inv(&stack->Stack[i]);
-    }
     stack->Top = &stack->Stack[0];
 }
 
@@ -782,16 +780,12 @@ init_matrix_stack(struct gl_matrix_stack *stack,
  *
  * \param stack matrix stack.
  *
- * Calls _math_matrix_dtr() for each element of the matrix stack and
- * clears the vector.
+ * The GLmatrix destructor releases each element's aligned allocations;
+ * clearing the vector is sufficient.
  */
 static void
 free_matrix_stack(struct gl_matrix_stack *stack)
 {
-    GLuint i;
-    for (i = 0; i < stack->MaxDepth; i++) {
-	_math_matrix_dtr(&stack->Stack[i]);
-    }
     stack->Stack.clear();
     stack->Top = NULL;
 }
@@ -831,8 +825,7 @@ void _mesa_init_matrix(GLcontext * ctx)
 			  MAX_PROGRAM_MATRIX_STACK_DEPTH, _NEW_TRACK_MATRIX);
     ctx->CurrentStack = &ctx->ModelviewMatrixStack;
 
-    /* Init combined Modelview*Projection matrix */
-    _math_matrix_ctr(&ctx->_ModelProjectMatrix);
+    /* _ModelProjectMatrix is default-constructed by GLmatrix() */
 }
 
 
@@ -855,9 +848,7 @@ void _mesa_free_matrix_data(GLcontext *ctx)
 	free_matrix_stack(&ctx->TextureMatrixStack[i]);
     for (i = 0; i < MAX_PROGRAM_MATRICES; i++)
 	free_matrix_stack(&ctx->ProgramMatrixStack[i]);
-    /* combined Modelview*Projection matrix */
-    _math_matrix_dtr(&ctx->_ModelProjectMatrix);
-
+    /* combined Modelview*Projection matrix freed by GLmatrix destructor */
 }
 
 
@@ -905,8 +896,7 @@ void _mesa_init_viewport(GLcontext *ctx)
     ctx->Viewport.Height = 0;
     ctx->Viewport.Near = 0.0;
     ctx->Viewport.Far = 1.0;
-    _math_matrix_ctr(&ctx->Viewport._WindowMap);
-
+    /* _WindowMap is default-constructed by GLmatrix() */
     _math_matrix_viewport(&ctx->Viewport._WindowMap, 0, 0, 0, 0,
 			  0.0F, 1.0F, depthMax);
 }
@@ -921,7 +911,8 @@ void _mesa_init_viewport(GLcontext *ctx)
  */
 void _mesa_free_viewport_data(GLcontext *ctx)
 {
-    _math_matrix_dtr(&ctx->Viewport._WindowMap);
+    /* _WindowMap is freed by GLmatrix destructor */
+    (void) ctx;
 }
 
 /*@}*/

@@ -68,23 +68,19 @@ enum GLmatrixtype {
 /**
  * Matrix type to represent 4x4 transformation matrices.
  */
-typedef struct {
+struct GLmatrix {
     GLfloat *m;		/**< 16 matrix elements (16-byte aligned) */
     GLfloat *inv;	/**< optional 16-element inverse (16-byte aligned) */
     GLuint flags;        /**< possible values determined by (of \link
                          * MatFlags MAT_FLAG_* flags\endlink)
                          */
     enum GLmatrixtype type;
-} GLmatrix;
 
+    GLmatrix();   /**< Initialises m to identity, inv to NULL. */
+    ~GLmatrix();  /**< Releases aligned m and inv allocations. */
+};
 
-
-
-extern void
-_math_matrix_ctr(GLmatrix *m);
-
-extern void
-_math_matrix_dtr(GLmatrix *m);
+static_assert(sizeof(GLfloat) == 4, "GLfloat must be 32-bit for 16-byte aligned matrix arrays");
 
 extern void
 _math_matrix_alloc_inv(GLmatrix *m);

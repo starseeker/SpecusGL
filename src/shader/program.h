@@ -76,13 +76,13 @@ _mesa_init_fragment_program(GLcontext *ctx,
 			    struct gl_fragment_program *prog,
 			    GLenum target, GLuint id);
 
-extern struct gl_program *
+[[nodiscard]] extern struct gl_program *
 _mesa_new_program(GLcontext *ctx, GLenum target, GLuint id);
 
 extern void
 _mesa_delete_program(GLcontext *ctx, struct gl_program *prog);
 
-extern struct gl_program *
+[[nodiscard]] extern struct gl_program *
 _mesa_lookup_program(GLcontext *ctx, GLuint id);
 
 

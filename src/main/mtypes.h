@@ -35,6 +35,8 @@
 #define TYPES_H
 
 #include <vector>
+#include <string>
+#include <unordered_map>
 
 #include "glheader.h"
 #include "glheader.h"
@@ -396,8 +398,8 @@ struct gl_color_table {
     GLenum InternalFormat;      /**< The user-specified format */
     GLenum _BaseFormat;         /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
     GLuint Size;                /**< number of entries in table */
-    GLfloat *TableF;            /**< Color table, floating point values */
-    GLubyte *TableUB;           /**< Color table, ubyte values */
+    std::vector<GLfloat> TableF;  /**< Color table, floating point values */
+    std::vector<GLubyte> TableUB; /**< Color table, ubyte values */
     GLubyte RedSize;
     GLubyte GreenSize;
     GLubyte BlueSize;
@@ -1494,16 +1496,8 @@ struct gl_texture_unit {
     GLboolean ColorTableEnabled;
 };
 
-struct texenvprog_cache_item {
-    GLuint hash;
-    void *key;
-    struct gl_fragment_program *data;
-    struct texenvprog_cache_item *next;
-};
-
 struct texenvprog_cache {
-    struct texenvprog_cache_item **items;
-    GLuint size, n_items;
+    std::unordered_map<std::string, struct gl_fragment_program *> map;
     GLcontext *ctx;
 };
 

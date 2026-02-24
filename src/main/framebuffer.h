@@ -29,10 +29,10 @@
 
 
 
-extern struct gl_framebuffer *
+[[nodiscard]] extern struct gl_framebuffer *
 _mesa_create_framebuffer(const GLvisual *visual);
 
-extern struct gl_framebuffer *
+[[nodiscard]] extern struct gl_framebuffer *
 _mesa_new_framebuffer(GLcontext *ctx, GLuint name);
 
 extern void

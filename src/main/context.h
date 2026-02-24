@@ -103,7 +103,7 @@ _mesa_destroy_visual(GLvisual *vis);
 /** \name Context-related functions */
 /*@{*/
 
-extern GLcontext *
+[[nodiscard]] extern GLcontext *
 _mesa_create_context(const GLvisual *visual,
 		     GLcontext *share_list,
 		     const struct dd_function_table *driverFunctions,
