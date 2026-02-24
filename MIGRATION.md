@@ -191,7 +191,42 @@ The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
 
 ---
 
-## Phase 5 – Rasteriser (swrast / tnl / vbo)
+## Phase 5 – Remaining math debug modules
+
+| Task | Status |
+|------|--------|
+| Migrate `src/math/m_debug_clip.c` → `m_debug_clip.cpp` | ✅ done |
+| Migrate `src/math/m_debug_norm.c` → `m_debug_norm.cpp` | ✅ done |
+| Migrate `src/math/m_debug_xform.c` → `m_debug_xform.cpp` | ✅ done |
+| Add `extern "C"` guards to `m_debug.h` | ✅ done |
+
+### What changed in `m_debug_clip.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* No memory-management changes required (no heap allocation in this file).
+* `extern "C"` guards added to `m_debug.h`.
+
+### What changed in `m_debug_norm.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `ALIGN_MALLOC(16 * sizeof(GLfloat), 16)` in `test_norm_function` replaced
+  with `new (std::align_val_t{16}) GLfloat[16]`.
+* `ALIGN_FREE(mat->m)` replaced with
+  `::operator delete[](mat->m, std::align_val_t{16})`.
+* `#include <new>` added for `std::align_val_t`.
+
+### What changed in `m_debug_xform.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `ALIGN_MALLOC(16 * sizeof(GLfloat), 16)` in `test_transform_function`
+  replaced with `new (std::align_val_t{16}) GLfloat[16]`.
+* `ALIGN_FREE(mat->m)` replaced with
+  `::operator delete[](mat->m, std::align_val_t{16})`.
+* `#include <new>` added for `std::align_val_t`.
+
+---
+
+## Phase 6 – Rasteriser (swrast / tnl / vbo)
 
 * Convert span-processing inner loops to use `std::span` (C++20 when
   available, otherwise a thin wrapper) for bounds-safe access.
@@ -203,7 +238,7 @@ The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
 
 ---
 
-## Phase 6 – Driver layer
+## Phase 7 – Driver layer
 
 * `src/drivers/osmesa/osmesa.c` – This file can be migrated last.  Replace
   the `osmesa_context` struct with a class derived from a C++ `GLContext`
@@ -230,7 +265,7 @@ The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
 [x] math/m_translate                             ✅ Phase 2
 [x] math/m_xform                                 ✅ Phase 2
 [x] math/m_eval                                  ✅ Phase 2
-[ ] math/          - remaining (m_debug_clip, m_debug_norm, m_debug_xform)
+[x] math/          - m_debug_clip, m_debug_norm, m_debug_xform  ✅ Phase 5
 [x] shader/program + prog_instruction + prog_parameter  ✅ Phase 4
 [ ] shader/        - remaining ARB/NV parsers, slang GLSL
 [ ] swrast/        - software rasteriser
