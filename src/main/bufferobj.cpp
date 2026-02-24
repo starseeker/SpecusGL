@@ -37,6 +37,8 @@
 #include "context.h"
 #include "bufferobj.h"
 
+#include <mutex>
+
 
 /**
  * Get the buffer object bound to the specified target in a GL context.
@@ -575,7 +577,7 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 	return;
     }
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     for (i = 0; i < n; i++) {
 	struct gl_buffer_object *bufObj = _mesa_lookup_bufferobj(ctx, ids[i]);
@@ -654,8 +656,6 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 	    _mesa_unbind_buffer_object(ctx, bufObj);
 	}
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -685,7 +685,7 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
     /*
      * This must be atomic (generation and allocation of buffer object IDs)
      */
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     first = _mesa_HashFindFreeKeyBlock(ctx->Shared->BufferObjects, n);
 
@@ -696,15 +696,12 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
 	GLenum target = 0;
 	bufObj = ctx->Driver.NewBufferObject(ctx, name, target);
 	if (!bufObj) {
-	    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenBuffersARB");
 	    return;
 	}
 	_mesa_save_buffer_object(ctx, bufObj);
 	buffer[i] = first + i;
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -722,9 +719,10 @@ _mesa_IsBufferARB(GLuint id)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-    bufObj = _mesa_lookup_bufferobj(ctx, id);
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	bufObj = _mesa_lookup_bufferobj(ctx, id);
+    }
 
     return bufObj ? GL_TRUE : GL_FALSE;
 }

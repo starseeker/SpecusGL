@@ -45,6 +45,8 @@
 
 #include "rbadaptors.h"
 
+#include <mutex>
+
 
 /* 32-bit color index format.  Not a public format. */
 #define COLOR_INDEX32 0x424243
@@ -1449,8 +1451,7 @@ nop_get_pointer(GLcontext *ctx, struct gl_renderbuffer *rb, GLint x, GLint y)
 void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 {
-    _glthread_INIT_MUTEX(rb->Mutex);
-
+    /* Mutex auto-initializes as std::mutex default-constructs */
     rb->Magic = RB_MAGIC;
     rb->ClassID = 0;
     rb->Name = name;
@@ -2117,13 +2118,14 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
 	struct gl_renderbuffer *oldRb = *ptr;
 
 	assert(oldRb->Magic == RB_MAGIC);
-	_glthread_LOCK_MUTEX(oldRb->Mutex);
-	assert(oldRb->Magic == RB_MAGIC);
-	ASSERT(oldRb->RefCount > 0);
-	oldRb->RefCount--;
-	/*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
-	deleteFlag = (oldRb->RefCount == 0);
-	_glthread_UNLOCK_MUTEX(oldRb->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(oldRb->Mutex);
+	    assert(oldRb->Magic == RB_MAGIC);
+	    ASSERT(oldRb->RefCount > 0);
+	    oldRb->RefCount--;
+	    /*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
+	    deleteFlag = (oldRb->RefCount == 0);
+	}
 
 	if (deleteFlag) {
 	    oldRb->Magic = 0; /* now invalid memory! */
@@ -2137,10 +2139,11 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
     if (rb) {
 	assert(rb->Magic == RB_MAGIC);
 	/* reference new renderbuffer */
-	_glthread_LOCK_MUTEX(rb->Mutex);
-	rb->RefCount++;
-	/*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
-	_glthread_UNLOCK_MUTEX(rb->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(rb->Mutex);
+	    rb->RefCount++;
+	    /*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
+	}
 	*ptr = rb;
     }
 }

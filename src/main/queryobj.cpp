@@ -510,24 +510,14 @@ _mesa_init_query(GLcontext *ctx)
 
 
 /**
- * Callback for deleting a query object.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_queryobj_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_query_object *q= (struct gl_query_object *) data;
-    (void) userData;
-    delete_query_object(q);
-}
-
-
-/**
  * Free the context state related to query objects.
  */
 void
 _mesa_free_query_data(GLcontext *ctx)
 {
-    _mesa_HashDeleteAll(ctx->Query.QueryObjects, delete_queryobj_cb, NULL);
+    _mesa_HashDeleteAll(ctx->Query.QueryObjects, [](GLuint, void *data) {
+	delete_query_object(static_cast<gl_query_object *>(data));
+    });
     _mesa_DeleteHashTable(ctx->Query.QueryObjects);
 }
 

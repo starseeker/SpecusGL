@@ -48,6 +48,8 @@
 #include "arrayobj.h"
 #include "dispatch.h"
 
+#include <mutex>
+
 
 /**
  * Look up the array object for the given ID.
@@ -288,7 +290,7 @@ _mesa_DeleteVertexArraysAPPLE(GLsizei n, const GLuint *ids)
 	return;
     }
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     for (i = 0; i < n; i++) {
 	struct gl_array_object *obj = lookup_arrayobj(ctx, ids[i]);
@@ -329,8 +331,6 @@ _mesa_DeleteVertexArraysAPPLE(GLsizei n, const GLuint *ids)
 	    ctx->Driver.DeleteArrayObject(ctx, obj);
 	}
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -360,7 +360,7 @@ _mesa_GenVertexArraysAPPLE(GLsizei n, GLuint *arrays)
     /*
      * This must be atomic (generation and allocation of array object IDs)
      */
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     first = _mesa_HashFindFreeKeyBlock(ctx->Shared->ArrayObjects, n);
 
@@ -371,15 +371,12 @@ _mesa_GenVertexArraysAPPLE(GLsizei n, GLuint *arrays)
 
 	obj = (*ctx->Driver.NewArrayObject)(ctx, name);
 	if (!obj) {
-	    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenVertexArraysAPPLE");
 	    return;
 	}
 	_mesa_save_array_object(ctx, obj);
 	arrays[i] = first + i;
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -400,9 +397,10 @@ _mesa_IsVertexArrayAPPLE(GLuint id)
     if (id == 0)
 	return GL_FALSE;
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-    obj = lookup_arrayobj(ctx, id);
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	obj = lookup_arrayobj(ctx, id);
+    }
 
     return (obj != NULL) ? GL_TRUE : GL_FALSE;
 }

@@ -193,8 +193,7 @@ _mesa_HashRemove(struct _mesa_HashTable *table, GLuint key)
  */
 void
 _mesa_HashDeleteAll(struct _mesa_HashTable *table,
-                    void (*callback)(GLuint key, void *data, void *userData),
-                    void *userData)
+                    std::function<void(GLuint key, void *data)> callback)
 {
     assert(table);
     assert(callback);
@@ -202,7 +201,7 @@ _mesa_HashDeleteAll(struct _mesa_HashTable *table,
     std::lock_guard<std::mutex> lock(table->mutex);
     table->inDeleteAll = true;
     for (auto &[key, data] : table->entries) {
-        callback(key, data, userData);
+        callback(key, data);
     }
     table->entries.clear();
     table->inDeleteAll = false;
@@ -218,15 +217,14 @@ _mesa_HashDeleteAll(struct _mesa_HashTable *table,
  */
 void
 _mesa_HashWalk(const struct _mesa_HashTable *table,
-               void (*callback)(GLuint key, void *data, void *userData),
-               void *userData)
+               std::function<void(GLuint key, void *data)> callback)
 {
     assert(table);
     assert(callback);
 
     std::lock_guard<std::mutex> lock(table->mutex);
     for (const auto &[key, data] : table->entries) {
-        callback(key, data, userData);
+        callback(key, data);
     }
 }
 

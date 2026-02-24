@@ -47,6 +47,8 @@
 #include "renderbuffer.h"
 #include "texobj.h"
 
+#include <mutex>
+
 
 
 /**
@@ -132,10 +134,9 @@ _mesa_initialize_framebuffer(struct gl_framebuffer *fb, const GLvisual *visual)
     assert(fb);
     assert(visual);
 
-    _mesa_bzero(fb, sizeof(struct gl_framebuffer));
-
-    _glthread_INIT_MUTEX(fb->Mutex);
-
+    /* Note: fb is value-initialized by new, so all POD fields are
+     * already zeroed; the std::mutex member is properly constructed.
+     * We only need to set the non-zero fields below. */
     fb->RefCount = 1;
 
     /* save the visual */
@@ -187,8 +188,6 @@ _mesa_free_framebuffer_data(struct gl_framebuffer *fb)
     assert(fb);
     assert(fb->RefCount == 0);
 
-    _glthread_DESTROY_MUTEX(fb->Mutex);
-
     for (i = 0; i < BUFFER_COUNT; i++) {
 	struct gl_renderbuffer_attachment *att = &fb->Attachment[i];
 	if (att->Renderbuffer) {
@@ -225,9 +224,10 @@ _mesa_reference_framebuffer(struct gl_framebuffer **ptr,
     }
     assert(!*ptr);
     assert(fb);
-    _glthread_LOCK_MUTEX(fb->Mutex);
-    fb->RefCount++;
-    _glthread_UNLOCK_MUTEX(fb->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(fb->Mutex);
+	fb->RefCount++;
+    }
     *ptr = fb;
 }
 
@@ -245,11 +245,12 @@ _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
     if (*fb) {
 	GLboolean deleteFlag = GL_FALSE;
 
-	_glthread_LOCK_MUTEX((*fb)->Mutex);
-	ASSERT((*fb)->RefCount > 0);
-	(*fb)->RefCount--;
-	deleteFlag = ((*fb)->RefCount == 0);
-	_glthread_UNLOCK_MUTEX((*fb)->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock((*fb)->Mutex);
+	    ASSERT((*fb)->RefCount > 0);
+	    (*fb)->RefCount--;
+	    deleteFlag = ((*fb)->RefCount == 0);
+	}
 
 	if (deleteFlag)
 	    (*fb)->Delete(*fb);

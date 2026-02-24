@@ -34,6 +34,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <mutex>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -1361,7 +1362,7 @@ struct gl_texture_image {
  * color palette.
  */
 struct gl_texture_object {
-    _glthread_Mutex Mutex;	/**< for thread safety */
+    mutable std::mutex Mutex;	/**< for thread safety */
     GLint RefCount;		/**< reference count */
     GLuint Name;			/**< the user-visible texture object ID */
     GLenum Target;               /**< GL_TEXTURE_1D, GL_TEXTURE_2D, etc. */
@@ -2064,7 +2065,7 @@ struct gl_shader_state {
  * State which can be shared by multiple contexts:
  */
 struct gl_shared_state {
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLint RefCount;			   /**< Reference count */
     struct _mesa_HashTable *DisplayList;	   /**< Display lists hash table */
     struct _mesa_HashTable *TexObjects;	   /**< Texture objects hash table */
@@ -2087,7 +2088,7 @@ struct gl_shared_state {
      * \todo Improve the granularity of locking.
      */
     /*@{*/
-    _glthread_Mutex TexMutex;		   /**< texobj thread safety */
+    mutable std::mutex TexMutex;		   /**< texobj thread safety */
     GLuint TextureStateStamp;	           /**< state notification for shared tex  */
     /*@}*/
 
@@ -2146,7 +2147,7 @@ struct gl_shared_state {
 struct gl_renderbuffer {
 #define RB_MAGIC 0xaabbccdd
     int Magic; /** XXX TEMPORARY DEBUG INFO */
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLuint ClassID;        /**< Useful for drivers */
     GLuint Name;
     GLint RefCount;
@@ -2262,7 +2263,7 @@ struct gl_renderbuffer_attachment {
  * will make derived classes.
  */
 struct gl_framebuffer {
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLuint Name;      /* if zero, this is a window system framebuffer */
     GLint RefCount;
     GLboolean DeletePending;

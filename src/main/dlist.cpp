@@ -89,6 +89,8 @@
 
 #include "dispatch.h"
 
+#include <mutex>
+
 
 /**
  * Flush vertices.
@@ -6641,7 +6643,7 @@ _mesa_GenLists(GLsizei range)
     /*
      * Make this an atomic operation
      */
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     base = _mesa_HashFindFreeKeyBlock(ctx->Shared->DisplayList, range);
     if (base) {
@@ -6652,8 +6654,6 @@ _mesa_GenLists(GLsizei range)
 			     make_list(base + i, 1));
 	}
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 
     return base;
 }

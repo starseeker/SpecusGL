@@ -41,6 +41,8 @@
 #include "texobj.h"
 #include "mtypes.h"
 
+#include <mutex>
+
 
 
 /**********************************************************************/
@@ -102,9 +104,10 @@ _mesa_initialize_texture_object(struct gl_texture_object *obj,
 	   target == GL_TEXTURE_CUBE_MAP_ARB ||
 	   target == GL_TEXTURE_RECTANGLE_NV);
 
-    _mesa_bzero(obj, sizeof(*obj));
-    /* init the non-zero fields */
-    _glthread_INIT_MUTEX(obj->Mutex);
+    /* obj is value-initialized by caller (new gl_texture_object{}) so
+     * all fields are already zeroed; no need for bzero, and std::mutex
+     * is already properly default-constructed.
+     * init the non-zero fields: */
     obj->RefCount = 1;
     obj->Name = name;
     obj->Target = target;
@@ -168,7 +171,7 @@ _mesa_delete_texture_object(GLcontext *ctx, struct gl_texture_object *texObj)
     }
 
     /* destroy the mutex -- it may have allocated memory (eg on bsd) */
-    _glthread_DESTROY_MUTEX(texObj->Mutex);
+    /* (std::mutex destructor handles this automatically) */
 
     /* free this object */
     delete texObj;
@@ -267,12 +270,12 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
 
 	assert(valid_texture_object(oldTex));
 
-	_glthread_LOCK_MUTEX(oldTex->Mutex);
-	ASSERT(oldTex->RefCount > 0);
-	oldTex->RefCount--;
-
-	deleteFlag = (oldTex->RefCount == 0);
-	_glthread_UNLOCK_MUTEX(oldTex->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(oldTex->Mutex);
+	    ASSERT(oldTex->RefCount > 0);
+	    oldTex->RefCount--;
+	    deleteFlag = (oldTex->RefCount == 0);
+	}
 
 	if (deleteFlag) {
 	    GET_CURRENT_CONTEXT(ctx);
@@ -289,17 +292,18 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
     if (tex) {
 	/* reference new texture */
 	assert(valid_texture_object(tex));
-	_glthread_LOCK_MUTEX(tex->Mutex);
-	if (tex->RefCount == 0) {
-	    /* this texture's being deleted (look just above) */
-	    /* Not sure this can every really happen.  Warn if it does. */
-	    _mesa_problem(NULL, "referencing deleted texture object");
-	    *ptr = NULL;
-	} else {
-	    tex->RefCount++;
-	    *ptr = tex;
+	{
+	    std::lock_guard<std::mutex> lock(tex->Mutex);
+	    if (tex->RefCount == 0) {
+		/* this texture's being deleted (look just above) */
+		/* Not sure this can every really happen.  Warn if it does. */
+		_mesa_problem(NULL, "referencing deleted texture object");
+		*ptr = NULL;
+	    } else {
+		tex->RefCount++;
+		*ptr = tex;
+	    }
 	}
-	_glthread_UNLOCK_MUTEX(tex->Mutex);
     }
 }
 
@@ -608,7 +612,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
  * Used by _mesa_GenTextures() to guarantee that the generation and allocation
  * of texture IDs is atomic.
  */
-_glthread_DECLARE_STATIC_MUTEX(GenTexturesLock);
+static std::mutex GenTexturesLock;
 
 /**
  * Generate texture names.
@@ -641,7 +645,7 @@ _mesa_GenTextures(GLsizei n, GLuint *textures)
     /*
      * This must be atomic (generation and allocation of texture IDs)
      */
-    _glthread_LOCK_MUTEX(GenTexturesLock);
+    std::lock_guard<std::mutex> genLock(GenTexturesLock);
 
     first = _mesa_HashFindFreeKeyBlock(ctx->Shared->TexObjects, n);
 
@@ -652,20 +656,18 @@ _mesa_GenTextures(GLsizei n, GLuint *textures)
 	GLenum target = 0;
 	texObj = (*ctx->Driver.NewTextureObject)(ctx, name, target);
 	if (!texObj) {
-	    _glthread_UNLOCK_MUTEX(GenTexturesLock);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenTextures");
 	    return;
 	}
 
 	/* insert into hash table */
-	_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	_mesa_HashInsert(ctx->Shared->TexObjects, texObj->Name, texObj);
-	_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	{
+	    std::lock_guard<std::mutex> sharedLock(ctx->Shared->Mutex);
+	    _mesa_HashInsert(ctx->Shared->TexObjects, texObj->Name, texObj);
+	}
 
 	textures[i] = name;
     }
-
-    _glthread_UNLOCK_MUTEX(GenTexturesLock);
 }
 
 
@@ -770,9 +772,10 @@ _mesa_DeleteTextures(GLsizei n, const GLuint *textures)
 		/* The texture _name_ is now free for re-use.
 		 * Remove it from the hash table now.
 		 */
-		_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-		_mesa_HashRemove(ctx->Shared->TexObjects, delObj->Name);
-		_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+		{
+		    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+		    _mesa_HashRemove(ctx->Shared->TexObjects, delObj->Name);
+		}
 
 		/* Unreference the texobj.  If refcount hits zero, the texture
 		 * will be deleted.
@@ -872,9 +875,10 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 	    }
 
 	    /* and insert it into hash table */
-	    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	    _mesa_HashInsert(ctx->Shared->TexObjects, texName, newTexObj);
-	    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	    {
+		std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+		_mesa_HashInsert(ctx->Shared->TexObjects, texName, newTexObj);
+	    }
 	}
 	newTexObj->Target = target;
     }
@@ -1056,7 +1060,7 @@ _mesa_IsTexture(GLuint texture)
  */
 void _mesa_lock_context_textures(GLcontext *ctx)
 {
-    _glthread_LOCK_MUTEX(ctx->Shared->TexMutex);
+    ctx->Shared->TexMutex.lock();
 
     if (ctx->Shared->TextureStateStamp != ctx->TextureStateTimestamp) {
 	ctx->NewState |= _NEW_TEXTURE;
@@ -1068,7 +1072,7 @@ void _mesa_lock_context_textures(GLcontext *ctx)
 void _mesa_unlock_context_textures(GLcontext *ctx)
 {
     assert(ctx->Shared->TextureStateStamp == ctx->TextureStateTimestamp);
-    _glthread_UNLOCK_MUTEX(ctx->Shared->TexMutex);
+    ctx->Shared->TexMutex.unlock();
 }
 
 /*@}*/

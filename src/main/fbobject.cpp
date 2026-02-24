@@ -40,6 +40,8 @@
 #include "texobj.h"
 #include "texstore.h"
 
+#include <mutex>
+
 
 /**
  * Notes:
@@ -236,11 +238,10 @@ _mesa_framebuffer_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			       GLenum attachment, struct gl_renderbuffer *rb)
 {
 
-    _glthread_LOCK_MUTEX(fb->Mutex);
+    std::lock_guard<std::mutex> lock(fb->Mutex);
 
     struct gl_renderbuffer_attachment *att = _mesa_get_attachment(ctx, fb, attachment);
     if (!att) {
-	_glthread_UNLOCK_MUTEX(fb->Mutex);
 	return;
     }
 
@@ -249,8 +250,6 @@ _mesa_framebuffer_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     } else {
 	_mesa_remove_attachment(ctx, att);
     }
-
-    _glthread_UNLOCK_MUTEX(fb->Mutex);
 }
 
 
@@ -637,9 +636,10 @@ _mesa_GenRenderbuffersEXT(GLsizei n, GLuint *renderbuffers)
 	GLuint name = first + i;
 	renderbuffers[i] = name;
 	/* insert dummy placeholder into hash table */
-	_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	_mesa_HashInsert(ctx->Shared->RenderBuffers, name, &DummyRenderbuffer);
-	_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	    _mesa_HashInsert(ctx->Shared->RenderBuffers, name, &DummyRenderbuffer);
+	}
     }
 }
 
@@ -1068,9 +1068,10 @@ _mesa_GenFramebuffersEXT(GLsizei n, GLuint *framebuffers)
 	GLuint name = first + i;
 	framebuffers[i] = name;
 	/* insert dummy placeholder into hash table */
-	_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	_mesa_HashInsert(ctx->Shared->FrameBuffers, name, &DummyFramebuffer);
-	_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	    _mesa_HashInsert(ctx->Shared->FrameBuffers, name, &DummyFramebuffer);
+	}
     }
 }
 
@@ -1205,14 +1206,15 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
     if (ctx->Driver.Flush)
 	ctx->Driver.Flush(ctx);
 
-    _glthread_LOCK_MUTEX(fb->Mutex);
-    if (texObj) {
-	_mesa_set_texture_attachment(ctx, fb, att, texObj, textarget,
-				     level, zoffset);
-    } else {
-	_mesa_remove_attachment(ctx, att);
+    {
+	std::lock_guard<std::mutex> lock(fb->Mutex);
+	if (texObj) {
+	    _mesa_set_texture_attachment(ctx, fb, att, texObj, textarget,
+					 level, zoffset);
+	} else {
+	    _mesa_remove_attachment(ctx, att);
+	}
     }
-    _glthread_UNLOCK_MUTEX(fb->Mutex);
 
     /* Some subsequent GL commands may depend on the framebuffer's visual
      * after the binding is updated.  Update visual info now.
