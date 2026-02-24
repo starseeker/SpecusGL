@@ -2,16 +2,15 @@
 
 ## Overview
 
-The osmesa codebase is derived from Mesa 7.0.4 and consists of approximately
-172 C source files implementing a software OpenGL 2.0 renderer.  The goal is
-to migrate it to idiomatic C++17 while preserving its complete API and
-behaviour.
+This codebase is derived from Mesa 7.0.4, implementing a software OpenGL 2.0
+renderer.  The goal is to migrate it to idiomatic C++17 while preserving its
+complete API and behaviour.
 
 An initial shift of the C code to C++ with minimal changes is now complete.
 What we want to do next is start migrating the "C++" code to become more
 idiomatic C++ rather than "technically C++" C code - i.e. take advantage
 of C++ language features to make the code more readable, well organized,
-less verbose, cleanly debuggable and performant.
+less verbose, readily debuggable and performant.
 
 ---
 
