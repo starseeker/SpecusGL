@@ -15,7 +15,11 @@ less verbose, readily debuggable and performant.
 Large, cross-cutting changes are expected and not something to shy away
 from - add testing code as appropriate to verify you're not breaking things,
 but we're looking to achieve a major refactoring of this codebase rather
-than incrementally inching forward slowly.
+than incrementally inching forward slowly. Given the nature of this code base,
+there will need to be some high risk changes at some point if we're going to
+meaningfully shift the code towards modern best practices. Mitigation will be
+adding tests to exercise the functionality thoroughly and be able to spot
+breakage, but we must accept some risk to make substantial change.
 
 ---
 
