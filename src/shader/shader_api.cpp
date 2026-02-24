@@ -56,14 +56,11 @@
 struct gl_shader_program *
 _mesa_new_shader_program(GLcontext *ctx, GLuint name)
 {
-    struct gl_shader_program *shProg;
-    shProg = CALLOC_STRUCT(gl_shader_program);
-    if (shProg) {
-	shProg->Type = GL_SHADER_PROGRAM_MESA;
-	shProg->Name = name;
-	shProg->RefCount = 1;
-	shProg->Attributes = _mesa_new_parameter_list();
-    }
+    auto *shProg = new gl_shader_program{};
+    shProg->Type = GL_SHADER_PROGRAM_MESA;
+    shProg->Name = name;
+    shProg->RefCount = 1;
+    shProg->Attributes = _mesa_new_parameter_list();
     return shProg;
 }
 
@@ -150,7 +147,7 @@ _mesa_free_shader_program(GLcontext *ctx, struct gl_shader_program *shProg)
 {
     _mesa_free_shader_program_data(ctx, shProg);
 
-    free(shProg);
+    delete shProg;
 }
 
 
@@ -229,14 +226,11 @@ _mesa_lookup_shader_program(GLcontext *ctx, GLuint name)
 struct gl_shader *
 _mesa_new_shader(GLcontext *ctx, GLuint name, GLenum type)
 {
-    struct gl_shader *shader;
     assert(type == GL_FRAGMENT_SHADER || type == GL_VERTEX_SHADER);
-    shader = CALLOC_STRUCT(gl_shader);
-    if (shader) {
-	shader->Type = type;
-	shader->Name = name;
-	shader->RefCount = 1;
-    }
+    auto *shader = new gl_shader{};
+    shader->Type = type;
+    shader->Name = name;
+    shader->RefCount = 1;
     return shader;
 }
 
@@ -255,7 +249,7 @@ _mesa_free_shader(GLcontext *ctx, struct gl_shader *sh)
     }
     if (sh->Programs)
 	free(sh->Programs);
-    free(sh);
+    delete sh;
 }
 
 

@@ -685,8 +685,9 @@ _mesa_strdup(const char *s)
 {
     if (s) {
 	const size_t l = strlen(s);
-	char *s2 = new char[l + 1];
-	memcpy(s2, s, l + 1);
+	char *s2 = (char *) malloc(l + 1);
+	if (s2)
+	    memcpy(s2, s, l + 1);
 	return s2;
     } else {
 	return NULL;
