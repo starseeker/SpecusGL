@@ -272,9 +272,6 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog == &_mesa_DummyProgram)
 	return;
 
-    if (prog->String)
-	free(prog->String);
-
     if (prog->Instructions) {
 	GLuint i;
 	for (i = 0; i < prog->NumInstructions; i++) {
@@ -338,7 +335,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 	return nullptr;
 
     assert(clone->Target == prog->Target);
-    clone->String = (GLubyte *) _mesa_strdup((char *) prog->String);
+    clone->String = prog->String;
     clone->RefCount = 1;
     clone->Format = prog->Format;
     clone->Instructions = _mesa_alloc_instructions(prog->NumInstructions);

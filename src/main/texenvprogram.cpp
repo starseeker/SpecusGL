@@ -1070,7 +1070,7 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     p.program->Base.NumTexIndirections = 1;	/* correct? */
     p.program->Base.NumTexInstructions = 0;
     p.program->Base.NumAluInstructions = 0;
-    p.program->Base.String = nullptr;
+    p.program->Base.String.clear();
     p.program->Base.NumInstructions =
 	p.program->Base.NumTemporaries =
 	    p.program->Base.NumParameters =

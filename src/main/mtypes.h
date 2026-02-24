@@ -1814,7 +1814,7 @@ struct gl_program_parameter_list;
  */
 struct gl_program {
     GLuint Id;
-    GLubyte *String;  /**< Null-terminated program text */
+    std::string String;  /**< Program text (null-terminated) */
     GLint RefCount;
     GLenum Target;    /**< GL_VERTEX/FRAGMENT_PROGRAM_ARB, GL_FRAGMENT_PROGRAM_NV */
     GLenum Format;    /**< String encoding format */
