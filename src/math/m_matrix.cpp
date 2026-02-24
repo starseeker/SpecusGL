@@ -37,9 +37,10 @@
 #include "glheader.h"
 #include "imports.h"
 #include "macros.h"
-#include "imports.h"
 
 #include "m_matrix.h"
+
+#include <new>
 
 
 /**
@@ -1543,7 +1544,7 @@ _math_matrix_loadf(GLmatrix *mat, const GLfloat *m)
 void
 _math_matrix_ctr(GLmatrix *m)
 {
-    m->m = (GLfloat *) ALIGN_MALLOC(16 * sizeof(GLfloat), 16);
+    m->m = new (std::align_val_t{16}) GLfloat[16];
     if (m->m)
 	memcpy(m->m, Identity, sizeof(Identity));
     m->inv = NULL;
@@ -1562,11 +1563,11 @@ void
 _math_matrix_dtr(GLmatrix *m)
 {
     if (m->m) {
-	ALIGN_FREE(m->m);
+	::operator delete[](m->m, std::align_val_t{16});
 	m->m = NULL;
     }
     if (m->inv) {
-	ALIGN_FREE(m->inv);
+	::operator delete[](m->inv, std::align_val_t{16});
 	m->inv = NULL;
     }
 }
@@ -1582,7 +1583,7 @@ void
 _math_matrix_alloc_inv(GLmatrix *m)
 {
     if (!m->inv) {
-	m->inv = (GLfloat *) ALIGN_MALLOC(16 * sizeof(GLfloat), 16);
+	m->inv = new (std::align_val_t{16}) GLfloat[16];
 	if (m->inv)
 	    memcpy(m->inv, Identity, 16 * sizeof(GLfloat));
     }
@@ -1682,7 +1683,7 @@ _math_transposefd(GLfloat to[16], const GLdouble from[16])
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:

@@ -33,7 +33,7 @@ set(osmesa_srcs
   main/colortab.c
   main/context.c
   main/convolve.c
-  main/debug.c
+  main/debug.cpp
   main/depth.c
   main/depthstencil.c
   main/dispatch.c
@@ -53,7 +53,7 @@ set(osmesa_srcs
   main/hint.c
   main/histogram.c
   main/image.c
-  main/imports.c
+  main/imports.cpp
   main/light.c
   main/lines.c
   main/matrix.c
@@ -84,9 +84,9 @@ set(osmesa_srcs
   math/m_debug_norm.c
   math/m_debug_xform.c
   math/m_eval.c
-  math/m_matrix.c
+  math/m_matrix.cpp
   math/m_translate.c
-  math/m_vector.c
+  math/m_vector.cpp
   math/m_xform.c
   shader/arbprogparse.c
   shader/arbprogram.c

@@ -62,16 +62,24 @@ The C++17 replacement:
 
 Target files (roughly in dependency order):
 
-* `src/main/imports.c` – Wrap `_mesa_align_malloc` / `_mesa_align_free` with
-  `std::aligned_alloc` / `free`; remove the `MALLOC_STRUCT` / `CALLOC_STRUCT`
-  macros in favour of `new` (done incrementally as callers are migrated).
-* `src/main/debug.c` – Replace vararg `_mesa_debug` / `_mesa_problem` with
-  variadic templates or `std::format` (C++20 if the toolchain supports it,
-  otherwise `fmt`-style).
-* `src/math/m_matrix.c` – Replace raw `GLfloat[16]` arrays with a thin
-  `Matrix4f` value type; use `std::array<float, 16>` internally.
-* `src/math/m_vector.c` – Wrap `GLfloat` arrays in `Vec3f`, `Vec4f` value
-  types with operator overloads.
+* `src/main/imports.c` → **`imports.cpp`** ✅ done – Replaced platform-specific
+  `posix_memalign` / manual-alignment fallback with `std::aligned_alloc` /
+  `std::free` (size rounded up to a multiple of alignment as required by the
+  standard).  Windows (`_aligned_malloc` / `_aligned_free`) path unchanged.
+  Duplicate `#include "imports.h"` removed; `<cstdlib>` added.
+* `src/main/debug.c` → **`debug.cpp`** ✅ done – Renamed to C++; `extern "C"`
+  guards added to `debug.h` so C translation units continue to call the
+  functions with C linkage.
+* `src/math/m_matrix.c` → **`m_matrix.cpp`** ✅ done – Replaced `ALIGN_MALLOC`
+  / `ALIGN_FREE` in the matrix constructor / destructor / `alloc_inv` with
+  C++17 placement-new using `std::align_val_t{16}` and the matching
+  `::operator delete[]` overload.  Duplicate `#include "imports.h"` removed;
+  `<new>` added.  `extern "C"` guards added to `m_matrix.h`.
+* `src/math/m_vector.c` → **`m_vector.cpp`** ✅ done – Replaced `ALIGN_MALLOC`
+  / `ALIGN_FREE` in `_mesa_vector4f_alloc` / `_mesa_vector4f_free` with
+  `std::aligned_alloc` / `std::free` (size rounded up).  Duplicate
+  `#include "imports.h"` removed; `<cstdlib>` added.  `extern "C"` guards
+  added to `m_vector.h`.
 
 ---
 
@@ -124,15 +132,17 @@ Target files (roughly in dependency order):
 
 ```
 [ ] glapi/         - dispatch table generation
-[ ] main/imports   - memory / math utilities
-[ ] main/debug     - error reporting
-[ ] main/hash      - ✅ done (Phase 1)
+[x] main/imports   - memory / math utilities     ✅ Phase 2
+[x] main/debug     - error reporting              ✅ Phase 2
+[x] main/hash      - ✅ done (Phase 1)
 [ ] main/context   - GL context lifecycle
 [ ] main/framebuffer + renderbuffer
 [ ] main/teximage + texstore + texobj
 [ ] main/bufferobj, arrayobj, varray
 [ ] main/dlist     - display list (complex)
-[ ] math/          - matrix and vector math
+[x] math/m_matrix  - matrix math                 ✅ Phase 2
+[x] math/m_vector  - vector math                 ✅ Phase 2
+[ ] math/          - remaining (m_translate, m_xform, m_eval, …)
 [ ] shader/        - ARB/NV programs, slang GLSL
 [ ] swrast/        - software rasteriser
 [ ] swrast_setup/

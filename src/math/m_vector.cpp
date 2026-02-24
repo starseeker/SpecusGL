@@ -31,9 +31,10 @@
 #include "glheader.h"
 #include "imports.h"
 #include "macros.h"
-#include "imports.h"
 
 #include "m_vector.h"
+
+#include <cstdlib>
 
 
 
@@ -104,9 +105,12 @@ void _mesa_vector4f_init(GLvector4f *v, GLuint flags, GLfloat(*storage)[4])
 void _mesa_vector4f_alloc(GLvector4f *v, GLuint flags, GLuint count,
 			  GLuint alignment)
 {
+    const size_t sz = count * 4 * sizeof(GLfloat);
+    /* std::aligned_alloc requires size to be a multiple of alignment */
+    const size_t aligned_sz = (sz + alignment - 1) & ~(size_t)(alignment - 1);
     v->stride = 4 * sizeof(GLfloat);
     v->size = 2;
-    v->storage = ALIGN_MALLOC(count * 4 * sizeof(GLfloat), alignment);
+    v->storage = std::aligned_alloc(alignment, aligned_sz);
     v->start = (GLfloat *) v->storage;
     v->data = (GLfloat(*)[4]) v->storage;
     v->count = 0;
@@ -126,7 +130,7 @@ void _mesa_vector4f_alloc(GLvector4f *v, GLuint flags, GLuint count,
 void _mesa_vector4f_free(GLvector4f *v)
 {
     if (v->flags & VEC_MALLOC) {
-	ALIGN_FREE(v->storage);
+	std::free(v->storage);
 	v->data = NULL;
 	v->start = NULL;
 	v->storage = NULL;
@@ -191,7 +195,7 @@ void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, GLboolean culling)
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:

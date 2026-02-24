@@ -210,7 +210,7 @@ _mesa_init_debug(GLcontext *ctx)
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:
