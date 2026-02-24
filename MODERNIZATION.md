@@ -17,14 +17,16 @@ less verbose, cleanly debuggable and performant.
 
 ## Guiding Principles
 
-1. **No functional regressions.**  Every phase must produce a library that
-   passes all existing tests.  If any phases need large migrations across
+1. If any phases need large migrations across
    the code at once and require intermediate non-working states that is
    acceptable (for example, if we need to shift all memory management to
    C++ new/delete/class container style at the same time) but once those
-   large shifts are done be sure to verify functionality.
+   large shifts are done be sure to verify functionality and address any
+   behavior regressions.
 2. **Preserve the public C API.**  `OSMesa/osmesa.h`, `OSMesa/gl.h`, etc.
    remain unchanged so that existing C consumers compile without modification.
+   Internal implementation code structure and organization should be updated to
+   reflect modern best practice C++ design.
 3. **Prefer the standard library.**  Replace bespoke data structures with
    `std::unordered_map`, `std::vector`, `std::string`, etc.
 4. **RAII everywhere.**  Eliminate naked `malloc`/`free` in migrated code;
