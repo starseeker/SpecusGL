@@ -1883,7 +1883,7 @@ struct gl_fragment_program {
  */
 struct gl_program_state {
     GLint ErrorPos;                       /* GL_PROGRAM_ERROR_POSITION_ARB/NV */
-    const char *ErrorString;              /* GL_PROGRAM_ERROR_STRING_ARB/NV */
+    std::string ErrorString;              /* GL_PROGRAM_ERROR_STRING_ARB/NV */
 };
 
 

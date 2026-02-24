@@ -56,7 +56,7 @@ _mesa_init_program(GLcontext *ctx)
     GLuint i;
 
     ctx->Program.ErrorPos = -1;
-    ctx->Program.ErrorString = _mesa_strdup("");
+    ctx->Program.ErrorString = "";
 
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
     ctx->VertexProgram.Enabled = GL_FALSE;
@@ -117,8 +117,8 @@ _mesa_free_program_data(GLcontext *ctx)
 	}
     }
 #endif
-    free((void *) ctx->Program.ErrorString);
-}
+    }
+
 
 
 
@@ -131,10 +131,7 @@ void
 _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string)
 {
     ctx->Program.ErrorPos = pos;
-    free((void *) ctx->Program.ErrorString);
-    if (!string)
-	string = "";
-    ctx->Program.ErrorString = _mesa_strdup(string);
+    ctx->Program.ErrorString = string ? string : "";
 }
 
 

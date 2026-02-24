@@ -176,7 +176,7 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 #endif
 
     /* Check that no error was already recorded.  Only record the first one. */
-    if (parseState->ctx->Program.ErrorString[0] == 0) {
+    if (parseState->ctx->Program.ErrorString.empty()) {
 	_mesa_set_program_error(parseState->ctx,
 				parseState->pos - parseState->start,
 				msg);

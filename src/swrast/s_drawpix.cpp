@@ -34,6 +34,7 @@
 #include "state.h"
 
 #include "s_context.h"
+#include <vector>
 #include "mtypes.h"
 #include "swrast.h"
 #include "s_span.h"
@@ -537,7 +538,7 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 {
     const GLint imgX = x, imgY = y;
     const GLboolean zoom = ctx->Pixel.ZoomX!=1.0 || ctx->Pixel.ZoomY!=1.0;
-    GLfloat *convImage = nullptr;
+    std::vector<GLfloat> convImage;
     GLbitfield transferOps = ctx->_ImageTransferState;
     SWspan span;
 
@@ -563,19 +564,11 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	 * rasterize the image.
 	 */
 	GLint row;
-	GLfloat *dest, *tmpImage;
+	GLfloat *dest;
+	std::vector<GLfloat> tmpImageVec(width * height * 4);
+	GLfloat *tmpImage = tmpImageVec.data();
 
-	tmpImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glDrawPixels");
-	    return;
-	}
-	convImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!convImage) {
-	    free(tmpImage);
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glDrawPixels");
-	    return;
-	}
+	convImage.resize(width * height * 4);
 
 	/* Unpack the image and apply transfer ops up to convolution */
 	dest = tmpImage;
@@ -590,16 +583,15 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 
 	/* do convolution */
 	if (ctx->Pixel.Convolution2DEnabled) {
-	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage.data());
 	} else {
 	    ASSERT(ctx->Pixel.Separable2DEnabled);
-	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage.data());
 	}
-	free(tmpImage);
 
 	/* continue transfer ops and draw the convolved image */
 	unpack = &ctx->DefaultPacking;
-	pixels = convImage;
+	pixels = convImage.data();
 	format = GL_RGBA;
 	type = GL_FLOAT;
 	transferOps &= IMAGE_POST_CONVOLUTION_BITS;
@@ -672,10 +664,8 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	span.array->ChanType = CHAN_TYPE;
     }
 
-    if (convImage) {
-	free(convImage);
-    }
 }
+
 
 
 /**
