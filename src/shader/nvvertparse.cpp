@@ -75,13 +75,11 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 {
 #ifdef DEBUG
     GLint line, column;
-    const GLubyte *lineStr;
-    lineStr = _mesa_find_line_column(parseState->start,
-				     parseState->pos, &line, &column);
+    std::string lineStr = _mesa_find_line_column(parseState->start,
+					       parseState->pos, &line, &column);
     _mesa_debug(parseState->ctx,
 		"nvfragparse.c(%d): line %d, column %d:%s (%s)\n",
-		lineNo, line, column, (char *) lineStr, msg);
-    free((void *) lineStr);
+		lineNo, line, column, lineStr.c_str(), msg);
 #else
     (void) lineNo;
 #endif
@@ -1027,8 +1025,7 @@ Parse_PrintInstruction(struct parse_state *parseState, struct prog_instruction *
     for (len = 0; str[len] != '\''; len++) /* find closing quote */
 	;
     parseState->pos += len + 1;
-    msg = (GLubyte*) malloc(len + 1);
-
+    msg = new GLubyte[len + 1];
     memcpy(msg, str, len);
     msg[len] = 0;
     inst->Data = msg;
@@ -1238,20 +1235,12 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
     struct prog_instruction instBuffer[MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS];
     struct prog_instruction *newInst;
     GLenum target;
-    GLubyte *programString;
+    std::string programString(reinterpret_cast<const char *>(str), len);
 
-    /* Make a null-terminated copy of the program string */
-    programString = (GLubyte *) malloc(len + 1);
-    if (!programString) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	return;
-    }
-    memcpy(programString, str, len);
-    programString[len] = 0;
 
     /* Get ready to parse */
     parseState.ctx = ctx;
-    parseState.start = programString;
+    parseState.start = reinterpret_cast<const GLubyte *>(programString.c_str());
     parseState.isPositionInvariant = GL_FALSE;
     parseState.isVersion1_1 = GL_FALSE;
     parseState.numInst = 0;
@@ -1263,30 +1252,28 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
     _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check the program header */
-    if (strncmp((const char *) programString, "!!VP1.0", 7) == 0) {
+    if (strncmp(programString.c_str(), "!!VP1.0", 7) == 0) {
 	target = GL_VERTEX_PROGRAM_NV;
-	parseState.pos = programString + 7;
+	parseState.pos = parseState.start + 7;
 	parseState.isStateProgram = GL_FALSE;
-    } else if (strncmp((const char *) programString, "!!VP1.1", 7) == 0) {
+    } else if (strncmp(programString.c_str(), "!!VP1.1", 7) == 0) {
 	target = GL_VERTEX_PROGRAM_NV;
-	parseState.pos = programString + 7;
+	parseState.pos = parseState.start + 7;
 	parseState.isStateProgram = GL_FALSE;
 	parseState.isVersion1_1 = GL_TRUE;
-    } else if (strncmp((const char *) programString, "!!VSP1.0", 8) == 0) {
+    } else if (strncmp(programString.c_str(), "!!VSP1.0", 8) == 0) {
 	target = GL_VERTEX_STATE_PROGRAM_NV;
-	parseState.pos = programString + 8;
+	parseState.pos = parseState.start + 8;
 	parseState.isStateProgram = GL_TRUE;
     } else {
 	/* invalid header */
 	ctx->Program.ErrorPos = 0;
-	free(programString);
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glLoadProgramNV(bad header)");
 	return;
     }
 
     /* make sure target and header match */
     if (target != dstTarget) {
-	free(programString);
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glLoadProgramNV(target mismatch)");
 	return;
@@ -1317,19 +1304,14 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 	newInst = _mesa_alloc_instructions(parseState.numInst);
 	if (!newInst) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	    free(programString);
 	    return;  /* out of memory */
 	}
 	_mesa_copy_instructions(newInst, instBuffer, parseState.numInst);
 
 	/* install the program */
 	program->Base.Target = target;
-	program->Base.String = (const char *) programString;
-	free(programString);
+	program->Base.String = programString;
 	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	if (program->Base.Instructions) {
-	    free(program->Base.Instructions);
-	}
 	program->Base.Instructions = newInst;
 	program->Base.InputsRead = parseState.inputsRead;
 	if (parseState.isPositionInvariant)

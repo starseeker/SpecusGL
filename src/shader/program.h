@@ -61,7 +61,7 @@ _mesa_free_program_data(GLcontext *ctx);
 extern void
 _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string);
 
-extern const GLubyte *
+extern std::string
 _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
 		       GLint *line, GLint *col);
 

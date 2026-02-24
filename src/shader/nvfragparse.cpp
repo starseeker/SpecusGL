@@ -164,13 +164,11 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 {
 #ifdef DEBUG
     GLint line, column;
-    const GLubyte *lineStr;
-    lineStr = _mesa_find_line_column(parseState->start,
-				     parseState->pos, &line, &column);
+    std::string lineStr = _mesa_find_line_column(parseState->start,
+					       parseState->pos, &line, &column);
     _mesa_debug(parseState->ctx,
 		"nvfragparse.c(%d): line %d, column %d:%s (%s)\n",
-		lineNo, line, column, (char *) lineStr, msg);
-    free((void *) lineStr);
+		lineNo, line, column, lineStr.c_str(), msg);
 #else
     (void) lineNo;
 #endif
@@ -1199,8 +1197,7 @@ Parse_PrintInstruction(struct parse_state *parseState,
     for (len = 0; str[len] != '\''; len++) /* find closing quote */
 	;
     parseState->pos += len + 1;
-    msg = (GLubyte*) malloc(len + 1);
-
+    msg = new GLubyte[len + 1];
     memcpy(msg, str, len);
     msg[len] = 0;
     inst->Data = msg;
@@ -1429,42 +1426,32 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
     struct prog_instruction instBuffer[MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS];
     struct prog_instruction *newInst;
     GLenum target;
-    GLubyte *programString;
+    std::string programString(reinterpret_cast<const char *>(str), len);
 
-    /* Make a null-terminated copy of the program string */
-    programString = (GLubyte *) malloc(len + 1);
-    if (!programString) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	return;
-    }
-    memcpy(programString, str, len);
-    programString[len] = 0;
 
     /* Get ready to parse */
     _mesa_bzero(&parseState, sizeof(struct parse_state));
     parseState.ctx = ctx;
-    parseState.start = programString;
+    parseState.start = reinterpret_cast<const GLubyte *>(programString.c_str());
     parseState.program = program;
     parseState.numInst = 0;
-    parseState.curLine = programString;
+    parseState.curLine = parseState.start;
     parseState.parameters = _mesa_new_parameter_list();
 
     /* Reset error state */
     _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check the program header */
-    if (strncmp((const char *) programString, "!!FP1.0", 7) == 0) {
+    if (strncmp(programString.c_str(), "!!FP1.0", 7) == 0) {
 	target = GL_FRAGMENT_PROGRAM_NV;
-	parseState.pos = programString + 7;
-    } else if (strncmp((const char *) programString, "!!FCP1.0", 8) == 0) {
+	parseState.pos = parseState.start + 7;
+    } else if (strncmp(programString.c_str(), "!!FCP1.0", 8) == 0) {
 	/* fragment / register combiner program - not supported */
-	free(programString);
 	_mesa_set_program_error(ctx, 0, "Invalid fragment program header");
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glLoadProgramNV(bad header)");
 	return;
     } else {
 	/* invalid header */
-	free(programString);
 	_mesa_set_program_error(ctx, 0, "Invalid fragment program header");
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glLoadProgramNV(bad header)");
 	return;
@@ -1472,7 +1459,6 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 
     /* make sure target and header match */
     if (target != dstTarget) {
-	free(programString);
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glLoadProgramNV(target mismatch 0x%x != 0x%x)",
 		    target, dstTarget);
@@ -1501,12 +1487,8 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 
 	/* install the program */
 	program->Base.Target = target;
-	program->Base.String = (const char *) programString;
-	free(programString);
+	program->Base.String = programString;
 	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	if (program->Base.Instructions) {
-	    free(program->Base.Instructions);
-	}
 	program->Base.Instructions = newInst;
 	program->Base.NumInstructions = parseState.numInst;
 	program->Base.InputsRead = parseState.inputsRead;

@@ -145,14 +145,12 @@ _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string)
  * \param col     returns the column number corresponding to 'pos'.
  * \return copy of the line containing 'pos'.
  */
-const GLubyte *
+std::string
 _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
 		       GLint *line, GLint *col)
 {
     const GLubyte *lineStart = string;
     const GLubyte *p = string;
-    GLubyte *s;
-    int len;
 
     *line = 1;
 
@@ -169,12 +167,8 @@ _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
     /* return copy of this line */
     while (*p != 0 && *p != '\n')
 	p++;
-    len = p - lineStart;
-    s = (GLubyte *) malloc(len + 1);
-    memcpy(s, lineStart, len);
-    s[len] = 0;
-
-    return s;
+    return std::string(reinterpret_cast<const char *>(lineStart),
+			  reinterpret_cast<const char *>(p));
 }
 
 
