@@ -25,6 +25,10 @@
 #ifndef S_ZOOM_H
 #define S_ZOOM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 #include "swrast.h"
 
@@ -57,6 +61,9 @@ _swrast_write_zoomed_z_span(GLcontext *ctx, GLint imgX, GLint imgY,
 			    const GLvoid *z);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

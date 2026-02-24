@@ -27,6 +27,10 @@
 #ifndef S_TRIANGLES_H
 #define S_TRIANGLES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -48,6 +52,9 @@ _swrast_add_spec_terms_triangle(GLcontext *ctx,
 				const SWvertex *v2);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

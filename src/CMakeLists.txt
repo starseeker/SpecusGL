@@ -17,8 +17,8 @@ set(osmesa_srcs
   drivers/common/driverfuncs.c
   drivers/osmesa/osmesa.c
   fxaa/fxaa_cpu.c
-  glapi/glapi.c
-  glapi/glthread.c
+  glapi/glapi.cpp
+  glapi/glthread.cpp
   main/accum.c
   main/api_arrayelt.c
   main/api_loopback.c
@@ -124,35 +124,35 @@ set(osmesa_srcs
   shader/slang/slang_typeinfo.c
   shader/slang/slang_utility.c
   shader/slang/slang_vartable.c
-  swrast/s_aaline.c
-  swrast/s_aatriangle.c
-  swrast/s_accum.c
-  swrast/s_alpha.c
-  swrast/s_atifragshader.c
-  swrast/s_bitmap.c
-  swrast/s_blend.c
-  swrast/s_blit.c
-  swrast/s_buffers.c
-  swrast/s_context.c
-  swrast/s_copypix.c
-  swrast/s_depth.c
-  swrast/s_drawpix.c
-  swrast/s_feedback.c
-  swrast/s_fog.c
-  swrast/s_fragprog.c
-  swrast/s_imaging.c
-  swrast/s_lines.c
-  swrast/s_logic.c
-  swrast/s_masking.c
-  swrast/s_points.c
-  swrast/s_readpix.c
-  swrast/s_span.c
-  swrast/s_stencil.c
-  swrast/s_texcombine.c
-  swrast/s_texfilter.c
-  swrast/s_texstore.c
-  swrast/s_triangle.c
-  swrast/s_zoom.c
+  swrast/s_aaline.cpp
+  swrast/s_aatriangle.cpp
+  swrast/s_accum.cpp
+  swrast/s_alpha.cpp
+  swrast/s_atifragshader.cpp
+  swrast/s_bitmap.cpp
+  swrast/s_blend.cpp
+  swrast/s_blit.cpp
+  swrast/s_buffers.cpp
+  swrast/s_context.cpp
+  swrast/s_copypix.cpp
+  swrast/s_depth.cpp
+  swrast/s_drawpix.cpp
+  swrast/s_feedback.cpp
+  swrast/s_fog.cpp
+  swrast/s_fragprog.cpp
+  swrast/s_imaging.cpp
+  swrast/s_lines.cpp
+  swrast/s_logic.cpp
+  swrast/s_masking.cpp
+  swrast/s_points.cpp
+  swrast/s_readpix.cpp
+  swrast/s_span.cpp
+  swrast/s_stencil.cpp
+  swrast/s_texcombine.cpp
+  swrast/s_texfilter.cpp
+  swrast/s_texstore.cpp
+  swrast/s_triangle.cpp
+  swrast/s_zoom.cpp
   swrast_setup/ss_context.c
   swrast_setup/ss_triangle.c
   tnl/t_context.c

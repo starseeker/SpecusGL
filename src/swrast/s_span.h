@@ -26,6 +26,10 @@
 #ifndef S_SPAN_H
 #define S_SPAN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -273,6 +277,9 @@ extern void *
 _swrast_get_dest_rgba(GLcontext *ctx, struct gl_renderbuffer *rb,
 		      SWspan *span);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

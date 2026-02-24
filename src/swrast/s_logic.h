@@ -26,6 +26,10 @@
 #ifndef S_LOGIC_H
 #define S_LOGIC_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -41,6 +45,9 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 			  SWspan *span);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

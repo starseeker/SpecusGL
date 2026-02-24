@@ -26,6 +26,10 @@
 #ifndef S_FRAGPROG_H
 #define S_FRAGPROG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "s_context.h"
 
@@ -34,6 +38,9 @@ extern void
 _swrast_exec_fragment_program(GLcontext *ctx, SWspan *span);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* S_FRAGPROG_H */
 
 

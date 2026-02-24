@@ -27,6 +27,10 @@
 #ifndef S_FOG_H
 #define S_FOG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -42,6 +46,9 @@ extern void
 _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*
