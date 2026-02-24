@@ -2160,7 +2160,7 @@ struct gl_shared_state {
     /** Buffer object lookup by ID (no locking; caller responsible). */
     [[nodiscard]] struct gl_buffer_object *lookup_buffer(GLuint id) const {
 	if (id == 0)
-	    return NULL;
+	    return nullptr;
 	return static_cast<struct gl_buffer_object *>(
 	    _mesa_HashLookup(BufferObjects, id));
     }

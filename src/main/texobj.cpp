@@ -103,10 +103,10 @@ _mesa_initialize_texture_object(struct gl_texture_object *obj,
 	   target == GL_TEXTURE_CUBE_MAP_ARB ||
 	   target == GL_TEXTURE_RECTANGLE_NV);
 
-    /* obj is value-initialized by caller (new gl_texture_object{}) so
-     * all fields are already zeroed; no need for bzero, and std::mutex
-     * is already properly default-constructed.
-     * init the non-zero fields: */
+    /* obj is value-initialized by the caller (_mesa_new_texture_object uses
+     * new gl_texture_object{}) so all POD fields are already zeroed and
+     * std::mutex is already properly default-constructed.
+     * Set only the non-zero fields: */
     obj->RefCount = 1;
     obj->Name = name;
     obj->Target = target;
