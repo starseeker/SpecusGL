@@ -44,6 +44,7 @@
 #include "eval.h"
 #include "macros.h"
 #include "mtypes.h"
+#include <vector>
 
 
 /*
@@ -223,22 +224,19 @@ get_2d_map(GLcontext *ctx, GLenum target)
  * \return pointer to buffer of contiguous control points or nullptr if out
  *          of memory.
  */
-GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
-				 const GLfloat *points)
+std::vector<GLfloat> _mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
+					  const GLfloat *points)
 {
-    GLfloat *buffer, *p;
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return nullptr;
+	return {};
 
-    buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
-
-    if (buffer)
-	for (i = 0, p = buffer; i < uorder; i++, points += ustride)
-	    for (k = 0; k < size; k++)
-		*p++ = points[k];
-
+    std::vector<GLfloat> buffer(uorder * size);
+    GLfloat *p = buffer.data();
+    for (i = 0; i < uorder; i++, points += ustride)
+	for (k = 0; k < size; k++)
+	    *p++ = points[k];
     return buffer;
 }
 
@@ -247,22 +245,19 @@ GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
 /*
  * Same as above but convert doubles to floats.
  */
-GLfloat *_mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
-				 const GLdouble *points)
+std::vector<GLfloat> _mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
+					  const GLdouble *points)
 {
-    GLfloat *buffer, *p;
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return nullptr;
+	return {};
 
-    buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
-
-    if (buffer)
-	for (i = 0, p = buffer; i < uorder; i++, points += ustride)
-	    for (k = 0; k < size; k++)
-		*p++ = (GLfloat) points[k];
-
+    std::vector<GLfloat> buffer(uorder * size);
+    GLfloat *p = buffer.data();
+    for (i = 0; i < uorder; i++, points += ustride)
+	for (k = 0; k < size; k++)
+	    *p++ = (GLfloat) points[k];
     return buffer;
 }
 
@@ -376,7 +371,6 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
 {
     GET_CURRENT_CONTEXT(ctx);
     GLint k;
-    GLfloat *pnts;
     struct gl_1d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -418,6 +412,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     }
 
     /* make copy of the control points */
+    std::vector<GLfloat> pnts;
     if (type == GL_FLOAT)
 	pnts = _mesa_copy_map_points1f(target, ustride, uorder, (GLfloat*) points);
     else
@@ -429,13 +424,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     map->u1 = u1;
     map->u2 = u2;
     map->du = 1.0F / (u2 - u1);
-    if (pnts) {
-	const int npts = uorder * _mesa_evaluator_components(target);
-	map->Points.assign(pnts, pnts + npts);
-	free(pnts);
-    } else {
-	map->Points.clear();
-    }
+    map->Points = std::move(pnts);
 }
 
 

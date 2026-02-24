@@ -33,6 +33,7 @@
 #include "texformat.h"
 #include "teximage.h"
 #include "image.h"
+#include <vector>
 
 
 
@@ -620,7 +621,6 @@ make_3d_mipmap(const struct gl_texture_format *format, GLint border,
     const GLint dstWidthNB = dstWidth - 2 * border;
     const GLint dstHeightNB = dstHeight - 2 * border;
     const GLint dstDepthNB = dstDepth - 2 * border;
-    GLvoid *tmpRowA, *tmpRowB;
     GLint img, row;
     GLint bytesPerSrcImage, bytesPerDstImage;
     GLint bytesPerSrcRow, bytesPerDstRow;
@@ -628,15 +628,11 @@ make_3d_mipmap(const struct gl_texture_format *format, GLint border,
 
     (void) srcDepthNB; /* silence warnings */
 
-    /* Need two temporary row buffers */
-    tmpRowA = malloc(srcWidth * bpt);
-    if (!tmpRowA)
-	return;
-    tmpRowB = malloc(srcWidth * bpt);
-    if (!tmpRowB) {
-	free(tmpRowA);
-	return;
-    }
+    /* Temporary row buffers */
+    std::vector<GLubyte> tmpVecA(srcWidth * bpt);
+    std::vector<GLubyte> tmpVecB(srcWidth * bpt);
+    GLvoid *tmpRowA = tmpVecA.data();
+    GLvoid *tmpRowB = tmpVecB.data();
 
     bytesPerSrcImage = srcWidth * srcHeight * bpt;
     bytesPerDstImage = dstWidth * dstHeight * bpt;
@@ -700,9 +696,6 @@ make_3d_mipmap(const struct gl_texture_format *format, GLint border,
 	    dstImgRow += bytesPerDstRow;
 	}
     }
-
-    free(tmpRowA);
-    free(tmpRowB);
 
     /* Luckily we can leverage the make_2d_mipmap() function here! */
     if (border > 0) {

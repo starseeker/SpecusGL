@@ -48,11 +48,6 @@
 /** \name General macros */
 /*@{*/
 
-#ifndef nullptr
-#define nullptr 0
-#endif
-
-
 /** gcc -pedantic warns about long string literals, LONGSTRING silences that */
 #if !defined(__GNUC__) || (__GNUC__ < 2) || \
     ((__GNUC__ == 2) && (__GNUC_MINOR__ <= 7))
@@ -65,22 +60,13 @@
 
 
 /**********************************************************************/
-/** Memory macros */
+/** Memory macros (legacy – prefer new/delete or std::vector in new code) */
 /*@{*/
-
-/** Allocate a structure of type \p T */
-#define MALLOC_STRUCT(T)   (struct T *) malloc(sizeof(struct T))
-/** Allocate and zero a structure of type \p T */
-#define CALLOC_STRUCT(T)   (struct T *) calloc(1,sizeof(struct T))
 
 /** Allocate \p BYTES aligned at \p N bytes */
 #define ALIGN_MALLOC(BYTES, N)     _mesa_align_malloc(BYTES, N)
 /** Allocate and zero \p BYTES bytes aligned at \p N bytes */
 #define ALIGN_CALLOC(BYTES, N)     _mesa_align_calloc(BYTES, N)
-/** Allocate a structure of type \p T aligned at \p N bytes */
-#define ALIGN_MALLOC_STRUCT(T, N)  (struct T *) _mesa_align_malloc(sizeof(struct T), N)
-/** Allocate and zero a structure of type \p T aligned at \p N bytes */
-#define ALIGN_CALLOC_STRUCT(T, N)  (struct T *) _mesa_align_calloc(sizeof(struct T), N)
 /** Free aligned memory */
 #define ALIGN_FREE(PTR)            _mesa_align_free(PTR)
 

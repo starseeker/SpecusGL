@@ -129,7 +129,7 @@ static struct state_key *make_state_key(GLcontext *ctx)
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     struct vertex_buffer *VB = &tnl->vb;
     const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
-    struct state_key *key = CALLOC_STRUCT(state_key);
+    struct state_key *key = new state_key{};
     GLuint i;
 
     /* This now relies on texenvprogram.c being active:

@@ -54,6 +54,7 @@
 #include "enable.h"
 #include "enums.h"
 #include "eval.h"
+#include <algorithm>
 #include "extensions.h"
 #include "feedback.h"
 #include "get.h"
@@ -493,11 +494,11 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 	    switch (n[0].opcode) {
 		/* for some commands, we need to free malloc'd memory */
 		case OPCODE_MAP1:
-		    free(n[6].data);
+		    delete[] static_cast<GLfloat *>(n[6].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_MAP2:
-		    free(n[10].data);
+		    delete[] static_cast<GLfloat *>(n[10].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_DRAW_PIXELS:
@@ -2298,7 +2299,9 @@ save_Map1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP1, 6);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points1d(target, stride, order, points);
+	auto pntsVec = _mesa_copy_map_points1d(target, stride, order, points);
+	GLfloat *pnts = new GLfloat[pntsVec.size()];
+	std::copy(pntsVec.begin(), pntsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = (GLfloat) u1;
 	n[3].f = (GLfloat) u2;
@@ -2320,7 +2323,9 @@ save_Map1f(GLenum target, GLfloat u1, GLfloat u2, GLint stride,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP1, 6);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points1f(target, stride, order, points);
+	auto pntsVec = _mesa_copy_map_points1f(target, stride, order, points);
+	GLfloat *pnts = new GLfloat[pntsVec.size()];
+	std::copy(pntsVec.begin(), pntsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = u1;
 	n[3].f = u2;

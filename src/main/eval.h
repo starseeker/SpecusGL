@@ -42,6 +42,8 @@
 
 #include "mtypes.h"
 
+#include <vector>
+
 #if _HAVE_FULL_GL
 
 extern void _mesa_init_eval(GLcontext *ctx);
@@ -55,11 +57,11 @@ extern void gl_free_control_points(GLcontext *ctx,
 				   GLenum target, GLfloat *data);
 
 
-[[nodiscard]] extern GLfloat *_mesa_copy_map_points1f(GLenum target,
+[[nodiscard]] extern std::vector<GLfloat> _mesa_copy_map_points1f(GLenum target,
 					GLint ustride, GLint uorder,
 					const GLfloat *points);
 
-[[nodiscard]] extern GLfloat *_mesa_copy_map_points1d(GLenum target,
+[[nodiscard]] extern std::vector<GLfloat> _mesa_copy_map_points1d(GLenum target,
 					GLint ustride, GLint uorder,
 					const GLdouble *points);
 
