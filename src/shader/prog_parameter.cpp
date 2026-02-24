@@ -383,14 +383,13 @@ _mesa_add_state_reference(struct gl_program_parameter_list *paramList,
 	}
     }
 
-    name = _mesa_program_state_string(stateTokens);
-    index = _mesa_add_parameter(paramList, PROGRAM_STATE_VAR, name,
-				size, GL_NONE,
-				nullptr, (gl_state_index *) stateTokens);
+    {
+	std::string stateName = _mesa_program_state_string(stateTokens);
+	index = _mesa_add_parameter(paramList, PROGRAM_STATE_VAR, stateName.c_str(),
+				    size, GL_NONE,
+				    nullptr, (gl_state_index *) stateTokens);
+    }
     paramList->StateFlags |= _mesa_program_state_flags(stateTokens);
-
-    /* free name string here since we duplicated it in add_parameter() */
-    free((void *) name);
 
     return index;
 }

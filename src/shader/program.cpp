@@ -274,7 +274,7 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
 	    if (prog->Instructions[i].Comment)
 		free((char *) prog->Instructions[i].Comment);
 	}
-	free(prog->Instructions);
+	delete[] prog->Instructions;
     }
 
     if (prog->Parameters) {
