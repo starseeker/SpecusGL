@@ -1565,13 +1565,15 @@ struct gl_viewport_attrib {
 
 
 /**
- * Node for the attribute stack.
+ * A single saved attribute group entry: a bit-mask identifying the group
+ * and the opaque heap-allocated state snapshot.
  */
-struct gl_attrib_node {
-    GLbitfield kind;
-    void *data;
-    struct gl_attrib_node *next;
-};
+using gl_attrib_entry = std::pair<GLbitfield, void *>;
+
+/**
+ * One level of the attribute stack: a collection of saved groups.
+ */
+using gl_attrib_level = std::vector<gl_attrib_entry>;
 
 
 /**
@@ -2972,8 +2974,7 @@ struct __GLcontextRec {
 
     /** \name State attribute stack (for glPush/PopAttrib) */
     /*@{*/
-    GLuint AttribStackDepth;
-    struct gl_attrib_node *AttribStack[MAX_ATTRIB_STACK_DEPTH];
+    std::vector<gl_attrib_level> AttribStack; /**< attribute push/pop stack */
     /*@}*/
 
     /** \name Renderer attribute groups
@@ -3006,8 +3007,7 @@ struct __GLcontextRec {
 
     /** \name Client attribute stack */
     /*@{*/
-    GLuint ClientAttribStackDepth;
-    struct gl_attrib_node *ClientAttribStack[MAX_CLIENT_ATTRIB_STACK_DEPTH];
+    std::vector<gl_attrib_level> ClientAttribStack; /**< client attribute push/pop stack */
     /*@}*/
 
     /** \name Client attribute groups */
