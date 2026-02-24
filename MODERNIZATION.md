@@ -37,10 +37,4 @@ than incrementally inching forward slowly.
    advantages or structural/organizational improvements to be had prioritize those over
    simply replacing low level C operations in the code with their low level
    C++ equivalents.
-3. **Prefer the standard library.**  Replace bespoke data structures with
-   `std::unordered_map`, `std::vector`, `std::string`, etc.
-4. **RAII everywhere.**  Eliminate naked `malloc`/`free` in migrated code;
-   use `new`/`delete` or smart pointers as appropriate.
-5. **`[[nodiscard]]` and `static_assert`.**  Apply where they improve
-   compile-time safety without touching unrelated code.
 
