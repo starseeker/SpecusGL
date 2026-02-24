@@ -35,6 +35,12 @@
 #define TYPES_H
 
 #ifdef __cplusplus
+extern "C++" {
+#include <vector>
+}
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -1591,9 +1597,13 @@ struct gl_buffer_object {
     GLenum Usage;
     GLenum Access;
     GLvoid *Pointer;          /**< Only valid while buffer is mapped */
-    GLsizeiptrARB Size;       /**< Size of storage in bytes */
-    GLubyte *Data;            /**< Location of storage either in RAM or VRAM. */
     GLboolean OnCard;         /**< Is buffer in VRAM? (hardware drivers) */
+#ifdef __cplusplus
+    std::vector<GLubyte> Data; /**< Storage in RAM; Data.size() is the byte count. */
+#else
+    GLubyte *Data;
+    GLsizeiptrARB Size;
+#endif
 };
 
 
@@ -1719,7 +1729,11 @@ struct gl_selection {
 struct gl_1d_map {
     GLuint Order;	/**< Number of control points */
     GLfloat u1, u2, du;	/**< u1, u2, 1.0/(u2-u1) */
+#ifdef __cplusplus
+    std::vector<GLfloat> Points; /**< Contiguous control points */
+#else
     GLfloat *Points;	/**< Points to contiguous control points */
+#endif
 };
 
 
@@ -1731,7 +1745,11 @@ struct gl_2d_map {
     GLuint Vorder;		/**< Number of control points in V dimension */
     GLfloat u1, u2, du;
     GLfloat v1, v2, dv;
+#ifdef __cplusplus
+    std::vector<GLfloat> Points; /**< Contiguous control points */
+#else
     GLfloat *Points;		/**< Points to contiguous control points */
+#endif
 };
 
 
@@ -2544,7 +2562,11 @@ struct gl_extensions {
  */
 struct gl_matrix_stack {
     GLmatrix *Top;      /**< points into Stack */
+#ifdef __cplusplus
+    std::vector<GLmatrix> Stack; /**< array of GLmatrix entries */
+#else
     GLmatrix *Stack;    /**< array [MaxDepth] of GLmatrix */
+#endif
     GLuint Depth;       /**< 0 <= Depth < MaxDepth */
     GLuint MaxDepth;    /**< size of Stack[] array */
     GLuint DirtyFlag;   /**< _NEW_MODELVIEW or _NEW_PROJECTION, for example */

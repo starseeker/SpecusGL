@@ -2710,7 +2710,7 @@ _mesa_validate_pbo_compressed_teximage(GLcontext *ctx,
 	return pixels;
     }
     if ((const GLubyte *) pixels + imageSize >
-	((const GLubyte *) 0) + packing->BufferObj->Size) {
+	((const GLubyte *) 0) + packing->BufferObj->Data.size()) {
 	/* out of bounds read! */
 	_mesa_error(ctx, GL_INVALID_OPERATION, funcName, "(invalid PBO access");
 	return NULL;
@@ -3682,7 +3682,7 @@ _mesa_get_compressed_teximage(GLcontext *ctx, GLenum target, GLint level,
 	/* pack texture image into a PBO */
 	GLubyte *buf;
 	if ((const GLubyte *) img + texImage->CompressedSize >
-	    (const GLubyte *) ctx->Pack.BufferObj->Size) {
+	    (const GLubyte *) ctx->Pack.BufferObj->Data.size()) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glGetCompressedTexImage(invalid PBO access)");
 	    return;

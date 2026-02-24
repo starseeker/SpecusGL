@@ -713,7 +713,7 @@ unpack_image(GLuint dimensions, GLsizei width, GLsizei height, GLsizei depth,
 				  type, pixels, unpack);
     } else if (_mesa_validate_pbo_access
 	       (dimensions, unpack, width, height, depth, format, type, pixels)) {
-	const GLubyte *src = ADD_POINTERS(unpack->BufferObj->Data, pixels);
+	const GLubyte *src = ADD_POINTERS(unpack->BufferObj->Data.data(), pixels);
 	return _mesa_unpack_image(dimensions, width, height, depth, format,
 				  type, src, unpack);
     }
