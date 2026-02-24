@@ -41,6 +41,9 @@
 #include "t_context.h" /* NOTE: very light dependency on this */
 #include "t_vp_build.h"
 
+#include <cstring>
+#include <unordered_map>
+
 
 struct state_key {
     unsigned light_global_enabled:1;
@@ -75,7 +78,32 @@ struct state_key {
     } unit[8];
 };
 
+/** Hasher for state_key: XOR all 32-bit words (same logic as the old hash_key). */
+struct StateKeyHash {
+    std::size_t operator()(const state_key &k) const noexcept {
+	const GLuint *ikey = reinterpret_cast<const GLuint *>(&k);
+	std::size_t hash = 0;
+	for (std::size_t i = 0; i < sizeof(k) / sizeof(GLuint); ++i)
+	    hash ^= ikey[i];
+	return hash;
+    }
+};
 
+/** Equality for state_key: byte-level comparison. */
+struct StateKeyEqual {
+    bool operator()(const state_key &a, const state_key &b) const noexcept {
+	return std::memcmp(&a, &b, sizeof(state_key)) == 0;
+    }
+};
+
+/**
+ * Cache that maps a state_key to the compiled gl_vertex_program*.
+ * Replaces the old manual hash-table with separate chaining.
+ */
+struct tnl_vp_cache {
+    std::unordered_map<state_key, struct gl_vertex_program *,
+		       StateKeyHash, StateKeyEqual> map;
+};
 
 #define FOG_NONE   0
 #define FOG_LINEAR 1
@@ -124,105 +152,105 @@ static GLuint translate_texgen(GLboolean enabled, GLenum mode)
     }
 }
 
-static struct state_key *make_state_key(GLcontext *ctx)
+static state_key make_state_key(GLcontext *ctx)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     struct vertex_buffer *VB = &tnl->vb;
     const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
-    struct state_key *key = new state_key{};
+    state_key key = {};
     GLuint i;
 
     /* This now relies on texenvprogram.c being active:
      */
     assert(fp);
 
-    key->fragprog_inputs_read = fp->Base.InputsRead;
+    key.fragprog_inputs_read = fp->Base.InputsRead;
 
-    key->separate_specular = (ctx->Light.Model.ColorControl ==
+    key.separate_specular = (ctx->Light.Model.ColorControl ==
 			      GL_SEPARATE_SPECULAR_COLOR);
 
     if (ctx->Light.Enabled) {
-	key->light_global_enabled = 1;
+	key.light_global_enabled = 1;
 
 	if (ctx->Light.Model.LocalViewer)
-	    key->light_local_viewer = 1;
+	    key.light_local_viewer = 1;
 
 	if (ctx->Light.Model.TwoSide)
-	    key->light_twoside = 1;
+	    key.light_twoside = 1;
 
 	if (ctx->Light.ColorMaterialEnabled) {
-	    key->light_color_material = 1;
-	    key->light_color_material_mask = ctx->Light.ColorMaterialBitmask;
+	    key.light_color_material = 1;
+	    key.light_color_material_mask = ctx->Light.ColorMaterialBitmask;
 	}
 
 	for (i = _TNL_FIRST_MAT; i <= _TNL_LAST_MAT; i++)
 	    if (VB->AttribPtr[i]->stride)
-		key->light_material_mask |= 1<<(i-_TNL_ATTRIB_MAT_FRONT_AMBIENT);
+		key.light_material_mask |= 1<<(i-_TNL_ATTRIB_MAT_FRONT_AMBIENT);
 
 	for (i = 0; i < MAX_LIGHTS; i++) {
 	    struct gl_light *light = &ctx->Light.Light[i];
 
 	    if (light->Enabled) {
-		key->unit[i].light_enabled = 1;
+		key.unit[i].light_enabled = 1;
 
 		if (light->EyePosition[3] == 0.0)
-		    key->unit[i].light_eyepos3_is_zero = 1;
+		    key.unit[i].light_eyepos3_is_zero = 1;
 
 		if (light->SpotCutoff == 180.0)
-		    key->unit[i].light_spotcutoff_is_180 = 1;
+		    key.unit[i].light_spotcutoff_is_180 = 1;
 
 		if (light->ConstantAttenuation != 1.0 ||
 		    light->LinearAttenuation != 0.0 ||
 		    light->QuadraticAttenuation != 0.0)
-		    key->unit[i].light_attenuated = 1;
+		    key.unit[i].light_attenuated = 1;
 	    }
 	}
     }
 
     if (ctx->Transform.Normalize)
-	key->normalize = 1;
+	key.normalize = 1;
 
     if (ctx->Transform.RescaleNormals)
-	key->rescale_normals = 1;
+	key.rescale_normals = 1;
 
-    key->fog_mode = translate_fog_mode(fp->FogOption);
+    key.fog_mode = translate_fog_mode(fp->FogOption);
 
     if (ctx->Fog.FogCoordinateSource == GL_FRAGMENT_DEPTH_EXT)
-	key->fog_source_is_depth = 1;
+	key.fog_source_is_depth = 1;
 
     if (tnl->_DoVertexFog)
-	key->tnl_do_vertex_fog = 1;
+	key.tnl_do_vertex_fog = 1;
 
     if (ctx->Point._Attenuated)
-	key->point_attenuated = 1;
+	key.point_attenuated = 1;
 
     if (ctx->Texture._TexGenEnabled ||
 	ctx->Texture._TexMatEnabled ||
 	ctx->Texture._EnabledUnits)
-	key->texture_enabled_global = 1;
+	key.texture_enabled_global = 1;
 
     for (i = 0; i < MAX_TEXTURE_UNITS; i++) {
 	struct gl_texture_unit *texUnit = &ctx->Texture.Unit[i];
 
 	if (texUnit->_ReallyEnabled)
-	    key->unit[i].texunit_really_enabled = 1;
+	    key.unit[i].texunit_really_enabled = 1;
 
 	if (ctx->Texture._TexMatEnabled & ENABLE_TEXMAT(i))
-	    key->unit[i].texmat_enabled = 1;
+	    key.unit[i].texmat_enabled = 1;
 
 	if (texUnit->TexGenEnabled) {
-	    key->unit[i].texgen_enabled = 1;
+	    key.unit[i].texgen_enabled = 1;
 
-	    key->unit[i].texgen_mode0 =
+	    key.unit[i].texgen_mode0 =
 		translate_texgen(texUnit->TexGenEnabled & (1<<0),
 				 texUnit->GenModeS);
-	    key->unit[i].texgen_mode1 =
+	    key.unit[i].texgen_mode1 =
 		translate_texgen(texUnit->TexGenEnabled & (1<<1),
 				 texUnit->GenModeT);
-	    key->unit[i].texgen_mode2 =
+	    key.unit[i].texgen_mode2 =
 		translate_texgen(texUnit->TexGenEnabled & (1<<2),
 				 texUnit->GenModeR);
-	    key->unit[i].texgen_mode3 =
+	    key.unit[i].texgen_mode3 =
 		translate_texgen(texUnit->TexGenEnabled & (1<<3),
 				 texUnit->GenModeQ);
 	}
@@ -1463,120 +1491,38 @@ create_new_program(const struct state_key *key,
     build_tnl_program(&p);
 }
 
-static void *search_cache(struct tnl_cache *cache,
-			  GLuint hash,
-			  const void *key,
-			  GLuint keysize)
-{
-    struct tnl_cache_item *c;
-
-    for (c = cache->items[hash % cache->size]; c; c = c->next) {
-	if (c->hash == hash && memcmp(c->key, key, keysize) == 0)
-	    return c->data;
-    }
-
-    return nullptr;
-}
-
-static void rehash(struct tnl_cache *cache)
-{
-    struct tnl_cache_item **items;
-    struct tnl_cache_item *c, *next;
-    GLuint size, i;
-
-    size = cache->size * 3;
-    items = (struct tnl_cache_item**) malloc(size * sizeof(*items));
-    memset(items, 0, size * sizeof(*items));
-
-    for (i = 0; i < cache->size; i++)
-	for (c = cache->items[i]; c; c = next) {
-	    next = c->next;
-	    c->next = items[c->hash % size];
-	    items[c->hash % size] = c;
-	}
-
-    free(cache->items);
-    cache->items = items;
-    cache->size = size;
-}
-
-static void cache_item(struct tnl_cache *cache,
-		       GLuint hash,
-		       void *key,
-		       void *data)
-{
-    struct tnl_cache_item *c = (struct tnl_cache_item*) malloc(sizeof(*c));
-    c->hash = hash;
-    c->key = key;
-    c->data = data;
-
-    if (++cache->n_items > cache->size * 1.5)
-	rehash(cache);
-
-    c->next = cache->items[hash % cache->size];
-    cache->items[hash % cache->size] = c;
-}
-
-static GLuint hash_key(struct state_key *key)
-{
-    GLuint *ikey = (GLuint *)key;
-    GLuint hash = 0, i;
-
-    /* I'm sure this can be improved on, but speed is important:
-     */
-    for (i = 0; i < sizeof(*key)/sizeof(GLuint); i++)
-	hash ^= ikey[i];
-
-    return hash;
-}
-
 void _tnl_UpdateFixedFunctionProgram(GLcontext *ctx)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    struct state_key *key;
-    GLuint hash;
     const struct gl_vertex_program *prev = ctx->VertexProgram._Current;
 
     if (!ctx->VertexProgram._Current ||
 	ctx->VertexProgram._Current == ctx->VertexProgram._TnlProgram) {
-	/* Grab all the relevent state and put it in a single structure:
-	 */
-	key = make_state_key(ctx);
-	hash = hash_key(key);
+	/* Grab all the relevant state and put it in a single structure: */
+	state_key key = make_state_key(ctx);
 
-	/* Look for an already-prepared program for this state:
-	 */
-	ctx->VertexProgram._TnlProgram = (struct gl_vertex_program *)
-					 search_cache(tnl->vp_cache, hash, key, sizeof(*key));
-
-	/* OK, we'll have to build a new one:
-	 */
-	if (!ctx->VertexProgram._TnlProgram) {
-	    if (0)
-		_mesa_printf("Build new TNL program\n");
-
+	/* Look for an already-prepared program for this state: */
+	auto it = tnl->vp_cache->map.find(key);
+	if (it != tnl->vp_cache->map.end()) {
+	    ctx->VertexProgram._TnlProgram = it->second;
+	} else {
+	    /* Build a new one: */
 	    ctx->VertexProgram._TnlProgram = (struct gl_vertex_program *)
 					     ctx->Driver.NewProgram(ctx, GL_VERTEX_PROGRAM_ARB, 0);
 
-	    create_new_program(key, ctx->VertexProgram._TnlProgram,
+	    create_new_program(&key, ctx->VertexProgram._TnlProgram,
 			       ctx->Const.VertexProgram.MaxTemps);
 
 	    if (ctx->Driver.ProgramStringNotify)
 		ctx->Driver.ProgramStringNotify(ctx, GL_VERTEX_PROGRAM_ARB,
 						&ctx->VertexProgram._TnlProgram->Base);
 
-	    cache_item(tnl->vp_cache, hash, key, ctx->VertexProgram._TnlProgram);
-	} else {
-	    free(key);
-	    if (0)
-		_mesa_printf("Found existing TNL program for key %x\n", hash);
+	    tnl->vp_cache->map.emplace(key, ctx->VertexProgram._TnlProgram);
 	}
 	ctx->VertexProgram._Current = ctx->VertexProgram._TnlProgram;
     }
 
-    /* Tell the driver about the change.  Could define a new target for
-     * this?
-     */
+    /* Tell the driver about the change. */
     if (ctx->VertexProgram._Current != prev && ctx->Driver.BindProgram) {
 	ctx->Driver.BindProgram(ctx, GL_VERTEX_PROGRAM_ARB,
 				(struct gl_program *) ctx->VertexProgram._Current);
@@ -1586,30 +1532,18 @@ void _tnl_UpdateFixedFunctionProgram(GLcontext *ctx)
 void _tnl_ProgramCacheInit(GLcontext *ctx)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-
-    tnl->vp_cache = (struct tnl_cache *) malloc(sizeof(*tnl->vp_cache));
-    tnl->vp_cache->size = 17;
-    tnl->vp_cache->n_items = 0;
-    tnl->vp_cache->items = (struct tnl_cache_item**)
-			   calloc(1,tnl->vp_cache->size * sizeof(*tnl->vp_cache->items));
+    tnl->vp_cache = new tnl_vp_cache{};
 }
 
 void _tnl_ProgramCacheDestroy(GLcontext *ctx)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    struct tnl_cache_item *c, *next;
-    GLuint i;
+    /* The gl_vertex_program objects in the cache are owned by the driver
+     * (refcounted); we just drop our references here.  The map destructor
+     * takes care of the rest. */
+    delete tnl->vp_cache;
+    tnl->vp_cache = nullptr;
 
-    for (i = 0; i < tnl->vp_cache->size; i++)
-	for (c = tnl->vp_cache->items[i]; c; c = next) {
-	    next = c->next;
-	    free(c->key);
-	    free(c->data);
-	    free(c);
-	}
-
-    free(tnl->vp_cache->items);
-    free(tnl->vp_cache);
 }
 
 /*
