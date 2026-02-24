@@ -36,6 +36,9 @@
 #include "mtypes.h"
 #include "prog_statevars.h"
 
+#include <string>
+#include <vector>
+
 
 /**
  * Program parameter.
@@ -45,7 +48,7 @@
  * Used by shaders for uniforms, constants, varying vars, etc.
  */
 struct gl_program_parameter {
-    const char *Name;        /**< Null-terminated string */
+    std::string Name;        /**< Parameter name */
     enum register_file Type; /**< PROGRAM_NAMED_PARAM, CONSTANT or STATE_VAR */
     GLenum DataType;         /**< GL_FLOAT, GL_FLOAT_VEC2, etc */
     GLuint Size;             /**< Number of components (1..4) */
@@ -60,12 +63,13 @@ struct gl_program_parameter {
  * List of gl_program_parameter instances.
  */
 struct gl_program_parameter_list {
-    GLuint Size;           /**< allocated size of Parameters, ParameterValues */
-    GLuint NumParameters;  /**< number of parameters in arrays */
-    struct gl_program_parameter *Parameters; /**< Array [Size] */
-    GLfloat(*ParameterValues)[4];         /**< Array [Size] of GLfloat[4] */
+    std::vector<gl_program_parameter> Parameters; /**< Parameter descriptors */
+    GLfloat(*ParameterValues)[4];         /**< Array [NumParameters] of GLfloat[4] */
+    GLuint ParameterValueCapacity;        /**< allocated size of ParameterValues */
     GLbitfield StateFlags; /**< _NEW_* flags indicating which state changes
                                might invalidate ParameterValues[] */
+
+    GLuint NumParameters() const { return static_cast<GLuint>(Parameters.size()); }
 };
 
 

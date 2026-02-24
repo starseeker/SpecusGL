@@ -1561,7 +1561,7 @@ PrintSrcReg(const struct gl_fragment_program *program,
 	} else {
 	    ASSERT(program->Base.Parameters->Parameters[src->Index].Type
 		   == PROGRAM_NAMED_PARAM);
-	    _mesa_printf("%s", program->Base.Parameters->Parameters[src->Index].Name);
+	    _mesa_printf("%s", program->Base.Parameters->Parameters[src->Index].Name.c_str());
 	}
     } else if (src->File == PROGRAM_OUTPUT) {
 	_mesa_printf("o[%s]", OutputRegisters[src->Index]);

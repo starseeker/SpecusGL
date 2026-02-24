@@ -49,16 +49,16 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     GLuint *map, i, firstVarying, newFile;
     GLbitfield varsWritten, varsRead;
 
-    map = (GLuint *) malloc(prog->Varying->NumParameters * sizeof(GLuint));
+    map = (GLuint *) malloc(prog->Varying->NumParameters() * sizeof(GLuint));
     if (!map)
 	return GL_FALSE;
 
-    for (i = 0; i < prog->Varying->NumParameters; i++) {
+    for (i = 0; i < prog->Varying->NumParameters(); i++) {
 	/* see if this varying is in the linked varying list */
 	const struct gl_program_parameter *var
-		= prog->Varying->Parameters + i;
+		= prog->&Varying->Parameters[i];
 
-	GLint j = _mesa_lookup_parameter_index(shProg->Varying, -1, var->Name);
+	GLint j = _mesa_lookup_parameter_index(shProg->Varying, -1, var->Name.c_str());
 	if (j >= 0) {
 	    /* already in list, check size */
 	    if (var->Size != shProg->Varying->Parameters[j].Size) {
@@ -69,7 +69,7 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    }
 	} else {
 	    /* not already in linked list */
-	    j = _mesa_add_varying(shProg->Varying, var->Name, var->Size);
+	    j = _mesa_add_varying(shProg->Varying, var->Name.c_str(), var->Size);
 	}
 	ASSERT(j >= 0);
 
@@ -153,13 +153,13 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     _mesa_print_parameter_list(shProg->Uniforms);
 #endif
 
-    map = (GLuint *) malloc(prog->Parameters->NumParameters * sizeof(GLuint));
+    map = (GLuint *) malloc(prog->Parameters->NumParameters() * sizeof(GLuint));
     if (!map)
 	return GL_FALSE;
 
-    for (i = 0; i < prog->Parameters->NumParameters; /* incr below*/) {
+    for (i = 0; i < prog->Parameters->NumParameters(); /* incr below*/) {
 	/* see if this uniform is in the linked uniform list */
-	const struct gl_program_parameter *p = prog->Parameters->Parameters + i;
+	const struct gl_program_parameter *p = prog->&Parameters->Parameters[i];
 	const GLfloat *pVals = prog->Parameters->ParameterValues[i];
 	GLint j;
 	GLint size;
@@ -167,8 +167,8 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	/* sanity check */
 	assert(is_uniform(p->Type));
 
-	if (p->Name) {
-	    j = _mesa_lookup_parameter_index(shProg->Uniforms, -1, p->Name);
+	if (!p->Name.empty()) {
+	    j = _mesa_lookup_parameter_index(shProg->Uniforms, -1, p->Name.c_str());
 	} else {
 	    /*GLuint swizzle;*/
 	    ASSERT(p->Type == PROGRAM_CONSTANT);
@@ -189,31 +189,31 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    /* not already in linked list */
 	    switch (p->Type) {
 		case PROGRAM_ENV_PARAM:
-		    j = _mesa_add_named_parameter(shProg->Uniforms, p->Name, pVals);
+		    j = _mesa_add_named_parameter(shProg->Uniforms, p->Name.c_str(), pVals);
 		    break;
 		case PROGRAM_CONSTANT:
-		    j = _mesa_add_named_constant(shProg->Uniforms, p->Name, pVals, p->Size);
+		    j = _mesa_add_named_constant(shProg->Uniforms, p->Name.c_str(), pVals, p->Size);
 		    break;
 		case PROGRAM_STATE_VAR:
 		    j = _mesa_add_state_reference(shProg->Uniforms, p->StateIndexes);
 		    break;
 		case PROGRAM_UNIFORM:
-		    if (!p->Name) {
-			_mesa_problem(NULL, "bad p->Name in link_uniform_vars()");
+		    if (p->Name.empty()) {
+			_mesa_problem(NULL, "bad p->Name.c_str() in link_uniform_vars()");
 			if (map)
 			    free(map);
 			return GL_FALSE;
 		    }
-		    j = _mesa_add_uniform(shProg->Uniforms, p->Name, p->Size, p->DataType);
+		    j = _mesa_add_uniform(shProg->Uniforms, p->Name.c_str(), p->Size, p->DataType);
 		    break;
 		case PROGRAM_SAMPLER:
-		    if (!p->Name) {
-			_mesa_problem(NULL, "bad p->Name in link_uniform_vars()");
+		    if (p->Name.empty()) {
+			_mesa_problem(NULL, "bad p->Name.c_str() in link_uniform_vars()");
 			if (map)
 			    free(map);
 			return GL_FALSE;
 		    }
-		    j = _mesa_add_sampler(shProg->Uniforms, p->Name, p->DataType);
+		    j = _mesa_add_sampler(shProg->Uniforms, p->Name.c_str(), p->DataType);
 		    break;
 		default:
 		    _mesa_problem(NULL, "bad parameter type in link_uniform_vars()");
@@ -243,7 +243,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 #if 0
     {
 	GLuint i;
-	for (i = 0; i < prog->Parameters->NumParameters; i++) {
+	for (i = 0; i < prog->Parameters->NumParameters(); i++) {
 	    printf("map[%d] = %d\n", i, map[i]);
 	}
 	_mesa_print_parameter_list(shProg->Uniforms);
@@ -307,7 +307,7 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
      * explicitly bound by the user with glBindAttributeLocation().
      */
     usedAttributes = 0x0;
-    for (i = 0; i < shProg->Attributes->NumParameters; i++) {
+    for (i = 0; i < shProg->Attributes->NumParameters(); i++) {
 	GLint attr = shProg->Attributes->Parameters[i].StateIndexes[0];
 	usedAttributes |= attr;
     }

@@ -3371,7 +3371,7 @@ debug_variables(GLcontext * ctx, struct var_cache *vc_head,
 		b = vc->param_binding_begin;
 		for (a = 0; a < vc->param_binding_length; a++) {
 		    fprintf(stderr, "%s\n",
-			    Program->Base.Parameters->Parameters[a + b].Name);
+			    Program->Base.Parameters->Parameters[a + b].Name.c_str());
 		    if (Program->Base.Parameters->Parameters[a + b].Type == PROGRAM_STATE_VAR) {
 			const char *s;
 			s = _mesa_program_state_string(Program->Base.Parameters->Parameters

@@ -226,7 +226,7 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 		    sprintf(str, "uniform[%d]", index);
 		    break;
 		case PROGRAM_STATE_VAR: {
-		    struct gl_program_parameter *param = prog->Parameters->Parameters + index;
+		    struct gl_program_parameter *param = &prog->Parameters->Parameters[index];
 		    const char *sstr = _mesa_program_state_string(param->StateIndexes);
 		    sprintf(str, "%s", sstr);
 		    free((void *)sstr);
@@ -760,13 +760,13 @@ _mesa_print_parameter_list(const struct gl_program_parameter_list *list)
     GLuint i;
 
     _mesa_printf("param list %p\n", (void *) list);
-    for (i = 0; i < list->NumParameters; i++) {
-	struct gl_program_parameter *param = list->Parameters + i;
+    for (i = 0; i < list->NumParameters(); i++) {
+	const struct gl_program_parameter *param = &list->Parameters[i];
 	const GLfloat *v = list->ParameterValues[i];
 	_mesa_printf("param[%d] sz=%d %s %s = {%.3g, %.3g, %.3g, %.3g};\n",
 		     i, param->Size,
 		     file_string(list->Parameters[i].Type, mode),
-		     param->Name, v[0], v[1], v[2], v[3]);
+		     param->Name.c_str(), v[0], v[1], v[2], v[3]);
     }
 }
 
