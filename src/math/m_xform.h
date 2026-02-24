@@ -26,6 +26,10 @@
 #ifndef _M_XFORM_H
 #define _M_XFORM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "glheader.h"
 #include "gllimits.h"
@@ -176,6 +180,10 @@ extern void _mesa_transform_point_sz(GLfloat Q[4], CONST GLfloat M[16],
    ( _mesa_transform_tab[(from)->size][(mat)->type]( to, (mat)->m, from ), \
      (to) )
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

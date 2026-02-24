@@ -26,6 +26,10 @@
 #ifndef _M_EVAL_H
 #define _M_EVAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "glheader.h"
 
 void _math_init_eval(void);
@@ -99,6 +103,10 @@ _math_de_casteljau_surf(GLfloat *cn, GLfloat *out, GLfloat *du, GLfloat *dv,
 			GLfloat u, GLfloat v, GLuint dim,
 			GLuint uorder, GLuint vorder);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

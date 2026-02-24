@@ -83,11 +83,11 @@ set(osmesa_srcs
   math/m_debug_clip.c
   math/m_debug_norm.c
   math/m_debug_xform.c
-  math/m_eval.c
+  math/m_eval.cpp
   math/m_matrix.cpp
-  math/m_translate.c
+  math/m_translate.cpp
   math/m_vector.cpp
-  math/m_xform.c
+  math/m_xform.cpp
   shader/arbprogparse.c
   shader/arbprogram.c
   shader/atifragshader.c
@@ -96,11 +96,11 @@ set(osmesa_srcs
   shader/nvprogram.c
   shader/nvvertparse.c
   shader/prog_execute.c
-  shader/prog_instruction.c
-  shader/prog_parameter.c
+  shader/prog_instruction.cpp
+  shader/prog_parameter.cpp
   shader/prog_print.c
   shader/prog_statevars.c
-  shader/program.c
+  shader/program.cpp
   shader/programopt.c
   shader/shader_api.c
   shader/slang/slang_builtin.c
