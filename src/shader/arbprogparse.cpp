@@ -544,7 +544,7 @@ var_cache_create(struct var_cache **va)
 {
     *va = (struct var_cache *) malloc(sizeof(struct var_cache));
     if (*va) {
-	(**va).name = NULL;
+	(**va).name = nullptr;
 	(**va).type = vt_none;
 	(**va).attrib_binding = ~0;
 	(**va).attrib_is_generic = 0;
@@ -553,8 +553,8 @@ var_cache_create(struct var_cache **va)
 	(**va).param_binding_type = ~0;
 	(**va).param_binding_begin = ~0;
 	(**va).param_binding_length = ~0;
-	(**va).alias_binding = NULL;
-	(**va).next = NULL;
+	(**va).alias_binding = nullptr;
+	(**va).next = nullptr;
     }
 }
 
@@ -564,7 +564,7 @@ var_cache_destroy(struct var_cache **va)
     if (*va) {
 	var_cache_destroy(&(**va).next);
 	free(*va);
-	*va = NULL;
+	*va = nullptr;
     }
 }
 
@@ -592,7 +592,7 @@ var_cache_find(struct var_cache *va, const GLubyte * name)
 	va = va->next;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -685,7 +685,7 @@ parse_string(const GLubyte ** inst, struct var_cache **vc_head,
 	     struct arb_program *Program, GLuint * found)
 {
     const GLubyte *i = *inst;
-    struct var_cache *va = NULL;
+    struct var_cache *va = nullptr;
     (void) Program;
 
     *inst += strlen((char *) i) + 1;
@@ -772,7 +772,7 @@ parse_integer(const GLubyte ** inst, struct arb_program *Program)
 /**
   Accumulate this string of digits, and return them as
   a large integer represented in floating point (for range).
-  If scale is not NULL, also accumulates a power-of-ten
+  If scale is not nullptr, also accumulates a power-of-ten
   integer scale factor that represents the number of digits
   in the string.
 */
@@ -2343,7 +2343,7 @@ parse_swizzle_mask(const GLubyte ** inst, GLubyte *swizzle, GLint len)
 		swizzle[i] = SWIZZLE_W;
 		break;
 	    default:
-		_mesa_problem(NULL, "bad component in parse_swizzle_mask()");
+		_mesa_problem(nullptr, "bad component in parse_swizzle_mask()");
 		return;
 	}
     }
@@ -2390,7 +2390,7 @@ parse_extended_swizzle_mask(const GLubyte **inst, GLubyte swizzle[4],
 		swizzle[i] = SWIZZLE_W;
 		break;
 	    default:
-		_mesa_problem(NULL, "bad case in parse_extended_swizzle_mask()");
+		_mesa_problem(nullptr, "bad case in parse_extended_swizzle_mask()");
 		return;
 	}
     }
@@ -2404,7 +2404,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 	      enum register_file * File, GLint * Index,
 	      GLboolean *IsRelOffset)
 {
-    struct var_cache *src = NULL;
+    struct var_cache *src = nullptr;
     GLuint binding = 0;
     GLuint is_generic = 0;
     GLuint found = 0;
@@ -3639,14 +3639,14 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
     struct var_cache *vc_head;
     grammar arbprogram_syn_id;
     GLubyte *parsed, *inst;
-    GLubyte *strz = NULL;
+    GLubyte *strz = nullptr;
     static int arbprogram_syn_is_ok = 0;		/* XXX temporary */
 
     /* set the program target before parsing */
     program->Base.Target = target;
 
     /* Reset error state */
-    _mesa_set_program_error(ctx, -1, NULL);
+    _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check if arb_grammar_text (arbprogram.syn) is syntactically correct */
     if (!arbprogram_syn_is_ok) {
@@ -3669,7 +3669,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 
 	/* 'parsed' is unused here */
 	free(parsed);
-	parsed = NULL;
+	parsed = nullptr;
 
 	/* NOTE: we can't destroy grammar_syn_id right here because
 	 * grammar_destroy() can reset the last error
@@ -3712,7 +3712,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	return GL_FALSE;
     }
 
-    /* check for NULL character occurences */
+    /* check for nullptr character occurences */
     {
 	GLint i;
 	for (i = 0; i < len; i++) {
@@ -3793,7 +3793,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	    program->NumTexIndirections = 0;
     program->UsesKill = 0;
 
-    vc_head = NULL;
+    vc_head = nullptr;
 
     /* Start examining the tokens in the array */
     inst = parsed;

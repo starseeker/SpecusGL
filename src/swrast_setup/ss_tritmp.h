@@ -28,7 +28,7 @@
 static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2)
 {
     SWvertex *verts = SWSETUP_CONTEXT(ctx)->verts;
-    SWvertex *v[3] = {NULL};
+    SWvertex *v[3] = {nullptr};
     GLfloat z[3];
     GLfloat offset = 0.0;
     GLenum mode = GL_FILL;

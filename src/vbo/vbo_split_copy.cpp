@@ -436,7 +436,7 @@ static void replay_init(struct copy_context *copy)
 	    break;
 
 	case GL_UNSIGNED_INT:
-	    copy->translated_elt_buf = NULL;
+	    copy->translated_elt_buf = nullptr;
 	    copy->srcelt = (const GLuint *)srcptr;
 	    break;
     }

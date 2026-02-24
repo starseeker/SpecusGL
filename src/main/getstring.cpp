@@ -62,9 +62,9 @@ _mesa_GetString(GLenum name)
 #endif
 
     if (!ctx)
-	return NULL;
+	return nullptr;
 
-    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
+    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, nullptr);
 
     /* this is a required driver function */
     assert(ctx->Driver.GetString);

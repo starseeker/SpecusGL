@@ -193,7 +193,7 @@ _mesa_GetVertexAttribPointervARB(GLuint index, GLenum pname, GLvoid **pointer)
 GLboolean GLAPIENTRY
 _mesa_IsProgramARB(GLuint id)
 {
-    struct gl_program *prog = NULL;
+    struct gl_program *prog = nullptr;
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 

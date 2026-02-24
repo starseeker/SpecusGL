@@ -676,7 +676,7 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 
 	/* Restore texture object state for each target */
 	for (tgt = 0; tgt < NUM_TEXTURE_TARGETS; tgt++) {
-	    const struct gl_texture_object *obj = NULL;
+	    const struct gl_texture_object *obj = nullptr;
 	    GLfloat bordColor[4];
 	    GLenum target;
 
@@ -749,11 +749,11 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 	}
 
 	/* remove saved references to the texture objects */
-	_mesa_reference_texobj(&texstate->SavedRef1D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRef2D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRef3D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRefCube[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRefRect[u], NULL);
+	_mesa_reference_texobj(&texstate->SavedRef1D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRef2D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRef3D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRefCube[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRefRect[u], nullptr);
     }
 
     _mesa_ActiveTextureARB(GL_TEXTURE0_ARB + texstate->Texture.CurrentUnit);
@@ -1331,11 +1331,11 @@ _mesa_free_attrib_data(GLcontext *ctx)
 		GLuint u;
 		/* clear references to the saved texture objects */
 		for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-		    _mesa_reference_texobj(&texstate->SavedRef1D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRef2D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRef3D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRefCube[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRefRect[u], NULL);
+		    _mesa_reference_texobj(&texstate->SavedRef1D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRef2D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRef3D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRefCube[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRefRect[u], nullptr);
 		}
 	    }
 	    free_attrib_data(kind, data);

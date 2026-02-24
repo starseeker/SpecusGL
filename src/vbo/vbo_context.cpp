@@ -235,13 +235,13 @@ void _vbo_DestroyContext(GLcontext *ctx)
 {
     if (ctx->aelt_context) {
 	_ae_destroy_context(ctx);
-	ctx->aelt_context = NULL;
+	ctx->aelt_context = nullptr;
     }
 
     vbo_exec_destroy(ctx);
     vbo_save_destroy(ctx);
     delete vbo_context(ctx);
-    ctx->swtnl_im = NULL;
+    ctx->swtnl_im = nullptr;
 }
 
 /*

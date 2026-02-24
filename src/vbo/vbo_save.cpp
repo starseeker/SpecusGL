@@ -74,14 +74,14 @@ void vbo_save_destroy(GLcontext *ctx)
     if (save->prim_store) {
 	if (--save->prim_store->refcount == 0) {
 	    delete save->prim_store;
-	    save->prim_store = NULL;
+	    save->prim_store = nullptr;
 	}
 	if (--save->vertex_store->refcount == 0) {
 	    if (save->vertex_store->bufferobj)
 		ctx->Driver.DeleteBuffer(ctx, save->vertex_store->bufferobj);
 
 	    delete save->vertex_store;
-	    save->vertex_store = NULL;
+	    save->vertex_store = nullptr;
 	}
     }
 }

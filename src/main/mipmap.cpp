@@ -474,7 +474,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 
 	default:
-	    _mesa_problem(NULL, "bad format in do_row()");
+	    _mesa_problem(nullptr, "bad format in do_row()");
     }
 }
 
@@ -797,8 +797,8 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 {
     const struct gl_texture_image *srcImage;
     const struct gl_texture_format *convertFormat;
-    const GLubyte *srcData = NULL;
-    GLubyte *dstData = NULL;
+    const GLubyte *srcData = nullptr;
+    GLubyte *dstData = nullptr;
     GLint level, maxLevels;
 
     ASSERT(texObj);
@@ -929,7 +929,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 	/* initialize new image */
 	_mesa_init_teximage_fields(ctx, target, dstImage, dstWidth, dstHeight,
 				   dstDepth, border, srcImage->InternalFormat);
-	dstImage->DriverData = NULL;
+	dstImage->DriverData = nullptr;
 	dstImage->TexFormat = srcImage->TexFormat;
 	dstImage->FetchTexelc = srcImage->FetchTexelc;
 	dstImage->FetchTexelf = srcImage->FetchTexelf;
@@ -1119,7 +1119,7 @@ do {									\
 	    RESCALE_IMAGE(GLubyte);
 	    break;
 	default:
-	    _mesa_problem(NULL,"unexpected bytes/pixel in _mesa_rescale_teximage2d");
+	    _mesa_problem(nullptr,"unexpected bytes/pixel in _mesa_rescale_teximage2d");
     }
 }
 

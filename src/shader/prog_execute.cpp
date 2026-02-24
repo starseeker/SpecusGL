@@ -125,10 +125,10 @@ get_register_pointer(const struct prog_src_register *source,
 	    return machine->CurProgram->Parameters->ParameterValues[source->Index];
 
 	default:
-	    _mesa_problem(NULL,
+	    _mesa_problem(nullptr,
 			  "Invalid input register file %d in get_register_pointer()",
 			  source->File);
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -382,7 +382,7 @@ store_vector4(const struct prog_instruction *inst,
 	case PROGRAM_WRITE_ONLY:
 	    return;
 	default:
-	    _mesa_problem(NULL, "bad register file in store_vector4(fp)");
+	    _mesa_problem(nullptr, "bad register file in store_vector4(fp)");
 	    return;
     }
 

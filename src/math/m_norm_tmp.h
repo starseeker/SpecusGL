@@ -35,7 +35,7 @@
  * mat - the 4x4 transformation matrix
  * scale - uniform scale factor of the transformation matrix (not always used)
  * in - the source vector of normals
- * lengths - length of each incoming normal (may be NULL) (a display list
+ * lengths - length of each incoming normal (may be nullptr) (a display list
  *           optimization)
  * dest - the destination vector of normals
  */

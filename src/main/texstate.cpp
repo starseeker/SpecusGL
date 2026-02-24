@@ -205,7 +205,7 @@ calculate_derived_texenv(struct gl_tex_env_combine_state *state,
 	    break;
 
 	default:
-	    _mesa_problem(NULL, "Invalid texBaseFormat in calculate_derived_texenv");
+	    _mesa_problem(nullptr, "Invalid texBaseFormat in calculate_derived_texenv");
 	    return;
     }
 
@@ -278,7 +278,7 @@ calculate_derived_texenv(struct gl_tex_env_combine_state *state,
 	    break;
 
 	default:
-	    _mesa_problem(NULL,
+	    _mesa_problem(nullptr,
 			  "Invalid texture env mode in calculate_derived_texenv");
 	    return;
     }
@@ -1493,7 +1493,7 @@ _mesa_GetTexLevelParameteriv(GLenum target, GLint level,
 {
     const struct gl_texture_unit *texUnit;
     struct gl_texture_object *texObj;
-    const struct gl_texture_image *img = NULL;
+    const struct gl_texture_image *img = nullptr;
     GLuint dimensions;
     GLboolean isProxy;
     GLint maxLevels;
@@ -2639,8 +2639,8 @@ static void
 update_texture_state(GLcontext *ctx)
 {
     GLuint unit;
-    struct gl_fragment_program *fprog = NULL;
-    struct gl_vertex_program *vprog = NULL;
+    struct gl_fragment_program *fprog = nullptr;
+    struct gl_vertex_program *vprog = nullptr;
 
     if (ctx->Shader.CurrentProgram &&
 	ctx->Shader.CurrentProgram->LinkStatus) {
@@ -2674,7 +2674,7 @@ update_texture_state(GLcontext *ctx)
 	struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
 	GLbitfield enableBits;
 
-	texUnit->_Current = NULL;
+	texUnit->_Current = nullptr;
 	texUnit->_ReallyEnabled = 0;
 	texUnit->_GenFlags = 0;
 
@@ -2977,11 +2977,11 @@ _mesa_free_texture_data(GLcontext *ctx)
     /* unreference current textures */
     for (u = 0; u < MAX_TEXTURE_IMAGE_UNITS; u++) {
 	struct gl_texture_unit *unit = ctx->Texture.Unit + u;
-	_mesa_reference_texobj(&unit->Current1D, NULL);
-	_mesa_reference_texobj(&unit->Current2D, NULL);
-	_mesa_reference_texobj(&unit->Current3D, NULL);
-	_mesa_reference_texobj(&unit->CurrentCubeMap, NULL);
-	_mesa_reference_texobj(&unit->CurrentRect, NULL);
+	_mesa_reference_texobj(&unit->Current1D, nullptr);
+	_mesa_reference_texobj(&unit->Current2D, nullptr);
+	_mesa_reference_texobj(&unit->Current3D, nullptr);
+	_mesa_reference_texobj(&unit->CurrentCubeMap, nullptr);
+	_mesa_reference_texobj(&unit->CurrentRect, nullptr);
     }
 
     /* Free proxy texture objects */

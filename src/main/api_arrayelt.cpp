@@ -1064,7 +1064,7 @@ void _ae_destroy_context(GLcontext *ctx)
 {
     if (AE_CONTEXT(ctx)) {
 	delete static_cast<AEcontext*>(ctx->aelt_context);
-	ctx->aelt_context = NULL;
+	ctx->aelt_context = nullptr;
     }
 }
 
@@ -1198,7 +1198,7 @@ static void _ae_update_state(GLcontext *ctx)
 
     ASSERT(at - actx->attribs <= VERT_ATTRIB_MAX);
     ASSERT(aa - actx->arrays < 32);
-    at->func = NULL;  /* terminate the list */
+    at->func = nullptr;  /* terminate the list */
     aa->offset = -1;  /* terminate the list */
 
     actx->NewState = 0;

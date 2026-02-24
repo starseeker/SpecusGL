@@ -874,8 +874,8 @@ const struct tnl_format_info _tnl_format_info[EMIT_MAX] = {
 
     {
 	"pad",
-	NULL,
-	{ NULL, NULL, NULL, NULL },
+	nullptr,
+	{ nullptr, nullptr, nullptr, nullptr },
 	0
     }
 
@@ -955,7 +955,7 @@ EMIT4(insert_4f_4, insert_4ub_4f_rgba_4, insert_2f_2, insert_2f_2, emit_xyzw4_rg
 void _tnl_generate_hardwired_emit(GLcontext *ctx)
 {
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
-    tnl_emit_func func = NULL;
+    tnl_emit_func func = nullptr;
 
     /* Does it fit a hardwired fastpath?  Help! this is growing out of
      * control!

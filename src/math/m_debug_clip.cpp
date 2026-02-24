@@ -212,7 +212,7 @@ static int test_cliptest_function(clip_func func, int np,
     (void) cycles;
 
     if (psize > 4) {
-	_mesa_problem(NULL, "test_cliptest_function called with psize > 4\n");
+	_mesa_problem(nullptr, "test_cliptest_function called with psize > 4\n");
 	return 0;
     }
 
@@ -348,7 +348,7 @@ void _math_test_all_cliptest_functions(char *description)
 		char buf[100];
 		_mesa_sprintf(buf, "%s[%d] failed test (%s)",
 			      cnames[np], psize, description);
-		_mesa_problem(NULL, buf);
+		_mesa_problem(nullptr, buf);
 	    }
 #ifdef RUN_DEBUG_BENCHMARK
 	    if (mesa_profile)

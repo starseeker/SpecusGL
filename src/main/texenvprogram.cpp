@@ -400,7 +400,7 @@ static struct ureg get_temp(struct texenv_fragment_program *p)
 	bit = _mesa_ffs(~p->temp_in_use);
 
     if (!bit) {
-	_mesa_problem(NULL, "%s: out of temporaries\n", __FILE__);
+	_mesa_problem(nullptr, "%s: out of temporaries\n", __FILE__);
 	_mesa_exit(1);
     }
 
@@ -429,7 +429,7 @@ static struct ureg get_tex_temp(struct texenv_fragment_program *p)
 	bit = _mesa_ffs(~p->temp_in_use);
 
     if (!bit) {
-	_mesa_problem(NULL, "%s: out of temporaries\n", __FILE__);
+	_mesa_problem(nullptr, "%s: out of temporaries\n", __FILE__);
 	_mesa_exit(1);
     }
 
@@ -671,7 +671,7 @@ static struct ureg get_zero(struct texenv_fragment_program *p)
 
 static void program_error(struct texenv_fragment_program *p, const char *msg)
 {
-    _mesa_problem(NULL, msg);
+    _mesa_problem(nullptr, msg);
     p->error = 1;
 }
 
@@ -1070,7 +1070,7 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     p.program->Base.NumTexIndirections = 1;	/* correct? */
     p.program->Base.NumTexInstructions = 0;
     p.program->Base.NumAluInstructions = 0;
-    p.program->Base.String = NULL;
+    p.program->Base.String = nullptr;
     p.program->Base.NumInstructions =
 	p.program->Base.NumTemporaries =
 	    p.program->Base.NumParameters =

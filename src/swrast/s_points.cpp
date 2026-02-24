@@ -171,7 +171,7 @@ void _swrast_add_spec_terms_point(GLcontext *ctx,
 /* record the current point function name */
 #ifdef DEBUG
 
-static const char *pntFuncName = NULL;
+static const char *pntFuncName = nullptr;
 
 #define USE(pntFunc)                   \
 do {                                   \

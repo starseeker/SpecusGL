@@ -112,7 +112,7 @@ rescale_accum(GLcontext *ctx)
 	    for (i = 0; i < 4 * rb->Width; i++) {
 		accRow[i] = (GLshort)(accRow[i] * s);
 	    }
-	    rb->PutRow(ctx, rb->Width, 0, y, accRow, NULL);
+	    rb->PutRow(ctx, rb->Width, 0, y, accRow, nullptr);
 	}
     }
 
@@ -159,7 +159,7 @@ _swrast_clear_accum_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	clearVal[3] = (GLshort)(ctx->Accum.ClearColor[3] * accScale);
 
 	for (i = 0; i < height; i++) {
-	    rb->PutMonoRow(ctx, width, x, y + i, clearVal, NULL);
+	    rb->PutMonoRow(ctx, width, x, y + i, clearVal, nullptr);
 	}
     } else {
 	/* someday support other sizes */
@@ -212,7 +212,7 @@ accum_add(GLcontext *ctx, GLfloat value,
 		for (j = 0; j < 4 * width; j++) {
 		    accRow[j] += incr;
 		}
-		rb->PutRow(ctx, width, xpos, ypos + i, accRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accRow, nullptr);
 	    }
 	}
     } else {
@@ -252,7 +252,7 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 		for (j = 0; j < 4 * width; j++) {
 		    accRow[j] = (GLshort)(accRow[j] * mult);
 		}
-		rb->PutRow(ctx, width, xpos, ypos + i, accRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accRow, nullptr);
 	    }
 	}
     } else {
@@ -269,7 +269,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != NULL);
+    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
 
     assert(rb);
 
@@ -325,7 +325,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
 	    }
 
 	    if (!directAccess) {
-		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, nullptr);
 	    }
 	}
     } else {
@@ -342,7 +342,7 @@ accum_load(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != NULL);
+    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
 
     assert(rb);
 
@@ -407,7 +407,7 @@ accum_load(GLcontext *ctx, GLfloat value,
 	    }
 
 	    if (!directAccess) {
-		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, nullptr);
 	    }
 	}
     }
@@ -422,7 +422,7 @@ accum_return(GLcontext *ctx, GLfloat value,
     struct gl_framebuffer *fb = ctx->DrawBuffer;
     struct gl_renderbuffer *accumRb = fb->Attachment[BUFFER_ACCUM].Renderbuffer;
     const GLboolean directAccess
-	= (accumRb->GetPointer(ctx, 0, 0) != NULL);
+	= (accumRb->GetPointer(ctx, 0, 0) != nullptr);
     const GLboolean masking = (!ctx->Color.ColorMask[RCOMP] ||
 			       !ctx->Color.ColorMask[GCOMP] ||
 			       !ctx->Color.ColorMask[BCOMP] ||
@@ -513,7 +513,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 		if (masking) {
 		    _swrast_mask_rgba_span(ctx, rb, &span);
 		}
-		rb->PutRow(ctx, width, xpos, ypos + i, span.array->rgba, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, span.array->rgba, nullptr);
 	    }
 	}
     } else {

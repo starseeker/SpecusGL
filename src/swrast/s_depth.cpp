@@ -495,13 +495,13 @@ depth_test_span(GLcontext *ctx, SWspan *span)
 	    GLushort zbuffer[MAX_WIDTH];
 	    rb->GetRow(ctx, count, x, y, zbuffer);
 	    passed = depth_test_span16(ctx, count, zbuffer, zValues, mask);
-	    rb->PutRow(ctx, count, x, y, zbuffer, NULL);
+	    rb->PutRow(ctx, count, x, y, zbuffer, nullptr);
 	} else {
 	    GLuint zbuffer[MAX_WIDTH];
 	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	    rb->GetRow(ctx, count, x, y, zbuffer);
 	    passed = depth_test_span32(ctx, count, zbuffer, zValues, mask);
-	    rb->PutRow(ctx, count, x, y, zbuffer, NULL);
+	    rb->PutRow(ctx, count, x, y, zbuffer, nullptr);
 	}
     }
 
@@ -1000,13 +1000,13 @@ depth_test_pixels(GLcontext *ctx, SWspan *span)
 	    GLushort zbuffer[MAX_WIDTH];
 	    _swrast_get_values(ctx, rb, count, x, y, zbuffer, sizeof(GLushort));
 	    depth_test_span16(ctx, count, zbuffer, z, mask);
-	    rb->PutValues(ctx, count, x, y, zbuffer, NULL);
+	    rb->PutValues(ctx, count, x, y, zbuffer, nullptr);
 	} else {
 	    GLuint zbuffer[MAX_WIDTH];
 	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	    _swrast_get_values(ctx, rb, count, x, y, zbuffer, sizeof(GLuint));
 	    depth_test_span32(ctx, count, zbuffer, z, mask);
-	    rb->PutValues(ctx, count, x, y, zbuffer, NULL);
+	    rb->PutValues(ctx, count, x, y, zbuffer, nullptr);
 	}
     }
 
@@ -1320,13 +1320,13 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    GLushort clearVal16 = (GLushort)(clearValue & 0xffff);
 	    GLint i;
 	    for (i = 0; i < height; i++) {
-		rb->PutMonoRow(ctx, width, x, y + i, &clearVal16, NULL);
+		rb->PutMonoRow(ctx, width, x, y + i, &clearVal16, nullptr);
 	    }
 	} else if (rb->DataType == GL_UNSIGNED_INT) {
 	    GLint i;
 	    ASSERT(sizeof(clearValue) == sizeof(GLuint));
 	    for (i = 0; i < height; i++) {
-		rb->PutMonoRow(ctx, width, x, y + i, &clearValue, NULL);
+		rb->PutMonoRow(ctx, width, x, y + i, &clearValue, nullptr);
 	    }
 	} else {
 	    _mesa_problem(ctx, "bad depth renderbuffer DataType");

@@ -67,7 +67,7 @@
 #ifdef DO_FOG
     GLfloat fogPlane[4];
 #else
-    GLfloat *fog = NULL;
+    GLfloat *fog = nullptr;
 #endif
 #ifdef DO_RGBA
     GLfloat rPlane[4], gPlane[4], bPlane[4], aPlane[4];

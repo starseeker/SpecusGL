@@ -162,7 +162,7 @@ _swrast_culltriangle(GLcontext *ctx,
       span.intTex[0] += span.intTexStep[0];				\
       span.intTex[1] += span.intTexStep[1];				\
    }									\
-   rb->PutRowRGB(ctx, span.end, span.x, span.y, rgb, NULL);
+   rb->PutRowRGB(ctx, span.end, span.x, span.y, rgb, nullptr);
 
 #include "s_tritemp.h"
 
@@ -243,7 +243,7 @@ struct affine_info {
     GLfixed er, eg, eb, ea;
     GLint tbytesline, tsize;
 };
-#define AFFINE_INFO_INIT_ZERO {0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0}
+#define AFFINE_INFO_INIT_ZERO {0, 0, 0, 0, 0, 0, nullptr, 0, 0, 0, 0, 0, 0}
 
 
 static INLINE GLint
@@ -564,7 +564,7 @@ affine_span(GLcontext *ctx, SWspan *span,
       info.tbytesline = obj->Image[0][b]->Width * 4;			\
       break;								\
    default:								\
-      _mesa_problem(NULL, "Bad texture format in affine_texture_triangle");\
+      _mesa_problem(nullptr, "Bad texture format in affine_texture_triangle");\
       return;								\
    }									\
    info.tsize = obj->Image[0][b]->Height * info.tbytesline;
@@ -585,7 +585,7 @@ struct persp_info {
     GLfixed er, eg, eb, ea;   /* texture env color */
     GLint tbytesline, tsize;
 };
-#define PERSP_INFO_INIT_ZERO {0, 0, 0, 0, 0, 0, NULL, 0, 0, 0, 0, 0, 0}
+#define PERSP_INFO_INIT_ZERO {0, 0, 0, 0, 0, 0, nullptr, 0, 0, 0, 0, 0, 0}
 
 static INLINE void
 fast_persp_span(GLcontext *ctx, SWspan *span,
@@ -832,7 +832,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
       info.tbytesline = obj->Image[0][b]->Width * 4;			\
       break;								\
    default:								\
-      _mesa_problem(NULL, "Bad texture format in persp_textured_triangle");\
+      _mesa_problem(nullptr, "Bad texture format in persp_textured_triangle");\
       return;								\
    }									\
    info.tsize = obj->Image[0][b]->Height * info.tbytesline;
@@ -981,7 +981,7 @@ void _swrast_add_spec_terms_triangle(GLcontext *ctx,
 #ifdef DEBUG
 
 /* record the current triangle function name */
-const char *_mesa_triFuncName = NULL;
+const char *_mesa_triFuncName = nullptr;
 
 #define USE(triFunc)				\
 do {						\
@@ -1058,7 +1058,7 @@ _swrast_choose_triangle(GLcontext *ctx)
 	    GLenum minFilter, magFilter, envMode;
 	    GLint format;
 	    texObj2D = ctx->Texture.Unit[0].Current2D;
-	    texImg = texObj2D ? texObj2D->Image[0][texObj2D->BaseLevel] : NULL;
+	    texImg = texObj2D ? texObj2D->Image[0][texObj2D->BaseLevel] : nullptr;
 	    format = texImg ? texImg->TexFormat->MesaFormat : -1;
 	    minFilter = texObj2D ? texObj2D->MinFilter : (GLenum) 0;
 	    magFilter = texObj2D ? texObj2D->MagFilter : (GLenum) 0;

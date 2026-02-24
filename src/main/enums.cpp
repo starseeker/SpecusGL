@@ -4846,7 +4846,7 @@ const char *_mesa_lookup_enum_by_nr(int nr)
     i = (unsigned *)bsearch(& nr, reduced_enums, Elements(reduced_enums),
 			    sizeof(reduced_enums[0]), (cfunc) compar_nr);
 
-    if (i != NULL) {
+    if (i != nullptr) {
 	return & enum_string_table[ all_enums[ *i ].offset ];
     } else {
 	/* this is not re-entrant safe, no big deal here */
@@ -4857,14 +4857,14 @@ const char *_mesa_lookup_enum_by_nr(int nr)
 
 int _mesa_lookup_enum_by_name(const char *symbol)
 {
-    enum_elt * f = NULL;
+    enum_elt * f = nullptr;
 
-    if (symbol != NULL) {
+    if (symbol != nullptr) {
 	f = (enum_elt *)bsearch(symbol, all_enums, Elements(all_enums),
 				sizeof(enum_elt), (cfunc) compar_name);
     }
 
-    return (f != NULL) ? f->n : -1;
+    return (f != nullptr) ? f->n : -1;
 }
 
 

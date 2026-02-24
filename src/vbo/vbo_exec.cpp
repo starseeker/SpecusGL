@@ -70,7 +70,7 @@ void vbo_exec_destroy(GLcontext *ctx)
 
     if (ctx->aelt_context) {
 	_ae_destroy_context(ctx);
-	ctx->aelt_context = NULL;
+	ctx->aelt_context = nullptr;
     }
 
     vbo_exec_vtx_destroy(exec);

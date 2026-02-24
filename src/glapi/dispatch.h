@@ -40,7 +40,7 @@
 #define CALL_by_offset(disp, cast, offset, parameters) \
     if (offset >= 0) (*(cast (GET_by_offset(disp, offset))))(parameters)
 #define GET_by_offset(disp, offset) \
-    (offset >= 0) ? (((_glapi_proc *)(disp))[offset]) : NULL
+    (offset >= 0) ? (((_glapi_proc *)(disp))[offset]) : nullptr
 #define SET_by_offset(disp, offset, fn) \
     do { \
         if ( (offset) < 0 ) { \

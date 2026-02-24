@@ -52,7 +52,7 @@ struct mesa_display_list;
 struct dd_function_table {
     /**
      * Return a string as needed by glGetString().
-     * Only the GL_RENDERER query must be implemented.  Otherwise, NULL can be
+     * Only the GL_RENDERER query must be implemented.  Otherwise, nullptr can be
      * returned.
      */
     const GLubyte * (*GetString)(GLcontext *ctx, GLenum name);
@@ -531,7 +531,7 @@ struct dd_function_table {
     /**
      * Called when the texture's color lookup table is changed.
      *
-     * If \p tObj is NULL then the shared texture palette
+     * If \p tObj is nullptr then the shared texture palette
      * gl_texture_object::Palette is to be updated.
      */
     void (*UpdateTexturePalette)(GLcontext *ctx,
@@ -900,8 +900,8 @@ struct dd_function_table {
      * ensures all computed values are up to date, thus allowing the driver to
      * decide if the current T&L module needs to be swapped out.
      *
-     * This must be non-NULL if a driver installs a custom T&L module and sets
-     * the dd_function_table::NeedValidate bitmask, but may be NULL otherwise.
+     * This must be non-nullptr if a driver installs a custom T&L module and sets
+     * the dd_function_table::NeedValidate bitmask, but may be nullptr otherwise.
      */
     void (*ValidateTnlModule)(GLcontext *ctx, GLuint new_state);
 

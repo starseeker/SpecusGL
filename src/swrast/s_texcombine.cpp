@@ -65,8 +65,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		GLchan(*rgba)[4])
 {
     const struct gl_texture_unit *textureUnit = &(ctx->Texture.Unit[unit]);
-    const GLchan(*argRGB [3])[4] = {NULL};
-    const GLchan(*argA [3])[4] = {NULL};
+    const GLchan(*argRGB [3])[4] = {nullptr};
+    const GLchan(*argA [3])[4] = {nullptr};
     const GLuint RGBshift = textureUnit->_CurrentCombine->ScaleShiftRGB;
     const GLuint Ashift   = textureUnit->_CurrentCombine->ScaleShiftA;
 #if CHAN_TYPE == GL_FLOAT

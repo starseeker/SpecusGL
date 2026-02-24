@@ -76,7 +76,7 @@ struct GLmatrix {
                          */
     enum GLmatrixtype type;
 
-    GLmatrix();   /**< Initialises m to identity, inv to NULL. */
+    GLmatrix();   /**< Initialises m to identity, inv to nullptr. */
     ~GLmatrix();  /**< Releases aligned m and inv allocations. */
 };
 

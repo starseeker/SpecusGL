@@ -153,10 +153,10 @@ get_1d_map(GLcontext *ctx, GLenum target)
 	case GL_MAP1_VERTEX_ATTRIB14_4_NV:
 	case GL_MAP1_VERTEX_ATTRIB15_4_NV:
 	    if (!ctx->Extensions.NV_vertex_program)
-		return NULL;
+		return nullptr;
 	    return &ctx->EvalMap.Map1Attrib[target - GL_MAP1_VERTEX_ATTRIB0_4_NV];
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -203,10 +203,10 @@ get_2d_map(GLcontext *ctx, GLenum target)
 	case GL_MAP2_VERTEX_ATTRIB14_4_NV:
 	case GL_MAP2_VERTEX_ATTRIB15_4_NV:
 	    if (!ctx->Extensions.NV_vertex_program)
-		return NULL;
+		return nullptr;
 	    return &ctx->EvalMap.Map2Attrib[target - GL_MAP2_VERTEX_ATTRIB0_4_NV];
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -220,7 +220,7 @@ get_2d_map(GLcontext *ctx, GLenum target)
  * Copy 1-parametric evaluator control points from user-specified
  * memory space to a buffer of contiguous control points.
  * \param see glMap1f for details
- * \return pointer to buffer of contiguous control points or NULL if out
+ * \return pointer to buffer of contiguous control points or nullptr if out
  *          of memory.
  */
 GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
@@ -230,7 +230,7 @@ GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return NULL;
+	return nullptr;
 
     buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
 
@@ -254,7 +254,7 @@ GLfloat *_mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return NULL;
+	return nullptr;
 
     buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
 
@@ -275,7 +275,7 @@ GLfloat *_mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
  * de Casteljau evaluation schemes.
  *
  * \param see glMap2f for details
- * \return pointer to buffer of contiguous control points or NULL if out
+ * \return pointer to buffer of contiguous control points or nullptr if out
  *          of memory.
  */
 GLfloat *_mesa_copy_map_points2f(GLenum target,
@@ -290,7 +290,7 @@ GLfloat *_mesa_copy_map_points2f(GLenum target,
     size = _mesa_evaluator_components(target);
 
     if (!points || size==0) {
-	return NULL;
+	return nullptr;
     }
 
     /* max(uorder, vorder) additional points are used in      */
@@ -333,7 +333,7 @@ GLfloat *_mesa_copy_map_points2d(GLenum target,
     size = _mesa_evaluator_components(target);
 
     if (!points || size==0) {
-	return NULL;
+	return nullptr;
     }
 
     /* max(uorder, vorder) additional points are used in      */
@@ -377,7 +377,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     GET_CURRENT_CONTEXT(ctx);
     GLint k;
     GLfloat *pnts;
-    struct gl_1d_map *map = NULL;
+    struct gl_1d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
     ASSERT(type == GL_FLOAT || type == GL_DOUBLE);
@@ -464,7 +464,7 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     GET_CURRENT_CONTEXT(ctx);
     GLint k;
     GLfloat *pnts;
-    struct gl_2d_map *map = NULL;
+    struct gl_2d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
     ASSERT(type == GL_FLOAT || type == GL_DOUBLE);

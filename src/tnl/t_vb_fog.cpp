@@ -257,17 +257,17 @@ free_fog_data(struct tnl_pipeline_stage *stage)
     if (store) {
 	_mesa_vector4f_free(&store->fogcoord);
 	delete store;
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
 
 const struct tnl_pipeline_stage _tnl_fog_coordinate_stage = {
     "build fog coordinates",	/* name */
-    NULL,			/* private_data */
+    nullptr,			/* private_data */
     alloc_fog_data,		/* dtr */
     free_fog_data,		/* dtr */
-    NULL,		/* check */
+    nullptr,		/* check */
     run_fog_stage		/* run -- initially set to init. */
 };
 

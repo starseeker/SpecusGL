@@ -76,7 +76,7 @@ read_color_image(GLcontext *ctx, GLint x, GLint y, GLenum type,
 
     image = (GLubyte *) malloc(width * height * pixelSize);
     if (!image)
-	return NULL;
+	return nullptr;
 
     RENDER_START(swrast, ctx);
 
@@ -107,7 +107,7 @@ read_depth_image(GLcontext *ctx, GLint x, GLint y,
 
     image = (GLuint *) malloc(width * height * sizeof(GLuint));
     if (!image)
-	return NULL;
+	return nullptr;
 
     RENDER_START(swrast, ctx);
 
@@ -141,7 +141,7 @@ read_depth_stencil_image(GLcontext *ctx, GLint x, GLint y,
 
     image = (GLuint *) calloc(width * height, sizeof(GLuint));
     if (!image)
-	return NULL;
+	return nullptr;
 
     RENDER_START(swrast, ctx);
 

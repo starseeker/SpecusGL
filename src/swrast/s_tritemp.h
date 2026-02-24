@@ -172,7 +172,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #endif
 	GLint lines;	/* number of lines to be sampled on this edge */
     } EdgeT;
-#define EDGET_INIT_ZERO {NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0}
+#define EDGET_INIT_ZERO {nullptr, nullptr, 0, 0, 0, 0, 0, 0, 0, 0}
 
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
 #ifdef INTERP_Z
@@ -183,7 +183,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #endif
     EdgeT eMaj = EDGET_INIT_ZERO, eTop = EDGET_INIT_ZERO, eBot = EDGET_INIT_ZERO;
     GLfloat oneOverArea = 0.0;
-    const SWvertex *vMin = NULL, *vMid = NULL, *vMax = NULL;  /* Y(vMin)<=Y(vMid)<=Y(vMax) */
+    const SWvertex *vMin = nullptr, *vMid = nullptr, *vMax = nullptr;  /* Y(vMin)<=Y(vMid)<=Y(vMax) */
     GLfloat bf = SWRAST_CONTEXT(ctx)->_BackfaceSign;
 #if !TRIANGLE_WALK_DOUBLE
     const GLint snapMask = ~((FIXED_ONE / (1 << SUB_PIXEL_BITS)) - 1); /* for x/y coord snapping */
@@ -709,13 +709,13 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 	    GLinterp fdxLeftEdge = 0, fdxRightEdge = 0;
 	    GLinterp fError = 0, fdError = 0;
 #ifdef PIXEL_ADDRESS
-	    PIXEL_TYPE *pRow = NULL;
+	    PIXEL_TYPE *pRow = nullptr;
 	    GLint dPRowOuter = 0, dPRowInner = 0;  /* offset in bytes */
 #endif
 #ifdef INTERP_Z
 #  ifdef DEPTH_TYPE
 	    struct gl_renderbuffer *zrb = ctx->DrawBuffer->Attachment[BUFFER_DEPTH].Renderbuffer;
-	    DEPTH_TYPE *zRow = NULL;
+	    DEPTH_TYPE *zRow = nullptr;
 	    GLint dZRowOuter = 0, dZRowInner = 0;  /* offset in bytes */
 #  endif
 	    GLuint zLeft = 0;

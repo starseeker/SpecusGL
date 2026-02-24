@@ -130,9 +130,9 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 					      &store->ormask,
 					      &store->andmask);
     } else {
-	VB->NdcPtr = NULL;
+	VB->NdcPtr = nullptr;
 	_mesa_clip_np_tab[VB->ClipPtr->size](VB->ClipPtr,
-					     NULL,
+					     nullptr,
 					     store->clipmask,
 					     &store->ormask,
 					     &store->andmask);
@@ -242,7 +242,7 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine)
     machine->StackDepth = 0;
 
     machine->FetchTexelLod = vp_fetch_texel;
-    machine->FetchTexelDeriv = NULL; /* not used by vertex programs */
+    machine->FetchTexelDeriv = nullptr; /* not used by vertex programs */
 }
 
 
@@ -508,7 +508,7 @@ dtr(struct tnl_pipeline_stage *stage)
 	ALIGN_FREE(store->clipmask);
 
 	delete store;
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
@@ -528,7 +528,7 @@ validate_vp_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
  */
 const struct tnl_pipeline_stage _tnl_vertex_program_stage = {
     "vertex-program",
-    NULL,			/* private_data */
+    nullptr,			/* private_data */
     init_vp,			/* create */
     dtr,				/* destroy */
     validate_vp_stage, 		/* validate */

@@ -205,13 +205,13 @@ const struct tnl_pipeline_stage *_tnl_default_pipeline[] = {
     &_tnl_point_attenuation_stage,
     &_tnl_vertex_program_stage,
     &_tnl_render_stage,
-    NULL
+    nullptr
 };
 
 const struct tnl_pipeline_stage *_tnl_vp_pipeline[] = {
     &_tnl_vertex_program_stage,
     &_tnl_render_stage,
-    NULL
+    nullptr
 };
 
 /*

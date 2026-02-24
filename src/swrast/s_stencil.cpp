@@ -421,7 +421,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
 	span->writeAll = GL_FALSE;
 	if (!rb->GetPointer(ctx, 0, 0)) {
 	    /* put updated stencil values into buffer */
-	    rb->PutRow(ctx, n, x, y, stencil, NULL);
+	    rb->PutRow(ctx, n, x, y, stencil, nullptr);
 	}
 	return GL_FALSE;
     }
@@ -430,7 +430,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
      * Some fragments passed the stencil test, apply depth test to them
      * and apply Zpass and Zfail stencil ops.
      */
-    if (ctx->Depth.Test == GL_FALSE || ctx->DrawBuffer->_DepthBuffer == NULL) {
+    if (ctx->Depth.Test == GL_FALSE || ctx->DrawBuffer->_DepthBuffer == nullptr) {
 	/*
 	 * No depth buffer, just apply zpass stencil function to active pixels.
 	 */
@@ -479,7 +479,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
      * Write updated stencil values back into hardware stencil buffer.
      */
     if (!rb->GetPointer(ctx, 0, 0)) {
-	rb->PutRow(ctx, n, x, y, stencil, NULL);
+	rb->PutRow(ctx, n, x, y, stencil, nullptr);
     }
 
     span->writeAll = GL_FALSE;
@@ -1085,9 +1085,9 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
 	    newVals[i]
 		= (stencil[i] & stencilMask) | (destVals[i] & ~stencilMask);
 	}
-	rb->PutRow(ctx, n, x, y, newVals, NULL);
+	rb->PutRow(ctx, n, x, y, newVals, nullptr);
     } else {
-	rb->PutRow(ctx, n, x, y, stencil, NULL);
+	rb->PutRow(ctx, n, x, y, stencil, nullptr);
     }
 }
 
@@ -1174,7 +1174,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
-		    rb->PutRow(ctx, width, x, y + i, stencil, NULL);
+		    rb->PutRow(ctx, width, x, y + i, stencil, nullptr);
 		}
 	    } else {
 		GLint i, j;
@@ -1184,7 +1184,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
-		    rb->PutRow(ctx, width, x, y + i, stencil, NULL);
+		    rb->PutRow(ctx, width, x, y + i, stencil, nullptr);
 		}
 	    }
 	} else {
@@ -1199,7 +1199,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		clear = &clear16;
 	    }
 	    for (i = 0; i < height; i++) {
-		rb->PutMonoRow(ctx, width, x, y + i, clear, NULL);
+		rb->PutMonoRow(ctx, width, x, y + i, clear, nullptr);
 	    }
 	}
     }

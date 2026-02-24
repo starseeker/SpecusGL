@@ -73,8 +73,8 @@ _mesa_free_parameter_list(struct gl_program_parameter_list *paramList)
  * \param type  type of parameter, such as
  * \param name  the parameter name, will be duplicated/copied!
  * \param size  number of elements in 'values' vector (1..4, or more)
- * \param values  initial parameter value, up to 4 GLfloats, or NULL
- * \param state  state indexes, or NULL
+ * \param values  initial parameter value, up to 4 GLfloats, or nullptr
+ * \param state  state indexes, or nullptr
  * \return  index of new parameter in the list, or -1 if error (out of mem)
  */
 GLint
@@ -121,7 +121,7 @@ _mesa_add_parameter(struct gl_program_parameter_list *paramList,
 
 	for (i = 0; i < sz4; i++) {
 	    struct gl_program_parameter *p = paramList->Parameters + oldNum + i;
-	    p->Name = name ? _mesa_strdup(name) : NULL;
+	    p->Name = name ? _mesa_strdup(name) : nullptr;
 	    p->Type = type;
 	    p->Size = size;
 	    p->DataType = datatype;
@@ -154,7 +154,7 @@ _mesa_add_named_parameter(struct gl_program_parameter_list *paramList,
 			  const char *name, const GLfloat values[4])
 {
     return _mesa_add_parameter(paramList, PROGRAM_NAMED_PARAM, name,
-			       4, GL_NONE, values, NULL);
+			       4, GL_NONE, values, nullptr);
 
 }
 
@@ -185,7 +185,7 @@ _mesa_add_named_constant(struct gl_program_parameter_list *paramList,
 #endif
     size = 4; /** XXX fix */
     return _mesa_add_parameter(paramList, PROGRAM_CONSTANT, name,
-			       size, GL_NONE, values, NULL);
+			       size, GL_NONE, values, nullptr);
 }
 
 
@@ -236,8 +236,8 @@ _mesa_add_unnamed_constant(struct gl_program_parameter_list *paramList,
     }
 
     /* add a new parameter to store this constant */
-    pos = _mesa_add_parameter(paramList, PROGRAM_CONSTANT, NULL,
-			      size, GL_NONE, values, NULL);
+    pos = _mesa_add_parameter(paramList, PROGRAM_CONSTANT, nullptr,
+			      size, GL_NONE, values, nullptr);
     if (pos >= 0 && swizzleOut) {
 	if (size == 1)
 	    *swizzleOut = SWIZZLE_XXXX;
@@ -269,7 +269,7 @@ _mesa_add_uniform(struct gl_program_parameter_list *paramList,
 	return i;
     } else {
 	i = _mesa_add_parameter(paramList, PROGRAM_UNIFORM, name,
-				size, datatype, NULL, NULL);
+				size, datatype, nullptr, nullptr);
 	return i;
     }
 }
@@ -293,7 +293,7 @@ _mesa_add_sampler(struct gl_program_parameter_list *paramList,
     } else {
 	const GLint size = 1; /* a sampler is basically a texture unit number */
 	i = _mesa_add_parameter(paramList, PROGRAM_SAMPLER, name,
-				size, datatype, NULL, NULL);
+				size, datatype, nullptr, nullptr);
 	return i;
     }
 }
@@ -313,7 +313,7 @@ _mesa_add_varying(struct gl_program_parameter_list *paramList,
     } else {
 	assert(size == 4);
 	i = _mesa_add_parameter(paramList, PROGRAM_VARYING, name,
-				size, GL_NONE, NULL, NULL);
+				size, GL_NONE, nullptr, nullptr);
 	return i;
     }
 }
@@ -341,7 +341,7 @@ _mesa_add_attribute(struct gl_program_parameter_list *paramList,
 	if (size < 0)
 	    size = 4;
 	i = _mesa_add_parameter(paramList, PROGRAM_INPUT, name,
-				size, GL_NONE, NULL, state);
+				size, GL_NONE, nullptr, state);
     }
     return i;
 }
@@ -406,7 +406,7 @@ _mesa_add_state_reference(struct gl_program_parameter_list *paramList,
     name = _mesa_program_state_string(stateTokens);
     index = _mesa_add_parameter(paramList, PROGRAM_STATE_VAR, name,
 				size, GL_NONE,
-				NULL, (gl_state_index *) stateTokens);
+				nullptr, (gl_state_index *) stateTokens);
     paramList->StateFlags |= _mesa_program_state_flags(stateTokens);
 
     /* free name string here since we duplicated it in add_parameter() */
@@ -562,14 +562,14 @@ _mesa_clone_parameter_list(const struct gl_program_parameter_list *list)
 
     clone = _mesa_new_parameter_list();
     if (!clone)
-	return NULL;
+	return nullptr;
 
     /** Not too efficient, but correct */
     for (i = 0; i < list->NumParameters; i++) {
 	struct gl_program_parameter *p = list->Parameters + i;
 	GLuint size = MIN2(p->Size, 4);
 	GLint j = _mesa_add_parameter(clone, p->Type, p->Name, size, p->DataType,
-				      list->ParameterValues[i], NULL);
+				      list->ParameterValues[i], nullptr);
 	ASSERT(j >= 0);
 	/* copy state indexes */
 	if (p->Type == PROGRAM_STATE_VAR) {

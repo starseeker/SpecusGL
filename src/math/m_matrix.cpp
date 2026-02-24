@@ -286,7 +286,7 @@ static void print_matrix_floats(const GLfloat m[16])
 {
     int i;
     for (i=0; i<4; i++) {
-	_mesa_debug(NULL,"\t%f %f %f %f\n", m[i], m[4+i], m[8+i], m[12+i]);
+	_mesa_debug(nullptr,"\t%f %f %f %f\n", m[i], m[4+i], m[8+i], m[12+i]);
     }
 }
 
@@ -298,17 +298,17 @@ static void print_matrix_floats(const GLfloat m[16])
 void
 _math_matrix_print(const GLmatrix *m)
 {
-    _mesa_debug(NULL, "Matrix type: %s, flags: %x\n", types[m->type], m->flags);
+    _mesa_debug(nullptr, "Matrix type: %s, flags: %x\n", types[m->type], m->flags);
     print_matrix_floats(m->m);
-    _mesa_debug(NULL, "Inverse: \n");
+    _mesa_debug(nullptr, "Inverse: \n");
     if (m->inv) {
 	GLfloat prod[16];
 	print_matrix_floats(m->inv);
 	matmul4(prod, m->m, m->inv);
-	_mesa_debug(NULL, "Mat * Inverse:\n");
+	_mesa_debug(nullptr, "Mat * Inverse:\n");
 	print_matrix_floats(prod);
     } else {
-	_mesa_debug(NULL, "  - not available\n");
+	_mesa_debug(nullptr, "  - not available\n");
     }
 }
 
@@ -1210,7 +1210,7 @@ _math_matrix_viewport(GLmatrix *m, GLint x, GLint y, GLint width, GLint height,
  *
  * \param mat matrix.
  *
- * Copies ::Identity into \p GLmatrix::m, and into GLmatrix::inv if not NULL.
+ * Copies ::Identity into \p GLmatrix::m, and into GLmatrix::inv if not nullptr.
  * Sets the matrix type to identity, and clear the dirty flags.
  */
 void
@@ -1535,14 +1535,14 @@ _math_matrix_loadf(GLmatrix *mat, const GLfloat *m)
 }
 
 /**
- * GLmatrix constructor — initialises m to identity, inv to NULL.
+ * GLmatrix constructor — initialises m to identity, inv to nullptr.
  */
 GLmatrix::GLmatrix()
 {
     m = new (std::align_val_t{16}) GLfloat[16];
     if (m)
 	memcpy(m, Identity, sizeof(Identity));
-    inv = NULL;
+    inv = nullptr;
     type = MATRIX_IDENTITY;
     flags = 0;
 }
@@ -1554,11 +1554,11 @@ GLmatrix::~GLmatrix()
 {
     if (m) {
 	::operator delete[](m, std::align_val_t{16});
-	m = NULL;
+	m = nullptr;
     }
     if (inv) {
 	::operator delete[](inv, std::align_val_t{16});
-	inv = NULL;
+	inv = nullptr;
     }
 }
 

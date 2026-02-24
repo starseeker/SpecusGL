@@ -246,7 +246,7 @@ _mesa_new_z24_renderbuffer_wrapper(GLcontext *ctx,
     z24rb->_BaseFormat = GL_DEPTH_COMPONENT;
     z24rb->DataType = GL_UNSIGNED_INT;
     z24rb->DepthBits = 24;
-    z24rb->Data = NULL;
+    z24rb->Data = nullptr;
 
     return z24rb;
 }
@@ -417,7 +417,7 @@ _mesa_new_s8_renderbuffer_wrapper(GLcontext *ctx, struct gl_renderbuffer *dsrb)
     s8rb->_BaseFormat = GL_STENCIL_INDEX;
     s8rb->DataType = GL_UNSIGNED_BYTE;
     s8rb->StencilBits = 8;
-    s8rb->Data = NULL;
+    s8rb->Data = nullptr;
 
     return s8rb;
 }
@@ -473,13 +473,13 @@ if (stencilRb->_ActualFormat == GL_STENCIL_INDEX8_EXT) {
     for (i = 0; i < width; i++) {
 stencil[i] = depthStencil[i] & 0xff;
     }
-    stencilRb->PutRow(ctx, width, 0, row, stencil, NULL);
+    stencilRb->PutRow(ctx, width, 0, row, stencil, nullptr);
 } else {
     /* 32bpp stencil */
     /* the 24 depth bits will be ignored */
     ASSERT(stencilRb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
     ASSERT(stencilRb->DataType == GL_UNSIGNED_INT_24_8_EXT);
-    stencilRb->PutRow(ctx, width, 0, row, depthStencil, NULL);
+    stencilRb->PutRow(ctx, width, 0, row, depthStencil, nullptr);
 }
     }
 }
@@ -537,7 +537,7 @@ depthStencil[i]
     }
 }
 
-dsRb->PutRow(ctx, width, 0, row, depthStencil, NULL);
+dsRb->PutRow(ctx, width, 0, row, depthStencil, nullptr);
     }
 }
 
@@ -558,7 +558,7 @@ _mesa_promote_stencil(GLcontext *ctx, struct gl_renderbuffer *stencilRb)
     ASSERT(stencilRb->Data);
 
     data = (GLubyte *) stencilRb->Data;
-    stencilRb->Data = NULL;
+    stencilRb->Data = nullptr;
     stencilRb->AllocStorage(ctx, GL_DEPTH24_STENCIL8_EXT, width, height);
 
     ASSERT(stencilRb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -569,7 +569,7 @@ GLuint depthStencil[MAX_WIDTH];
 for (j = 0; j < width; j++) {
     depthStencil[j] = data[k++];
 }
-stencilRb->PutRow(ctx, width, 0, i, depthStencil, NULL);
+stencilRb->PutRow(ctx, width, 0, i, depthStencil, nullptr);
     }
     free(data);
 

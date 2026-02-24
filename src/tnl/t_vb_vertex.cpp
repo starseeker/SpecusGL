@@ -109,8 +109,8 @@ USER_CLIPTEST(userclip4, 4)
 static void (*(usercliptab[5]))(GLcontext *,
 				GLvector4f *, GLubyte *,
 				GLubyte *, GLubyte *) = {
-    NULL,
-    NULL,
+    nullptr,
+    nullptr,
     userclip2,
     userclip3,
     userclip4
@@ -174,9 +174,9 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
 					      &store->ormask,
 					      &store->andmask);
     } else {
-	VB->NdcPtr = NULL;
+	VB->NdcPtr = nullptr;
 	_mesa_clip_np_tab[VB->ClipPtr->size](VB->ClipPtr,
-					     NULL,
+					     nullptr,
 					     store->clipmask,
 					     &store->ormask,
 					     &store->andmask);
@@ -245,7 +245,7 @@ static void dtr(struct tnl_pipeline_stage *stage)
 	_mesa_vector4f_free(&store->proj);
 	ALIGN_FREE(store->clipmask);
 	free(store);
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
 	stage->run = init_vertex_stage;
     }
 }
@@ -253,10 +253,10 @@ static void dtr(struct tnl_pipeline_stage *stage)
 
 const struct tnl_pipeline_stage _tnl_vertex_transform_stage = {
     "modelview/project/cliptest/divide",
-    NULL,			/* private data */
+    nullptr,			/* private data */
     init_vertex_stage,
     dtr,				/* destructor */
-    NULL,
+    nullptr,
     run_vertex_stage		/* run -- initially set to init */
 };
 

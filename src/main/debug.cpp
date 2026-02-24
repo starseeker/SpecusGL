@@ -50,7 +50,7 @@ const char *_mesa_prim_name[GL_POLYGON+4] = {
 void
 _mesa_print_state(const char *msg, GLuint state)
 {
-    _mesa_debug(NULL,
+    _mesa_debug(nullptr,
 		"%s: (0x%x) %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
 		msg,
 		state,
@@ -85,7 +85,7 @@ _mesa_print_state(const char *msg, GLuint state)
 void
 _mesa_print_tri_caps(const char *name, GLuint flags)
 {
-    _mesa_debug(NULL,
+    _mesa_debug(nullptr,
 		"%s: (0x%x) %s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n",
 		name,
 		flags,
@@ -113,21 +113,21 @@ _mesa_print_tri_caps(const char *name, GLuint flags)
  */
 void _mesa_print_info(void)
 {
-    _mesa_debug(NULL, "Mesa GL_VERSION = %s\n",
+    _mesa_debug(nullptr, "Mesa GL_VERSION = %s\n",
 		(char *) _mesa_GetString(GL_VERSION));
-    _mesa_debug(NULL, "Mesa GL_RENDERER = %s\n",
+    _mesa_debug(nullptr, "Mesa GL_RENDERER = %s\n",
 		(char *) _mesa_GetString(GL_RENDERER));
-    _mesa_debug(NULL, "Mesa GL_VENDOR = %s\n",
+    _mesa_debug(nullptr, "Mesa GL_VENDOR = %s\n",
 		(char *) _mesa_GetString(GL_VENDOR));
-    _mesa_debug(NULL, "Mesa GL_EXTENSIONS = %s\n",
+    _mesa_debug(nullptr, "Mesa GL_EXTENSIONS = %s\n",
 		(char *) _mesa_GetString(GL_EXTENSIONS));
 #if defined(THREADS)
-    _mesa_debug(NULL, "Mesa thread-safe: YES\n");
+    _mesa_debug(nullptr, "Mesa thread-safe: YES\n");
 #else
-    _mesa_debug(NULL, "Mesa thread-safe: NO\n");
+    _mesa_debug(nullptr, "Mesa thread-safe: NO\n");
 #endif
-    _mesa_debug(NULL, "Mesa x86-optimized: NO\n");
-    _mesa_debug(NULL, "Mesa sparc-optimized: NO\n");
+    _mesa_debug(nullptr, "Mesa x86-optimized: NO\n");
+    _mesa_debug(nullptr, "Mesa sparc-optimized: NO\n");
 }
 
 

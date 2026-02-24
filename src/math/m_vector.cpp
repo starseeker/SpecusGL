@@ -131,9 +131,9 @@ void _mesa_vector4f_free(GLvector4f *v)
 {
     if (v->flags & VEC_MALLOC) {
 	std::free(v->storage);
-	v->data = NULL;
-	v->start = NULL;
-	v->storage = NULL;
+	v->data = nullptr;
+	v->start = nullptr;
+	v->storage = nullptr;
 	v->flags &= ~VEC_MALLOC;
     }
 }

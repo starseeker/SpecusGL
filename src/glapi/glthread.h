@@ -103,7 +103,7 @@ typedef pthread_mutex_t _glthread_Mutex;
    static _glthread_Mutex name = PTHREAD_MUTEX_INITIALIZER
 
 #define _glthread_INIT_MUTEX(name) \
-   pthread_mutex_init(&(name), NULL)
+   pthread_mutex_init(&(name), nullptr)
 
 #define _glthread_DESTROY_MUTEX(name) \
    pthread_mutex_destroy(&(name))
@@ -265,7 +265,7 @@ _glthread_SetTSD(_glthread_TSD *, void *);
 #if   !defined(GL_CALL)
 # if defined(THREADS)
 #  define GET_DISPATCH() \
-   ((__builtin_expect( _glapi_Dispatch != NULL, 1 )) \
+   ((__builtin_expect( _glapi_Dispatch != nullptr, 1 )) \
        ? _glapi_Dispatch : _glapi_get_dispatch())
 # else
 #  define GET_DISPATCH() _glapi_Dispatch

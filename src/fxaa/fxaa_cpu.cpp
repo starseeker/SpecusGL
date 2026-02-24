@@ -152,7 +152,7 @@ static int vtkEndpointSearchCPU(
 
 void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p) {
     // If out == in, use a temp buffer to avoid read/write hazards.
-    uint8_t* temp = NULL;
+    uint8_t* temp = nullptr;
     ImageRGBA8 dst = *out;
 
     int inPlace = (in->rgba == out->rgba);

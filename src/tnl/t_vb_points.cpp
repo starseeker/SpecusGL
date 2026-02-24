@@ -95,17 +95,17 @@ free_point_data(struct tnl_pipeline_stage *stage)
     if (store) {
 	_mesa_vector4f_free(&store->PointSize);
 	delete store;
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
 
 const struct tnl_pipeline_stage _tnl_point_attenuation_stage = {
     "point size attenuation",	/* name */
-    NULL,			/* stage private data */
+    nullptr,			/* stage private data */
     alloc_point_data,		/* alloc data */
     free_point_data,		/* destructor */
-    NULL,
+    nullptr,
     run_point_stage		/* run */
 };
 

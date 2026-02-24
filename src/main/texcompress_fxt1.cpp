@@ -233,13 +233,13 @@ const struct gl_texture_format _mesa_texformat_rgb_fxt1 = {
     0,					/* StencilBits */
     0,					/* TexelBytes */
     texstore_rgb_fxt1,			/* StoreTexImageFunc */
-    NULL, /*impossible*/ 		/* FetchTexel1D */
+    nullptr, /*impossible*/ 		/* FetchTexel1D */
     fetch_texel_2d_rgb_fxt1, 		/* FetchTexel2D */
-    NULL, /*impossible*/ 		/* FetchTexel3D */
-    NULL, /*impossible*/ 		/* FetchTexel1Df */
+    nullptr, /*impossible*/ 		/* FetchTexel3D */
+    nullptr, /*impossible*/ 		/* FetchTexel1Df */
     fetch_texel_2d_f_rgb_fxt1, 		/* FetchTexel2Df */
-    NULL, /*impossible*/ 		/* FetchTexel3Df */
-    NULL					/* StoreTexel */
+    nullptr, /*impossible*/ 		/* FetchTexel3Df */
+    nullptr					/* StoreTexel */
 };
 
 const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
@@ -257,13 +257,13 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
     0,					/* StencilBits */
     0,					/* TexelBytes */
     texstore_rgba_fxt1,			/* StoreTexImageFunc */
-    NULL, /*impossible*/ 		/* FetchTexel1D */
+    nullptr, /*impossible*/ 		/* FetchTexel1D */
     fetch_texel_2d_rgba_fxt1, 		/* FetchTexel2D */
-    NULL, /*impossible*/ 		/* FetchTexel3D */
-    NULL, /*impossible*/ 		/* FetchTexel1Df */
+    nullptr, /*impossible*/ 		/* FetchTexel3D */
+    nullptr, /*impossible*/ 		/* FetchTexel1Df */
     fetch_texel_2d_f_rgba_fxt1, 		/* FetchTexel2Df */
-    NULL, /*impossible*/ 		/* FetchTexel3Df */
-    NULL					/* StoreTexel */
+    nullptr, /*impossible*/ 		/* FetchTexel3Df */
+    nullptr					/* StoreTexel */
 };
 
 
@@ -1129,8 +1129,8 @@ fxt1_quantize_MIXED0(GLuint *cc,
     GLint minColR = 0, maxColR = 0;
     GLint minVal;
     GLint maxVal;
-    GLint maxVarL = fxt1_variance(NULL, input, n_comp, N_TEXELS / 2);
-    GLint maxVarR = fxt1_variance(NULL, &input[N_TEXELS / 2], n_comp, N_TEXELS / 2);
+    GLint maxVarL = fxt1_variance(nullptr, input, n_comp, N_TEXELS / 2);
+    GLint maxVarR = fxt1_variance(nullptr, &input[N_TEXELS / 2], n_comp, N_TEXELS / 2);
 
     /* Scan the channel with max variance for lo & hi
      * and use those as the two representative colors.
@@ -1337,7 +1337,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     GLuint x, y;
     const GLubyte *data;
     GLuint *encoded = (GLuint *)dest;
-    void *newSource = NULL;
+    void *newSource = nullptr;
 
     assert(comps == 3 || comps == 4);
 
@@ -1374,7 +1374,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 	for (i = 0; i < n; i++) {
 	    dest[i] = CHAN_TO_UBYTE(src[i]);
 	}
-	if (newSource != NULL) {
+	if (newSource != nullptr) {
 	    free(newSource);
 	}
 	newSource = dest;  /* we'll free this buffer before returning */
@@ -1400,7 +1400,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     }
 
 cleanUp:
-    if (newSource != NULL) {
+    if (newSource != nullptr) {
 	free(newSource);
     }
 }

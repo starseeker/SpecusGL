@@ -498,7 +498,7 @@ _mesa_program_state_flags(const gl_state_index state[STATE_LENGTH])
 	    }
 
 	default:
-	    _mesa_problem(NULL, "unexpected state[0] in make_state_flags()");
+	    _mesa_problem(nullptr, "unexpected state[0] in make_state_flags()");
 	    return 0;
     }
 }
@@ -771,7 +771,7 @@ _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 	case STATE_INTERNAL:
 	    break;
 	default:
-	    _mesa_problem(NULL, "Invalid state in _mesa_program_state_string");
+	    _mesa_problem(nullptr, "Invalid state in _mesa_program_state_string");
 	    break;
     }
 

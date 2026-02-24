@@ -238,7 +238,7 @@ get_map_idx(GLenum value)
 	case GL_ABGR_EXT:
 	    return IDX_ABGR;
 	default:
-	    _mesa_problem(NULL, "Unexpected inFormat");
+	    _mesa_problem(nullptr, "Unexpected inFormat");
 	    return 0;
     }
 }
@@ -771,7 +771,7 @@ type_mapping(GLenum srcType)
 	case GL_UNSIGNED_INT_8_8_8_8_REV:
 	    return _mesa_little_endian() ? map_identity : map_3210;
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -791,7 +791,7 @@ byteswap_mapping(GLboolean swapBytes,
 	case GL_UNSIGNED_INT_8_8_8_8_REV:
 	    return map_3210;
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -2629,14 +2629,14 @@ _mesa_validate_pbo_teximage(GLcontext *ctx, GLuint dimensions,
     if (!_mesa_validate_pbo_access(dimensions, unpack, width, height, depth,
 				   format, type, pixels)) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, funcName, "(invalid PBO access");
-	return NULL;
+	return nullptr;
     }
 
     buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 					    GL_READ_ONLY_ARB, unpack->BufferObj);
     if (!buf) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, funcName, "(PBO is mapped");
-	return NULL;
+	return nullptr;
     }
 
     return ADD_POINTERS(buf, pixels);
@@ -2666,14 +2666,14 @@ _mesa_validate_pbo_compressed_teximage(GLcontext *ctx,
 	((const GLubyte *) 0) + packing->BufferObj->Data.size()) {
 	/* out of bounds read! */
 	_mesa_error(ctx, GL_INVALID_OPERATION, funcName, "(invalid PBO access");
-	return NULL;
+	return nullptr;
     }
 
     buf = (GLubyte*) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 					   GL_READ_ONLY_ARB, packing->BufferObj);
     if (!buf) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, funcName, "(PBO is mapped");
-	return NULL;
+	return nullptr;
     }
 
     return ADD_POINTERS(buf, pixels);
@@ -2844,7 +2844,7 @@ _mesa_store_teximage1d(GLcontext *ctx, GLenum target, GLint level,
     (void) border;
 
     if (ctx->_ImageTransferState & IMAGE_CONVOLUTION_BIT) {
-	_mesa_adjust_image_for_convolution(ctx, 1, &postConvWidth, NULL);
+	_mesa_adjust_image_for_convolution(ctx, 1, &postConvWidth, nullptr);
     }
 
     choose_texture_format(ctx, texImage, 1, format, type, internalFormat);
@@ -2863,7 +2863,7 @@ _mesa_store_teximage1d(GLcontext *ctx, GLenum target, GLint level,
     pixels = _mesa_validate_pbo_teximage(ctx, 1, width, 1, 1, format, type,
 					 pixels, packing, "glTexImage1D");
     if (!pixels) {
-	/* Note: we check for a NULL image pointer here, _after_ we allocated
+	/* Note: we check for a nullptr image pointer here, _after_ we allocated
 	 * memory for the texture.  That's what the GL spec calls for.
 	 */
 	return;
@@ -2941,7 +2941,7 @@ _mesa_store_teximage2d(GLcontext *ctx, GLenum target, GLint level,
     pixels = _mesa_validate_pbo_teximage(ctx, 2, width, height, 1, format, type,
 					 pixels, packing, "glTexImage2D");
     if (!pixels) {
-	/* Note: we check for a NULL image pointer here, _after_ we allocated
+	/* Note: we check for a nullptr image pointer here, _after_ we allocated
 	 * memory for the texture.  That's what the GL spec calls for.
 	 */
 	return;
@@ -3015,7 +3015,7 @@ _mesa_store_teximage3d(GLcontext *ctx, GLenum target, GLint level,
     pixels = _mesa_validate_pbo_teximage(ctx, 3, width, height, depth, format,
 					 type, pixels, packing, "glTexImage3D");
     if (!pixels) {
-	/* Note: we check for a NULL image pointer here, _after_ we allocated
+	/* Note: we check for a nullptr image pointer here, _after_ we allocated
 	 * memory for the texture.  That's what the GL spec calls for.
 	 */
 	return;
@@ -3258,7 +3258,7 @@ _mesa_store_compressed_teximage2d(GLcontext *ctx, GLenum target, GLint level,
     ASSERT(texImage->Width > 0);
     ASSERT(texImage->Height > 0);
     ASSERT(texImage->Depth == 1);
-    ASSERT(texImage->Data == NULL); /* was freed in glCompressedTexImage2DARB */
+    ASSERT(texImage->Data == nullptr); /* was freed in glCompressedTexImage2DARB */
 
     choose_texture_format(ctx, texImage, 2, 0, 0, internalFormat);
 

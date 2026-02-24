@@ -527,7 +527,7 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
  * \param row  row of pixel in the image (0 for 1D images)
  * \param column column of pixel in the image
  *
- * \return address of pixel on success, or NULL on error.
+ * \return address of pixel on success, or nullptr on error.
  *
  * \sa gl_pixelstore_attrib.
  */
@@ -577,13 +577,13 @@ _mesa_image_address(GLuint dimensions,
 	/* Compute bytes per component */
 	bytes_per_comp = _mesa_sizeof_packed_type(type);
 	if (bytes_per_comp < 0) {
-	    return NULL;
+	    return nullptr;
 	}
 
 	/* Compute number of components per pixel */
 	comp_per_pixel = _mesa_components_in_format(format);
 	if (comp_per_pixel < 0) {
-	    return NULL;
+	    return nullptr;
 	}
 
 	bytes_per_row = alignment
@@ -823,13 +823,13 @@ _mesa_unpack_bitmap(GLint width, GLint height, const GLubyte *pixels,
     GLubyte *buffer, *dst;
 
     if (!pixels)
-	return NULL;
+	return nullptr;
 
     /* Alloc dest storage */
     bytes = ((width + 7) / 8 * height);
     buffer = (GLubyte *) malloc(bytes);
     if (!buffer)
-	return NULL;
+	return nullptr;
 
     width_in_bytes = CEILING(width, 8);
     dst = buffer;
@@ -839,7 +839,7 @@ _mesa_unpack_bitmap(GLint width, GLint height, const GLubyte *pixels,
 				     GL_COLOR_INDEX, GL_BITMAP, row, 0);
 	if (!src) {
 	    free(buffer);
-	    return NULL;
+	    return nullptr;
 	}
 
 	if ((packing->SkipPixels & 7) == 0) {
@@ -2241,7 +2241,7 @@ extract_uint_indexes(GLuint n, GLuint indexes[],
 	break;
 
 	default:
-	    _mesa_problem(NULL, "bad srcType in extract_uint_indexes");
+	    _mesa_problem(nullptr, "bad srcType in extract_uint_indexes");
 	    return;
     }
 }
@@ -2399,7 +2399,7 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
 	    stride = 4;
 	    break;
 	default:
-	    _mesa_problem(NULL, "bad srcFormat in extract float data");
+	    _mesa_problem(nullptr, "bad srcFormat in extract float data");
 	    return;
     }
 
@@ -2835,7 +2835,7 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
 	    }
 	    break;
 	default:
-	    _mesa_problem(NULL, "bad srcType in extract float data");
+	    _mesa_problem(nullptr, "bad srcType in extract float data");
 	    break;
     }
 }
@@ -3980,7 +3980,7 @@ _mesa_unpack_depth_span(const GLcontext *ctx, GLuint n,
 	}
 	break;
 	default:
-	    _mesa_problem(NULL, "bad type in _mesa_unpack_depth_span()");
+	    _mesa_problem(nullptr, "bad type in _mesa_unpack_depth_span()");
 	    return;
     }
 
@@ -4206,10 +4206,10 @@ _mesa_unpack_image(GLuint dimensions,
     GLboolean flipBytes, swap2, swap4;
 
     if (!pixels)
-	return NULL;  /* not necessarily an error */
+	return nullptr;  /* not necessarily an error */
 
     if (width <= 0 || height <= 0 || depth <= 0)
-	return NULL;  /* generate error later */
+	return nullptr;  /* generate error later */
 
     if (type == GL_BITMAP) {
 	bytesPerRow = (width + 7) >> 3;
@@ -4225,7 +4225,7 @@ _mesa_unpack_image(GLuint dimensions,
 	    components = 1;
 
 	if (bytesPerPixel <= 0 || components <= 0)
-	    return NULL;   /* bad format or type.  generate error later */
+	    return nullptr;   /* bad format or type.  generate error later */
 	bytesPerRow = bytesPerPixel * width;
 	bytesPerComp = bytesPerPixel / components;
 	flipBytes = GL_FALSE;
@@ -4241,7 +4241,7 @@ _mesa_unpack_image(GLuint dimensions,
 	GLubyte *dst;
 	GLint img, row;
 	if (!destBuffer)
-	    return NULL;   /* generate GL_OUT_OF_MEMORY later */
+	    return nullptr;   /* generate GL_OUT_OF_MEMORY later */
 
 	dst = destBuffer;
 	for (img = 0; img < depth; img++) {
@@ -4436,7 +4436,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 	    }
 	    break;
 	default:
-	    _mesa_problem(NULL, "Invalid datatype in _mesa_convert_colors");
+	    _mesa_problem(nullptr, "Invalid datatype in _mesa_convert_colors");
     }
 }
 

@@ -91,7 +91,7 @@ _mesa_DeleteHashTable(struct _mesa_HashTable *table)
 {
     assert(table);
     if (!table->entries.empty()) {
-        _mesa_problem(NULL, "In _mesa_DeleteHashTable, found non-freed data");
+        _mesa_problem(nullptr, "In _mesa_DeleteHashTable, found non-freed data");
     }
     delete table;
 }
@@ -106,7 +106,7 @@ _mesa_DeleteHashTable(struct _mesa_HashTable *table)
  *
  * \param table the hash table.
  * \param key   the key (must be non-zero).
- * \return pointer to the stored data, or NULL if the key is not present.
+ * \return pointer to the stored data, or nullptr if the key is not present.
  */
 void *
 _mesa_HashLookup(const struct _mesa_HashTable *table, GLuint key)
@@ -115,7 +115,7 @@ _mesa_HashLookup(const struct _mesa_HashTable *table, GLuint key)
     assert(key);
 
     auto it = table->entries.find(key);
-    return (it != table->entries.end()) ? it->second : NULL;
+    return (it != table->entries.end()) ? it->second : nullptr;
 }
 
 
@@ -167,7 +167,7 @@ _mesa_HashRemove(struct _mesa_HashTable *table, GLuint key)
      * HashRemove caller will either see the flag set (error path) or will
      * acquire the mutex after DeleteAll has cleared it. */
     if (table->inDeleteAll) {
-        _mesa_problem(NULL, "_mesa_HashRemove illegally called from "
+        _mesa_problem(nullptr, "_mesa_HashRemove illegally called from "
                       "_mesa_HashDeleteAll callback function");
         return;
     }
@@ -281,7 +281,7 @@ _mesa_HashPrint(const struct _mesa_HashTable *table)
 {
     assert(table);
     for (const auto &[key, data] : table->entries) {
-        _mesa_debug(NULL, "%u %p\n", key, data);
+        _mesa_debug(nullptr, "%u %p\n", key, data);
     }
 }
 

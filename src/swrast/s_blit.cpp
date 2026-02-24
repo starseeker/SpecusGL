@@ -230,7 +230,7 @@ blit_nearest(GLcontext *ctx,
 	}
 
 	/* store pixel row in destination */
-	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, NULL);
+	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, nullptr);
     }
 
     free(srcBuffer);
@@ -436,7 +436,7 @@ blit_linear(GLcontext *ctx,
 	}
 
 	/* store pixel row in destination */
-	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, NULL);
+	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, nullptr);
     }
 
     free(srcBuffer0);
@@ -537,7 +537,7 @@ simple_blit(GLcontext *ctx,
 
     for (row = 0; row < height; row++) {
 	readRb->GetRow(ctx, width, srcX0, srcY, rowBuffer);
-	drawRb->PutRow(ctx, width, dstX0, dstY, rowBuffer, NULL);
+	drawRb->PutRow(ctx, width, dstX0, dstY, rowBuffer, nullptr);
 	srcY += yStep;
 	dstY += yStep;
     }

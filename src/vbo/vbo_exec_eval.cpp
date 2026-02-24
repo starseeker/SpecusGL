@@ -36,12 +36,12 @@
 
 static void clear_active_eval1(struct vbo_exec_context *exec, GLuint attr)
 {
-    exec->eval.map1[attr].map = NULL;
+    exec->eval.map1[attr].map = nullptr;
 }
 
 static void clear_active_eval2(struct vbo_exec_context *exec, GLuint attr)
 {
-    exec->eval.map2[attr].map = NULL;
+    exec->eval.map2[attr].map = nullptr;
 }
 
 static void set_active_eval1(struct vbo_exec_context *exec, GLuint attr, GLuint dim,

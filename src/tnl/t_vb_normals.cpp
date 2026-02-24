@@ -61,7 +61,7 @@ run_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
      * got a transformation matrix with uniform scaling.
      */
     if (_math_matrix_is_general_scale(ctx->ModelviewMatrixStack.Top))
-	lengths = NULL;
+	lengths = nullptr;
     else
 	lengths = VB->NormalLengthPtr;
 
@@ -80,7 +80,7 @@ run_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     VB->AttribPtr[_TNL_ATTRIB_NORMAL] = &store->normal;
     VB->NormalPtr = &store->normal;
 
-    VB->NormalLengthPtr = NULL;	/* no longer valid */
+    VB->NormalLengthPtr = nullptr;	/* no longer valid */
     return GL_TRUE;
 }
 
@@ -97,7 +97,7 @@ validate_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     if (ctx->VertexProgram._Current ||
 	(!ctx->Light.Enabled &&
 	 !(ctx->Texture._GenFlags & TEXGEN_NEED_NORMALS))) {
-	store->NormalTransform = NULL;
+	store->NormalTransform = nullptr;
 	return;
     }
 
@@ -132,7 +132,7 @@ validate_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 		   ctx->_ModelViewInvScale != 1.0) {
 	    store->NormalTransform = _mesa_normal_tab[NORM_RESCALE];
 	} else {
-	    store->NormalTransform = NULL;
+	    store->NormalTransform = nullptr;
 	}
     }
 }
@@ -165,14 +165,14 @@ free_normal_data(struct tnl_pipeline_stage *stage)
     if (store) {
 	_mesa_vector4f_free(&store->normal);
 	delete store;
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
 
 const struct tnl_pipeline_stage _tnl_normal_transform_stage = {
     "normal transform",		/* name */
-    NULL,			/* privatePtr */
+    nullptr,			/* privatePtr */
     alloc_normal_data,		/* create */
     free_normal_data,		/* destroy */
     validate_normal_stage,	/* validate */

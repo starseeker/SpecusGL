@@ -81,10 +81,10 @@ REBASE(GLubyte)
  *      min_index will be transformed.
  *
  * Hardware tnl:
- *    - if ib != NULL and min_index != 0, otherwise vertices lower than
+ *    - if ib != nullptr and min_index != 0, otherwise vertices lower than
  *      min_index will be uploaded.  Requires adjusting index values.
  *
- *    - if ib == NULL and min_index != 0, just for convenience so this doesn't
+ *    - if ib == nullptr and min_index != 0, just for convenience so this doesn't
  *      have to be handled within the driver.
  *
  * Hardware tnl with VBO support:
@@ -105,8 +105,8 @@ void vbo_rebase_prims(GLcontext *ctx,
     const struct gl_client_array *tmp_array_pointers[VERT_ATTRIB_MAX];
 
     struct _mesa_index_buffer tmp_ib;
-    struct _mesa_prim *tmp_prims = NULL;
-    void *tmp_indices = NULL;
+    struct _mesa_prim *tmp_prims = nullptr;
+    void *tmp_indices = nullptr;
     GLuint i;
 
     assert(min_index != 0);

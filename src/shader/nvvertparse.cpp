@@ -280,13 +280,13 @@ Parse_String(struct parse_state *parseState, const char *pattern)
 
 static const char *InputRegisters[MAX_NV_VERTEX_PROGRAM_INPUTS + 1] = {
     "OPOS", "WGHT", "NRML", "COL0", "COL1", "FOGC", "6", "7",
-    "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7", NULL
+    "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7", nullptr
 };
 
 static const char *OutputRegisters[MAX_NV_VERTEX_PROGRAM_OUTPUTS + 1] = {
     "HPOS", "COL0", "COL1", "FOGC",
     "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7",
-    "PSIZ", "BFC0", "BFC1", NULL
+    "PSIZ", "BFC0", "BFC1", nullptr
 };
 
 
@@ -1260,7 +1260,7 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
     parseState.anyProgRegsWritten = GL_FALSE;
 
     /* Reset error state */
-    _mesa_set_program_error(ctx, -1, NULL);
+    _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check the program header */
     if (strncmp((const char *) programString, "!!VP1.0", 7) == 0) {
@@ -1353,7 +1353,7 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 	/* GL_NV_vertex_program isn't supposed to set the error string
 	 * so we reset it here.
 	 */
-	_mesa_set_program_error(ctx, ctx->Program.ErrorPos, NULL);
+	_mesa_set_program_error(ctx, ctx->Program.ErrorPos, nullptr);
     }
 }
 

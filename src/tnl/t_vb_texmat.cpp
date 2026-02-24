@@ -113,7 +113,7 @@ static void free_texmat_data(struct tnl_pipeline_stage *stage)
 	    if (store->texcoord[i].data)
 		_mesa_vector4f_free(&store->texcoord[i]);
 	free(store);
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
@@ -121,10 +121,10 @@ static void free_texmat_data(struct tnl_pipeline_stage *stage)
 
 const struct tnl_pipeline_stage _tnl_texture_transform_stage = {
     "texture transform",			/* name */
-    NULL,				/* private data */
+    nullptr,				/* private data */
     alloc_texmat_data,
     free_texmat_data,			/* destructor */
-    NULL,
+    nullptr,
     run_texmat_stage,
 };
 

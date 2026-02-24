@@ -87,10 +87,10 @@ static GLboolean run_cull_stage(GLcontext *ctx,
 
 const struct tnl_pipeline_stage _tnl_vertex_cull_stage = {
     "EXT_cull_vertex",
-    NULL,			/* private data */
-    NULL,				/* ctr */
-    NULL,				/* destructor */
-    NULL,
+    nullptr,			/* private data */
+    nullptr,				/* ctr */
+    nullptr,				/* destructor */
+    nullptr,
     run_cull_stage		/* run -- initially set to init */
 };
 

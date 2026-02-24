@@ -236,7 +236,7 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 		    sprintf(str, "A%d", index);
 		    break;
 		default:
-		    _mesa_problem(NULL, "bad file in reg_string()");
+		    _mesa_problem(nullptr, "bad file in reg_string()");
 	    }
 	    break;
 
@@ -270,12 +270,12 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 		    sprintf(str, "state[%d]", index);
 		    break;
 		default:
-		    _mesa_problem(NULL, "bad file in reg_string()");
+		    _mesa_problem(nullptr, "bad file in reg_string()");
 	    }
 	    break;
 
 	default:
-	    _mesa_problem(NULL, "bad mode in reg_string()");
+	    _mesa_problem(nullptr, "bad mode in reg_string()");
     }
 
     return str;
@@ -478,7 +478,7 @@ void
 _mesa_print_alu_instruction(const struct prog_instruction *inst,
 			    const char *opcode_string, GLuint numRegs)
 {
-    print_alu_instruction(inst, opcode_string, numRegs, PROG_PRINT_DEBUG, NULL);
+    print_alu_instruction(inst, opcode_string, numRegs, PROG_PRINT_DEBUG, nullptr);
 }
 
 
@@ -486,7 +486,7 @@ void
 _mesa_print_instruction(const struct prog_instruction *inst)
 {
     /* note: 4th param should be ignored for PROG_PRINT_DEBUG */
-    _mesa_print_instruction_opt(inst, 0, PROG_PRINT_DEBUG, NULL);
+    _mesa_print_instruction_opt(inst, 0, PROG_PRINT_DEBUG, nullptr);
 }
 
 

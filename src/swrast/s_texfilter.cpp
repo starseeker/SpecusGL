@@ -745,7 +745,7 @@ sample_1d_nearest_mipmap_nearest(GLcontext *ctx,
 				 const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_1d_nearest(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -760,7 +760,7 @@ sample_1d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_1d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -775,7 +775,7 @@ sample_1d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -800,7 +800,7 @@ sample_1d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -864,7 +864,7 @@ sample_lambda_1d(GLcontext *ctx,
     GLuint magStart, magEnd;  /* texels with magnification */
     GLuint i;
 
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1156,7 +1156,7 @@ sample_2d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_2d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -1172,7 +1172,7 @@ sample_2d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1198,7 +1198,7 @@ sample_2d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1222,7 +1222,7 @@ sample_2d_linear_mipmap_linear_repeat(GLcontext *ctx,
 				      const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     ASSERT(tObj->WrapS == GL_REPEAT);
     ASSERT(tObj->WrapT == GL_REPEAT);
     for (i = 0; i < n; i++) {
@@ -1382,7 +1382,7 @@ sample_lambda_2d(GLcontext *ctx,
 					&& (tImg->TexFormat->BaseFormat != GL_COLOR_INDEX)
 					&& tImg->_IsPowerOfTwo;
 
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1395,24 +1395,24 @@ sample_lambda_2d(GLcontext *ctx,
 		    switch (tImg->TexFormat->MesaFormat) {
 			case MESA_FORMAT_RGB:
 			    opt_sample_rgb_2d(ctx, tObj, m, texcoords + minStart,
-					      NULL, rgba + minStart);
+					      nullptr, rgba + minStart);
 			    break;
 			case MESA_FORMAT_RGBA:
 			    opt_sample_rgba_2d(ctx, tObj, m, texcoords + minStart,
-					       NULL, rgba + minStart);
+					       nullptr, rgba + minStart);
 			    break;
 			default:
 			    sample_nearest_2d(ctx, tObj, m, texcoords + minStart,
-					      NULL, rgba + minStart);
+					      nullptr, rgba + minStart);
 		    }
 		} else {
 		    sample_nearest_2d(ctx, tObj, m, texcoords + minStart,
-				      NULL, rgba + minStart);
+				      nullptr, rgba + minStart);
 		}
 		break;
 	    case GL_LINEAR:
 		sample_linear_2d(ctx, tObj, m, texcoords + minStart,
-				 NULL, rgba + minStart);
+				 nullptr, rgba + minStart);
 		break;
 	    case GL_NEAREST_MIPMAP_NEAREST:
 		sample_2d_nearest_mipmap_nearest(ctx, tObj, m,
@@ -1451,24 +1451,24 @@ sample_lambda_2d(GLcontext *ctx,
 		    switch (tImg->TexFormat->MesaFormat) {
 			case MESA_FORMAT_RGB:
 			    opt_sample_rgb_2d(ctx, tObj, m, texcoords + magStart,
-					      NULL, rgba + magStart);
+					      nullptr, rgba + magStart);
 			    break;
 			case MESA_FORMAT_RGBA:
 			    opt_sample_rgba_2d(ctx, tObj, m, texcoords + magStart,
-					       NULL, rgba + magStart);
+					       nullptr, rgba + magStart);
 			    break;
 			default:
 			    sample_nearest_2d(ctx, tObj, m, texcoords + magStart,
-					      NULL, rgba + magStart);
+					      nullptr, rgba + magStart);
 		    }
 		} else {
 		    sample_nearest_2d(ctx, tObj, m, texcoords + magStart,
-				      NULL, rgba + magStart);
+				      nullptr, rgba + magStart);
 		}
 		break;
 	    case GL_LINEAR:
 		sample_linear_2d(ctx, tObj, m, texcoords + magStart,
-				 NULL, rgba + magStart);
+				 nullptr, rgba + magStart);
 		break;
 	    default:
 		_mesa_problem(ctx, "Bad mag filter in sample_lambda_2d");
@@ -1584,7 +1584,7 @@ sample_lambda_2d_f(GLcontext *ctx,
     const GLfloat texcoords[][4], const GLfloat lambda[], GLfloat rgba[][4])
 {
     GLuint minStart, minEnd, magStart, magEnd;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1593,11 +1593,11 @@ sample_lambda_2d_f(GLcontext *ctx,
 	switch (tObj->MinFilter) {
 	    case GL_NEAREST:
 		sample_nearest_2d_f(ctx, tObj, m, texcoords + minStart,
-				    NULL, rgba + minStart);
+				    nullptr, rgba + minStart);
 		break;
 	    case GL_LINEAR:
 		sample_linear_2d_f(ctx, tObj, m, texcoords + minStart,
-				   NULL, rgba + minStart);
+				   nullptr, rgba + minStart);
 		break;
 	    case GL_NEAREST_MIPMAP_NEAREST:
 		sample_2d_nearest_mipmap_nearest_f(ctx, tObj, m,
@@ -1626,11 +1626,11 @@ sample_lambda_2d_f(GLcontext *ctx,
 	switch (tObj->MagFilter) {
 	    case GL_NEAREST:
 		sample_nearest_2d_f(ctx, tObj, m, texcoords + magStart,
-				    NULL, rgba + magStart);
+				    nullptr, rgba + magStart);
 		break;
 	    case GL_LINEAR:
 		sample_linear_2d_f(ctx, tObj, m, texcoords + magStart,
-				   NULL, rgba + magStart);
+				   nullptr, rgba + magStart);
 		break;
 	    default:
 		_mesa_problem(ctx, "Bad mag filter in sample_lambda_2d_f");
@@ -1833,7 +1833,7 @@ sample_3d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_3d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -1848,7 +1848,7 @@ sample_3d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1872,7 +1872,7 @@ sample_3d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1934,7 +1934,7 @@ sample_lambda_3d(GLcontext *ctx,
     GLuint magStart, magEnd;  /* texels with magnification */
     GLuint i;
 
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -2113,7 +2113,7 @@ sample_cube_nearest_mipmap_nearest(GLcontext *ctx,
 				   const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2131,7 +2131,7 @@ sample_cube_linear_mipmap_nearest(GLcontext *ctx,
 				  const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2149,7 +2149,7 @@ sample_cube_nearest_mipmap_linear(GLcontext *ctx,
 				  const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2176,7 +2176,7 @@ sample_cube_linear_mipmap_linear(GLcontext *ctx,
 				 const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2205,7 +2205,7 @@ sample_lambda_cube(GLcontext *ctx,
     GLuint minStart, minEnd;  /* texels with minification */
     GLuint magStart, magEnd;  /* texels with magnification */
 
-    ASSERT(lambda != NULL);
+    ASSERT(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -2481,19 +2481,19 @@ sample_lambda_rect(GLcontext *ctx,
     if (minStart < minEnd) {
 	if (tObj->MinFilter == GL_NEAREST) {
 	    sample_nearest_rect(ctx, tObj, minEnd - minStart,
-				texcoords + minStart, NULL, rgba + minStart);
+				texcoords + minStart, nullptr, rgba + minStart);
 	} else {
 	    sample_linear_rect(ctx, tObj, minEnd - minStart,
-			       texcoords + minStart, NULL, rgba + minStart);
+			       texcoords + minStart, nullptr, rgba + minStart);
 	}
     }
     if (magStart < magEnd) {
 	if (tObj->MagFilter == GL_NEAREST) {
 	    sample_nearest_rect(ctx, tObj, magEnd - magStart,
-				texcoords + magStart, NULL, rgba + magStart);
+				texcoords + magStart, nullptr, rgba + magStart);
 	} else {
 	    sample_linear_rect(ctx, tObj, magEnd - magStart,
-			       texcoords + magStart, NULL, rgba + magStart);
+			       texcoords + magStart, nullptr, rgba + magStart);
 	}
     }
 }

@@ -94,7 +94,7 @@ _tnl_DestroyContext(GLcontext *ctx)
 	_tnl_ProgramCacheDestroy(ctx);
 
     delete tnl;
-    ctx->swtnl_context = NULL;
+    ctx->swtnl_context = nullptr;
 }
 
 
