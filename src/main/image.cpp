@@ -782,7 +782,7 @@ _mesa_unpack_polygon_stipple(const GLubyte *pattern, GLuint dest[32],
 		      | (p[3]);
 	    p += 4;
 	}
-	free(ptrn);
+	delete[] ptrn;
     }
 }
 
@@ -827,9 +827,7 @@ _mesa_unpack_bitmap(GLint width, GLint height, const GLubyte *pixels,
 
     /* Alloc dest storage */
     bytes = ((width + 7) / 8 * height);
-    buffer = (GLubyte *) malloc(bytes);
-    if (!buffer)
-	return nullptr;
+    buffer = new GLubyte[bytes]();
 
     width_in_bytes = CEILING(width, 8);
     dst = buffer;
@@ -838,7 +836,7 @@ _mesa_unpack_bitmap(GLint width, GLint height, const GLubyte *pixels,
 			     _mesa_image_address2d(packing, pixels, width, height,
 				     GL_COLOR_INDEX, GL_BITMAP, row, 0);
 	if (!src) {
-	    free(buffer);
+	    delete[] buffer;
 	    return nullptr;
 	}
 
@@ -4236,12 +4234,9 @@ _mesa_unpack_image(GLuint dimensions,
     }
 
     {
-	GLubyte *destBuffer
-	    = (GLubyte *) malloc(bytesPerRow * height * depth);
+	auto *destBuffer = new GLubyte[bytesPerRow * height * depth];
 	GLubyte *dst;
 	GLint img, row;
-	if (!destBuffer)
-	    return nullptr;   /* generate GL_OUT_OF_MEMORY later */
 
 	dst = destBuffer;
 	for (img = 0; img < depth; img++) {

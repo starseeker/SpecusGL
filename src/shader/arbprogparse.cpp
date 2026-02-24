@@ -3737,7 +3737,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
      */
 
     /* Initialize the arb_program struct */
-    program->Base.String = strz ? (const char *) strz : "";
+    program->Base.String.assign(reinterpret_cast<const char *>(strzVec.data()), len);
     program->Base.Instructions = _mesa_alloc_instructions(MAX_INSTRUCTIONS);
     program->Base.NumInstructions =
 	program->Base.NumTemporaries =
