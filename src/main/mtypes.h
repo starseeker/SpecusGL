@@ -34,11 +34,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
+#include <vector>
+#include <string>
+#include <unordered_map>
 
 #include "glheader.h"
 #include "glcontext.h"	/* __GLcontextModes (GLvisual) */
@@ -399,8 +397,8 @@ struct gl_color_table {
     GLenum InternalFormat;      /**< The user-specified format */
     GLenum _BaseFormat;         /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
     GLuint Size;                /**< number of entries in table */
-    GLfloat *TableF;            /**< Color table, floating point values */
-    GLubyte *TableUB;           /**< Color table, ubyte values */
+    std::vector<GLfloat> TableF;  /**< Color table, floating point values */
+    std::vector<GLubyte> TableUB; /**< Color table, ubyte values */
     GLubyte RedSize;
     GLubyte GreenSize;
     GLubyte BlueSize;
@@ -1497,16 +1495,8 @@ struct gl_texture_unit {
     GLboolean ColorTableEnabled;
 };
 
-struct texenvprog_cache_item {
-    GLuint hash;
-    void *key;
-    struct gl_fragment_program *data;
-    struct texenvprog_cache_item *next;
-};
-
 struct texenvprog_cache {
-    struct texenvprog_cache_item **items;
-    GLuint size, n_items;
+    std::unordered_map<std::string, struct gl_fragment_program *> map;
     GLcontext *ctx;
 };
 
@@ -1591,9 +1581,8 @@ struct gl_buffer_object {
     GLenum Usage;
     GLenum Access;
     GLvoid *Pointer;          /**< Only valid while buffer is mapped */
-    GLsizeiptrARB Size;       /**< Size of storage in bytes */
-    GLubyte *Data;            /**< Location of storage either in RAM or VRAM. */
     GLboolean OnCard;         /**< Is buffer in VRAM? (hardware drivers) */
+    std::vector<GLubyte> Data; /**< Storage in RAM; Data.size() is the byte count. */
 };
 
 
@@ -1719,7 +1708,7 @@ struct gl_selection {
 struct gl_1d_map {
     GLuint Order;	/**< Number of control points */
     GLfloat u1, u2, du;	/**< u1, u2, 1.0/(u2-u1) */
-    GLfloat *Points;	/**< Points to contiguous control points */
+    std::vector<GLfloat> Points; /**< Contiguous control points */
 };
 
 
@@ -1731,7 +1720,7 @@ struct gl_2d_map {
     GLuint Vorder;		/**< Number of control points in V dimension */
     GLfloat u1, u2, du;
     GLfloat v1, v2, dv;
-    GLfloat *Points;		/**< Points to contiguous control points */
+    std::vector<GLfloat> Points; /**< Contiguous control points */
 };
 
 
@@ -2544,7 +2533,7 @@ struct gl_extensions {
  */
 struct gl_matrix_stack {
     GLmatrix *Top;      /**< points into Stack */
-    GLmatrix *Stack;    /**< array [MaxDepth] of GLmatrix */
+    std::vector<GLmatrix> Stack; /**< array of GLmatrix entries */
     GLuint Depth;       /**< 0 <= Depth < MaxDepth */
     GLuint MaxDepth;    /**< size of Stack[] array */
     GLuint DirtyFlag;   /**< _NEW_MODELVIEW or _NEW_PROJECTION, for example */
@@ -3006,9 +2995,7 @@ extern int MESA_DEBUG_FLAGS;
 #  define NDEBUG
 # endif
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

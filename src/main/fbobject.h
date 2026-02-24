@@ -26,9 +26,7 @@
 #ifndef FBOBJECT_H
 #define FBOBJECT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -137,9 +135,7 @@ _mesa_BlitFramebufferEXT(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* FBOBJECT_H */
 

@@ -29,9 +29,7 @@
 #ifndef __M_DEBUG_H__
 #define __M_DEBUG_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 extern void _math_test_all_transform_functions(char *description);
 extern void _math_test_all_normal_transform_functions(char *description);
@@ -43,9 +41,7 @@ extern void _math_test_all_vertex_functions(char *description);
 
 extern char *mesa_profile;
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

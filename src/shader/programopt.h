@@ -26,9 +26,7 @@
 #ifndef PROGRAMOPT_H
 #define PROGRAMOPT_H 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 extern void
@@ -44,9 +42,7 @@ extern void
 _mesa_count_texture_instructions(struct gl_program *prog);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROGRAMOPT_H */
 

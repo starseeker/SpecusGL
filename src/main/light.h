@@ -31,9 +31,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -149,9 +147,7 @@ extern void _mesa_allow_light_in_model(GLcontext *ctx, GLboolean flag);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

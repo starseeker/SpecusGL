@@ -119,7 +119,7 @@ buffer_object_subdata_range_good(GLcontext * ctx, GLenum target,
 	_mesa_error(ctx, GL_INVALID_OPERATION, "%s", caller);
 	return NULL;
     }
-    if (offset + size > bufObj->Size) {
+    if (offset + size > (GLsizeiptrARB)bufObj->Data.size()) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "%s(size + offset > buffer size)", caller);
 	return NULL;
@@ -162,8 +162,6 @@ _mesa_delete_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 {
     (void) ctx;
 
-    if (bufObj->Data)
-	free(bufObj->Data);
     delete bufObj;
 }
 
@@ -193,11 +191,13 @@ _mesa_initialize_buffer_object(struct gl_buffer_object *obj,
 {
     (void) target;
 
-    _mesa_bzero(obj, sizeof(struct gl_buffer_object));
     obj->RefCount = 1;
     obj->Name = name;
     obj->Usage = GL_STATIC_DRAW_ARB;
     obj->Access = GL_READ_WRITE_ARB;
+    obj->Pointer = NULL;
+    obj->OnCard = GL_FALSE;
+    obj->Data.clear();
 }
 
 
@@ -252,20 +252,14 @@ _mesa_buffer_data(GLcontext *ctx, GLenum target, GLsizeiptrARB size,
 		  const GLvoid * data, GLenum usage,
 		  struct gl_buffer_object * bufObj)
 {
-    void * new_data;
-
     (void) ctx;
     (void) target;
 
-    new_data = _mesa_realloc(bufObj->Data, bufObj->Size, size);
-    if (new_data) {
-	bufObj->Data = (GLubyte *) new_data;
-	bufObj->Size = size;
-	bufObj->Usage = usage;
+    bufObj->Data.resize(size);
+    bufObj->Usage = usage;
 
-	if (data) {
-	    memcpy(bufObj->Data, data, size);
-	}
+    if (data) {
+	memcpy(bufObj->Data.data(), data, size);
     }
 }
 
@@ -297,10 +291,10 @@ _mesa_buffer_subdata(GLcontext *ctx, GLenum target, GLintptrARB offset,
     (void) target;
 
     /* this should have been caught in _mesa_BufferSubData() */
-    ASSERT(size + offset <= bufObj->Size);
+    ASSERT(size + offset <= (GLsizeiptrARB)bufObj->Data.size());
 
-    if (bufObj->Data) {
-	memcpy((GLubyte *) bufObj->Data + offset, data, size);
+    if (!bufObj->Data.empty()) {
+	memcpy(bufObj->Data.data() + offset, data, size);
     }
 }
 
@@ -331,8 +325,8 @@ _mesa_buffer_get_subdata(GLcontext *ctx, GLenum target, GLintptrARB offset,
     (void) ctx;
     (void) target;
 
-    if (bufObj->Data && ((GLsizeiptrARB)(size + offset) <= bufObj->Size)) {
-	memcpy(data, (GLubyte *) bufObj->Data + offset, size);
+    if (!bufObj->Data.empty() && ((GLsizeiptrARB)(size + offset) <= (GLsizeiptrARB)bufObj->Data.size())) {
+	memcpy(data, bufObj->Data.data() + offset, size);
     }
 }
 
@@ -366,7 +360,7 @@ _mesa_buffer_map(GLcontext *ctx, GLenum target, GLenum access,
 	/* already mapped! */
 	return NULL;
     }
-    bufObj->Pointer = bufObj->Data;
+    bufObj->Pointer = bufObj->Data.data();
     return bufObj->Pointer;
 }
 
@@ -438,7 +432,7 @@ _mesa_validate_pbo_access(GLuint dimensions,
 {
     ASSERT(pack->BufferObj->Name != 0);
 
-    if (pack->BufferObj->Size == 0)
+    if (pack->BufferObj->Data.empty())
 	/* no buffer! */
 	return GL_FALSE;
 
@@ -451,7 +445,7 @@ _mesa_validate_pbo_access(GLuint dimensions,
 			       format, type, depth-1, height-1, width);
 
     /* buffer size, cast to a pointer */
-    const GLubyte *sizeAddr = ((const GLubyte *) 0) + pack->BufferObj->Size;
+    const GLubyte *sizeAddr = ((const GLubyte *) 0) + pack->BufferObj->Data.size();
 
     if ((void *)start > (void *)sizeAddr) {
 	/* This will catch negative values / wrap-around */
@@ -924,7 +918,7 @@ _mesa_GetBufferParameterivARB(GLenum target, GLenum pname, GLint *params)
 
     switch (pname) {
 	case GL_BUFFER_SIZE_ARB:
-	    *params = (GLint) bufObj->Size;
+	    *params = (GLint) bufObj->Data.size();
 	    break;
 	case GL_BUFFER_USAGE_ARB:
 	    *params = bufObj->Usage;

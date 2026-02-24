@@ -25,9 +25,7 @@
 #ifndef GRAMMAR_MESA_H
 #define GRAMMAR_MESA_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "imports.h"
@@ -43,9 +41,7 @@ typedef GLubyte byte;
 #undef GRAMMAR_PORT_INCLUDE
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

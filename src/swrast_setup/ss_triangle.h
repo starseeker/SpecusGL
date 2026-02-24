@@ -29,9 +29,7 @@
 #ifndef SS_TRIANGLE_H
 #define SS_TRIANGLE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 #include "ss_context.h"
@@ -40,9 +38,7 @@ extern "C" {
 void _swsetup_trifuncs_init(GLcontext *ctx);
 void _swsetup_choose_trifuncs(GLcontext *ctx);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

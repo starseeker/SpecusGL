@@ -36,9 +36,7 @@
 #ifndef HINT_H
 #define HINT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -60,9 +58,7 @@ _mesa_init_hint(GLcontext * ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -27,9 +27,7 @@
 #ifndef S_POINTS_H
 #define S_POINTS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 
@@ -40,9 +38,7 @@ extern void
 _swrast_add_spec_terms_point(GLcontext *ctx,
 			     const SWvertex *v0);
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

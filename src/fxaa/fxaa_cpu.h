@@ -10,9 +10,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
     typedef struct {
 	float RelativeContrastThreshold;   // e.g. 0.125f
@@ -40,9 +38,7 @@ extern "C" {
      */
     void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* FXAA_CPU_H */
 

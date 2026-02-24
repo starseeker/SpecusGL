@@ -143,7 +143,7 @@ void vbo_exec_do_EvalCoord1f(struct vbo_exec_context *exec, GLfloat u)
 
 	    ASSIGN_4V(data, 0, 0, 0, 1);
 
-	    _math_horner_bezier_curve(map->Points, data, uu,
+	    _math_horner_bezier_curve(map->Points.data(), data, uu,
 				      exec->eval.map1[attr].sz,
 				      map->Order);
 
@@ -162,7 +162,7 @@ void vbo_exec_do_EvalCoord1f(struct vbo_exec_context *exec, GLfloat u)
 
 	ASSIGN_4V(vertex, 0, 0, 0, 1);
 
-	_math_horner_bezier_curve(map->Points, vertex, uu,
+	_math_horner_bezier_curve(map->Points.data(), vertex, uu,
 				  exec->eval.map1[0].sz,
 				  map->Order);
 
@@ -189,7 +189,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 
 	    ASSIGN_4V(data, 0, 0, 0, 1);
 
-	    _math_horner_bezier_surf(map->Points,
+	    _math_horner_bezier_surf(map->Points.data(),
 				     data,
 				     uu, vv,
 				     exec->eval.map2[attr].sz,
@@ -215,7 +215,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 	    GLfloat normal[4];
 	    GLfloat du[4], dv[4];
 
-	    _math_de_casteljau_surf(map->Points, vertex, du, dv, uu, vv,
+	    _math_de_casteljau_surf(map->Points.data(), vertex, du, dv, uu, vv,
 				    exec->eval.map2[0].sz,
 				    map->Uorder, map->Vorder);
 
@@ -239,7 +239,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 		       normal);
 
 	} else {
-	    _math_horner_bezier_surf(map->Points, vertex, uu, vv,
+	    _math_horner_bezier_surf(map->Points.data(), vertex, uu, vv,
 				     exec->eval.map2[0].sz,
 				     map->Uorder, map->Vorder);
 	}

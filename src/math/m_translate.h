@@ -26,9 +26,7 @@
 #ifndef _M_TRANSLATE_H_
 #define _M_TRANSLATE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "gllimits.h"
 #include "mtypes.h"		/* hack for GLchan */
@@ -123,9 +121,7 @@ extern void _math_trans_3fn(GLfloat(*to)[3],
 extern void _math_init_translate(void);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

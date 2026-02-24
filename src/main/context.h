@@ -53,9 +53,7 @@
 #include "imports.h"
 #include "mtypes.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /** \name Visual-related functions */
@@ -105,7 +103,7 @@ _mesa_destroy_visual(GLvisual *vis);
 /** \name Context-related functions */
 /*@{*/
 
-extern GLcontext *
+[[nodiscard]] extern GLcontext *
 _mesa_create_context(const GLvisual *visual,
 		     GLcontext *share_list,
 		     const struct dd_function_table *driverFunctions,
@@ -293,9 +291,7 @@ do {									\
    ((CTX)->Color.BlendEnabled && (CTX)->Color.BlendEquationRGB == GL_LOGIC_OP))
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* CONTEXT_H */
 

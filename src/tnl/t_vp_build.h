@@ -26,9 +26,7 @@
 #ifndef _T_ARB_BUILD_H
 #define _T_ARB_BUILD_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 
@@ -37,9 +35,7 @@ extern void _tnl_UpdateFixedFunctionProgram(GLcontext *ctx);
 extern void _tnl_ProgramCacheInit(GLcontext *ctx);
 extern void _tnl_ProgramCacheDestroy(GLcontext *ctx);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

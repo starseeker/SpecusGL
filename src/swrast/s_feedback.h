@@ -27,9 +27,7 @@
 #ifndef S_FEEDBACK_H
 #define S_FEEDBACK_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -52,9 +50,7 @@ extern void _swrast_select_line(GLcontext *ctx,
 extern void _swrast_select_triangle(GLcontext *ctx, const SWvertex *v0,
 				    const SWvertex *v1, const SWvertex *v2);
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

@@ -31,9 +31,7 @@
 #ifndef FEEDBACK_H
 #define FEEDBACK_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -85,9 +83,7 @@ _mesa_RenderMode(GLenum mode);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

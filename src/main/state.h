@@ -31,9 +31,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -52,9 +50,7 @@ _mesa_update_state_locked(GLcontext *ctx);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

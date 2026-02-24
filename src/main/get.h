@@ -31,9 +31,7 @@
 #ifndef GET_H
 #define GET_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -62,9 +60,7 @@ extern GLenum GLAPIENTRY
 _mesa_GetError(void);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

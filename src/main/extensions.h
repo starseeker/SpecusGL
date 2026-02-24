@@ -36,9 +36,7 @@
 #ifndef _EXTENSIONS_H_
 #define _EXTENSIONS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -89,9 +87,7 @@ extern void _mesa_init_extensions(GLcontext *ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -26,9 +26,7 @@
 #ifndef ARBPROGRAM_H
 #define ARBPROGRAM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 extern void GLAPIENTRY
@@ -143,9 +141,7 @@ extern void GLAPIENTRY
 _mesa_GetProgramStringARB(GLenum target, GLenum pname, GLvoid *string);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -1034,10 +1034,10 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 {
     const GLint max = table->Size - 1;
     const GLfloat scale = (GLfloat) max;
-    const GLfloat *lut = table->TableF;
+    const GLfloat *lut = table->TableF.data();
     GLuint i;
 
-    if (!table->TableF || table->Size == 0)
+    if (table->TableF.empty() || table->Size == 0)
 	return;
 
     switch (table->_BaseFormat) {
@@ -1131,11 +1131,11 @@ void
 _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 			GLuint n, GLubyte rgba[][4])
 {
-    const GLubyte *lut = table->TableUB;
+    const GLubyte *lut = table->TableUB.data();
     const GLfloat scale = (GLfloat)(table->Size - 1) / 255.0;
     GLuint i;
 
-    if (!table->TableUB || table->Size == 0)
+    if (table->TableUB.empty() || table->Size == 0)
 	return;
 
     switch (table->_BaseFormat) {

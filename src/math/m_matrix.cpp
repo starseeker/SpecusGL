@@ -1535,40 +1535,30 @@ _math_matrix_loadf(GLmatrix *mat, const GLfloat *m)
 }
 
 /**
- * Matrix constructor.
- *
- * \param m matrix.
- *
- * Initialize the GLmatrix fields.
+ * GLmatrix constructor — initialises m to identity, inv to NULL.
  */
-void
-_math_matrix_ctr(GLmatrix *m)
+GLmatrix::GLmatrix()
 {
-    m->m = new (std::align_val_t{16}) GLfloat[16];
-    if (m->m)
-	memcpy(m->m, Identity, sizeof(Identity));
-    m->inv = NULL;
-    m->type = MATRIX_IDENTITY;
-    m->flags = 0;
+    m = new (std::align_val_t{16}) GLfloat[16];
+    if (m)
+	memcpy(m, Identity, sizeof(Identity));
+    inv = NULL;
+    type = MATRIX_IDENTITY;
+    flags = 0;
 }
 
 /**
- * Matrix destructor.
- *
- * \param m matrix.
- *
- * Frees the data in a GLmatrix.
+ * GLmatrix destructor — releases the aligned m and inv allocations.
  */
-void
-_math_matrix_dtr(GLmatrix *m)
+GLmatrix::~GLmatrix()
 {
-    if (m->m) {
-	::operator delete[](m->m, std::align_val_t{16});
-	m->m = NULL;
+    if (m) {
+	::operator delete[](m, std::align_val_t{16});
+	m = NULL;
     }
-    if (m->inv) {
-	::operator delete[](m->inv, std::align_val_t{16});
-	m->inv = NULL;
+    if (inv) {
+	::operator delete[](inv, std::align_val_t{16});
+	inv = NULL;
     }
 }
 

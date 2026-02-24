@@ -26,9 +26,7 @@
 #ifndef SLANG_LOG_H
 #define SLANG_LOG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 typedef struct slang_info_log_ {
@@ -57,9 +55,7 @@ extern void
 slang_info_log_memory(slang_info_log *);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_LOG_H */
 

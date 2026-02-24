@@ -32,9 +32,7 @@
 #ifndef SLANG_IR_H
 #define SLANG_IR_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "imports.h"
@@ -200,9 +198,7 @@ extern void
 _slang_print_ir_tree(const slang_ir_node *n, int indent);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_IR_H */
 

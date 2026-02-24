@@ -32,9 +32,7 @@
 #ifndef DLIST_H
 #define DLIST_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -99,9 +97,7 @@ extern void _mesa_save_vtxfmt_init(GLvertexformat *vfmt);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

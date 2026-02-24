@@ -1209,7 +1209,7 @@ static void FETCH(ci8)(const struct gl_texture_image *texImage,
     index = (*src) & (palette->Size - 1);
 
     {
-	const GLubyte *table = palette->TableUB;
+	const GLubyte *table = palette->TableUB.data();
 	switch (palette->_BaseFormat) {
 	    case GL_ALPHA:
 		texelUB[RCOMP] =

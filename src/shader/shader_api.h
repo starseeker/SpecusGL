@@ -26,9 +26,7 @@
 #ifndef SHADER_API_H
 #define SHADER_API_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "glheader.h"
@@ -190,9 +188,7 @@ extern void
 _mesa_validate_program(GLcontext *ctx, GLuint program);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SHADER_API_H */
 

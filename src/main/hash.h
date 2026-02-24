@@ -35,9 +35,7 @@
 #include "glheader.h"
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 [[nodiscard]] extern struct _mesa_HashTable *_mesa_NewHashTable(void);
@@ -71,9 +69,7 @@ extern void _mesa_HashPrint(const struct _mesa_HashTable *table);
 extern void _mesa_test_hash_functions(void);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 
 #endif

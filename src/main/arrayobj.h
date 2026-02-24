@@ -27,9 +27,7 @@
 #ifndef ARRAYOBJ_H
 #define ARRAYOBJ_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "context.h"
@@ -73,9 +71,7 @@ void GLAPIENTRY _mesa_GenVertexArraysAPPLE(GLsizei n, GLuint *buffer);
 GLboolean GLAPIENTRY _mesa_IsVertexArrayAPPLE(GLuint id);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* ARRAYOBJ_H */
 

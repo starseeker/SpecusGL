@@ -26,9 +26,7 @@
 #ifndef S_TEXCOMBINE_H
 #define S_TEXCOMBINE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -37,9 +35,7 @@ extern "C" {
 extern void
 _swrast_texture_span(GLcontext *ctx, SWspan *span);
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

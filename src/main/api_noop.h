@@ -25,9 +25,7 @@
 #ifndef _API_NOOP_H
 #define _API_NOOP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -49,9 +47,7 @@ extern void
 _mesa_noop_vtxfmt_init(GLvertexformat *vfmt);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

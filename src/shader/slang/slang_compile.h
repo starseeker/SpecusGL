@@ -33,9 +33,7 @@
 #include "slang_compile_operation.h"
 #include "slang_compile_function.h"
 
-#if defined __cplusplus
-extern "C" {
-#endif
+
 
     typedef enum slang_unit_type_ {
 	SLANG_UNIT_FRAGMENT_SHADER,
@@ -88,9 +86,7 @@ extern "C" {
     extern GLboolean
     _slang_compile(GLcontext *ctx, struct gl_shader *shader);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

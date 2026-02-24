@@ -429,9 +429,13 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     map->u1 = u1;
     map->u2 = u2;
     map->du = 1.0F / (u2 - u1);
-    if (map->Points)
-	free(map->Points);
-    map->Points = pnts;
+    if (pnts) {
+	const int npts = uorder * _mesa_evaluator_components(target);
+	map->Points.assign(pnts, pnts + npts);
+	free(pnts);
+    } else {
+	map->Points.clear();
+    }
 }
 
 
@@ -529,9 +533,13 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     map->v1 = v1;
     map->v2 = v2;
     map->dv = 1.0F / (v2 - v1);
-    if (map->Points)
-	free(map->Points);
-    map->Points = pnts;
+    if (pnts) {
+	const int npts = uorder * vorder * _mesa_evaluator_components(target);
+	map->Points.assign(pnts, pnts + npts);
+	free(pnts);
+    } else {
+	map->Points.clear();
+    }
 }
 
 
@@ -565,7 +573,7 @@ _mesa_GetMapdv(GLenum target, GLenum query, GLdouble *v)
     struct gl_1d_map *map1d;
     struct gl_2d_map *map2d;
     GLint i, n;
-    GLfloat *data;
+    const GLfloat *data;
     GLuint comps;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -583,10 +591,10 @@ _mesa_GetMapdv(GLenum target, GLenum query, GLdouble *v)
     switch (query) {
 	case GL_COEFF:
 	    if (map1d) {
-		data = map1d->Points;
+		data = map1d->Points.data();
 		n = map1d->Order * comps;
 	    } else {
-		data = map2d->Points;
+		data = map2d->Points.data();
 		n = map2d->Uorder * map2d->Vorder * comps;
 	    }
 	    if (data) {
@@ -627,7 +635,7 @@ _mesa_GetMapfv(GLenum target, GLenum query, GLfloat *v)
     struct gl_1d_map *map1d;
     struct gl_2d_map *map2d;
     GLint i, n;
-    GLfloat *data;
+    const GLfloat *data;
     GLuint comps;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -645,10 +653,10 @@ _mesa_GetMapfv(GLenum target, GLenum query, GLfloat *v)
     switch (query) {
 	case GL_COEFF:
 	    if (map1d) {
-		data = map1d->Points;
+		data = map1d->Points.data();
 		n = map1d->Order * comps;
 	    } else {
-		data = map2d->Points;
+		data = map2d->Points.data();
 		n = map2d->Uorder * map2d->Vorder * comps;
 	    }
 	    if (data) {
@@ -689,7 +697,7 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v)
     struct gl_1d_map *map1d;
     struct gl_2d_map *map2d;
     GLuint i, n;
-    GLfloat *data;
+    const GLfloat *data;
     GLuint comps;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -707,10 +715,10 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v)
     switch (query) {
 	case GL_COEFF:
 	    if (map1d) {
-		data = map1d->Points;
+		data = map1d->Points.data();
 		n = map1d->Order * comps;
 	    } else {
-		data = map2d->Points;
+		data = map2d->Points.data();
 		n = map2d->Uorder * map2d->Vorder * comps;
 	    }
 	    if (data) {
@@ -821,12 +829,7 @@ init_1d_map(struct gl_1d_map *map, int n, const float *initial)
     map->Order = 1;
     map->u1 = 0.0;
     map->u2 = 1.0;
-    map->Points = (GLfloat *) malloc(n * sizeof(GLfloat));
-    if (map->Points) {
-	GLint i;
-	for (i=0; i<n; i++)
-	    map->Points[i] = initial[i];
-    }
+    map->Points.assign(initial, initial + n);
 }
 
 
@@ -842,12 +845,7 @@ init_2d_map(struct gl_2d_map *map, int n, const float *initial)
     map->u2 = 1.0;
     map->v1 = 0.0;
     map->v2 = 1.0;
-    map->Points = (GLfloat *) malloc(n * sizeof(GLfloat));
-    if (map->Points) {
-	GLint i;
-	for (i=0; i<n; i++)
-	    map->Points[i] = initial[i];
-    }
+    map->Points.assign(initial, initial + n);
 }
 
 
@@ -925,50 +923,11 @@ void _mesa_init_eval(GLcontext *ctx)
 
 void _mesa_free_eval_data(GLcontext *ctx)
 {
-    int i;
-
-    /* Free evaluator data */
-    if (ctx->EvalMap.Map1Vertex3.Points)
-	free(ctx->EvalMap.Map1Vertex3.Points);
-    if (ctx->EvalMap.Map1Vertex4.Points)
-	free(ctx->EvalMap.Map1Vertex4.Points);
-    if (ctx->EvalMap.Map1Index.Points)
-	free(ctx->EvalMap.Map1Index.Points);
-    if (ctx->EvalMap.Map1Color4.Points)
-	free(ctx->EvalMap.Map1Color4.Points);
-    if (ctx->EvalMap.Map1Normal.Points)
-	free(ctx->EvalMap.Map1Normal.Points);
-    if (ctx->EvalMap.Map1Texture1.Points)
-	free(ctx->EvalMap.Map1Texture1.Points);
-    if (ctx->EvalMap.Map1Texture2.Points)
-	free(ctx->EvalMap.Map1Texture2.Points);
-    if (ctx->EvalMap.Map1Texture3.Points)
-	free(ctx->EvalMap.Map1Texture3.Points);
-    if (ctx->EvalMap.Map1Texture4.Points)
-	free(ctx->EvalMap.Map1Texture4.Points);
-    for (i = 0; i < 16; i++)
-	free((ctx->EvalMap.Map1Attrib[i].Points));
-
-    if (ctx->EvalMap.Map2Vertex3.Points)
-	free(ctx->EvalMap.Map2Vertex3.Points);
-    if (ctx->EvalMap.Map2Vertex4.Points)
-	free(ctx->EvalMap.Map2Vertex4.Points);
-    if (ctx->EvalMap.Map2Index.Points)
-	free(ctx->EvalMap.Map2Index.Points);
-    if (ctx->EvalMap.Map2Color4.Points)
-	free(ctx->EvalMap.Map2Color4.Points);
-    if (ctx->EvalMap.Map2Normal.Points)
-	free(ctx->EvalMap.Map2Normal.Points);
-    if (ctx->EvalMap.Map2Texture1.Points)
-	free(ctx->EvalMap.Map2Texture1.Points);
-    if (ctx->EvalMap.Map2Texture2.Points)
-	free(ctx->EvalMap.Map2Texture2.Points);
-    if (ctx->EvalMap.Map2Texture3.Points)
-	free(ctx->EvalMap.Map2Texture3.Points);
-    if (ctx->EvalMap.Map2Texture4.Points)
-	free(ctx->EvalMap.Map2Texture4.Points);
-    for (i = 0; i < 16; i++)
-	free((ctx->EvalMap.Map2Attrib[i].Points));
+    /* With std::vector, Points storage is freed automatically when
+     * the GLcontext (and its embedded gl_evaluators) is destroyed.
+     * Nothing to do here - kept for API compatibility.
+     */
+    (void) ctx;
 }
 
 /*

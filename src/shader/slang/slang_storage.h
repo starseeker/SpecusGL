@@ -25,9 +25,7 @@
 #ifndef SLANG_STORAGE_H
 #define SLANG_STORAGE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "slang_compile.h"
 #include "slang_typeinfo.h"
@@ -138,9 +136,7 @@ _slang_flatten_aggregate(slang_storage_aggregate *,
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_STORAGE_H */
 

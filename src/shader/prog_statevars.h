@@ -25,9 +25,7 @@
 #ifndef PROG_STATEVARS_H
 #define PROG_STATEVARS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 
@@ -134,9 +132,7 @@ extern void
 _mesa_load_tracked_matrices(GLcontext *ctx);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROG_STATEVARS_H */
 

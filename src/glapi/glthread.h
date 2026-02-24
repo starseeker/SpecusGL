@@ -63,9 +63,7 @@
 #ifndef GLTHREAD_H
 #define GLTHREAD_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #if defined(USE_MGL_NAMESPACE)
@@ -275,9 +273,7 @@ _glthread_SetTSD(_glthread_TSD *, void *);
 #endif  /* ndef GL_CALL */
 
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif /* THREADS_H */
 
 /*

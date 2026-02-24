@@ -36,9 +36,7 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #if _HAVE_FULL_GL
 
@@ -61,9 +59,7 @@ extern void _mesa_init_debug(GLcontext *ctx);
 
 #endif /* _HAVE_FULL_GL */
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -23,13 +23,13 @@
  */
 
 /**
- * \file grammar.c
+ * \file grammar.cpp
  * syntax parsing engine
  * \author Michal Krol
  */
 
 #ifndef GRAMMAR_PORT_BUILD
-#error Do not build this file directly, build your grammar_XXX.c instead, which includes this file
+#error Do not build this file directly, include it via grammar_mesa.cpp
 #endif
 
 /*

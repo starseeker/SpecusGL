@@ -2,9 +2,7 @@
 #ifndef SLANG_VARTABLE_H
 #define SLANG_VARTABLE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 struct _slang_ir_storage;
 
@@ -43,9 +41,7 @@ extern GLboolean
 _slang_is_temp(const slang_var_table *t, const struct _slang_ir_storage *store);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_VARTABLE_H */
 

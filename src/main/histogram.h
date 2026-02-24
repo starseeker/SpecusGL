@@ -36,9 +36,7 @@
 #ifndef HISTOGRAM_H
 #define HISTOGRAM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "glheader.h"
@@ -92,9 +90,7 @@ extern void _mesa_init_histogram(GLcontext * ctx);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

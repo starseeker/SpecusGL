@@ -32,9 +32,7 @@
 #ifndef _VBO_H
 #define _VBO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 
@@ -116,9 +114,7 @@ void vbo_rebase_prims(GLcontext *ctx,
 		      vbo_draw_func draw);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

@@ -34,9 +34,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef VBO_SAVE_H
 #define VBO_SAVE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 #include "vbo.h"
@@ -177,9 +175,7 @@ void vbo_save_playback_vertex_list(GLcontext *ctx, void *data);
 
 void vbo_save_api_init(struct vbo_save_context *save);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

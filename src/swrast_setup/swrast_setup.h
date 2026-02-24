@@ -38,9 +38,7 @@
 #ifndef SWRAST_SETUP_H
 #define SWRAST_SETUP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "swrast/swrast.h"
 
@@ -62,9 +60,7 @@ _swsetup_Wakeup(GLcontext *ctx);
 extern void
 _swsetup_Translate(GLcontext *ctx, const void *vertex, SWvertex *dest);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

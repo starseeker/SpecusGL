@@ -31,7 +31,7 @@
 #include "grammar_mesa.h"
 
 #define GRAMMAR_PORT_BUILD 1
-#include "grammar.c"
+#include "grammar.cpp"
 #undef GRAMMAR_PORT_BUILD
 
 

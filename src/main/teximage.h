@@ -31,9 +31,7 @@
 #ifndef TEXIMAGE_H
 #define TEXIMAGE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -257,9 +255,7 @@ _mesa_GetCompressedTexImageARB(GLenum target, GLint lod, GLvoid *img);
 /*@}*/
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

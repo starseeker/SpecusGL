@@ -31,9 +31,7 @@
 #ifndef PROG_PARAMETER_H
 #define PROG_PARAMETER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 #include "mtypes.h"
 #include "prog_statevars.h"
@@ -142,9 +140,7 @@ _mesa_num_parameters_of_type(const struct gl_program_parameter_list *list,
 			     enum register_file type);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROG_PARAMETER_H */
 

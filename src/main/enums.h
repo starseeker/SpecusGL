@@ -36,9 +36,7 @@
 #ifndef _ENUMS_H_
 #define _ENUMS_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -58,9 +56,7 @@ extern int _mesa_lookup_enum_by_name(const char *symbol);
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

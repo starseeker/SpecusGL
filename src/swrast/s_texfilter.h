@@ -26,9 +26,7 @@
 #ifndef S_TEXFILTER_H
 #define S_TEXFILTER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 #include "mtypes.h"
@@ -44,9 +42,7 @@ _swrast_choose_texture_sample_func_f(GLcontext *ctx,
 				     const struct gl_texture_object *tObj);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 #endif
 
 /*

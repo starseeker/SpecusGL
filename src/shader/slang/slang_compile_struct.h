@@ -25,9 +25,7 @@
 #if !defined SLANG_COMPILE_STRUCT_H
 #define SLANG_COMPILE_STRUCT_H
 
-#if defined __cplusplus
-extern "C" {
-#endif
+
 
     typedef struct slang_struct_scope_ {
 	struct slang_struct_ *structs;
@@ -53,9 +51,7 @@ extern "C" {
     int slang_struct_copy(slang_struct *, const slang_struct *);
     int slang_struct_equal(const slang_struct *, const slang_struct *);
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

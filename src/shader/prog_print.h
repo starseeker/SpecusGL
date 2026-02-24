@@ -26,9 +26,7 @@
 #ifndef PROG_PRINT_H
 #define PROG_PRINT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /**
@@ -73,9 +71,7 @@ extern void
 _mesa_print_parameter_list(const struct gl_program_parameter_list *list);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* PROG_PRINT_H */
 

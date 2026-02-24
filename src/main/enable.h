@@ -31,9 +31,7 @@
 #ifndef ENABLE_H
 #define ENABLE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -60,9 +58,7 @@ _mesa_DisableClientState(GLenum cap);
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

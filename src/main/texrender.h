@@ -1,9 +1,7 @@
 #ifndef TEXRENDER_H
 #define TEXRENDER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -18,9 +16,7 @@ _mesa_finish_render_texture(GLcontext *ctx,
 
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* TEXRENDER_H */
 

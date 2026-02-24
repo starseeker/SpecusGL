@@ -26,15 +26,13 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 
-extern struct gl_framebuffer *
+
+[[nodiscard]] extern struct gl_framebuffer *
 _mesa_create_framebuffer(const GLvisual *visual);
 
-extern struct gl_framebuffer *
+[[nodiscard]] extern struct gl_framebuffer *
 _mesa_new_framebuffer(GLcontext *ctx, GLuint name);
 
 extern void
@@ -81,9 +79,7 @@ extern GLboolean
 _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* FRAMEBUFFER_H */
 

@@ -29,9 +29,7 @@
 #ifndef NVPROGRAM_H
 #define NVPROGRAM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 extern void GLAPIENTRY
@@ -120,9 +118,7 @@ _mesa_GetProgramNamedParameterdvNV(GLuint id, GLsizei len, const GLubyte *name,
 				   GLdouble *params);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

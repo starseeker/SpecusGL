@@ -27,9 +27,7 @@
 #ifndef CONVOLVE_H
 #define CONVOLVE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 
@@ -117,9 +115,7 @@ _mesa_adjust_image_for_convolution(const GLcontext *ctx, GLuint dimensions,
 #endif
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif
 

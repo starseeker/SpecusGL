@@ -75,7 +75,7 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
      * be sure we won't go out of bounds.
      */
     if (ctx->Array.ArrayBufferObj->Name)
-	array->_MaxElement = ((GLsizeiptrARB) ctx->Array.ArrayBufferObj->Size
+	array->_MaxElement = ((GLsizeiptrARB) ctx->Array.ArrayBufferObj->Data.size()
 			      - (GLsizeiptrARB) array->Ptr + array->StrideB
 			      - elementSize) / array->StrideB;
     else

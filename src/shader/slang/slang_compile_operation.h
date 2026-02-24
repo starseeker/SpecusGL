@@ -25,9 +25,7 @@
 #ifndef SLANG_COMPILE_OPERATION_H
 #define SLANG_COMPILE_OPERATION_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 
 /**
@@ -150,9 +148,7 @@ extern void
 _slang_operation_swap(slang_operation *oper0, slang_operation *oper1);
 
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* SLANG_COMPILE_OPERATION_H */
 
