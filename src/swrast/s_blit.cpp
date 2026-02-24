@@ -26,6 +26,7 @@
 #include "glheader.h"
 #include "macros.h"
 #include "s_context.h"
+#include <vector>
 
 
 #define ABS(X)   ((X) < 0 ? -(X) : (X))
@@ -124,7 +125,6 @@ blit_nearest(GLcontext *ctx,
     GLint dstRow;
 
     GLint comps, pixelSize;
-    GLvoid *srcBuffer, *dstBuffer;
     GLint prevY = -1;
 
     typedef void (*resample_func)(GLint srcWidth, GLint dstWidth,
@@ -196,17 +196,10 @@ blit_nearest(GLcontext *ctx,
     }
 
     /* allocate the src/dst row buffers */
-    srcBuffer = malloc(pixelSize * srcWidth);
-    if (!srcBuffer) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
-    dstBuffer = malloc(pixelSize * dstWidth);
-    if (!dstBuffer) {
-	free(srcBuffer);
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
+    std::vector<GLubyte> srcVec(pixelSize * srcWidth);
+    std::vector<GLubyte> dstVec(pixelSize * dstWidth);
+    GLvoid *srcBuffer = srcVec.data();
+    GLvoid *dstBuffer = dstVec.data();
 
     for (dstRow = 0; dstRow < dstHeight; dstRow++) {
 	const GLint dstY = dstYpos + dstRow;
@@ -233,8 +226,6 @@ blit_nearest(GLcontext *ctx,
 	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, nullptr);
     }
 
-    free(srcBuffer);
-    free(dstBuffer);
 }
 
 
@@ -338,9 +329,7 @@ blit_linear(GLcontext *ctx,
     GLint dstRow;
 
     GLint pixelSize;
-    GLvoid *srcBuffer0, *srcBuffer1;
     GLint srcBufferY0 = -1, srcBufferY1 = -1;
-    GLvoid *dstBuffer;
 
     switch (readRb->DataType) {
 	case GL_UNSIGNED_BYTE:
@@ -364,24 +353,12 @@ blit_linear(GLcontext *ctx,
     /* Allocate the src/dst row buffers.
      * Keep two adjacent src rows around for bilinear sampling.
      */
-    srcBuffer0 = malloc(pixelSize * srcWidth);
-    if (!srcBuffer0) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
-    srcBuffer1 = malloc(pixelSize * srcWidth);
-    if (!srcBuffer1) {
-	free(srcBuffer0);
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
-    dstBuffer = malloc(pixelSize * dstWidth);
-    if (!dstBuffer) {
-	free(srcBuffer0);
-	free(srcBuffer1);
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
+    std::vector<GLubyte> srcVec0(pixelSize * srcWidth);
+    std::vector<GLubyte> srcVec1(pixelSize * srcWidth);
+    std::vector<GLubyte> dstVec(pixelSize * dstWidth);
+    GLvoid *srcBuffer0 = srcVec0.data();
+    GLvoid *srcBuffer1 = srcVec1.data();
+    GLvoid *dstBuffer = dstVec.data();
 
     for (dstRow = 0; dstRow < dstHeight; dstRow++) {
 	const GLint dstY = dstYpos + dstRow;
@@ -439,9 +416,6 @@ blit_linear(GLcontext *ctx,
 	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, nullptr);
     }
 
-    free(srcBuffer0);
-    free(srcBuffer1);
-    free(dstBuffer);
 }
 
 
@@ -460,7 +434,6 @@ simple_blit(GLcontext *ctx,
     const GLint height = srcY1 - srcY0;
     GLint row, srcY, dstY, yStep;
     GLint comps, bytesPerRow;
-    void *rowBuffer;
 
     /* only one buffer */
     ASSERT(_mesa_bitcount(buffer) == 1);
@@ -529,11 +502,8 @@ simple_blit(GLcontext *ctx,
     }
 
     /* allocate the row buffer */
-    rowBuffer = malloc(bytesPerRow);
-    if (!rowBuffer) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBlitFrameBufferEXT");
-	return;
-    }
+    std::vector<GLubyte> rowVec(bytesPerRow);
+    GLvoid *rowBuffer = rowVec.data();
 
     for (row = 0; row < height; row++) {
 	readRb->GetRow(ctx, width, srcX0, srcY, rowBuffer);
@@ -541,8 +511,6 @@ simple_blit(GLcontext *ctx,
 	srcY += yStep;
 	dstY += yStep;
     }
-
-    free(rowBuffer);
 }
 
 
