@@ -246,7 +246,7 @@ _mesa_free_shader(GLcontext *ctx, struct gl_shader *sh)
 {
     GLuint i;
     if (sh->Source)
-	free((void *) sh->Source);
+	delete[] sh->Source;
     if (sh->InfoLog)
 	free(sh->InfoLog);
     for (i = 0; i < sh->NumPrograms; i++) {
@@ -1114,7 +1114,7 @@ _mesa_shader_source(GLcontext *ctx, GLuint shader, const GLchar *source)
 
     /* free old shader source string and install new one */
     if (sh->Source) {
-	free((void *) sh->Source);
+	delete[] sh->Source;
     }
     sh->Source = source;
     sh->CompileStatus = GL_FALSE;
