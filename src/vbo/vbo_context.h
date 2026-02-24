@@ -51,6 +51,10 @@
 #ifndef _VBO_CONTEXT_H
 #define _VBO_CONTEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "vbo.h"
 #include "vbo_attrib.h"
 #include "vbo_save.h"
@@ -104,6 +108,10 @@ static INLINE GLuint get_program_mode(GLcontext *ctx)
 	return VP_ARB;
 }
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

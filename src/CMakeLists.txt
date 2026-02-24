@@ -153,38 +153,38 @@ set(osmesa_srcs
   swrast/s_texstore.cpp
   swrast/s_triangle.cpp
   swrast/s_zoom.cpp
-  swrast_setup/ss_context.c
-  swrast_setup/ss_triangle.c
-  tnl/t_context.c
-  tnl/t_draw.c
-  tnl/t_pipeline.c
-  tnl/t_vb_cull.c
-  tnl/t_vb_fog.c
-  tnl/t_vb_light.c
-  tnl/t_vb_normals.c
-  tnl/t_vb_points.c
-  tnl/t_vb_program.c
-  tnl/t_vb_render.c
-  tnl/t_vb_texgen.c
-  tnl/t_vb_texmat.c
-  tnl/t_vb_vertex.c
-  tnl/t_vertex.c
-  tnl/t_vertex_generic.c
-  tnl/t_vp_build.c
-  vbo/vbo_context.c
-  vbo/vbo_exec.c
-  vbo/vbo_exec_api.c
-  vbo/vbo_exec_array.c
-  vbo/vbo_exec_draw.c
-  vbo/vbo_exec_eval.c
-  vbo/vbo_rebase.c
-  vbo/vbo_save.c
-  vbo/vbo_save_api.c
-  vbo/vbo_save_draw.c
-  vbo/vbo_save_loopback.c
-  vbo/vbo_split.c
-  vbo/vbo_split_copy.c
-  vbo/vbo_split_inplace.c
+  swrast_setup/ss_context.cpp
+  swrast_setup/ss_triangle.cpp
+  tnl/t_context.cpp
+  tnl/t_draw.cpp
+  tnl/t_pipeline.cpp
+  tnl/t_vb_cull.cpp
+  tnl/t_vb_fog.cpp
+  tnl/t_vb_light.cpp
+  tnl/t_vb_normals.cpp
+  tnl/t_vb_points.cpp
+  tnl/t_vb_program.cpp
+  tnl/t_vb_render.cpp
+  tnl/t_vb_texgen.cpp
+  tnl/t_vb_texmat.cpp
+  tnl/t_vb_vertex.cpp
+  tnl/t_vertex.cpp
+  tnl/t_vertex_generic.cpp
+  tnl/t_vp_build.cpp
+  vbo/vbo_context.cpp
+  vbo/vbo_exec.cpp
+  vbo/vbo_exec_api.cpp
+  vbo/vbo_exec_array.cpp
+  vbo/vbo_exec_draw.cpp
+  vbo/vbo_exec_eval.cpp
+  vbo/vbo_rebase.cpp
+  vbo/vbo_save.cpp
+  vbo/vbo_save_api.cpp
+  vbo/vbo_save_draw.cpp
+  vbo/vbo_save_loopback.cpp
+  vbo/vbo_split.cpp
+  vbo/vbo_split_copy.cpp
+  vbo/vbo_split_inplace.cpp
   )
 
 add_library(osmesa SHARED ${osmesa_srcs})

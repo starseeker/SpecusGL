@@ -28,6 +28,10 @@
 #ifndef _TNL_VERTEX_H
 #define _TNL_VERTEX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 #include "t_context.h"
 
@@ -159,6 +163,10 @@ void _tnl_generate_hardwired_emit(GLcontext *ctx);
 /* t_vertex_sse.c -- Internal functions for t_vertex.c
  */
 void _tnl_generate_sse_emit(GLcontext *ctx);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

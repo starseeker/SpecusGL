@@ -28,6 +28,10 @@
 #ifndef _TNL_H
 #define _TNL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 
 
@@ -80,6 +84,10 @@ _tnl_draw_prims(GLcontext *ctx,
 		const struct _mesa_index_buffer *ib,
 		GLuint min_index,
 		GLuint max_index);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
