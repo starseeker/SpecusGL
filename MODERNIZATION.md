@@ -26,6 +26,18 @@ less verbose, readily debuggable and performant.
    remain unchanged so that existing C consumers compile without modification.
    Internal implementation code structure and organization should be updated to
    reflect modern best practice C++ design.
+3. **Look for opportunities to collapse functions into methods on Classes.** Right now the logic flows
+   of SpecusGL are designed around lots of individual functions passing
+   parameters around, and functions are doing init and free work.  Let's
+   see if we can (internally, while preserving the exposed public C API)
+   migrate to a more C++-ish approach of having class objects with methods
+   handle a lot of the bookkeeping and reduce the function/parameter passing
+   complexity.  Ideally, we could also clean up some of the more complex
+   parts of the codebase to be easier to understand and modify as well.  Don't
+   do this just for the sake of doing it, but if there are code cleanliness
+   advantages or structural/organizational improvements to be had prioritize those over
+   simply replacing low level C operations in the code with their low level
+   C++ equivalents.
 3. **Prefer the standard library.**  Replace bespoke data structures with
    `std::unordered_map`, `std::vector`, `std::string`, etc.
 4. **RAII everywhere.**  Eliminate naked `malloc`/`free` in migrated code;
