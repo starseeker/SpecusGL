@@ -46,7 +46,7 @@ extern "C" {
  * Internal functions
  */
 
-struct gl_array_object * _mesa_new_array_object(GLcontext *ctx,
+[[nodiscard]] struct gl_array_object * _mesa_new_array_object(GLcontext *ctx,
 	GLuint name);
 
 void _mesa_delete_array_object(GLcontext *ctx, struct gl_array_object *obj);

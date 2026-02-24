@@ -78,9 +78,8 @@ _mesa_lookup_texture(GLcontext *ctx, GLuint id)
 struct gl_texture_object *
 _mesa_new_texture_object(GLcontext *ctx, GLuint name, GLenum target)
 {
-    struct gl_texture_object *obj;
     (void) ctx;
-    obj = MALLOC_STRUCT(gl_texture_object);
+    auto *obj = new gl_texture_object{};
     _mesa_initialize_texture_object(obj, name, target);
     return obj;
 }
@@ -172,7 +171,7 @@ _mesa_delete_texture_object(GLcontext *ctx, struct gl_texture_object *texObj)
     _glthread_DESTROY_MUTEX(texObj->Mutex);
 
     /* free this object */
-    free(texObj);
+    delete texObj;
 }
 
 

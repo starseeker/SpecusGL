@@ -30,6 +30,9 @@
 #include "simple_list.h"
 #include "mtypes.h"
 
+#include <cstring>
+#include <string>
+
 
 #define F(x) (int)(uintptr_t)&(((struct gl_extensions *)0)->x)
 #define ON GL_TRUE
@@ -519,35 +522,22 @@ GLubyte *
 _mesa_make_extension_string(GLcontext *ctx)
 {
     const GLboolean *base = (const GLboolean *) &ctx->Extensions;
-    GLuint extStrLen = 0;
-    GLubyte *s;
-    GLuint i;
+    std::string ext;
 
-    /* first, compute length of the extension string */
-    for (i = 0 ; i < Elements(default_extensions) ; i++) {
+    for (GLuint i = 0 ; i < Elements(default_extensions) ; i++) {
 	if (!default_extensions[i].flag_offset ||
 	    *(base + default_extensions[i].flag_offset)) {
-	    extStrLen += (GLuint)strlen(default_extensions[i].name) + 1;
+	    if (!ext.empty())
+		ext += ' ';
+	    ext += default_extensions[i].name;
 	}
     }
-    s = (GLubyte *) malloc(extStrLen);
 
-    /* second, build the extension string */
-    extStrLen = 0;
-    for (i = 0 ; i < Elements(default_extensions) ; i++) {
-	if (!default_extensions[i].flag_offset ||
-	    *(base + default_extensions[i].flag_offset)) {
-	    GLuint len = (GLuint)strlen(default_extensions[i].name);
-	    memcpy(s + extStrLen, default_extensions[i].name, len);
-	    extStrLen += len;
-	    s[extStrLen] = (GLubyte) ' ';
-	    extStrLen++;
-	}
-    }
-    ASSERT(extStrLen > 0);
+    ASSERT(!ext.empty());
 
-    s[extStrLen - 1] = 0;
-
+    /* Allocate a C string that the caller can store and free with free(). */
+    auto *s = new GLubyte[ext.size() + 1];
+    memcpy(s, ext.c_str(), ext.size() + 1);
     return s;
 }
 
