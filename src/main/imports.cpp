@@ -684,10 +684,10 @@ char *
 _mesa_strdup(const char *s)
 {
     if (s) {
-	size_t l = strlen(s);
+	const size_t l = strlen(s);
 	char *s2 = (char *) malloc(l + 1);
 	if (s2)
-	    strcpy(s2, s);
+	    memcpy(s2, s, l + 1);
 	return s2;
     } else {
 	return NULL;

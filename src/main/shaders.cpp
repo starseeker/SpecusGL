@@ -27,6 +27,8 @@
 #include "context.h"
 #include "shaders.h"
 
+#include <vector>
+
 
 /**
  * These are basically just wrappers/adaptors for calling the
@@ -368,8 +370,7 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
 		      const GLcharARB ** string, const GLint * length)
 {
     GET_CURRENT_CONTEXT(ctx);
-    GLint *offsets;
-    GLsizei i, totalLength;
+    GLsizei totalLength;
     GLcharARB *source;
 
     if (string == NULL) {
@@ -381,15 +382,10 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
      * This array holds offsets of where the appropriate string ends, thus the
      * last element will be set to the total length of the source code.
      */
-    offsets = (GLint *) malloc(count * sizeof(GLint));
-    if (offsets == NULL) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glShaderSourceARB");
-	return;
-    }
+    std::vector<GLint> offsets(count);
 
-    for (i = 0; i < count; i++) {
+    for (GLsizei i = 0; i < count; i++) {
 	if (string[i] == NULL) {
-	    free((GLvoid *) offsets);
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glShaderSourceARB(null string)");
 	    return;
 	}
@@ -407,14 +403,9 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
      * valgrind warnings in the parser/grammer code.
      */
     totalLength = offsets[count - 1] + 2;
-    source = (GLcharARB *) malloc(totalLength * sizeof(GLcharARB));
-    if (source == NULL) {
-	free((GLvoid *) offsets);
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glShaderSourceARB");
-	return;
-    }
+    source = new GLcharARB[totalLength];
 
-    for (i = 0; i < count; i++) {
+    for (GLsizei i = 0; i < count; i++) {
 	GLint start = (i > 0) ? offsets[i - 1] : 0;
 	memcpy(source + start, string[i],
 		     (offsets[i] - start) * sizeof(GLcharARB));
@@ -423,8 +414,7 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
     source[totalLength - 2] = '\0';
 
     ctx->Driver.ShaderSource(ctx, shaderObj, source);
-
-    free(offsets);
+    /* source ownership transferred to driver; offsets auto-freed */
 }
 
 

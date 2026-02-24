@@ -41,12 +41,10 @@ static struct ati_fragment_shader DummyShader;
 struct ati_fragment_shader *
 _mesa_new_ati_fragment_shader(GLcontext *ctx, GLuint id)
 {
-    struct ati_fragment_shader *s = CALLOC_STRUCT(ati_fragment_shader);
     (void) ctx;
-    if (s) {
-	s->Id = id;
-	s->RefCount = 1;
-    }
+    auto *s = new ati_fragment_shader{};
+    s->Id = id;
+    s->RefCount = 1;
     return s;
 }
 
@@ -60,11 +58,11 @@ _mesa_delete_ati_fragment_shader(GLcontext *ctx, struct ati_fragment_shader *s)
     GLuint i;
     for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
 	if (s->Instructions[i])
-	    free(s->Instructions[i]);
+	    delete[] s->Instructions[i];
 	if (s->SetupInst[i])
-	    free(s->SetupInst[i]);
+	    delete[] s->SetupInst[i];
     }
-    free(s);
+    delete s;
 }
 
 
@@ -317,17 +315,12 @@ _mesa_BeginFragmentShaderATI(void)
 	    free(ctx->ATIFragmentShader.Current->SetupInst[i]);
     }
 
-    /* malloc the instructions here - not sure if the best place but its
-       a start */
+    /* allocate the instructions here */
     for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
 	ctx->ATIFragmentShader.Current->Instructions[i] =
-	    (struct atifs_instruction *)
-	    calloc(1,sizeof(struct atifs_instruction) *
-			 (MAX_NUM_INSTRUCTIONS_PER_PASS_ATI));
+	    new atifs_instruction[MAX_NUM_INSTRUCTIONS_PER_PASS_ATI]{};
 	ctx->ATIFragmentShader.Current->SetupInst[i] =
-	    (struct atifs_setupinst *)
-	    calloc(1,sizeof(struct atifs_setupinst) *
-			 (MAX_NUM_FRAGMENT_REGISTERS_ATI));
+	    new atifs_setupinst[MAX_NUM_FRAGMENT_REGISTERS_ATI]{};
     }
 
     /* can't rely on calloc for initialization as it's possible to redefine a shader (?) */

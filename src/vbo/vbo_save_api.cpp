@@ -167,7 +167,7 @@ static GLuint _save_copy_vertices(GLcontext *ctx,
 
 static struct vbo_save_vertex_store *alloc_vertex_store(GLcontext *ctx)
 {
-    struct vbo_save_vertex_store *vertex_store = CALLOC_STRUCT(vbo_save_vertex_store);
+    auto *vertex_store = new vbo_save_vertex_store{};
 
     /* obj->Name needs to be non-zero, but won't ever be examined more
      * closely than that.  In particular these buffers won't be entered
@@ -198,7 +198,7 @@ static void free_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vert
     if (vertex_store->bufferobj)
 	ctx->Driver.DeleteBuffer(ctx, vertex_store->bufferobj);
 
-    free(vertex_store);
+    delete vertex_store;
 }
 
 static GLfloat *map_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vertex_store)
@@ -223,8 +223,8 @@ static void unmap_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *ver
 
 static struct vbo_save_primitive_store *alloc_prim_store(GLcontext *ctx)
 {
-    struct vbo_save_primitive_store *store = CALLOC_STRUCT(vbo_save_primitive_store);
     (void) ctx;
+    auto *store = new vbo_save_primitive_store{};
     store->used = 0;
     store->refcount = 1;
     return store;
@@ -1095,7 +1095,7 @@ static void vbo_destroy_vertex_list(GLcontext *ctx, void *data)
 	free_vertex_store(ctx, node->vertex_store);
 
     if (--node->prim_store->refcount == 0)
-	free(node->prim_store);
+	delete node->prim_store;
 }
 
 

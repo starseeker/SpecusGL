@@ -1021,13 +1021,10 @@ generic_nop(void)
 static struct _glapi_table *
 alloc_dispatch_table(void)
 {
-    struct _glapi_table *table = (struct _glapi_table *)malloc(sizeof(struct _glapi_table));
-    if (table) {
-	_glapi_proc *entry = (_glapi_proc *) table;
-	GLint i;
-	for (i = 0; i < DISPATCH_TABLE_SIZE; i++) {
-	    entry[i] = (_glapi_proc) generic_nop;
-	}
+    auto *table = new _glapi_table{};
+    _glapi_proc *entry = reinterpret_cast<_glapi_proc *>(table);
+    for (GLint i = 0; i < DISPATCH_TABLE_SIZE; i++) {
+	entry[i] = reinterpret_cast<_glapi_proc>(generic_nop);
     }
     return table;
 }
@@ -1111,7 +1108,7 @@ _mesa_initialize_context(GLcontext *ctx,
     if (!ctx->Exec || !ctx->Save) {
 	free_shared_state(ctx, ctx->Shared);
 	if (ctx->Exec) {
-	    free(ctx->Exec);
+	    delete ctx->Exec;
 	    ctx->Exec = NULL;
 	}
     }
@@ -1220,8 +1217,8 @@ _mesa_free_context_data(GLcontext *ctx)
     _mesa_delete_array_object(ctx, ctx->Array.DefaultArrayObj);
 
     /* free dispatch tables */
-    free(ctx->Exec);
-    free(ctx->Save);
+    delete ctx->Exec;
+    delete ctx->Save;
 
     /* Shared context state (display lists, textures, etc) */
     _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
@@ -1234,7 +1231,7 @@ _mesa_free_context_data(GLcontext *ctx)
     }
 
     if (ctx->Extensions.String)
-	free((void *) ctx->Extensions.String);
+	delete[] ctx->Extensions.String;
 
     /* unbind the context if it's currently bound */
     if (ctx == _mesa_get_current_context()) {

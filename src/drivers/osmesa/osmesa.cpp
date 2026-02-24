@@ -876,7 +876,7 @@ compute_row_addresses(OSMesaContext osmesa)
 static void
 osmesa_delete_renderbuffer(struct gl_renderbuffer *rb)
 {
-    free(rb);
+    delete rb;
 }
 
 
@@ -1219,7 +1219,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	return NULL;
     }
 
-    osmesa = (OSMesaContext) CALLOC_STRUCT(osmesa_context);
+    osmesa = new osmesa_context{};
     if (osmesa) {
 	osmesa->gl_visual = _mesa_create_visual(rgbmode,
 						GL_FALSE,    /* double buffer */
@@ -1238,7 +1238,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 						1            /* num samples */
 					       );
 	if (!osmesa->gl_visual) {
-	    free(osmesa);
+	    delete osmesa;
 	    return NULL;
 	}
 
@@ -1256,7 +1256,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 				      : (GLcontext *) NULL,
 				      &functions, (void *) osmesa)) {
 	    _mesa_destroy_visual(osmesa->gl_visual);
-	    free(osmesa);
+	    delete osmesa;
 	    return NULL;
 	}
 
@@ -1269,7 +1269,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	if (!osmesa->gl_buffer) {
 	    _mesa_destroy_visual(osmesa->gl_visual);
 	    _mesa_free_context_data(&osmesa->mesa);
-	    free(osmesa);
+	    delete osmesa;
 	    return NULL;
 	}
 
@@ -1307,7 +1307,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 		!_swsetup_CreateContext(ctx)) {
 		_mesa_destroy_visual(osmesa->gl_visual);
 		_mesa_free_context_data(ctx);
-		free(osmesa);
+		delete osmesa;
 		return NULL;
 	    }
 
@@ -1350,7 +1350,7 @@ OSMesaDestroyContext(OSMesaContext osmesa)
 	_mesa_unreference_framebuffer(&osmesa->gl_buffer);
 
 	_mesa_free_context_data(&osmesa->mesa);
-	free(osmesa);
+	delete osmesa;
     }
 }
 

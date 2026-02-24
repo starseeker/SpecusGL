@@ -45,10 +45,10 @@ extern "C" {
  */
 /*@{*/
 
-extern struct gl_texture_object *
+[[nodiscard]] extern struct gl_texture_object *
 _mesa_lookup_texture(GLcontext *ctx, GLuint id);
 
-extern struct gl_texture_object *
+[[nodiscard]] extern struct gl_texture_object *
 _mesa_new_texture_object(GLcontext *ctx, GLuint name, GLenum target);
 
 extern void

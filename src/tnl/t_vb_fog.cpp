@@ -236,9 +236,8 @@ static GLboolean
 alloc_fog_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    struct fog_stage_data *store;
-    stage->privatePtr = malloc(sizeof(*store));
-    store = FOG_STAGE_DATA(stage);
+    auto *store = new fog_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
@@ -257,7 +256,7 @@ free_fog_data(struct tnl_pipeline_stage *stage)
     struct fog_stage_data *store = FOG_STAGE_DATA(stage);
     if (store) {
 	_mesa_vector4f_free(&store->fogcoord);
-	free(store);
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

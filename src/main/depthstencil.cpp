@@ -71,7 +71,7 @@ delete_wrapper(struct gl_renderbuffer *rb)
     if (dsrb->RefCount <= 0) {
 	dsrb->Delete(dsrb);
     }
-    free(rb);
+    delete rb;
 }
 
 

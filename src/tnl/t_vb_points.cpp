@@ -78,9 +78,8 @@ static GLboolean
 alloc_point_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-    struct point_stage_data *store;
-    stage->privatePtr = malloc(sizeof(*store));
-    store = POINT_STAGE_DATA(stage);
+    auto *store = new point_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
@@ -95,7 +94,7 @@ free_point_data(struct tnl_pipeline_stage *stage)
     struct point_stage_data *store = POINT_STAGE_DATA(stage);
     if (store) {
 	_mesa_vector4f_free(&store->PointSize);
-	free(store);
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

@@ -40,11 +40,11 @@ extern "C" {
 #endif
 
 
-extern struct _mesa_HashTable *_mesa_NewHashTable(void);
+[[nodiscard]] extern struct _mesa_HashTable *_mesa_NewHashTable(void);
 
 extern void _mesa_DeleteHashTable(struct _mesa_HashTable *table);
 
-extern void *_mesa_HashLookup(const struct _mesa_HashTable *table, GLuint key);
+[[nodiscard]] extern void *_mesa_HashLookup(const struct _mesa_HashTable *table, GLuint key);
 
 extern void _mesa_HashInsert(struct _mesa_HashTable *table, GLuint key, void *data);
 
@@ -60,13 +60,13 @@ _mesa_HashWalk(const struct _mesa_HashTable *table,
 	       void (*callback)(GLuint key, void *data, void *userData),
 	       void *userData);
 
-extern GLuint _mesa_HashFirstEntry(struct _mesa_HashTable *table);
+[[nodiscard]] extern GLuint _mesa_HashFirstEntry(struct _mesa_HashTable *table);
 
-extern GLuint _mesa_HashNextEntry(const struct _mesa_HashTable *table, GLuint key);
+[[nodiscard]] extern GLuint _mesa_HashNextEntry(const struct _mesa_HashTable *table, GLuint key);
 
 extern void _mesa_HashPrint(const struct _mesa_HashTable *table);
 
-extern GLuint _mesa_HashFindFreeKeyBlock(struct _mesa_HashTable *table, GLuint numKeys);
+[[nodiscard]] extern GLuint _mesa_HashFindFreeKeyBlock(struct _mesa_HashTable *table, GLuint numKeys);
 
 extern void _mesa_test_hash_functions(void);
 

@@ -34,7 +34,7 @@ extern "C" {
 extern void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name);
 
-extern struct gl_renderbuffer *
+[[nodiscard]] extern struct gl_renderbuffer *
 _mesa_new_renderbuffer(GLcontext *ctx, GLuint name);
 
 extern void

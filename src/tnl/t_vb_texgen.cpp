@@ -559,19 +559,17 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-    struct texgen_stage_data *store;
     GLuint i;
-
-    stage->privatePtr = calloc(1,sizeof(*store));
-    store = TEXGEN_STAGE_DATA(stage);
+    auto *store = new texgen_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
 	_mesa_vector4f_alloc(&store->texcoord[i], 0, VB->Size, 32);
 
-    store->tmp_f = (GLfloat(*)[3]) malloc(VB->Size * sizeof(GLfloat[3]));
-    store->tmp_m = (GLfloat *) malloc(VB->Size * sizeof(GLfloat));
+    store->tmp_f = new GLfloat[VB->Size][3];
+    store->tmp_m = new GLfloat[VB->Size];
 
     return GL_TRUE;
 }
@@ -589,9 +587,9 @@ static void free_texgen_data(struct tnl_pipeline_stage *stage)
 		_mesa_vector4f_free(&store->texcoord[i]);
 
 
-	if (store->tmp_f) free(store->tmp_f);
-	if (store->tmp_m) free(store->tmp_m);
-	free(store);
+	if (store->tmp_f) delete[] store->tmp_f;
+	if (store->tmp_m) delete[] store->tmp_m;
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

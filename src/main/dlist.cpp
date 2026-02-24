@@ -446,9 +446,9 @@ void mesa_print_display_list(GLuint list);
 static struct mesa_display_list *
 make_list(GLuint list, GLuint count)
 {
-    struct mesa_display_list *dlist = CALLOC_STRUCT(mesa_display_list);
+    auto *dlist = new mesa_display_list{};
     dlist->id = list;
-    dlist->node = (Node *) malloc(sizeof(Node) * count);
+    dlist->node = new Node[count];
     dlist->node[0].opcode = OPCODE_END_OF_LIST;
     return dlist;
 }
@@ -598,11 +598,11 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 #endif
 		case OPCODE_CONTINUE:
 		    n = (Node *) n[1].next;
-		    free(block);
+		    delete[] block;
 		    block = n;
 		    break;
 		case OPCODE_END_OF_LIST:
-		    free(block);
+		    delete[] block;
 		    done = GL_TRUE;
 		    break;
 		default:
@@ -613,7 +613,7 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 	}
     }
 
-    free(dlist);
+    delete dlist;
 }
 
 
@@ -754,7 +754,7 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
 	    return NULL;
 #endif
 	n[0].opcode = OPCODE_CONTINUE;
-	newblock = (Node *) malloc(sizeof(Node) * BLOCK_SIZE);
+	newblock = new Node[BLOCK_SIZE];
 	if (!newblock) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Building display list");
 	    return NULL;

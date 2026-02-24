@@ -310,7 +310,8 @@ static void
 delete_texture_wrapper(struct gl_renderbuffer *rb)
 {
     ASSERT(rb->RefCount == 0);
-    free(rb);
+    /* rb is the Base member of texture_renderbuffer; free the full struct */
+    delete reinterpret_cast<texture_renderbuffer*>(rb);
 }
 
 
@@ -328,7 +329,7 @@ wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
     ASSERT(att->Type == GL_TEXTURE);
     ASSERT(att->Renderbuffer == NULL);
 
-    trb = CALLOC_STRUCT(texture_renderbuffer);
+    trb = new texture_renderbuffer{};
     if (!trb) {
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "wrap_texture");
 	return -1;

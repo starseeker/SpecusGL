@@ -35,6 +35,9 @@
 #include "program.h"
 #include "prog_parameter.h"
 #include "prog_instruction.h"
+#if FEATURE_ATI_fragment_shader
+#include "atifragshader.h"
+#endif
 
 
 /**
@@ -110,7 +113,7 @@ _mesa_free_program_data(GLcontext *ctx)
     if (ctx->ATIFragmentShader.Current) {
 	ctx->ATIFragmentShader.Current->RefCount--;
 	if (ctx->ATIFragmentShader.Current->RefCount <= 0) {
-	    free(ctx->ATIFragmentShader.Current);
+	    _mesa_delete_ati_fragment_shader(ctx, ctx->ATIFragmentShader.Current);
 	}
     }
 #endif

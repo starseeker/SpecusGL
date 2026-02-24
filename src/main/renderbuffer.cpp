@@ -31,12 +31,8 @@
  *  - Renamed to .cpp so that the translation unit is compiled as C++17.
  *  - extern "C" guards have been added to renderbuffer.h so that C
  *    translation units that include renderbuffer.h continue to see C linkage.
- *
- * Note: gl_renderbuffer objects are still allocated with CALLOC_STRUCT /
- * freed with free() because several non-migrated C translation units
- * (depthstencil.c, texrender.c, osmesa.c) call free() directly on
- * renderbuffer pointers obtained from _mesa_new_renderbuffer().  Switching
- * to new/delete here would require migrating those files simultaneously.
+ *  - gl_renderbuffer objects are now allocated with new{} and freed with
+ *    delete (see _mesa_new_renderbuffer and _mesa_delete_renderbuffer).
  */
 
 
@@ -1264,7 +1260,7 @@ delete_renderbuffer_alpha8(struct gl_renderbuffer *arb)
     ASSERT(arb != arb->Wrapped);
     arb->Wrapped->Delete(arb->Wrapped);
     arb->Wrapped = NULL;
-    free(arb);
+    delete arb;
 }
 
 
@@ -1501,10 +1497,8 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 struct gl_renderbuffer *
 _mesa_new_renderbuffer(GLcontext *ctx, GLuint name)
 {
-    struct gl_renderbuffer *rb = CALLOC_STRUCT(gl_renderbuffer);
-    if (rb) {
-	_mesa_init_renderbuffer(rb, name);
-    }
+    auto *rb = new gl_renderbuffer{};
+    _mesa_init_renderbuffer(rb, name);
     return rb;
 }
 
@@ -1519,7 +1513,7 @@ _mesa_delete_renderbuffer(struct gl_renderbuffer *rb)
     if (rb->Data) {
 	free(rb->Data);
     }
-    free(rb);
+    delete rb;
 }
 
 

@@ -198,6 +198,15 @@
 
 #include "gllimits.h"
 
+/* Compile-time verification of fundamental GL type sizes. */
+static_assert(sizeof(GLbyte)   == 1, "GLbyte must be 1 byte");
+static_assert(sizeof(GLubyte)  == 1, "GLubyte must be 1 byte");
+static_assert(sizeof(GLshort)  == 2, "GLshort must be 2 bytes");
+static_assert(sizeof(GLushort) == 2, "GLushort must be 2 bytes");
+static_assert(sizeof(GLint)    == 4, "GLint must be 4 bytes");
+static_assert(sizeof(GLuint)   == 4, "GLuint must be 4 bytes");
+static_assert(sizeof(GLfloat)  == 4, "GLfloat must be 4 bytes");
+
 #endif /* GLHEADER_H */
 
 /*

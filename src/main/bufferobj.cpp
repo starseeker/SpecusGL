@@ -143,11 +143,9 @@ buffer_object_subdata_range_good(GLcontext * ctx, GLenum target,
 struct gl_buffer_object *
 _mesa_new_buffer_object(GLcontext *ctx, GLuint name, GLenum target)
 {
-    struct gl_buffer_object *obj;
-
     (void) ctx;
 
-    obj = MALLOC_STRUCT(gl_buffer_object);
+    auto *obj = new gl_buffer_object{};
     _mesa_initialize_buffer_object(obj, name, target);
     return obj;
 }
@@ -166,7 +164,7 @@ _mesa_delete_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 
     if (bufObj->Data)
 	free(bufObj->Data);
-    free(bufObj);
+    delete bufObj;
 }
 
 

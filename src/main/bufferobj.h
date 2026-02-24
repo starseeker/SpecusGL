@@ -43,7 +43,7 @@ extern "C" {
 extern void
 _mesa_init_buffer_objects(GLcontext *ctx);
 
-extern struct gl_buffer_object *
+[[nodiscard]] extern struct gl_buffer_object *
 _mesa_new_buffer_object(GLcontext *ctx, GLuint name, GLenum target);
 
 extern void

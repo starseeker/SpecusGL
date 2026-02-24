@@ -77,9 +77,8 @@ lookup_arrayobj(GLcontext *ctx, GLuint id)
 struct gl_array_object *
 _mesa_new_array_object(GLcontext *ctx, GLuint name)
 {
-    struct gl_array_object *obj = MALLOC_STRUCT(gl_array_object);
-    if (obj)
-	_mesa_initialize_array_object(ctx, obj, name);
+    auto *obj = new gl_array_object{};
+    _mesa_initialize_array_object(ctx, obj, name);
     return obj;
 }
 
@@ -94,7 +93,7 @@ void
 _mesa_delete_array_object(GLcontext *ctx, struct gl_array_object *obj)
 {
     (void) ctx;
-    free(obj);
+    delete obj;
 }
 
 

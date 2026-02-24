@@ -58,7 +58,7 @@ extern GLboolean
 _mesa_is_proxy_texture(GLenum target);
 
 
-extern struct gl_texture_image *
+[[nodiscard]] extern struct gl_texture_image *
 _mesa_new_texture_image(GLcontext *ctx);
 
 

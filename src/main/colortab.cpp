@@ -448,8 +448,8 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	_mesa_free_colortable_data(table);
 
 	if (width > 0) {
-	    table->TableF = (GLfloat *) malloc(comps * width * sizeof(GLfloat));
-	    table->TableUB = (GLubyte *) malloc(comps * width * sizeof(GLubyte));
+	    table->TableF = new GLfloat[comps * width];
+	    table->TableUB = new GLubyte[comps * width];
 
 	    if (!table->TableF || !table->TableUB) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glColorTable");
@@ -1194,11 +1194,11 @@ void
 _mesa_free_colortable_data(struct gl_color_table *p)
 {
     if (p->TableF) {
-	free(p->TableF);
+	delete[] p->TableF;
 	p->TableF = NULL;
     }
     if (p->TableUB) {
-	free(p->TableUB);
+	delete[] p->TableUB;
 	p->TableUB = NULL;
     }
 }

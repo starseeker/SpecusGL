@@ -1346,11 +1346,11 @@ _mesa_init_lighting(GLcontext *ctx)
     ctx->Light.ClampVertexColor = GL_TRUE;
 
     /* Lighting miscellaneous */
-    ctx->_ShineTabList = MALLOC_STRUCT(gl_shine_tab);
+    ctx->_ShineTabList = new gl_shine_tab{};
     make_empty_list(ctx->_ShineTabList);
     /* Allocate 10 (arbitrary) shininess lookup tables */
     for (i = 0 ; i < 10 ; i++) {
-	struct gl_shine_tab *s = MALLOC_STRUCT(gl_shine_tab);
+	auto *s = new gl_shine_tab{};
 	s->shininess = -1;
 	s->refcount = 0;
 	insert_at_tail(ctx->_ShineTabList, s);
@@ -1373,9 +1373,9 @@ _mesa_free_lighting_data(GLcontext *ctx)
 
     /* Free lighting shininess exponentiation table */
     foreach_s(s, tmps, ctx->_ShineTabList) {
-	free(s);
+	delete s;
     }
-    free(ctx->_ShineTabList);
+    delete ctx->_ShineTabList;
 }
 
 /*

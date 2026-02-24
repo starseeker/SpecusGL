@@ -296,11 +296,9 @@ static GLboolean init_lighting(GLcontext *ctx,
 			       struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    struct light_stage_data *store;
     GLuint size = tnl->vb.Size;
-
-    stage->privatePtr = malloc(sizeof(*store));
-    store = LIGHT_STAGE_DATA(stage);
+    auto *store = new light_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
@@ -344,7 +342,7 @@ static void dtr(struct tnl_pipeline_stage *stage)
 	_mesa_vector4f_free(&store->LitSecondary[1]);
 	_mesa_vector4f_free(&store->LitIndex[0]);
 	_mesa_vector4f_free(&store->LitIndex[1]);
-	free(store);
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

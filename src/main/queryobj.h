@@ -32,7 +32,7 @@ extern "C" {
 
 
 
-extern struct gl_query_object *
+[[nodiscard]] extern struct gl_query_object *
 _mesa_new_query_object(GLcontext *ctx, GLuint id);
 
 extern void
