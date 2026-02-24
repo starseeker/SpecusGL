@@ -31,7 +31,7 @@ set(osmesa_srcs
   main/buffers.c
   main/clip.c
   main/colortab.c
-  main/context.c
+  main/context.cpp
   main/convolve.c
   main/debug.cpp
   main/depth.c
@@ -46,7 +46,7 @@ set(osmesa_srcs
   main/fbobject.c
   main/feedback.c
   main/fog.c
-  main/framebuffer.c
+  main/framebuffer.cpp
   main/get.c
   main/getstring.c
   main/hash.cpp
@@ -64,7 +64,7 @@ set(osmesa_srcs
   main/queryobj.c
   main/rastpos.c
   main/rbadaptors.c
-  main/renderbuffer.c
+  main/renderbuffer.cpp
   main/shaders.c
   main/state.c
   main/stencil.c

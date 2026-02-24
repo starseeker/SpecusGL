@@ -26,6 +26,10 @@
 #ifndef RENDERBUFFER_H
 #define RENDERBUFFER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name);
@@ -108,6 +112,10 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
 extern struct gl_renderbuffer *
 _mesa_new_depthstencil_renderbuffer(GLcontext *ctx, GLuint name);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RENDERBUFFER_H */
 
