@@ -1578,13 +1578,21 @@ struct gl_attrib_node {
  * GL_ARB_vertex/pixel_buffer_object buffer object
  */
 struct gl_buffer_object {
-    GLint RefCount;
-    GLuint Name;
-    GLenum Usage;
-    GLenum Access;
-    GLvoid *Pointer;          /**< Only valid while buffer is mapped */
-    GLboolean OnCard;         /**< Is buffer in VRAM? (hardware drivers) */
+    GLint RefCount = 1;
+    GLuint Name = 0;
+    GLenum Usage = GL_STATIC_DRAW_ARB;
+    GLenum Access = GL_READ_WRITE_ARB;
+    GLvoid *Pointer = nullptr;          /**< Only valid while buffer is mapped */
+    GLboolean OnCard = GL_FALSE;         /**< Is buffer in VRAM? (hardware drivers) */
     std::vector<GLubyte> Data; /**< Storage in RAM; Data.size() is the byte count. */
+
+    /** Construct a new buffer object with the given name. */
+    gl_buffer_object(GLuint name, GLenum /*target*/)
+        : RefCount(1), Name(name), Usage(GL_STATIC_DRAW_ARB), Access(GL_READ_WRITE_ARB)
+    {}
+
+    /** Default constructor for zero/null buffer objects. */
+    gl_buffer_object() = default;
 };
 
 

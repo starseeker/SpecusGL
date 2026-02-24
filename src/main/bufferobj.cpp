@@ -146,10 +146,7 @@ struct gl_buffer_object *
 _mesa_new_buffer_object(GLcontext *ctx, GLuint name, GLenum target)
 {
     (void) ctx;
-
-    auto *obj = new gl_buffer_object{};
-    _mesa_initialize_buffer_object(obj, name, target);
-    return obj;
+    return new gl_buffer_object(name, target);
 }
 
 
@@ -181,25 +178,6 @@ _mesa_unbind_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 	    ctx->Driver.DeleteBuffer(ctx, bufObj);
 	}
     }
-}
-
-
-/**
- * Initialize a buffer object to default values.
- */
-void
-_mesa_initialize_buffer_object(struct gl_buffer_object *obj,
-			       GLuint name, GLenum target)
-{
-    (void) target;
-
-    obj->RefCount = 1;
-    obj->Name = name;
-    obj->Usage = GL_STATIC_DRAW_ARB;
-    obj->Access = GL_READ_WRITE_ARB;
-    obj->Pointer = NULL;
-    obj->OnCard = GL_FALSE;
-    obj->Data.clear();
 }
 
 
