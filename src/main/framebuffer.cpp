@@ -292,7 +292,7 @@ _mesa_resize_framebuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 	    /* only resize if size is changing */
 	    if (rb->Width != width || rb->Height != height) {
 		/* could just as well pass rb->_ActualFormat here */
-		if (rb->AllocStorage(ctx, rb, rb->InternalFormat, width, height)) {
+		if (rb->AllocStorage(ctx, rb->InternalFormat, width, height)) {
 		    ASSERT(rb->Width == width);
 		    ASSERT(rb->Height == height);
 		} else {
@@ -306,7 +306,7 @@ _mesa_resize_framebuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     if (fb->_DepthBuffer) {
 	struct gl_renderbuffer *rb = fb->_DepthBuffer;
 	if (rb->Width != width || rb->Height != height) {
-	    if (!rb->AllocStorage(ctx, rb, rb->InternalFormat, width, height)) {
+	    if (!rb->AllocStorage(ctx, rb->InternalFormat, width, height)) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "Resizing framebuffer");
 	    }
 	}
@@ -315,7 +315,7 @@ _mesa_resize_framebuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     if (fb->_StencilBuffer) {
 	struct gl_renderbuffer *rb = fb->_StencilBuffer;
 	if (rb->Width != width || rb->Height != height) {
-	    if (!rb->AllocStorage(ctx, rb, rb->InternalFormat, width, height)) {
+	    if (!rb->AllocStorage(ctx, rb->InternalFormat, width, height)) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "Resizing framebuffer");
 	    }
 	}

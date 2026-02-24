@@ -224,13 +224,13 @@ blit_nearest(GLcontext *ctx,
 
 	/* get pixel row from source and resample to match dest width */
 	if (prevY != srcY) {
-	    readRb->GetRow(ctx, readRb, srcWidth, srcXpos, srcY, srcBuffer);
+	    readRb->GetRow(ctx, srcWidth, srcXpos, srcY, srcBuffer);
 	    (*resampleRow)(srcWidth, dstWidth, srcBuffer, dstBuffer, invertX);
 	    prevY = srcY;
 	}
 
 	/* store pixel row in destination */
-	drawRb->PutRow(ctx, drawRb, dstWidth, dstXpos, dstY, dstBuffer, NULL);
+	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, NULL);
     }
 
     free(srcBuffer);
@@ -416,13 +416,13 @@ blit_linear(GLcontext *ctx,
 	    srcBuffer0 = srcBuffer1;
 	    srcBuffer1 = tmp;
 	    /* get y1 row */
-	    readRb->GetRow(ctx, readRb, srcWidth, srcXpos, srcY1, srcBuffer1);
+	    readRb->GetRow(ctx, srcWidth, srcXpos, srcY1, srcBuffer1);
 	    srcBufferY0 = srcY0;
 	    srcBufferY1 = srcY1;
 	} else {
 	    /* get both new rows */
-	    readRb->GetRow(ctx, readRb, srcWidth, srcXpos, srcY0, srcBuffer0);
-	    readRb->GetRow(ctx, readRb, srcWidth, srcXpos, srcY1, srcBuffer1);
+	    readRb->GetRow(ctx, srcWidth, srcXpos, srcY0, srcBuffer0);
+	    readRb->GetRow(ctx, srcWidth, srcXpos, srcY1, srcBuffer1);
 	    srcBufferY0 = srcY0;
 	    srcBufferY1 = srcY1;
 	}
@@ -436,7 +436,7 @@ blit_linear(GLcontext *ctx,
 	}
 
 	/* store pixel row in destination */
-	drawRb->PutRow(ctx, drawRb, dstWidth, dstXpos, dstY, dstBuffer, NULL);
+	drawRb->PutRow(ctx, dstWidth, dstXpos, dstY, dstBuffer, NULL);
     }
 
     free(srcBuffer0);
@@ -536,8 +536,8 @@ simple_blit(GLcontext *ctx,
     }
 
     for (row = 0; row < height; row++) {
-	readRb->GetRow(ctx, readRb, width, srcX0, srcY, rowBuffer);
-	drawRb->PutRow(ctx, drawRb, width, dstX0, dstY, rowBuffer, NULL);
+	readRb->GetRow(ctx, width, srcX0, srcY, rowBuffer);
+	drawRb->PutRow(ctx, width, dstX0, dstY, rowBuffer, NULL);
 	srcY += yStep;
 	dstY += yStep;
     }

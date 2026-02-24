@@ -1072,10 +1072,10 @@ _swrast_write_index_span(GLcontext *ctx, SWspan *span)
 		}
 
 		if (span->arrayMask & SPAN_XY) {
-		    rb->PutMonoValues(ctx, rb, span->end, span->array->x,
+		    rb->PutMonoValues(ctx, span->end, span->array->x,
 				      span->array->y, value, span->array->mask);
 		} else {
-		    rb->PutMonoRow(ctx, rb, span->end, span->x, span->y,
+		    rb->PutMonoRow(ctx, span->end, span->x, span->y,
 				   value, span->array->mask);
 		}
 	    } else {
@@ -1102,11 +1102,11 @@ _swrast_write_index_span(GLcontext *ctx, SWspan *span)
 		}
 
 		if (span->arrayMask & SPAN_XY) {
-		    rb->PutValues(ctx, rb, span->end,
+		    rb->PutValues(ctx, span->end,
 				  span->array->x, span->array->y,
 				  values, span->array->mask);
 		} else {
-		    rb->PutRow(ctx, rb, span->end, span->x, span->y,
+		    rb->PutRow(ctx, span->end, span->x, span->y,
 			       values, span->array->mask);
 		}
 	    }
@@ -1597,13 +1597,13 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 		if (span->arrayMask & SPAN_XY) {
 		    /* array of pixel coords */
 		    ASSERT(rb->PutValues);
-		    rb->PutValues(ctx, rb, span->end,
+		    rb->PutValues(ctx, span->end,
 				  span->array->x, span->array->y,
 				  colorData, span->array->mask);
 		} else {
 		    /* horizontal run of pixels */
 		    ASSERT(rb->PutRow);
-		    rb->PutRow(ctx, rb, span->end, span->x, span->y,
+		    rb->PutRow(ctx, span->end, span->x, span->y,
 			       colorData,
 			       span->writeAll ? NULL: span->array->mask);
 		}
@@ -1675,11 +1675,11 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	ASSERT(rb->_BaseFormat == GL_RGB || rb->_BaseFormat == GL_RGBA);
 
 	if (rb->DataType == dstType) {
-	    rb->GetRow(ctx, rb, length, x + skip, y,
+	    rb->GetRow(ctx, length, x + skip, y,
 		       (GLubyte *) rgba + skip * RGBA_PIXEL_SIZE(rb->DataType));
 	} else {
 	    GLuint temp[MAX_WIDTH * 4];
-	    rb->GetRow(ctx, rb, length, x + skip, y, temp);
+	    rb->GetRow(ctx, length, x + skip, y, temp);
 	    _mesa_convert_colors(rb->DataType, temp,
 				 dstType, (GLubyte *) rgba + skip * RGBA_PIXEL_SIZE(dstType),
 				 length, NULL);
@@ -1735,17 +1735,17 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	if (rb->DataType == GL_UNSIGNED_BYTE) {
 	    GLubyte index8[MAX_WIDTH];
 	    GLint i;
-	    rb->GetRow(ctx, rb, length, x + skip, y, index8);
+	    rb->GetRow(ctx, length, x + skip, y, index8);
 	    for (i = 0; i < length; i++)
 		index[skip + i] = index8[i];
 	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
 	    GLushort index16[MAX_WIDTH];
 	    GLint i;
-	    rb->GetRow(ctx, rb, length, x + skip, y, index16);
+	    rb->GetRow(ctx, length, x + skip, y, index16);
 	    for (i = 0; i < length; i++)
 		index[skip + i] = index16[i];
 	} else if (rb->DataType == GL_UNSIGNED_INT) {
-	    rb->GetRow(ctx, rb, length, x + skip, y, index + skip);
+	    rb->GetRow(ctx, length, x + skip, y, index + skip);
 	}
     }
 }
@@ -1775,7 +1775,7 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
 	} else {
 	    if (inCount > 0) {
 		/* read [inStart, inStart + inCount) */
-		rb->GetValues(ctx, rb, inCount, x + inStart, y + inStart,
+		rb->GetValues(ctx, inCount, x + inStart, y + inStart,
 			      (GLubyte *) values + inStart * valueSize);
 		inCount = 0;
 	    }
@@ -1783,7 +1783,7 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
     }
     if (inCount > 0) {
 	/* read last values */
-	rb->GetValues(ctx, rb, inCount, x + inStart, y + inStart,
+	rb->GetValues(ctx, inCount, x + inStart, y + inStart,
 		      (GLubyte *) values + inStart * valueSize);
     }
 }
@@ -1819,7 +1819,7 @@ _swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 	count -= skip;
     }
 
-    rb->PutRow(ctx, rb, count, x, y,
+    rb->PutRow(ctx, count, x, y,
 	       (const GLubyte *) values + skip * valueSize, NULL);
 }
 
@@ -1854,7 +1854,7 @@ _swrast_get_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 	count -= skip;
     }
 
-    rb->GetRow(ctx, rb, count, x, y, (GLubyte *) values + skip * valueSize);
+    rb->GetRow(ctx, count, x, y, (GLubyte *) values + skip * valueSize);
 }
 
 

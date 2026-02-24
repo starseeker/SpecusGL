@@ -92,12 +92,12 @@ rescale_accum(GLcontext *ctx)
     assert(rb->DataType == GL_SHORT || rb->DataType == GL_UNSIGNED_SHORT);
     assert(swrast->_IntegerAccumMode);
 
-    if (rb->GetPointer(ctx, rb, 0, 0)) {
+    if (rb->GetPointer(ctx, 0, 0)) {
 	/* directly-addressable memory */
 	GLuint y;
 	for (y = 0; y < rb->Height; y++) {
 	    GLuint i;
-	    GLshort *acc = (GLshort *) rb->GetPointer(ctx, rb, 0, y);
+	    GLshort *acc = (GLshort *) rb->GetPointer(ctx, 0, y);
 	    for (i = 0; i < 4 * rb->Width; i++) {
 		acc[i] = (GLshort)(acc[i] * s);
 	    }
@@ -108,11 +108,11 @@ rescale_accum(GLcontext *ctx)
 	for (y = 0; y < rb->Height; y++) {
 	    GLshort accRow[MAX_WIDTH * 4];
 	    GLuint i;
-	    rb->GetRow(ctx, rb, rb->Width, 0, y, accRow);
+	    rb->GetRow(ctx, rb->Width, 0, y, accRow);
 	    for (i = 0; i < 4 * rb->Width; i++) {
 		accRow[i] = (GLshort)(accRow[i] * s);
 	    }
-	    rb->PutRow(ctx, rb, rb->Width, 0, y, accRow, NULL);
+	    rb->PutRow(ctx, rb->Width, 0, y, accRow, NULL);
 	}
     }
 
@@ -159,7 +159,7 @@ _swrast_clear_accum_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	clearVal[3] = (GLshort)(ctx->Accum.ClearColor[3] * accScale);
 
 	for (i = 0; i < height; i++) {
-	    rb->PutMonoRow(ctx, rb, width, x, y + i, clearVal, NULL);
+	    rb->PutMonoRow(ctx, width, x, y + i, clearVal, NULL);
 	}
     } else {
 	/* someday support other sizes */
@@ -196,10 +196,10 @@ accum_add(GLcontext *ctx, GLfloat value,
 
     if (rb->DataType == GL_SHORT || rb->DataType == GL_UNSIGNED_SHORT) {
 	const GLshort incr = (GLshort)(value * ACCUM_SCALE16);
-	if (rb->GetPointer(ctx, rb, 0, 0)) {
+	if (rb->GetPointer(ctx, 0, 0)) {
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
-		GLshort *acc = (GLshort *) rb->GetPointer(ctx, rb, xpos, ypos + i);
+		GLshort *acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
 		for (j = 0; j < 4 * width; j++) {
 		    acc[j] += incr;
 		}
@@ -208,11 +208,11 @@ accum_add(GLcontext *ctx, GLfloat value,
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
 		GLshort accRow[4 * MAX_WIDTH];
-		rb->GetRow(ctx, rb, width, xpos, ypos + i, accRow);
+		rb->GetRow(ctx, width, xpos, ypos + i, accRow);
 		for (j = 0; j < 4 * width; j++) {
 		    accRow[j] += incr;
 		}
-		rb->PutRow(ctx, rb, width, xpos, ypos + i, accRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accRow, NULL);
 	    }
 	}
     } else {
@@ -236,10 +236,10 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 	rescale_accum(ctx);
 
     if (rb->DataType == GL_SHORT || rb->DataType == GL_UNSIGNED_SHORT) {
-	if (rb->GetPointer(ctx, rb, 0, 0)) {
+	if (rb->GetPointer(ctx, 0, 0)) {
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
-		GLshort *acc = (GLshort *) rb->GetPointer(ctx, rb, xpos, ypos + i);
+		GLshort *acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
 		for (j = 0; j < 4 * width; j++) {
 		    acc[j] = (GLshort)(acc[j] * mult);
 		}
@@ -248,11 +248,11 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
 		GLshort accRow[4 * MAX_WIDTH];
-		rb->GetRow(ctx, rb, width, xpos, ypos + i, accRow);
+		rb->GetRow(ctx, width, xpos, ypos + i, accRow);
 		for (j = 0; j < 4 * width; j++) {
 		    accRow[j] = (GLshort)(accRow[j] * mult);
 		}
-		rb->PutRow(ctx, rb, width, xpos, ypos + i, accRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accRow, NULL);
 	    }
 	}
     } else {
@@ -269,7 +269,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, rb, 0, 0) != NULL);
+    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != NULL);
 
     assert(rb);
 
@@ -293,9 +293,9 @@ accum_accum(GLcontext *ctx, GLfloat value,
 	for (i = 0; i < height; i++) {
 	    GLshort *acc;
 	    if (directAccess) {
-		acc = (GLshort *) rb->GetPointer(ctx, rb, xpos, ypos + i);
+		acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
 	    } else {
-		rb->GetRow(ctx, rb, width, xpos, ypos + i, accumRow);
+		rb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;
 	    }
 
@@ -325,7 +325,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
 	    }
 
 	    if (!directAccess) {
-		rb->PutRow(ctx, rb, width, xpos, ypos + i, accumRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, NULL);
 	    }
 	}
     } else {
@@ -342,7 +342,7 @@ accum_load(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, rb, 0, 0) != NULL);
+    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != NULL);
 
     assert(rb);
 
@@ -373,9 +373,9 @@ accum_load(GLcontext *ctx, GLfloat value,
 	for (i = 0; i < height; i++) {
 	    GLshort *acc;
 	    if (directAccess) {
-		acc = (GLshort *) rb->GetPointer(ctx, rb, xpos, ypos + i);
+		acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
 	    } else {
-		rb->GetRow(ctx, rb, width, xpos, ypos + i, accumRow);
+		rb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;
 	    }
 
@@ -407,7 +407,7 @@ accum_load(GLcontext *ctx, GLfloat value,
 	    }
 
 	    if (!directAccess) {
-		rb->PutRow(ctx, rb, width, xpos, ypos + i, accumRow, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, accumRow, NULL);
 	    }
 	}
     }
@@ -422,7 +422,7 @@ accum_return(GLcontext *ctx, GLfloat value,
     struct gl_framebuffer *fb = ctx->DrawBuffer;
     struct gl_renderbuffer *accumRb = fb->Attachment[BUFFER_ACCUM].Renderbuffer;
     const GLboolean directAccess
-	= (accumRb->GetPointer(ctx, accumRb, 0, 0) != NULL);
+	= (accumRb->GetPointer(ctx, 0, 0) != NULL);
     const GLboolean masking = (!ctx->Color.ColorMask[RCOMP] ||
 			       !ctx->Color.ColorMask[GCOMP] ||
 			       !ctx->Color.ColorMask[BCOMP] ||
@@ -466,9 +466,9 @@ accum_return(GLcontext *ctx, GLfloat value,
 	    span.y = ypos + i;
 
 	    if (directAccess) {
-		acc = (GLshort *) accumRb->GetPointer(ctx, accumRb, xpos, ypos +i);
+		acc = (GLshort *) accumRb->GetPointer(ctx, xpos, ypos +i);
 	    } else {
-		accumRb->GetRow(ctx, accumRb, width, xpos, ypos + i, accumRow);
+		accumRb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;
 	    }
 
@@ -513,7 +513,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 		if (masking) {
 		    _swrast_mask_rgba_span(ctx, rb, &span);
 		}
-		rb->PutRow(ctx, rb, width, xpos, ypos + i, span.array->rgba, NULL);
+		rb->PutRow(ctx, width, xpos, ypos + i, span.array->rgba, NULL);
 	    }
 	}
     } else {

@@ -2252,11 +2252,11 @@ struct gl_shared_state {
 /**
  * A renderbuffer stores colors or depth values or stencil values.
  * A framebuffer object will have a collection of these.
- * Data are read/written to the buffer with a handful of Get/Put functions.
+ * Data are read/written to the buffer with virtual Get/Put methods.
  *
- * Instances of this object are allocated with the Driver's NewRenderbuffer
- * hook.  Drivers will likely wrap this class inside a driver-specific
- * class to simulate inheritance.
+ * This is an abstract base class; concrete subclasses (SoftRenderbuffer,
+ * OsMesaRenderbuffer, Z24RenderbufferWrapper, etc.) override the virtual
+ * pixel-access methods for each specific storage format.
  */
 struct gl_renderbuffer {
 #define RB_MAGIC 0xaabbccdd
@@ -2280,74 +2280,53 @@ struct gl_renderbuffer {
     GLubyte StencilBits;
     GLvoid *Data;        /**< This may not be used by some kinds of RBs */
 
-    /* Used to wrap one renderbuffer around another: */
+    /** Used to wrap one renderbuffer around another. */
     struct gl_renderbuffer *Wrapped;
 
-    /* Delete this renderbuffer */
-    void (*Delete)(struct gl_renderbuffer *rb);
+    /** Virtual destructor – base implementation frees Data. */
+    virtual ~gl_renderbuffer();
 
-    /* Allocate new storage for this renderbuffer */
-    GLboolean(*AllocStorage)(GLcontext *ctx, struct gl_renderbuffer *rb,
-			     GLenum internalFormat,
-			     GLuint width, GLuint height);
+    /** Allocate new storage for this renderbuffer. */
+    virtual GLboolean AllocStorage(GLcontext *ctx, GLenum internalFormat,
+				   GLuint width, GLuint height);
 
-    /* Lock/Unlock are called before/after calling the Get/Put functions.
-     * Not sure this is the right place for these yet.
-    void (*Lock)(GLcontext *ctx, struct gl_renderbuffer *rb);
-    void (*Unlock)(GLcontext *ctx, struct gl_renderbuffer *rb);
-     */
+    /** Return a pointer to the pixel at (x,y), or nullptr if not directly
+     *  addressable.  Default implementation returns nullptr. */
+    virtual void *GetPointer(GLcontext *ctx, GLint x, GLint y);
 
-    /* Return a pointer to the element/pixel at (x,y).
-     * Should return NULL if the buffer memory can't be directly addressed.
-     */
-    void *(*GetPointer)(GLcontext *ctx, struct gl_renderbuffer *rb,
-			GLint x, GLint y);
+    /** Get/Read a row of values (format _BaseFormat, type DataType). */
+    virtual void GetRow(GLcontext *ctx, GLuint count,
+			GLint x, GLint y, void *values) = 0;
 
-    /* Get/Read a row of values.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*GetRow)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		   GLint x, GLint y, void *values);
+    /** Get/Read values at arbitrary locations. */
+    virtual void GetValues(GLcontext *ctx, GLuint count,
+			   const GLint x[], const GLint y[], void *values) = 0;
 
-    /* Get/Read values at arbitrary locations.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*GetValues)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		      const GLint x[], const GLint y[], void *values);
+    /** Put/Write a row of values. */
+    virtual void PutRow(GLcontext *ctx, GLuint count,
+			GLint x, GLint y,
+			const void *values, const GLubyte *mask) = 0;
 
-    /* Put/Write a row of values.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*PutRow)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		   GLint x, GLint y, const void *values, const GLubyte *mask);
+    /** Put/Write a row of RGB values (only for RGBA renderbuffers with RGB
+     *  source data).  Default implementation aborts – override when needed. */
+    virtual void PutRowRGB(GLcontext *ctx, GLuint count,
+			   GLint x, GLint y,
+			   const void *values, const GLubyte *mask);
 
-    /* Put/Write a row of RGB values.  This is a special-case routine that's
-     * only used for RGBA renderbuffers when the source data is GL_RGB. That's
-     * a common case for glDrawPixels and some triangle routines.
-     * The values will be of format GL_RGB and type DataType.
-     */
-    void (*PutRowRGB)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		      GLint x, GLint y, const void *values, const GLubyte *mask);
+    /** Put/Write a row of identical values. */
+    virtual void PutMonoRow(GLcontext *ctx, GLuint count,
+			    GLint x, GLint y,
+			    const void *value, const GLubyte *mask) = 0;
 
+    /** Put/Write values at arbitrary locations. */
+    virtual void PutValues(GLcontext *ctx, GLuint count,
+			   const GLint x[], const GLint y[],
+			   const void *values, const GLubyte *mask) = 0;
 
-    /* Put/Write a row of identical values.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*PutMonoRow)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		       GLint x, GLint y, const void *value, const GLubyte *mask);
-
-    /* Put/Write values at arbitrary locations.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*PutValues)(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
-		      const GLint x[], const GLint y[], const void *values,
-		      const GLubyte *mask);
-    /* Put/Write identical values at arbitrary locations.
-     * The values will be of format _BaseFormat and type DataType.
-     */
-    void (*PutMonoValues)(GLcontext *ctx, struct gl_renderbuffer *rb,
-			  GLuint count, const GLint x[], const GLint y[],
-			  const void *value, const GLubyte *mask);
+    /** Put/Write identical values at arbitrary locations. */
+    virtual void PutMonoValues(GLcontext *ctx, GLuint count,
+			       const GLint x[], const GLint y[],
+			       const void *value, const GLubyte *mask) = 0;
 };
 
 

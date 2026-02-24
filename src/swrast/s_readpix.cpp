@@ -65,7 +65,7 @@ read_index_pixels(GLcontext *ctx,
 	GLuint index[MAX_WIDTH];
 	GLvoid *dest;
 	ASSERT(rb->DataType == GL_UNSIGNED_INT);
-	rb->GetRow(ctx, rb, width, x, y + i, index);
+	rb->GetRow(ctx, width, x, y + i, index);
 
 	dest = _mesa_image_address2d(packing, pixels, width, height,
 				     GL_COLOR_INDEX, type, i, 0);
@@ -112,7 +112,7 @@ read_depth_pixels(GLcontext *ctx,
 	for (j = 0; j < height; j++, y++) {
 	    void *dest =_mesa_image_address2d(packing, pixels, width, height,
 					      GL_DEPTH_COMPONENT, type, j, 0);
-	    rb->GetRow(ctx, rb, width, x, y, dest);
+	    rb->GetRow(ctx, width, x, y, dest);
 	}
     } else if (type == GL_UNSIGNED_INT && fb->Visual.depthBits == 24
 	       && !biasOrScale && !packing->SwapBytes) {
@@ -125,7 +125,7 @@ read_depth_pixels(GLcontext *ctx,
 			   _mesa_image_address2d(packing, pixels, width, height,
 						 GL_DEPTH_COMPONENT, type, j, 0);
 	    GLint k;
-	    rb->GetRow(ctx, rb, width, x, y, dest);
+	    rb->GetRow(ctx, width, x, y, dest);
 	    /* convert range from 24-bit to 32-bit */
 	    for (k = 0; k < width; k++) {
 		/* Note: put MSByte of 24-bit value into LSByte */
@@ -141,7 +141,7 @@ read_depth_pixels(GLcontext *ctx,
 	for (j = 0; j < height; j++, y++) {
 	    void *dest = _mesa_image_address2d(packing, pixels, width, height,
 					       GL_DEPTH_COMPONENT, type, j, 0);
-	    rb->GetRow(ctx, rb, width, x, y, dest);
+	    rb->GetRow(ctx, width, x, y, dest);
 	}
     } else {
 	/* General case (slower) */
@@ -234,7 +234,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	GLint row;
 	ASSERT(rb->GetRow);
 	for (row = 0; row < height; row++) {
-	    rb->GetRow(ctx, rb, width, x, y + row, dest);
+	    rb->GetRow(ctx, width, x, y + row, dest);
 	    dest += dstStride;
 	}
 	return GL_TRUE;
@@ -253,7 +253,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	for (row = 0; row < height; row++) {
 	    GLubyte tempRow[MAX_WIDTH][4];
 	    GLint col;
-	    rb->GetRow(ctx, rb, width, x, y + row, tempRow);
+	    rb->GetRow(ctx, width, x, y + row, tempRow);
 	    /* convert RGBA to RGB */
 	    for (col = 0; col < width; col++) {
 		dest[col * 3 + 0] = tempRow[col][0];
@@ -362,7 +362,7 @@ read_rgba_pixels(GLcontext *ctx,
 	    } else {
 		GLuint index[MAX_WIDTH];
 		ASSERT(rb->DataType == GL_UNSIGNED_INT);
-		rb->GetRow(ctx, rb, width, x, y, index);
+		rb->GetRow(ctx, width, x, y, index);
 		_mesa_apply_ci_transfer_ops(ctx,
 					    transferOps & IMAGE_SHIFT_OFFSET_BIT,
 					    width, index);
@@ -418,7 +418,7 @@ read_rgba_pixels(GLcontext *ctx,
 		/* read CI and convert to RGBA */
 		GLuint index[MAX_WIDTH];
 		ASSERT(rb->DataType == GL_UNSIGNED_INT);
-		rb->GetRow(ctx, rb, width, x, y, index);
+		rb->GetRow(ctx, width, x, y, index);
 		_mesa_apply_ci_transfer_ops(ctx,
 					    transferOps & IMAGE_SHIFT_OFFSET_BIT,
 					    width, index);
@@ -486,7 +486,7 @@ read_depth_stencil_pixels(GLcontext *ctx,
 		       GL_DEPTH_STENCIL_EXT,
 		       type, 0, 0);
 	for (i = 0; i < height; i++) {
-	    depthRb->GetRow(ctx, depthRb, width, x, y + i, dst);
+	    depthRb->GetRow(ctx, width, x, y + i, dst);
 	    dst += dstStride;
 	}
     } else {
@@ -514,7 +514,7 @@ read_depth_stencil_pixels(GLcontext *ctx,
 		GLint j;
 		ASSERT(depthRb->DataType == GL_UNSIGNED_INT);
 		/* note, we've already been clipped */
-		depthRb->GetRow(ctx, depthRb, width, x, y + i, zVals);
+		depthRb->GetRow(ctx, width, x, y + i, zVals);
 		for (j = 0; j < width; j++) {
 		    depthStencilDst[j] = (zVals[j] << 8) | (stencilVals[j] & 0xff);
 		}

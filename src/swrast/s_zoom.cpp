@@ -466,7 +466,7 @@ _swrast_write_zoomed_z_span(GLcontext *ctx, GLint imgX, GLint imgY,
 
     /* write the zoomed spans */
     for (y = y0; y < y1; y++) {
-	rb->PutRow(ctx, rb, zoomedWidth, x0, y, z, NULL);
+	rb->PutRow(ctx, zoomedWidth, x0, y, z, NULL);
     }
 }
 

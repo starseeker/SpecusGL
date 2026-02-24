@@ -201,7 +201,7 @@ _swrast_logicop_ci_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	_swrast_get_values(ctx, rb, span->end, span->array->x, span->array->y,
 			   dest, sizeof(GLuint));
     } else {
-	rb->GetRow(ctx, rb, span->end, span->x, span->y, dest);
+	rb->GetRow(ctx, span->end, span->x, span->y, dest);
     }
 
     logicop_uint1(ctx, span->end, index, dest, span->array->mask);

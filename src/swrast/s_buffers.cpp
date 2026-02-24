@@ -94,7 +94,7 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 	span.y = y + i;
 	_swrast_mask_rgba_span(ctx, rb, &span);
 	/* write masked row */
-	rb->PutRow(ctx, rb, width, x, y + i, span.array->rgba, NULL);
+	rb->PutRow(ctx, width, x, y + i, span.array->rgba, NULL);
     }
 }
 
@@ -131,7 +131,7 @@ clear_ci_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 	span.y = y + i;
 	_swrast_mask_ci_span(ctx, rb, &span);
 	/* write masked row */
-	rb->PutRow(ctx, rb, width, x, y + i, span.array->index, NULL);
+	rb->PutRow(ctx, width, x, y + i, span.array->index, NULL);
     }
 }
 
@@ -184,7 +184,7 @@ clear_rgba_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     }
 
     for (i = 0; i < height; i++) {
-	rb->PutMonoRow(ctx, rb, width, x, y + i, clearVal, NULL);
+	rb->PutMonoRow(ctx, width, x, y + i, clearVal, NULL);
     }
 }
 
@@ -232,7 +232,7 @@ clear_ci_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     }
 
     for (i = 0; i < height; i++)
-	rb->PutMonoRow(ctx, rb, width, x, y + i, clearVal, NULL);
+	rb->PutMonoRow(ctx, width, x, y + i, clearVal, NULL);
 }
 
 

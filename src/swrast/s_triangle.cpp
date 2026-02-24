@@ -162,7 +162,7 @@ _swrast_culltriangle(GLcontext *ctx,
       span.intTex[0] += span.intTexStep[0];				\
       span.intTex[1] += span.intTexStep[1];				\
    }									\
-   rb->PutRowRGB(ctx, rb, span.end, span.x, span.y, rgb, NULL);
+   rb->PutRowRGB(ctx, span.end, span.x, span.y, rgb, NULL);
 
 #include "s_tritemp.h"
 
@@ -225,7 +225,7 @@ _swrast_culltriangle(GLcontext *ctx,
          span.z += span.zStep;						\
       }									\
    }									\
-   rb->PutRowRGB(ctx, rb, span.end, span.x, span.y, rgb, span.array->mask);
+   rb->PutRowRGB(ctx, span.end, span.x, span.y, rgb, span.array->mask);
 
 #include "s_tritemp.h"
 
@@ -885,7 +885,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
    if (rb->DepthBits <= 16) {						\
       GLuint i;								\
       const GLushort *zRow = (const GLushort *)				\
-         rb->GetPointer(ctx, rb, span.x, span.y);			\
+         rb->GetPointer(ctx, span.x, span.y);			\
       if (zRow) {							\
          for (i = 0; i < span.end; i++) {				\
             GLuint z = FixedToDepth(span.z);				\
@@ -899,7 +899,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
    else {								\
       GLuint i;								\
       const GLuint *zRow = (const GLuint *)				\
-         rb->GetPointer(ctx, rb, span.x, span.y);			\
+         rb->GetPointer(ctx, span.x, span.y);			\
       if (zRow) {							\
          for (i = 0; i < span.end; i++) {				\
             if ((GLuint)span.z < zRow[i]) {				\

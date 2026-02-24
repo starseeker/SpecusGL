@@ -406,9 +406,9 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
     }
 #endif
 
-    stencil = (GLstencil *) rb->GetPointer(ctx, rb, x, y);
+    stencil = (GLstencil *) rb->GetPointer(ctx, x, y);
     if (!stencil) {
-	rb->GetRow(ctx, rb, n, x, y, stencilRow);
+	rb->GetRow(ctx, n, x, y, stencilRow);
 	stencil = stencilRow;
     }
 
@@ -419,9 +419,9 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
     if (do_stencil_test(ctx, face, n, stencil, mask) == GL_FALSE) {
 	/* all fragments failed the stencil test, we're done. */
 	span->writeAll = GL_FALSE;
-	if (!rb->GetPointer(ctx, rb, 0, 0)) {
+	if (!rb->GetPointer(ctx, 0, 0)) {
 	    /* put updated stencil values into buffer */
-	    rb->PutRow(ctx, rb, n, x, y, stencil, NULL);
+	    rb->PutRow(ctx, n, x, y, stencil, NULL);
 	}
 	return GL_FALSE;
     }
@@ -478,8 +478,8 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
     /*
      * Write updated stencil values back into hardware stencil buffer.
      */
-    if (!rb->GetPointer(ctx, rb, 0, 0)) {
-	rb->PutRow(ctx, rb, n, x, y, stencil, NULL);
+    if (!rb->GetPointer(ctx, 0, 0)) {
+	rb->PutRow(ctx, n, x, y, stencil, NULL);
     }
 
     span->writeAll = GL_FALSE;
@@ -520,7 +520,7 @@ apply_stencil_op_to_pixels(GLcontext *ctx,
     GLstencil *stencilStart = (GLubyte *) rb->Data;
     const GLuint stride = rb->Width;
 
-    ASSERT(rb->GetPointer(ctx, rb, 0, 0));
+    ASSERT(rb->GetPointer(ctx, 0, 0));
     ASSERT(sizeof(GLstencil) == 1);
 
     switch (oper) {
@@ -686,7 +686,7 @@ stencil_test_pixels(GLcontext *ctx, GLuint face, GLuint n,
     const GLstencil *stencilStart = (GLstencil *) rb->Data;
     const GLuint stride = rb->Width;
 
-    ASSERT(rb->GetPointer(ctx, rb, 0, 0));
+    ASSERT(rb->GetPointer(ctx, 0, 0));
     ASSERT(sizeof(GLstencil) == 1);
 
     /*
@@ -872,7 +872,7 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
     ASSERT(ctx->Stencil.Enabled);
     ASSERT(n <= MAX_WIDTH);
 
-    if (!rb->GetPointer(ctx, rb, 0, 0)) {
+    if (!rb->GetPointer(ctx, 0, 0)) {
 	/* No direct access */
 	GLstencil stencil[MAX_WIDTH];
 	GLubyte origMask[MAX_WIDTH];
@@ -913,7 +913,7 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 	}
 
 	/* Write updated stencil values into hardware stencil buffer */
-	rb->PutValues(ctx, rb, n, x, y, stencil, origMask);
+	rb->PutValues(ctx, n, x, y, stencil, origMask);
 
 	return GL_TRUE;
     } else {
@@ -1035,7 +1035,7 @@ _swrast_read_stencil_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return;
     }
 
-    rb->GetRow(ctx, rb, n, x, y, stencil);
+    rb->GetRow(ctx, n, x, y, stencil);
 }
 
 
@@ -1080,14 +1080,14 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
 	/* need to apply writemask */
 	GLstencil destVals[MAX_WIDTH], newVals[MAX_WIDTH];
 	GLint i;
-	rb->GetRow(ctx, rb, n, x, y, destVals);
+	rb->GetRow(ctx, n, x, y, destVals);
 	for (i = 0; i < n; i++) {
 	    newVals[i]
 		= (stencil[i] & stencilMask) | (destVals[i] & ~stencilMask);
 	}
-	rb->PutRow(ctx, rb, n, x, y, newVals, NULL);
+	rb->PutRow(ctx, n, x, y, newVals, NULL);
     } else {
-	rb->PutRow(ctx, rb, n, x, y, stencil, NULL);
+	rb->PutRow(ctx, n, x, y, stencil, NULL);
     }
 }
 
@@ -1120,14 +1120,14 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     width  = ctx->DrawBuffer->_Xmax - ctx->DrawBuffer->_Xmin;
     height = ctx->DrawBuffer->_Ymax - ctx->DrawBuffer->_Ymin;
 
-    if (rb->GetPointer(ctx, rb, 0, 0)) {
+    if (rb->GetPointer(ctx, 0, 0)) {
 	/* Direct buffer access */
 	if ((mask & stencilMax) != stencilMax) {
 	    /* need to mask the clear */
 	    if (rb->DataType == GL_UNSIGNED_BYTE) {
 		GLint i, j;
 		for (i = 0; i < height; i++) {
-		    GLubyte *stencil = (GLubyte*) rb->GetPointer(ctx, rb, x, y + i);
+		    GLubyte *stencil = (GLubyte*) rb->GetPointer(ctx, x, y + i);
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
@@ -1135,7 +1135,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    } else {
 		GLint i, j;
 		for (i = 0; i < height; i++) {
-		    GLushort *stencil = (GLushort*) rb->GetPointer(ctx, rb, x, y + i);
+		    GLushort *stencil = (GLushort*) rb->GetPointer(ctx, x, y + i);
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
@@ -1146,14 +1146,14 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    if (width == (GLint) rb->Width && rb->DataType == GL_UNSIGNED_BYTE) {
 		/* optimized case */
 		/* Note: bottom-to-top raster assumed! */
-		GLubyte *stencil = (GLubyte *) rb->GetPointer(ctx, rb, x, y);
+		GLubyte *stencil = (GLubyte *) rb->GetPointer(ctx, x, y);
 		GLuint len = width * height * sizeof(GLubyte);
 		memset(stencil, clearVal, len);
 	    } else {
 		/* general case */
 		GLint i;
 		for (i = 0; i < height; i++) {
-		    GLvoid *stencil = rb->GetPointer(ctx, rb, x, y + i);
+		    GLvoid *stencil = rb->GetPointer(ctx, x, y + i);
 		    if (rb->DataType == GL_UNSIGNED_BYTE) {
 			memset(stencil, clearVal, width);
 		    } else {
@@ -1170,21 +1170,21 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		GLint i, j;
 		for (i = 0; i < height; i++) {
 		    GLubyte stencil[MAX_WIDTH];
-		    rb->GetRow(ctx, rb, width, x, y + i, stencil);
+		    rb->GetRow(ctx, width, x, y + i, stencil);
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
-		    rb->PutRow(ctx, rb, width, x, y + i, stencil, NULL);
+		    rb->PutRow(ctx, width, x, y + i, stencil, NULL);
 		}
 	    } else {
 		GLint i, j;
 		for (i = 0; i < height; i++) {
 		    GLushort stencil[MAX_WIDTH];
-		    rb->GetRow(ctx, rb, width, x, y + i, stencil);
+		    rb->GetRow(ctx, width, x, y + i, stencil);
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
-		    rb->PutRow(ctx, rb, width, x, y + i, stencil, NULL);
+		    rb->PutRow(ctx, width, x, y + i, stencil, NULL);
 		}
 	    }
 	} else {
@@ -1199,7 +1199,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		clear = &clear16;
 	    }
 	    for (i = 0; i < height; i++) {
-		rb->PutMonoRow(ctx, rb, width, x, y + i, clear, NULL);
+		rb->PutMonoRow(ctx, width, x, y + i, clear, NULL);
 	    }
 	}
     }

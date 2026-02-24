@@ -877,208 +877,201 @@ osmesa_context::compute_row_addresses()
 
 
 /**
- * Don't use _mesa_delete_renderbuffer since we can't free rb->Data.
+ /**
+ * OsMesaRenderbuffer – renderbuffer that operates on a user-provided pixel
+ * buffer (so Data must NOT be freed on destruction).
+ *
+ * AllocStorage sets up the format-specific dispatch table exactly as the
+ * former osmesa_renderbuffer_storage() did.
  */
-static void
-osmesa_delete_renderbuffer(struct gl_renderbuffer *rb)
-{
-    delete rb;
-}
-
-
-/**
- * Allocate renderbuffer storage.  We don't actually allocate any storage
- * since we're using a user-provided buffer.
- * Just set up all the gl_renderbuffer methods.
- */
-static GLboolean
-osmesa_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
-			    GLenum internalFormat, GLuint width, GLuint height)
-{
-    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
-    GLint bpc; /* bits per channel */
-
-    if (rb->DataType == GL_UNSIGNED_BYTE)
-	bpc = 8;
-    else if (rb->DataType == GL_UNSIGNED_SHORT)
-	bpc = 16;
-    else
-	bpc = 32;
-
-    rb->RedBits =
-	rb->GreenBits =
-	    rb->BlueBits =
-		rb->AlphaBits = bpc;
-
-    /* Note: we can ignoring internalFormat for "window-system" renderbuffers */
-    (void) internalFormat;
-
-    if (osmesa->format == OSMESA_RGBA) {
-	if (rb->DataType == GL_UNSIGNED_BYTE) {
-	    rb->GetRow = get_row_RGBA8;
-	    rb->GetValues = get_values_RGBA8;
-	    rb->PutRow = put_row_RGBA8;
-	    rb->PutRowRGB = put_row_rgb_RGBA8;
-	    rb->PutMonoRow = put_mono_row_RGBA8;
-	    rb->PutValues = put_values_RGBA8;
-	    rb->PutMonoValues = put_mono_values_RGBA8;
-	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    rb->GetRow = get_row_RGBA16;
-	    rb->GetValues = get_values_RGBA16;
-	    rb->PutRow = put_row_RGBA16;
-	    rb->PutRowRGB = put_row_rgb_RGBA16;
-	    rb->PutMonoRow = put_mono_row_RGBA16;
-	    rb->PutValues = put_values_RGBA16;
-	    rb->PutMonoValues = put_mono_values_RGBA16;
-	} else {
-	    rb->GetRow = get_row_RGBA32;
-	    rb->GetValues = get_values_RGBA32;
-	    rb->PutRow = put_row_RGBA32;
-	    rb->PutRowRGB = put_row_rgb_RGBA32;
-	    rb->PutMonoRow = put_mono_row_RGBA32;
-	    rb->PutValues = put_values_RGBA32;
-	    rb->PutMonoValues = put_mono_values_RGBA32;
-	}
-	rb->RedBits = rb->GreenBits = rb->BlueBits = rb->AlphaBits = bpc;
-    } else if (osmesa->format == OSMESA_BGRA) {
-	if (rb->DataType == GL_UNSIGNED_BYTE) {
-	    rb->GetRow = get_row_BGRA8;
-	    rb->GetValues = get_values_BGRA8;
-	    rb->PutRow = put_row_BGRA8;
-	    rb->PutRowRGB = put_row_rgb_BGRA8;
-	    rb->PutMonoRow = put_mono_row_BGRA8;
-	    rb->PutValues = put_values_BGRA8;
-	    rb->PutMonoValues = put_mono_values_BGRA8;
-	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    rb->GetRow = get_row_BGRA16;
-	    rb->GetValues = get_values_BGRA16;
-	    rb->PutRow = put_row_BGRA16;
-	    rb->PutRowRGB = put_row_rgb_BGRA16;
-	    rb->PutMonoRow = put_mono_row_BGRA16;
-	    rb->PutValues = put_values_BGRA16;
-	    rb->PutMonoValues = put_mono_values_BGRA16;
-	} else {
-	    rb->GetRow = get_row_BGRA32;
-	    rb->GetValues = get_values_BGRA32;
-	    rb->PutRow = put_row_BGRA32;
-	    rb->PutRowRGB = put_row_rgb_BGRA32;
-	    rb->PutMonoRow = put_mono_row_BGRA32;
-	    rb->PutValues = put_values_BGRA32;
-	    rb->PutMonoValues = put_mono_values_BGRA32;
-	}
-	rb->RedBits = rb->GreenBits = rb->BlueBits = rb->AlphaBits = bpc;
-    } else if (osmesa->format == OSMESA_ARGB) {
-	if (rb->DataType == GL_UNSIGNED_BYTE) {
-	    rb->GetRow = get_row_ARGB8;
-	    rb->GetValues = get_values_ARGB8;
-	    rb->PutRow = put_row_ARGB8;
-	    rb->PutRowRGB = put_row_rgb_ARGB8;
-	    rb->PutMonoRow = put_mono_row_ARGB8;
-	    rb->PutValues = put_values_ARGB8;
-	    rb->PutMonoValues = put_mono_values_ARGB8;
-	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    rb->GetRow = get_row_ARGB16;
-	    rb->GetValues = get_values_ARGB16;
-	    rb->PutRow = put_row_ARGB16;
-	    rb->PutRowRGB = put_row_rgb_ARGB16;
-	    rb->PutMonoRow = put_mono_row_ARGB16;
-	    rb->PutValues = put_values_ARGB16;
-	    rb->PutMonoValues = put_mono_values_ARGB16;
-	} else {
-	    rb->GetRow = get_row_ARGB32;
-	    rb->GetValues = get_values_ARGB32;
-	    rb->PutRow = put_row_ARGB32;
-	    rb->PutRowRGB = put_row_rgb_ARGB32;
-	    rb->PutMonoRow = put_mono_row_ARGB32;
-	    rb->PutValues = put_values_ARGB32;
-	    rb->PutMonoValues = put_mono_values_ARGB32;
-	}
-	rb->RedBits = rb->GreenBits = rb->BlueBits = rb->AlphaBits = bpc;
-    } else if (osmesa->format == OSMESA_RGB) {
-	if (rb->DataType == GL_UNSIGNED_BYTE) {
-	    rb->GetRow = get_row_RGB8;
-	    rb->GetValues = get_values_RGB8;
-	    rb->PutRow = put_row_RGB8;
-	    rb->PutRowRGB = put_row_rgb_RGB8;
-	    rb->PutMonoRow = put_mono_row_RGB8;
-	    rb->PutValues = put_values_RGB8;
-	    rb->PutMonoValues = put_mono_values_RGB8;
-	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    rb->GetRow = get_row_RGB16;
-	    rb->GetValues = get_values_RGB16;
-	    rb->PutRow = put_row_RGB16;
-	    rb->PutRowRGB = put_row_rgb_RGB16;
-	    rb->PutMonoRow = put_mono_row_RGB16;
-	    rb->PutValues = put_values_RGB16;
-	    rb->PutMonoValues = put_mono_values_RGB16;
-	} else {
-	    rb->GetRow = get_row_RGB32;
-	    rb->GetValues = get_values_RGB32;
-	    rb->PutRow = put_row_RGB32;
-	    rb->PutRowRGB = put_row_rgb_RGB32;
-	    rb->PutMonoRow = put_mono_row_RGB32;
-	    rb->PutValues = put_values_RGB32;
-	    rb->PutMonoValues = put_mono_values_RGB32;
-	}
-	rb->RedBits = rb->GreenBits = rb->BlueBits = bpc;
-    } else if (osmesa->format == OSMESA_BGR) {
-	if (rb->DataType == GL_UNSIGNED_BYTE) {
-	    rb->GetRow = get_row_BGR8;
-	    rb->GetValues = get_values_BGR8;
-	    rb->PutRow = put_row_BGR8;
-	    rb->PutRowRGB = put_row_rgb_BGR8;
-	    rb->PutMonoRow = put_mono_row_BGR8;
-	    rb->PutValues = put_values_BGR8;
-	    rb->PutMonoValues = put_mono_values_BGR8;
-	} else if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    rb->GetRow = get_row_BGR16;
-	    rb->GetValues = get_values_BGR16;
-	    rb->PutRow = put_row_BGR16;
-	    rb->PutRowRGB = put_row_rgb_BGR16;
-	    rb->PutMonoRow = put_mono_row_BGR16;
-	    rb->PutValues = put_values_BGR16;
-	    rb->PutMonoValues = put_mono_values_BGR16;
-	} else {
-	    rb->GetRow = get_row_BGR32;
-	    rb->GetValues = get_values_BGR32;
-	    rb->PutRow = put_row_BGR32;
-	    rb->PutRowRGB = put_row_rgb_BGR32;
-	    rb->PutMonoRow = put_mono_row_BGR32;
-	    rb->PutValues = put_values_BGR32;
-	    rb->PutMonoValues = put_mono_values_BGR32;
-	}
-	rb->RedBits = rb->GreenBits = rb->BlueBits = bpc;
-    } else if (osmesa->format == OSMESA_RGB_565) {
-	ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
-	rb->GetRow = get_row_RGB_565;
-	rb->GetValues = get_values_RGB_565;
-	rb->PutRow = put_row_RGB_565;
-	rb->PutRowRGB = put_row_rgb_RGB_565;
-	rb->PutMonoRow = put_mono_row_RGB_565;
-	rb->PutValues = put_values_RGB_565;
-	rb->PutMonoValues = put_mono_values_RGB_565;
-	rb->RedBits = 5;
-	rb->GreenBits = 6;
-	rb->BlueBits = 5;
-    } else if (osmesa->format == OSMESA_COLOR_INDEX) {
-	rb->GetRow = get_row_CI;
-	rb->GetValues = get_values_CI;
-	rb->PutRow = put_row_CI;
-	rb->PutMonoRow = put_mono_row_CI;
-	rb->PutValues = put_values_CI;
-	rb->PutMonoValues = put_mono_values_CI;
-	rb->IndexBits = 8;
-    } else {
-	_mesa_problem(ctx, "bad pixel format in osmesa renderbuffer_storage");
+class OsMesaRenderbuffer : public gl_renderbuffer {
+public:
+    OsMesaRenderbuffer() = default;
+    ~OsMesaRenderbuffer() override {
+	/* Data is the user-provided buffer – do NOT free it. */
+	Data = nullptr;
     }
 
-    rb->Width = width;
-    rb->Height = height;
+    GLboolean AllocStorage(GLcontext *ctx, GLenum internalFormat,
+			   GLuint width, GLuint height) override {
+	const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
+	GLint bpc; /* bits per channel */
 
-    osmesa->compute_row_addresses();
+	if (DataType == GL_UNSIGNED_BYTE)
+	    bpc = 8;
+	else if (DataType == GL_UNSIGNED_SHORT)
+	    bpc = 16;
+	else
+	    bpc = 32;
 
-    return GL_TRUE;
-}
+	RedBits = GreenBits = BlueBits = AlphaBits = bpc;
+
+	/* Note: ignoring internalFormat for window-system renderbuffers */
+	(void) internalFormat;
+
+	if (osmesa->format == OSMESA_RGBA) {
+	    if (DataType == GL_UNSIGNED_BYTE) {
+		m_GetRow = get_row_RGBA8; m_GetValues = get_values_RGBA8;
+		m_PutRow = put_row_RGBA8; m_PutRowRGB = put_row_rgb_RGBA8;
+		m_PutMonoRow = put_mono_row_RGBA8;
+		m_PutValues = put_values_RGBA8; m_PutMonoValues = put_mono_values_RGBA8;
+	    } else if (DataType == GL_UNSIGNED_SHORT) {
+		m_GetRow = get_row_RGBA16; m_GetValues = get_values_RGBA16;
+		m_PutRow = put_row_RGBA16; m_PutRowRGB = put_row_rgb_RGBA16;
+		m_PutMonoRow = put_mono_row_RGBA16;
+		m_PutValues = put_values_RGBA16; m_PutMonoValues = put_mono_values_RGBA16;
+	    } else {
+		m_GetRow = get_row_RGBA32; m_GetValues = get_values_RGBA32;
+		m_PutRow = put_row_RGBA32; m_PutRowRGB = put_row_rgb_RGBA32;
+		m_PutMonoRow = put_mono_row_RGBA32;
+		m_PutValues = put_values_RGBA32; m_PutMonoValues = put_mono_values_RGBA32;
+	    }
+	    RedBits = GreenBits = BlueBits = AlphaBits = bpc;
+	} else if (osmesa->format == OSMESA_BGRA) {
+	    if (DataType == GL_UNSIGNED_BYTE) {
+		m_GetRow = get_row_BGRA8; m_GetValues = get_values_BGRA8;
+		m_PutRow = put_row_BGRA8; m_PutRowRGB = put_row_rgb_BGRA8;
+		m_PutMonoRow = put_mono_row_BGRA8;
+		m_PutValues = put_values_BGRA8; m_PutMonoValues = put_mono_values_BGRA8;
+	    } else if (DataType == GL_UNSIGNED_SHORT) {
+		m_GetRow = get_row_BGRA16; m_GetValues = get_values_BGRA16;
+		m_PutRow = put_row_BGRA16; m_PutRowRGB = put_row_rgb_BGRA16;
+		m_PutMonoRow = put_mono_row_BGRA16;
+		m_PutValues = put_values_BGRA16; m_PutMonoValues = put_mono_values_BGRA16;
+	    } else {
+		m_GetRow = get_row_BGRA32; m_GetValues = get_values_BGRA32;
+		m_PutRow = put_row_BGRA32; m_PutRowRGB = put_row_rgb_BGRA32;
+		m_PutMonoRow = put_mono_row_BGRA32;
+		m_PutValues = put_values_BGRA32; m_PutMonoValues = put_mono_values_BGRA32;
+	    }
+	    RedBits = GreenBits = BlueBits = AlphaBits = bpc;
+	} else if (osmesa->format == OSMESA_ARGB) {
+	    if (DataType == GL_UNSIGNED_BYTE) {
+		m_GetRow = get_row_ARGB8; m_GetValues = get_values_ARGB8;
+		m_PutRow = put_row_ARGB8; m_PutRowRGB = put_row_rgb_ARGB8;
+		m_PutMonoRow = put_mono_row_ARGB8;
+		m_PutValues = put_values_ARGB8; m_PutMonoValues = put_mono_values_ARGB8;
+	    } else if (DataType == GL_UNSIGNED_SHORT) {
+		m_GetRow = get_row_ARGB16; m_GetValues = get_values_ARGB16;
+		m_PutRow = put_row_ARGB16; m_PutRowRGB = put_row_rgb_ARGB16;
+		m_PutMonoRow = put_mono_row_ARGB16;
+		m_PutValues = put_values_ARGB16; m_PutMonoValues = put_mono_values_ARGB16;
+	    } else {
+		m_GetRow = get_row_ARGB32; m_GetValues = get_values_ARGB32;
+		m_PutRow = put_row_ARGB32; m_PutRowRGB = put_row_rgb_ARGB32;
+		m_PutMonoRow = put_mono_row_ARGB32;
+		m_PutValues = put_values_ARGB32; m_PutMonoValues = put_mono_values_ARGB32;
+	    }
+	    RedBits = GreenBits = BlueBits = AlphaBits = bpc;
+	} else if (osmesa->format == OSMESA_RGB) {
+	    if (DataType == GL_UNSIGNED_BYTE) {
+		m_GetRow = get_row_RGB8; m_GetValues = get_values_RGB8;
+		m_PutRow = put_row_RGB8; m_PutRowRGB = put_row_rgb_RGB8;
+		m_PutMonoRow = put_mono_row_RGB8;
+		m_PutValues = put_values_RGB8; m_PutMonoValues = put_mono_values_RGB8;
+	    } else if (DataType == GL_UNSIGNED_SHORT) {
+		m_GetRow = get_row_RGB16; m_GetValues = get_values_RGB16;
+		m_PutRow = put_row_RGB16; m_PutRowRGB = put_row_rgb_RGB16;
+		m_PutMonoRow = put_mono_row_RGB16;
+		m_PutValues = put_values_RGB16; m_PutMonoValues = put_mono_values_RGB16;
+	    } else {
+		m_GetRow = get_row_RGB32; m_GetValues = get_values_RGB32;
+		m_PutRow = put_row_RGB32; m_PutRowRGB = put_row_rgb_RGB32;
+		m_PutMonoRow = put_mono_row_RGB32;
+		m_PutValues = put_values_RGB32; m_PutMonoValues = put_mono_values_RGB32;
+	    }
+	    RedBits = GreenBits = BlueBits = bpc;
+	} else if (osmesa->format == OSMESA_BGR) {
+	    if (DataType == GL_UNSIGNED_BYTE) {
+		m_GetRow = get_row_BGR8; m_GetValues = get_values_BGR8;
+		m_PutRow = put_row_BGR8; m_PutRowRGB = put_row_rgb_BGR8;
+		m_PutMonoRow = put_mono_row_BGR8;
+		m_PutValues = put_values_BGR8; m_PutMonoValues = put_mono_values_BGR8;
+	    } else if (DataType == GL_UNSIGNED_SHORT) {
+		m_GetRow = get_row_BGR16; m_GetValues = get_values_BGR16;
+		m_PutRow = put_row_BGR16; m_PutRowRGB = put_row_rgb_BGR16;
+		m_PutMonoRow = put_mono_row_BGR16;
+		m_PutValues = put_values_BGR16; m_PutMonoValues = put_mono_values_BGR16;
+	    } else {
+		m_GetRow = get_row_BGR32; m_GetValues = get_values_BGR32;
+		m_PutRow = put_row_BGR32; m_PutRowRGB = put_row_rgb_BGR32;
+		m_PutMonoRow = put_mono_row_BGR32;
+		m_PutValues = put_values_BGR32; m_PutMonoValues = put_mono_values_BGR32;
+	    }
+	    RedBits = GreenBits = BlueBits = bpc;
+	} else if (osmesa->format == OSMESA_RGB_565) {
+	    ASSERT(DataType == GL_UNSIGNED_BYTE);
+	    m_GetRow = get_row_RGB_565; m_GetValues = get_values_RGB_565;
+	    m_PutRow = put_row_RGB_565; m_PutRowRGB = put_row_rgb_RGB_565;
+	    m_PutMonoRow = put_mono_row_RGB_565;
+	    m_PutValues = put_values_RGB_565; m_PutMonoValues = put_mono_values_RGB_565;
+	    RedBits = 5; GreenBits = 6; BlueBits = 5;
+	} else if (osmesa->format == OSMESA_COLOR_INDEX) {
+	    m_GetRow = get_row_CI; m_GetValues = get_values_CI;
+	    m_PutRow = put_row_CI; m_PutRowRGB = nullptr;
+	    m_PutMonoRow = put_mono_row_CI;
+	    m_PutValues = put_values_CI; m_PutMonoValues = put_mono_values_CI;
+	    IndexBits = 8;
+	} else {
+	    _mesa_problem(ctx, "bad pixel format in osmesa renderbuffer_storage");
+	}
+
+	Width  = width;
+	Height = height;
+
+	osmesa->compute_row_addresses();
+
+	return GL_TRUE;
+    }
+
+    void GetRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
+		void *values) override {
+	m_GetRow(ctx, this, count, x, y, values);
+    }
+    void GetValues(GLcontext *ctx, GLuint count,
+		   const GLint x[], const GLint y[], void *values) override {
+	m_GetValues(ctx, this, count, x, y, values);
+    }
+    void PutRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
+		const void *values, const GLubyte *mask) override {
+	m_PutRow(ctx, this, count, x, y, values, mask);
+    }
+    void PutRowRGB(GLcontext *ctx, GLuint count, GLint x, GLint y,
+		   const void *values, const GLubyte *mask) override {
+	if (m_PutRowRGB)
+	    m_PutRowRGB(ctx, this, count, x, y, values, mask);
+    }
+    void PutMonoRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
+		    const void *value, const GLubyte *mask) override {
+	m_PutMonoRow(ctx, this, count, x, y, value, mask);
+    }
+    void PutValues(GLcontext *ctx, GLuint count,
+		   const GLint x[], const GLint y[],
+		   const void *values, const GLubyte *mask) override {
+	m_PutValues(ctx, this, count, x, y, values, mask);
+    }
+    void PutMonoValues(GLcontext *ctx, GLuint count,
+		       const GLint x[], const GLint y[],
+		       const void *value, const GLubyte *mask) override {
+	m_PutMonoValues(ctx, this, count, x, y, value, mask);
+    }
+
+private:
+    using GetRowFn  = void (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, void *);
+    using GetValFn  = void (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], void *);
+    using PutRowFn  = void (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *);
+    using PutMRowFn = void (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *);
+    using PutValFn  = void (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *);
+    using PutMValFn = void (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *);
+
+    GetRowFn  m_GetRow        = nullptr;
+    GetValFn  m_GetValues     = nullptr;
+    PutRowFn  m_PutRow        = nullptr;
+    PutRowFn  m_PutRowRGB     = nullptr;
+    PutMRowFn m_PutMonoRow    = nullptr;
+    PutValFn  m_PutValues     = nullptr;
+    PutMValFn m_PutMonoValues = nullptr;
+};
 
 
 /**
@@ -1088,23 +1081,20 @@ static struct gl_renderbuffer *
 new_osmesa_renderbuffer(GLcontext *ctx, GLenum format, GLenum type)
 {
     const GLuint name = 0;
-    struct gl_renderbuffer *rb = _mesa_new_renderbuffer(ctx, name);
-    if (rb) {
-	rb->RefCount = 1;
-	rb->Delete = osmesa_delete_renderbuffer;
-	rb->AllocStorage = osmesa_renderbuffer_storage;
+    auto *rb = new OsMesaRenderbuffer{};
+    _mesa_init_renderbuffer(rb, name);
+    rb->RefCount = 1;
 
-	if (format == OSMESA_COLOR_INDEX) {
-	    rb->InternalFormat = GL_COLOR_INDEX;
-	    rb->_ActualFormat = GL_COLOR_INDEX8_EXT;
-	    rb->_BaseFormat = GL_COLOR_INDEX;
-	    rb->DataType = GL_UNSIGNED_BYTE;
-	} else {
-	    rb->InternalFormat = GL_RGBA;
-	    rb->_ActualFormat = GL_RGBA;
-	    rb->_BaseFormat = GL_RGBA;
-	    rb->DataType = type;
-	}
+    if (format == OSMESA_COLOR_INDEX) {
+	rb->InternalFormat = GL_COLOR_INDEX;
+	rb->_ActualFormat  = GL_COLOR_INDEX8_EXT;
+	rb->_BaseFormat    = GL_COLOR_INDEX;
+	rb->DataType       = GL_UNSIGNED_BYTE;
+    } else {
+	rb->InternalFormat = GL_RGBA;
+	rb->_ActualFormat  = GL_RGBA;
+	rb->_BaseFormat    = GL_RGBA;
+	rb->DataType       = type;
     }
     return rb;
 }
