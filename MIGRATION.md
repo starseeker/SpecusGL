@@ -83,16 +83,48 @@ Target files (roughly in dependency order):
 
 ---
 
-## Phase 3 – GL state and context
+## Phase 3 – GL state and context (this PR)
 
-* `src/main/context.c` / `context.h` – Introduce a `GLContext` C++ class
-  wrapping `GLcontext`; use member initialiser lists to replace
-  `CALLOC_STRUCT` + manual zero-fill.
-* `src/main/framebuffer.c`, `renderbuffer.c` – Convert reference-counted
-  objects to `std::shared_ptr`.
-* `src/main/hash.h` consumers – Replace `_mesa_HashTable*` pointer usage in
-  the state structs with a type-safe `MesaHashTable<T>` template wrapper once
-  all callers have been migrated to C++.
+| Task | Status |
+|------|--------|
+| Migrate `src/main/context.c` → `context.cpp` | ✅ done |
+| Add `extern "C"` guards to `context.h` | ✅ done |
+| Migrate `src/main/framebuffer.c` → `framebuffer.cpp` | ✅ done |
+| Add `extern "C"` guards to `framebuffer.h` | ✅ done |
+| Migrate `src/main/renderbuffer.c` → `renderbuffer.cpp` | ✅ done |
+| Add `extern "C"` guards to `renderbuffer.h` | ✅ done |
+
+### What changed in `context.cpp`
+
+The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
+`GLvisual`, `gl_shared_state`, and `GLcontext` objects.  The C++17 replacement:
+
+* Uses value-initialising `new T{}` instead of `calloc` — this zero-initialises
+  all members the same way `calloc` did, but uses the C++ free store so that
+  `new`/`delete` are matched correctly.
+* Replaces the corresponding `free()` calls with `delete`.
+* `extern "C"` guards added to `context.h` so that C translation units
+  continue to call the functions with C linkage.
+* The `alloc_dispatch_table()` helper keeps `malloc`/`free` because it
+  initialises the table with an explicit loop (no zero-fill required) and
+  is freed from the same file.
+
+### What changed in `framebuffer.cpp`
+
+* `CALLOC_STRUCT(gl_framebuffer)` replaced with `new gl_framebuffer{}` in
+  `_mesa_create_framebuffer` and `_mesa_new_framebuffer`.
+* `free(fb)` in `_mesa_destroy_framebuffer` replaced with `delete fb`.
+* `extern "C"` guards added to `framebuffer.h`.
+
+### What changed in `renderbuffer.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `extern "C"` guards added to `renderbuffer.h`.
+* `CALLOC_STRUCT`/`free` kept for `gl_renderbuffer` objects because several
+  not-yet-migrated C translation units (`depthstencil.c`, `texrender.c`,
+  `osmesa.c`) call `free()` directly on renderbuffer pointers obtained from
+  `_mesa_new_renderbuffer()`.  Converting to `new`/`delete` here requires
+  migrating those files simultaneously (deferred to a later phase).
 
 ---
 
@@ -135,8 +167,8 @@ Target files (roughly in dependency order):
 [x] main/imports   - memory / math utilities     ✅ Phase 2
 [x] main/debug     - error reporting              ✅ Phase 2
 [x] main/hash      - ✅ done (Phase 1)
-[ ] main/context   - GL context lifecycle
-[ ] main/framebuffer + renderbuffer
+[x] main/context   - GL context lifecycle         ✅ Phase 3
+[x] main/framebuffer + renderbuffer               ✅ Phase 3
 [ ] main/teximage + texstore + texobj
 [ ] main/bufferobj, arrayobj, varray
 [ ] main/dlist     - display list (complex)

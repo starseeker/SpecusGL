@@ -53,6 +53,10 @@
 #include "imports.h"
 #include "mtypes.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /** \name Visual-related functions */
 /*@{*/
@@ -288,6 +292,10 @@ do {									\
   ((CTX)->Color.ColorLogicOpEnabled || \
    ((CTX)->Color.BlendEnabled && (CTX)->Color.BlendEquationRGB == GL_LOGIC_OP))
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CONTEXT_H */
 
