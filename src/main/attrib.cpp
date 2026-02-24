@@ -1431,7 +1431,7 @@ _mesa_PopClientAttrib(void)
 	}
 
 	next = attr->next;
-	::operator delete(attr->data);
+	free_attrib_node_data(attr);
 	delete attr;
 	attr = next;
     }

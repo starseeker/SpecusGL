@@ -535,7 +535,7 @@ _mesa_make_extension_string(GLcontext *ctx)
 
     ASSERT(!ext.empty());
 
-    /* Allocate a C string that the caller can store and free with free(). */
+    /* Allocate a C string. The caller frees with delete[]. */
     auto *s = new GLubyte[ext.size() + 1];
     memcpy(s, ext.c_str(), ext.size() + 1);
     return s;
