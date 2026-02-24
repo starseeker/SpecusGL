@@ -145,10 +145,8 @@ static GLboolean
 alloc_normal_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    struct normal_stage_data *store;
-
-    stage->privatePtr = malloc(sizeof(*store));
-    store = NORMAL_STAGE_DATA(stage);
+    auto *store = new normal_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
@@ -166,7 +164,7 @@ free_normal_data(struct tnl_pipeline_stage *stage)
     struct normal_stage_data *store = NORMAL_STAGE_DATA(stage);
     if (store) {
 	_mesa_vector4f_free(&store->normal);
-	free(store);
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

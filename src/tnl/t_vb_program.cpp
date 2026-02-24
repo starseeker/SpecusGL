@@ -467,12 +467,10 @@ init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     struct vertex_buffer *VB = &(tnl->vb);
-    struct vp_stage_data *store;
     const GLuint size = VB->Size;
     GLuint i;
-
-    stage->privatePtr = malloc(sizeof(*store));
-    store = VP_STAGE_DATA(stage);
+    auto *store = new vp_stage_data{};
+    stage->privatePtr = store;
     if (!store)
 	return GL_FALSE;
 
@@ -509,7 +507,7 @@ dtr(struct tnl_pipeline_stage *stage)
 	_mesa_vector4f_free(&store->ndcCoords);
 	ALIGN_FREE(store->clipmask);
 
-	free(store);
+	delete store;
 	stage->privatePtr = NULL;
     }
 }

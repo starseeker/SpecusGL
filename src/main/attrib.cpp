@@ -92,7 +92,8 @@ new_attrib_node(GLbitfield kind)
 /**
  * Delete the data associated with a gl_attrib_node, using the correct type.
  * GL_POLYGON_STIPPLE_BIT stores a GLuint[32] array; everything else stores
- * a single POD struct.
+ * a single POD struct (no non-trivial destructor), so ::operator delete is
+ * safe and avoids a lengthy switch statement.
  */
 static void
 free_attrib_node_data(struct gl_attrib_node *attr)
@@ -100,7 +101,7 @@ free_attrib_node_data(struct gl_attrib_node *attr)
     if (attr->kind == GL_POLYGON_STIPPLE_BIT)
 	delete[] static_cast<GLuint*>(attr->data);
     else
-	::operator delete(attr->data);
+	::operator delete(attr->data);  /* safe: all non-stipple data is POD */
 }
 
 
