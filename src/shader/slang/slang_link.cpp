@@ -56,7 +56,7 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     for (i = 0; i < prog->Varying->NumParameters(); i++) {
 	/* see if this varying is in the linked varying list */
 	const struct gl_program_parameter *var
-		= prog->&Varying->Parameters[i];
+		= &prog->Varying->Parameters[i];
 
 	GLint j = _mesa_lookup_parameter_index(shProg->Varying, -1, var->Name.c_str());
 	if (j >= 0) {
@@ -159,7 +159,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 
     for (i = 0; i < prog->Parameters->NumParameters(); /* incr below*/) {
 	/* see if this uniform is in the linked uniform list */
-	const struct gl_program_parameter *p = prog->&Parameters->Parameters[i];
+	const struct gl_program_parameter *p = &prog->Parameters->Parameters[i];
 	const GLfloat *pVals = prog->Parameters->ParameterValues[i];
 	GLint j;
 	GLint size;
@@ -322,12 +322,12 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
 		inst->SrcReg[j].Index >= VERT_ATTRIB_GENERIC0) {
 		/* this is a generic attrib */
 		const GLint k = inst->SrcReg[j].Index - VERT_ATTRIB_GENERIC0;
-		const char *name = prog->Attributes->Parameters[k].Name;
+		const std::string &name = prog->Attributes->Parameters[k].Name;
 		/* See if this attrib name is in the program's attribute list
 		 * (i.e. was bound by the user).
 		 */
 		GLint index = _mesa_lookup_parameter_index(shProg->Attributes,
-			      -1, name);
+			      -1, name.c_str());
 		GLint attr;
 		if (index >= 0) {
 		    /* found, user must have specified a binding */
@@ -347,7 +347,7 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
 			/* too many!  XXX record error log */
 			return GL_FALSE;
 		    }
-		    _mesa_add_attribute(shProg->Attributes, name, size, attr);
+		    _mesa_add_attribute(shProg->Attributes, name.c_str(), size, attr);
 
 		    /* set the attribute as used */
 		    usedAttributes |= 1<<attr;
