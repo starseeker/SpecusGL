@@ -208,7 +208,7 @@ static void split_prims(struct split_context *split)
 	     */
 	    struct _mesa_index_buffer ib;
 	    struct _mesa_prim tmpprim;
-	    GLuint *elts = static_cast<GLuint*>(malloc(count * sizeof(GLuint)));
+	    GLuint *elts = new GLuint[count];
 	    GLuint j;
 
 	    for (j = 0; j < count; j++)
@@ -233,7 +233,7 @@ static void split_prims(struct split_context *split)
 			   split->draw,
 			   split->limits);
 
-	    free(elts);
+	    delete[] elts;
 	} else {
 	    flush_vertex(split);
 

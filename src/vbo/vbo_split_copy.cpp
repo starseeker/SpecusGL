@@ -420,7 +420,7 @@ static void replay_init(struct copy_context *copy)
 
     switch (copy->ib->type) {
 	case GL_UNSIGNED_BYTE:
-	    copy->translated_elt_buf = static_cast<GLuint*>(malloc(sizeof(GLuint) * copy->ib->count));
+	    copy->translated_elt_buf = new GLuint[copy->ib->count];
 	    copy->srcelt = copy->translated_elt_buf;
 
 	    for (i = 0; i < copy->ib->count; i++)
@@ -428,7 +428,7 @@ static void replay_init(struct copy_context *copy)
 	    break;
 
 	case GL_UNSIGNED_SHORT:
-	    copy->translated_elt_buf = static_cast<GLuint*>(malloc(sizeof(GLuint) * copy->ib->count));
+	    copy->translated_elt_buf = new GLuint[copy->ib->count];
 	    copy->srcelt = copy->translated_elt_buf;
 
 	    for (i = 0; i < copy->ib->count; i++)
@@ -454,8 +454,7 @@ static void replay_init(struct copy_context *copy)
      *
      * XXX:  This should be a VBO!
      */
-    copy->dstbuf = static_cast<GLubyte*>(malloc(copy->dstbuf_size *
-				copy->vertex_size));
+    copy->dstbuf = new GLubyte[copy->dstbuf_size * copy->vertex_size];
     copy->dstptr = copy->dstbuf;
 
     /* Setup new vertex arrays to point into the output buffer:
@@ -483,7 +482,7 @@ static void replay_init(struct copy_context *copy)
 			     copy->ib->count * 2 + 3);
     copy->dstelt_size = MIN2(copy->dstelt_size,
 			     copy->limits->max_indices);
-    copy->dstelt = static_cast<GLuint*>(malloc(sizeof(GLuint) * copy->dstelt_size));
+    copy->dstelt = new GLuint[copy->dstelt_size];
     copy->dstelt_nr = 0;
 
     /* Setup the new index buffer to point to the allocated element
@@ -503,9 +502,9 @@ static void replay_finish(struct copy_context *copy)
 
     /* Free our vertex and index buffers:
      */
-    free(copy->translated_elt_buf);
-    free(copy->dstbuf);
-    free(copy->dstelt);
+    delete[] copy->translated_elt_buf;
+    delete[] copy->dstbuf;
+    delete[] copy->dstelt;
 
     /* Unmap VBO's
      */
