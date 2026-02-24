@@ -2183,6 +2183,59 @@ struct gl_shared_state {
     void remove_arrayobj(GLuint id) {
 	_mesa_HashRemove(ArrayObjects, id);
     }
+
+#if FEATURE_NV_vertex_program || FEATURE_NV_fragment_program
+    /** Program (vertex/fragment) lookup by ID (no locking). */
+    [[nodiscard]] struct gl_program *lookup_program(GLuint id) const {
+	return static_cast<struct gl_program *>(
+	    _mesa_HashLookup(Programs, id));
+    }
+
+    /** Insert program into shared table (no locking). */
+    void insert_program(GLuint id, struct gl_program *prog) {
+	_mesa_HashInsert(Programs, id, prog);
+    }
+
+    /** Remove program from shared table by ID (no locking). */
+    void remove_program(GLuint id) {
+	_mesa_HashRemove(Programs, id);
+    }
+#endif
+
+#if FEATURE_ARB_shader_objects
+    /** Shader/program object lookup by ID (no locking). */
+    [[nodiscard]] void *lookup_shader_object(GLuint name) const {
+	return _mesa_HashLookup(ShaderObjects, name);
+    }
+
+    /** Insert shader/program object into shared table (no locking). */
+    void insert_shader_object(GLuint name, void *obj) {
+	_mesa_HashInsert(ShaderObjects, name, obj);
+    }
+
+    /** Remove shader/program object from shared table by ID (no locking). */
+    void remove_shader_object(GLuint name) {
+	_mesa_HashRemove(ShaderObjects, name);
+    }
+#endif
+
+#if FEATURE_ATI_fragment_shader
+    /** ATI fragment shader lookup by ID (no locking). */
+    [[nodiscard]] struct ati_fragment_shader *lookup_ati_shader(GLuint id) const {
+	return static_cast<struct ati_fragment_shader *>(
+	    _mesa_HashLookup(ATIShaders, id));
+    }
+
+    /** Insert ATI fragment shader into shared table (no locking). */
+    void insert_ati_shader(GLuint id, struct ati_fragment_shader *s) {
+	_mesa_HashInsert(ATIShaders, id, s);
+    }
+
+    /** Remove ATI fragment shader from shared table by ID (no locking). */
+    void remove_ati_shader(GLuint id) {
+	_mesa_HashRemove(ATIShaders, id);
+    }
+#endif
 };
 
 

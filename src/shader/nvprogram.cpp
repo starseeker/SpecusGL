@@ -541,7 +541,7 @@ _mesa_LoadProgramNV(GLenum target, GLuint id, GLsizei len,
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
 		return;
 	    }
-	    _mesa_HashInsert(ctx->Shared->Programs, id, vprog);
+	    ctx->Shared->insert_program(id, &vprog->Base);
 	}
 	_mesa_parse_nv_vertex_program(ctx, target, program, len, vprog);
     } else if (target == GL_FRAGMENT_PROGRAM_NV
@@ -554,7 +554,7 @@ _mesa_LoadProgramNV(GLenum target, GLuint id, GLsizei len,
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
 		return;
 	    }
-	    _mesa_HashInsert(ctx->Shared->Programs, id, fprog);
+	    ctx->Shared->insert_program(id, &fprog->Base);
 	}
 	_mesa_parse_nv_fragment_program(ctx, target, program, len, fprog);
     } else {

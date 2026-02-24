@@ -320,7 +320,7 @@ struct gl_program *
 _mesa_lookup_program(GLcontext *ctx, GLuint id)
 {
     if (id)
-	return (struct gl_program *) _mesa_HashLookup(ctx->Shared->Programs, id);
+	return ctx->Shared->lookup_program(id);
     else
 	return NULL;
 }
@@ -483,7 +483,7 @@ _mesa_BindProgram(GLenum target, GLuint id)
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindProgramNV/ARB");
 		return;
 	    }
-	    _mesa_HashInsert(ctx->Shared->Programs, id, newProg);
+	    ctx->Shared->insert_program(id, newProg);
 	} else if (!compatible_program_targets(newProg->Target, target)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glBindProgramNV/ARB(target mismatch)");
@@ -548,7 +548,7 @@ _mesa_DeletePrograms(GLsizei n, const GLuint *ids)
 	if (ids[i] != 0) {
 	    struct gl_program *prog = _mesa_lookup_program(ctx, ids[i]);
 	    if (prog == &_mesa_DummyProgram) {
-		_mesa_HashRemove(ctx->Shared->Programs, ids[i]);
+		ctx->Shared->remove_program(ids[i]);
 	    } else if (prog) {
 		/* Unbind program if necessary */
 		if (prog->Target == GL_VERTEX_PROGRAM_ARB || /* == GL_VERTEX_PROGRAM_NV */
@@ -570,7 +570,7 @@ _mesa_DeletePrograms(GLsizei n, const GLuint *ids)
 		    return;
 		}
 		/* The ID is immediately available for re-use now */
-		_mesa_HashRemove(ctx->Shared->Programs, ids[i]);
+		ctx->Shared->remove_program(ids[i]);
 		prog->RefCount--;
 		if (prog->RefCount <= 0) {
 		    ctx->Driver.DeleteProgram(ctx, prog);
@@ -606,7 +606,7 @@ _mesa_GenPrograms(GLsizei n, GLuint *ids)
 
     /* Insert pointer to dummy program as placeholder */
     for (i = 0; i < (GLuint) n; i++) {
-	_mesa_HashInsert(ctx->Shared->Programs, first + i, &_mesa_DummyProgram);
+	ctx->Shared->insert_program(first + i, &_mesa_DummyProgram);
     }
 
     /* Return the program names */

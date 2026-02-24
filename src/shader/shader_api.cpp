@@ -180,7 +180,7 @@ _mesa_reference_shader_program(GLcontext *ctx,
 	deleteFlag = (old->RefCount == 0);
 
 	if (deleteFlag) {
-	    _mesa_HashRemove(ctx->Shared->ShaderObjects, old->Name);
+	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader_program(ctx, old);
 	}
 
@@ -205,8 +205,8 @@ _mesa_lookup_shader_program(GLcontext *ctx, GLuint name)
 {
     struct gl_shader_program *shProg;
     if (name) {
-	shProg = (struct gl_shader_program *)
-		 _mesa_HashLookup(ctx->Shared->ShaderObjects, name);
+	shProg = static_cast<struct gl_shader_program *>(
+		 ctx->Shared->lookup_shader_object(name));
 	/* Note that both gl_shader and gl_shader_program objects are kept
 	 * in the same hash table.  Check the object's type to be sure it's
 	 * what we're expecting.
@@ -281,7 +281,7 @@ _mesa_reference_shader(GLcontext *ctx, struct gl_shader **ptr,
 	deleteFlag = (old->RefCount == 0);
 
 	if (deleteFlag) {
-	    _mesa_HashRemove(ctx->Shared->ShaderObjects, old->Name);
+	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader(ctx, old);
 	}
 
@@ -306,8 +306,8 @@ struct gl_shader *
 _mesa_lookup_shader(GLcontext *ctx, GLuint name)
 {
     if (name) {
-	struct gl_shader *sh = (struct gl_shader *)
-			       _mesa_HashLookup(ctx->Shared->ShaderObjects, name);
+	struct gl_shader *sh = static_cast<struct gl_shader *>(
+			       ctx->Shared->lookup_shader_object(name));
 	/* Note that both gl_shader and gl_shader_program objects are kept
 	 * in the same hash table.  Check the object's type to be sure it's
 	 * what we're expecting.
@@ -533,7 +533,7 @@ _mesa_create_shader(GLcontext *ctx, GLenum type)
 	    return 0;
     }
 
-    _mesa_HashInsert(ctx->Shared->ShaderObjects, name, sh);
+    ctx->Shared->insert_shader_object(name, sh);
 
     return name;
 }
@@ -548,7 +548,7 @@ _mesa_create_program(GLcontext *ctx)
     name = _mesa_HashFindFreeKeyBlock(ctx->Shared->ShaderObjects, 1);
     shProg = _mesa_new_shader_program(ctx, name);
 
-    _mesa_HashInsert(ctx->Shared->ShaderObjects, name, shProg);
+    ctx->Shared->insert_shader_object(name, shProg);
 
     assert(shProg->RefCount == 1);
 
