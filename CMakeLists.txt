@@ -32,6 +32,9 @@ endif ()
 add_subdirectory(src)
 add_subdirectory(include)
 
+# Behavioural test suite
+add_subdirectory(tests)
+
 # For testing purposes, the build defines a number
 # of (relatively) self-contained OpenGL examples.
 # These are very much optional - in case a distribution
