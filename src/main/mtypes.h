@@ -39,7 +39,6 @@
 #include <unordered_map>
 
 #include "glheader.h"
-#include "glheader.h"
 #include "glcontext.h"	/* __GLcontextModes (GLvisual) */
 #include "gllimits.h"		/* Hardwired parameters */
 #include "glapitable.h"
