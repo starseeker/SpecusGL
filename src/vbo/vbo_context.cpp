@@ -166,7 +166,8 @@ static void vbo_exec_current_init(struct vbo_exec_context *exec)
 
 GLboolean _vbo_CreateContext(GLcontext *ctx)
 {
-    struct vbo_context *vbo = CALLOC_STRUCT(vbo_context);
+    using VboCtx = struct vbo_context;
+    auto *vbo = new VboCtx{};
 
     ctx->swtnl_im = (void *)vbo;
 
@@ -239,7 +240,7 @@ void _vbo_DestroyContext(GLcontext *ctx)
 
     vbo_exec_destroy(ctx);
     vbo_save_destroy(ctx);
-    free(vbo_context(ctx));
+    delete vbo_context(ctx);
     ctx->swtnl_im = NULL;
 }
 
