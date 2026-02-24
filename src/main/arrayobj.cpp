@@ -55,7 +55,7 @@
  * Look up the array object for the given ID.
  *
  * \returns
- * Either a pointer to the array object with the specified ID or \c NULL for
+ * Either a pointer to the array object with the specified ID or \c nullptr for
  * a non-existent ID.  The spec defines ID 0 as being technically
  * non-existent.
  */
@@ -63,7 +63,7 @@
 static INLINE struct gl_array_object *
 lookup_arrayobj(GLcontext *ctx, GLuint id)
 {
-    return (id == 0) ? NULL : ctx->Shared->lookup_arrayobj(id);
+    return (id == 0) ? nullptr : ctx->Shared->lookup_arrayobj(id);
 }
 
 
@@ -110,54 +110,54 @@ _mesa_initialize_array_object(GLcontext *ctx,
     obj->Vertex.Type = GL_FLOAT;
     obj->Vertex.Stride = 0;
     obj->Vertex.StrideB = 0;
-    obj->Vertex.Ptr = NULL;
+    obj->Vertex.Ptr = nullptr;
     obj->Vertex.Enabled = GL_FALSE;
     obj->Normal.Type = GL_FLOAT;
     obj->Normal.Stride = 0;
     obj->Normal.StrideB = 0;
-    obj->Normal.Ptr = NULL;
+    obj->Normal.Ptr = nullptr;
     obj->Normal.Enabled = GL_FALSE;
     obj->Color.Size = 4;
     obj->Color.Type = GL_FLOAT;
     obj->Color.Stride = 0;
     obj->Color.StrideB = 0;
-    obj->Color.Ptr = NULL;
+    obj->Color.Ptr = nullptr;
     obj->Color.Enabled = GL_FALSE;
     obj->SecondaryColor.Size = 4;
     obj->SecondaryColor.Type = GL_FLOAT;
     obj->SecondaryColor.Stride = 0;
     obj->SecondaryColor.StrideB = 0;
-    obj->SecondaryColor.Ptr = NULL;
+    obj->SecondaryColor.Ptr = nullptr;
     obj->SecondaryColor.Enabled = GL_FALSE;
     obj->FogCoord.Size = 1;
     obj->FogCoord.Type = GL_FLOAT;
     obj->FogCoord.Stride = 0;
     obj->FogCoord.StrideB = 0;
-    obj->FogCoord.Ptr = NULL;
+    obj->FogCoord.Ptr = nullptr;
     obj->FogCoord.Enabled = GL_FALSE;
     obj->Index.Type = GL_FLOAT;
     obj->Index.Stride = 0;
     obj->Index.StrideB = 0;
-    obj->Index.Ptr = NULL;
+    obj->Index.Ptr = nullptr;
     obj->Index.Enabled = GL_FALSE;
     for (i = 0; i < MAX_TEXTURE_UNITS; i++) {
 	obj->TexCoord[i].Size = 4;
 	obj->TexCoord[i].Type = GL_FLOAT;
 	obj->TexCoord[i].Stride = 0;
 	obj->TexCoord[i].StrideB = 0;
-	obj->TexCoord[i].Ptr = NULL;
+	obj->TexCoord[i].Ptr = nullptr;
 	obj->TexCoord[i].Enabled = GL_FALSE;
     }
     obj->EdgeFlag.Stride = 0;
     obj->EdgeFlag.StrideB = 0;
-    obj->EdgeFlag.Ptr = NULL;
+    obj->EdgeFlag.Ptr = nullptr;
     obj->EdgeFlag.Enabled = GL_FALSE;
     for (i = 0; i < VERT_ATTRIB_MAX; i++) {
 	obj->VertexAttrib[i].Size = 4;
 	obj->VertexAttrib[i].Type = GL_FLOAT;
 	obj->VertexAttrib[i].Stride = 0;
 	obj->VertexAttrib[i].StrideB = 0;
-	obj->VertexAttrib[i].Ptr = NULL;
+	obj->VertexAttrib[i].Ptr = nullptr;
 	obj->VertexAttrib[i].Enabled = GL_FALSE;
 	obj->VertexAttrib[i].Normalized = GL_FALSE;
     }
@@ -214,19 +214,19 @@ _mesa_remove_array_object(GLcontext *ctx, struct gl_array_object *obj)
  * Bind a new array.
  *
  * \todo
- * The binding could be done more efficiently by comparing the non-NULL
+ * The binding could be done more efficiently by comparing the non-nullptr
  * pointers in the old and new objects.  The only arrays that are "dirty" are
- * the ones that are non-NULL in either object.
+ * the ones that are non-nullptr in either object.
  */
 void GLAPIENTRY
 _mesa_BindVertexArrayAPPLE(GLuint id)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_array_object * const oldObj = ctx->Array.ArrayObj;
-    struct gl_array_object *newObj = NULL;
+    struct gl_array_object *newObj = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    ASSERT(oldObj != NULL);
+    ASSERT(oldObj != nullptr);
 
     if (oldObj->Name == id)
 	return;   /* rebinding the same array object- no change */
@@ -290,7 +290,7 @@ _mesa_DeleteVertexArraysAPPLE(GLsizei n, const GLuint *ids)
     for (i = 0; i < n; i++) {
 	struct gl_array_object *obj = lookup_arrayobj(ctx, ids[i]);
 
-	if (obj != NULL) {
+	if (obj != nullptr) {
 	    ASSERT(obj->Name == ids[i]);
 
 
@@ -397,7 +397,7 @@ _mesa_IsVertexArrayAPPLE(GLuint id)
 	obj = lookup_arrayobj(ctx, id);
     }
 
-    return (obj != NULL) ? GL_TRUE : GL_FALSE;
+    return (obj != nullptr) ? GL_TRUE : GL_FALSE;
 }
 
 /*

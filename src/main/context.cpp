@@ -200,7 +200,7 @@ _mesa_notifySwapBuffers(__GLcontext *gc)
  * \param alphaBits same as above.
  * \param numSamples not really used.
  *
- * \return pointer to new GLvisual or NULL if requested parameters can't be
+ * \return pointer to new GLvisual or nullptr if requested parameters can't be
  * met.
  *
  * \note Need to add params for level and numAuxBuffers (at least)
@@ -230,7 +230,7 @@ _mesa_create_visual(GLboolean rgbFlag,
 			         accumBlueBits, accumAlphaBits,
 			         numSamples)) {
 	delete vis;
-	return NULL;
+	return nullptr;
     }
     return vis;
 }
@@ -397,9 +397,9 @@ one_time_init(GLcontext *ctx)
  * Allocate and initialize a shared context state structure.
  * Initializes the display list, texture objects and vertex programs hash
  * tables, allocates the texture objects. If it runs out of memory, frees
- * everything already allocated before returning NULL.
+ * everything already allocated before returning nullptr.
  *
- * \return pointer to a gl_shared_state structure on success, or NULL on
+ * \return pointer to a gl_shared_state structure on success, or nullptr on
  * failure.
  */
 static GLboolean
@@ -481,7 +481,7 @@ alloc_shared_state(GLcontext *ctx)
     return GL_TRUE;
 
 cleanup:
-    /* Ran out of memory at some point.  Free everything and return NULL */
+    /* Ran out of memory at some point.  Free everything and return nullptr */
     if (ss->DisplayList)
 	_mesa_DeleteHashTable(ss->DisplayList);
     if (ss->TexObjects)
@@ -621,7 +621,7 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
 	 */
 	fb->RefCount = 0;
 	/* NOTE: Delete should always be defined but there are two reports
-	 * of it being NULL (bugs 13507, 14293).  Work-around for now.
+	 * of it being nullptr (bugs 13507, 14293).  Work-around for now.
 	 */
 	if (fb->Delete)
 	    fb->Delete(fb);
@@ -912,7 +912,7 @@ init_attrib_groups(GLcontext *ctx)
 static int
 generic_nop(void)
 {
-    _mesa_problem(NULL, "User called no-op dispatch function (an unsupported extension function?)");
+    _mesa_problem(nullptr, "User called no-op dispatch function (an unsupported extension function?)");
     return 0;
 }
 
@@ -954,7 +954,7 @@ alloc_dispatch_table(void)
  * \param ctx the context to initialize
  * \param visual describes the visual attributes for this context
  * \param share_list points to context to share textures, display lists,
- *        etc with, or NULL
+ *        etc with, or nullptr
  * \param driverFunctions table of device driver functions for this context
  *        to use
  * \param driverContext pointer to driver-specific context data
@@ -974,10 +974,10 @@ _mesa_initialize_context(GLcontext *ctx,
     one_time_init(ctx);
 
     ctx->Visual = *visual;
-    ctx->DrawBuffer = NULL;
-    ctx->ReadBuffer = NULL;
-    ctx->WinSysDrawBuffer = NULL;
-    ctx->WinSysReadBuffer = NULL;
+    ctx->DrawBuffer = nullptr;
+    ctx->ReadBuffer = nullptr;
+    ctx->WinSysDrawBuffer = nullptr;
+    ctx->WinSysReadBuffer = nullptr;
 
     /* Plug in driver functions and context pointer here.
      * This is important because when we call alloc_shared_state() below
@@ -1013,7 +1013,7 @@ _mesa_initialize_context(GLcontext *ctx,
 	free_shared_state(ctx, ctx->Shared);
 	if (ctx->Exec) {
 	    delete ctx->Exec;
-	    ctx->Exec = NULL;
+	    ctx->Exec = nullptr;
 	}
     }
     _mesa_init_exec_table(ctx->Exec);
@@ -1023,16 +1023,16 @@ _mesa_initialize_context(GLcontext *ctx,
     _mesa_install_save_vtxfmt(ctx, &ctx->ListState.ListVtxfmt);
     /* Neutral tnl module stuff */
     _mesa_init_exec_vtxfmt(ctx);
-    ctx->TnlModule.Current = NULL;
+    ctx->TnlModule.Current = nullptr;
     ctx->TnlModule.SwapCount = 0;
 #endif
 
     ctx->FragmentProgram._MaintainTexEnvProgram
-	= (_mesa_getenv("MESA_TEX_PROG") != NULL);
+	= (_mesa_getenv("MESA_TEX_PROG") != nullptr);
     ctx->FragmentProgram._UseTexEnvProgram = ctx->FragmentProgram._MaintainTexEnvProgram;
 
     ctx->VertexProgram._MaintainTnlProgram
-	= (_mesa_getenv("MESA_TNL_PROG") != NULL);
+	= (_mesa_getenv("MESA_TNL_PROG") != nullptr);
     if (ctx->VertexProgram._MaintainTnlProgram) {
 	/* this is required... */
 	ctx->FragmentProgram._MaintainTexEnvProgram = GL_TRUE;
@@ -1051,12 +1051,12 @@ _mesa_initialize_context(GLcontext *ctx,
  * the rendering context.
  *
  * \param visual a GLvisual pointer (we copy the struct contents)
- * \param share_list another context to share display lists with or NULL
+ * \param share_list another context to share display lists with or nullptr
  * \param driverFunctions points to the dd_function_table into which the
  *        driver has plugged in all its special functions.
  * \param driverCtx points to the device driver's private context state
  *
- * \return pointer to a new __GLcontextRec or NULL if error.
+ * \return pointer to a new __GLcontextRec or nullptr if error.
  */
 GLcontext *
 _mesa_create_context(const GLvisual *visual,
@@ -1076,7 +1076,7 @@ _mesa_create_context(const GLvisual *visual,
 	return ctx;
     } else {
 	delete ctx;
-	return NULL;
+	return nullptr;
     }
 }
 
@@ -1095,7 +1095,7 @@ _mesa_free_context_data(GLcontext *ctx)
 	/* No current context, but we may need one in order to delete
 	 * texture objs, etc.  So temporarily bind the context now.
 	 */
-	_mesa_make_current(ctx, NULL, NULL);
+	_mesa_make_current(ctx, nullptr, nullptr);
     }
 
     /* unreference WinSysDraw/Read buffers */
@@ -1140,7 +1140,7 @@ _mesa_free_context_data(GLcontext *ctx)
 
     /* unbind the context if it's currently bound */
     if (ctx == _mesa_get_current_context()) {
-	_mesa_make_current(NULL, NULL, NULL);
+	_mesa_make_current(nullptr, nullptr, nullptr);
     }
 }
 
@@ -1364,7 +1364,7 @@ initialize_framebuffer_size(GLcontext *ctx, GLframebuffer *fb)
  * We check that the context's and framebuffer's visuals are compatible
  * and return immediately if they're not.
  *
- * \param newCtx  the new GL context. If NULL then there will be no current GL
+ * \param newCtx  the new GL context. If nullptr then there will be no current GL
  *                context.
  * \param drawBuffer  the drawing framebuffer
  * \param readBuffer  the reading framebuffer
@@ -1398,7 +1398,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
     ASSERT(_mesa_get_current_context() == newCtx);
 
     if (!newCtx) {
-	_glapi_set_dispatch(NULL);  /* none current */
+	_glapi_set_dispatch(nullptr);  /* none current */
     } else {
 	_glapi_set_dispatch(newCtx->CurrentDispatch);
 
@@ -1411,7 +1411,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
 	    _mesa_reference_framebuffer(&newCtx->WinSysReadBuffer, readBuffer);
 
 	    /*
-	     * Only set the context's Draw/ReadBuffer fields if they're NULL
+	     * Only set the context's Draw/ReadBuffer fields if they're nullptr
 	     * or not bound to a user-created FBO.
 	     */
 	    if (!newCtx->DrawBuffer || newCtx->DrawBuffer->Name == 0) {
@@ -1581,7 +1581,7 @@ _mesa_record_error(GLcontext *ctx, GLenum error)
  * Execute glFinish().
  *
  * Calls the #ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH macro and the
- * dd_function_table::Finish driver callback, if not NULL.
+ * dd_function_table::Finish driver callback, if not nullptr.
  */
 void GLAPIENTRY
 _mesa_Finish(void)
@@ -1598,7 +1598,7 @@ _mesa_Finish(void)
  * Execute glFlush().
  *
  * Calls the #ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH macro and the
- * dd_function_table::Flush driver callback, if not NULL.
+ * dd_function_table::Flush driver callback, if not nullptr.
  */
 void GLAPIENTRY
 _mesa_Flush(void)

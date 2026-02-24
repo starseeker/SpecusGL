@@ -238,10 +238,10 @@ valid_texture_object(const struct gl_texture_object *tex)
 	case GL_TEXTURE_RECTANGLE_NV:
 	    return GL_TRUE;
 	case 0x99:
-	    _mesa_problem(NULL, "invalid reference to a deleted texture object");
+	    _mesa_problem(nullptr, "invalid reference to a deleted texture object");
 	    return GL_FALSE;
 	default:
-	    _mesa_problem(NULL, "invalid texture object Target value");
+	    _mesa_problem(nullptr, "invalid texture object Target value");
 	    return GL_FALSE;
     }
 }
@@ -281,10 +281,10 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
 	    if (ctx)
 		ctx->Driver.DeleteTexture(ctx, oldTex);
 	    else
-		_mesa_problem(NULL, "Unable to delete texture, no context");
+		_mesa_problem(nullptr, "Unable to delete texture, no context");
 	}
 
-	*ptr = NULL;
+	*ptr = nullptr;
     }
     assert(!*ptr);
 
@@ -296,8 +296,8 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
 	    if (tex->RefCount == 0) {
 		/* this texture's being deleted (look just above) */
 		/* Not sure this can every really happen.  Warn if it does. */
-		_mesa_problem(NULL, "referencing deleted texture object");
-		*ptr = NULL;
+		_mesa_problem(nullptr, "referencing deleted texture object");
+		*ptr = nullptr;
 	    } else {
 		tex->RefCount++;
 		*ptr = tex;
@@ -351,7 +351,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     /* Always need the base level image */
     if (!t->Image[0][baseLevel]) {
 	char s[100];
-	_mesa_sprintf(s, "obj %p (%d) Image[baseLevel=%d] == NULL",
+	_mesa_sprintf(s, "obj %p (%d) Image[baseLevel=%d] == nullptr",
 		      (void *) t, t->Name, baseLevel);
 	incomplete(t, s);
 	t->Complete = GL_FALSE;
@@ -407,7 +407,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 	const GLuint h = t->Image[0][baseLevel]->Height2;
 	GLuint face;
 	for (face = 1; face < 6; face++) {
-	    if (t->Image[face][baseLevel] == NULL ||
+	    if (t->Image[face][baseLevel] == nullptr ||
 		t->Image[face][baseLevel]->Width2 != w ||
 		t->Image[face][baseLevel]->Height2 != h) {
 		t->Complete = GL_FALSE;
@@ -459,7 +459,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 		if (i >= minLevel && i <= maxLevel) {
 		    if (!t->Image[0][i]) {
 			t->Complete = GL_FALSE;
-			incomplete(t, "1D Image[0][i] == NULL");
+			incomplete(t, "1D Image[0][i] == nullptr");
 			return;
 		    }
 		    if (t->Image[0][i]->Width2 != width) {
@@ -486,7 +486,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 		if (i >= minLevel && i <= maxLevel) {
 		    if (!t->Image[0][i]) {
 			t->Complete = GL_FALSE;
-			incomplete(t, "2D Image[0][i] == NULL");
+			incomplete(t, "2D Image[0][i] == nullptr");
 			return;
 		    }
 		    if (t->Image[0][i]->Width2 != width) {
@@ -521,7 +521,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 		}
 		if (i >= minLevel && i <= maxLevel) {
 		    if (!t->Image[0][i]) {
-			incomplete(t, "3D Image[0][i] == NULL");
+			incomplete(t, "3D Image[0][i] == nullptr");
 			t->Complete = GL_FALSE;
 			return;
 		    }
@@ -567,7 +567,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 			/* check that we have images defined */
 			if (!t->Image[face][i]) {
 			    t->Complete = GL_FALSE;
-			    incomplete(t, "CubeMap Image[n][i] == NULL");
+			    incomplete(t, "CubeMap Image[n][i] == nullptr");
 			    return;
 			}
 			/* Don't support GL_DEPTH_COMPONENT for cube maps */
@@ -779,7 +779,7 @@ _mesa_DeleteTextures(GLsizei n, const GLuint *textures)
 		/* Unreference the texobj.  If refcount hits zero, the texture
 		 * will be deleted.
 		 */
-		_mesa_reference_texobj(&delObj, NULL);
+		_mesa_reference_texobj(&delObj, nullptr);
 	    }
 	}
     }
@@ -807,7 +807,7 @@ _mesa_BindTexture(GLenum target, GLuint texName)
     GET_CURRENT_CONTEXT(ctx);
     const GLuint unit = ctx->Texture.CurrentUnit;
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
-    struct gl_texture_object *newTexObj = NULL;
+    struct gl_texture_object *newTexObj = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     if (MESA_VERBOSE & (VERBOSE_API|VERBOSE_TEXTURE))

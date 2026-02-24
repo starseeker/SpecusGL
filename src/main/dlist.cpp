@@ -720,7 +720,7 @@ unpack_image(GLuint dimensions, GLsizei width, GLsizei height, GLsizei depth,
 				  type, src, unpack);
     }
     /* bad access! */
-    return NULL;
+    return nullptr;
 }
 
 
@@ -749,17 +749,17 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
 
     if (ctx->ListState.CurrentPos + numNodes + 2 > BLOCK_SIZE) {
 	/* This block is full.  Allocate a new block and chain to it */
-	Node *newblock = NULL;
+	Node *newblock = nullptr;
 	n = ctx->ListState.CurrentBlock + ctx->ListState.CurrentPos;
 #ifdef __clang_analyzer__
 	if (!n)
-	    return NULL;
+	    return nullptr;
 #endif
 	n[0].opcode = OPCODE_CONTINUE;
 	newblock = new Node[BLOCK_SIZE];
 	if (!newblock) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Building display list");
-	    return NULL;
+	    return nullptr;
 	}
 	n[1].next = (Node *) newblock;
 	ctx->ListState.CurrentBlock = newblock;
@@ -769,7 +769,7 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
     n = ctx->ListState.CurrentBlock + ctx->ListState.CurrentPos;
 #ifdef __clang_analyzer__
     if (!n)
-	return NULL;
+	return nullptr;
 #endif
     ctx->ListState.CurrentPos += numNodes;
     n[0].opcode = (OpCode) opcode;
@@ -5156,7 +5156,7 @@ save_Materialfv(GLenum face, GLenum pname, const GLfloat * param)
     }
 
     {
-	GLuint bitmask = _mesa_material_bitmask(ctx, face, pname, ~0, NULL);
+	GLuint bitmask = _mesa_material_bitmask(ctx, face, pname, ~0, nullptr);
 	for (i = 0; i < MAT_ATTRIB_MAX; i++)
 	    if (bitmask & (1 << i)) {
 		ctx->ListState.ActiveMaterialSize[i] = args;
@@ -6750,9 +6750,9 @@ _mesa_EndList(void)
 
     ctx->Driver.EndList(ctx);
 
-    ctx->ListState.CurrentList = NULL;
+    ctx->ListState.CurrentList = nullptr;
     ctx->ListState.CurrentListNum = 0;
-    ctx->ListState.CurrentListPtr = NULL;
+    ctx->ListState.CurrentListPtr = nullptr;
     ctx->ExecuteFlag = GL_TRUE;
     ctx->CompileFlag = GL_FALSE;
 
@@ -8517,8 +8517,8 @@ _mesa_init_display_list(GLcontext *ctx)
     ctx->ListState.CallDepth = 0;
     ctx->ExecuteFlag = GL_TRUE;
     ctx->CompileFlag = GL_FALSE;
-    ctx->ListState.CurrentListPtr = NULL;
-    ctx->ListState.CurrentBlock = NULL;
+    ctx->ListState.CurrentListPtr = nullptr;
+    ctx->ListState.CurrentBlock = nullptr;
     ctx->ListState.CurrentListNum = 0;
     ctx->ListState.CurrentPos = 0;
 

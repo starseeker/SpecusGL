@@ -211,7 +211,7 @@ _mesa_init_fragment_program(GLcontext *ctx, struct gl_fragment_program *prog,
     if (prog)
 	return _mesa_init_program_struct(ctx, &prog->Base, target, id);
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -225,7 +225,7 @@ _mesa_init_vertex_program(GLcontext *ctx, struct gl_vertex_program *prog,
     if (prog)
 	return _mesa_init_program_struct(ctx, &prog->Base, target, id);
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -255,7 +255,7 @@ _mesa_new_program(GLcontext *ctx, GLenum target, GLuint id)
 					       target, id);
 	default:
 	    _mesa_problem(ctx, "bad target in _mesa_new_program");
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -322,7 +322,7 @@ _mesa_lookup_program(GLcontext *ctx, GLuint id)
     if (id)
 	return ctx->Shared->lookup_program(id);
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -338,7 +338,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 
     clone = ctx->Driver.NewProgram(ctx, prog->Target, prog->Id);
     if (!clone)
-	return NULL;
+	return nullptr;
 
     assert(clone->Target == prog->Target);
     clone->String = (GLubyte *) _mesa_strdup((char *) prog->String);
@@ -347,7 +347,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
     clone->Instructions = _mesa_alloc_instructions(prog->NumInstructions);
     if (!clone->Instructions) {
 	ctx->Driver.DeleteProgram(ctx, clone);
-	return NULL;
+	return nullptr;
     }
     _mesa_copy_instructions(clone->Instructions, prog->Instructions,
 			    prog->NumInstructions);
@@ -397,7 +397,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 	}
 	break;
 	default:
-	    _mesa_problem(NULL, "Unexpected target in _mesa_clone_program");
+	    _mesa_problem(nullptr, "Unexpected target in _mesa_clone_program");
     }
 
     return clone;
@@ -468,7 +468,7 @@ _mesa_BindProgram(GLenum target, GLuint id)
      */
     if (id == 0) {
 	/* Bind a default program */
-	newProg = NULL;
+	newProg = nullptr;
 	if (target == GL_VERTEX_PROGRAM_ARB) /* == GL_VERTEX_PROGRAM_NV */
 	    newProg = ctx->Shared->DefaultVertexProgram;
 	else

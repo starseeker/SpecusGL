@@ -106,7 +106,7 @@ get_string(GLcontext *ctx, GLenum name)
 	    return (const GLubyte *) "Mesa OffScreen";
 #endif
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -637,7 +637,7 @@ do {							\
 
 /**
  * Analyze context state to see if we can provide a fast line drawing
- * function.  Otherwise, return NULL.
+ * function.  Otherwise, return nullptr.
  */
 static swrast_line_func
 osmesa_choose_line_function(GLcontext *ctx)
@@ -646,18 +646,18 @@ osmesa_choose_line_function(GLcontext *ctx)
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
     if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
-	return NULL;
+	return nullptr;
 
-    if (ctx->RenderMode != GL_RENDER)      return NULL;
-    if (ctx->Line.SmoothFlag)              return NULL;
-    if (ctx->Texture._EnabledUnits)        return NULL;
-    if (ctx->Light.ShadeModel != GL_FLAT)  return NULL;
-    if (ctx->Line.Width != 1.0F)           return NULL;
-    if (ctx->Line.StippleFlag)             return NULL;
-    if (ctx->Line.SmoothFlag)              return NULL;
+    if (ctx->RenderMode != GL_RENDER)      return nullptr;
+    if (ctx->Line.SmoothFlag)              return nullptr;
+    if (ctx->Texture._EnabledUnits)        return nullptr;
+    if (ctx->Light.ShadeModel != GL_FLAT)  return nullptr;
+    if (ctx->Line.Width != 1.0F)           return nullptr;
+    if (ctx->Line.StippleFlag)             return nullptr;
+    if (ctx->Line.SmoothFlag)              return nullptr;
     if (osmesa->format != OSMESA_RGBA &&
 	osmesa->format != OSMESA_BGRA &&
-	osmesa->format != OSMESA_ARGB)     return NULL;
+	osmesa->format != OSMESA_ARGB)     return nullptr;
 
     if (swrast->_RasterMask==DEPTH_BIT
 	&& ctx->Depth.Func==GL_LESS
@@ -670,7 +670,7 @@ osmesa_choose_line_function(GLcontext *ctx)
 	return (swrast_line_func) flat_rgba_line;
     }
 
-    return (swrast_line_func) NULL;
+    return (swrast_line_func) nullptr;
 }
 
 
@@ -761,18 +761,18 @@ osmesa_choose_triangle_function(GLcontext *ctx)
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
     if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
-	return (swrast_tri_func) NULL;
+	return (swrast_tri_func) nullptr;
 
-    if (ctx->RenderMode != GL_RENDER)    return (swrast_tri_func) NULL;
-    if (ctx->Polygon.SmoothFlag)         return (swrast_tri_func) NULL;
-    if (ctx->Polygon.StippleFlag)        return (swrast_tri_func) NULL;
-    if (ctx->Texture._EnabledUnits)      return (swrast_tri_func) NULL;
+    if (ctx->RenderMode != GL_RENDER)    return (swrast_tri_func) nullptr;
+    if (ctx->Polygon.SmoothFlag)         return (swrast_tri_func) nullptr;
+    if (ctx->Polygon.StippleFlag)        return (swrast_tri_func) nullptr;
+    if (ctx->Texture._EnabledUnits)      return (swrast_tri_func) nullptr;
     if (osmesa->format != OSMESA_RGBA &&
 	osmesa->format != OSMESA_BGRA &&
-	osmesa->format != OSMESA_ARGB)   return (swrast_tri_func) NULL;
+	osmesa->format != OSMESA_ARGB)   return (swrast_tri_func) nullptr;
     if (ctx->Polygon.CullFlag &&
 	ctx->Polygon.CullFaceMode == GL_FRONT_AND_BACK)
-	return (swrast_tri_func) NULL;
+	return (swrast_tri_func) nullptr;
 
     if (swrast->_RasterMask == DEPTH_BIT &&
 	ctx->Depth.Func == GL_LESS &&
@@ -784,7 +784,7 @@ osmesa_choose_triangle_function(GLcontext *ctx)
 	    return (swrast_tri_func) flat_rgba_z_triangle;
 	}
     }
-    return (swrast_tri_func) NULL;
+    return (swrast_tri_func) nullptr;
 }
 
 
@@ -1121,7 +1121,7 @@ new_osmesa_renderbuffer(GLcontext *ctx, GLenum format, GLenum type)
  *
  * Input:  format - either GL_RGBA or GL_COLOR_INDEX
  *         sharelist - specifies another OSMesaContext with which to share
- *                     display lists.  NULL indicates no sharing.
+ *                     display lists.  nullptr indicates no sharing.
  * Return:  an OSMesaContext or 0 if error
  */
 GLAPI OSMesaContext GLAPIENTRY
@@ -1222,7 +1222,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
     }
 #endif
     else {
-	return NULL;
+	return nullptr;
     }
 
     osmesa = new osmesa_context{};
@@ -1245,7 +1245,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 					       );
 	if (!osmesa->gl_visual) {
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	/* Initialize device driver function table */
@@ -1253,17 +1253,17 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	/* override with our functions */
 	functions.GetString = get_string;
 	functions.UpdateState = osmesa_update_state;
-	functions.GetBufferSize = NULL;
+	functions.GetBufferSize = nullptr;
 	functions.Finish = osmesa_finish;
 
 	if (!_mesa_initialize_context(&osmesa->mesa,
 				      osmesa->gl_visual,
 				      sharelist ? &sharelist->mesa
-				      : (GLcontext *) NULL,
+				      : (GLcontext *) nullptr,
 				      &functions, (void *) osmesa)) {
 	    _mesa_destroy_visual(osmesa->gl_visual);
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	_mesa_enable_sw_extensions(&(osmesa->mesa));
@@ -1276,7 +1276,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	    _mesa_destroy_visual(osmesa->gl_visual);
 	    _mesa_free_context_data(&osmesa->mesa);
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	/* create front color buffer in user-provided memory (no back buffer) */
@@ -1314,7 +1314,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 		_mesa_destroy_visual(osmesa->gl_visual);
 		_mesa_free_context_data(ctx);
 		delete osmesa;
-		return NULL;
+		return nullptr;
 	    }
 
 	    _swsetup_Wakeup(ctx);
@@ -1345,7 +1345,7 @@ OSMesaDestroyContext(OSMesaContext osmesa)
 {
     if (osmesa) {
 	if (osmesa->rb)
-	    _mesa_reference_renderbuffer(&osmesa->rb, NULL);
+	    _mesa_reference_renderbuffer(&osmesa->rb, nullptr);
 
 	_swsetup_DestroyContext(&osmesa->mesa);
 	_tnl_DestroyContext(&osmesa->mesa);
@@ -1457,7 +1457,7 @@ OSMesaGetCurrentContext(void)
     if (ctx)
 	return (OSMesaContext) ctx;
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1548,7 +1548,7 @@ GLAPI GLboolean GLAPIENTRY
 OSMesaGetDepthBuffer(OSMesaContext c, GLint *width, GLint *height,
 		     GLint *bytesPerValue, void **buffer)
 {
-    struct gl_renderbuffer *rb = NULL;
+    struct gl_renderbuffer *rb = nullptr;
 
     if (c->gl_buffer)
 	rb = c->gl_buffer->Attachment[BUFFER_DEPTH].Renderbuffer;
@@ -1618,7 +1618,7 @@ static struct name_function functions[] = {
     { "OSMesaGetProcAddress", (OSMESAproc) OSMesaGetProcAddress },
     { "OSMesaColorClamp", (OSMESAproc) OSMesaColorClamp },
     { "OSMesaFXAAEnable", (OSMESAproc) OSMesaFXAAEnable },
-    { NULL, NULL }
+    { nullptr, nullptr }
 };
 
 

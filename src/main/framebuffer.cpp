@@ -191,10 +191,10 @@ _mesa_free_framebuffer_data(struct gl_framebuffer *fb)
     for (i = 0; i < BUFFER_COUNT; i++) {
 	struct gl_renderbuffer_attachment *att = &fb->Attachment[i];
 	if (att->Renderbuffer) {
-	    _mesa_reference_renderbuffer(&att->Renderbuffer, NULL);
+	    _mesa_reference_renderbuffer(&att->Renderbuffer, nullptr);
 	}
 	if (att->Texture) {
-	    _mesa_reference_texobj(&att->Texture, NULL);
+	    _mesa_reference_texobj(&att->Texture, nullptr);
 	}
 	ASSERT(!att->Renderbuffer);
 	ASSERT(!att->Texture);
@@ -202,8 +202,8 @@ _mesa_free_framebuffer_data(struct gl_framebuffer *fb)
     }
 
     /* unbind _Depth/_StencilBuffer to decr ref counts */
-    _mesa_reference_renderbuffer(&fb->_DepthBuffer, NULL);
-    _mesa_reference_renderbuffer(&fb->_StencilBuffer, NULL);
+    _mesa_reference_renderbuffer(&fb->_DepthBuffer, nullptr);
+    _mesa_reference_renderbuffer(&fb->_StencilBuffer, nullptr);
 }
 
 
@@ -236,7 +236,7 @@ _mesa_reference_framebuffer(struct gl_framebuffer **ptr,
  * Undo/remove a reference to a framebuffer object.
  * Decrement the framebuffer object's reference count and delete it when
  * the refcount hits zero.
- * Note: we pass the address of a pointer and set it to NULL.
+ * Note: we pass the address of a pointer and set it to nullptr.
  */
 void
 _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
@@ -255,7 +255,7 @@ _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
 	if (deleteFlag)
 	    (*fb)->Delete(*fb);
 
-	*fb = NULL;
+	*fb = nullptr;
     }
 }
 
@@ -629,7 +629,7 @@ update_color_read_buffer(GLcontext *ctx, struct gl_framebuffer *fb)
 	fb->DeletePending ||
 	fb->Width == 0 ||
 	fb->Height == 0) {
-	fb->_ColorReadBuffer = NULL; /* legal! */
+	fb->_ColorReadBuffer = nullptr; /* legal! */
     } else {
 	ASSERT(fb->_ColorReadBufferIndex >= 0);
 	ASSERT(fb->_ColorReadBufferIndex < BUFFER_COUNT);
@@ -704,7 +704,7 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 	case GL_BGRA:
 	case GL_ABGR_EXT:
 	case GL_COLOR_INDEX:
-	    if (ctx->ReadBuffer->_ColorReadBuffer == NULL) {
+	    if (ctx->ReadBuffer->_ColorReadBuffer == nullptr) {
 		return GL_FALSE;
 	    }
 	    /* XXX enable this post 6.5 release:

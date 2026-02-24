@@ -76,7 +76,7 @@ _mesa_lookup_renderbuffer(GLcontext *ctx, GLuint id)
     struct gl_renderbuffer *rb;
 
     if (id == 0)
-	return NULL;
+	return nullptr;
 
     rb = (struct gl_renderbuffer *)
 	 _mesa_HashLookup(ctx->Shared->RenderBuffers, id);
@@ -93,7 +93,7 @@ _mesa_lookup_framebuffer(GLcontext *ctx, GLuint id)
     struct gl_framebuffer *fb;
 
     if (id == 0)
-	return NULL;
+	return nullptr;
 
     fb = (struct gl_framebuffer *)
 	 _mesa_HashLookup(ctx->Shared->FrameBuffers, id);
@@ -133,7 +133,7 @@ _mesa_get_attachment(GLcontext *ctx, struct gl_framebuffer *fb,
 		    ((BUFFER_COLOR0 + i) >= BUFFER_COUNT)) {
 		// TODO - need to check the relationship between BUFFER_COUNT,
 		// BUFFER_COLOR0, and GL_COLOR_ATTACHMENT* values
-		return NULL;
+		return nullptr;
 	    }
 	    return &fb->Attachment[BUFFER_COLOR0 + i];
 	case GL_DEPTH_ATTACHMENT_EXT:
@@ -141,7 +141,7 @@ _mesa_get_attachment(GLcontext *ctx, struct gl_framebuffer *fb,
 	case GL_STENCIL_ATTACHMENT_EXT:
 	    return &fb->Attachment[BUFFER_STENCIL];
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -159,13 +159,13 @@ _mesa_remove_attachment(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 	    /* tell driver we're done rendering to this texobj */
 	    ctx->Driver.FinishRenderTexture(ctx, att);
 	}
-	_mesa_reference_texobj(&att->Texture, NULL); /* unbind */
+	_mesa_reference_texobj(&att->Texture, nullptr); /* unbind */
 	ASSERT(!att->Texture);
     }
     if (att->Type == GL_TEXTURE || att->Type == GL_RENDERBUFFER_EXT) {
 	ASSERT(att->Renderbuffer);
 	ASSERT(!att->Texture);
-	_mesa_reference_renderbuffer(&att->Renderbuffer, NULL); /* unbind */
+	_mesa_reference_renderbuffer(&att->Renderbuffer, nullptr); /* unbind */
 	ASSERT(!att->Renderbuffer);
     }
     att->Type = GL_NONE;
@@ -223,7 +223,7 @@ _mesa_set_renderbuffer_attachment(GLcontext *ctx,
     /* XXX check if re-doing same attachment, exit early */
     _mesa_remove_attachment(ctx, att);
     att->Type = GL_RENDERBUFFER_EXT;
-    att->Texture = NULL; /* just to be safe */
+    att->Texture = nullptr; /* just to be safe */
     att->Complete = GL_FALSE;
     _mesa_reference_renderbuffer(&att->Renderbuffer, rb);
 }
@@ -371,7 +371,7 @@ fbo_incomplete(const char *msg, int index)
     (void) msg;
     (void) index;
     /*
-    _mesa_debug(NULL, "FBO Incomplete: %s [%d]\n", msg, index);
+    _mesa_debug(nullptr, "FBO Incomplete: %s [%d]\n", msg, index);
     */
 }
 
@@ -520,7 +520,7 @@ _mesa_IsRenderbufferEXT(GLuint renderbuffer)
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
     if (renderbuffer) {
 	struct gl_renderbuffer *rb = _mesa_lookup_renderbuffer(ctx, renderbuffer);
-	if (rb != NULL)
+	if (rb != nullptr)
 	    return GL_TRUE;
     }
     return GL_FALSE;
@@ -553,7 +553,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 	newRb = _mesa_lookup_renderbuffer(ctx, renderbuffer);
 	if (newRb == &DummyRenderbuffer) {
 	    /* ID was reserved, but no real renderbuffer object made yet */
-	    newRb = NULL;
+	    newRb = nullptr;
 	}
 	if (!newRb) {
 	    /* create new renderbuffer object */
@@ -567,7 +567,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 	    newRb->RefCount = 1; /* referenced by hash table */
 	}
     } else {
-	newRb = NULL;
+	newRb = nullptr;
     }
 
     ASSERT(newRb != &DummyRenderbuffer);
@@ -605,7 +605,7 @@ _mesa_DeleteRenderbuffersEXT(GLsizei n, const GLuint *renderbuffers)
 
 		if (rb != &DummyRenderbuffer) {
 		    /* no longer referenced by hash table */
-		    _mesa_reference_renderbuffer(&rb, NULL);
+		    _mesa_reference_renderbuffer(&rb, nullptr);
 		}
 	    }
 	}
@@ -857,7 +857,7 @@ _mesa_IsFramebufferEXT(GLuint framebuffer)
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
     if (framebuffer) {
 	struct gl_framebuffer *rb = _mesa_lookup_framebuffer(ctx, framebuffer);
-	if (rb != NULL)
+	if (rb != nullptr)
 	    return GL_TRUE;
     }
     return GL_FALSE;
@@ -953,7 +953,7 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 	newFb = _mesa_lookup_framebuffer(ctx, framebuffer);
 	if (newFb == &DummyFramebuffer) {
 	    /* ID was reserved, but no real framebuffer object made yet */
-	    newFb = NULL;
+	    newFb = nullptr;
 	}
 	if (!newFb) {
 	    /* create new framebuffer object */
@@ -1132,7 +1132,7 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
 		    GLint level, GLint zoffset)
 {
     struct gl_renderbuffer_attachment *att;
-    struct gl_texture_object *texObj = NULL;
+    struct gl_texture_object *texObj = nullptr;
     struct gl_framebuffer *fb;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -1161,7 +1161,7 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
 	GLboolean err = GL_TRUE;
 
 	texObj = _mesa_lookup_texture(ctx, texture);
-	if (texObj != NULL) {
+	if (texObj != nullptr) {
 	    err = (texObj->Target == GL_TEXTURE_CUBE_MAP)
 		  ? !IS_CUBE_FACE(textarget)
 		  : (texObj->Target != textarget);
@@ -1193,7 +1193,7 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
     }
 
     att = _mesa_get_attachment(ctx, fb, attachment);
-    if (att == NULL) {
+    if (att == nullptr) {
 	_mesa_error(ctx, GL_INVALID_ENUM,
 		    "glFramebufferTexture%sEXT(attachment)", caller);
 	return;
@@ -1332,7 +1332,7 @@ _mesa_FramebufferRenderbufferEXT(GLenum target, GLenum attachment,
     }
 
     att = _mesa_get_attachment(ctx, fb, attachment);
-    if (att == NULL) {
+    if (att == nullptr) {
 	_mesa_error(ctx, GL_INVALID_ENUM,
 		    "glFramebufferRenderbufferEXT(attachment)");
 	return;
@@ -1347,7 +1347,7 @@ _mesa_FramebufferRenderbufferEXT(GLenum target, GLenum attachment,
 	}
     } else {
 	/* remove renderbuffer attachment */
-	rb = NULL;
+	rb = nullptr;
     }
 
     FLUSH_VERTICES(ctx, _NEW_BUFFERS);
@@ -1412,7 +1412,7 @@ _mesa_GetFramebufferAttachmentParameterivEXT(GLenum target, GLenum attachment,
     }
 
     att = _mesa_get_attachment(ctx, buffer, attachment);
-    if (att == NULL) {
+    if (att == nullptr) {
 	_mesa_error(ctx, GL_INVALID_ENUM,
 		    "glGetFramebufferAttachmentParameterivEXT(attachment)");
 	return;
