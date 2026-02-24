@@ -196,7 +196,7 @@ _mesa_GenFragmentShadersATI(GLuint range)
 
     first = _mesa_HashFindFreeKeyBlock(ctx->Shared->ATIShaders, range);
     for (i = 0; i < range; i++) {
-	_mesa_HashInsert(ctx->Shared->ATIShaders, first + i, &DummyShader);
+	ctx->Shared->insert_ati_shader(first + i, &DummyShader);
     }
 
     return first;
@@ -224,7 +224,7 @@ _mesa_BindFragmentShaderATI(GLuint id)
     if (curProg->Id != 0) {
 	curProg->RefCount--;
 	if (curProg->RefCount <= 0) {
-	    _mesa_HashRemove(ctx->Shared->ATIShaders, id);
+	    ctx->Shared->remove_ati_shader(id);
 	}
     }
 
@@ -232,8 +232,7 @@ _mesa_BindFragmentShaderATI(GLuint id)
     if (id == 0) {
 	newProg = ctx->Shared->DefaultFragmentShader;
     } else {
-	newProg = (struct ati_fragment_shader *)
-		  _mesa_HashLookup(ctx->Shared->ATIShaders, id);
+	newProg = ctx->Shared->lookup_ati_shader(id);
 	if (!newProg || newProg == &DummyShader) {
 	    /* allocate a new program now */
 	    newProg = _mesa_new_ati_fragment_shader(ctx, id);
@@ -241,7 +240,7 @@ _mesa_BindFragmentShaderATI(GLuint id)
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindFragmentShaderATI");
 		return;
 	    }
-	    _mesa_HashInsert(ctx->Shared->ATIShaders, id, newProg);
+	    ctx->Shared->insert_ati_shader(id, newProg);
 	}
 
     }
@@ -268,10 +267,9 @@ _mesa_DeleteFragmentShaderATI(GLuint id)
     }
 
     if (id != 0) {
-	struct ati_fragment_shader *prog = (struct ati_fragment_shader *)
-					   _mesa_HashLookup(ctx->Shared->ATIShaders, id);
+	struct ati_fragment_shader *prog = ctx->Shared->lookup_ati_shader(id);
 	if (prog == &DummyShader) {
-	    _mesa_HashRemove(ctx->Shared->ATIShaders, id);
+	    ctx->Shared->remove_ati_shader(id);
 	} else if (prog) {
 	    if (ctx->ATIFragmentShader.Current &&
 		ctx->ATIFragmentShader.Current->Id == id) {
@@ -281,7 +279,7 @@ _mesa_DeleteFragmentShaderATI(GLuint id)
 	}
 
 	/* The ID is immediately available for re-use now */
-	_mesa_HashRemove(ctx->Shared->ATIShaders, id);
+	ctx->Shared->remove_ati_shader(id);
 	if (prog && (prog != &DummyShader)) {
 	    prog->RefCount--;
 	    if (prog->RefCount <= 0) {
@@ -390,7 +388,7 @@ _mesa_EndFragmentShaderATI(void)
     }
 #endif
     if (ctx->Driver.ProgramStringNotify)
-	ctx->Driver.ProgramStringNotify(ctx, GL_FRAGMENT_SHADER_ATI, NULL);
+	ctx->Driver.ProgramStringNotify(ctx, GL_FRAGMENT_SHADER_ATI, nullptr);
 }
 
 void GLAPIENTRY

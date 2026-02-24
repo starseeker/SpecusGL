@@ -45,6 +45,8 @@
 
 #include "rbadaptors.h"
 
+#include <mutex>
+
 
 /* 32-bit color index format.  Not a public format. */
 #define COLOR_INDEX32 0x424243
@@ -66,7 +68,7 @@ get_pointer_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb,
 		  GLint x, GLint y)
 {
     if (!rb->Data)
-	return NULL;
+	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     /* Can't assert _ActualFormat since these funcs may be used for serveral
      * different formats (GL_ALPHA8, GL_STENCIL_INDEX8, etc).
@@ -186,7 +188,7 @@ get_pointer_ushort(GLcontext *ctx, struct gl_renderbuffer *rb,
 		   GLint x, GLint y)
 {
     if (!rb->Data)
-	return NULL;
+	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     ASSERT(rb->Width > 0);
     return (GLushort *) rb->Data + y * rb->Width + x;
@@ -312,7 +314,7 @@ get_pointer_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 		 GLint x, GLint y)
 {
     if (!rb->Data)
-	return NULL;
+	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     return (GLuint *) rb->Data + y * rb->Width + x;
@@ -441,7 +443,7 @@ get_pointer_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb,
     /* No direct access since this buffer is RGB but caller will be
      * treating it as if it were RGBA.
      */
-    return NULL;
+    return nullptr;
 }
 
 
@@ -603,7 +605,7 @@ get_pointer_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb,
 		   GLint x, GLint y)
 {
     if (!rb->Data)
-	return NULL;
+	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     return (GLubyte *) rb->Data + 4 * (y * rb->Width + x);
@@ -759,7 +761,7 @@ get_pointer_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb,
 		    GLint x, GLint y)
 {
     if (!rb->Data)
-	return NULL;
+	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     return (GLushort *) rb->Data + 4 * (y * rb->Width + x);
 }
@@ -1015,7 +1017,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_alpha8;
 	    rb->GetValues = get_values_alpha8;
 	    rb->PutRow = put_row_alpha8;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_alpha8;
 	    rb->PutValues = put_values_alpha8;
 	    rb->PutMonoValues = put_mono_values_alpha8;
@@ -1037,7 +1039,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_ubyte;
 	    rb->GetValues = get_values_ubyte;
 	    rb->PutRow = put_row_ubyte;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_ubyte;
 	    rb->PutValues = put_values_ubyte;
 	    rb->PutMonoValues = put_mono_values_ubyte;
@@ -1052,7 +1054,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_ushort;
 	    rb->GetValues = get_values_ushort;
 	    rb->PutRow = put_row_ushort;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_ushort;
 	    rb->PutValues = put_values_ushort;
 	    rb->PutMonoValues = put_mono_values_ushort;
@@ -1068,7 +1070,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_ushort;
 	    rb->GetValues = get_values_ushort;
 	    rb->PutRow = put_row_ushort;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_ushort;
 	    rb->PutValues = put_values_ushort;
 	    rb->PutMonoValues = put_mono_values_ushort;
@@ -1083,7 +1085,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_uint;
 	    rb->GetValues = get_values_uint;
 	    rb->PutRow = put_row_uint;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_uint;
 	    rb->PutValues = put_values_uint;
 	    rb->PutMonoValues = put_mono_values_uint;
@@ -1105,7 +1107,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_uint;
 	    rb->GetValues = get_values_uint;
 	    rb->PutRow = put_row_uint;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_uint;
 	    rb->PutValues = put_values_uint;
 	    rb->PutMonoValues = put_mono_values_uint;
@@ -1121,7 +1123,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_ubyte;
 	    rb->GetValues = get_values_ubyte;
 	    rb->PutRow = put_row_ubyte;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_ubyte;
 	    rb->PutValues = put_values_ubyte;
 	    rb->PutMonoValues = put_mono_values_ubyte;
@@ -1136,7 +1138,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_ushort;
 	    rb->GetValues = get_values_ushort;
 	    rb->PutRow = put_row_ushort;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_ushort;
 	    rb->PutValues = put_values_ushort;
 	    rb->PutMonoValues = put_mono_values_ushort;
@@ -1151,7 +1153,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow = get_row_uint;
 	    rb->GetValues = get_values_uint;
 	    rb->PutRow = put_row_uint;
-	    rb->PutRowRGB = NULL;
+	    rb->PutRowRGB = nullptr;
 	    rb->PutMonoRow = put_mono_row_uint;
 	    rb->PutValues = put_values_uint;
 	    rb->PutMonoValues = put_mono_values_uint;
@@ -1175,13 +1177,13 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
     /* free old buffer storage */
     if (rb->Data) {
 	free(rb->Data);
-	rb->Data = NULL;
+	rb->Data = nullptr;
     }
 
     if (width > 0 && height > 0) {
 	/* allocate new buffer storage */
 	rb->Data = malloc(width * height * pixelSize);
-	if (rb->Data == NULL) {
+	if (rb->Data == nullptr) {
 	    rb->Width = 0;
 	    rb->Height = 0;
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY,
@@ -1233,7 +1235,7 @@ alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
     }
 
     arb->Data = malloc(width * height * sizeof(GLubyte));
-    if (arb->Data == NULL) {
+    if (arb->Data == nullptr) {
 	arb->Width = 0;
 	arb->Height = 0;
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "software alpha buffer allocation");
@@ -1259,7 +1261,7 @@ delete_renderbuffer_alpha8(struct gl_renderbuffer *arb)
     ASSERT(arb->Wrapped);
     ASSERT(arb != arb->Wrapped);
     arb->Wrapped->Delete(arb->Wrapped);
-    arb->Wrapped = NULL;
+    arb->Wrapped = nullptr;
     delete arb;
 }
 
@@ -1268,7 +1270,7 @@ static void *
 get_pointer_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 		   GLint x, GLint y)
 {
-    return NULL;   /* don't allow direct access! */
+    return nullptr;   /* don't allow direct access! */
 }
 
 
@@ -1433,13 +1435,13 @@ copy_buffer_alpha8(struct gl_renderbuffer* dst, struct gl_renderbuffer* src)
 
 
 /**
- * Default GetPointer routine.  Always return NULL to indicate that
+ * Default GetPointer routine.  Always return nullptr to indicate that
  * direct buffer access is not supported.
  */
 static void *
 nop_get_pointer(GLcontext *ctx, struct gl_renderbuffer *rb, GLint x, GLint y)
 {
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1449,8 +1451,7 @@ nop_get_pointer(GLcontext *ctx, struct gl_renderbuffer *rb, GLint x, GLint y)
 void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 {
-    _glthread_INIT_MUTEX(rb->Mutex);
-
+    /* Mutex auto-initializes as std::mutex default-constructs */
     rb->Magic = RB_MAGIC;
     rb->ClassID = 0;
     rb->Name = name;
@@ -1460,7 +1461,7 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
     /* The rest of these should be set later by the caller of this function or
      * the AllocStorage method:
      */
-    rb->AllocStorage = NULL;
+    rb->AllocStorage = nullptr;
 
     rb->Width = 0;
     rb->Height = 0;
@@ -1472,21 +1473,21 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
     rb->IndexBits = 0;
     rb->DepthBits = 0;
     rb->StencilBits = 0;
-    rb->Data = NULL;
+    rb->Data = nullptr;
 
-    /* Point back to ourself so that we don't have to check for Wrapped==NULL
+    /* Point back to ourself so that we don't have to check for Wrapped==nullptr
      * all over the drivers.
      */
     rb->Wrapped = rb;
 
     rb->GetPointer = nop_get_pointer;
-    rb->GetRow = NULL;
-    rb->GetValues = NULL;
-    rb->PutRow = NULL;
-    rb->PutRowRGB = NULL;
-    rb->PutMonoRow = NULL;
-    rb->PutValues = NULL;
-    rb->PutMonoValues = NULL;
+    rb->GetRow = nullptr;
+    rb->GetValues = nullptr;
+    rb->PutRow = nullptr;
+    rb->PutRowRGB = nullptr;
+    rb->PutMonoRow = nullptr;
+    rb->PutValues = nullptr;
+    rb->PutMonoValues = nullptr;
 }
 
 
@@ -1574,7 +1575,7 @@ _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	else if (b == BUFFER_BACK_RIGHT && !backRight)
 	    continue;
 
-	assert(fb->Attachment[b].Renderbuffer == NULL);
+	assert(fb->Attachment[b].Renderbuffer == nullptr);
 
 	rb = _mesa_new_renderbuffer(ctx, 0);
 	if (!rb) {
@@ -1643,7 +1644,7 @@ _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	else if (b == BUFFER_BACK_RIGHT && !backRight)
 	    continue;
 
-	assert(fb->Attachment[b].Renderbuffer == NULL);
+	assert(fb->Attachment[b].Renderbuffer == nullptr);
 
 	rb = _mesa_new_renderbuffer(ctx, 0);
 	if (!rb) {
@@ -1741,7 +1742,7 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	arb->PutMonoValues  = put_mono_values_alpha8;
 
 	/* clear the pointer to avoid assertion/sanity check failure later */
-	fb->Attachment[b].Renderbuffer = NULL;
+	fb->Attachment[b].Renderbuffer = nullptr;
 
 	/* plug the alpha renderbuffer into the colorbuffer attachment */
 	_mesa_add_renderbuffer(fb, b, arb);
@@ -1792,7 +1793,7 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 	return GL_FALSE;
     }
 
-    assert(fb->Attachment[BUFFER_DEPTH].Renderbuffer == NULL);
+    assert(fb->Attachment[BUFFER_DEPTH].Renderbuffer == nullptr);
 
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
@@ -1836,7 +1837,7 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 	return GL_FALSE;
     }
 
-    assert(fb->Attachment[BUFFER_STENCIL].Renderbuffer == NULL);
+    assert(fb->Attachment[BUFFER_STENCIL].Renderbuffer == nullptr);
 
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
@@ -1880,7 +1881,7 @@ _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 	return GL_FALSE;
     }
 
-    assert(fb->Attachment[BUFFER_ACCUM].Renderbuffer == NULL);
+    assert(fb->Attachment[BUFFER_ACCUM].Renderbuffer == nullptr);
 
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
@@ -1925,7 +1926,7 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
     for (i = 0; i < numBuffers; i++) {
 	struct gl_renderbuffer *rb = _mesa_new_renderbuffer(ctx, 0);
 
-	assert(fb->Attachment[BUFFER_AUX0 + i].Renderbuffer == NULL);
+	assert(fb->Attachment[BUFFER_AUX0 + i].Renderbuffer == nullptr);
 
 	if (!rb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating accum buffer");
@@ -1969,13 +1970,13 @@ _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
 	if (fb->Visual.rgbMode) {
 	    assert(fb->Visual.redBits == fb->Visual.greenBits);
 	    assert(fb->Visual.redBits == fb->Visual.blueBits);
-	    _mesa_add_color_renderbuffers(NULL, fb,
+	    _mesa_add_color_renderbuffers(nullptr, fb,
 					  fb->Visual.redBits,
 					  fb->Visual.alphaBits,
 					  frontLeft, backLeft,
 					  frontRight, backRight);
 	} else {
-	    _mesa_add_color_index_renderbuffers(NULL, fb,
+	    _mesa_add_color_index_renderbuffers(nullptr, fb,
 						fb->Visual.indexBits,
 						frontLeft, backLeft,
 						frontRight, backRight);
@@ -1984,12 +1985,12 @@ _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
 
     if (depth) {
 	assert(fb->Visual.depthBits > 0);
-	_mesa_add_depth_renderbuffer(NULL, fb, fb->Visual.depthBits);
+	_mesa_add_depth_renderbuffer(nullptr, fb, fb->Visual.depthBits);
     }
 
     if (stencil) {
 	assert(fb->Visual.stencilBits > 0);
-	_mesa_add_stencil_renderbuffer(NULL, fb, fb->Visual.stencilBits);
+	_mesa_add_stencil_renderbuffer(nullptr, fb, fb->Visual.stencilBits);
     }
 
     if (accum) {
@@ -1997,7 +1998,7 @@ _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
 	assert(fb->Visual.accumRedBits > 0);
 	assert(fb->Visual.accumGreenBits > 0);
 	assert(fb->Visual.accumBlueBits > 0);
-	_mesa_add_accum_renderbuffer(NULL, fb,
+	_mesa_add_accum_renderbuffer(nullptr, fb,
 				     fb->Visual.accumRedBits,
 				     fb->Visual.accumGreenBits,
 				     fb->Visual.accumBlueBits,
@@ -2007,14 +2008,14 @@ _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
     if (aux) {
 	assert(fb->Visual.rgbMode);
 	assert(fb->Visual.numAuxBuffers > 0);
-	_mesa_add_aux_renderbuffers(NULL, fb, fb->Visual.redBits,
+	_mesa_add_aux_renderbuffers(nullptr, fb, fb->Visual.redBits,
 				    fb->Visual.numAuxBuffers);
     }
 
     if (alpha) {
 	assert(fb->Visual.rgbMode);
 	assert(fb->Visual.alphaBits > 0);
-	_mesa_add_alpha_renderbuffers(NULL, fb, fb->Visual.alphaBits,
+	_mesa_add_alpha_renderbuffers(nullptr, fb, fb->Visual.alphaBits,
 				      frontLeft, backLeft,
 				      frontRight, backRight);
     }
@@ -2044,7 +2045,7 @@ _mesa_add_renderbuffer(struct gl_framebuffer *fb,
      */
     assert(bufferName == BUFFER_DEPTH ||
 	   bufferName == BUFFER_STENCIL ||
-	   fb->Attachment[bufferName].Renderbuffer == NULL);
+	   fb->Attachment[bufferName].Renderbuffer == nullptr);
 
     /* winsys vs. user-created buffer cross check */
     if (fb->Name) {
@@ -2090,9 +2091,9 @@ _mesa_remove_renderbuffer(struct gl_framebuffer *fb, GLuint bufferName)
     if (!rb)
 	return;
 
-    _mesa_reference_renderbuffer(&rb, NULL);
+    _mesa_reference_renderbuffer(&rb, nullptr);
 
-    fb->Attachment[bufferName].Renderbuffer = NULL;
+    fb->Attachment[bufferName].Renderbuffer = nullptr;
 }
 
 
@@ -2117,30 +2118,32 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
 	struct gl_renderbuffer *oldRb = *ptr;
 
 	assert(oldRb->Magic == RB_MAGIC);
-	_glthread_LOCK_MUTEX(oldRb->Mutex);
-	assert(oldRb->Magic == RB_MAGIC);
-	ASSERT(oldRb->RefCount > 0);
-	oldRb->RefCount--;
-	/*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
-	deleteFlag = (oldRb->RefCount == 0);
-	_glthread_UNLOCK_MUTEX(oldRb->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(oldRb->Mutex);
+	    assert(oldRb->Magic == RB_MAGIC);
+	    ASSERT(oldRb->RefCount > 0);
+	    oldRb->RefCount--;
+	    /*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
+	    deleteFlag = (oldRb->RefCount == 0);
+	}
 
 	if (deleteFlag) {
 	    oldRb->Magic = 0; /* now invalid memory! */
 	    oldRb->Delete(oldRb);
 	}
 
-	*ptr = NULL;
+	*ptr = nullptr;
     }
     assert(!*ptr);
 
     if (rb) {
 	assert(rb->Magic == RB_MAGIC);
 	/* reference new renderbuffer */
-	_glthread_LOCK_MUTEX(rb->Mutex);
-	rb->RefCount++;
-	/*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
-	_glthread_UNLOCK_MUTEX(rb->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(rb->Mutex);
+	    rb->RefCount++;
+	    /*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
+	}
 	*ptr = rb;
     }
 }
@@ -2158,7 +2161,7 @@ _mesa_new_depthstencil_renderbuffer(GLcontext *ctx, GLuint name)
 
     dsrb = _mesa_new_renderbuffer(ctx, name);
     if (!dsrb)
-	return NULL;
+	return nullptr;
 
     /* init fields not covered by _mesa_new_renderbuffer() */
     dsrb->InternalFormat = GL_DEPTH24_STENCIL8_EXT;

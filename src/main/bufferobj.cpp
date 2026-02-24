@@ -37,6 +37,8 @@
 #include "context.h"
 #include "bufferobj.h"
 
+#include <mutex>
+
 
 /**
  * Get the buffer object bound to the specified target in a GL context.
@@ -45,12 +47,12 @@
  * \param target  Buffer object target to be retrieved.  Currently this must
  *                be either \c GL_ARRAY_BUFFER or \c GL_ELEMENT_ARRAY_BUFFER.
  * \return   A pointer to the buffer object bound to \c target in the
- *           specified context or \c NULL if \c target is invalid.
+ *           specified context or \c nullptr if \c target is invalid.
  */
 static INLINE struct gl_buffer_object *
 get_buffer(GLcontext *ctx, GLenum target)
 {
-    struct gl_buffer_object * bufObj = NULL;
+    struct gl_buffer_object * bufObj = nullptr;
 
     switch (target) {
 	case GL_ARRAY_BUFFER_ARB:
@@ -67,7 +69,7 @@ get_buffer(GLcontext *ctx, GLenum target)
 	    break;
 	default:
 	    /* error must be recorded by caller */
-	    return NULL;
+	    return nullptr;
     }
 
     /* bufObj should point to NullBufferObj or a user-created buffer object */
@@ -87,7 +89,7 @@ get_buffer(GLcontext *ctx, GLenum target)
  * \param size    Size, in bytes, of the subdata range.
  * \param caller  Name of calling function for recording errors.
  * \return   A pointer to the buffer object bound to \c target in the
- *           specified context or \c NULL if any of the parameter or state
+ *           specified context or \c nullptr if any of the parameter or state
  *           conditions for \c glBufferSubDataARB or \c glGetBufferSubDataARB
  *           are invalid.
  *
@@ -102,32 +104,32 @@ buffer_object_subdata_range_good(GLcontext * ctx, GLenum target,
 
     if (size < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "%s(size < 0)", caller);
-	return NULL;
+	return nullptr;
     }
 
     if (offset < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "%s(offset < 0)", caller);
-	return NULL;
+	return nullptr;
     }
 
     bufObj = get_buffer(ctx, target);
     if (!bufObj) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "%s(target)", caller);
-	return NULL;
+	return nullptr;
     }
     if (bufObj->Name == 0) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "%s", caller);
-	return NULL;
+	return nullptr;
     }
     if (offset + size > (GLsizeiptrARB)bufObj->Data.size()) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "%s(size + offset > buffer size)", caller);
-	return NULL;
+	return nullptr;
     }
     if (bufObj->Pointer) {
 	/* Buffer is currently mapped */
 	_mesa_error(ctx, GL_INVALID_OPERATION, "%s", caller);
-	return NULL;
+	return nullptr;
     }
 
     return bufObj;
@@ -144,10 +146,7 @@ struct gl_buffer_object *
 _mesa_new_buffer_object(GLcontext *ctx, GLuint name, GLenum target)
 {
     (void) ctx;
-
-    auto *obj = new gl_buffer_object{};
-    _mesa_initialize_buffer_object(obj, name, target);
-    return obj;
+    return new gl_buffer_object(name, target);
 }
 
 
@@ -183,33 +182,13 @@ _mesa_unbind_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 
 
 /**
- * Initialize a buffer object to default values.
- */
-void
-_mesa_initialize_buffer_object(struct gl_buffer_object *obj,
-			       GLuint name, GLenum target)
-{
-    (void) target;
-
-    obj->RefCount = 1;
-    obj->Name = name;
-    obj->Usage = GL_STATIC_DRAW_ARB;
-    obj->Access = GL_READ_WRITE_ARB;
-    obj->Pointer = NULL;
-    obj->OnCard = GL_FALSE;
-    obj->Data.clear();
-}
-
-
-/**
  * Add the given buffer object to the buffer object pool.
  */
 void
 _mesa_save_buffer_object(GLcontext *ctx, struct gl_buffer_object *obj)
 {
     if (obj->Name > 0) {
-	/* insert into hash table */
-	_mesa_HashInsert(ctx->Shared->BufferObjects, obj->Name, obj);
+	ctx->Shared->insert_buffer(obj->Name, obj);
     }
 }
 
@@ -222,15 +201,14 @@ void
 _mesa_remove_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 {
     if (bufObj->Name > 0) {
-	/* remove from hash table */
-	_mesa_HashRemove(ctx->Shared->BufferObjects, bufObj->Name);
+	ctx->Shared->remove_buffer(bufObj->Name);
     }
 }
 
 
 /**
  * Allocate space for and store data in a buffer object.  Any data that was
- * previously stored in the buffer object is lost.  If \c data is \c NULL,
+ * previously stored in the buffer object is lost.  If \c data is \c nullptr,
  * memory will be allocated, but no copy will occur.
  *
  * This function is intended to be called via
@@ -241,7 +219,7 @@ _mesa_remove_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
  * \param target  Buffer object target on which to operate.
  * \param size    Size, in bytes, of the new data store.
  * \param data    Pointer to the data to store in the buffer object.  This
- *                pointer may be \c NULL.
+ *                pointer may be \c nullptr.
  * \param usage   Hints about how the data will be used.
  * \param bufObj  Object to be used.
  *
@@ -267,7 +245,7 @@ _mesa_buffer_data(GLcontext *ctx, GLenum target, GLsizeiptrARB size,
 /**
  * Replace data in a subrange of buffer object.  If the data range
  * specified by \c size + \c offset extends beyond the end of the buffer or
- * if \c data is \c NULL, no copy is performed.
+ * if \c data is \c nullptr, no copy is performed.
  *
  * This function is intended to be called by
  * \c dd_function_table::BufferSubData.  This function need not set GL error
@@ -302,7 +280,7 @@ _mesa_buffer_subdata(GLcontext *ctx, GLenum target, GLintptrARB offset,
 /**
  * Retrieve data from a subrange of buffer object.  If the data range
  * specified by \c size + \c offset extends beyond the end of the buffer or
- * if \c data is \c NULL, no copy is performed.
+ * if \c data is \c nullptr, no copy is performed.
  *
  * This function is intended to be called by
  * \c dd_function_table::BufferGetSubData.  This function need not set GL error
@@ -358,7 +336,7 @@ _mesa_buffer_map(GLcontext *ctx, GLenum target, GLenum access,
     /* Just return a direct pointer to the data */
     if (bufObj->Pointer) {
 	/* already mapped! */
-	return NULL;
+	return nullptr;
     }
     bufObj->Pointer = bufObj->Data.data();
     return bufObj->Pointer;
@@ -382,7 +360,7 @@ _mesa_buffer_unmap(GLcontext *ctx, GLenum target,
     (void) target;
     ASSERT(!bufObj->OnCard);
     /* XXX we might assert here that bufObj->Pointer is non-null */
-    bufObj->Pointer = NULL;
+    bufObj->Pointer = nullptr;
     return GL_TRUE;
 }
 
@@ -463,16 +441,12 @@ _mesa_validate_pbo_access(GLuint dimensions,
 
 /**
  * Return the gl_buffer_object for the given ID.
- * Always return NULL for ID 0.
+ * Always return nullptr for ID 0.
  */
 struct gl_buffer_object *
 _mesa_lookup_bufferobj(GLcontext *ctx, GLuint buffer)
 {
-    if (buffer == 0)
-	return NULL;
-    else
-	return (struct gl_buffer_object *)
-	       _mesa_HashLookup(ctx->Shared->BufferObjects, buffer);
+    return ctx->Shared->lookup_buffer(buffer);
 }
 
 
@@ -486,8 +460,8 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_buffer_object *oldBufObj;
-    struct gl_buffer_object *newBufObj = NULL;
-    struct gl_buffer_object **bindTarget = NULL;
+    struct gl_buffer_object *newBufObj = nullptr;
+    struct gl_buffer_object **bindTarget = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     switch (target) {
@@ -575,7 +549,7 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 	return;
     }
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     for (i = 0; i < n; i++) {
 	struct gl_buffer_object *bufObj = _mesa_lookup_bufferobj(ctx, ids[i]);
@@ -654,8 +628,6 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 	    _mesa_unbind_buffer_object(ctx, bufObj);
 	}
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -685,7 +657,7 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
     /*
      * This must be atomic (generation and allocation of buffer object IDs)
      */
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
+    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
     first = _mesa_HashFindFreeKeyBlock(ctx->Shared->BufferObjects, n);
 
@@ -696,15 +668,12 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
 	GLenum target = 0;
 	bufObj = ctx->Driver.NewBufferObject(ctx, name, target);
 	if (!bufObj) {
-	    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenBuffersARB");
 	    return;
 	}
 	_mesa_save_buffer_object(ctx, bufObj);
 	buffer[i] = first + i;
     }
-
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
 }
 
 
@@ -722,9 +691,10 @@ _mesa_IsBufferARB(GLuint id)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-    bufObj = _mesa_lookup_bufferobj(ctx, id);
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	bufObj = _mesa_lookup_bufferobj(ctx, id);
+    }
 
     return bufObj ? GL_TRUE : GL_FALSE;
 }
@@ -827,7 +797,7 @@ _mesa_MapBufferARB(GLenum target, GLenum access)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_buffer_object * bufObj;
-    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
+    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, nullptr);
 
     switch (access) {
 	case GL_READ_ONLY_ARB:
@@ -837,21 +807,21 @@ _mesa_MapBufferARB(GLenum target, GLenum access)
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glMapBufferARB(access)");
-	    return NULL;
+	    return nullptr;
     }
 
     bufObj = get_buffer(ctx, target);
     if (!bufObj) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glMapBufferARB(target)");
-	return NULL;
+	return nullptr;
     }
     if (bufObj->Name == 0) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glMapBufferARB");
-	return NULL;
+	return nullptr;
     }
     if (bufObj->Pointer) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glMapBufferARB(already mapped)");
-	return NULL;
+	return nullptr;
     }
 
     ASSERT(ctx->Driver.MapBuffer);
@@ -893,7 +863,7 @@ _mesa_UnmapBufferARB(GLenum target)
     }
 
     bufObj->Access = GL_READ_WRITE_ARB; /* initial value, OK? */
-    bufObj->Pointer = NULL;
+    bufObj->Pointer = nullptr;
 
     return status;
 }
@@ -927,7 +897,7 @@ _mesa_GetBufferParameterivARB(GLenum target, GLenum pname, GLint *params)
 	    *params = bufObj->Access;
 	    break;
 	case GL_BUFFER_MAPPED_ARB:
-	    *params = (bufObj->Pointer != NULL);
+	    *params = (bufObj->Pointer != nullptr);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetBufferParameterivARB(pname)");

@@ -34,6 +34,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <mutex>
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -43,6 +44,7 @@
 #include "gllimits.h"		/* Hardwired parameters */
 #include "glapitable.h"
 #include "glthread.h"
+#include "hash.h"
 #include "math/m_matrix.h"	/* GLmatrix */
 #include "bitset.h"
 
@@ -1361,7 +1363,7 @@ struct gl_texture_image {
  * color palette.
  */
 struct gl_texture_object {
-    _glthread_Mutex Mutex;	/**< for thread safety */
+    mutable std::mutex Mutex;	/**< for thread safety */
     GLint RefCount;		/**< reference count */
     GLuint Name;			/**< the user-visible texture object ID */
     GLenum Target;               /**< GL_TEXTURE_1D, GL_TEXTURE_2D, etc. */
@@ -1576,13 +1578,21 @@ struct gl_attrib_node {
  * GL_ARB_vertex/pixel_buffer_object buffer object
  */
 struct gl_buffer_object {
-    GLint RefCount;
-    GLuint Name;
-    GLenum Usage;
-    GLenum Access;
-    GLvoid *Pointer;          /**< Only valid while buffer is mapped */
-    GLboolean OnCard;         /**< Is buffer in VRAM? (hardware drivers) */
+    GLint RefCount = 1;
+    GLuint Name = 0;
+    GLenum Usage = GL_STATIC_DRAW_ARB;
+    GLenum Access = GL_READ_WRITE_ARB;
+    GLvoid *Pointer = nullptr;          /**< Only valid while buffer is mapped */
+    GLboolean OnCard = GL_FALSE;         /**< Is buffer in VRAM? (hardware drivers) */
     std::vector<GLubyte> Data; /**< Storage in RAM; Data.size() is the byte count. */
+
+    /** Construct a new buffer object with the given name. */
+    gl_buffer_object(GLuint name, GLenum /*target*/)
+        : RefCount(1), Name(name), Usage(GL_STATIC_DRAW_ARB), Access(GL_READ_WRITE_ARB)
+    {}
+
+    /** Default constructor for zero/null buffer objects. */
+    gl_buffer_object() = default;
 };
 
 
@@ -2064,7 +2074,7 @@ struct gl_shader_state {
  * State which can be shared by multiple contexts:
  */
 struct gl_shared_state {
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLint RefCount;			   /**< Reference count */
     struct _mesa_HashTable *DisplayList;	   /**< Display lists hash table */
     struct _mesa_HashTable *TexObjects;	   /**< Texture objects hash table */
@@ -2087,7 +2097,7 @@ struct gl_shared_state {
      * \todo Improve the granularity of locking.
      */
     /*@{*/
-    _glthread_Mutex TexMutex;		   /**< texobj thread safety */
+    mutable std::mutex TexMutex;		   /**< texobj thread safety */
     GLuint TextureStateStamp;	           /**< state notification for shared tex  */
     /*@}*/
 
@@ -2129,6 +2139,111 @@ struct gl_shared_state {
     struct _mesa_HashTable *ArrayObjects;
 
     void *DriverData;  /**< Device driver shared state */
+
+    /** Texture object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_texture_object *lookup_texture(GLuint id) const {
+	return static_cast<struct gl_texture_object *>(
+	    _mesa_HashLookup(TexObjects, id));
+    }
+
+    /** Insert texture object into shared table (no locking). */
+    void insert_texture(GLuint id, struct gl_texture_object *obj) {
+	_mesa_HashInsert(TexObjects, id, obj);
+    }
+
+    /** Remove texture object from shared table by ID (no locking). */
+    void remove_texture(GLuint id) {
+	_mesa_HashRemove(TexObjects, id);
+    }
+
+#if FEATURE_ARB_vertex_buffer_object || FEATURE_ARB_pixel_buffer_object
+    /** Buffer object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_buffer_object *lookup_buffer(GLuint id) const {
+	if (id == 0)
+	    return nullptr;
+	return static_cast<struct gl_buffer_object *>(
+	    _mesa_HashLookup(BufferObjects, id));
+    }
+
+    /** Insert buffer object into shared table (no locking). */
+    void insert_buffer(GLuint id, struct gl_buffer_object *obj) {
+	_mesa_HashInsert(BufferObjects, id, obj);
+    }
+
+    /** Remove buffer object from shared table by ID (no locking). */
+    void remove_buffer(GLuint id) {
+	_mesa_HashRemove(BufferObjects, id);
+    }
+#endif
+
+    /** Array object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_array_object *lookup_arrayobj(GLuint id) const {
+	return static_cast<struct gl_array_object *>(
+	    _mesa_HashLookup(ArrayObjects, id));
+    }
+
+    /** Insert array object into shared table (no locking). */
+    void insert_arrayobj(GLuint id, struct gl_array_object *obj) {
+	_mesa_HashInsert(ArrayObjects, id, obj);
+    }
+
+    /** Remove array object from shared table by ID (no locking). */
+    void remove_arrayobj(GLuint id) {
+	_mesa_HashRemove(ArrayObjects, id);
+    }
+
+#if FEATURE_NV_vertex_program || FEATURE_NV_fragment_program
+    /** Program (vertex/fragment) lookup by ID (no locking). */
+    [[nodiscard]] struct gl_program *lookup_program(GLuint id) const {
+	return static_cast<struct gl_program *>(
+	    _mesa_HashLookup(Programs, id));
+    }
+
+    /** Insert program into shared table (no locking). */
+    void insert_program(GLuint id, struct gl_program *prog) {
+	_mesa_HashInsert(Programs, id, prog);
+    }
+
+    /** Remove program from shared table by ID (no locking). */
+    void remove_program(GLuint id) {
+	_mesa_HashRemove(Programs, id);
+    }
+#endif
+
+#if FEATURE_ARB_shader_objects
+    /** Shader/program object lookup by ID (no locking). */
+    [[nodiscard]] void *lookup_shader_object(GLuint name) const {
+	return _mesa_HashLookup(ShaderObjects, name);
+    }
+
+    /** Insert shader/program object into shared table (no locking). */
+    void insert_shader_object(GLuint name, void *obj) {
+	_mesa_HashInsert(ShaderObjects, name, obj);
+    }
+
+    /** Remove shader/program object from shared table by ID (no locking). */
+    void remove_shader_object(GLuint name) {
+	_mesa_HashRemove(ShaderObjects, name);
+    }
+#endif
+
+#if FEATURE_ATI_fragment_shader
+    /** ATI fragment shader lookup by ID (no locking). */
+    [[nodiscard]] struct ati_fragment_shader *lookup_ati_shader(GLuint id) const {
+	return static_cast<struct ati_fragment_shader *>(
+	    _mesa_HashLookup(ATIShaders, id));
+    }
+
+    /** Insert ATI fragment shader into shared table (no locking). */
+    void insert_ati_shader(GLuint id, struct ati_fragment_shader *s) {
+	_mesa_HashInsert(ATIShaders, id, s);
+    }
+
+    /** Remove ATI fragment shader from shared table by ID (no locking). */
+    void remove_ati_shader(GLuint id) {
+	_mesa_HashRemove(ATIShaders, id);
+    }
+#endif
 };
 
 
@@ -2146,7 +2261,7 @@ struct gl_shared_state {
 struct gl_renderbuffer {
 #define RB_MAGIC 0xaabbccdd
     int Magic; /** XXX TEMPORARY DEBUG INFO */
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLuint ClassID;        /**< Useful for drivers */
     GLuint Name;
     GLint RefCount;
@@ -2262,7 +2377,7 @@ struct gl_renderbuffer_attachment {
  * will make derived classes.
  */
 struct gl_framebuffer {
-    _glthread_Mutex Mutex;		   /**< for thread safety */
+    mutable std::mutex Mutex;		   /**< for thread safety */
     GLuint Name;      /* if zero, this is a window system framebuffer */
     GLint RefCount;
     GLboolean DeletePending;

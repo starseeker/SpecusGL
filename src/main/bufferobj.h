@@ -51,10 +51,6 @@ _mesa_delete_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj);
 _mesa_lookup_bufferobj(GLcontext *ctx, GLuint buffer);
 
 extern void
-_mesa_initialize_buffer_object(struct gl_buffer_object *obj,
-			       GLuint name, GLenum target);
-
-extern void
 _mesa_save_buffer_object(GLcontext *ctx, struct gl_buffer_object *obj);
 
 extern void

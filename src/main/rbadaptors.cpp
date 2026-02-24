@@ -38,6 +38,8 @@
 #include "renderbuffer.h"
 #include "rbadaptors.h"
 
+#include <mutex>
+
 
 static void
 Delete_wrapper(struct gl_renderbuffer *rb)
@@ -45,7 +47,7 @@ Delete_wrapper(struct gl_renderbuffer *rb)
     /* Decrement reference count on the buffer we're wrapping and delete
      * it if refcount hits zero.
      */
-    _mesa_reference_renderbuffer(&rb->Wrapped, NULL);
+    _mesa_reference_renderbuffer(&rb->Wrapped, nullptr);
 
     /* delete myself */
     _mesa_delete_renderbuffer(rb);
@@ -74,7 +76,7 @@ GetPointer_wrapper(GLcontext *ctx, struct gl_renderbuffer *rb,
     (void) rb;
     (void) x;
     (void) y;
-    return NULL;
+    return nullptr;
 }
 
 
@@ -213,9 +215,10 @@ _mesa_new_renderbuffer_16wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8)
 	ASSERT(rb8->DataType == GL_UNSIGNED_BYTE);
 	ASSERT(rb8->_BaseFormat == GL_RGBA);
 
-	_glthread_LOCK_MUTEX(rb8->Mutex);
-	rb8->RefCount++;
-	_glthread_UNLOCK_MUTEX(rb8->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(rb8->Mutex);
+	    rb8->RefCount++;
+	}
 
 	rb16->InternalFormat = rb8->InternalFormat;
 	rb16->_ActualFormat = rb8->_ActualFormat;
@@ -380,9 +383,10 @@ _mesa_new_renderbuffer_32wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8)
 	ASSERT(rb8->DataType == GL_UNSIGNED_BYTE);
 	ASSERT(rb8->_BaseFormat == GL_RGBA);
 
-	_glthread_LOCK_MUTEX(rb8->Mutex);
-	rb8->RefCount++;
-	_glthread_UNLOCK_MUTEX(rb8->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(rb8->Mutex);
+	    rb8->RefCount++;
+	}
 
 	rb32->InternalFormat = rb8->InternalFormat;
 	rb32->_ActualFormat = rb8->_ActualFormat;
@@ -547,9 +551,10 @@ _mesa_new_renderbuffer_32wrap16(GLcontext *ctx, struct gl_renderbuffer *rb16)
 	ASSERT(rb16->DataType == GL_UNSIGNED_SHORT);
 	ASSERT(rb16->_BaseFormat == GL_RGBA);
 
-	_glthread_LOCK_MUTEX(rb16->Mutex);
-	rb16->RefCount++;
-	_glthread_UNLOCK_MUTEX(rb16->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(rb16->Mutex);
+	    rb16->RefCount++;
+	}
 
 	rb32->InternalFormat = rb16->InternalFormat;
 	rb32->_ActualFormat = rb16->_ActualFormat;

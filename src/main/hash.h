@@ -34,6 +34,8 @@
 
 #include "glheader.h"
 
+#include <functional>
+
 
 
 
@@ -50,13 +52,11 @@ extern void _mesa_HashRemove(struct _mesa_HashTable *table, GLuint key);
 
 extern void
 _mesa_HashDeleteAll(struct _mesa_HashTable *table,
-		    void (*callback)(GLuint key, void *data, void *userData),
-		    void *userData);
+		    std::function<void(GLuint key, void *data)> callback);
 
 extern void
 _mesa_HashWalk(const struct _mesa_HashTable *table,
-	       void (*callback)(GLuint key, void *data, void *userData),
-	       void *userData);
+	       std::function<void(GLuint key, void *data)> callback);
 
 [[nodiscard]] extern GLuint _mesa_HashFirstEntry(struct _mesa_HashTable *table);
 

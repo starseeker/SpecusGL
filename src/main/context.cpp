@@ -141,6 +141,8 @@
 #endif
 #include "shader_api.h"
 
+#include <mutex>
+
 
 #ifndef MESA_VERBOSE
 int MESA_VERBOSE = 0;
@@ -198,7 +200,7 @@ _mesa_notifySwapBuffers(__GLcontext *gc)
  * \param alphaBits same as above.
  * \param numSamples not really used.
  *
- * \return pointer to new GLvisual or NULL if requested parameters can't be
+ * \return pointer to new GLvisual or nullptr if requested parameters can't be
  * met.
  *
  * \note Need to add params for level and numAuxBuffers (at least)
@@ -228,7 +230,7 @@ _mesa_create_visual(GLboolean rgbFlag,
 			         accumBlueBits, accumAlphaBits,
 			         numSamples)) {
 	delete vis;
-	return NULL;
+	return nullptr;
     }
     return vis;
 }
@@ -336,7 +338,7 @@ _mesa_destroy_visual(GLvisual *vis)
  *
  * \sa Used by one_time_init().
  */
-_glthread_DECLARE_STATIC_MUTEX(OneTimeLock);
+static std::mutex OneTimeLock;
 
 /**
  * Calls all the various one-time-init functions in Mesa.
@@ -352,7 +354,7 @@ one_time_init(GLcontext *ctx)
 {
     static GLboolean alreadyCalled = GL_FALSE;
     (void) ctx;
-    _glthread_LOCK_MUTEX(OneTimeLock);
+    std::lock_guard<std::mutex> lock(OneTimeLock);
     if (!alreadyCalled) {
 	GLuint i;
 
@@ -388,7 +390,6 @@ one_time_init(GLcontext *ctx)
 
 	alreadyCalled = GL_TRUE;
     }
-    _glthread_UNLOCK_MUTEX(OneTimeLock);
 }
 
 
@@ -396,9 +397,9 @@ one_time_init(GLcontext *ctx)
  * Allocate and initialize a shared context state structure.
  * Initializes the display list, texture objects and vertex programs hash
  * tables, allocates the texture objects. If it runs out of memory, frees
- * everything already allocated before returning NULL.
+ * everything already allocated before returning nullptr.
  *
- * \return pointer to a gl_shared_state structure on success, or NULL on
+ * \return pointer to a gl_shared_state structure on success, or nullptr on
  * failure.
  */
 static GLboolean
@@ -409,8 +410,6 @@ alloc_shared_state(GLcontext *ctx)
 	return GL_FALSE;
 
     ctx->Shared = ss;
-
-    _glthread_INIT_MUTEX(ss->Mutex);
 
     ss->DisplayList = _mesa_NewHashTable();
     ss->TexObjects = _mesa_NewHashTable();
@@ -468,7 +467,6 @@ alloc_shared_state(GLcontext *ctx)
     /* sanity check */
     assert(ss->Default1D->RefCount == 1);
 
-    _glthread_INIT_MUTEX(ss->TexMutex);
     ss->TextureStateStamp = 0;
 
 #if FEATURE_EXT_framebuffer_object
@@ -483,7 +481,7 @@ alloc_shared_state(GLcontext *ctx)
     return GL_TRUE;
 
 cleanup:
-    /* Ran out of memory at some point.  Free everything and return NULL */
+    /* Ran out of memory at some point.  Free everything and return nullptr */
     if (ss->DisplayList)
 	_mesa_DeleteHashTable(ss->DisplayList);
     if (ss->TexObjects)
@@ -541,140 +539,6 @@ cleanup:
 
 
 /**
- * Callback for deleting a display list.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_displaylist_cb(GLuint id, void *data, void *userData)
-{
-    struct mesa_display_list *list = (struct mesa_display_list *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    _mesa_delete_list(ctx, list);
-}
-
-/**
- * Callback for deleting a texture object.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_texture_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_texture_object *texObj = (struct gl_texture_object *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    ctx->Driver.DeleteTexture(ctx, texObj);
-}
-
-/**
- * Callback for deleting a program object.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_program_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_program *prog = (struct gl_program *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    ctx->Driver.DeleteProgram(ctx, prog);
-}
-
-/**
- * Callback for deleting an ATI fragment shader object.
- * Called by _mesa_HashDeleteAll().
- */
-static void
-delete_fragshader_cb(GLuint id, void *data, void *userData)
-{
-    struct ati_fragment_shader *shader = (struct ati_fragment_shader *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    _mesa_delete_ati_fragment_shader(ctx, shader);
-}
-
-/**
- * Callback for deleting a buffer object.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_bufferobj_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_buffer_object *bufObj = (struct gl_buffer_object *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    ctx->Driver.DeleteBuffer(ctx, bufObj);
-}
-
-/**
- * Callback for deleting an array object.  Called by _mesa_HashDeleteAll().
- */
-static void
-delete_arrayobj_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_array_object *arrayObj = (struct gl_array_object *) data;
-    GLcontext *ctx = (GLcontext *) userData;
-    _mesa_delete_array_object(ctx, arrayObj);
-}
-
-/**
- * Callback for freeing shader program data. Call it before delete_shader_cb
- * to avoid memory access error.
- */
-static void
-free_shader_program_data_cb(GLuint id, void *data, void *userData)
-{
-    GLcontext *ctx = (GLcontext *) userData;
-    struct gl_shader_program *shProg = (struct gl_shader_program *) data;
-
-    if (shProg->Type == GL_SHADER_PROGRAM_MESA) {
-	_mesa_free_shader_program_data(ctx, shProg);
-    }
-}
-
-/**
- * Callback for deleting shader and shader programs objects.
- * Called by _mesa_HashDeleteAll().
- */
-static void
-delete_shader_cb(GLuint id, void *data, void *userData)
-{
-    GLcontext *ctx = (GLcontext *) userData;
-    struct gl_shader *sh = (struct gl_shader *) data;
-    if (sh->Type == GL_FRAGMENT_SHADER || sh->Type == GL_VERTEX_SHADER) {
-	_mesa_free_shader(ctx, sh);
-    } else {
-	struct gl_shader_program *shProg = (struct gl_shader_program *) data;
-	ASSERT(shProg->Type == GL_SHADER_PROGRAM_MESA);
-	_mesa_free_shader_program(ctx, shProg);
-    }
-}
-
-/**
- * Callback for deleting a framebuffer object.  Called by _mesa_HashDeleteAll()
- */
-static void
-delete_framebuffer_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_framebuffer *fb = (struct gl_framebuffer *) data;
-    /* The fact that the framebuffer is in the hashtable means its refcount
-     * is one, but we're removing from the hashtable now.  So clear refcount.
-     */
-    /*assert(fb->RefCount == 1);*/
-    fb->RefCount = 0;
-
-    /* NOTE: Delete should always be defined but there are two reports
-     * of it being NULL (bugs 13507, 14293).  Work-around for now.
-     */
-    if (fb->Delete)
-	fb->Delete(fb);
-}
-
-/**
- * Callback for deleting a renderbuffer object. Called by _mesa_HashDeleteAll()
- */
-static void
-delete_renderbuffer_cb(GLuint id, void *data, void *userData)
-{
-    struct gl_renderbuffer *rb = (struct gl_renderbuffer *) data;
-    rb->RefCount = 0;  /* see comment for FBOs above */
-    if (rb->Delete)
-	rb->Delete(rb);
-}
-
-
-
-/**
  * Deallocate a shared state object and all children structures.
  *
  * \param ctx GL context.
@@ -692,11 +556,15 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
     /*
      * Free display lists
      */
-    _mesa_HashDeleteAll(ss->DisplayList, delete_displaylist_cb, ctx);
+    _mesa_HashDeleteAll(ss->DisplayList, [ctx](GLuint, void *data) {
+	_mesa_delete_list(ctx, static_cast<mesa_display_list *>(data));
+    });
     _mesa_DeleteHashTable(ss->DisplayList);
 
 #if defined(FEATURE_NV_vertex_program) || defined(FEATURE_NV_fragment_program)
-    _mesa_HashDeleteAll(ss->Programs, delete_program_cb, ctx);
+    _mesa_HashDeleteAll(ss->Programs, [ctx](GLuint, void *data) {
+	ctx->Driver.DeleteProgram(ctx, static_cast<gl_program *>(data));
+    });
     _mesa_DeleteHashTable(ss->Programs);
 #endif
 #if FEATURE_ARB_vertex_program
@@ -707,29 +575,64 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
 #endif
 
 #if FEATURE_ATI_fragment_shader
-    _mesa_HashDeleteAll(ss->ATIShaders, delete_fragshader_cb, ctx);
+    _mesa_HashDeleteAll(ss->ATIShaders, [ctx](GLuint, void *data) {
+	_mesa_delete_ati_fragment_shader(ctx, static_cast<ati_fragment_shader *>(data));
+    });
     _mesa_DeleteHashTable(ss->ATIShaders);
     _mesa_delete_ati_fragment_shader(ctx, ss->DefaultFragmentShader);
 #endif
 
 #if FEATURE_ARB_vertex_buffer_object || FEATURE_ARB_pixel_buffer_object
-    _mesa_HashDeleteAll(ss->BufferObjects, delete_bufferobj_cb, ctx);
+    _mesa_HashDeleteAll(ss->BufferObjects, [ctx](GLuint, void *data) {
+	ctx->Driver.DeleteBuffer(ctx, static_cast<gl_buffer_object *>(data));
+    });
     _mesa_DeleteHashTable(ss->BufferObjects);
 #endif
 
-    _mesa_HashDeleteAll(ss->ArrayObjects, delete_arrayobj_cb, ctx);
+    _mesa_HashDeleteAll(ss->ArrayObjects, [ctx](GLuint, void *data) {
+	_mesa_delete_array_object(ctx, static_cast<gl_array_object *>(data));
+    });
     _mesa_DeleteHashTable(ss->ArrayObjects);
 
 #if FEATURE_ARB_shader_objects
-    _mesa_HashWalk(ss->ShaderObjects, free_shader_program_data_cb, ctx);
-    _mesa_HashDeleteAll(ss->ShaderObjects, delete_shader_cb, ctx);
+    _mesa_HashWalk(ss->ShaderObjects, [ctx](GLuint, void *data) {
+	auto *shProg = static_cast<gl_shader_program *>(data);
+	if (shProg->Type == GL_SHADER_PROGRAM_MESA)
+	    _mesa_free_shader_program_data(ctx, shProg);
+    });
+    _mesa_HashDeleteAll(ss->ShaderObjects, [ctx](GLuint, void *data) {
+	auto *sh = static_cast<gl_shader *>(data);
+	if (sh->Type == GL_FRAGMENT_SHADER || sh->Type == GL_VERTEX_SHADER) {
+	    _mesa_free_shader(ctx, sh);
+	} else {
+	    auto *shProg = static_cast<gl_shader_program *>(data);
+	    ASSERT(shProg->Type == GL_SHADER_PROGRAM_MESA);
+	    _mesa_free_shader_program(ctx, shProg);
+	}
+    });
     _mesa_DeleteHashTable(ss->ShaderObjects);
 #endif
 
 #if FEATURE_EXT_framebuffer_object
-    _mesa_HashDeleteAll(ss->FrameBuffers, delete_framebuffer_cb, ctx);
+    _mesa_HashDeleteAll(ss->FrameBuffers, [](GLuint, void *data) {
+	auto *fb = static_cast<gl_framebuffer *>(data);
+	/* The fact that the framebuffer is in the hashtable means its refcount
+	 * is one, but we're removing from the hashtable now.  So clear refcount.
+	 */
+	fb->RefCount = 0;
+	/* NOTE: Delete should always be defined but there are two reports
+	 * of it being nullptr (bugs 13507, 14293).  Work-around for now.
+	 */
+	if (fb->Delete)
+	    fb->Delete(fb);
+    });
     _mesa_DeleteHashTable(ss->FrameBuffers);
-    _mesa_HashDeleteAll(ss->RenderBuffers, delete_renderbuffer_cb, ctx);
+    _mesa_HashDeleteAll(ss->RenderBuffers, [](GLuint, void *data) {
+	auto *rb = static_cast<gl_renderbuffer *>(data);
+	rb->RefCount = 0;  /* see comment for FBOs above */
+	if (rb->Delete)
+	    rb->Delete(rb);
+    });
     _mesa_DeleteHashTable(ss->RenderBuffers);
 #endif
 
@@ -745,10 +648,10 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
     ctx->Driver.DeleteTexture(ctx, ss->DefaultCubeMap);
     ctx->Driver.DeleteTexture(ctx, ss->DefaultRect);
     /* all other textures */
-    _mesa_HashDeleteAll(ss->TexObjects, delete_texture_cb, ctx);
+    _mesa_HashDeleteAll(ss->TexObjects, [ctx](GLuint, void *data) {
+	ctx->Driver.DeleteTexture(ctx, static_cast<gl_texture_object *>(data));
+    });
     _mesa_DeleteHashTable(ss->TexObjects);
-
-    _glthread_DESTROY_MUTEX(ss->Mutex);
 
     delete ss;
 }
@@ -1009,7 +912,7 @@ init_attrib_groups(GLcontext *ctx)
 static int
 generic_nop(void)
 {
-    _mesa_problem(NULL, "User called no-op dispatch function (an unsupported extension function?)");
+    _mesa_problem(nullptr, "User called no-op dispatch function (an unsupported extension function?)");
     return 0;
 }
 
@@ -1051,7 +954,7 @@ alloc_dispatch_table(void)
  * \param ctx the context to initialize
  * \param visual describes the visual attributes for this context
  * \param share_list points to context to share textures, display lists,
- *        etc with, or NULL
+ *        etc with, or nullptr
  * \param driverFunctions table of device driver functions for this context
  *        to use
  * \param driverContext pointer to driver-specific context data
@@ -1071,10 +974,10 @@ _mesa_initialize_context(GLcontext *ctx,
     one_time_init(ctx);
 
     ctx->Visual = *visual;
-    ctx->DrawBuffer = NULL;
-    ctx->ReadBuffer = NULL;
-    ctx->WinSysDrawBuffer = NULL;
-    ctx->WinSysReadBuffer = NULL;
+    ctx->DrawBuffer = nullptr;
+    ctx->ReadBuffer = nullptr;
+    ctx->WinSysDrawBuffer = nullptr;
+    ctx->WinSysReadBuffer = nullptr;
 
     /* Plug in driver functions and context pointer here.
      * This is important because when we call alloc_shared_state() below
@@ -1093,9 +996,10 @@ _mesa_initialize_context(GLcontext *ctx,
 	    return GL_FALSE;
 	}
     }
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-    ctx->Shared->RefCount++;
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	ctx->Shared->RefCount++;
+    }
 
     if (!init_attrib_groups(ctx)) {
 	free_shared_state(ctx, ctx->Shared);
@@ -1109,7 +1013,7 @@ _mesa_initialize_context(GLcontext *ctx,
 	free_shared_state(ctx, ctx->Shared);
 	if (ctx->Exec) {
 	    delete ctx->Exec;
-	    ctx->Exec = NULL;
+	    ctx->Exec = nullptr;
 	}
     }
     _mesa_init_exec_table(ctx->Exec);
@@ -1119,16 +1023,16 @@ _mesa_initialize_context(GLcontext *ctx,
     _mesa_install_save_vtxfmt(ctx, &ctx->ListState.ListVtxfmt);
     /* Neutral tnl module stuff */
     _mesa_init_exec_vtxfmt(ctx);
-    ctx->TnlModule.Current = NULL;
+    ctx->TnlModule.Current = nullptr;
     ctx->TnlModule.SwapCount = 0;
 #endif
 
     ctx->FragmentProgram._MaintainTexEnvProgram
-	= (_mesa_getenv("MESA_TEX_PROG") != NULL);
+	= (_mesa_getenv("MESA_TEX_PROG") != nullptr);
     ctx->FragmentProgram._UseTexEnvProgram = ctx->FragmentProgram._MaintainTexEnvProgram;
 
     ctx->VertexProgram._MaintainTnlProgram
-	= (_mesa_getenv("MESA_TNL_PROG") != NULL);
+	= (_mesa_getenv("MESA_TNL_PROG") != nullptr);
     if (ctx->VertexProgram._MaintainTnlProgram) {
 	/* this is required... */
 	ctx->FragmentProgram._MaintainTexEnvProgram = GL_TRUE;
@@ -1147,12 +1051,12 @@ _mesa_initialize_context(GLcontext *ctx,
  * the rendering context.
  *
  * \param visual a GLvisual pointer (we copy the struct contents)
- * \param share_list another context to share display lists with or NULL
+ * \param share_list another context to share display lists with or nullptr
  * \param driverFunctions points to the dd_function_table into which the
  *        driver has plugged in all its special functions.
  * \param driverCtx points to the device driver's private context state
  *
- * \return pointer to a new __GLcontextRec or NULL if error.
+ * \return pointer to a new __GLcontextRec or nullptr if error.
  */
 GLcontext *
 _mesa_create_context(const GLvisual *visual,
@@ -1172,7 +1076,7 @@ _mesa_create_context(const GLvisual *visual,
 	return ctx;
     } else {
 	delete ctx;
-	return NULL;
+	return nullptr;
     }
 }
 
@@ -1191,7 +1095,7 @@ _mesa_free_context_data(GLcontext *ctx)
 	/* No current context, but we may need one in order to delete
 	 * texture objs, etc.  So temporarily bind the context now.
 	 */
-	_mesa_make_current(ctx, NULL, NULL);
+	_mesa_make_current(ctx, nullptr, nullptr);
     }
 
     /* unreference WinSysDraw/Read buffers */
@@ -1221,10 +1125,11 @@ _mesa_free_context_data(GLcontext *ctx)
     delete ctx->Save;
 
     /* Shared context state (display lists, textures, etc) */
-    _glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-    ctx->Shared->RefCount--;
-    assert(ctx->Shared->RefCount >= 0);
-    _glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+    {
+	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	ctx->Shared->RefCount--;
+	assert(ctx->Shared->RefCount >= 0);
+    }
     if (ctx->Shared->RefCount == 0) {
 	/* free shared state */
 	free_shared_state(ctx, ctx->Shared);
@@ -1235,7 +1140,7 @@ _mesa_free_context_data(GLcontext *ctx)
 
     /* unbind the context if it's currently bound */
     if (ctx == _mesa_get_current_context()) {
-	_mesa_make_current(NULL, NULL, NULL);
+	_mesa_make_current(nullptr, nullptr, nullptr);
     }
 }
 
@@ -1459,7 +1364,7 @@ initialize_framebuffer_size(GLcontext *ctx, GLframebuffer *fb)
  * We check that the context's and framebuffer's visuals are compatible
  * and return immediately if they're not.
  *
- * \param newCtx  the new GL context. If NULL then there will be no current GL
+ * \param newCtx  the new GL context. If nullptr then there will be no current GL
  *                context.
  * \param drawBuffer  the drawing framebuffer
  * \param readBuffer  the reading framebuffer
@@ -1493,7 +1398,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
     ASSERT(_mesa_get_current_context() == newCtx);
 
     if (!newCtx) {
-	_glapi_set_dispatch(NULL);  /* none current */
+	_glapi_set_dispatch(nullptr);  /* none current */
     } else {
 	_glapi_set_dispatch(newCtx->CurrentDispatch);
 
@@ -1506,7 +1411,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
 	    _mesa_reference_framebuffer(&newCtx->WinSysReadBuffer, readBuffer);
 
 	    /*
-	     * Only set the context's Draw/ReadBuffer fields if they're NULL
+	     * Only set the context's Draw/ReadBuffer fields if they're nullptr
 	     * or not bound to a user-created FBO.
 	     */
 	    if (!newCtx->DrawBuffer || newCtx->DrawBuffer->Name == 0) {
@@ -1583,16 +1488,18 @@ GLboolean
 _mesa_share_state(GLcontext *ctx, GLcontext *ctxToShare)
 {
     if (ctx && ctxToShare && ctx->Shared && ctxToShare->Shared) {
-	_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	ctx->Shared->RefCount--;
-	_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	    ctx->Shared->RefCount--;
+	}
 	if (ctx->Shared->RefCount == 0) {
 	    free_shared_state(ctx, ctx->Shared);
 	}
 	ctx->Shared = ctxToShare->Shared;
-	_glthread_LOCK_MUTEX(ctx->Shared->Mutex);
-	ctx->Shared->RefCount++;
-	_glthread_UNLOCK_MUTEX(ctx->Shared->Mutex);
+	{
+	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
+	    ctx->Shared->RefCount++;
+	}
 	return GL_TRUE;
     } else {
 	return GL_FALSE;
@@ -1674,7 +1581,7 @@ _mesa_record_error(GLcontext *ctx, GLenum error)
  * Execute glFinish().
  *
  * Calls the #ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH macro and the
- * dd_function_table::Finish driver callback, if not NULL.
+ * dd_function_table::Finish driver callback, if not nullptr.
  */
 void GLAPIENTRY
 _mesa_Finish(void)
@@ -1691,7 +1598,7 @@ _mesa_Finish(void)
  * Execute glFlush().
  *
  * Calls the #ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH macro and the
- * dd_function_table::Flush driver callback, if not NULL.
+ * dd_function_table::Flush driver callback, if not nullptr.
  */
 void GLAPIENTRY
 _mesa_Flush(void)

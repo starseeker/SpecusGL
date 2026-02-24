@@ -115,7 +115,7 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 static INLINE void _mesa_lock_texture(GLcontext *ctx,
 				      struct gl_texture_object *texObj)
 {
-    _glthread_LOCK_MUTEX(ctx->Shared->TexMutex);
+    ctx->Shared->TexMutex.lock();
     ctx->Shared->TextureStateStamp++;
     (void) texObj;
 }
@@ -123,7 +123,7 @@ static INLINE void _mesa_lock_texture(GLcontext *ctx,
 static INLINE void _mesa_unlock_texture(GLcontext *ctx,
 					struct gl_texture_object *texObj)
 {
-    _glthread_UNLOCK_MUTEX(ctx->Shared->TexMutex);
+    ctx->Shared->TexMutex.unlock();
 }
 
 /*@}*/

@@ -70,6 +70,12 @@ struct osmesa_context {
     GLboolean yup;		/*< TRUE  -> Y increases upward */
     /*< FALSE -> Y increases downward */
     GLboolean enable_fxaa;	/*< TRUE to enable FXAA post-processing */
+
+    /** Recompute the rowaddr array from the current buffer and format. */
+    void compute_row_addresses();
+
+    /** Apply FXAA post-processing if enabled. */
+    void apply_fxaa();
 };
 
 
@@ -77,7 +83,7 @@ static INLINE OSMesaContext
 OSMESA_CONTEXT(GLcontext *ctx)
 {
     /* Just cast, since we're using structure containment */
-    return (OSMesaContext) ctx;
+    return static_cast<OSMesaContext>(static_cast<void *>(ctx));
 }
 
 
@@ -100,7 +106,7 @@ get_string(GLcontext *ctx, GLenum name)
 	    return (const GLubyte *) "Mesa OffScreen";
 #endif
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -120,29 +126,29 @@ osmesa_update_state(GLcontext *ctx, GLuint new_state)
  * Apply FXAA post-processing if enabled.
  * Called from glFinish to process the final rendered image.
  */
-static void
-osmesa_apply_fxaa(OSMesaContext osmesa)
+void
+osmesa_context::apply_fxaa()
 {
-    if (!osmesa || !osmesa->enable_fxaa)
+    if (!enable_fxaa)
         return;
     
     /* Only apply FXAA to RGBA8 buffers */
-    if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
+    if (rb->DataType != GL_UNSIGNED_BYTE)
         return;
     
     /* Only apply to RGBA format for now */
-    if (osmesa->format != OSMESA_RGBA)
+    if (format != OSMESA_RGBA)
         return;
     
-    GLint width = osmesa->rb->Width;
-    GLint height = osmesa->rb->Height;
-    uint8_t* buffer = (uint8_t*)osmesa->rb->Data;
+    GLint width = rb->Width;
+    GLint height = rb->Height;
+    uint8_t* buffer = (uint8_t*)rb->Data;
     
     if (!buffer || width <= 0 || height <= 0)
         return;
     
     /* Calculate stride based on row length */
-    GLint rowlength = osmesa->userRowLength ? osmesa->userRowLength : width;
+    GLint rowlength = userRowLength ? userRowLength : width;
     GLint strideBytes = rowlength * 4;  /* 4 bytes per RGBA pixel */
     
     /* Set up FXAA parameters (matching VTK defaults) */
@@ -172,7 +178,7 @@ osmesa_finish(GLcontext *ctx)
     _swrast_flush(ctx);
     
     /* Apply FXAA if enabled */
-    osmesa_apply_fxaa(osmesa);
+    osmesa->apply_fxaa();
 }
 
 
@@ -631,7 +637,7 @@ do {							\
 
 /**
  * Analyze context state to see if we can provide a fast line drawing
- * function.  Otherwise, return NULL.
+ * function.  Otherwise, return nullptr.
  */
 static swrast_line_func
 osmesa_choose_line_function(GLcontext *ctx)
@@ -640,18 +646,18 @@ osmesa_choose_line_function(GLcontext *ctx)
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
     if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
-	return NULL;
+	return nullptr;
 
-    if (ctx->RenderMode != GL_RENDER)      return NULL;
-    if (ctx->Line.SmoothFlag)              return NULL;
-    if (ctx->Texture._EnabledUnits)        return NULL;
-    if (ctx->Light.ShadeModel != GL_FLAT)  return NULL;
-    if (ctx->Line.Width != 1.0F)           return NULL;
-    if (ctx->Line.StippleFlag)             return NULL;
-    if (ctx->Line.SmoothFlag)              return NULL;
+    if (ctx->RenderMode != GL_RENDER)      return nullptr;
+    if (ctx->Line.SmoothFlag)              return nullptr;
+    if (ctx->Texture._EnabledUnits)        return nullptr;
+    if (ctx->Light.ShadeModel != GL_FLAT)  return nullptr;
+    if (ctx->Line.Width != 1.0F)           return nullptr;
+    if (ctx->Line.StippleFlag)             return nullptr;
+    if (ctx->Line.SmoothFlag)              return nullptr;
     if (osmesa->format != OSMESA_RGBA &&
 	osmesa->format != OSMESA_BGRA &&
-	osmesa->format != OSMESA_ARGB)     return NULL;
+	osmesa->format != OSMESA_ARGB)     return nullptr;
 
     if (swrast->_RasterMask==DEPTH_BIT
 	&& ctx->Depth.Func==GL_LESS
@@ -664,7 +670,7 @@ osmesa_choose_line_function(GLcontext *ctx)
 	return (swrast_line_func) flat_rgba_line;
     }
 
-    return (swrast_line_func) NULL;
+    return (swrast_line_func) nullptr;
 }
 
 
@@ -755,18 +761,18 @@ osmesa_choose_triangle_function(GLcontext *ctx)
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
     if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
-	return (swrast_tri_func) NULL;
+	return (swrast_tri_func) nullptr;
 
-    if (ctx->RenderMode != GL_RENDER)    return (swrast_tri_func) NULL;
-    if (ctx->Polygon.SmoothFlag)         return (swrast_tri_func) NULL;
-    if (ctx->Polygon.StippleFlag)        return (swrast_tri_func) NULL;
-    if (ctx->Texture._EnabledUnits)      return (swrast_tri_func) NULL;
+    if (ctx->RenderMode != GL_RENDER)    return (swrast_tri_func) nullptr;
+    if (ctx->Polygon.SmoothFlag)         return (swrast_tri_func) nullptr;
+    if (ctx->Polygon.StippleFlag)        return (swrast_tri_func) nullptr;
+    if (ctx->Texture._EnabledUnits)      return (swrast_tri_func) nullptr;
     if (osmesa->format != OSMESA_RGBA &&
 	osmesa->format != OSMESA_BGRA &&
-	osmesa->format != OSMESA_ARGB)   return (swrast_tri_func) NULL;
+	osmesa->format != OSMESA_ARGB)   return (swrast_tri_func) nullptr;
     if (ctx->Polygon.CullFlag &&
 	ctx->Polygon.CullFaceMode == GL_FRONT_AND_BACK)
-	return (swrast_tri_func) NULL;
+	return (swrast_tri_func) nullptr;
 
     if (swrast->_RasterMask == DEPTH_BIT &&
 	ctx->Depth.Func == GL_LESS &&
@@ -778,7 +784,7 @@ osmesa_choose_triangle_function(GLcontext *ctx)
 	    return (swrast_tri_func) flat_rgba_z_triangle;
 	}
     }
-    return (swrast_tri_func) NULL;
+    return (swrast_tri_func) nullptr;
 }
 
 
@@ -812,39 +818,39 @@ osmesa_choose_line(GLcontext *ctx)
 /**
  * Recompute the values of the context's rowaddr array.
  */
-static void
-compute_row_addresses(OSMesaContext osmesa)
+void
+osmesa_context::compute_row_addresses()
 {
     GLint bytesPerPixel, bytesPerRow, i;
-    GLubyte *origin = (GLubyte *) osmesa->rb->Data;
+    GLubyte *origin = (GLubyte *) rb->Data;
     GLint bpc; /* bytes per channel */
     GLint rowlength; /* in pixels */
-    GLint height = osmesa->rb->Height;
+    GLint height = rb->Height;
 
-    if (osmesa->userRowLength)
-	rowlength = osmesa->userRowLength;
+    if (userRowLength)
+	rowlength = userRowLength;
     else
-	rowlength = osmesa->rb->Width;
+	rowlength = rb->Width;
 
-    if (osmesa->rb->DataType == GL_UNSIGNED_BYTE)
+    if (rb->DataType == GL_UNSIGNED_BYTE)
 	bpc = 1;
-    else if (osmesa->rb->DataType == GL_UNSIGNED_SHORT)
+    else if (rb->DataType == GL_UNSIGNED_SHORT)
 	bpc = 2;
-    else if (osmesa->rb->DataType == GL_FLOAT)
+    else if (rb->DataType == GL_FLOAT)
 	bpc = 4;
     else {
-	_mesa_problem(&osmesa->mesa,
+	_mesa_problem(&mesa,
 		      "Unexpected datatype in osmesa::compute_row_addresses");
 	return;
     }
 
-    if (osmesa->format == OSMESA_COLOR_INDEX) {
+    if (format == OSMESA_COLOR_INDEX) {
 	/* CI mode */
 	bytesPerPixel = 1 * sizeof(GLubyte);
-    } else if ((osmesa->format == OSMESA_RGB) || (osmesa->format == OSMESA_BGR)) {
+    } else if ((format == OSMESA_RGB) || (format == OSMESA_BGR)) {
 	/* RGB mode */
 	bytesPerPixel = 3 * bpc;
-    } else if (osmesa->format == OSMESA_RGB_565) {
+    } else if (format == OSMESA_RGB_565) {
 	/* 5/6/5 RGB pixel in 16 bits */
 	bytesPerPixel = 2;
     } else {
@@ -854,16 +860,16 @@ compute_row_addresses(OSMesaContext osmesa)
 
     bytesPerRow = rowlength * bytesPerPixel;
 
-    if (osmesa->yup) {
+    if (yup) {
 	/* Y=0 is bottom line of window */
 	for (i = 0; i < height; i++) {
-	    osmesa->rowaddr[i] = (GLvoid *)((GLubyte *) origin + i * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + i * bytesPerRow);
 	}
     } else {
 	/* Y=0 is top line of window */
 	for (i = 0; i < height; i++) {
 	    GLint j = height - i - 1;
-	    osmesa->rowaddr[i] = (GLvoid *)((GLubyte *) origin + j * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + j * bytesPerRow);
 	}
     }
 }
@@ -1069,7 +1075,7 @@ osmesa_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
     rb->Width = width;
     rb->Height = height;
 
-    compute_row_addresses(osmesa);
+    osmesa->compute_row_addresses();
 
     return GL_TRUE;
 }
@@ -1115,7 +1121,7 @@ new_osmesa_renderbuffer(GLcontext *ctx, GLenum format, GLenum type)
  *
  * Input:  format - either GL_RGBA or GL_COLOR_INDEX
  *         sharelist - specifies another OSMesaContext with which to share
- *                     display lists.  NULL indicates no sharing.
+ *                     display lists.  nullptr indicates no sharing.
  * Return:  an OSMesaContext or 0 if error
  */
 GLAPI OSMesaContext GLAPIENTRY
@@ -1216,7 +1222,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
     }
 #endif
     else {
-	return NULL;
+	return nullptr;
     }
 
     osmesa = new osmesa_context{};
@@ -1239,7 +1245,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 					       );
 	if (!osmesa->gl_visual) {
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	/* Initialize device driver function table */
@@ -1247,17 +1253,17 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	/* override with our functions */
 	functions.GetString = get_string;
 	functions.UpdateState = osmesa_update_state;
-	functions.GetBufferSize = NULL;
+	functions.GetBufferSize = nullptr;
 	functions.Finish = osmesa_finish;
 
 	if (!_mesa_initialize_context(&osmesa->mesa,
 				      osmesa->gl_visual,
 				      sharelist ? &sharelist->mesa
-				      : (GLcontext *) NULL,
+				      : (GLcontext *) nullptr,
 				      &functions, (void *) osmesa)) {
 	    _mesa_destroy_visual(osmesa->gl_visual);
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	_mesa_enable_sw_extensions(&(osmesa->mesa));
@@ -1270,7 +1276,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 	    _mesa_destroy_visual(osmesa->gl_visual);
 	    _mesa_free_context_data(&osmesa->mesa);
 	    delete osmesa;
-	    return NULL;
+	    return nullptr;
 	}
 
 	/* create front color buffer in user-provided memory (no back buffer) */
@@ -1308,7 +1314,7 @@ OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 		_mesa_destroy_visual(osmesa->gl_visual);
 		_mesa_free_context_data(ctx);
 		delete osmesa;
-		return NULL;
+		return nullptr;
 	    }
 
 	    _swsetup_Wakeup(ctx);
@@ -1339,7 +1345,7 @@ OSMesaDestroyContext(OSMesaContext osmesa)
 {
     if (osmesa) {
 	if (osmesa->rb)
-	    _mesa_reference_renderbuffer(&osmesa->rb, NULL);
+	    _mesa_reference_renderbuffer(&osmesa->rb, nullptr);
 
 	_swsetup_DestroyContext(&osmesa->mesa);
 	_tnl_DestroyContext(&osmesa->mesa);
@@ -1451,7 +1457,7 @@ OSMesaGetCurrentContext(void)
     if (ctx)
 	return (OSMesaContext) ctx;
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1478,7 +1484,7 @@ OSMesaPixelStore(GLint pname, GLint value)
 	    return;
     }
 
-    compute_row_addresses(osmesa);
+    osmesa->compute_row_addresses();
 }
 
 
@@ -1542,7 +1548,7 @@ GLAPI GLboolean GLAPIENTRY
 OSMesaGetDepthBuffer(OSMesaContext c, GLint *width, GLint *height,
 		     GLint *bytesPerValue, void **buffer)
 {
-    struct gl_renderbuffer *rb = NULL;
+    struct gl_renderbuffer *rb = nullptr;
 
     if (c->gl_buffer)
 	rb = c->gl_buffer->Attachment[BUFFER_DEPTH].Renderbuffer;
@@ -1612,7 +1618,7 @@ static struct name_function functions[] = {
     { "OSMesaGetProcAddress", (OSMESAproc) OSMesaGetProcAddress },
     { "OSMesaColorClamp", (OSMESAproc) OSMesaColorClamp },
     { "OSMesaFXAAEnable", (OSMESAproc) OSMesaFXAAEnable },
-    { NULL, NULL }
+    { nullptr, nullptr }
 };
 
 
