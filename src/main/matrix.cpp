@@ -233,7 +233,7 @@ _mesa_PushMatrix(void)
 	_mesa_debug(ctx, "glPushMatrix %s\n",
 		    _mesa_lookup_enum_by_nr(ctx->Transform.MatrixMode));
 
-    if (stack->Depth + 1 >= stack->MaxDepth) {
+    if (!stack->push_matrix()) {
 	if (ctx->Transform.MatrixMode == GL_TEXTURE) {
 	    _mesa_error(ctx,  GL_STACK_OVERFLOW,
 			"glPushMatrix(mode=GL_TEXTURE, unit=%d)",
@@ -244,10 +244,6 @@ _mesa_PushMatrix(void)
 	}
 	return;
     }
-    _math_matrix_copy(&stack->Stack[stack->Depth + 1],
-		      &stack->Stack[stack->Depth]);
-    stack->Depth++;
-    stack->Top = &(stack->Stack[stack->Depth]);
     ctx->NewState |= stack->DirtyFlag;
 }
 
@@ -272,7 +268,7 @@ _mesa_PopMatrix(void)
 	_mesa_debug(ctx, "glPopMatrix %s\n",
 		    _mesa_lookup_enum_by_nr(ctx->Transform.MatrixMode));
 
-    if (stack->Depth == 0) {
+    if (!stack->pop_matrix()) {
 	if (ctx->Transform.MatrixMode == GL_TEXTURE) {
 	    _mesa_error(ctx,  GL_STACK_UNDERFLOW,
 			"glPopMatrix(mode=GL_TEXTURE, unit=%d)",
@@ -283,8 +279,6 @@ _mesa_PopMatrix(void)
 	}
 	return;
     }
-    stack->Depth--;
-    stack->Top = &(stack->Stack[stack->Depth]);
     ctx->NewState |= stack->DirtyFlag;
 }
 
@@ -756,38 +750,52 @@ void _mesa_update_modelview_project(GLcontext *ctx, GLuint new_state)
  * \param dirtyFlag dirty flag.
  *
  * Allocates an array of \p maxDepth elements for the matrix stack and calls
- * _math_matrix_ctr() and _math_matrix_alloc_inv() for each element to
- * initialize it.
+ * _math_matrix_alloc_inv() for each element to initialize it.
  */
-static void
-init_matrix_stack(struct gl_matrix_stack *stack,
-		  GLuint maxDepth, GLuint dirtyFlag)
+void
+gl_matrix_stack::init(GLuint maxDepth, GLuint dirtyFlag)
 {
-    GLuint i;
-
-    stack->Depth = 0;
-    stack->MaxDepth = maxDepth;
-    stack->DirtyFlag = dirtyFlag;
+    Depth = 0;
+    MaxDepth = maxDepth;
+    DirtyFlag = dirtyFlag;
     /* GLmatrix constructor handles m/inv initialisation; just alloc inv */
-    stack->Stack.resize(maxDepth);
-    for (i = 0; i < maxDepth; i++)
-	_math_matrix_alloc_inv(&stack->Stack[i]);
-    stack->Top = &stack->Stack[0];
+    Stack.resize(maxDepth);
+    for (GLuint i = 0; i < maxDepth; i++)
+	_math_matrix_alloc_inv(&Stack[i]);
+    Top = &Stack[0];
 }
 
 /**
- * Free matrix stack.
+ * Push the current top matrix.
  *
- * \param stack matrix stack.
- *
- * The GLmatrix destructor releases each element's aligned allocations;
- * clearing the vector is sufficient.
+ * Returns false on overflow.  The caller is responsible for raising
+ * GL_STACK_OVERFLOW when false is returned.
  */
-static void
-free_matrix_stack(struct gl_matrix_stack *stack)
+bool
+gl_matrix_stack::push_matrix()
 {
-    stack->Stack.clear();
-    stack->Top = NULL;
+    if (Depth + 1 >= MaxDepth)
+	return false;
+    _math_matrix_copy(&Stack[Depth + 1], &Stack[Depth]);
+    ++Depth;
+    Top = &Stack[Depth];
+    return true;
+}
+
+/**
+ * Pop the current top matrix.
+ *
+ * Returns false on underflow.  The caller is responsible for raising
+ * GL_STACK_UNDERFLOW when false is returned.
+ */
+bool
+gl_matrix_stack::pop_matrix()
+{
+    if (Depth == 0)
+	return false;
+    --Depth;
+    Top = &Stack[Depth];
+    return true;
 }
 
 /*@}*/
@@ -808,21 +816,15 @@ free_matrix_stack(struct gl_matrix_stack *stack)
  */
 void _mesa_init_matrix(GLcontext * ctx)
 {
-    GLint i;
-
-    /* Initialize matrix stacks */
-    init_matrix_stack(&ctx->ModelviewMatrixStack, MAX_MODELVIEW_STACK_DEPTH,
-		      _NEW_MODELVIEW);
-    init_matrix_stack(&ctx->ProjectionMatrixStack, MAX_PROJECTION_STACK_DEPTH,
-		      _NEW_PROJECTION);
-    init_matrix_stack(&ctx->ColorMatrixStack, MAX_COLOR_STACK_DEPTH,
-		      _NEW_COLOR_MATRIX);
-    for (i = 0; i < MAX_TEXTURE_UNITS; i++)
-	init_matrix_stack(&ctx->TextureMatrixStack[i], MAX_TEXTURE_STACK_DEPTH,
-			  _NEW_TEXTURE_MATRIX);
-    for (i = 0; i < MAX_PROGRAM_MATRICES; i++)
-	init_matrix_stack(&ctx->ProgramMatrixStack[i],
-			  MAX_PROGRAM_MATRIX_STACK_DEPTH, _NEW_TRACK_MATRIX);
+    /* Initialize matrix stacks using the new init() method. */
+    ctx->ModelviewMatrixStack.init(MAX_MODELVIEW_STACK_DEPTH, _NEW_MODELVIEW);
+    ctx->ProjectionMatrixStack.init(MAX_PROJECTION_STACK_DEPTH, _NEW_PROJECTION);
+    ctx->ColorMatrixStack.init(MAX_COLOR_STACK_DEPTH, _NEW_COLOR_MATRIX);
+    for (GLint i = 0; i < MAX_TEXTURE_UNITS; i++)
+	ctx->TextureMatrixStack[i].init(MAX_TEXTURE_STACK_DEPTH, _NEW_TEXTURE_MATRIX);
+    for (GLint i = 0; i < MAX_PROGRAM_MATRICES; i++)
+	ctx->ProgramMatrixStack[i].init(MAX_PROGRAM_MATRIX_STACK_DEPTH,
+					_NEW_TRACK_MATRIX);
     ctx->CurrentStack = &ctx->ModelviewMatrixStack;
 
     /* _ModelProjectMatrix is default-constructed by GLmatrix() */
@@ -839,15 +841,14 @@ void _mesa_init_matrix(GLcontext * ctx)
  */
 void _mesa_free_matrix_data(GLcontext *ctx)
 {
-    GLint i;
-
-    free_matrix_stack(&ctx->ModelviewMatrixStack);
-    free_matrix_stack(&ctx->ProjectionMatrixStack);
-    free_matrix_stack(&ctx->ColorMatrixStack);
-    for (i = 0; i < MAX_TEXTURE_UNITS; i++)
-	free_matrix_stack(&ctx->TextureMatrixStack[i]);
-    for (i = 0; i < MAX_PROGRAM_MATRICES; i++)
-	free_matrix_stack(&ctx->ProgramMatrixStack[i]);
+    /* clear() calls ~GLmatrix() for each entry, releasing aligned memory. */
+    ctx->ModelviewMatrixStack.Stack.clear();
+    ctx->ProjectionMatrixStack.Stack.clear();
+    ctx->ColorMatrixStack.Stack.clear();
+    for (auto &s : ctx->TextureMatrixStack)
+	s.Stack.clear();
+    for (auto &s : ctx->ProgramMatrixStack)
+	s.Stack.clear();
     /* combined Modelview*Projection matrix freed by GLmatrix destructor */
 }
 
