@@ -2084,7 +2084,7 @@ compile_shader(GLcontext *ctx, slang_code_object * object,
     _slang_code_object_dtr(object);
     _slang_code_object_ctr(object);
 
-    success = compile_object(&id, shader->Source, object, type, infolog, program);
+    success = compile_object(&id, shader->Source.c_str(), object, type, infolog, program);
     if (id != 0)
 	grammar_destroy(id);
     if (!success)
@@ -2110,7 +2110,7 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
 	type = SLANG_UNIT_FRAGMENT_SHADER;
     }
 
-    if (!shader->Source)
+    if (shader->Source.empty())
 	return GL_FALSE;
 
     ctx->Shader.MemPool = _slang_new_mempool(1024*1024);
@@ -2138,14 +2138,11 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
     success = compile_shader(ctx, &obj, type, &info_log, shader);
 
     /* free shader's prev info log */
-    if (shader->InfoLog) {
-	free(shader->InfoLog);
-	shader->InfoLog = NULL;
-    }
+    shader->InfoLog.clear();
 
     if (info_log.text) {
 	/* copy info-log string to shader object */
-	shader->InfoLog = _mesa_strdup(info_log.text);
+	shader->InfoLog = info_log.text ? info_log.text : "";
     }
 
     if (info_log.error_flag) {

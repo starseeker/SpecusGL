@@ -2027,11 +2027,11 @@ struct gl_shader {
     GLint RefCount;  /**< Reference count */
     GLboolean DeletePending;
 
-    const GLchar *Source;  /**< Source code string */
+    std::string Source;  /**< Source code string */
     GLboolean CompileStatus;
     GLuint NumPrograms;  /**< size of Programs[] array */
     struct gl_program **Programs;  /**< Post-compile assembly code */
-    GLchar *InfoLog;
+    std::string InfoLog;
 };
 
 
@@ -2055,7 +2055,7 @@ struct gl_shader_program {
     struct gl_program_parameter_list *Attributes; /**< Vertex attributes */
     GLboolean LinkStatus;   /**< GL_LINK_STATUS */
     GLboolean Validated;
-    GLchar *InfoLog;
+    std::string InfoLog;
 };
 
 

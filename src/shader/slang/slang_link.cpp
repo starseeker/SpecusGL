@@ -502,10 +502,7 @@ fragment_program(struct gl_program *prog)
 static void
 link_error(struct gl_shader_program *shProg, const char *msg)
 {
-    if (shProg->InfoLog) {
-	free(shProg->InfoLog);
-    }
-    shProg->InfoLog = _mesa_strdup(msg);
+    shProg->InfoLog = msg ? msg : "";
     shProg->LinkStatus = GL_FALSE;
 }
 

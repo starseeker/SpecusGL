@@ -127,15 +127,10 @@ _mesa_free_shader_program_data(GLcontext *ctx,
     }
     shProg->NumShaders = 0;
 
-    if (shProg->Shaders) {
-	free(shProg->Shaders);
-	shProg->Shaders = nullptr;
-    }
+    delete[] shProg->Shaders;
+    shProg->Shaders = nullptr;
 
-    if (shProg->InfoLog) {
-	free(shProg->InfoLog);
-	shProg->InfoLog = nullptr;
-    }
+    shProg->InfoLog.clear();
 }
 
 
@@ -239,16 +234,12 @@ void
 _mesa_free_shader(GLcontext *ctx, struct gl_shader *sh)
 {
     GLuint i;
-    if (sh->Source)
-	delete[] sh->Source;
-    if (sh->InfoLog)
-	free(sh->InfoLog);
     for (i = 0; i < sh->NumPrograms; i++) {
 	assert(sh->Programs[i]);
 	ctx->Driver.DeleteProgram(ctx, sh->Programs[i]);
     }
-    if (sh->Programs)
-	free(sh->Programs);
+    delete[] sh->Programs;
+    sh->Programs = nullptr;
     delete sh;
 }
 
@@ -454,13 +445,12 @@ _mesa_attach_shader(GLcontext *ctx, GLuint program, GLuint shader)
     }
 
     /* grow list */
-    shProg->Shaders = (struct gl_shader **)
-		      _mesa_realloc(shProg->Shaders,
-				    n * sizeof(struct gl_shader *),
-				    (n + 1) * sizeof(struct gl_shader *));
-    if (!shProg->Shaders) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glAttachShader");
-	return;
+    {
+	auto *newList = new struct gl_shader *[n + 1];
+	if (n > 0)
+	    std::copy(shProg->Shaders, shProg->Shaders + n, newList);
+	delete[] shProg->Shaders;
+	shProg->Shaders = newList;
     }
 
     /* append */
@@ -626,18 +616,13 @@ _mesa_detach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	    _mesa_reference_shader(ctx, &shProg->Shaders[i], nullptr);
 
 	    /* alloc new, smaller array */
-	    newList = (struct gl_shader **)
-		      malloc((n - 1) * sizeof(struct gl_shader *));
-	    if (!newList) {
-		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glDetachShader");
-		return;
-	    }
+	    newList = new struct gl_shader *[n > 1 ? n - 1 : 1];
 	    for (j = 0; j < i; j++) {
 		newList[j] = shProg->Shaders[j];
 	    }
 	    while (++i < n)
 		newList[j++] = shProg->Shaders[i];
-	    free(shProg->Shaders);
+	    delete[] shProg->Shaders;
 
 	    shProg->Shaders = newList;
 	    shProg->NumShaders = n - 1;
@@ -843,7 +828,7 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 	    *params = shProg->Validated;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = shProg->InfoLog ? strlen(shProg->InfoLog) + 1 : 0;
+	    *params = (GLsizei) shProg->InfoLog.size() + 1;
 	    break;
 	case GL_ATTACHED_SHADERS:
 	    *params = shProg->NumShaders;
@@ -895,10 +880,10 @@ _mesa_get_shaderiv(GLcontext *ctx, GLuint name, GLenum pname, GLint *params)
 	    *params = shader->CompileStatus;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = shader->InfoLog ? strlen(shader->InfoLog) + 1 : 0;
+	    *params = (GLsizei) shader->InfoLog.size() + 1;
 	    break;
 	case GL_SHADER_SOURCE_LENGTH:
-	    *params = shader->Source ? strlen((char *) shader->Source) + 1 : 0;
+	    *params = (GLsizei) shader->Source.size() + 1;
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetShaderiv(pname)");
@@ -917,7 +902,7 @@ _mesa_get_program_info_log(GLcontext *ctx, GLuint program, GLsizei bufSize,
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetProgramInfoLog(program)");
 	return;
     }
-    copy_string(infoLog, bufSize, length, shProg->InfoLog);
+    copy_string(infoLog, bufSize, length, shProg->InfoLog.c_str());
 }
 
 
@@ -930,7 +915,7 @@ _mesa_get_shader_info_log(GLcontext *ctx, GLuint shader, GLsizei bufSize,
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetShaderInfoLog(shader)");
 	return;
     }
-    copy_string(infoLog, bufSize, length, sh->InfoLog);
+    copy_string(infoLog, bufSize, length, sh->InfoLog.c_str());
 }
 
 
@@ -951,7 +936,7 @@ _mesa_get_shader_source(GLcontext *ctx, GLuint shader, GLsizei maxLength,
 	_mesa_error(ctx, err, "glGetShaderSource(shader)");
 	return;
     }
-    copy_string(sourceOut, maxLength, length, sh->Source);
+    copy_string(sourceOut, maxLength, length, sh->Source.c_str());
 }
 
 
@@ -1107,9 +1092,6 @@ _mesa_shader_source(GLcontext *ctx, GLuint shader, const GLchar *source)
     }
 
     /* free old shader source string and install new one */
-    if (sh->Source) {
-	delete[] sh->Source;
-    }
     sh->Source = source;
     sh->CompileStatus = GL_FALSE;
 }
