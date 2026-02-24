@@ -32,6 +32,10 @@
 #ifndef SWRAST_H
 #define SWRAST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 
 /**
@@ -285,6 +289,10 @@ struct swrast_device_driver {
 };
 
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 
