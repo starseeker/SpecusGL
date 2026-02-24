@@ -25,6 +25,10 @@
 #ifndef SLANG_PREPROCESS_H
 #define SLANG_PREPROCESS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "slang_compile.h"
 #include "slang_log.h"
 
@@ -36,6 +40,10 @@ extern GLboolean
 _slang_preprocess_directives(slang_string *output, const char *input,
 			     slang_info_log *);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_PREPROCESS_H */
 

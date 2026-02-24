@@ -26,6 +26,10 @@
 #ifndef ARBPROGRAM_H
 #define ARBPROGRAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern void GLAPIENTRY
 _mesa_EnableVertexAttribArrayARB(GLuint index);
@@ -138,6 +142,10 @@ _mesa_GetProgramivARB(GLenum target, GLenum pname, GLint *params);
 extern void GLAPIENTRY
 _mesa_GetProgramStringARB(GLenum target, GLenum pname, GLvoid *string);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

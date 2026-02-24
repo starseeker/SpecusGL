@@ -14,9 +14,9 @@ include_directories(
   )
 
 set(osmesa_srcs
-  drivers/common/driverfuncs.c
-  drivers/osmesa/osmesa.c
-  fxaa/fxaa_cpu.c
+  drivers/common/driverfuncs.cpp
+  drivers/osmesa/osmesa.cpp
+  fxaa/fxaa_cpu.cpp
   glapi/glapi.cpp
   glapi/glthread.cpp
   main/accum.cpp
@@ -88,42 +88,42 @@ set(osmesa_srcs
   math/m_translate.cpp
   math/m_vector.cpp
   math/m_xform.cpp
-  shader/arbprogparse.c
-  shader/arbprogram.c
-  shader/atifragshader.c
-  shader/grammar/grammar_mesa.c
-  shader/nvfragparse.c
-  shader/nvprogram.c
-  shader/nvvertparse.c
-  shader/prog_execute.c
+  shader/arbprogparse.cpp
+  shader/arbprogram.cpp
+  shader/atifragshader.cpp
+  shader/grammar/grammar_mesa.cpp
+  shader/nvfragparse.cpp
+  shader/nvprogram.cpp
+  shader/nvvertparse.cpp
+  shader/prog_execute.cpp
   shader/prog_instruction.cpp
   shader/prog_parameter.cpp
-  shader/prog_print.c
-  shader/prog_statevars.c
+  shader/prog_print.cpp
+  shader/prog_statevars.cpp
   shader/program.cpp
-  shader/programopt.c
-  shader/shader_api.c
-  shader/slang/slang_builtin.c
-  shader/slang/slang_codegen.c
-  shader/slang/slang_compile.c
-  shader/slang/slang_compile_function.c
-  shader/slang/slang_compile_operation.c
-  shader/slang/slang_compile_struct.c
-  shader/slang/slang_compile_variable.c
-  shader/slang/slang_emit.c
-  shader/slang/slang_ir.c
-  shader/slang/slang_label.c
-  shader/slang/slang_library_noise.c
-  shader/slang/slang_link.c
-  shader/slang/slang_log.c
-  shader/slang/slang_mem.c
-  shader/slang/slang_preprocess.c
-  shader/slang/slang_print.c
-  shader/slang/slang_simplify.c
-  shader/slang/slang_storage.c
-  shader/slang/slang_typeinfo.c
-  shader/slang/slang_utility.c
-  shader/slang/slang_vartable.c
+  shader/programopt.cpp
+  shader/shader_api.cpp
+  shader/slang/slang_builtin.cpp
+  shader/slang/slang_codegen.cpp
+  shader/slang/slang_compile.cpp
+  shader/slang/slang_compile_function.cpp
+  shader/slang/slang_compile_operation.cpp
+  shader/slang/slang_compile_struct.cpp
+  shader/slang/slang_compile_variable.cpp
+  shader/slang/slang_emit.cpp
+  shader/slang/slang_ir.cpp
+  shader/slang/slang_label.cpp
+  shader/slang/slang_library_noise.cpp
+  shader/slang/slang_link.cpp
+  shader/slang/slang_log.cpp
+  shader/slang/slang_mem.cpp
+  shader/slang/slang_preprocess.cpp
+  shader/slang/slang_print.cpp
+  shader/slang/slang_simplify.cpp
+  shader/slang/slang_storage.cpp
+  shader/slang/slang_typeinfo.cpp
+  shader/slang/slang_utility.cpp
+  shader/slang/slang_vartable.cpp
   swrast/s_aaline.cpp
   swrast/s_aatriangle.cpp
   swrast/s_accum.cpp

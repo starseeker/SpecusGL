@@ -26,12 +26,20 @@
 #ifndef DRIVERFUNCS_H
 #define DRIVERFUNCS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern void
 _mesa_init_driver_functions(struct dd_function_table *driver);
 
 
 extern void
 _mesa_init_glsl_driver_functions(struct dd_function_table *driver);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -26,6 +26,10 @@
 #ifndef SHADER_API_H
 #define SHADER_API_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "glheader.h"
 #include "mtypes.h"
@@ -185,6 +189,10 @@ _mesa_use_program(GLcontext *ctx, GLuint program);
 extern void
 _mesa_validate_program(GLcontext *ctx, GLuint program);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SHADER_API_H */
 

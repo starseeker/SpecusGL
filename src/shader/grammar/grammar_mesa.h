@@ -25,6 +25,10 @@
 #ifndef GRAMMAR_MESA_H
 #define GRAMMAR_MESA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "imports.h"
 /* NOTE: include Mesa 3-D specific headers here */
@@ -38,6 +42,10 @@ typedef GLubyte byte;
 #include "grammar.h"
 #undef GRAMMAR_PORT_INCLUDE
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

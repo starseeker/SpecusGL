@@ -25,6 +25,10 @@
 #ifndef SLANG_COMPILE_FUNCTION_H
 #define SLANG_COMPILE_FUNCTION_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct slang_code_unit_;
 
@@ -93,6 +97,10 @@ slang_function_scope_find_by_name(slang_function_scope *, slang_atom, int);
 
 extern slang_function *
 slang_function_scope_find(slang_function_scope *, slang_function *, int);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_COMPILE_FUNCTION_H */
 

@@ -29,6 +29,10 @@
 #ifndef NVVERTPARSE_H
 #define NVVERTPARSE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern void
 _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum target,
@@ -46,6 +50,10 @@ _mesa_nv_vertex_input_register_name(GLuint i);
 
 extern const char *
 _mesa_nv_vertex_output_register_name(GLuint i);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

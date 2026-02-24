@@ -8,6 +8,10 @@
 #ifndef ATIFRAGSHADER_H
 #define ATIFRAGSHADER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_NUM_INSTRUCTIONS_PER_PASS_ATI 8
 #define MAX_NUM_PASSES_ATI                2
 #define MAX_NUM_FRAGMENT_REGISTERS_ATI    6
@@ -112,6 +116,10 @@ _mesa_AlphaFragmentOp3ATI(GLenum op, GLuint dst, GLuint dstMod, GLuint arg1,
 
 extern void GLAPIENTRY
 _mesa_SetFragmentShaderConstantATI(GLuint dst, const GLfloat * value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

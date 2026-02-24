@@ -1,6 +1,10 @@
 #ifndef SLANG_LABEL_H
 #define SLANG_LABEL_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "imports.h"
 #include "mtypes.h"
 #include "prog_instruction.h"
@@ -40,6 +44,10 @@ extern void
 _slang_label_set_location(slang_label *l, GLint location,
 			  struct gl_program *prog);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_LABEL_H */
 

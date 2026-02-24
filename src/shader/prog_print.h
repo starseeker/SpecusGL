@@ -26,6 +26,10 @@
 #ifndef PROG_PRINT_H
 #define PROG_PRINT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /**
  * The output style to use when printing programs.
@@ -68,6 +72,10 @@ _mesa_print_program_parameters(GLcontext *ctx, const struct gl_program *prog);
 extern void
 _mesa_print_parameter_list(const struct gl_program_parameter_list *list);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PROG_PRINT_H */
 

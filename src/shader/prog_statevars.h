@@ -25,6 +25,10 @@
 #ifndef PROG_STATEVARS_H
 #define PROG_STATEVARS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 
 
@@ -129,6 +133,10 @@ _mesa_program_state_string(const gl_state_index state[STATE_LENGTH]);
 extern void
 _mesa_load_tracked_matrices(GLcontext *ctx);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PROG_STATEVARS_H */
 
