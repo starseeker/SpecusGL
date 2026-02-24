@@ -36,6 +36,11 @@
 #ifndef _EXTENSIONS_H_
 #define _EXTENSIONS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "mtypes.h"
 
 #if _HAVE_FULL_GL
@@ -81,6 +86,11 @@ extern GLubyte *_mesa_make_extension_string(GLcontext *ctx);
 /** No-op */
 #define _mesa_enable_extension( c, n ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

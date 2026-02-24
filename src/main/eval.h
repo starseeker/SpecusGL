@@ -36,6 +36,11 @@
 #ifndef EVAL_H
 #define EVAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -123,6 +128,11 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v);
 /** No-op */
 #define _mesa_free_eval_data( c ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

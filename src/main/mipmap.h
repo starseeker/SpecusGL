@@ -26,6 +26,11 @@
 #ifndef MIPMAP_H
 #define MIPMAP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "mtypes.h"
 
 extern void
@@ -48,6 +53,11 @@ _mesa_upscale_teximage2d(GLsizei inWidth, GLsizei inHeight,
 			 GLint comps, const GLchan *src, GLint srcRowStride,
 			 GLchan *dest);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MIPMAP_H */
 

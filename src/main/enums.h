@@ -36,6 +36,11 @@
 #ifndef _ENUMS_H_
 #define _ENUMS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #if defined(_HAVE_FULL_GL) && _HAVE_FULL_GL
 
@@ -50,6 +55,11 @@ extern int _mesa_lookup_enum_by_name(const char *symbol);
 /** No-op */
 #define _mesa_lookup_enum_by_nr( n ) "unknown"
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

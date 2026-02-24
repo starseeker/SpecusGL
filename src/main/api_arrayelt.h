@@ -27,6 +27,11 @@
 #ifndef API_ARRAYELT_H
 #define API_ARRAYELT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "mtypes.h"
 
 extern GLboolean _ae_create_context(GLcontext *ctx);
@@ -38,6 +43,11 @@ extern void GLAPIENTRY _ae_loopback_array_elt(GLint elt);
  */
 extern void _ae_map_vbos(GLcontext *ctx);
 extern void _ae_unmap_vbos(GLcontext *ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

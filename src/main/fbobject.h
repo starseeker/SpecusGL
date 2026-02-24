@@ -26,6 +26,11 @@
 #ifndef FBOBJECT_H
 #define FBOBJECT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 extern struct gl_renderbuffer *
 _mesa_lookup_renderbuffer(GLcontext *ctx, GLuint id);
@@ -130,6 +135,11 @@ _mesa_BlitFramebufferEXT(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
 			 GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
 			 GLbitfield mask, GLenum filter);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* FBOBJECT_H */
 

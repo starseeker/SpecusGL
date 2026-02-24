@@ -31,12 +31,22 @@
 #ifndef TEXENVPROGRAM_H
 #define TEXENVPROGRAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
 extern void _mesa_UpdateTexEnvProgram(GLcontext *ctx);
 extern void _mesa_TexEnvProgramCacheInit(GLcontext *ctx);
 extern void _mesa_TexEnvProgramCacheDestroy(GLcontext *ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

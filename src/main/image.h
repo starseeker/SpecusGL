@@ -26,6 +26,11 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -229,6 +234,11 @@ _mesa_clip_to_region(GLint xmin, GLint ymin,
 		     GLint xmax, GLint ymax,
 		     GLint *x, GLint *y,
 		     GLsizei *width, GLsizei *height);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -26,6 +26,11 @@
 #ifndef COLORTAB_H
 #define COLORTAB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -95,6 +100,11 @@ _mesa_free_colortables_data(GLcontext *ctx);
 /** No-op */
 #define _mesa_free_colortables_data( p ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

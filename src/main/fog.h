@@ -36,6 +36,11 @@
 #ifndef FOG_H
 #define FOG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -61,6 +66,11 @@ extern void _mesa_init_fog(GLcontext * ctx);
 /** No-op */
 #define _mesa_init_fog( c ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

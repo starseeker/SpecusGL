@@ -32,6 +32,11 @@
 #ifndef LINES_H
 #define LINES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -44,6 +49,11 @@ _mesa_LineStipple(GLint factor, GLushort pattern);
 
 extern void GLAPIENTRY
 _mesa_init_line(GLcontext * ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

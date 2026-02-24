@@ -26,6 +26,11 @@
 #ifndef SHADERS_H
 #define SHADERS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "glheader.h"
 #include "mtypes.h"
@@ -232,6 +237,11 @@ extern void GLAPIENTRY
 _mesa_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose,
 			 const GLfloat *value);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SHADERS_H */
 

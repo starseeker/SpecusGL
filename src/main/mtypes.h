@@ -34,6 +34,11 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "glheader.h"
 #include "glcontext.h"	/* __GLcontextModes (GLvisual) */
@@ -3000,6 +3005,11 @@ extern int MESA_DEBUG_FLAGS;
 # ifndef NDEBUG
 #  define NDEBUG
 # endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif
 
 

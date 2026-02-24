@@ -37,6 +37,11 @@
 #ifndef ATTRIB_H
 #define ATTRIB_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -67,6 +72,11 @@ _mesa_free_attrib_data(GLcontext *ctx);
 #define _mesa_init_attrib( c ) ((void)0)
 #define _mesa_free_attrib_data( c ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -31,6 +31,11 @@
 #ifndef STENCIL_H
 #define STENCIL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -76,6 +81,11 @@ _mesa_update_stencil(GLcontext *ctx);
 
 extern void
 _mesa_init_stencil(GLcontext * ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

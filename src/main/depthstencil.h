@@ -26,6 +26,11 @@
 #ifndef DEPTHSTENCIL_H
 #define DEPTHSTENCIL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 extern struct gl_renderbuffer *
 _mesa_new_z24_renderbuffer_wrapper(GLcontext *ctx,
@@ -52,6 +57,11 @@ _mesa_insert_stencil(GLcontext *ctx,
 extern void
 _mesa_promote_stencil(GLcontext *ctx, struct gl_renderbuffer *stencilRb);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DEPTHSTENCIL_H */
 

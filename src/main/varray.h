@@ -36,6 +36,11 @@
 #ifndef VARRAY_H
 #define VARRAY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -155,6 +160,11 @@ _mesa_init_varray(GLcontext * ctx);
 /** No-op */
 #define _mesa_init_varray( c )  ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

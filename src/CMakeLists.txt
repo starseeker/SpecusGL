@@ -19,67 +19,67 @@ set(osmesa_srcs
   fxaa/fxaa_cpu.c
   glapi/glapi.cpp
   glapi/glthread.cpp
-  main/accum.c
-  main/api_arrayelt.c
-  main/api_loopback.c
-  main/api_noop.c
-  main/api_validate.c
-  main/arrayobj.c
-  main/attrib.c
-  main/blend.c
-  main/bufferobj.c
-  main/buffers.c
-  main/clip.c
-  main/colortab.c
+  main/accum.cpp
+  main/api_arrayelt.cpp
+  main/api_loopback.cpp
+  main/api_noop.cpp
+  main/api_validate.cpp
+  main/arrayobj.cpp
+  main/attrib.cpp
+  main/blend.cpp
+  main/bufferobj.cpp
+  main/buffers.cpp
+  main/clip.cpp
+  main/colortab.cpp
   main/context.cpp
-  main/convolve.c
+  main/convolve.cpp
   main/debug.cpp
-  main/depth.c
-  main/depthstencil.c
-  main/dispatch.c
-  main/dlist.c
-  main/drawpix.c
-  main/enable.c
-  main/enums.c
-  main/eval.c
-  main/extensions.c
-  main/fbobject.c
-  main/feedback.c
-  main/fog.c
+  main/depth.cpp
+  main/depthstencil.cpp
+  main/dispatch.cpp
+  main/dlist.cpp
+  main/drawpix.cpp
+  main/enable.cpp
+  main/enums.cpp
+  main/eval.cpp
+  main/extensions.cpp
+  main/fbobject.cpp
+  main/feedback.cpp
+  main/fog.cpp
   main/framebuffer.cpp
-  main/get.c
-  main/getstring.c
+  main/get.cpp
+  main/getstring.cpp
   main/hash.cpp
-  main/hint.c
-  main/histogram.c
-  main/image.c
+  main/hint.cpp
+  main/histogram.cpp
+  main/image.cpp
   main/imports.cpp
-  main/light.c
-  main/lines.c
-  main/matrix.c
-  main/mipmap.c
-  main/pixel.c
-  main/points.c
-  main/polygon.c
-  main/queryobj.c
-  main/rastpos.c
-  main/rbadaptors.c
+  main/light.cpp
+  main/lines.cpp
+  main/matrix.cpp
+  main/mipmap.cpp
+  main/pixel.cpp
+  main/points.cpp
+  main/polygon.cpp
+  main/queryobj.cpp
+  main/rastpos.cpp
+  main/rbadaptors.cpp
   main/renderbuffer.cpp
-  main/shaders.c
-  main/state.c
-  main/stencil.c
-  main/texcompress.c
-  main/texcompress_fxt1.c
-  main/texcompress_s3tc.c
-  main/texenvprogram.c
-  main/texformat.c
-  main/teximage.c
-  main/texobj.c
-  main/texrender.c
-  main/texstate.c
-  main/texstore.c
-  main/varray.c
-  main/vtxfmt.c
+  main/shaders.cpp
+  main/state.cpp
+  main/stencil.cpp
+  main/texcompress.cpp
+  main/texcompress_fxt1.cpp
+  main/texcompress_s3tc.cpp
+  main/texenvprogram.cpp
+  main/texformat.cpp
+  main/teximage.cpp
+  main/texobj.cpp
+  main/texrender.cpp
+  main/texstate.cpp
+  main/texstore.cpp
+  main/varray.cpp
+  main/vtxfmt.cpp
   math/m_debug_clip.cpp
   math/m_debug_norm.cpp
   math/m_debug_xform.cpp
