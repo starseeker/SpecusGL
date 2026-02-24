@@ -40,6 +40,10 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 
 
@@ -102,6 +106,9 @@ extern void GLAPIENTRY
 _mesa_GenPrograms(GLsizei n, GLuint *ids);
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PROGRAM_H */
 

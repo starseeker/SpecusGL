@@ -80,6 +80,15 @@ Target files (roughly in dependency order):
   `std::aligned_alloc` / `std::free` (size rounded up).  Duplicate
   `#include "imports.h"` removed; `<cstdlib>` added.  `extern "C"` guards
   added to `m_vector.h`.
+* `src/math/m_translate.c` → **`m_translate.cpp`** ✅ done – Renamed to C++17;
+  no memory-management changes required (no heap allocation in this file).
+  `extern "C"` guards added to `m_translate.h`.
+* `src/math/m_xform.c` → **`m_xform.cpp`** ✅ done – Renamed to C++17; no
+  memory-management changes required.  `extern "C"` guards added to
+  `m_xform.h`.
+* `src/math/m_eval.c` → **`m_eval.cpp`** ✅ done – Renamed to C++17; no
+  memory-management changes required.  `extern "C"` guards added to
+  `m_eval.h`.
 
 ---
 
@@ -130,8 +139,52 @@ The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
 
 ## Phase 4 – Shader / program subsystem
 
-* `src/shader/program.c`, `prog_instruction.c`, `prog_parameter.c` – Replace
-  dynamic arrays (hand-managed `realloc`) with `std::vector`.
+| Task | Status |
+|------|--------|
+| Migrate `src/shader/prog_instruction.c` → `prog_instruction.cpp` | ✅ done |
+| Add `extern "C"` guards to `prog_instruction.h` | ✅ done |
+| Migrate `src/shader/prog_parameter.c` → `prog_parameter.cpp` | ✅ done |
+| Add `extern "C"` guards to `prog_parameter.h` | ✅ done |
+| Migrate `src/shader/program.c` → `program.cpp` | ✅ done |
+| Add `extern "C"` guards to `program.h` | ✅ done |
+
+### What changed in `prog_instruction.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `extern "C"` guards added to `prog_instruction.h`.
+* `calloc`/`_mesa_realloc` kept in `_mesa_alloc_instructions` and
+  `_mesa_realloc_instructions` because not-yet-migrated C translation units
+  (`nvvertparse.c`, `nvfragparse.c`, `arbprogparse.c`, `programopt.c`,
+  `slang/slang_emit.c`) call `free()` directly on instruction arrays obtained
+  from these functions.
+
+### What changed in `prog_parameter.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `CALLOC_STRUCT(gl_program_parameter_list)` in `_mesa_new_parameter_list`
+  replaced with `new gl_program_parameter_list{}`.
+* `free(paramList)` in `_mesa_free_parameter_list` replaced with
+  `delete paramList`.
+* The internal `Parameters` and `ParameterValues` arrays retain
+  `_mesa_realloc` / `_mesa_align_realloc` management because they are raw
+  pointers in a struct whose layout is shared with not-yet-migrated C
+  translation units.
+* Implicit `int` → `gl_state_index` enum conversion in `_mesa_add_attribute`
+  made explicit with a cast (required by C++ but not C).
+* `extern "C"` guards added to `prog_parameter.h`.
+
+### What changed in `program.cpp`
+
+* Renamed to `.cpp` so the translation unit is compiled as C++17.
+* `CALLOC_STRUCT(gl_vertex_program)` and `CALLOC_STRUCT(gl_fragment_program)`
+  in `_mesa_new_program` replaced with `new gl_vertex_program{}` /
+  `new gl_fragment_program{}`.
+* `free(prog)` in `_mesa_delete_program` replaced with type-aware `delete`:
+  the existing `GL_VERTEX_PROGRAM_ARB` check is reused to cast `prog` back
+  to its concrete type before deleting, since `Base` is the first member of
+  both subtypes.
+* `extern "C"` guards added to `program.h`.
+
 * `src/shader/slang/` – The GLSL compiler (slang) is the most complex
   subsystem; migrate it last, wrapping the grammar and IR in proper C++
   classes with clear ownership semantics.
@@ -174,8 +227,12 @@ The original `context.c` used `calloc(1, sizeof(T))` / `free()` for allocating
 [ ] main/dlist     - display list (complex)
 [x] math/m_matrix  - matrix math                 ✅ Phase 2
 [x] math/m_vector  - vector math                 ✅ Phase 2
-[ ] math/          - remaining (m_translate, m_xform, m_eval, …)
-[ ] shader/        - ARB/NV programs, slang GLSL
+[x] math/m_translate                             ✅ Phase 2
+[x] math/m_xform                                 ✅ Phase 2
+[x] math/m_eval                                  ✅ Phase 2
+[ ] math/          - remaining (m_debug_clip, m_debug_norm, m_debug_xform)
+[x] shader/program + prog_instruction + prog_parameter  ✅ Phase 4
+[ ] shader/        - remaining ARB/NV parsers, slang GLSL
 [ ] swrast/        - software rasteriser
 [ ] swrast_setup/
 [ ] tnl/           - transform-and-light pipeline
