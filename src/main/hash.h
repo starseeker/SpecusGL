@@ -35,6 +35,11 @@
 #include "glheader.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 extern struct _mesa_HashTable *_mesa_NewHashTable(void);
 
 extern void _mesa_DeleteHashTable(struct _mesa_HashTable *table);
@@ -64,6 +69,11 @@ extern void _mesa_HashPrint(const struct _mesa_HashTable *table);
 extern GLuint _mesa_HashFindFreeKeyBlock(struct _mesa_HashTable *table, GLuint numKeys);
 
 extern void _mesa_test_hash_functions(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif
