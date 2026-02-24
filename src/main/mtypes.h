@@ -2645,6 +2645,11 @@ struct gl_extensions {
 
 /**
  * A stack of matrices (projection, modelview, color, texture, etc).
+ *
+ * C++17 upgrade: push_matrix()/pop_matrix() encapsulate the mutation that
+ * was previously scattered across init_matrix_stack() / _mesa_PushMatrix() /
+ * _mesa_PopMatrix().  The implementation lives in matrix.cpp where
+ * _math_matrix_alloc_inv() and _math_matrix_copy() are already visible.
  */
 struct gl_matrix_stack {
     GLmatrix *Top;      /**< points into Stack */
@@ -2652,6 +2657,34 @@ struct gl_matrix_stack {
     GLuint Depth;       /**< 0 <= Depth < MaxDepth */
     GLuint MaxDepth;    /**< size of Stack[] array */
     GLuint DirtyFlag;   /**< _NEW_MODELVIEW or _NEW_PROJECTION, for example */
+
+    /**
+     * Initialise the stack (replaces init_matrix_stack()).
+     *
+     * Resizes the backing vector to \p maxDepth elements (each with an
+     * allocated inverse), sets the dirty flag and points Top at the
+     * bottom element.
+     */
+    void init(GLuint maxDepth, GLuint dirtyFlag);
+
+    /**
+     * Push the current top matrix onto the stack.
+     *
+     * Returns \c false and leaves the stack unchanged when it is already at
+     * maximum depth (caller should raise GL_STACK_OVERFLOW).
+     */
+    [[nodiscard]] bool push_matrix();
+
+    /**
+     * Pop the top matrix from the stack.
+     *
+     * Returns \c false and leaves the stack unchanged when the stack is at
+     * depth zero (caller should raise GL_STACK_UNDERFLOW).
+     */
+    [[nodiscard]] bool pop_matrix();
+
+    /** Current stack depth (0 means only a single matrix on the stack). */
+    [[nodiscard]] GLuint depth() const noexcept { return Depth; }
 };
 
 
