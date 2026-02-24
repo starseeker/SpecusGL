@@ -12,21 +12,20 @@ idiomatic C++ rather than "technically C++" C code - i.e. take advantage
 of C++ language features to make the code more readable, well organized,
 less verbose, readily debuggable and performant.
 
+Large, cross-cutting changes are expected and not something to shy away
+from - add testing code as appropriate to verify you're not breaking things,
+but we're looking to achieve a major refactoring of this codebase rather
+than incrementally inching forward slowly.
+
 ---
 
 ## Guiding Principles
 
-1. If any phases need large migrations across
-   the code at once and require intermediate non-working states that is
-   acceptable (for example, if we need to shift all memory management to
-   C++ new/delete/class container style at the same time) but once those
-   large shifts are done be sure to verify functionality and address any
-   behavior regressions.
-2. **Preserve the public C API.**  `OSMesa/osmesa.h`, `OSMesa/gl.h`, etc.
+1. **Preserve the public C API.**  `OSMesa/osmesa.h`, `OSMesa/gl.h`, etc.
    remain unchanged so that existing C consumers compile without modification.
    Internal implementation code structure and organization should be updated to
    reflect modern best practice C++ design.
-3. **Look for opportunities to collapse functions into methods on Classes.** Right now the logic flows
+2. **Look for opportunities to collapse functions into methods on Classes.** Right now the logic flows
    of SpecusGL are designed around lots of individual functions passing
    parameters around, and functions are doing init and free work.  Let's
    see if we can (internally, while preserving the exposed public C API)
