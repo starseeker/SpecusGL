@@ -63,10 +63,7 @@
 static INLINE struct gl_array_object *
 lookup_arrayobj(GLcontext *ctx, GLuint id)
 {
-    return (id == 0)
-	   ? NULL
-	   : (struct gl_array_object *) _mesa_HashLookup(ctx->Shared->ArrayObjects,
-		   id);
+    return (id == 0) ? NULL : ctx->Shared->lookup_arrayobj(id);
 }
 
 
@@ -191,8 +188,7 @@ void
 _mesa_save_array_object(GLcontext *ctx, struct gl_array_object *obj)
 {
     if (obj->Name > 0) {
-	/* insert into hash table */
-	_mesa_HashInsert(ctx->Shared->ArrayObjects, obj->Name, obj);
+	ctx->Shared->insert_arrayobj(obj->Name, obj);
     }
 }
 
@@ -205,8 +201,7 @@ void
 _mesa_remove_array_object(GLcontext *ctx, struct gl_array_object *obj)
 {
     if (obj->Name > 0) {
-	/* remove from hash table */
-	_mesa_HashRemove(ctx->Shared->ArrayObjects, obj->Name);
+	ctx->Shared->remove_arrayobj(obj->Name);
     }
 }
 

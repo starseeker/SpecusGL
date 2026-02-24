@@ -56,8 +56,7 @@
 struct gl_texture_object *
 _mesa_lookup_texture(GLcontext *ctx, GLuint id)
 {
-    return (struct gl_texture_object *)
-	   _mesa_HashLookup(ctx->Shared->TexObjects, id);
+    return ctx->Shared->lookup_texture(id);
 }
 
 
@@ -663,7 +662,7 @@ _mesa_GenTextures(GLsizei n, GLuint *textures)
 	/* insert into hash table */
 	{
 	    std::lock_guard<std::mutex> sharedLock(ctx->Shared->Mutex);
-	    _mesa_HashInsert(ctx->Shared->TexObjects, texObj->Name, texObj);
+	    ctx->Shared->insert_texture(texObj->Name, texObj);
 	}
 
 	textures[i] = name;
@@ -774,7 +773,7 @@ _mesa_DeleteTextures(GLsizei n, const GLuint *textures)
 		 */
 		{
 		    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-		    _mesa_HashRemove(ctx->Shared->TexObjects, delObj->Name);
+		    ctx->Shared->remove_texture(delObj->Name);
 		}
 
 		/* Unreference the texobj.  If refcount hits zero, the texture
@@ -877,7 +876,7 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 	    /* and insert it into hash table */
 	    {
 		std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-		_mesa_HashInsert(ctx->Shared->TexObjects, texName, newTexObj);
+		ctx->Shared->insert_texture(texName, newTexObj);
 	    }
 	}
 	newTexObj->Target = target;

@@ -44,6 +44,7 @@
 #include "gllimits.h"		/* Hardwired parameters */
 #include "glapitable.h"
 #include "glthread.h"
+#include "hash.h"
 #include "math/m_matrix.h"	/* GLmatrix */
 #include "bitset.h"
 
@@ -2130,6 +2131,58 @@ struct gl_shared_state {
     struct _mesa_HashTable *ArrayObjects;
 
     void *DriverData;  /**< Device driver shared state */
+
+    /** Texture object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_texture_object *lookup_texture(GLuint id) const {
+	return static_cast<struct gl_texture_object *>(
+	    _mesa_HashLookup(TexObjects, id));
+    }
+
+    /** Insert texture object into shared table (no locking). */
+    void insert_texture(GLuint id, struct gl_texture_object *obj) {
+	_mesa_HashInsert(TexObjects, id, obj);
+    }
+
+    /** Remove texture object from shared table by ID (no locking). */
+    void remove_texture(GLuint id) {
+	_mesa_HashRemove(TexObjects, id);
+    }
+
+#if FEATURE_ARB_vertex_buffer_object || FEATURE_ARB_pixel_buffer_object
+    /** Buffer object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_buffer_object *lookup_buffer(GLuint id) const {
+	if (id == 0)
+	    return NULL;
+	return static_cast<struct gl_buffer_object *>(
+	    _mesa_HashLookup(BufferObjects, id));
+    }
+
+    /** Insert buffer object into shared table (no locking). */
+    void insert_buffer(GLuint id, struct gl_buffer_object *obj) {
+	_mesa_HashInsert(BufferObjects, id, obj);
+    }
+
+    /** Remove buffer object from shared table by ID (no locking). */
+    void remove_buffer(GLuint id) {
+	_mesa_HashRemove(BufferObjects, id);
+    }
+#endif
+
+    /** Array object lookup by ID (no locking; caller responsible). */
+    [[nodiscard]] struct gl_array_object *lookup_arrayobj(GLuint id) const {
+	return static_cast<struct gl_array_object *>(
+	    _mesa_HashLookup(ArrayObjects, id));
+    }
+
+    /** Insert array object into shared table (no locking). */
+    void insert_arrayobj(GLuint id, struct gl_array_object *obj) {
+	_mesa_HashInsert(ArrayObjects, id, obj);
+    }
+
+    /** Remove array object from shared table by ID (no locking). */
+    void remove_arrayobj(GLuint id) {
+	_mesa_HashRemove(ArrayObjects, id);
+    }
 };
 
 

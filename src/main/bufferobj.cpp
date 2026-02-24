@@ -210,8 +210,7 @@ void
 _mesa_save_buffer_object(GLcontext *ctx, struct gl_buffer_object *obj)
 {
     if (obj->Name > 0) {
-	/* insert into hash table */
-	_mesa_HashInsert(ctx->Shared->BufferObjects, obj->Name, obj);
+	ctx->Shared->insert_buffer(obj->Name, obj);
     }
 }
 
@@ -224,8 +223,7 @@ void
 _mesa_remove_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 {
     if (bufObj->Name > 0) {
-	/* remove from hash table */
-	_mesa_HashRemove(ctx->Shared->BufferObjects, bufObj->Name);
+	ctx->Shared->remove_buffer(bufObj->Name);
     }
 }
 
@@ -470,11 +468,7 @@ _mesa_validate_pbo_access(GLuint dimensions,
 struct gl_buffer_object *
 _mesa_lookup_bufferobj(GLcontext *ctx, GLuint buffer)
 {
-    if (buffer == 0)
-	return NULL;
-    else
-	return (struct gl_buffer_object *)
-	       _mesa_HashLookup(ctx->Shared->BufferObjects, buffer);
+    return ctx->Shared->lookup_buffer(buffer);
 }
 
 
