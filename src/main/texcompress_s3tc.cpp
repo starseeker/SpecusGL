@@ -24,7 +24,7 @@
 
 
 /**
- * \file texcompress_s3tc.c
+ * \file texcompress_s3tc.cpp
  * GL_EXT_texture_compression_s3tc support.
  */
 

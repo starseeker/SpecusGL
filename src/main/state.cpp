@@ -24,7 +24,7 @@
 
 
 /**
- * \file state.c
+ * \file state.cpp
  * State management.
  *
  * This file manages recalculation of derived values in the __GLcontextRec.

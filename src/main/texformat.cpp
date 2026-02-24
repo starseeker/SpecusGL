@@ -24,7 +24,7 @@
 
 
 /**
- * \file texformat.c
+ * \file texformat.cpp
  * Texture formats.
  *
  * \author Gareth Hughes

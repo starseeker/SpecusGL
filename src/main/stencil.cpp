@@ -24,7 +24,7 @@
 
 
 /**
- * \file stencil.c
+ * \file stencil.cpp
  * Stencil operations.
  *
  * Note: There's an incompatibility between GL_EXT_stencil_two_side and

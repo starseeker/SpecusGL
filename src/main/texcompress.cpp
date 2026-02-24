@@ -24,7 +24,7 @@
 
 
 /**
- * \file texcompress.c
+ * \file texcompress.cpp
  * Helper functions for texture compression.
  */
 
