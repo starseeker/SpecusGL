@@ -26,8 +26,7 @@ less verbose, cleanly debuggable and performant.
 2. **Preserve the public C API.**  `OSMesa/osmesa.h`, `OSMesa/gl.h`, etc.
    remain unchanged so that existing C consumers compile without modification.
 3. **Prefer the standard library.**  Replace bespoke data structures with
-   `std::unordered_map`, `std::vector`, `std::string`, etc.  Replace manual
-   mutex macros with `std::mutex` and `std::lock_guard`/`std::unique_lock`.
+   `std::unordered_map`, `std::vector`, `std::string`, etc.
 4. **RAII everywhere.**  Eliminate naked `malloc`/`free` in migrated code;
    use `new`/`delete` or smart pointers as appropriate.
 5. **`[[nodiscard]]` and `static_assert`.**  Apply where they improve
