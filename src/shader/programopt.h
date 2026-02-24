@@ -26,6 +26,10 @@
 #ifndef PROGRAMOPT_H
 #define PROGRAMOPT_H 1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 extern void
 _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog);
@@ -39,6 +43,10 @@ _mesa_count_texture_indirections(struct gl_program *prog);
 extern void
 _mesa_count_texture_instructions(struct gl_program *prog);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* PROGRAMOPT_H */
 

@@ -34,6 +34,11 @@
 #ifndef TEXFORMAT_H
 #define TEXFORMAT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -240,6 +245,11 @@ extern const struct gl_texture_format _mesa_null_texformat;
 extern const struct gl_texture_format *
 _mesa_choose_tex_format(GLcontext *ctx, GLint internalFormat,
 			GLenum format, GLenum type);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

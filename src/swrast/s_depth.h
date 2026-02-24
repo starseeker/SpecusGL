@@ -26,6 +26,10 @@
 #ifndef S_DEPTH_H
 #define S_DEPTH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "s_context.h"
@@ -53,6 +57,9 @@ extern void
 _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

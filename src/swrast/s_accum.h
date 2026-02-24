@@ -26,6 +26,10 @@
 #ifndef S_ACCUM_H
 #define S_ACCUM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 
@@ -34,6 +38,9 @@ extern void
 _swrast_clear_accum_buffer(GLcontext *ctx, struct gl_renderbuffer *rb);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

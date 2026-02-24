@@ -31,6 +31,11 @@
 #ifndef DEPTH_H
 #define DEPTH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -57,6 +62,11 @@ _mesa_init_depth(GLcontext * ctx);
 /** No-op */
 #define _mesa_init_depth( c ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

@@ -27,6 +27,11 @@
 #ifndef DRAWPIXELS_H
 #define DRAWPIXELS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -51,6 +56,11 @@ _mesa_Bitmap(GLsizei width, GLsizei height,
 	     GLfloat xorig, GLfloat yorig, GLfloat xmove, GLfloat ymove,
 	     const GLubyte *bitmap);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

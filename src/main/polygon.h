@@ -31,6 +31,11 @@
 #ifndef POLYGON_H
 #define POLYGON_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -62,6 +67,11 @@ _mesa_GetPolygonStipple(GLubyte *mask);
 
 extern void
 _mesa_init_polygon(GLcontext * ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

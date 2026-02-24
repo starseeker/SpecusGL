@@ -31,6 +31,11 @@
 #ifndef PIXEL_H
 #define PIXEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -124,6 +129,11 @@ extern void
 _mesa_init_pixel(GLcontext * ctx);
 
 /*@}*/
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -31,6 +31,11 @@
 #ifndef POINTS_H
 #define POINTS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -53,6 +58,11 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params);
 extern void
 _mesa_init_point(GLcontext * ctx);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

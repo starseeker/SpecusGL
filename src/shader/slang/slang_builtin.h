@@ -26,6 +26,10 @@
 #ifndef SLANG_BUILTIN_H
 #define SLANG_BUILTIN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "prog_parameter.h"
 #include "slang_utility.h"
 #include "slang_ir.h"
@@ -35,6 +39,10 @@ extern GLint
 _slang_alloc_statevar(slang_ir_node *n,
 		      struct gl_program_parameter_list *paramList);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_BUILTIN_H */
 

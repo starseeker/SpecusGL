@@ -49,6 +49,10 @@
 #ifndef _T_CONTEXT_H
 #define _T_CONTEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "glheader.h"
 #include "mtypes.h"
 
@@ -556,6 +560,10 @@ typedef struct {
 #define TYPE_IDX(t) ((t) & 0xf)
 #define MAX_TYPES TYPE_IDX(GL_DOUBLE)+1      /* 0xa + 1 */
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -31,6 +31,11 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -127,6 +132,11 @@ _mesa_free_viewport_data(GLcontext *ctx);
 extern void
 _mesa_update_modelview_project(GLcontext *ctx, GLuint newstate);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -26,6 +26,10 @@
 #ifndef S_MASKING_H
 #define S_MASKING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -40,6 +44,9 @@ extern void
 _swrast_mask_ci_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 		     SWspan *span);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

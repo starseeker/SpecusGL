@@ -26,6 +26,10 @@
 #ifndef S_STENCIL_H
 #define S_STENCIL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -50,6 +54,9 @@ extern void
 _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

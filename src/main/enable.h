@@ -31,6 +31,11 @@
 #ifndef ENABLE_H
 #define ENABLE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -53,6 +58,11 @@ _mesa_EnableClientState(GLenum cap);
 extern void GLAPIENTRY
 _mesa_DisableClientState(GLenum cap);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

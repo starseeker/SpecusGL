@@ -1,6 +1,11 @@
 #ifndef TEXRENDER_H
 #define TEXRENDER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 extern void
 _mesa_render_texture(GLcontext *ctx,
@@ -11,6 +16,11 @@ extern void
 _mesa_finish_render_texture(GLcontext *ctx,
 			    struct gl_renderbuffer_attachment *att);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TEXRENDER_H */
 

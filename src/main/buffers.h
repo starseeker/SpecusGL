@@ -32,6 +32,11 @@
 #ifndef BUFFERS_H
 #define BUFFERS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -79,6 +84,11 @@ _mesa_set_scissor(GLcontext *ctx,
 		  GLint x, GLint y, GLsizei width, GLsizei height);
 
 extern void _mesa_resizebuffers(GLcontext *ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

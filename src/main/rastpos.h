@@ -31,6 +31,11 @@
 #ifndef RASTPOS_H
 #define RASTPOS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "glheader.h"
 
@@ -189,6 +194,11 @@ extern void
 _mesa_init_rastpos(GLcontext * ctx);
 
 /*@}*/
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

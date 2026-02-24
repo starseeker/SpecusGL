@@ -34,6 +34,11 @@
 #ifndef TEXSTORE_H
 #define TEXSTORE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -234,6 +239,11 @@ extern void
 _mesa_unmap_teximage_pbo(GLcontext *ctx,
 			 const struct gl_pixelstore_attrib *unpack);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

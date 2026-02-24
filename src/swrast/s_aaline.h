@@ -27,6 +27,10 @@
 #ifndef S_AALINE_H
 #define S_AALINE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "swrast.h"
@@ -36,6 +40,9 @@ extern void
 _swrast_choose_aa_line_function(GLcontext *ctx);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

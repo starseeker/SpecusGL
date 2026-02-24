@@ -26,6 +26,10 @@
 #ifndef SLANG_MEM_H
 #define SLANG_MEM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "imports.h"
 
@@ -51,6 +55,10 @@ _slang_strdup(const char *s);
 extern void
 _slang_free(void *addr);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

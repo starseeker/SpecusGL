@@ -26,6 +26,10 @@
 #ifndef SLANG_CODEGEN_H
 #define SLANG_CODEGEN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "imports.h"
 #include "slang_compile.h"
@@ -41,6 +45,10 @@ extern GLboolean
 _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
 			       slang_unit_type type);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_CODEGEN_H */
 

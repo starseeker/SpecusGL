@@ -36,6 +36,11 @@
 #ifndef HINT_H
 #define HINT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -52,6 +57,11 @@ _mesa_init_hint(GLcontext * ctx);
 /** No-op */
 #define _mesa_init_hint( c ) ((void) 0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

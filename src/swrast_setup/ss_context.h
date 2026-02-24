@@ -29,6 +29,10 @@
 #ifndef SS_CONTEXT_H
 #define SS_CONTEXT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 #include "swrast/swrast.h"
 #include "swrast_setup.h"
@@ -42,6 +46,10 @@ typedef struct {
 } SScontext;
 
 #define SWSETUP_CONTEXT(ctx) ((SScontext *)ctx->swsetup_context)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

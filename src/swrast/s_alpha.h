@@ -27,6 +27,10 @@
 #ifndef S_ALPHA_H
 #define S_ALPHA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "mtypes.h"
 #include "s_context.h"
@@ -36,6 +40,9 @@ extern GLint
 _swrast_alpha_test(const GLcontext *ctx, SWspan *span);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

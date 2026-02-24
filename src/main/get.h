@@ -31,6 +31,11 @@
 #ifndef GET_H
 #define GET_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -55,6 +60,11 @@ _mesa_GetString(GLenum name);
 
 extern GLenum GLAPIENTRY
 _mesa_GetError(void);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

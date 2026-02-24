@@ -31,6 +31,11 @@
 #ifndef FEEDBACK_H
 #define FEEDBACK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -78,6 +83,11 @@ _mesa_PopName(void);
 extern GLint GLAPIENTRY
 _mesa_RenderMode(GLenum mode);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

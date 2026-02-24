@@ -25,6 +25,11 @@
 #ifndef TEXCOMPRESS_H
 #define TEXCOMPRESS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "mtypes.h"
 
 #if _HAVE_FULL_GL
@@ -70,6 +75,11 @@ _mesa_init_texture_fxt1(GLcontext *ctx);
 #define _mesa_compress_teximage( c, w, h, sF, s, sRS, dF, d, drs ) ((void)0)
 
 #endif /* _HAVE_FULL_GL */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* TEXCOMPRESS_H */
 

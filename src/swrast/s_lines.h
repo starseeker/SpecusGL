@@ -27,6 +27,10 @@
 #ifndef S_LINES_H
 #define S_LINES_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 
 void
@@ -38,6 +42,9 @@ _swrast_add_spec_terms_line(GLcontext *ctx,
 			    const SWvertex *v1);
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

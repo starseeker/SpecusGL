@@ -32,6 +32,11 @@
 #ifndef DLIST_H
 #define DLIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -91,6 +96,11 @@ extern void _mesa_save_vtxfmt_init(GLvertexformat *vfmt);
 /** No-op */
 #define _mesa_save_vtxfmt_init(v) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

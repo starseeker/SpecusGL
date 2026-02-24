@@ -44,6 +44,10 @@
 #ifndef _GLAPI_H
 #define _GLAPI_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "OSMesa/gl.h"
 #include "glapitable.h"
@@ -133,6 +137,9 @@ _glapi_get_proc_address(const char *funcName);
 extern const char *
 _glapi_get_proc_name(GLuint offset);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /*

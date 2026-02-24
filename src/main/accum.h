@@ -37,6 +37,11 @@
 #ifndef ACCUM_H
 #define ACCUM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -57,6 +62,11 @@ _mesa_init_accum(GLcontext *ctx);
 /** No-op */
 #define _mesa_init_accum( c ) ((void)0)
 
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

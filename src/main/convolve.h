@@ -27,6 +27,11 @@
 #ifndef CONVOLVE_H
 #define CONVOLVE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -109,6 +114,11 @@ _mesa_adjust_image_for_convolution(const GLcontext *ctx, GLuint dimensions,
 #define _mesa_convolve_1d_image(c,w,s,d) ((void)0)
 #define _mesa_convolve_2d_image(c,w,h,s,d) ((void)0)
 #define _mesa_convolve_sep_image(c,w,h,s,d) ((void)0)
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

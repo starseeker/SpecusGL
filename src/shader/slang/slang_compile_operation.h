@@ -25,6 +25,10 @@
 #ifndef SLANG_COMPILE_OPERATION_H
 #define SLANG_COMPILE_OPERATION_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /**
  * Types of slang operations.
@@ -145,6 +149,10 @@ slang_operation_insert(GLuint *numChildren, slang_operation **children,
 extern void
 _slang_operation_swap(slang_operation *oper0, slang_operation *oper1);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLANG_COMPILE_OPERATION_H */
 

@@ -26,6 +26,11 @@
 #ifndef RBADAPTORS_H
 #define RBADAPTORS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 extern struct gl_renderbuffer *
 _mesa_new_renderbuffer_16wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8);
@@ -36,6 +41,11 @@ _mesa_new_renderbuffer_32wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8);
 extern struct gl_renderbuffer *
 _mesa_new_renderbuffer_32wrap16(GLcontext *ctx, struct gl_renderbuffer *rb16);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* RBADAPTORS_H */
 

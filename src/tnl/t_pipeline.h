@@ -30,6 +30,10 @@
 #ifndef _T_PIPELINE_H_
 #define _T_PIPELINE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "mtypes.h"
 #include "t_context.h"
 
@@ -70,6 +74,10 @@ extern void _tnl_RenderClippedPolygon(GLcontext *ctx,
 
 extern void _tnl_RenderClippedLine(GLcontext *ctx, GLuint ii, GLuint jj);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

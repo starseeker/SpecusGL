@@ -31,6 +31,11 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -141,6 +146,11 @@ extern void _mesa_allow_light_in_model(GLcontext *ctx, GLboolean flag);
 #define _mesa_update_lighting( c ) ((void)0)
 #define _mesa_update_tnl_spaces( c, n ) ((void)0)
 #define GET_SHINE_TAB_ENTRY( table, dp, result )  ((result)=0)
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

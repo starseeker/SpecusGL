@@ -31,6 +31,11 @@
 #ifndef TEXSTATE_H
 #define TEXSTATE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 #include "mtypes.h"
 
@@ -148,6 +153,11 @@ extern void
 _mesa_free_texture_data(GLcontext *ctx);
 
 /*@}*/
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

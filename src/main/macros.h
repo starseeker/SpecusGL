@@ -31,6 +31,11 @@
 #ifndef MACROS_H
 #define MACROS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "imports.h"
 
 
@@ -656,6 +661,11 @@ do {                        \
 #define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
 #define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

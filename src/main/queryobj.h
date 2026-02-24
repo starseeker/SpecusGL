@@ -26,6 +26,11 @@
 #ifndef OCCLUDE_H
 #define OCCLUDE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 
 extern struct gl_query_object *
 _mesa_new_query_object(GLcontext *ctx, GLuint id);
@@ -66,6 +71,11 @@ _mesa_GetQueryObjecti64vEXT(GLuint id, GLenum pname, GLint64EXT *params);
 extern void GLAPIENTRY
 _mesa_GetQueryObjectui64vEXT(GLuint id, GLenum pname, GLuint64EXT *params);
 
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* OCCLUDE_H */
 
