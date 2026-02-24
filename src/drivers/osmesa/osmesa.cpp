@@ -70,6 +70,12 @@ struct osmesa_context {
     GLboolean yup;		/*< TRUE  -> Y increases upward */
     /*< FALSE -> Y increases downward */
     GLboolean enable_fxaa;	/*< TRUE to enable FXAA post-processing */
+
+    /** Recompute the rowaddr array from the current buffer and format. */
+    void compute_row_addresses();
+
+    /** Apply FXAA post-processing if enabled. */
+    void apply_fxaa();
 };
 
 
@@ -77,7 +83,7 @@ static INLINE OSMesaContext
 OSMESA_CONTEXT(GLcontext *ctx)
 {
     /* Just cast, since we're using structure containment */
-    return (OSMesaContext) ctx;
+    return static_cast<OSMesaContext>(static_cast<void *>(ctx));
 }
 
 
@@ -120,29 +126,29 @@ osmesa_update_state(GLcontext *ctx, GLuint new_state)
  * Apply FXAA post-processing if enabled.
  * Called from glFinish to process the final rendered image.
  */
-static void
-osmesa_apply_fxaa(OSMesaContext osmesa)
+void
+osmesa_context::apply_fxaa()
 {
-    if (!osmesa || !osmesa->enable_fxaa)
+    if (!enable_fxaa)
         return;
     
     /* Only apply FXAA to RGBA8 buffers */
-    if (osmesa->rb->DataType != GL_UNSIGNED_BYTE)
+    if (rb->DataType != GL_UNSIGNED_BYTE)
         return;
     
     /* Only apply to RGBA format for now */
-    if (osmesa->format != OSMESA_RGBA)
+    if (format != OSMESA_RGBA)
         return;
     
-    GLint width = osmesa->rb->Width;
-    GLint height = osmesa->rb->Height;
-    uint8_t* buffer = (uint8_t*)osmesa->rb->Data;
+    GLint width = rb->Width;
+    GLint height = rb->Height;
+    uint8_t* buffer = (uint8_t*)rb->Data;
     
     if (!buffer || width <= 0 || height <= 0)
         return;
     
     /* Calculate stride based on row length */
-    GLint rowlength = osmesa->userRowLength ? osmesa->userRowLength : width;
+    GLint rowlength = userRowLength ? userRowLength : width;
     GLint strideBytes = rowlength * 4;  /* 4 bytes per RGBA pixel */
     
     /* Set up FXAA parameters (matching VTK defaults) */
@@ -172,7 +178,7 @@ osmesa_finish(GLcontext *ctx)
     _swrast_flush(ctx);
     
     /* Apply FXAA if enabled */
-    osmesa_apply_fxaa(osmesa);
+    osmesa->apply_fxaa();
 }
 
 
@@ -812,39 +818,39 @@ osmesa_choose_line(GLcontext *ctx)
 /**
  * Recompute the values of the context's rowaddr array.
  */
-static void
-compute_row_addresses(OSMesaContext osmesa)
+void
+osmesa_context::compute_row_addresses()
 {
     GLint bytesPerPixel, bytesPerRow, i;
-    GLubyte *origin = (GLubyte *) osmesa->rb->Data;
+    GLubyte *origin = (GLubyte *) rb->Data;
     GLint bpc; /* bytes per channel */
     GLint rowlength; /* in pixels */
-    GLint height = osmesa->rb->Height;
+    GLint height = rb->Height;
 
-    if (osmesa->userRowLength)
-	rowlength = osmesa->userRowLength;
+    if (userRowLength)
+	rowlength = userRowLength;
     else
-	rowlength = osmesa->rb->Width;
+	rowlength = rb->Width;
 
-    if (osmesa->rb->DataType == GL_UNSIGNED_BYTE)
+    if (rb->DataType == GL_UNSIGNED_BYTE)
 	bpc = 1;
-    else if (osmesa->rb->DataType == GL_UNSIGNED_SHORT)
+    else if (rb->DataType == GL_UNSIGNED_SHORT)
 	bpc = 2;
-    else if (osmesa->rb->DataType == GL_FLOAT)
+    else if (rb->DataType == GL_FLOAT)
 	bpc = 4;
     else {
-	_mesa_problem(&osmesa->mesa,
+	_mesa_problem(&mesa,
 		      "Unexpected datatype in osmesa::compute_row_addresses");
 	return;
     }
 
-    if (osmesa->format == OSMESA_COLOR_INDEX) {
+    if (format == OSMESA_COLOR_INDEX) {
 	/* CI mode */
 	bytesPerPixel = 1 * sizeof(GLubyte);
-    } else if ((osmesa->format == OSMESA_RGB) || (osmesa->format == OSMESA_BGR)) {
+    } else if ((format == OSMESA_RGB) || (format == OSMESA_BGR)) {
 	/* RGB mode */
 	bytesPerPixel = 3 * bpc;
-    } else if (osmesa->format == OSMESA_RGB_565) {
+    } else if (format == OSMESA_RGB_565) {
 	/* 5/6/5 RGB pixel in 16 bits */
 	bytesPerPixel = 2;
     } else {
@@ -854,16 +860,16 @@ compute_row_addresses(OSMesaContext osmesa)
 
     bytesPerRow = rowlength * bytesPerPixel;
 
-    if (osmesa->yup) {
+    if (yup) {
 	/* Y=0 is bottom line of window */
 	for (i = 0; i < height; i++) {
-	    osmesa->rowaddr[i] = (GLvoid *)((GLubyte *) origin + i * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + i * bytesPerRow);
 	}
     } else {
 	/* Y=0 is top line of window */
 	for (i = 0; i < height; i++) {
 	    GLint j = height - i - 1;
-	    osmesa->rowaddr[i] = (GLvoid *)((GLubyte *) origin + j * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + j * bytesPerRow);
 	}
     }
 }
@@ -1069,7 +1075,7 @@ osmesa_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
     rb->Width = width;
     rb->Height = height;
 
-    compute_row_addresses(osmesa);
+    osmesa->compute_row_addresses();
 
     return GL_TRUE;
 }
@@ -1478,7 +1484,7 @@ OSMesaPixelStore(GLint pname, GLint value)
 	    return;
     }
 
-    compute_row_addresses(osmesa);
+    osmesa->compute_row_addresses();
 }
 
 
