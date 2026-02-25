@@ -79,7 +79,7 @@ _mesa_init_program(GLcontext *ctx)
 #if FEATURE_ATI_fragment_shader
     ctx->ATIFragmentShader.Current = (struct ati_fragment_shader *) ctx->Shared->DefaultFragmentShader;
     assert(ctx->ATIFragmentShader.Current);
-    ctx->ATIFragmentShader.Current->RefCount++;
+    ctx->ATIFragmentShader.Current->ref();
 #endif
 }
 
@@ -105,8 +105,7 @@ _mesa_free_program_data(GLcontext *ctx)
     /* XXX probably move this stuff */
 #if FEATURE_ATI_fragment_shader
     if (ctx->ATIFragmentShader.Current) {
-	ctx->ATIFragmentShader.Current->RefCount--;
-	if (ctx->ATIFragmentShader.Current->RefCount <= 0) {
+	if (ctx->ATIFragmentShader.Current->unref()) {
 	    _mesa_delete_ati_fragment_shader(ctx, ctx->ATIFragmentShader.Current);
 	}
     }

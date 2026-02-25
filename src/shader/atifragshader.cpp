@@ -222,8 +222,7 @@ _mesa_BindFragmentShaderATI(GLuint id)
 
     /* unbind current */
     if (curProg->Id != 0) {
-	curProg->RefCount--;
-	if (curProg->RefCount <= 0) {
+	if (curProg->unref()) {
 	    ctx->Shared->remove_ati_shader(id);
 	}
     }
@@ -250,7 +249,7 @@ _mesa_BindFragmentShaderATI(GLuint id)
 
     ASSERT(ctx->ATIFragmentShader.Current);
     if (newProg)
-	newProg->RefCount++;
+	newProg->ref();
 
     /*if (ctx->Driver.BindProgram)
        ctx->Driver.BindProgram(ctx, target, prog); */
@@ -281,8 +280,7 @@ _mesa_DeleteFragmentShaderATI(GLuint id)
 	/* The ID is immediately available for re-use now */
 	ctx->Shared->remove_ati_shader(id);
 	if (prog && (prog != &DummyShader)) {
-	    prog->RefCount--;
-	    if (prog->RefCount <= 0) {
+	    if (prog->unref()) {
 		delete prog;
 	    }
 	}

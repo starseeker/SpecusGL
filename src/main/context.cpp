@@ -405,8 +405,6 @@ static GLboolean
 alloc_shared_state(GLcontext *ctx)
 {
     struct gl_shared_state *ss = new gl_shared_state{};
-    if (!ss)
-	return GL_FALSE;
 
     ctx->Shared = ss;
 

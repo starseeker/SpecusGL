@@ -50,9 +50,6 @@ _swsetup_CreateContext(GLcontext *ctx)
 {
     auto *swsetup = new SScontext{};
 
-    if (!swsetup)
-	return GL_FALSE;
-
     ctx->swsetup_context = swsetup;
 
     swsetup->NewState = ~0;

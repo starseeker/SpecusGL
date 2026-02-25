@@ -2100,6 +2100,15 @@ struct ati_fragment_shader {
     GLboolean interpinp1;
     GLboolean isValid;
     GLuint swizzlerq;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 /**
