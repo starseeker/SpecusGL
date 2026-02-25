@@ -110,8 +110,7 @@ struct prog_instruction *
     GLuint i;
     memcpy(dest, src, n * sizeof(struct prog_instruction));
     for (i = 0; i < n; i++) {
-	if (src[i].Comment)
-	    dest[i].Comment = _mesa_strdup(src[i].Comment);
+	dest[i].Comment = src[i].Comment;
     }
     return dest;
 }

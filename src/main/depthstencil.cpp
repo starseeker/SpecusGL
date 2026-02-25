@@ -557,7 +557,7 @@ _mesa_promote_stencil(GLcontext *ctx, struct gl_renderbuffer *stencilRb)
     ASSERT(stencilRb->_ActualFormat == GL_STENCIL_INDEX8_EXT);
     ASSERT(stencilRb->Data);
 
-    data = (GLubyte *) stencilRb->Data;
+    data = static_cast<GLubyte *>(stencilRb->Data);
     stencilRb->Data = nullptr;
     stencilRb->AllocStorage(ctx, GL_DEPTH24_STENCIL8_EXT, width, height);
 
@@ -571,7 +571,7 @@ for (j = 0; j < width; j++) {
 }
 stencilRb->PutRow(ctx, width, 0, i, depthStencil, nullptr);
     }
-    free(data);
+    delete[] data;
 
     stencilRb->_BaseFormat = GL_DEPTH_STENCIL_EXT;
 }

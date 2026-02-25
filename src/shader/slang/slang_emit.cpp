@@ -362,7 +362,7 @@ storage_annotation(const slang_ir_node *n, const struct gl_program *prog)
 /**
  * Return an annotation string for an instruction.
  */
-static char *
+static std::string
 instruction_annotation(gl_inst_opcode opcode, char *dstAnnot,
 		       char *srcAnnot0, char *srcAnnot1, char *srcAnnot2)
 {
@@ -445,7 +445,7 @@ emit_comment(slang_emit_info *emitInfo, const char *s)
 {
     struct prog_instruction *inst = new_instruction(emitInfo, OPCODE_NOP);
     if (inst) {
-	inst->Comment = _mesa_strdup(s);
+	inst->Comment = s;
     }
     return inst;
 }
@@ -618,7 +618,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
 	storage_to_src_reg(&inst->SrcReg[1], n->Children[1]->Store);
 	storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
-	inst->Comment = _mesa_strdup("Compare values");
+	inst->Comment = "Compare values";
 
 	/* Compute tmp2 = DOT(tmp1, tmp1)  (reduction) */
 	inst = new_instruction(emitInfo, dotOp);
@@ -629,7 +629,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	if (!alloc_temp_storage(emitInfo, n, 1))  /* alloc tmp2 */
 	    return NULL;
 	storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
-	inst->Comment = _mesa_strdup("Reduce vec to bool");
+	inst->Comment = "Reduce vec to bool";
 
 	if (n->Opcode == IR_EQUAL) {
 	    /* compute tmp2.x = !tmp2.x  via tmp2.x = (tmp2.x == 0) */
@@ -637,7 +637,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	    storage_to_src_reg(&inst->SrcReg[0], n->Store);
 	    constant_to_src_reg(&inst->SrcReg[1], 0.0, emitInfo);
 	    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
-	    inst->Comment = _mesa_strdup("Invert true/false");
+	    inst->Comment = "Invert true/false";
 	}
     } else {
 	/* size > 4, struct compare */
@@ -825,7 +825,7 @@ emit_fcall(slang_emit_info *emitInfo, slang_ir_node *n)
 	 * really just a NOP to attach the label to.
 	 */
 	inst = new_instruction(emitInfo, OPCODE_BGNSUB);
-	inst->Comment = _mesa_strdup(n->Label->Name);
+	inst->Comment = n->Label->Name;
     }
 
     /* body of function: */
@@ -840,7 +840,7 @@ emit_fcall(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (emitInfo->EmitBeginEndSub) {
 	inst = new_instruction(emitInfo, OPCODE_ENDSUB);
-	inst->Comment = _mesa_strdup(n->Label->Name);
+	inst->Comment = n->Label->Name;
     }
 
     /* pop/restore cur program */
@@ -850,7 +850,7 @@ emit_fcall(slang_emit_info *emitInfo, slang_ir_node *n)
     inst = new_instruction(emitInfo, OPCODE_CAL);
     /* The branch target is just the subroutine number (changed later) */
     inst->BranchTarget = subroutineId;
-    inst->Comment = _mesa_strdup(n->Label->Name);
+    inst->Comment = n->Label->Name;
     assert(inst->BranchTarget >= 0);
 
     return inst;
@@ -997,7 +997,7 @@ emit_move(slang_emit_info *emitInfo, slang_ir_node *n)
 	    srcStore.Size = 4;
 	    while (size >= 4) {
 		inst = new_instruction(emitInfo, OPCODE_MOV);
-		inst->Comment = _mesa_strdup("IR_MOVE block");
+		inst->Comment = "IR_MOVE block";
 		storage_to_dst_reg(&inst->DstReg, &dstStore, n->Writemask);
 		storage_to_src_reg(&inst->SrcReg[0], &srcStore);
 		srcStore.Index++;
@@ -1071,7 +1071,7 @@ emit_cond(slang_emit_info *emitInfo, slang_ir_node *n)
 	    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 	    storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
 	    _slang_free_temp(emitInfo->vt, n->Store);
-	    inst->Comment = _mesa_strdup("COND expr");
+	    inst->Comment = "COND expr";
 	    return inst;
 	}
     } else {
@@ -1129,7 +1129,7 @@ emit_not(slang_emit_info *emitInfo, slang_ir_node *n)
     constant_to_src_reg(&inst->SrcReg[1], 0.0, emitInfo);
     free_temp_storage(emitInfo->vt, n->Children[0]);
 
-    inst->Comment = _mesa_strdup("NOT");
+    inst->Comment = "NOT";
     return inst;
 }
 
@@ -1191,7 +1191,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
 	    /* jump to endif instruction */
 	    struct prog_instruction *inst;
 	    inst = new_instruction(emitInfo, OPCODE_BRA);
-	    inst->Comment = _mesa_strdup("else");
+	    inst->Comment = "else";
 	    inst->DstReg.CondMask = COND_TR;  /* always branch */
 	}
 	prog->Instructions[ifInstLoc].BranchTarget = prog->NumInstructions;
@@ -1616,7 +1616,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 	    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 	    storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
 	    if (emitInfo->EmitComments)
-		inst->Comment = _mesa_strdup("int to float");
+		inst->Comment = "int to float";
 	    return NULL;
 
 	/* Simple arithmetic */

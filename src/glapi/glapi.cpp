@@ -47,6 +47,7 @@
 
 
 #include "glheader.h"
+#include <string>
 #include "glapi.h"
 #include "glapioffsets.h"
 #include "glapitable.h"
@@ -384,7 +385,7 @@ struct _glapi_function {
     /**
      * Name of the function.
      */
-    const char * name;
+    std::string name;
 
 
     /**
@@ -396,7 +397,7 @@ struct _glapi_function {
      *   - 'f' for \c GLfloat and \c GLclampf
      *   - 'd' for \c GLdouble and \c GLclampd
      */
-    const char * parameter_signature;
+    std::string parameter_signature;
 
 
     /**
@@ -476,11 +477,7 @@ add_function_name(const char * funcName)
 	_glapi_proc entrypoint = generate_entrypoint(~0);
 	if (entrypoint != nullptr) {
 	    entry = & ExtEntryTable[NumExtEntryPoints];
-	    size_t nlen = strlen(funcName);
-	    char *ncpy = (char *)malloc(nlen + 1);
-	    strncpy(ncpy, funcName, nlen);
-	    ncpy[nlen] = '\0';
-	    ExtEntryTable[NumExtEntryPoints].name = ncpy;
+	    ExtEntryTable[NumExtEntryPoints].name = funcName;
 	    ExtEntryTable[NumExtEntryPoints].parameter_signature = nullptr;
 	    ExtEntryTable[NumExtEntryPoints].dispatch_offset = ~0;
 	    ExtEntryTable[NumExtEntryPoints].dispatch_stub = entrypoint;
@@ -585,14 +582,13 @@ _glapi_add_dispatch(const char * const * function_names,
 
 
 	for (j = 0 ; j < NumExtEntryPoints ; j++) {
-	    if (strcmp(ExtEntryTable[j].name, function_names[i]) == 0) {
+	    if (ExtEntryTable[j].name == function_names[i]) {
 		/* The offset may be ~0 if the function name was added by
 		 * glXGetProcAddress but never filled in by the driver.
 		 */
 
 		if (ExtEntryTable[j].dispatch_offset != ~0) {
-		    if (strcmp(real_sig, ExtEntryTable[j].parameter_signature)
-			!= 0) {
+		    if (ExtEntryTable[j].parameter_signature != real_sig) {
 			return -1;
 		    }
 
@@ -625,11 +621,7 @@ _glapi_add_dispatch(const char * const * function_names,
 		}
 	    }
 
-	    size_t nlen = strlen(real_sig);
-	    char *ncpy = (char *)malloc(nlen + 1);
-	    strncpy(ncpy, real_sig, nlen);
-	    ncpy[nlen] = '\0';
-	    entry[i]->parameter_signature = ncpy;
+	    entry[i]->parameter_signature = real_sig;
 	    fill_in_entrypoint_offset(entry[i]->dispatch_stub, offset);
 	    entry[i]->dispatch_offset = offset;
 	}
@@ -648,7 +640,7 @@ _glapi_get_proc_offset(const char *funcName)
     /* search extension functions first */
     GLuint i;
     for (i = 0; i < NumExtEntryPoints; i++) {
-	if (strcmp(ExtEntryTable[i].name, funcName) == 0) {
+	if (ExtEntryTable[i].name == funcName) {
 	    return ExtEntryTable[i].dispatch_offset;
 	}
     }
@@ -685,7 +677,7 @@ _glapi_get_proc_address(const char *funcName)
 
     /* search extension functions first */
     for (i = 0; i < NumExtEntryPoints; i++) {
-	if (strcmp(ExtEntryTable[i].name, funcName) == 0) {
+	if (ExtEntryTable[i].name == funcName) {
 	    return ExtEntryTable[i].dispatch_stub;
 	}
     }
@@ -737,7 +729,7 @@ _glapi_get_proc_name(GLuint offset)
     /* search added extension functions */
     for (i = 0; i < NumExtEntryPoints; i++) {
 	if (ExtEntryTable[i].dispatch_offset == offset) {
-	    return ExtEntryTable[i].name;
+	    return ExtEntryTable[i].name.c_str();
 	}
     }
     return nullptr;

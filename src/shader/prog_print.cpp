@@ -430,8 +430,8 @@ print_src_reg(const struct prog_src_register *srcReg, gl_prog_print_mode mode,
 static void
 print_comment(const struct prog_instruction *inst)
 {
-    if (inst->Comment)
-	_mesa_printf(";  # %s\n", inst->Comment);
+    if (!inst->Comment.empty())
+	_mesa_printf(";  # %s\n", inst->Comment.c_str());
     else
 	_mesa_printf(";\n");
 }
@@ -521,8 +521,8 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 			     _mesa_swizzle_string(inst->SrcReg[0].Swizzle,
 						  inst->SrcReg[0].NegateBase, GL_FALSE));
 	    }
-	    if (inst->Comment)
-		_mesa_printf("  # %s", inst->Comment);
+	    if (!inst->Comment.empty())
+		_mesa_printf("  # %s", inst->Comment.c_str());
 	    print_comment(inst);
 	    break;
 	case OPCODE_SWZ:
@@ -623,7 +623,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 
 	case OPCODE_BGNSUB:
 	    if (mode == PROG_PRINT_NV) {
-		_mesa_printf("%s:\n", inst->Comment); /* comment is label */
+		_mesa_printf("%s:\n", inst->Comment.c_str()); /* comment is label */
 		return indent;
 	    } else {
 		_mesa_printf("BGNSUB");
@@ -638,7 +638,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    break;
 	case OPCODE_CAL:
 	    if (mode == PROG_PRINT_NV) {
-		_mesa_printf("CAL %s;  # (goto %d)\n", inst->Comment, inst->BranchTarget);
+		_mesa_printf("CAL %s;  # (goto %d)\n", inst->Comment.c_str(), inst->BranchTarget);
 	    } else {
 		_mesa_printf("CAL %u", inst->BranchTarget);
 		print_comment(inst);
@@ -658,9 +658,9 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    if (mode == PROG_PRINT_DEBUG) {
 		_mesa_printf("NOP");
 		print_comment(inst);
-	    } else if (inst->Comment) {
+	    } else if (!inst->Comment.empty()) {
 		/* ARB/NV extensions don't have NOP instruction */
-		_mesa_printf("# %s\n", inst->Comment);
+		_mesa_printf("# %s\n", inst->Comment.c_str());
 	    }
 	    break;
 	/* XXX may need other special-case instructions */

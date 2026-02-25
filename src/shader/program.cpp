@@ -270,9 +270,8 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
 	GLuint i;
 	for (i = 0; i < prog->NumInstructions; i++) {
 	    if (prog->Instructions[i].Data)
-		free(prog->Instructions[i].Data);
-	    if (prog->Instructions[i].Comment)
-		free((char *) prog->Instructions[i].Comment);
+		delete[] static_cast<GLubyte *>(prog->Instructions[i].Data);
+	    /* Comment is now std::string, no explicit free needed */
 	}
 	delete[] prog->Instructions;
     }
@@ -291,7 +290,7 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog->Target == GL_VERTEX_PROGRAM_ARB) {
 	struct gl_vertex_program *vprog = (struct gl_vertex_program *) prog;
 	if (vprog->TnlData)
-	    free(vprog->TnlData);
+	    delete static_cast<char *>(vprog->TnlData); /* should always be nullptr */
 	delete vprog;
     } else {
 	delete (struct gl_fragment_program *) prog;
