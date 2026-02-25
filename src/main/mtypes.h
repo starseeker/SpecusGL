@@ -1338,8 +1338,8 @@ struct gl_texture_image {
     GLuint CompressedSize;	/**< GL_ARB_texture_compression */
 
     GLuint RowStride;		/**< == Width unless IsClientData and padded */
-    GLuint *ImageOffsets;        /**< if 3D texture: array [Depth] of offsets to
-                                     each 2D slice in 'Data', in texels */
+    std::vector<GLuint> ImageOffsets; /**< if 3D texture: offsets to each 2D
+                                          slice in 'Data', in texels */
     GLvoid *Data;		/**< Image data, accessed via FetchTexel() */
 
     /**
@@ -1415,6 +1415,34 @@ struct gl_texture_object {
      * allocation.
      */
     void *DriverData;	/**< Arbitrary device driver data */
+
+    /**
+     * Initialise a texture object to its default state.
+     *
+     * This is the canonical initialisation routine for gl_texture_object.
+     * Sets all fields to the OpenGL-specified defaults for an object with
+     * the given \p name and \p target.  Replaces the old free function
+     * _mesa_initialize_texture_object().
+     */
+    void init(GLuint name, GLenum target);
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if the
+     * object should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 

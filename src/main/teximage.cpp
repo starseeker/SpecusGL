@@ -711,8 +711,6 @@ _mesa_delete_texture_image(GLcontext *ctx, struct gl_texture_image *texImage)
     ctx->Driver.FreeTexImageData(ctx, texImage);
 
     ASSERT(texImage->Data == nullptr);
-    if (texImage->ImageOffsets)
-	delete[] texImage->ImageOffsets;
     delete texImage;
 }
 
@@ -1094,10 +1092,7 @@ clear_teximage_fields(struct gl_texture_image *img)
     img->Height = 0;
     img->Depth = 0;
     img->RowStride = 0;
-    if (img->ImageOffsets) {
-	delete[] img->ImageOffsets;
-	img->ImageOffsets = nullptr;
-    }
+    img->ImageOffsets.clear();
     img->Width2 = 0;
     img->Height2 = 0;
     img->Depth2 = 0;
@@ -1173,11 +1168,11 @@ _mesa_init_teximage_fields(GLcontext *ctx, GLenum target,
 
     /* RowStride and ImageOffsets[] describe how to address texels in 'Data' */
     img->RowStride = width;
-    /* Allocate the ImageOffsets array and initialize to typical values.
-     * We allocate the array for 1D/2D textures too in order to avoid special-
-     * case code in the texstore routines.
+    /* Initialise the ImageOffsets vector with typical per-slice values.
+     * We populate it for 1D/2D textures too to avoid special-case code
+     * in the texstore routines.
      */
-    img->ImageOffsets = new GLuint[depth];
+    img->ImageOffsets.resize(depth);
     for (i = 0; i < depth; i++) {
 	img->ImageOffsets[i] = i * width * height;
     }

@@ -2876,7 +2876,7 @@ _mesa_store_teximage1d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  0, 0, 0,  /* dstX/Y/Zoffset */
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, 1, 1,
 		  format, type, pixels, packing);
 	if (!success) {
@@ -2960,7 +2960,7 @@ _mesa_store_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  0, 0, 0,  /* dstX/Y/Zoffset */
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, height, 1,
 		  format, type, pixels, packing);
 	if (!success) {
@@ -3034,7 +3034,7 @@ _mesa_store_teximage3d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  0, 0, 0,  /* dstX/Y/Zoffset */
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, height, depth,
 		  format, type, pixels, packing);
 	if (!success) {
@@ -3082,7 +3082,7 @@ _mesa_store_texsubimage1d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  xoffset, 0, 0,  /* offsets */
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, 1, 1,
 		  format, type, pixels, packing);
 	if (!success) {
@@ -3136,7 +3136,7 @@ _mesa_store_texsubimage2d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  xoffset, yoffset, 0,
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, height, 1,
 		  format, type, pixels, packing);
 	if (!success) {
@@ -3190,7 +3190,7 @@ _mesa_store_texsubimage3d(GLcontext *ctx, GLenum target, GLint level,
 		  texImage->Data,
 		  xoffset, yoffset, zoffset,
 		  dstRowStride,
-		  texImage->ImageOffsets,
+		  texImage->ImageOffsets.data(),
 		  width, height, depth,
 		  format, type, pixels, packing);
 	if (!success) {
