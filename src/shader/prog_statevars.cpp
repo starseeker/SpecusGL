@@ -305,8 +305,8 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		modifier == STATE_MATRIX_INVTRANS) {
 		/* Be sure inverse is up to date:
 		 */
-		_math_matrix_alloc_inv((GLmatrix *) matrix);
-		_math_matrix_analyse((GLmatrix*) matrix);
+		((GLmatrix *) matrix)->alloc_inv();
+		((GLmatrix *) matrix)->analyse();
 		m = matrix->inv;
 	    } else {
 		m = matrix->m;
@@ -870,16 +870,16 @@ _mesa_load_tracked_matrices(GLcontext *ctx)
 	if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_IDENTITY_NV) {
 	    load_matrix(ctx->VertexProgram.Parameters, i*4, mat->m);
 	} else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_INVERSE_NV) {
-	    _math_matrix_analyse(mat); /* update the inverse */
-	    ASSERT(!_math_matrix_is_dirty(mat));
+	    mat->analyse(); /* update the inverse */
+	    ASSERT(!mat->is_dirty());
 	    load_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
 	} else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_TRANSPOSE_NV) {
 	    load_transpose_matrix(ctx->VertexProgram.Parameters, i*4, mat->m);
 	} else {
 	    assert(ctx->VertexProgram.TrackMatrixTransform[i]
 		   == GL_INVERSE_TRANSPOSE_NV);
-	    _math_matrix_analyse(mat); /* update the inverse */
-	    ASSERT(!_math_matrix_is_dirty(mat));
+	    mat->analyse(); /* update the inverse */
+	    ASSERT(!mat->is_dirty());
 	    load_transpose_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
 	}
     }

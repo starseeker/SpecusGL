@@ -1400,7 +1400,7 @@ update_image_transfer_state(GLcontext *ctx)
 void _mesa_update_pixel(GLcontext *ctx, GLuint new_state)
 {
     if (new_state & _NEW_COLOR_MATRIX)
-	_math_matrix_analyse(ctx->ColorMatrixStack.Top);
+	ctx->ColorMatrixStack.Top->analyse();
 
     /* References ColorMatrix.type (derived above).
      */

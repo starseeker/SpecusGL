@@ -1027,7 +1027,7 @@ update_viewport_matrix(GLcontext *ctx)
      * and should be maintained elsewhere if at all.
      * NOTE: RasterPos uses this.
      */
-    _math_matrix_viewport(&ctx->Viewport._WindowMap,
+    ctx->Viewport._WindowMap.viewport(
 			  ctx->Viewport.X, ctx->Viewport.Y,
 			  ctx->Viewport.Width, ctx->Viewport.Height,
 			  ctx->Viewport.Near, ctx->Viewport.Far,

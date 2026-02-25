@@ -205,8 +205,8 @@ _mesa_Lightfv(GLenum light, GLenum pname, const GLfloat *params)
 	    break;
 	case GL_SPOT_DIRECTION:
 	    /* transform direction by inverse modelview */
-	    if (_math_matrix_is_dirty(ctx->ModelviewMatrixStack.Top)) {
-		_math_matrix_analyse(ctx->ModelviewMatrixStack.Top);
+	    if (ctx->ModelviewMatrixStack.Top->is_dirty()) {
+		ctx->ModelviewMatrixStack.Top->analyse();
 	    }
 	    TRANSFORM_NORMAL(temp, params, ctx->ModelviewMatrixStack.Top->inv);
 	    params = temp;
@@ -1172,7 +1172,7 @@ static void
 update_modelview_scale(GLcontext *ctx)
 {
     ctx->_ModelViewInvScale = 1.0F;
-    if (!_math_matrix_is_length_preserving(ctx->ModelviewMatrixStack.Top)) {
+    if (!ctx->ModelviewMatrixStack.Top->is_length_preserving()) {
 	const GLfloat *m = ctx->ModelviewMatrixStack.Top->inv;
 	GLfloat f = m[2] * m[2] + m[6] * m[6] + m[10] * m[10];
 	if (f < 1e-12) f = 1.0;
@@ -1202,7 +1202,7 @@ _mesa_update_tnl_spaces(GLcontext *ctx, GLuint new_state)
 	ctx->_NeedEyeCoords = GL_TRUE;
 
     if (ctx->Light.Enabled &&
-	!_math_matrix_is_length_preserving(ctx->ModelviewMatrixStack.Top))
+	!ctx->ModelviewMatrixStack.Top->is_length_preserving())
 	ctx->_NeedEyeCoords = GL_TRUE;
 
     /* Check if the truth-value interpretations of the bitfields have

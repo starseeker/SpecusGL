@@ -268,8 +268,8 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 	    if (state) {
 		ctx->Transform.ClipPlanesEnabled |= (1 << p);
 
-		if (_math_matrix_is_dirty(ctx->ProjectionMatrixStack.Top))
-		    _math_matrix_analyse(ctx->ProjectionMatrixStack.Top);
+		if (ctx->ProjectionMatrixStack.Top->is_dirty())
+		    ctx->ProjectionMatrixStack.Top->analyse();
 
 		/* This derived state also calculated in clip.c and
 		 * from _mesa_update_state() on changes to EyeUserPlane
