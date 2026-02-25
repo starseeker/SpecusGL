@@ -35,7 +35,7 @@ _slang_label_new_unique(const char *name)
 	l->Name = (char *) _slang_alloc(strlen(name) + 10);
 	if (!l->Name) {
 	    free(l);
-	    return NULL;
+	    return nullptr;
 	}
 	_mesa_sprintf(l->Name, "%s_%d", name, id);
 	id++;
@@ -49,11 +49,11 @@ _slang_label_delete(slang_label *l)
 {
     if (l->Name) {
 	_slang_free(l->Name);
-	l->Name = NULL;
+	l->Name = nullptr;
     }
     if (l->References) {
 	_slang_free(l->References);
-	l->References = NULL;
+	l->References = nullptr;
     }
     _slang_free(l);
 }
@@ -99,7 +99,7 @@ _slang_label_set_location(slang_label *l, GLint location,
 
     if (l->References) {
 	_slang_free(l->References);
-	l->References = NULL;
+	l->References = nullptr;
     }
 }
 

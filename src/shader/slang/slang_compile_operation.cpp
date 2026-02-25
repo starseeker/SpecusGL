@@ -40,17 +40,17 @@ GLboolean
 slang_operation_construct(slang_operation * oper)
 {
     oper->type = SLANG_OPER_NONE;
-    oper->children = NULL;
+    oper->children = nullptr;
     oper->num_children = 0;
     oper->literal[0] = 0.0;
     oper->literal_size = 1;
     oper->a_id = SLANG_ATOM_NULL;
-    oper->locals = _slang_variable_scope_new(NULL);
-    if (oper->locals == NULL)
+    oper->locals = _slang_variable_scope_new(nullptr);
+    if (oper->locals == nullptr)
 	return GL_FALSE;
     _slang_variable_scope_ctr(oper->locals);
-    oper->fun = NULL;
-    oper->var = NULL;
+    oper->fun = nullptr;
+    oper->var = nullptr;
     return GL_TRUE;
 }
 
@@ -64,9 +64,9 @@ slang_operation_destruct(slang_operation * oper)
     _slang_free(oper->children);
     slang_variable_scope_destruct(oper->locals);
     _slang_free(oper->locals);
-    oper->children = NULL;
+    oper->children = nullptr;
     oper->num_children = 0;
-    oper->locals = NULL;
+    oper->locals = nullptr;
 }
 
 /**
@@ -80,14 +80,14 @@ slang_operation_copy(slang_operation * x, const slang_operation * y)
     GLuint i;
 
     /* Initialize */
-    z.label = NULL;
+    z.label = nullptr;
 
     if (!slang_operation_construct(&z))
 	return GL_FALSE;
     z.type = y->type;
     z.children = (slang_operation *)
 		 _slang_alloc(y->num_children * sizeof(slang_operation));
-    if (z.children == NULL) {
+    if (z.children == nullptr) {
 	slang_operation_destruct(&z);
 	return GL_FALSE;
     }
@@ -144,8 +144,8 @@ slang_operation_new(GLuint count)
 		// existing logic flows.  TODO - find out what the behavior
 		// *should* be if slang_operation_construct fails here...
 		slang_operation * oper = (ops+i);
-		oper->fun = NULL;
-		oper->var = NULL;
+		oper->fun = nullptr;
+		oper->var = nullptr;
 	    }
 	}
     }
@@ -177,14 +177,14 @@ slang_operation_grow(GLuint *numChildren, slang_operation **children)
 	slang_operation *newOp = ops + *numChildren;
 	if (!slang_operation_construct(newOp)) {
 	    _slang_free(ops);
-	    *children = NULL;
-	    return NULL;
+	    *children = nullptr;
+	    return nullptr;
 	}
 	*children = ops;
 	(*numChildren)++;
 	return newOp;
     }
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -216,8 +216,8 @@ slang_operation_insert(GLuint *numElements, slang_operation **array,
 	if (!slang_operation_construct(newOp)) {
 	    _slang_free(ops);
 	    *numElements = 0;
-	    *array = NULL;
-	    return NULL;
+	    *array = nullptr;
+	    return nullptr;
 	}
 	if (*array)
 	    _slang_free(*array);
@@ -225,7 +225,7 @@ slang_operation_insert(GLuint *numElements, slang_operation **array,
 	(*numElements)++;
 	return newOp;
     }
-    return NULL;
+    return nullptr;
 }
 
 

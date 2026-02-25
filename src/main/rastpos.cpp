@@ -36,7 +36,6 @@
 #include "macros.h"
 #include "rastpos.h"
 #include "state.h"
-#include "simple_list.h"
 #include "mtypes.h"
 
 #include "math/m_matrix.h"
@@ -127,7 +126,6 @@ shade_rastpos(GLcontext *ctx,
 	      GLfloat *Rindex)
 {
     /*const*/ GLfloat(*base)[3] = ctx->Light._BaseColor;
-    const struct gl_light *light;
     GLfloat diffuseColor[4], specularColor[4];  /* for RGB mode only */
     GLfloat diffuseCI = 0.0, specularCI = 0.0;  /* for CI mode only */
 
@@ -138,7 +136,7 @@ shade_rastpos(GLcontext *ctx,
 			  ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3], 0.0F, 1.0F);
     ASSIGN_4V(specularColor, 0.0, 0.0, 0.0, 1.0);
 
-    foreach (light, &ctx->Light.EnabledList) {
+    for (const auto *light : ctx->Light.EnabledList) {
 	GLfloat attenuation = 1.0;
 	GLfloat VP[3]; /* vector from vertex to light pos */
 	GLfloat n_dot_VP;

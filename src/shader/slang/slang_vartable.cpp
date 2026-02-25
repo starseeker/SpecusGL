@@ -60,7 +60,7 @@ void
 _slang_delete_var_table(slang_var_table *vt)
 {
     if (vt->Top) {
-	_mesa_problem(NULL, "non-empty var table in _slang_delete_var_table()");
+	_mesa_problem(nullptr, "non-empty var table in _slang_delete_var_table()");
 	return;
     }
     _slang_free(vt);
@@ -137,7 +137,7 @@ _slang_pop_var_table(slang_var_table *vt)
 
     if (t->Vars) {
 	_slang_free(t->Vars);
-	t->Vars = NULL;
+	t->Vars = nullptr;
     }
 
     vt->Top = t->Parent;
@@ -183,7 +183,7 @@ _slang_find_variable(const slang_var_table *vt, slang_atom name)
 	if (t->Parent)
 	    t = t->Parent;
 	else
-	    return NULL;
+	    return nullptr;
     }
 }
 

@@ -38,7 +38,7 @@ GLboolean
 slang_storage_array_construct(slang_storage_array * arr)
 {
     arr->type = SLANG_STORE_AGGREGATE;
-    arr->aggregate = NULL;
+    arr->aggregate = nullptr;
     arr->length = 0;
     return GL_TRUE;
 }
@@ -46,7 +46,7 @@ slang_storage_array_construct(slang_storage_array * arr)
 GLvoid
 slang_storage_array_destruct(slang_storage_array * arr)
 {
-    if (arr->aggregate != NULL) {
+    if (arr->aggregate != nullptr) {
 	slang_storage_aggregate_destruct(arr->aggregate);
 	_slang_free(arr->aggregate);
     }
@@ -57,7 +57,7 @@ slang_storage_array_destruct(slang_storage_array * arr)
 GLboolean
 slang_storage_aggregate_construct(slang_storage_aggregate * agg)
 {
-    agg->arrays = NULL;
+    agg->arrays = nullptr;
     agg->count = 0;
     return GL_TRUE;
 }
@@ -75,16 +75,16 @@ slang_storage_aggregate_destruct(slang_storage_aggregate * agg)
 static slang_storage_array *
 slang_storage_aggregate_push_new(slang_storage_aggregate * agg)
 {
-    slang_storage_array *arr = NULL;
+    slang_storage_array *arr = nullptr;
 
     agg->arrays = (slang_storage_array *)
 		  _slang_realloc(agg->arrays,
 				 agg->count * sizeof(slang_storage_array),
 				 (agg->count + 1) * sizeof(slang_storage_array));
-    if (agg->arrays != NULL) {
+    if (agg->arrays != nullptr) {
 	arr = agg->arrays + agg->count;
 	if (!slang_storage_array_construct(arr))
-	    return NULL;
+	    return nullptr;
 	agg->count++;
     }
     return arr;
@@ -97,7 +97,7 @@ aggregate_vector(slang_storage_aggregate * agg, slang_storage_type basic_type,
 		 GLuint row_count)
 {
     slang_storage_array *arr = slang_storage_aggregate_push_new(agg);
-    if (arr == NULL)
+    if (arr == nullptr)
 	return GL_FALSE;
     arr->type = basic_type;
     arr->length = row_count;
@@ -109,17 +109,17 @@ aggregate_matrix(slang_storage_aggregate * agg, slang_storage_type basic_type,
 		 GLuint columns, GLuint rows)
 {
     slang_storage_array *arr = slang_storage_aggregate_push_new(agg);
-    if (arr == NULL)
+    if (arr == nullptr)
 	return GL_FALSE;
     arr->type = SLANG_STORE_AGGREGATE;
     arr->length = columns;
     arr->aggregate = (slang_storage_aggregate *)
 		     _slang_alloc(sizeof(slang_storage_aggregate));
-    if (arr->aggregate == NULL)
+    if (arr->aggregate == nullptr)
 	return GL_FALSE;
     if (!slang_storage_aggregate_construct(arr->aggregate)) {
 	_slang_free(arr->aggregate);
-	arr->aggregate = NULL;
+	arr->aggregate = nullptr;
 	return GL_FALSE;
     }
     if (!aggregate_vector(arr->aggregate, basic_type, rows))
@@ -215,16 +215,16 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 	    slang_storage_array *arr;
 
 	    arr = slang_storage_aggregate_push_new(agg);
-	    if (arr == NULL)
+	    if (arr == nullptr)
 		return GL_FALSE;
 	    arr->type = SLANG_STORE_AGGREGATE;
 	    arr->aggregate = (slang_storage_aggregate *)
 			     _slang_alloc(sizeof(slang_storage_aggregate));
-	    if (arr->aggregate == NULL)
+	    if (arr->aggregate == nullptr)
 		return GL_FALSE;
 	    if (!slang_storage_aggregate_construct(arr->aggregate)) {
 		_slang_free(arr->aggregate);
-		arr->aggregate = NULL;
+		arr->aggregate = nullptr;
 		return GL_FALSE;
 	    }
 	    if (!_slang_aggregate_variable(arr->aggregate, spec->_array, 0,
@@ -300,7 +300,7 @@ _slang_flatten_aggregate(slang_storage_aggregate * flat,
 		    slang_storage_array *arr;
 
 		    arr = slang_storage_aggregate_push_new(flat);
-		    if (arr == NULL)
+		    if (arr == nullptr)
 			return GL_FALSE;
 		    arr->type = type;
 		    arr->length = 1;

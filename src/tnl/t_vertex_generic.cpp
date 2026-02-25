@@ -31,7 +31,6 @@
 #include "colormac.h"
 #include "t_context.h"
 #include "t_vertex.h"
-#include "simple_list.h"
 
 
 

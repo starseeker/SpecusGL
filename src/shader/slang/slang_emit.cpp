@@ -47,6 +47,8 @@
 #include "slang_emit.h"
 #include "slang_mem.h"
 
+#include <vector>
+
 
 #define PEEPHOLE_OPTIMIZATIONS 1
 #define ANNOTATE 0
@@ -56,7 +58,7 @@ typedef struct {
     slang_info_log *log;
     slang_var_table *vt;
     struct gl_program *prog;
-    struct gl_program **Subroutines;
+    std::vector<struct gl_program *> Subroutines;
     GLuint NumSubroutines;
 
     /* code-gen options */
@@ -72,13 +74,10 @@ static struct gl_program *
 new_subroutine(slang_emit_info *emitInfo, GLuint *id)
 {
     GET_CURRENT_CONTEXT(ctx);
-    const GLuint n = emitInfo->NumSubroutines;
+    const GLuint n = static_cast<GLuint>(emitInfo->Subroutines.size());
 
-    emitInfo->Subroutines = (struct gl_program **)
-			    _mesa_realloc(emitInfo->Subroutines,
-					  n * sizeof(struct gl_program *),
-					  (n + 1) * sizeof(struct gl_program *));
-    emitInfo->Subroutines[n] = ctx->Driver.NewProgram(ctx, emitInfo->prog->Target, 0);
+    emitInfo->Subroutines.push_back(
+	ctx->Driver.NewProgram(ctx, emitInfo->prog->Target, 0));
     emitInfo->Subroutines[n]->Parameters = emitInfo->prog->Parameters;
     emitInfo->NumSubroutines++;
     *id = n;
@@ -152,7 +151,7 @@ alloc_temp_storage(slang_emit_info *emitInfo, slang_ir_node *n, GLint size)
 	slang_info_log_error(emitInfo->log,
 			     "Ran out of registers, too many temporaries");
 	_slang_free(n->Store);
-	n->Store = NULL;
+	n->Store = nullptr;
 	return GL_FALSE;
     }
     return GL_TRUE;
@@ -174,7 +173,7 @@ free_temp_storage(slang_var_table *vt, slang_ir_node *n)
 	    n->Store->Index = -1;
 	    n->Store->Size = -1;
 	    /*free(n->Store);*/ /* XXX leak */
-	    n->Store = NULL;
+	    n->Store = nullptr;
 	}
     }
 }
@@ -296,7 +295,7 @@ static struct prog_instruction *
 {
     struct gl_program *prog = emitInfo->prog;
     if (prog->NumInstructions == 0)
-	return NULL;
+	return nullptr;
     else
 	return prog->Instructions + prog->NumInstructions - 1;
 }
@@ -413,7 +412,7 @@ instruction_annotation(gl_inst_opcode opcode, const std::string& dstAnnot,
 
     return s;
 #else
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -448,7 +447,7 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
     /* we'll save pointers to nodes/storage to free in temps[] until
      * the very end.
      */
-    temps[0] = temps[1] = temps[2] = NULL;
+    temps[0] = temps[1] = temps[2] = nullptr;
 
     assert(info);
     assert(info->InstOpcode != OPCODE_NOP);
@@ -497,7 +496,7 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
 	    emit(emitInfo, n->Children[i]);
 	    if (!n->Children[i] || !n->Children[i]->Store) {
 		/* error recovery */
-		return NULL;
+		return nullptr;
 	    }
 	}
 
@@ -520,7 +519,7 @@ emit_arith(slang_emit_info *emitInfo, slang_ir_node *n)
 	GLint size = n->Children[0]->Store
 		     ? n->Children[0]->Store->Size : info->ResultSize;
 	if (!alloc_temp_storage(emitInfo, n, size))
-	    return NULL;
+	    return nullptr;
     }
 
     storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
@@ -564,7 +563,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 
 	if (!n->Store) {
 	    if (!alloc_temp_storage(emitInfo, n, 1))  /* 1 bool */
-		return NULL;
+		return nullptr;
 	}
 
 	opcode = n->Opcode == IR_EQUAL ? OPCODE_SEQ : OPCODE_SNE;
@@ -579,7 +578,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	assert(!n->Store);
 	if (!n->Store) {
 	    if (!alloc_temp_storage(emitInfo, n, size))  /* 'size' bools */
-		return NULL;
+		return nullptr;
 	}
 
 	if (size == 4) {
@@ -608,7 +607,7 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	inst->SrcReg[0].Swizzle = inst->SrcReg[1].Swizzle = swizzle; /*override*/
 	free_temp_storage(emitInfo->vt, n); /* free tmp1 */
 	if (!alloc_temp_storage(emitInfo, n, 1))  /* alloc tmp2 */
-	    return NULL;
+	    return nullptr;
 	storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 	inst->Comment = "Reduce vec to bool";
 
@@ -642,8 +641,8 @@ emit_compare(slang_emit_info *emitInfo, slang_ir_node *n)
 	}
 	storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 #endif
-	_mesa_problem(NULL, "struct comparison not implemented yet");
-	inst = NULL;
+	_mesa_problem(nullptr, "struct comparison not implemented yet");
+	inst = nullptr;
     }
 
     /* free temps */
@@ -704,7 +703,7 @@ emit_clamp(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (!n->Store)
 	if (!alloc_temp_storage(emitInfo, n, n->Children[0]->Store->Size))
-	    return NULL;
+	    return nullptr;
 
     emit(emitInfo, n->Children[1]);
     emit(emitInfo, n->Children[2]);
@@ -715,7 +714,7 @@ emit_clamp(slang_emit_info *emitInfo, slang_ir_node *n)
      */
     _mesa_bzero(&tmpNode, sizeof(tmpNode));
     if (!alloc_temp_storage(emitInfo, &tmpNode, n->Store->Size)) {
-	return NULL;
+	return nullptr;
     }
 
     /* tmp = max(ch[0], ch[1]) */
@@ -749,7 +748,7 @@ emit_negation(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (!n->Store)
 	if (!alloc_temp_storage(emitInfo, n, n->Children[0]->Store->Size))
-	    return NULL;
+	    return nullptr;
 
     inst = new_instruction(emitInfo, OPCODE_MOV);
     storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
@@ -773,7 +772,7 @@ emit_label(slang_emit_info *emitInfo, const slang_ir_node *n)
 	_slang_label_set_location(n->Label, emitInfo->prog->NumInstructions,
 				  emitInfo->prog);
 #endif
-    return NULL;
+    return nullptr;
 }
 
 
@@ -891,7 +890,7 @@ emit_tex(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (!n->Store)
 	if (!alloc_temp_storage(emitInfo, n, 4))
-	    return NULL;
+	    return nullptr;
 
     storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 
@@ -926,7 +925,7 @@ emit_move(slang_emit_info *emitInfo, slang_ir_node *n)
     emit(emitInfo, n->Children[0]);
     if (!n->Children[0]->Store || n->Children[0]->Store->Index < 0) {
 	/* an error should have been already recorded */
-	return NULL;
+	return nullptr;
     }
 
     /* rhs */
@@ -934,10 +933,10 @@ emit_move(slang_emit_info *emitInfo, slang_ir_node *n)
     inst = emit(emitInfo, n->Children[1]);
 
     if (!n->Children[1]->Store || n->Children[1]->Store->Index < 0) {
-	if (!emitInfo->log->text) {
+	if (emitInfo->log->text.empty()) {
 	    slang_info_log_error(emitInfo->log, "invalid assignment");
 	}
-	return NULL;
+	return nullptr;
     }
 
     assert(n->Children[1]->Store->Index >= 0);
@@ -995,7 +994,7 @@ emit_move(slang_emit_info *emitInfo, slang_ir_node *n)
 	    dstAnnot = storage_annotation(n->Children[0], emitInfo->prog);
 	    srcAnnot = storage_annotation(n->Children[1], emitInfo->prog);
 	    inst->Comment = instruction_annotation(inst->Opcode, dstAnnot,
-						   srcAnnot, NULL, NULL);
+						   srcAnnot, nullptr, nullptr);
 	}
 	free_temp_storage(emitInfo->vt, n->Children[1]);
 	return inst;
@@ -1015,14 +1014,14 @@ emit_cond(slang_emit_info *emitInfo, slang_ir_node *n)
     assert(n->Opcode == IR_COND);
 
     if (!n->Children[0])
-	return NULL;
+	return nullptr;
 
     /* emit code for the expression */
     inst = emit(emitInfo, n->Children[0]);
 
     if (!n->Children[0]->Store) {
 	/* error recovery */
-	return NULL;
+	return nullptr;
     }
 
     assert(n->Children[0]->Store);
@@ -1046,7 +1045,7 @@ emit_cond(slang_emit_info *emitInfo, slang_ir_node *n)
 	     * Generate a move instruction just to set condition codes.
 	     */
 	    if (!alloc_temp_storage(emitInfo, n, 1))
-		return NULL;
+		return nullptr;
 	    inst = new_instruction(emitInfo, OPCODE_MOV);
 	    inst->CondUpdate = GL_TRUE;
 	    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
@@ -1102,7 +1101,7 @@ emit_not(slang_emit_info *emitInfo, slang_ir_node *n)
     /* else, invert using SEQ (v = v == 0) */
     if (!n->Store)
 	if (!alloc_temp_storage(emitInfo, n, n->Children[0]->Store->Size))
-	    return NULL;
+	    return nullptr;
 
     inst = new_instruction(emitInfo, OPCODE_SEQ);
     storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
@@ -1129,7 +1128,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
 	if (emitInfo->EmitCondCodes) {
 	    if (!inst) {
 		/* error recovery */
-		return NULL;
+		return nullptr;
 	    }
 	    condWritemask = inst->DstReg.WriteMask;
 	}
@@ -1189,7 +1188,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
     if (n->Children[2]) {
 	prog->Instructions[elseInstLoc].BranchTarget = prog->NumInstructions;
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1256,7 +1255,7 @@ emit_loop(slang_emit_info *emitInfo, slang_ir_node *n)
 	    inst->BranchTarget = endInstLoc;
 	}
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1446,7 +1445,7 @@ emit_array_element(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (n->Store->File == PROGRAM_STATE_VAR) {
 	n->Store->Index = _slang_alloc_statevar(n, emitInfo->prog->Parameters);
-	return NULL;
+	return nullptr;
     }
 
     if (n->Children[1]->Opcode == IR_FLOAT) {
@@ -1458,10 +1457,10 @@ emit_array_element(slang_emit_info *emitInfo, slang_ir_node *n)
 	/* Variable index - PROBLEM */
 	const GLint arrayAddr = n->Children[0]->Store->Index;
 	const GLint index = 0;
-	_mesa_problem(NULL, "variable array indexes not supported yet!");
+	_mesa_problem(nullptr, "variable array indexes not supported yet!");
 	n->Store->Index = arrayAddr + index;
     }
-    return NULL; /* no instruction */
+    return nullptr; /* no instruction */
 }
 
 
@@ -1475,7 +1474,7 @@ static struct prog_instruction *
 	n->Store->Index = _slang_alloc_statevar(n, emitInfo->prog->Parameters);
 	if (n->Store->Index < 0) {
 	    slang_info_log_error(emitInfo->log, "Error parsing state variable");
-	    return NULL;
+	    return nullptr;
 	}
     } else {
 	GLint offset = n->FieldOffset / 4;
@@ -1488,7 +1487,7 @@ static struct prog_instruction *
 	    n->Store->Swizzle = SWIZZLE_XYZW;
 	}
     }
-    return NULL; /* no instruction */
+    return nullptr; /* no instruction */
 }
 
 
@@ -1497,7 +1496,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 {
     struct prog_instruction *inst;
     if (!n)
-	return NULL;
+	return nullptr;
 
     switch (n->Opcode) {
 	case IR_SEQ:
@@ -1531,7 +1530,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		if (n->Store->Index < 0 && !_slang_alloc_temp(emitInfo->vt, n->Store)) {
 		    slang_info_log_error(emitInfo->log,
 					 "Ran out of registers, too many temporaries");
-		    return NULL;
+		    return nullptr;
 		}
 	    } else {
 		/* a regular variable */
@@ -1539,7 +1538,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		if (!_slang_alloc_var(emitInfo->vt, n->Store)) {
 		    slang_info_log_error(emitInfo->log,
 					 "Ran out of registers, too many variables");
-		    return NULL;
+		    return nullptr;
 		}
 		/*
 		printf("IR_VAR_DECL %s %d store %p\n",
@@ -1558,7 +1557,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		inst = emit_comment(emitInfo, s);
 		return inst;
 	    }
-	    return NULL;
+	    return nullptr;
 
 	case IR_VAR:
 	    /* Reference to a variable
@@ -1574,7 +1573,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 
 	    if (n->Store->Index < 0) {
 		/* probably ran out of registers */
-		return NULL;
+		return nullptr;
 	    }
 	    assert(n->Store->Size > 0);
 	    break;
@@ -1592,13 +1591,13 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 	    inst = new_instruction(emitInfo, OPCODE_MOV);
 	    if (!n->Store) {
 		if (!alloc_temp_storage(emitInfo, n, 1))
-		    return NULL;
+		    return nullptr;
 	    }
 	    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
 	    storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
 	    if (emitInfo->EmitComments)
 		inst->Comment = "int to float";
-	    return NULL;
+	    return nullptr;
 
 	/* Simple arithmetic */
 	/* unary */
@@ -1659,9 +1658,9 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 			      &n->Store->Swizzle);
 	    if (n->Store->Index < 0) {
 		slang_info_log_error(emitInfo->log, "Ran out of space for constants");
-		return NULL;
+		return nullptr;
 	    }
-	    return NULL;
+	    return nullptr;
 
 	case IR_MOVE:
 	    return emit_move(emitInfo, n);
@@ -1706,12 +1705,12 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 	    return emit_return(emitInfo, n);
 
 	case IR_NOP:
-	    return NULL;
+	    return nullptr;
 
 	default:
-	    _mesa_problem(NULL, "Unexpected IR opcode in emit()\n");
+	    _mesa_problem(nullptr, "Unexpected IR opcode in emit()\n");
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -1726,10 +1725,9 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_program *mainP = emitInfo->prog;
-    GLuint *subroutineLoc, i, total;
+    GLuint i, total;
 
-    subroutineLoc
-	= (GLuint *) malloc(emitInfo->NumSubroutines * sizeof(GLuint));
+    std::vector<GLuint> subroutineLoc(emitInfo->NumSubroutines);
 
     /* total number of instructions */
     total = mainP->NumInstructions;
@@ -1761,15 +1759,12 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 				sub->Instructions,
 				sub->NumInstructions);
 	/* delete subroutine code */
-	sub->Parameters = NULL; /* prevent double-free */
+	sub->Parameters = nullptr; /* prevent double-free */
 	_mesa_delete_program(ctx, sub);
     }
 
-    /* free subroutine list */
-    if (emitInfo->Subroutines) {
-	free(emitInfo->Subroutines);
-	emitInfo->Subroutines = NULL;
-    }
+    /* clear subroutine list (vector cleans up memory automatically) */
+    emitInfo->Subroutines.clear();
     emitInfo->NumSubroutines = 0;
 
     /* Examine CAL instructions.
@@ -1785,8 +1780,6 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 	    inst->BranchTarget = subroutineLoc[f];
 	}
     }
-
-    free(subroutineLoc);
 }
 
 
@@ -1804,7 +1797,6 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
     emitInfo.log = log;
     emitInfo.vt = vt;
     emitInfo.prog = prog;
-    emitInfo.Subroutines = NULL;
     emitInfo.NumSubroutines = 0;
 
     emitInfo.EmitHighLevelInstructions = ctx->Shader.EmitHighLevelInstructions;

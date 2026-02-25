@@ -36,9 +36,9 @@
 GLvoid
 _slang_struct_scope_ctr(slang_struct_scope * self)
 {
-    self->structs = NULL;
+    self->structs = nullptr;
     self->num_structs = 0;
-    self->outer_scope = NULL;
+    self->outer_scope = nullptr;
 }
 
 void
@@ -61,7 +61,7 @@ slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
     _slang_struct_scope_ctr(&z);
     z.structs = (slang_struct *)
 		_slang_alloc(y->num_structs * sizeof(slang_struct));
-    if (z.structs == NULL) {
+    if (z.structs == nullptr) {
 	slang_struct_scope_destruct(&z);
 	return 0;
     }
@@ -90,9 +90,9 @@ slang_struct_scope_find(slang_struct_scope * stru, slang_atom a_name,
     for (i = 0; i < stru->num_structs; i++)
 	if (a_name == stru->structs[i].a_name)
 	    return &stru->structs[i];
-    if (all_scopes && stru->outer_scope != NULL)
+    if (all_scopes && stru->outer_scope != nullptr)
 	return slang_struct_scope_find(stru->outer_scope, a_name, 1);
-    return NULL;
+    return nullptr;
 }
 
 /* slang_struct */
@@ -103,13 +103,13 @@ slang_struct_construct(slang_struct * stru)
     stru->a_name = SLANG_ATOM_NULL;
     stru->fields = (slang_variable_scope *)
 		   _slang_alloc(sizeof(slang_variable_scope));
-    if (stru->fields == NULL)
+    if (stru->fields == nullptr)
 	return 0;
     _slang_variable_scope_ctr(stru->fields);
 
     stru->structs =
 	(slang_struct_scope *) _slang_alloc(sizeof(slang_struct_scope));
-    if (stru->structs == NULL) {
+    if (stru->structs == nullptr) {
 	slang_variable_scope_destruct(stru->fields);
 	_slang_free(stru->fields);
 	return 0;

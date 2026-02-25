@@ -88,7 +88,6 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 
     for (j = 0; j < nr; j++,STRIDE_F(vertex,vstride),STRIDE_F(normal,nstride)) {
 	GLfloat sum[2][3], spec[2][3];
-	struct gl_light *light;
 
 #if IDX & LIGHT_MATERIAL
 	update_materials(ctx, store);
@@ -107,7 +106,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 #endif
 
 	/* Add contribution from each enabled light source */
-	foreach (light, &ctx->Light.EnabledList) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    GLfloat n_dot_h;
 	    GLfloat correction;
 	    GLint side;
@@ -267,7 +266,6 @@ static void TAG(light_rgba)(GLcontext *ctx,
 
     for (j = 0; j < nr; j++,STRIDE_F(vertex,vstride),STRIDE_F(normal,nstride)) {
 	GLfloat sum[2][3];
-	struct gl_light *light;
 
 #if IDX & LIGHT_MATERIAL
 	update_materials(ctx, store);
@@ -284,7 +282,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 #endif
 
 	/* Add contribution from each enabled light source */
-	foreach (light, &ctx->Light.EnabledList) {
+	for (auto *light : ctx->Light.EnabledList) {
 
 	    GLfloat n_dot_h;
 	    GLfloat correction;
@@ -423,7 +421,7 @@ static void TAG(light_fast_rgba_single)(GLcontext *ctx,
 #if IDX & LIGHT_TWOSIDE
     GLfloat(*Bcolor)[4] = (GLfloat(*)[4]) store->LitColor[1].data;
 #endif
-    const struct gl_light *light = ctx->Light.EnabledList.next;
+    const struct gl_light *light = ctx->Light.EnabledList.front();
     GLuint j = 0;
     GLfloat base[2][4] = {{0}};
 #if IDX & LIGHT_MATERIAL
@@ -535,7 +533,6 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 #else
     const GLuint nr = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->count;
 #endif
-    const struct gl_light *light;
 
 #ifdef TRACE
     fprintf(stderr, "%s %d\n", __func__, nr);
@@ -578,7 +575,7 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 	COPY_3V(sum[1], ctx->Light._BaseColor[1]);
 #endif
 
-	foreach (light, &ctx->Light.EnabledList) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    GLfloat n_dot_h, n_dot_VP, spec;
 
 	    ACC_3V(sum[0], light->_MatAmbient[0]);
@@ -665,7 +662,6 @@ static void TAG(light_ci)(GLcontext *ctx,
     for (j=0; j<nr; j++,STRIDE_F(vertex,vstride),STRIDE_F(normal, nstride)) {
 	GLfloat diffuse[2], specular[2];
 	GLuint side = 0;
-	struct gl_light *light;
 
 #if IDX & LIGHT_MATERIAL
 	update_materials(ctx, store);
@@ -678,7 +674,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 #endif
 
 	/* Accumulate diffuse and specular from each light source */
-	foreach (light, &ctx->Light.EnabledList) {
+	for (auto *light : ctx->Light.EnabledList) {
 
 	    GLfloat attenuation = 1.0F;
 	    GLfloat VP[3];  /* unit vector from vertex to light */

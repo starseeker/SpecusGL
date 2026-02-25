@@ -36,6 +36,7 @@
 
 #include <mutex>
 #include <vector>
+#include <list>
 #include <string>
 #include <unordered_map>
 
@@ -478,7 +479,6 @@ struct gl_color_table {
  * Material shininess lookup table.
  */
 struct gl_shine_tab {
-    struct gl_shine_tab *next, *prev;
     GLfloat tab[SHINE_TABLE_SIZE+1];
     GLfloat shininess;
     GLuint refcount;
@@ -489,9 +489,6 @@ struct gl_shine_tab {
  * Light source state.
  */
 struct gl_light {
-    struct gl_light *next;	/**< double linked list with sentinel */
-    struct gl_light *prev;
-
     GLfloat Ambient[4];		/**< ambient color */
     GLfloat Diffuse[4];		/**< diffuse color */
     GLfloat Specular[4];		/**< specular color */
@@ -795,15 +792,15 @@ struct gl_fog_attrib {
  * Values are always one of GL_FASTEST, GL_NICEST, or GL_DONT_CARE.
  */
 struct gl_hint_attrib {
-    GLenum PerspectiveCorrection;
-    GLenum PointSmooth;
-    GLenum LineSmooth;
-    GLenum PolygonSmooth;
-    GLenum Fog;
-    GLenum ClipVolumeClipping;   /**< GL_EXT_clip_volume_hint */
-    GLenum TextureCompression;   /**< GL_ARB_texture_compression */
-    GLenum GenerateMipmap;       /**< GL_SGIS_generate_mipmap */
-    GLenum FragmentShaderDerivative; /**< GL_ARB_fragment_shader */
+    GLenum PerspectiveCorrection{GL_DONT_CARE};
+    GLenum PointSmooth{GL_DONT_CARE};
+    GLenum LineSmooth{GL_DONT_CARE};
+    GLenum PolygonSmooth{GL_DONT_CARE};
+    GLenum Fog{GL_DONT_CARE};
+    GLenum ClipVolumeClipping{GL_DONT_CARE};   /**< GL_EXT_clip_volume_hint */
+    GLenum TextureCompression{GL_DONT_CARE};   /**< GL_ARB_texture_compression */
+    GLenum GenerateMipmap{GL_DONT_CARE};       /**< GL_SGIS_generate_mipmap */
+    GLenum FragmentShaderDerivative{GL_DONT_CARE}; /**< GL_ARB_fragment_shader */
 };
 
 
@@ -878,7 +875,7 @@ struct gl_light_attrib {
     GLboolean ColorMaterialEnabled;
     GLenum ClampVertexColor;
 
-    struct gl_light EnabledList;         /**< List sentinel */
+    std::vector<gl_light *> EnabledList; /**< Pointers to enabled lights */
 
     /**
      * Derived state for optimizations:
@@ -1690,11 +1687,11 @@ struct gl_array_attrib {
  * Feedback buffer state
  */
 struct gl_feedback {
-    GLenum Type;
-    GLbitfield _Mask;		/* FB_* bits */
-    GLfloat *Buffer;
-    GLuint BufferSize;
-    GLuint Count;
+    GLenum Type{GL_2D};
+    GLbitfield _Mask{0};	/* FB_* bits */
+    GLfloat *Buffer{nullptr};
+    GLuint BufferSize{0};
+    GLuint Count{0};
 };
 
 
@@ -1702,15 +1699,15 @@ struct gl_feedback {
  * Selection buffer state
  */
 struct gl_selection {
-    GLuint *Buffer;	/**< selection buffer */
-    GLuint BufferSize;	/**< size of the selection buffer */
-    GLuint BufferCount;	/**< number of values in the selection buffer */
-    GLuint Hits;		/**< number of records in the selection buffer */
-    GLuint NameStackDepth; /**< name stack depth */
-    GLuint NameStack[MAX_NAME_STACK_DEPTH]; /**< name stack */
-    GLboolean HitFlag;	/**< hit flag */
-    GLfloat HitMinZ;	/**< minimum hit depth */
-    GLfloat HitMaxZ;	/**< maximum hit depth */
+    GLuint *Buffer{nullptr};	/**< selection buffer */
+    GLuint BufferSize{0};	/**< size of the selection buffer */
+    GLuint BufferCount{0};	/**< number of values in the selection buffer */
+    GLuint Hits{0};		/**< number of records in the selection buffer */
+    GLuint NameStackDepth{0}; /**< name stack depth */
+    GLuint NameStack[MAX_NAME_STACK_DEPTH]{}; /**< name stack */
+    GLboolean HitFlag{GL_FALSE};	/**< hit flag */
+    GLfloat HitMinZ{0.0f};	/**< minimum hit depth */
+    GLfloat HitMaxZ{0.0f};	/**< maximum hit depth */
 };
 
 
@@ -3068,8 +3065,8 @@ struct __GLcontextRec {
 
     GLuint TextureStateTimestamp; /* detect changes to shared state */
 
-    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables */
-    struct gl_shine_tab *_ShineTabList;  /**< MRU list of inactive shine tables */
+    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables (point into _ShineTabList) */
+    std::list<gl_shine_tab> _ShineTabList;  /**< MRU pool of shine tables */
     /**@}*/
 
     struct gl_list_extensions ListExt; /**< driver dlist extensions */

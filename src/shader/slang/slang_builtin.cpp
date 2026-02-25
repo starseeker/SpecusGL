@@ -83,7 +83,7 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
 	{ "gl_NormalMatrix", STATE_MODELVIEW_MATRIX, STATE_MATRIX_TRANSPOSE },
 	{ "__NormalMatrixTranspose", STATE_MODELVIEW_MATRIX, static_cast<gl_state_index>(0) },
 
-	{ NULL, static_cast<gl_state_index>(0), static_cast<gl_state_index>(0) }
+	{ nullptr, static_cast<gl_state_index>(0), static_cast<gl_state_index>(0) }
     };
     gl_state_index tokens[STATE_LENGTH];
     GLuint i;
@@ -352,7 +352,7 @@ _slang_alloc_statevar(slang_ir_node *n,
 		      struct gl_program_parameter_list *paramList)
 {
     slang_ir_node *n0 = n;
-    const char *field = NULL, *var;
+    const char *field = nullptr, *var;
     GLint index1 = -1, index2 = -1, pos;
     GLuint swizzle;
 

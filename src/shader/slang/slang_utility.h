@@ -25,15 +25,10 @@
 #ifndef SLANG_UTILITY_H
 #define SLANG_UTILITY_H
 
+#include <string>
+#include <cstring>
+#include <cstdio>
 
-
-
-/* Compile-time assertions.  If the expression is zero, try to declare an
- * array of size [-1] to cause compilation error.
- */
-#ifndef static_assert
-#  define static_assert(expr) do { int _array[(expr) ? 1 : -1]; (void) _array[0]; } while (0)
-#endif
 
 #define slang_string_compare(str1, str2) strcmp (str1, str2)
 #define slang_string_copy(dst, src) strcpy (dst, src)
@@ -41,38 +36,31 @@
 
 char *slang_string_concat(char *, const char *);
 
-/* slang_string */
+/* slang_string – backed by std::string */
 
-typedef struct {
-    char *data;
-    GLuint length;
-    GLuint capacity;
-    GLboolean fail;
-} slang_string;
+using slang_string = std::string;
 
-GLvoid
-slang_string_init(slang_string *);
+inline void slang_string_init(slang_string *s) { s->clear(); }
+inline void slang_string_free(slang_string *s) { s->clear(); s->shrink_to_fit(); }
+inline void slang_string_reset(slang_string *s) { s->clear(); }
 
-GLvoid
-slang_string_free(slang_string *);
+inline void slang_string_push(slang_string *s, const slang_string *str)
+{ s->append(*str); }
 
-GLvoid
-slang_string_reset(slang_string *);
+inline void slang_string_pushc(slang_string *s, const char c)
+{ s->push_back(c); }
 
-GLvoid
-slang_string_push(slang_string *, const slang_string *);
+inline void slang_string_pushs(slang_string *s, const char *cstr, GLuint len)
+{ s->append(cstr, static_cast<std::string::size_type>(len)); }
 
-GLvoid
-slang_string_pushc(slang_string *, const char);
+inline void slang_string_pushi(slang_string *s, GLint i)
+{
+    char buf[24];
+    snprintf(buf, sizeof(buf), "%d", i);
+    s->append(buf);
+}
 
-GLvoid
-slang_string_pushs(slang_string *, const char *, GLuint);
-
-GLvoid
-slang_string_pushi(slang_string *, GLint);
-
-const char *
-slang_string_cstr(slang_string *);
+inline const char *slang_string_cstr(slang_string *s) { return s->c_str(); }
 
 /* slang_atom */
 

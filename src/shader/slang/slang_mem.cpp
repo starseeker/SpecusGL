@@ -61,7 +61,7 @@ _slang_new_mempool(GLuint initialSize)
 	/*printf("ALLOC MEMPOOL %d at %p\n", initialSize, pool->Data);*/
 	if (!pool->Data) {
 	    free(pool);
-	    return NULL;
+	    return nullptr;
 	}
 	pool->Size = initialSize;
 	pool->Used = 0;
@@ -154,7 +154,7 @@ _slang_alloc(GLuint bytes)
 	    pool->Next = _slang_new_mempool(sz);
 	    if (!pool->Next) {
 		/* we're _really_ out of memory */
-		return NULL;
+		return nullptr;
 	    } else {
 		pool = pool->Next;
 		pool->Largest = bytes;
@@ -167,7 +167,7 @@ _slang_alloc(GLuint bytes)
 	    }
 	}
     }
-    return NULL;
+    return nullptr;
 #endif
 }
 
@@ -215,7 +215,7 @@ _slang_strdup(const char *s)
 	    strcpy(s2, s);
 	return s2;
     } else {
-	return NULL;
+	return nullptr;
     }
 }
 

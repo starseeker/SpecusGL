@@ -134,20 +134,8 @@
 #define _NORMAPIP *
 
 
-/* Function inlining */
-#if defined(__GNUC__)
-#  define INLINE __inline__
-#elif defined(__MSC__)
-#  define INLINE __inline
-#elif defined(_MSC_VER)
-#  define INLINE __inline
-#elif defined(__ICL)
-#  define INLINE __inline
-#elif defined(__INTEL_COMPILER)
-#  define INLINE inline
-#else
-#  define INLINE
-#endif
+/* Function inlining - in C++17, 'inline' is standard and sufficient */
+#define INLINE inline
 
 /* Prevent inlining.  Used to keep the auto-vectorizer from operating on a
  * function in a caller context where it generates incorrect code (e.g. the

@@ -40,18 +40,18 @@
 #include "shader_api.h"
 #include "slang_link.h"
 
+#include <vector>
+
 
 
 
 static GLboolean
 link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 {
-    GLuint *map, i, firstVarying, newFile;
+    GLuint i, firstVarying, newFile;
     GLbitfield varsWritten, varsRead;
 
-    map = (GLuint *) malloc(prog->Varying->NumParameters() * sizeof(GLuint));
-    if (!map)
-	return GL_FALSE;
+    std::vector<GLuint> map(prog->Varying->NumParameters());
 
     for (i = 0; i < prog->Varying->NumParameters(); i++) {
 	/* see if this varying is in the linked varying list */
@@ -63,8 +63,6 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    /* already in list, check size */
 	    if (var->Size != shProg->Varying->Parameters[j].Size) {
 		/* error */
-		if (map)
-		    free(map);
 		return GL_FALSE;
 	    }
 	} else {
@@ -125,8 +123,6 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	/*printf("FRAG INPUTS: 0x%x\n", varsRead);*/
     }
 
-    free(map);
-
     return GL_TRUE;
 }
 
@@ -146,16 +142,14 @@ is_uniform(GLuint file)
 static GLboolean
 link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 {
-    GLuint *map, i;
+    GLuint i;
 
 #if 0
     printf("================ pre link uniforms ===============\n");
     _mesa_print_parameter_list(shProg->Uniforms);
 #endif
 
-    map = (GLuint *) malloc(prog->Parameters->NumParameters() * sizeof(GLuint));
-    if (!map)
-	return GL_FALSE;
+    std::vector<GLuint> map(prog->Parameters->NumParameters());
 
     for (i = 0; i < prog->Parameters->NumParameters(); /* incr below*/) {
 	/* see if this uniform is in the linked uniform list */
@@ -173,7 +167,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    /*GLuint swizzle;*/
 	    ASSERT(p->Type == PROGRAM_CONSTANT);
 	    if (_mesa_lookup_parameter_constant(shProg->Uniforms, pVals,
-						p->Size, &j, NULL)) {
+						p->Size, &j, nullptr)) {
 		assert(j >= 0);
 	    } else {
 		j = -1;
@@ -199,27 +193,21 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 		    break;
 		case PROGRAM_UNIFORM:
 		    if (p->Name.empty()) {
-			_mesa_problem(NULL, "bad p->Name.c_str() in link_uniform_vars()");
-			if (map)
-			    free(map);
-			return GL_FALSE;
+			_mesa_problem(nullptr, "bad p->Name.c_str() in link_uniform_vars()");
+		return GL_FALSE;
 		    }
 		    j = _mesa_add_uniform(shProg->Uniforms, p->Name.c_str(), p->Size, p->DataType);
 		    break;
 		case PROGRAM_SAMPLER:
 		    if (p->Name.empty()) {
-			_mesa_problem(NULL, "bad p->Name.c_str() in link_uniform_vars()");
-			if (map)
-			    free(map);
-			return GL_FALSE;
+			_mesa_problem(nullptr, "bad p->Name.c_str() in link_uniform_vars()");
+		return GL_FALSE;
 		    }
 		    j = _mesa_add_sampler(shProg->Uniforms, p->Name.c_str(), p->DataType);
 		    break;
 		default:
-		    _mesa_problem(NULL, "bad parameter type in link_uniform_vars()");
-		    if (map)
-			free(map);
-		    return GL_FALSE;
+		    _mesa_problem(nullptr, "bad parameter type in link_uniform_vars()");
+		return GL_FALSE;
 	    }
 	}
 
@@ -277,8 +265,6 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    inst->Sampler = map[ inst->Sampler ];
 	}
     }
-
-    free(map);
 
     return GL_TRUE;
 }
@@ -547,8 +533,8 @@ _slang_link(GLcontext *ctx,
     /**
      * Find attached vertex shader, fragment shader
      */
-    vertProg = NULL;
-    fragProg = NULL;
+    vertProg = nullptr;
+    fragProg = nullptr;
     for (i = 0; i < shProg->Shaders.size(); i++) {
 	if (shProg->Shaders[i]->Type == GL_VERTEX_SHADER)
 	    vertProg = vertex_program(shProg->Shaders[i]->Programs[0]);
@@ -566,14 +552,14 @@ _slang_link(GLcontext *ctx,
 	shProg->VertexProgram
 	    = vertex_program(_mesa_clone_program(ctx, &vertProg->Base));
     } else {
-	shProg->VertexProgram = NULL;
+	shProg->VertexProgram = nullptr;
     }
 
     if (fragProg) {
 	shProg->FragmentProgram
 	    = fragment_program(_mesa_clone_program(ctx, &fragProg->Base));
     } else {
-	shProg->FragmentProgram = NULL;
+	shProg->FragmentProgram = nullptr;
     }
 
     if (shProg->VertexProgram)

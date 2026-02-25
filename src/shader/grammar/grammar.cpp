@@ -274,8 +274,8 @@ static const byte *INVALID_REGISTER_NAME = (byte *) "internal error 1004: invali
 /*static const byte *DUPLICATE_IDENTIFIER =   (byte *) "internal error 1005: identifier '$' already defined";*/
 static const byte *UNREFERENCED_IDENTIFIER =(byte *) "internal error 1006: unreferenced identifier '$'";
 
-static const byte *error_message = NULL;    /* points to one of the error messages above */
-static byte *error_param = NULL;        /* this is inserted into error_message in place of $ */
+static const byte *error_message = nullptr;    /* points to one of the error messages above */
+static byte *error_param = nullptr;        /* this is inserted into error_message in place of $ */
 static int error_position = -1;
 
 static byte *unknown = (byte *) "???";
@@ -283,13 +283,13 @@ static byte *unknown = (byte *) "???";
 static void clear_last_error(void)
 {
     /* reset error message */
-    error_message = NULL;
+    error_message = nullptr;
 
     /* free error parameter - if error_param is a "???" don't free it - it's static */
     if (error_param != unknown)
 	mem_free((void **)(void *) &error_param);
     else
-	error_param = NULL;
+	error_param = nullptr;
 
     /* reset error position */
     error_position = -1;
@@ -298,17 +298,17 @@ static void clear_last_error(void)
 static void set_last_error(const byte *msg, byte *param, int pos)
 {
     /* error message can be set only once */
-    if (error_message != NULL) {
+    if (error_message != nullptr) {
 	mem_free((void **)(void *) &param);
 	return;
     }
 
     error_message = msg;
 
-    /* if param is NULL, set error_param to unknown ("???") */
+    /* if param is nullptr, set error_param to unknown ("???") */
     /* note: do not try to strdup the "???" - it may be that we are here because of */
     /* out of memory error so strdup can fail */
-    if (param != NULL)
+    if (param != nullptr)
 	error_param = param;
     else
 	error_param = unknown;
@@ -322,8 +322,8 @@ static void set_last_error(const byte *msg, byte *param, int pos)
 static void *mem_alloc(size_t size)
 {
     void *ptr = grammar_alloc_malloc(size);
-    if (ptr == NULL)
-	set_last_error(OUT_OF_MEMORY, NULL, -1);
+    if (ptr == nullptr)
+	set_last_error(OUT_OF_MEMORY, nullptr, -1);
     return ptr;
 }
 
@@ -335,14 +335,14 @@ static void *mem_copy(void *dst, const void *src, size_t size)
 static void mem_free(void **ptr)
 {
     grammar_alloc_free(*ptr);
-    *ptr = NULL;
+    *ptr = nullptr;
 }
 
 static void *mem_realloc(void *ptr, size_t old_size, size_t new_size)
 {
     void *ptr2 = grammar_alloc_realloc(ptr, old_size, new_size);
-    if (ptr2 == NULL)
-	set_last_error(OUT_OF_MEMORY, NULL, -1);
+    if (ptr2 == nullptr)
+	set_last_error(OUT_OF_MEMORY, nullptr, -1);
     return ptr2;
 }
 
@@ -354,8 +354,8 @@ static byte *str_copy_n(byte *dst, const byte *src, size_t max_len)
 static byte *str_duplicate(const byte *str)
 {
     byte *new_str = grammar_string_duplicate(str);
-    if (new_str == NULL)
-	set_last_error(OUT_OF_MEMORY, NULL, -1);
+    if (new_str == nullptr)
+	set_last_error(OUT_OF_MEMORY, nullptr, -1);
     return new_str;
 }
 
@@ -397,9 +397,9 @@ static void map_byte_create(map_byte **ma)
 {
     *ma = (map_byte *) mem_alloc(sizeof(map_byte));
     if (*ma) {
-	(**ma).key = NULL;
+	(**ma).key = nullptr;
 	(**ma).data = '\0';
-	(**ma).next = NULL;
+	(**ma).next = nullptr;
     }
 }
 
@@ -417,7 +417,7 @@ GRAMMAR_IMPLEMENT_LIST_APPEND(map_byte)
 /*
     searches the map for the specified key,
     returns pointer to the element with the specified key if it exists
-    returns NULL otherwise
+    returns nullptr otherwise
 */
 static map_byte *map_byte_locate(map_byte **ma, const byte *key)
 {
@@ -429,7 +429,7 @@ static map_byte *map_byte_locate(map_byte **ma, const byte *key)
     }
 
     set_last_error(UNRESOLVED_REFERENCE, str_duplicate(key), -1);
-    return NULL;
+    return nullptr;
 }
 
 /*
@@ -441,7 +441,7 @@ static map_byte *map_byte_locate(map_byte **ma, const byte *key)
 static int map_byte_find(map_byte **ma, const byte *key, byte *data)
 {
     map_byte *found = map_byte_locate(ma, key);
-    if (found != NULL) {
+    if (found != nullptr) {
 	*data = found->data;
 
 	return 0;
@@ -474,8 +474,8 @@ static void regbyte_ctx_create(regbyte_ctx **re)
 {
     *re = (regbyte_ctx *) mem_alloc(sizeof(regbyte_ctx));
     if (*re) {
-	(**re).m_regbyte = NULL;
-	(**re).m_prev = NULL;
+	(**re).m_regbyte = nullptr;
+	(**re).m_prev = nullptr;
     }
 }
 
@@ -489,7 +489,7 @@ static void regbyte_ctx_destroy(regbyte_ctx **re)
 static byte regbyte_ctx_extract(regbyte_ctx **re, map_byte *reg)
 {
     /* first lookup in the register stack */
-    while (*re != NULL) {
+    while (*re != nullptr) {
 	if ((**re).m_regbyte == reg)
 	    return (**re).m_current_value;
 
@@ -536,9 +536,9 @@ static void emit_create(emit **em)
 	(**em).m_emit_dest = ed_output;
 	(**em).m_emit_type = et_byte;
 	(**em).m_byte = '\0';
-	(**em).m_regbyte = NULL;
-	(**em).m_regname = NULL;
-	(**em).m_next = NULL;
+	(**em).m_regbyte = nullptr;
+	(**em).m_regname = nullptr;
+	(**em).m_next = nullptr;
     }
 }
 
@@ -555,7 +555,7 @@ static unsigned int emit_size(emit *_E)
 {
     unsigned int n = 0;
 
-    while (_E != NULL) {
+    while (_E != nullptr) {
 	if (_E->m_emit_dest == ed_output) {
 	    if (_E->m_emit_type == et_position)
 		n += 4;     /* position is a 32-bit unsigned integer */
@@ -570,7 +570,7 @@ static unsigned int emit_size(emit *_E)
 
 static int emit_push(emit *_E, byte *_P, byte c, unsigned int _Pos, regbyte_ctx **_Ctx)
 {
-    while (_E != NULL) {
+    while (_E != nullptr) {
 	if (_E->m_emit_dest == ed_output) {
 	    if (_E->m_emit_type == et_byte)
 		*_P++ = _E->m_byte;
@@ -585,7 +585,7 @@ static int emit_push(emit *_E, byte *_P, byte c, unsigned int _Pos, regbyte_ctx 
 	} else {
 	    regbyte_ctx *new_rbc;
 	    regbyte_ctx_create(&new_rbc);
-	    if (new_rbc == NULL)
+	    if (new_rbc == nullptr)
 		return 1;
 
 	    new_rbc->m_prev = *_Ctx;
@@ -617,9 +617,9 @@ static void error_create(error **er)
 {
     *er = (error *) mem_alloc(sizeof(error));
     if (*er) {
-	(**er).m_text = NULL;
-	(**er).m_token_name = NULL;
-	(**er).m_token = NULL;
+	(**er).m_text = nullptr;
+	(**er).m_token_name = nullptr;
+	(**er).m_token = nullptr;
     }
 }
 
@@ -675,8 +675,8 @@ static void cond_create(cond **co)
 {
     *co = (cond *) mem_alloc(sizeof(cond));
     if (*co) {
-	(**co).m_operands[0].m_regname = NULL;
-	(**co).m_operands[1].m_regname = NULL;
+	(**co).m_operands[0].m_regname = nullptr;
+	(**co).m_operands[1].m_regname = nullptr;
     }
 }
 
@@ -724,12 +724,12 @@ static void spec_create(spec **sp)
 	(**sp).m_spec_type = st_false;
 	(**sp).m_byte[0] = '\0';
 	(**sp).m_byte[1] = '\0';
-	(**sp).m_string = NULL;
-	(**sp).m_rule = NULL;
-	(**sp).m_emits = NULL;
-	(**sp).m_errtext = NULL;
-	(**sp).m_cond = NULL;
-	(**sp).next = NULL;
+	(**sp).m_string = nullptr;
+	(**sp).m_rule = nullptr;
+	(**sp).m_emits = nullptr;
+	(**sp).m_errtext = nullptr;
+	(**sp).m_cond = nullptr;
+	(**sp).next = nullptr;
     }
 }
 
@@ -771,8 +771,8 @@ static void rule_create(rule **ru)
     *ru = (rule *) mem_alloc(sizeof(rule));
     if (*ru) {
 	(**ru).m_oper = op_none;
-	(**ru).m_specs = NULL;
-	(**ru).next = NULL;
+	(**ru).m_specs = nullptr;
+	(**ru).next = nullptr;
 	(**ru).m_referenced = 0;
     }
 }
@@ -814,12 +814,12 @@ static void dict_create(dict **di)
 {
     *di = (dict *) mem_alloc(sizeof(dict));
     if (*di) {
-	(**di).m_rulez = NULL;
-	(**di).m_syntax = NULL;
-	(**di).m_string = NULL;
-	(**di).m_regbytes = NULL;
+	(**di).m_rulez = nullptr;
+	(**di).m_syntax = nullptr;
+	(**di).m_string = nullptr;
+	(**di).m_regbytes = nullptr;
 	(**di).m_id = next_valid_grammar_id();
-	(**di).next = NULL;
+	(**di).next = nullptr;
     }
 }
 
@@ -845,10 +845,10 @@ static void dict_find(dict **di, grammar key, dict **data)
 	di = &(**di).next;
     }
 
-    *data = NULL;
+    *data = nullptr;
 }
 
-static dict *g_dicts = NULL;
+static dict *g_dicts = nullptr;
 
 /*
     byte array typedef
@@ -862,7 +862,7 @@ static void barray_create(barray **ba)
 {
     *ba = (barray *) mem_alloc(sizeof(barray));
     if (*ba) {
-	(**ba).data = NULL;
+	(**ba).data = nullptr;
 	(**ba).len = 0;
     }
 }
@@ -886,7 +886,7 @@ static int barray_resize(barray **ba, unsigned int nlen)
 
     if (nlen == 0) {
 	mem_free((void **) &(**ba).data);
-	(**ba).data = NULL;
+	(**ba).data = nullptr;
 	(**ba).len = 0;
 
 	return 0;
@@ -946,7 +946,7 @@ typedef struct bytepool_ {
 
 static void bytepool_destroy(bytepool **by)
 {
-    if (*by != NULL) {
+    if (*by != nullptr) {
 	mem_free((void **) &(**by)._F);
 	mem_free((void **) by);
     }
@@ -955,11 +955,11 @@ static void bytepool_destroy(bytepool **by)
 static void bytepool_create(bytepool **by, int len)
 {
     *by = (bytepool *)(mem_alloc(sizeof(bytepool)));
-    if (*by != NULL) {
+    if (*by != nullptr) {
 	(**by)._F = (byte *)(mem_alloc(sizeof(byte) * len));
 	(**by)._Siz = len;
 
-	if ((**by)._F == NULL)
+	if ((**by)._F == nullptr)
 	    bytepool_destroy(by);
     }
 }
@@ -976,7 +976,7 @@ static int bytepool_reserve(bytepool *by, unsigned int n)
 
     /* reallocate the memory and adjust pointers to the new memory location */
     _P = (byte *)(mem_realloc(by->_F, sizeof(byte) * by->_Siz, sizeof(byte) * n));
-    if (_P != NULL) {
+    if (_P != nullptr) {
 	by->_F = _P;
 	by->_Siz = n;
 	return 0;
@@ -998,9 +998,9 @@ static void map_str_create(map_str **ma)
 {
     *ma = (map_str *) mem_alloc(sizeof(map_str));
     if (*ma) {
-	(**ma).key = NULL;
-	(**ma).data = NULL;
-	(**ma).next = NULL;
+	(**ma).key = nullptr;
+	(**ma).data = nullptr;
+	(**ma).next = nullptr;
     }
 }
 
@@ -1027,7 +1027,7 @@ static int map_str_find(map_str **ma, const byte *key, byte **data)
     while (*ma) {
 	if (str_equal((**ma).key, key)) {
 	    *data = str_duplicate((**ma).data);
-	    if (*data == NULL)
+	    if (*data == nullptr)
 		return 1;
 
 	    return 0;
@@ -1053,9 +1053,9 @@ static void map_rule_create(map_rule **ma)
 {
     *ma = (map_rule *) mem_alloc(sizeof(map_rule));
     if (*ma) {
-	(**ma).key = NULL;
-	(**ma).data = NULL;
-	(**ma).next = NULL;
+	(**ma).key = nullptr;
+	(**ma).data = nullptr;
+	(**ma).next = nullptr;
     }
 }
 
@@ -1165,10 +1165,10 @@ static void eat_spaces(const byte **text)
 static int string_grow(byte **ptr, unsigned int *len, byte c)
 {
     /* reallocate the string in 16-byte increments */
-    if ((*len & 0x0F) == 0x0F || *ptr == NULL) {
+    if ((*len & 0x0F) == 0x0F || *ptr == nullptr) {
 	byte *tmp = (byte *) mem_realloc(*ptr, ((*len + 1) & ~0x0F) * sizeof(byte),
 					 ((*len + 1 + 0x10) & ~0x0F) * sizeof(byte));
-	if (tmp == NULL)
+	if (tmp == nullptr)
 	    return 1;
 
 	*ptr = tmp;
@@ -1195,7 +1195,7 @@ static int is_identifier(byte c)
 
 /*
     copies characters from *text to *id until non-identifier character is encountered,
-    assumes that *id points to NULL object - caller is responsible for later freeing the string,
+    assumes that *id points to nullptr object - caller is responsible for later freeing the string,
     text pointer is advanced to point past the copied identifier,
     returns 0 if identifier was successfully copied,
     returns 1 otherwise
@@ -1203,7 +1203,7 @@ static int is_identifier(byte c)
 static int get_identifier(const byte **text, byte **id)
 {
     const byte *t = *text;
-    byte *p = NULL;
+    byte *p = nullptr;
     unsigned int len = 0;
 
     if (string_grow(&p, &len, '\0'))
@@ -1344,7 +1344,7 @@ static byte get_escape_sequence(const byte **text)
 
 /*
     copies characters from *text to *str until " or ' character is encountered,
-    assumes that *str points to NULL object - caller is responsible for later freeing the string,
+    assumes that *str points to nullptr object - caller is responsible for later freeing the string,
     assumes that *text points to " or ' character that starts the string,
     text pointer is advanced to point past the " or ' character,
     returns 0 if string was successfully copied,
@@ -1353,7 +1353,7 @@ static byte get_escape_sequence(const byte **text)
 static int get_string(const byte **text, byte **str)
 {
     const byte *t = *text;
-    byte *p = NULL;
+    byte *p = nullptr;
     unsigned int len = 0;
     byte term_char;
 
@@ -1394,10 +1394,10 @@ static int get_string(const byte **text, byte **str)
 static int get_emtcode(const byte **text, map_byte **ma)
 {
     const byte *t = *text;
-    map_byte *m = NULL;
+    map_byte *m = nullptr;
 
     map_byte_create(&m);
-    if (m == NULL)
+    if (m == nullptr)
 	return 1;
 
     if (get_identifier(&t, &m->key)) {
@@ -1451,10 +1451,10 @@ static int get_regbyte(const byte **text, map_byte **ma)
 static int get_errtext(const byte **text, map_str **ma)
 {
     const byte *t = *text;
-    map_str *m = NULL;
+    map_str *m = nullptr;
 
     map_str_create(&m);
-    if (m == NULL)
+    if (m == nullptr)
 	return 1;
 
     if (get_identifier(&t, &m->key)) {
@@ -1481,7 +1481,7 @@ static int get_errtext(const byte **text, map_str **ma)
 static int get_error(const byte **text, error **er, map_str *maps)
 {
     const byte *t = *text;
-    byte *temp = NULL;
+    byte *temp = nullptr;
 
     if (*t != '.')
 	return 0;
@@ -1499,7 +1499,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
     mem_free((void **)(void *) &temp);
 
     error_create(er);
-    if (*er == NULL)
+    if (*er == nullptr)
 	return 1;
 
     if (*t == '\"') {
@@ -1526,7 +1526,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 
     /* try to extract "token" from "...$token$..." */
     {
-	byte *processed = NULL;
+	byte *processed = nullptr;
 	unsigned int len = 0;
 	int i = 0;
 
@@ -1604,8 +1604,8 @@ static int get_error(const byte **text, error **er, map_str *maps)
 static int get_emits(const byte **text, emit **em, map_byte *mapb)
 {
     const byte *t = *text;
-    byte *temp = NULL;
-    emit *e = NULL;
+    byte *temp = nullptr;
+    emit *e = nullptr;
     emit_dest dest;
 
     if (*t != '.')
@@ -1630,7 +1630,7 @@ static int get_emits(const byte **text, emit **em, map_byte *mapb)
     mem_free((void **)(void *) &temp);
 
     emit_create(&e);
-    if (e == NULL)
+    if (e == nullptr)
 	return 1;
 
     e->m_emit_dest = dest;
@@ -1715,16 +1715,16 @@ static int get_emits(const byte **text, emit **em, map_byte *mapb)
 static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 {
     const byte *t = *text;
-    spec *s = NULL;
+    spec *s = nullptr;
 
     spec_create(&s);
-    if (s == NULL)
+    if (s == nullptr)
 	return 1;
 
     /* first - read optional .if statement */
     if (*t == '.') {
 	const byte *u = t;
-	byte *keyword = NULL;
+	byte *keyword = nullptr;
 
 	/* skip the dot */
 	u++;
@@ -1737,7 +1737,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	/* .if */
 	if (str_equal((byte *) "if", keyword)) {
 	    cond_create(&s->m_cond);
-	    if (s->m_cond == NULL) {
+	    if (s->m_cond == nullptr) {
 		spec_destroy(&s);
 		return 1;
 	    }
@@ -1789,7 +1789,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
     }
 
     if (*t == '\'') {
-	byte *temp = NULL;
+	byte *temp = nullptr;
 
 	if (get_string(&t, &temp)) {
 	    spec_destroy(&s);
@@ -1798,7 +1798,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	eat_spaces(&t);
 
 	if (*t == '-') {
-	    byte *temp2 = NULL;
+	    byte *temp2 = nullptr;
 
 	    /* skip the '-' character */
 	    t++;
@@ -1831,7 +1831,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 
 	s->m_spec_type = st_string;
     } else if (*t == '.') {
-	byte *keyword = NULL;
+	byte *keyword = nullptr;
 
 	/* skip the dot */
 	t++;
@@ -1898,10 +1898,10 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 static int get_rule(const byte **text, rule **ru, map_str *maps, map_byte *mapb)
 {
     const byte *t = *text;
-    rule *r = NULL;
+    rule *r = nullptr;
 
     rule_create(&r);
-    if (r == NULL)
+    if (r == nullptr)
 	return 1;
 
     if (get_spec(&t, &r->m_specs, maps, mapb)) {
@@ -1910,8 +1910,8 @@ static int get_rule(const byte **text, rule **ru, map_str *maps, map_byte *mapb)
     }
 
     while (*t != ';') {
-	byte *op = NULL;
-	spec *sp = NULL;
+	byte *op = nullptr;
+	spec *sp = nullptr;
 
 	/* skip the dot that precedes "and" or "or" */
 	t++;
@@ -1976,7 +1976,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 
     /* update dependecies for the root and lexer symbols */
     if (update_dependency(mapr, *syntax_symbol, &di->m_syntax) ||
-	(*string_symbol != NULL && update_dependency(mapr, *string_symbol, &di->m_string)))
+	(*string_symbol != nullptr && update_dependency(mapr, *string_symbol, &di->m_string)))
 	return 1;
 
     mem_free((void **) syntax_symbol);
@@ -2012,7 +2012,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 			sp->m_cond->m_operands[i].m_regbyte = map_byte_locate(&regbytes,
 							      sp->m_cond->m_operands[i].m_regname);
 
-			if (sp->m_cond->m_operands[i].m_regbyte == NULL)
+			if (sp->m_cond->m_operands[i].m_regbyte == nullptr)
 			    return 1;
 
 			mem_free((void **) &sp->m_cond->m_operands[i].m_regname);
@@ -2022,11 +2022,11 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 	    /* update dependency for all .load instructions */
 	    if (sp->m_emits) {
 		emit *em = sp->m_emits;
-		while (em != NULL) {
+		while (em != nullptr) {
 		    if (em->m_emit_dest == ed_regbyte) {
 			em->m_regbyte = map_byte_locate(&regbytes, em->m_regname);
 
-			if (em->m_regbyte == NULL)
+			if (em->m_regbyte == nullptr)
 			    return 1;
 
 			mem_free((void **) &em->m_regname);
@@ -2044,7 +2044,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 
     /* check for unreferenced symbols */
     rulez = di->m_rulez;
-    while (rulez != NULL) {
+    while (rulez != nullptr) {
 	if (!rulez->m_referenced) {
 	    map_rule *ma = mapr;
 	    while (ma) {
@@ -2066,7 +2066,7 @@ static int satisfies_condition(cond *co, regbyte_ctx *ctx)
     byte values[2];
     int i;
 
-    if (co == NULL)
+    if (co == nullptr)
 	return 1;
 
     for (i = 0; i < 2; i++)
@@ -2121,13 +2121,13 @@ match(dict *di, const byte *text, int *index, rule *ru, barray **ba, int filteri
     /* for every specifier in the rule */
     while (sp) {
 	int i, len, save_ind = ind;
-	barray *array = NULL;
+	barray *array = nullptr;
 
 	if (satisfies_condition(sp->m_cond, ctx)) {
 	    switch (sp->m_spec_type) {
 		case st_identifier:
 		    barray_create(&array);
-		    if (array == NULL) {
+		    if (array == nullptr) {
 			free_regbyte_ctx_stack(ctx, *rbc);
 			return mr_internal_error;
 		    }
@@ -2148,10 +2148,10 @@ match(dict *di, const byte *text, int *index, rule *ru, barray **ba, int filteri
 			barray *ba;
 			int filter_index = 0;
 			match_result result;
-			regbyte_ctx *null_ctx = NULL;
+			regbyte_ctx *null_ctx = nullptr;
 
 			barray_create(&ba);
-			if (ba == NULL) {
+			if (ba == nullptr) {
 			    free_regbyte_ctx_stack(ctx, *rbc);
 			    return mr_internal_error;
 			}
@@ -2211,7 +2211,7 @@ match(dict *di, const byte *text, int *index, rule *ru, barray **ba, int filteri
 		    break;
 		case st_identifier_loop:
 		    barray_create(&array);
-		    if (array == NULL) {
+		    if (array == nullptr) {
 			free_regbyte_ctx_stack(ctx, *rbc);
 			return mr_internal_error;
 		    }
@@ -2235,7 +2235,7 @@ match(dict *di, const byte *text, int *index, rule *ru, barray **ba, int filteri
 			    }
 			    barray_destroy(&array);
 			    barray_create(&array);
-			    if (array == NULL) {
+			    if (array == nullptr) {
 				free_regbyte_ctx_stack(ctx, *rbc);
 				return mr_internal_error;
 			    }
@@ -2350,9 +2350,9 @@ fast_match(dict *di, const byte *text, int *index, rule *ru, int *_PP, bytepool 
 		    if (!filtering_string && di->m_string) {
 			int filter_index = 0;
 			match_result result;
-			regbyte_ctx *null_ctx = NULL;
+			regbyte_ctx *null_ctx = nullptr;
 
-			result = fast_match(di, text + ind, &filter_index, di->m_string, NULL, _BP, 1, &null_ctx);
+			result = fast_match(di, text + ind, &filter_index, di->m_string, nullptr, _BP, 1, &null_ctx);
 
 			if (result == mr_internal_error) {
 			    free_regbyte_ctx_stack(ctx, *rbc);
@@ -2414,7 +2414,7 @@ fast_match(dict *di, const byte *text, int *index, rule *ru, int *_PP, bytepool 
 			    break;
 			} else if (result == mr_matched) {
 			    if (!filtering_string) {
-				if (sp->m_emits != NULL) {
+				if (sp->m_emits != nullptr) {
 				    if (emit_push(sp->m_emits, _BP->_F + _P, text[ind - 1], save_ind, &ctx)) {
 					free_regbyte_ctx_stack(ctx, *rbc);
 					return mr_internal_error;
@@ -2460,7 +2460,7 @@ fast_match(dict *di, const byte *text, int *index, rule *ru, int *_PP, bytepool 
 	}
 
 	if (status == mr_matched) {
-	    if (sp->m_emits != NULL) {
+	    if (sp->m_emits != nullptr) {
 		const byte ch = (ind <= 0) ? 0 : text[ind - 1];
 		if (emit_push(sp->m_emits, _BP->_F + _P, ch, save_ind, &ctx)) {
 		    free_regbyte_ctx_stack(ctx, *rbc);
@@ -2499,19 +2499,19 @@ fast_match(dict *di, const byte *text, int *index, rule *ru, int *_PP, bytepool 
 static byte *
 error_get_token(error *er, dict *di, const byte *text, int ind)
 {
-    byte *str = NULL;
+    byte *str = nullptr;
 
     if (er->m_token) {
 	barray *ba;
 	int filter_index = 0;
-	regbyte_ctx *ctx = NULL;
+	regbyte_ctx *ctx = nullptr;
 
 	barray_create(&ba);
-	if (ba != NULL) {
+	if (ba != nullptr) {
 	    if (match(di, text + ind, &filter_index, er->m_token, &ba, 0, &ctx) == mr_matched &&
 		filter_index) {
 		str = (byte *) mem_alloc(filter_index + 1);
-		if (str != NULL) {
+		if (str != nullptr) {
 		    str_copy_n(str, text + ind, filter_index);
 		    str[filter_index] = '\0';
 		}
@@ -2536,12 +2536,12 @@ static void grammar_load_state_create(grammar_load_state **gr)
 {
     *gr = (grammar_load_state *) mem_alloc(sizeof(grammar_load_state));
     if (*gr) {
-	(**gr).di = NULL;
-	(**gr).syntax_symbol = NULL;
-	(**gr).string_symbol = NULL;
-	(**gr).maps = NULL;
-	(**gr).mapb = NULL;
-	(**gr).mapr = NULL;
+	(**gr).di = nullptr;
+	(**gr).syntax_symbol = nullptr;
+	(**gr).string_symbol = nullptr;
+	(**gr).maps = nullptr;
+	(**gr).mapb = nullptr;
+	(**gr).mapr = nullptr;
     }
 }
 
@@ -2570,19 +2570,19 @@ static void error_msg(int line, const char *msg)
 */
 grammar grammar_load_from_text(const byte *text)
 {
-    grammar_load_state *g = NULL;
+    grammar_load_state *g = nullptr;
     grammar id = 0;
 
     clear_last_error();
 
     grammar_load_state_create(&g);
-    if (g == NULL) {
+    if (g == nullptr) {
 	error_msg(__LINE__, "");
 	return 0;
     }
 
     dict_create(&g->di);
-    if (g->di == NULL) {
+    if (g->di == nullptr) {
 	grammar_load_state_destroy(&g);
 	error_msg(__LINE__, "");
 	return 0;
@@ -2607,7 +2607,7 @@ grammar grammar_load_from_text(const byte *text)
     eat_spaces(&text);
 
     while (*text) {
-	byte *symbol = NULL;
+	byte *symbol = nullptr;
 	int is_dot = *text == '.';
 
 	if (is_dot)
@@ -2622,7 +2622,7 @@ grammar grammar_load_from_text(const byte *text)
 
 	/* .emtcode */
 	if (is_dot && str_equal(symbol, (byte *) "emtcode")) {
-	    map_byte *ma = NULL;
+	    map_byte *ma = nullptr;
 
 	    mem_free((void **)(void *) &symbol);
 
@@ -2636,7 +2636,7 @@ grammar grammar_load_from_text(const byte *text)
 	}
 	/* .regbyte */
 	else if (is_dot && str_equal(symbol, (byte *) "regbyte")) {
-	    map_byte *ma = NULL;
+	    map_byte *ma = nullptr;
 
 	    mem_free((void **)(void *) &symbol);
 
@@ -2650,7 +2650,7 @@ grammar grammar_load_from_text(const byte *text)
 	}
 	/* .errtext */
 	else if (is_dot && str_equal(symbol, (byte *) "errtext")) {
-	    map_str *ma = NULL;
+	    map_str *ma = nullptr;
 
 	    mem_free((void **)(void *) &symbol);
 
@@ -2666,7 +2666,7 @@ grammar grammar_load_from_text(const byte *text)
 	else if (is_dot && str_equal(symbol, (byte *) "string")) {
 	    mem_free((void **)(void *) &symbol);
 
-	    if (g->di->m_string != NULL) {
+	    if (g->di->m_string != nullptr) {
 		grammar_load_state_destroy(&g);
 		error_msg(__LINE__, "");
 		return 0;
@@ -2683,8 +2683,8 @@ grammar grammar_load_from_text(const byte *text)
 	    text++;
 	    eat_spaces(&text);
 	} else {
-	    rule *ru = NULL;
-	    map_rule *ma = NULL;
+	    rule *ru = nullptr;
+	    map_rule *ma = nullptr;
 
 	    if (get_rule(&text, &ru, g->maps, g->mapb)) {
 		grammar_load_state_destroy(&g);
@@ -2699,7 +2699,7 @@ grammar grammar_load_from_text(const byte *text)
 		ru->m_oper = op_and;
 
 	    map_rule_create(&ma);
-	    if (ma == NULL) {
+	    if (ma == nullptr) {
 		grammar_load_state_destroy(&g);
 		error_msg(__LINE__, "");
 		return 0;
@@ -2720,7 +2720,7 @@ grammar grammar_load_from_text(const byte *text)
 
     dict_append(&g_dicts, g->di);
     id = g->di->m_id;
-    g->di = NULL;
+    g->di = nullptr;
 
     grammar_load_state_destroy(&g);
 
@@ -2729,19 +2729,19 @@ grammar grammar_load_from_text(const byte *text)
 
 int grammar_set_reg8(grammar id, const byte *name, byte value)
 {
-    dict *di = NULL;
-    map_byte *reg = NULL;
+    dict *di = nullptr;
+    map_byte *reg = nullptr;
 
     clear_last_error();
 
     dict_find(&g_dicts, id, &di);
-    if (di == NULL) {
-	set_last_error(INVALID_GRAMMAR_ID, NULL, -1);
+    if (di == nullptr) {
+	set_last_error(INVALID_GRAMMAR_ID, nullptr, -1);
 	return 0;
     }
 
     reg = map_byte_locate(&di->m_regbytes, name);
-    if (reg == NULL) {
+    if (reg == nullptr) {
 	set_last_error(INVALID_REGISTER_NAME, str_duplicate(name), -1);
 	return 0;
     }
@@ -2756,59 +2756,59 @@ int grammar_set_reg8(grammar id, const byte *name, byte value)
 static int _grammar_check(grammar id, const byte *text, byte **prod, unsigned int *size,
 			  unsigned int estimate_prod_size, int use_fast_path)
 {
-    dict *di = NULL;
+    dict *di = nullptr;
     int index = 0;
 
     clear_last_error();
 
     dict_find(&g_dicts, id, &di);
-    if (di == NULL) {
-	set_last_error(INVALID_GRAMMAR_ID, NULL, -1);
+    if (di == nullptr) {
+	set_last_error(INVALID_GRAMMAR_ID, nullptr, -1);
 	return 0;
     }
 
-    *prod = NULL;
+    *prod = nullptr;
     *size = 0;
 
     if (use_fast_path) {
-	regbyte_ctx *rbc = NULL;
-	bytepool *bp = NULL;
+	regbyte_ctx *rbc = nullptr;
+	bytepool *bp = nullptr;
 	int _P = 0;
 
 	bytepool_create(&bp, estimate_prod_size);
-	if (bp == NULL)
+	if (bp == nullptr)
 	    return 0;
 
 	if (fast_match(di, text, &index, di->m_syntax, &_P, bp, 0, &rbc) != mr_matched) {
 	    bytepool_destroy(&bp);
-	    free_regbyte_ctx_stack(rbc, NULL);
+	    free_regbyte_ctx_stack(rbc, nullptr);
 	    return 0;
 	}
 
-	free_regbyte_ctx_stack(rbc, NULL);
+	free_regbyte_ctx_stack(rbc, nullptr);
 
 	*prod = bp->_F;
 	*size = _P;
-	bp->_F = NULL;
+	bp->_F = nullptr;
 	bytepool_destroy(&bp);
     } else {
-	regbyte_ctx *rbc = NULL;
-	barray *ba = NULL;
+	regbyte_ctx *rbc = nullptr;
+	barray *ba = nullptr;
 
 	barray_create(&ba);
-	if (ba == NULL)
+	if (ba == nullptr)
 	    return 0;
 
 	if (match(di, text, &index, di->m_syntax, &ba, 0, &rbc) != mr_matched) {
 	    barray_destroy(&ba);
-	    free_regbyte_ctx_stack(rbc, NULL);
+	    free_regbyte_ctx_stack(rbc, nullptr);
 	    return 0;
 	}
 
-	free_regbyte_ctx_stack(rbc, NULL);
+	free_regbyte_ctx_stack(rbc, nullptr);
 
 	*prod = (byte *) mem_alloc(ba->len * sizeof(byte));
-	if (*prod == NULL) {
+	if (*prod == nullptr) {
 	    barray_destroy(&ba);
 	    return 0;
 	}
@@ -2838,7 +2838,7 @@ int grammar_destroy(grammar id)
 
     clear_last_error();
 
-    while (*di != NULL) {
+    while (*di != nullptr) {
 	if ((**di).m_id == id) {
 	    dict *tmp = *di;
 	    *di = (**di).next;
@@ -2849,7 +2849,7 @@ int grammar_destroy(grammar id)
 	di = &(**di).next;
     }
 
-    set_last_error(INVALID_GRAMMAR_ID, NULL, -1);
+    set_last_error(INVALID_GRAMMAR_ID, nullptr, -1);
     return 0;
 }
 

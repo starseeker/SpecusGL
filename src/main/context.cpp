@@ -122,7 +122,6 @@
 #endif
 #include "queryobj.h"
 #include "rastpos.h"
-#include "simple_list.h"
 #include "state.h"
 #include "stencil.h"
 #include "texcompress.h"
@@ -1207,13 +1206,13 @@ _mesa_copy_context(const GLcontext *src, GLcontext *dst, GLuint mask)
     }
     if (mask & GL_LIGHTING_BIT) {
 	GLuint i;
-	/* begin with memcpy */
+	/* copy all lighting state */
 	dst->Light = src->Light;
-	/* fixup linked lists to prevent pointer insanity */
-	make_empty_list(&(dst->Light.EnabledList));
+	/* Rebuild the enabled list to point at dst's own light objects */
+	dst->Light.EnabledList.clear();
 	for (i = 0; i < MAX_LIGHTS; i++) {
 	    if (dst->Light.Light[i].Enabled) {
-		insert_at_tail(&(dst->Light.EnabledList), &(dst->Light.Light[i]));
+		dst->Light.EnabledList.push_back(&dst->Light.Light[i]);
 	    }
 	}
     }

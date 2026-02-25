@@ -516,18 +516,8 @@ _mesa_RenderMode(GLenum mode)
  */
 void _mesa_init_feedback(GLcontext * ctx)
 {
-    /* Feedback */
-    ctx->Feedback.Type = GL_2D;   /* TODO: verify */
-    ctx->Feedback.Buffer = nullptr;
-    ctx->Feedback.BufferSize = 0;
-    ctx->Feedback.Count = 0;
-
-    /* Selection/picking */
-    ctx->Select.Buffer = nullptr;
-    ctx->Select.BufferSize = 0;
-    ctx->Select.BufferCount = 0;
-    ctx->Select.Hits = 0;
-    ctx->Select.NameStackDepth = 0;
+    /* Feedback and Selection are zero/default-initialized via their struct
+     * default member initializers (see mtypes.h). */
 
     /* Miscellaneous */
     ctx->RenderMode = GL_RENDER;
