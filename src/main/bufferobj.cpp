@@ -656,7 +656,7 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
      */
     std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
-    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->BufferObjects, n);
+    first = ctx->Shared->BufferObjects.findFreeKeyBlock(n);
 
     /* Allocate new, empty buffer objects and return identifiers */
     for (i = 0; i < n; i++) {

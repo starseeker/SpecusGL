@@ -579,7 +579,7 @@ _mesa_GenPrograms(GLsizei n, GLuint *ids)
     if (!ids)
 	return;
 
-    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->Programs, n);
+    first = ctx->Shared->Programs.findFreeKeyBlock(n);
 
     /* Insert pointer to dummy program as placeholder */
     for (i = 0; i < (GLuint) n; i++) {

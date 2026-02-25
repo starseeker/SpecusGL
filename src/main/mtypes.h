@@ -2129,9 +2129,9 @@ struct gl_query_object {
  * Context state for query objects.
  */
 struct gl_query_state {
-    struct _mesa_HashTable *QueryObjects;
-    struct gl_query_object *CurrentOcclusionObject; /* GL_ARB_occlusion_query */
-    struct gl_query_object *CurrentTimerObject;     /* GL_EXT_timer_query */
+    _mesa_HashTable QueryObjects;                   /**< All query objects */
+    struct gl_query_object *CurrentOcclusionObject = nullptr; /* GL_ARB_occlusion_query */
+    struct gl_query_object *CurrentTimerObject = nullptr;     /* GL_EXT_timer_query */
 };
 
 

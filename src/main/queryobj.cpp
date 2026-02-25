@@ -66,8 +66,7 @@ delete_query_object(struct gl_query_object *q)
 static struct gl_query_object *
 lookup_query_object(GLcontext *ctx, GLuint id)
 {
-    return (struct gl_query_object *)
-	   _mesa_HashLookup(ctx->Query.QueryObjects, id);
+    return static_cast<struct gl_query_object *>(ctx->Query.QueryObjects.lookup(id));
 }
 
 
@@ -91,7 +90,7 @@ _mesa_GenQueriesARB(GLsizei n, GLuint *ids)
 	return;
     }
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Query.QueryObjects, n);
+    first = ctx->Query.QueryObjects.findFreeKeyBlock(n);
     if (first) {
 	GLsizei i;
 	for (i = 0; i < n; i++) {
@@ -102,7 +101,7 @@ _mesa_GenQueriesARB(GLsizei n, GLuint *ids)
 		return;
 	    }
 	    ids[i] = first + i;
-	    _mesa_HashInsert(ctx->Query.QueryObjects, first + i, q);
+	    ctx->Query.QueryObjects.insert(first + i, q);
 	}
     }
 }
@@ -132,7 +131,7 @@ _mesa_DeleteQueriesARB(GLsizei n, const GLuint *ids)
 	    struct gl_query_object *q = lookup_query_object(ctx, ids[i]);
 	    if (q) {
 		ASSERT(!q->Active); /* should be caught earlier */
-		_mesa_HashRemove(ctx->Query.QueryObjects, ids[i]);
+		ctx->Query.QueryObjects.remove(ids[i]);
 		delete_query_object(q);
 	    }
 	}
@@ -203,7 +202,7 @@ _mesa_BeginQueryARB(GLenum target, GLuint id)
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glBeginQueryARB");
 	    return;
 	}
-	_mesa_HashInsert(ctx->Query.QueryObjects, id, q);
+	ctx->Query.QueryObjects.insert(id, q);
     } else {
 	/* pre-existing object */
 	if (q->Active) {
@@ -502,10 +501,9 @@ _mesa_GetQueryObjectui64vEXT(GLuint id, GLenum pname, GLuint64EXT *params)
 void
 _mesa_init_query(GLcontext *ctx)
 {
-#if FEATURE_ARB_occlusion_query
-    ctx->Query.QueryObjects = _mesa_NewHashTable();
-    ctx->Query.CurrentOcclusionObject = nullptr;
-#endif
+    /* gl_query_state members are value-initialised by their default
+     * constructors; no explicit allocation needed. */
+    (void) ctx;
 }
 
 
@@ -515,10 +513,9 @@ _mesa_init_query(GLcontext *ctx)
 void
 _mesa_free_query_data(GLcontext *ctx)
 {
-    _mesa_HashDeleteAll(ctx->Query.QueryObjects, [](GLuint, void *data) {
+    ctx->Query.QueryObjects.deleteAll([](GLuint, void *data) {
 	delete_query_object(static_cast<gl_query_object *>(data));
     });
-    _mesa_DeleteHashTable(ctx->Query.QueryObjects);
 }
 
 /*
