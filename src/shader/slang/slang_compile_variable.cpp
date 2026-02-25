@@ -69,14 +69,14 @@ static const type_specifier_type_name type_specifier_type_names[] = {
     {"sampler2DShadow", SLANG_SPEC_SAMPLER2DSHADOW},
     {"sampler2DRect", SLANG_SPEC_SAMPLER2DRECT},
     {"sampler2DRectShadow", SLANG_SPEC_SAMPLER2DRECTSHADOW},
-    {NULL, SLANG_SPEC_VOID}
+    {nullptr, SLANG_SPEC_VOID}
 };
 
 slang_type_specifier_type
 slang_type_specifier_type_from_string(const char *name)
 {
     const type_specifier_type_name *p = type_specifier_type_names;
-    while (p->name != NULL) {
+    while (p->name != nullptr) {
 	if (slang_string_compare(p->name, name) == 0)
 	    break;
 	p++;
@@ -88,7 +88,7 @@ const char *
 slang_type_specifier_type_to_string(slang_type_specifier_type type)
 {
     const type_specifier_type_name *p = type_specifier_type_names;
-    while (p->name != NULL) {
+    while (p->name != nullptr) {
 	if (p->type == type)
 	    break;
 	p++;
@@ -138,7 +138,7 @@ slang_variable_new(void)
     if (v) {
 	if (!slang_variable_construct(v)) {
 	    _slang_free(v);
-	    v = NULL;
+	    v = nullptr;
 	}
     }
     return v;
@@ -171,9 +171,9 @@ _slang_variable_scope_new(slang_variable_scope *parent)
 GLvoid
 _slang_variable_scope_ctr(slang_variable_scope * self)
 {
-    self->variables = NULL;
+    self->variables = nullptr;
     self->num_variables = 0;
-    self->outer_scope = NULL;
+    self->outer_scope = nullptr;
 }
 
 void
@@ -201,7 +201,7 @@ slang_variable_scope_copy(slang_variable_scope * x,
     _slang_variable_scope_ctr(&z);
     z.variables = (slang_variable **)
 		  _slang_alloc(y->num_variables * sizeof(slang_variable *));
-    if (z.variables == NULL) {
+    if (z.variables == nullptr) {
 	slang_variable_scope_destruct(&z);
 	return 0;
     }
@@ -239,13 +239,13 @@ slang_variable_scope_grow(slang_variable_scope *scope)
 				      n * sizeof(slang_variable *),
 				      (n + 1) * sizeof(slang_variable *));
     if (!scope->variables)
-	return NULL;
+	return nullptr;
 
     scope->num_variables++;
 
     scope->variables[n] = slang_variable_new();
     if (!scope->variables[n])
-	return NULL;
+	return nullptr;
 
     return scope->variables[n];
 }
@@ -261,11 +261,11 @@ slang_variable_construct(slang_variable * var)
 	return 0;
     var->a_name = SLANG_ATOM_NULL;
     var->array_len = 0;
-    var->initializer = NULL;
+    var->initializer = nullptr;
     var->address = ~0;
     var->size = 0;
     var->isTemp = GL_FALSE;
-    var->aux = NULL;
+    var->aux = nullptr;
     return 1;
 }
 
@@ -274,7 +274,7 @@ void
 slang_variable_destruct(slang_variable * var)
 {
     slang_fully_specified_type_destruct(&var->type);
-    if (var->initializer != NULL) {
+    if (var->initializer != nullptr) {
 	slang_operation_destruct(var->initializer);
 	_slang_free(var->initializer);
     }
@@ -299,10 +299,10 @@ slang_variable_copy(slang_variable * x, const slang_variable * y)
     }
     z.a_name = y->a_name;
     z.array_len = y->array_len;
-    if (y->initializer != NULL) {
+    if (y->initializer != nullptr) {
 	z.initializer
 	    = (slang_operation *) _slang_alloc(sizeof(slang_operation));
-	if (z.initializer == NULL) {
+	if (z.initializer == nullptr) {
 	    slang_variable_destruct(&z);
 	    return 0;
 	}
@@ -333,9 +333,9 @@ _slang_locate_variable(const slang_variable_scope * scope,
     for (i = 0; i < scope->num_variables; i++)
 	if (a_name == scope->variables[i]->a_name)
 	    return scope->variables[i];
-    if (all && scope->outer_scope != NULL)
+    if (all && scope->outer_scope != nullptr)
 	return _slang_locate_variable(scope->outer_scope, a_name, 1);
-    return NULL;
+    return nullptr;
 }
 
 /*

@@ -90,7 +90,7 @@ static const slang_ir_info IrInfo[] = {
     { IR_FIELD, "IR_FIELD", OPCODE_NOP, 0, 0 },
     { IR_ELEMENT, "IR_ELEMENT", OPCODE_NOP, 0, 0 },
     { IR_SWIZZLE, "IR_SWIZZLE", OPCODE_NOP, 0, 0 },
-    { IR_NOP, NULL, OPCODE_NOP, 0, 0 }
+    { IR_NOP, nullptr, OPCODE_NOP, 0, 0 }
 };
 
 
@@ -103,7 +103,7 @@ _slang_ir_info(slang_ir_opcode opcode)
 	    return IrInfo + i;
 	}
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -148,7 +148,7 @@ _slang_free_ir(slang_ir_node *n)
 	n->Store->RefCount--;
 	if (n->Store->RefCount == 0) {
 	    _slang_free(n->Store);
-	    n->Store = NULL;
+	    n->Store = nullptr;
 	}
     }
 #endif

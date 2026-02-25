@@ -33,7 +33,7 @@ static char *out_of_memory = "Error: Out of memory.\n";
 void
 slang_info_log_construct(slang_info_log * log)
 {
-    log->text = NULL;
+    log->text = nullptr;
     log->dont_free_text = GL_FALSE;
     log->error_flag = GL_FALSE;
 }
@@ -58,9 +58,9 @@ slang_info_log_message(slang_info_log * log, const char *prefix,
     if (log->dont_free_text)
 	return 0;
     size = slang_string_length(msg) + 2;
-    if (prefix != NULL)
+    if (prefix != nullptr)
 	size += slang_string_length(prefix) + 2;
-    if (log->text != NULL) {
+    if (log->text != nullptr) {
 	GLuint old_len = slang_string_length(log->text);
 	log->text = (char *)
 #if 0
@@ -74,12 +74,12 @@ slang_info_log_message(slang_info_log * log, const char *prefix,
 #else
 	log->text = (char *)(malloc(size));
 #endif
-	if (log->text != NULL)
+	if (log->text != nullptr)
 	    log->text[0] = '\0';
     }
-    if (log->text == NULL)
+    if (log->text == nullptr)
 	return 0;
-    if (prefix != NULL) {
+    if (prefix != nullptr) {
 	slang_string_concat(log->text, prefix);
 	slang_string_concat(log->text, ": ");
     }
@@ -97,7 +97,7 @@ slang_info_log_print(slang_info_log * log, const char *msg, ...)
     va_start(va, msg);
     vsprintf(buf, msg, va);
     va_end(va);
-    return slang_info_log_message(log, NULL, buf);
+    return slang_info_log_message(log, nullptr, buf);
 }
 
 int

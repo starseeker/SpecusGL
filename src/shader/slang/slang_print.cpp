@@ -211,7 +211,7 @@ find_scope(const slang_variable_scope *s, slang_atom name)
     if (s->outer_scope)
 	return find_scope(s->outer_scope, name);
     else
-	return NULL;
+	return nullptr;
 }
 
 static const slang_variable *
@@ -225,7 +225,7 @@ find_var(const slang_variable_scope *s, slang_atom name)
     if (s->outer_scope)
 	return find_var(s->outer_scope, name);
     else
-	return NULL;
+	return nullptr;
 }
 
 
@@ -244,7 +244,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_BLOCK_NO_NEW_SCOPE:
 	    spaces(indent);
 	    printf("{ locals %p  outer %p\n", (void*)op->locals, (void*)op->locals->outer_scope);
-	    print_generic(op, NULL, indent+3);
+	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}\n");
 	    break;
@@ -252,7 +252,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_BLOCK_NEW_SCOPE:
 	    spaces(indent);
 	    printf("{{ // new scope  locals %p\n", (void*)op->locals);
-	    print_generic(op, NULL, indent+3);
+	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}}\n");
 	    break;
@@ -297,7 +297,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_ASM:
 	    spaces(indent);
 	    printf("ASM: %s\n", (char*) op->a_id);
-	    print_generic(op, NULL, indent+3);
+	    print_generic(op, nullptr, indent+3);
 	    break;
 
 	case SLANG_OPER_BREAK:
@@ -570,7 +570,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_SUBSCRIPT:
 	    spaces(indent);
 	    printf("SLANG_OPER_SUBSCRIPT\n");
-	    print_generic(op, NULL, indent+3);
+	    print_generic(op, nullptr, indent+3);
 	    break;
 
 	case SLANG_OPER_CALL:

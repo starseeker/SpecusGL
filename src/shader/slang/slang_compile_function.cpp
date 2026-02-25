@@ -37,7 +37,7 @@
 void
 slang_fixup_table_init(slang_fixup_table * fix)
 {
-    fix->table = NULL;
+    fix->table = nullptr;
     fix->count = 0;
 }
 
@@ -58,7 +58,7 @@ slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 		    _slang_realloc(fixups->table,
 				   fixups->count * sizeof(GLuint),
 				   (fixups->count + 1) * sizeof(GLuint));
-    if (fixups->table == NULL)
+    if (fixups->table == nullptr)
 	return GL_FALSE;
     fixups->table[fixups->count] = address;
     fixups->count++;
@@ -78,14 +78,14 @@ slang_function_construct(slang_function * func)
 
     func->parameters = (slang_variable_scope *)
 		       _slang_alloc(sizeof(slang_variable_scope));
-    if (func->parameters == NULL) {
+    if (func->parameters == nullptr) {
 	slang_variable_destruct(&func->header);
 	return 0;
     }
 
     _slang_variable_scope_ctr(func->parameters);
     func->param_count = 0;
-    func->body = NULL;
+    func->body = nullptr;
     func->address = ~0;
     slang_fixup_table_init(&func->fixups);
     return 1;
@@ -97,7 +97,7 @@ slang_function_destruct(slang_function * func)
     slang_variable_destruct(&func->header);
     slang_variable_scope_destruct(func->parameters);
     _slang_free(func->parameters);
-    if (func->body != NULL) {
+    if (func->body != nullptr) {
 	slang_operation_destruct(func->body);
 	_slang_free(func->body);
     }
@@ -111,9 +111,9 @@ slang_function_destruct(slang_function * func)
 GLvoid
 _slang_function_scope_ctr(slang_function_scope * self)
 {
-    self->functions = NULL;
+    self->functions = nullptr;
     self->num_functions = 0;
-    self->outer_scope = NULL;
+    self->outer_scope = nullptr;
 }
 
 void
@@ -142,7 +142,7 @@ _slang_function_has_return_value(const slang_function *fun)
  * \param funcs  the list of functions to search
  * \param a_name  the name to search for
  * \param all_scopes  if non-zero, search containing scopes too.
- * \return pointer to found function, or NULL.
+ * \return pointer to found function, or nullptr.
  */
 int
 slang_function_scope_find_by_name(slang_function_scope * funcs,
@@ -153,7 +153,7 @@ slang_function_scope_find_by_name(slang_function_scope * funcs,
     for (i = 0; i < funcs->num_functions; i++)
 	if (a_name == funcs->functions[i].header.a_name)
 	    return 1;
-    if (all_scopes && funcs->outer_scope != NULL)
+    if (all_scopes && funcs->outer_scope != nullptr)
 	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, 1);
     return 0;
 }
@@ -167,7 +167,7 @@ slang_function_scope_find_by_name(slang_function_scope * funcs,
  * \param funcs  the list of functions to search
  * \param fun  the function to search for
  * \param all_scopes  if non-zero, search containing scopes too.
- * \return pointer to found function, or NULL.
+ * \return pointer to found function, or nullptr.
  */
 slang_function *
 slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
@@ -210,9 +210,9 @@ slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
     /*
     printf("Not found\n");
     */
-    if (all_scopes && funcs->outer_scope != NULL)
+    if (all_scopes && funcs->outer_scope != nullptr)
 	return slang_function_scope_find(funcs->outer_scope, fun, 1);
-    return NULL;
+    return nullptr;
 }
 
 /*

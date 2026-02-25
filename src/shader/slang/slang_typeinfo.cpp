@@ -170,18 +170,18 @@ GLvoid
 slang_type_specifier_ctr(slang_type_specifier * self)
 {
     self->type = SLANG_SPEC_VOID;
-    self->_struct = NULL;
-    self->_array = NULL;
+    self->_struct = nullptr;
+    self->_array = nullptr;
 }
 
 GLvoid
 slang_type_specifier_dtr(slang_type_specifier * self)
 {
-    if (self->_struct != NULL) {
+    if (self->_struct != nullptr) {
 	slang_struct_destruct(self->_struct);
 	_slang_free(self->_struct);
     }
-    if (self->_array != NULL) {
+    if (self->_array != nullptr) {
 	slang_type_specifier_dtr(self->_array);
 	_slang_free(self->_array);
     }
@@ -197,7 +197,7 @@ slang_type_specifier_copy(slang_type_specifier * x,
     z.type = y->type;
     if (z.type == SLANG_SPEC_STRUCT) {
 	z._struct = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-	if (z._struct == NULL) {
+	if (z._struct == nullptr) {
 	    slang_type_specifier_dtr(&z);
 	    return GL_FALSE;
 	}
@@ -213,7 +213,7 @@ slang_type_specifier_copy(slang_type_specifier * x,
     } else if (z.type == SLANG_SPEC_ARRAY) {
 	z._array = (slang_type_specifier *)
 		   _slang_alloc(sizeof(slang_type_specifier));
-	if (z._array == NULL) {
+	if (z._array == nullptr) {
 	    slang_type_specifier_dtr(&z);
 	    return GL_FALSE;
 	}
@@ -292,7 +292,7 @@ slang_typeinfo_destruct(slang_typeinfo * ti)
  * \param num_params  number of parameters to function
  * \param space  namespace to search
  * \param spec  returns the type
- * \param funFound  returns pointer to the function, or NULL if not found.
+ * \param funFound  returns pointer to the function, or nullptr if not found.
  * \return GL_TRUE for success, GL_FALSE if failure (bad function name)
  */
 static GLboolean
@@ -417,7 +417,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    else if (op->literal_size == 4)
 		ti->spec.type = SLANG_SPEC_BVEC4;
 	    else {
-		_mesa_problem(NULL,
+		_mesa_problem(nullptr,
 			      "Unexpected bool literal_size %d in _slang_typeof_operation()",
 			      op->literal_size);
 		ti->spec.type = SLANG_SPEC_BOOL;
@@ -445,7 +445,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    else if (op->literal_size == 4)
 		ti->spec.type = SLANG_SPEC_IVEC4;
 	    else {
-		_mesa_problem(NULL,
+		_mesa_problem(nullptr,
 			      "Unexpected int literal_size %d in _slang_typeof_operation()",
 			      op->literal_size);
 		ti->spec.type = SLANG_SPEC_INT;
@@ -461,7 +461,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    else if (op->literal_size == 4)
 		ti->spec.type = SLANG_SPEC_VEC4;
 	    else {
-		_mesa_problem(NULL,
+		_mesa_problem(nullptr,
 			      "Unexpected float literal_size %d in _slang_typeof_operation()",
 			      op->literal_size);
 		ti->spec.type = SLANG_SPEC_FLOAT;
@@ -590,11 +590,11 @@ _slang_typeof_operation_(slang_operation * op,
 			ti->spec.type = SLANG_SPEC_STRUCT;
 			ti->spec._struct =
 			    (slang_struct *) _slang_alloc(sizeof(slang_struct));
-			if (ti->spec._struct == NULL)
+			if (ti->spec._struct == nullptr)
 			    return GL_FALSE;
 			if (!slang_struct_construct(ti->spec._struct)) {
 			    _slang_free(ti->spec._struct);
-			    ti->spec._struct = NULL;
+			    ti->spec._struct = nullptr;
 			    return GL_FALSE;
 			}
 			if (!slang_struct_copy(ti->spec._struct, s))
@@ -629,7 +629,7 @@ _slang_typeof_operation_(slang_operation * op,
 
 		field = _slang_locate_variable(_ti.spec._struct->fields, op->a_id,
 					       GL_FALSE);
-		if (field == NULL) {
+		if (field == nullptr) {
 		    slang_typeinfo_destruct(&_ti);
 		    return GL_FALSE;
 		}
@@ -764,10 +764,10 @@ _slang_locate_function(const slang_function_scope * funcs, slang_atom a_name,
 	    slang_typeinfo ti;
 
 	    if (!slang_typeinfo_construct(&ti))
-		return NULL;
+		return nullptr;
 	    if (!_slang_typeof_operation_(&args[j], space, &ti, atoms, log)) {
 		slang_typeinfo_destruct(&ti);
-		return NULL;
+		return nullptr;
 	    }
 	    if (!slang_type_specifier_compatible(&ti.spec,
 						 &f->parameters->variables[j]->type.specifier)) {
@@ -787,10 +787,10 @@ _slang_locate_function(const slang_function_scope * funcs, slang_atom a_name,
 	if (j == num_args)
 	    return f;
     }
-    if (funcs->outer_scope != NULL)
+    if (funcs->outer_scope != nullptr)
 	return _slang_locate_function(funcs->outer_scope, a_name, args,
 				      num_args, space, atoms, log);
-    return NULL;
+    return nullptr;
 }
 
 

@@ -183,10 +183,10 @@ parse_number(slang_parse_ctx * C, int *number)
 static int
 parse_float(slang_parse_ctx * C, float *number)
 {
-    char *integral = NULL;
-    char *fractional = NULL;
-    char *exponent = NULL;
-    char *whole = NULL;
+    char *integral = nullptr;
+    char *fractional = nullptr;
+    char *exponent = nullptr;
+    char *whole = nullptr;
 
     parse_identifier_str(C, &integral);
     parse_identifier_str(C, &fractional);
@@ -195,7 +195,7 @@ parse_float(slang_parse_ctx * C, float *number)
     whole = (char *) _slang_alloc((strlen(integral) +
 				   strlen(fractional) +
 				   strlen(exponent) + 3) * sizeof(char));
-    if (whole == NULL) {
+    if (whole == nullptr) {
 	slang_info_log_memory(C->L);
 	return 0;
     }
@@ -206,7 +206,7 @@ parse_float(slang_parse_ctx * C, float *number)
     slang_string_concat(whole, "E");
     slang_string_concat(whole, exponent);
 
-    *number = (float)(strtod(whole, (char **) NULL));
+    *number = (float)(strtod(whole, (char **) nullptr));
 
     _slang_free(whole);
 
@@ -289,7 +289,7 @@ convert_to_array(slang_parse_ctx * C, slang_variable * var,
     var->type.specifier.type = SLANG_SPEC_ARRAY;
     var->type.specifier._array = (slang_type_specifier *)
 				 _slang_alloc(sizeof(slang_type_specifier));
-    if (var->type.specifier._array == NULL) {
+    if (var->type.specifier._array == nullptr) {
 	slang_info_log_memory(C->L);
 	return GL_FALSE;
     }
@@ -364,20 +364,20 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 
     name = slang_atom_pool_id(C->atoms, a_name);
     if (name[0] != '\0'
-	&& slang_struct_scope_find(O->structs, a_name, 0) != NULL) {
+	&& slang_struct_scope_find(O->structs, a_name, 0) != nullptr) {
 	slang_info_log_error(C->L, "%s: duplicate type name.", name);
 	return 0;
     }
 
     /* set-up a new struct */
     *st = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-    if (*st == NULL) {
+    if (*st == nullptr) {
 	slang_info_log_memory(C->L);
 	return 0;
     }
     if (!slang_struct_construct(*st)) {
 	_slang_free(*st);
-	*st = NULL;
+	*st = nullptr;
 	slang_info_log_memory(C->L);
 	return 0;
     }
@@ -406,7 +406,7 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 					    * sizeof(slang_struct),
 					    (O->structs->num_structs + 1)
 					    * sizeof(slang_struct));
-	if (O->structs->structs == NULL) {
+	if (O->structs->structs == nullptr) {
 	    slang_info_log_memory(C->L);
 	    return 0;
 	}
@@ -604,24 +604,24 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		slang_struct *stru;
 
 		a_name = parse_identifier(C);
-		if (a_name == NULL)
+		if (a_name == nullptr)
 		    return 0;
 
 		stru = slang_struct_scope_find(O->structs, a_name, 1);
-		if (stru == NULL) {
+		if (stru == nullptr) {
 		    slang_info_log_error(C->L, "undeclared type name '%s'",
 					 slang_atom_pool_id(C->atoms, a_name));
 		    return 0;
 		}
 
 		spec->_struct = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-		if (spec->_struct == NULL) {
+		if (spec->_struct == nullptr) {
 		    slang_info_log_memory(C->L);
 		    return 0;
 		}
 		if (!slang_struct_construct(spec->_struct)) {
 		    _slang_free(spec->_struct);
-		    spec->_struct = NULL;
+		    spec->_struct = nullptr;
 		    return 0;
 		}
 		if (!slang_struct_copy(spec->_struct, stru))
@@ -783,7 +783,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 		    assert(oper->num_children == 0);
 		    oper->num_children = num_vars;
 		    oper->children = slang_operation_new(num_vars);
-		    if (oper->children == NULL) {
+		    if (oper->children == nullptr) {
 			slang_info_log_memory(C->L);
 			return 0;
 		    }
@@ -885,7 +885,7 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
     unsigned int i;
 
     op->children = slang_operation_new(n);
-    if (op->children == NULL) {
+    if (op->children == nullptr) {
 	slang_info_log_memory(C->L);
 	return 0;
     }
@@ -903,7 +903,7 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
 	   _slang_realloc(*ops,
 			  (*total_ops + n) * sizeof(slang_operation),
 			  *total_ops * sizeof(slang_operation));
-    if (*ops == NULL) {
+    if (*ops == nullptr) {
 	slang_info_log_memory(C->L);
 	return 0;
     }
@@ -916,14 +916,14 @@ is_constructor_name(const char *name, slang_atom a_name,
 {
     if (slang_type_specifier_type_from_string(name) != SLANG_SPEC_VOID)
 	return 1;
-    return slang_struct_scope_find(structs, a_name, 1) != NULL;
+    return slang_struct_scope_find(structs, a_name, 1) != nullptr;
 }
 
 static int
 parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		 slang_operation * oper)
 {
-    slang_operation *ops = NULL;
+    slang_operation *ops = nullptr;
     unsigned int num_ops = 0;
     int number;
 
@@ -936,7 +936,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	      _slang_realloc(ops,
 			     num_ops * sizeof(slang_operation),
 			     (num_ops + 1) * sizeof(slang_operation));
-	if (ops == NULL) {
+	if (ops == nullptr) {
 	    slang_info_log_memory(C->L);
 	    return 0;
 	}
@@ -1443,13 +1443,13 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 
     /* create function's body operation */
     func->body = (slang_operation *) _slang_alloc(sizeof(slang_operation));
-    if (func->body == NULL) {
+    if (func->body == nullptr) {
 	slang_info_log_memory(C->L);
 	return 0;
     }
     if (!slang_operation_construct(func->body)) {
 	_slang_free(func->body);
-	func->body = NULL;
+	func->body = nullptr;
 	slang_info_log_memory(C->L);
 	return 0;
     }
@@ -1472,10 +1472,10 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     slang_operation op_id, op_assign;
 
     /* Initialize */
-    op_id.label = NULL;
+    op_id.label = nullptr;
 
     /* Initialize */
-    op_id.label = NULL;
+    op_id.label = nullptr;
 
     /* construct the left side of assignment */
     if (!slang_operation_construct(&op_id))
@@ -1486,7 +1486,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     /* put the variable into operation's scope */
     op_id.locals->variables =
 	(slang_variable **) _slang_alloc(sizeof(slang_variable *));
-    if (op_id.locals->variables == NULL) {
+    if (op_id.locals->variables == nullptr) {
 	slang_operation_destruct(&op_id);
 	return GL_FALSE;
     }
@@ -1502,7 +1502,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     op_assign.type = SLANG_OPER_ASSIGN;
     op_assign.children =
 	(slang_operation *) _slang_alloc(2 * sizeof(slang_operation));
-    if (op_assign.children == NULL) {
+    if (op_assign.children == nullptr) {
 	slang_operation_destruct(&op_assign);
 	op_id.locals->num_variables = 0;
 	slang_operation_destruct(&op_id);
@@ -1515,7 +1515,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     /* carefully destroy the operations */
     op_assign.num_children = 0;
     _slang_free(op_assign.children);
-    op_assign.children = NULL;
+    op_assign.children = nullptr;
     slang_operation_destruct(&op_assign);
     op_id.locals->num_variables = 0;
     slang_operation_destruct(&op_id);
@@ -1573,13 +1573,13 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 		return 0;
 	    var->initializer =
 		(slang_operation *) _slang_alloc(sizeof(slang_operation));
-	    if (var->initializer == NULL) {
+	    if (var->initializer == nullptr) {
 		slang_info_log_memory(C->L);
 		return 0;
 	    }
 	    if (!slang_operation_construct(var->initializer)) {
 		_slang_free(var->initializer);
-		var->initializer = NULL;
+		var->initializer = nullptr;
 		slang_info_log_memory(C->L);
 		return 0;
 	    }
@@ -1612,7 +1612,7 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 	A.space.vars = O->vars;
 	A.program = O->program;
 	A.vartable = O->vartable;
-	A.curFuncEndLabel = NULL;
+	A.curFuncEndLabel = nullptr;
 	if (!_slang_codegen_global_variable(&A, var, C->type))
 	    return 0;
     }
@@ -1628,7 +1628,7 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 
     /* initialize global variable */
     if (C->global_scope) {
-	if (var->initializer != NULL) {
+	if (var->initializer != nullptr) {
 	    slang_assemble_ctx A;
 
 	    A.atoms = C->atoms;
@@ -1706,7 +1706,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
      * overriding
      */
     found_func = slang_function_scope_find(O->funs, &parsed_func, 0);
-    if (found_func == NULL) {
+    if (found_func == nullptr) {
 	/* New function, add it to the function list */
 	O->funs->functions =
 	    (slang_function *) _slang_realloc(O->funs->functions,
@@ -1714,7 +1714,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 					      * sizeof(slang_function),
 					      (O->funs->num_functions + 1)
 					      * sizeof(slang_function));
-	if (O->funs->functions == NULL) {
+	if (O->funs->functions == nullptr) {
 	    slang_info_log_memory(C->L);
 	    slang_function_destruct(&parsed_func);
 	    return GL_FALSE;
@@ -1728,7 +1728,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 	/* previously defined or declared */
 	/* TODO: check function return type qualifiers and specifiers */
 	if (definition) {
-	    if (found_func->body != NULL) {
+	    if (found_func->body != nullptr) {
 		slang_info_log_error(C->L, "%s: function already has a body.",
 				     slang_atom_pool_id(C->atoms,
 							parsed_func.header.
@@ -1869,7 +1869,7 @@ compile_binary(const byte * prod, slang_code_unit * unit,
     /* setup parse context */
     C.I = prod;
     C.L = infolog;
-    C.parsing_builtin = (builtin == NULL);
+    C.parsing_builtin = (builtin == nullptr);
     C.global_scope = GL_TRUE;
     C.atoms = &unit->object->atompool;
     C.type = type;
@@ -1877,7 +1877,7 @@ compile_binary(const byte * prod, slang_code_unit * unit,
     if (!check_revision(&C))
 	return GL_FALSE;
 
-    if (downlink != NULL) {
+    if (downlink != nullptr) {
 	unit->vars.outer_scope = &downlink->vars;
 	unit->funs.outer_scope = &downlink->funs;
 	unit->structs.outer_scope = &downlink->structs;
@@ -1988,7 +1988,7 @@ compile_object(grammar * id, const char *source, slang_code_object * object,
 	       slang_unit_type type, slang_info_log * infolog,
 	       struct gl_program *program)
 {
-    slang_code_unit *builtins = NULL;
+    slang_code_unit *builtins = nullptr;
 
     /* load GLSL grammar */
     *id = grammar_load_from_text((const byte *)(slang_shader_syn));
@@ -2017,41 +2017,41 @@ compile_object(grammar * id, const char *source, slang_code_object * object,
 	if (!compile_binary(slang_core_gc,
 			    &object->builtin[SLANG_BUILTIN_CORE],
 			    SLANG_UNIT_FRAGMENT_BUILTIN, infolog,
-			    NULL, NULL, NULL))
+			    nullptr, nullptr, nullptr))
 	    return GL_FALSE;
 
 #if FEATURE_ARB_shading_language_120
 	if (!compile_binary(slang_120_core_gc,
 			    &object->builtin[SLANG_BUILTIN_120_CORE],
 			    SLANG_UNIT_FRAGMENT_BUILTIN, infolog,
-			    NULL, &object->builtin[SLANG_BUILTIN_CORE], NULL))
+			    nullptr, &object->builtin[SLANG_BUILTIN_CORE], nullptr))
 	    return GL_FALSE;
 #endif
 
 	/* compile common functions and variables, link to core */
 	if (!compile_binary(slang_common_builtin_gc,
 			    &object->builtin[SLANG_BUILTIN_COMMON],
-			    SLANG_UNIT_FRAGMENT_BUILTIN, infolog, NULL,
+			    SLANG_UNIT_FRAGMENT_BUILTIN, infolog, nullptr,
 #if FEATURE_ARB_shading_language_120
 			    &object->builtin[SLANG_BUILTIN_120_CORE],
 #else
 			    &object->builtin[SLANG_BUILTIN_CORE],
 #endif
-			    NULL))
+			    nullptr))
 	    return GL_FALSE;
 
 	/* compile target-specific functions and variables, link to common */
 	if (type == SLANG_UNIT_FRAGMENT_SHADER) {
 	    if (!compile_binary(slang_fragment_builtin_gc,
 				&object->builtin[SLANG_BUILTIN_TARGET],
-				SLANG_UNIT_FRAGMENT_BUILTIN, infolog, NULL,
-				&object->builtin[SLANG_BUILTIN_COMMON], NULL))
+				SLANG_UNIT_FRAGMENT_BUILTIN, infolog, nullptr,
+				&object->builtin[SLANG_BUILTIN_COMMON], nullptr))
 		return GL_FALSE;
 	} else if (type == SLANG_UNIT_VERTEX_SHADER) {
 	    if (!compile_binary(slang_vertex_builtin_gc,
 				&object->builtin[SLANG_BUILTIN_TARGET],
-				SLANG_UNIT_VERTEX_BUILTIN, infolog, NULL,
-				&object->builtin[SLANG_BUILTIN_COMMON], NULL))
+				SLANG_UNIT_VERTEX_BUILTIN, infolog, nullptr,
+				&object->builtin[SLANG_BUILTIN_COMMON], nullptr))
 		return GL_FALSE;
 	}
 
@@ -2151,7 +2151,7 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
     _slang_code_object_dtr(&obj);
 
     _slang_delete_mempool((slang_mempool *) ctx->Shader.MemPool);
-    ctx->Shader.MemPool = NULL;
+    ctx->Shader.MemPool = nullptr;
 
     return success;
 }

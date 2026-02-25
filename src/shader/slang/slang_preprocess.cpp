@@ -343,7 +343,7 @@ typedef struct {
 static GLvoid
 pp_symbols_init(pp_symbols *self)
 {
-    self->symbols = NULL;
+    self->symbols = nullptr;
     self->count = 0;
 }
 
@@ -396,8 +396,8 @@ pp_symbols_push(pp_symbols *self)
 {
     self->symbols = (pp_symbol *)(_mesa_realloc(self->symbols, self->count * sizeof(pp_symbol),
 				  (self->count + 1) * sizeof(pp_symbol)));
-    if (self->symbols == NULL)
-	return NULL;
+    if (self->symbols == nullptr)
+	return nullptr;
     pp_symbol_init(&self->symbols[self->count]);
     return &self->symbols[self->count++];
 }
@@ -413,7 +413,7 @@ pp_symbols_erase(pp_symbols *self, pp_symbol *symbol)
 	memcpy(symbol, symbol + 1, sizeof(pp_symbol) * (self->symbols + self->count - symbol));
     self->symbols = (pp_symbol *)(_mesa_realloc(self->symbols, (self->count + 1) * sizeof(pp_symbol),
 				  self->count * sizeof(pp_symbol)));
-    return self->symbols != NULL;
+    return self->symbols != nullptr;
 }
 
 static pp_symbol *
@@ -424,7 +424,7 @@ pp_symbols_find(pp_symbols *self, const char *name)
     for (i = 0; i < self->count; i++)
 	if (strcmp(name, slang_string_cstr(&self->symbols[i].name)) == 0)
 	    return &self->symbols[i];
-    return NULL;
+    return nullptr;
 }
 
 /*
@@ -590,7 +590,7 @@ expand_defined(expand_state *e, slang_string *buffer)
     id = slang_string_cstr(buffer);
 
     /* Check if the operand is defined. Output 1 if it is defined, output 0 if not. */
-    if (pp_symbols_find(&e->state->symbols, id) == NULL)
+    if (pp_symbols_find(&e->state->symbols, id) == nullptr)
 	slang_string_pushs(e->output, " 0 ", 3);
     else
 	slang_string_pushs(e->output, " 1 ", 3);
@@ -723,11 +723,11 @@ expand(expand_state *e, pp_symbols *symbols)
 		/* The list of symbols from <symbols> take precedence over the list from <state>.
 		 * Note that in some cases this is the same list so avoid double look-up. */
 		symbol = pp_symbols_find(symbols, id);
-		if (symbol == NULL && symbols != &e->state->symbols)
+		if (symbol == nullptr && symbols != &e->state->symbols)
 		    symbol = pp_symbols_find(&e->state->symbols, id);
 
 		/* If the symbol was found, recursively expand its definition. */
-		if (symbol != NULL) {
+		if (symbol != nullptr) {
 		    if (!expand_symbol(e, symbol)) {
 			slang_string_free(&buffer);
 			return GL_FALSE;
@@ -878,7 +878,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 		    break;
 
 		case TOKEN_DEFINE: {
-		    pp_symbol *symbol = NULL;
+		    pp_symbol *symbol = nullptr;
 
 		    /* Parse macro name. */
 		    id = (const char *)(&prod[i]);
@@ -888,9 +888,9 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 			/* If the symbol is already defined, override it. */
 			symbol = pp_symbols_find(&state.symbols, id);
-			if (symbol == NULL) {
+			if (symbol == nullptr) {
 			    symbol = pp_symbols_push(&state.symbols);
-			    if (symbol == NULL)
+			    if (symbol == nullptr)
 				goto error;
 			    slang_string_pushs(&symbol->name, id, idlen);
 			} else {
@@ -908,7 +908,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 			    idlen = strlen(id);
 			    pp_annotate(output, "%s, ", id);
 			    param = pp_symbols_push(&symbol->parameters);
-			    if (param == NULL)
+			    if (param == nullptr)
 				goto error;
 			    slang_string_pushs(&param->name, id, idlen);
 			}
@@ -935,7 +935,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 			pp_annotate(output, "// #undef %s", id);
 			/* Try to find symbol with given name and remove it. */
 			symbol = pp_symbols_find(&state.symbols, id);
-			if (symbol != NULL)
+			if (symbol != nullptr)
 			    if (!pp_symbols_erase(&state.symbols, symbol))
 				goto error;
 		    }

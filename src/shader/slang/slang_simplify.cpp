@@ -63,7 +63,7 @@ _slang_lookup_constant(const char *name)
 	{ "gl_MaxVaryingFloats", GL_MAX_VARYING_FLOATS },
 	{ "gl_MaxVertexTextureImageUnits", GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS },
 	{ "gl_MaxTextureImageUnits", GL_MAX_TEXTURE_IMAGE_UNITS },
-	{ NULL, 0 }
+	{ nullptr, 0 }
     };
     GLuint i;
 
@@ -268,7 +268,7 @@ _slang_simplify(slang_operation *oper,
 		oper->literal[2] = oper->literal[1];
 		oper->literal[3] = oper->literal[1];
 		oper->literal_size = 2;
-		slang_operation_destruct(oper); /* XXX oper->locals goes NULL! */
+		slang_operation_destruct(oper); /* XXX oper->locals goes nullptr! */
 		oper->type = SLANG_OPER_LITERAL_FLOAT;
 		assert(oper->num_children == 0);
 		return;
@@ -288,7 +288,7 @@ _slang_simplify(slang_operation *oper,
 		oper->literal_size = func[3] - '0';
 		assert(oper->literal_size >= 2);
 		assert(oper->literal_size <= 4);
-		slang_operation_destruct(oper); /* XXX oper->locals goes NULL! */
+		slang_operation_destruct(oper); /* XXX oper->locals goes nullptr! */
 		oper->type = SLANG_OPER_LITERAL_FLOAT;
 		assert(oper->num_children == 0);
 		return;

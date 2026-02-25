@@ -44,7 +44,7 @@ slang_string_concat(char *dst, const char *src)
 GLvoid
 slang_string_init(slang_string *self)
 {
-    self->data = NULL;
+    self->data = nullptr;
     self->capacity = 0;
     self->length = 0;
     self->fail = GL_FALSE;
@@ -53,7 +53,7 @@ slang_string_init(slang_string *self)
 GLvoid
 slang_string_free(slang_string *self)
 {
-    if (self->data != NULL)
+    if (self->data != nullptr)
 	free(self->data);
 }
 
@@ -75,7 +75,7 @@ grow(slang_string *self, GLuint size)
 
 	self->data = (char *)(_mesa_realloc(self->data, self->capacity, size * 2));
 	self->capacity = size * 2;
-	if (self->data == NULL) {
+	if (self->data == nullptr) {
 	    self->capacity = 0;
 	    self->fail = GL_TRUE;
 	    return GL_FALSE;
@@ -140,7 +140,7 @@ slang_atom_pool_construct(slang_atom_pool * pool)
     GLuint i;
 
     for (i = 0; i < SLANG_ATOM_POOL_SIZE; i++)
-	pool->entries[i] = NULL;
+	pool->entries[i] = nullptr;
 }
 
 void
@@ -152,7 +152,7 @@ slang_atom_pool_destruct(slang_atom_pool * pool)
 	slang_atom_entry * entry;
 
 	entry = pool->entries[i];
-	while (entry != NULL) {
+	while (entry != nullptr) {
 	    slang_atom_entry *next = entry->next;
 	    _slang_free(entry->id);
 	    _slang_free(entry);
@@ -192,7 +192,7 @@ slang_atom_pool_atom(slang_atom_pool * pool, const char * id)
      * name.
      */
     entry = &pool->entries[hash];
-    while (*entry != NULL) {
+    while (*entry != nullptr) {
 	/* If the same, return the associated atom. */
 	if (slang_string_compare((**entry).id, id) == 0)
 	    return (slang_atom)(**entry).id;
@@ -204,16 +204,16 @@ slang_atom_pool_atom(slang_atom_pool * pool, const char * id)
      * Note that the <entry> points to the last entry's <next> field.
      */
     *entry = (slang_atom_entry *) _slang_alloc(sizeof(slang_atom_entry));
-    if (*entry == NULL)
+    if (*entry == nullptr)
 	return SLANG_ATOM_NULL;
 
     /* Initialize a new entry. Because we'll need the actual name of
      * the atom, we use the pointer to this string as an actual atom's
      * value.
      */
-    (**entry).next = NULL;
+    (**entry).next = nullptr;
     (**entry).id = _slang_strdup(id);
-    if ((**entry).id == NULL)
+    if ((**entry).id == nullptr)
 	return SLANG_ATOM_NULL;
     return (slang_atom)(**entry).id;
 }

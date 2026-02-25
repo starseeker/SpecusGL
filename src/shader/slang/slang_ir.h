@@ -56,7 +56,7 @@ typedef enum {
     IR_IF,      /* high-level IF/then/else */
     /* Children[0] = conditional expression */
     /* Children[1] = if-true part */
-    /* Children[2] = if-else part, or NULL */
+    /* Children[2] = if-else part, or nullptr */
 
     IR_BEGIN_SUB, /* begin subroutine */
     IR_END_SUB,   /* end subroutine */
@@ -65,7 +65,7 @@ typedef enum {
 
     IR_LOOP,      /* high-level loop-begin / loop-end */
     /* Children[0] = loop body */
-    /* Children[1] = loop tail code, or NULL */
+    /* Children[1] = loop tail code, or nullptr */
 
     IR_CONT,      /* continue loop */
     /* n->Parent = ptr to parent IR_LOOP Node */
