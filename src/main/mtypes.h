@@ -2398,6 +2398,15 @@ struct gl_shared_state {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Release all driver-owned objects stored in this shared state.
+     *
+     * Must be called before deleting the gl_shared_state object.
+     * Requires \p ctx so that driver-provided Delete callbacks can be invoked.
+     * Replaces the old free_shared_state() free function in context.cpp.
+     */
+    void cleanup(struct __GLcontextRec *ctx);
 };
 
 
