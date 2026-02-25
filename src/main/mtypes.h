@@ -1348,6 +1348,29 @@ struct gl_texture_image {
     /*@{*/
     void *DriverData;		/**< Arbitrary device driver data */
     /*@}*/
+
+    /**
+     * Initialise this image's dimension and format fields.
+     *
+     * Fills in InternalFormat, Border, Width/Height/Depth, the derived
+     * log2 / log2 / scale fields, ImageOffsets and the IsPowerOfTwo flag.
+     * Requires _BaseFormat to have already been set.
+     *
+     * Replaces _mesa_init_teximage_fields().
+     */
+    void init_fields(GLcontext *ctx, GLenum target,
+                     GLsizei width, GLsizei height, GLsizei depth,
+                     GLint border, GLenum internalFormat);
+
+    /**
+     * Reset all dimension / format fields to their zero/empty state.
+     *
+     * Clears ImageOffsets and sets Data to nullptr.  Called when a texture
+     * level is being invalidated before re-allocation.
+     *
+     * Replaces the zero-out block at the beginning of _mesa_init_teximage_fields().
+     */
+    void clear_fields();
 };
 
 
