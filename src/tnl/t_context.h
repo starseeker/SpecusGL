@@ -547,7 +547,7 @@ struct TNLcontext {
 
 
 
-#define TNL_CONTEXT(ctx) ((TNLcontext *)((ctx)->swtnl_context))
+#define TNL_CONTEXT(ctx) ((ctx)->swtnl_context)
 
 
 #define TYPE_IDX(t) ((t) & 0xf)

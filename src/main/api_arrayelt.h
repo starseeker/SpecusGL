@@ -32,6 +32,37 @@
 
 #include "mtypes.h"
 
+
+/**
+ * Per-element array helper types.  These live here (rather than in the .cpp)
+ * so that the AEcontext pointer in GLcontext can be typed correctly.
+ */
+
+typedef void (GLAPIENTRY *attrib_func)(GLuint indx, const void *data);
+
+struct AEarray {
+    const struct gl_client_array *array;
+    int offset;
+};
+
+struct AEattrib {
+    const struct gl_client_array *array;
+    attrib_func func;
+    GLuint index;
+};
+
+/** Per-context state for the GL_ARB_vertex_array element helper. */
+struct AEcontext {
+    AEarray arrays[32];
+    AEattrib attribs[VERT_ATTRIB_MAX + 1];
+    GLuint NewState;
+
+    struct gl_buffer_object *vbo[VERT_ATTRIB_MAX];
+    GLuint nr_vbos;
+    GLboolean mapped_vbos;
+};
+
+
 extern GLboolean _ae_create_context(GLcontext *ctx);
 extern void _ae_destroy_context(GLcontext *ctx);
 extern void _ae_invalidate_state(GLcontext *ctx, GLuint new_state);

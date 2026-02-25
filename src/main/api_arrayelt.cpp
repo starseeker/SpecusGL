@@ -36,31 +36,7 @@
 
 typedef void (GLAPIENTRY *array_func)(const void *);
 
-typedef struct {
-    const struct gl_client_array *array;
-    int offset;
-} AEarray;
-
-typedef void (GLAPIENTRY *attrib_func)(GLuint indx, const void *data);
-
-typedef struct {
-    const struct gl_client_array *array;
-    attrib_func func;
-    GLuint index;
-} AEattrib;
-
-typedef struct {
-    AEarray arrays[32];
-    AEattrib attribs[VERT_ATTRIB_MAX + 1];
-    GLuint NewState;
-
-    struct gl_buffer_object *vbo[VERT_ATTRIB_MAX];
-    GLuint nr_vbos;
-    GLboolean mapped_vbos;
-
-} AEcontext;
-
-#define AE_CONTEXT(ctx) ((AEcontext *)(ctx)->aelt_context)
+#define AE_CONTEXT(ctx) ((ctx)->aelt_context)
 
 
 /*
@@ -1052,9 +1028,6 @@ GLboolean _ae_create_context(GLcontext *ctx)
     FogCoordFuncs[7] = _gloffset_FogCoorddvEXT;
 
     ctx->aelt_context = new AEcontext{};
-    if (!ctx->aelt_context)
-	return GL_FALSE;
-
     AE_CONTEXT(ctx)->NewState = ~0;
     return GL_TRUE;
 }
@@ -1062,8 +1035,8 @@ GLboolean _ae_create_context(GLcontext *ctx)
 
 void _ae_destroy_context(GLcontext *ctx)
 {
-    if (AE_CONTEXT(ctx)) {
-	delete static_cast<AEcontext*>(ctx->aelt_context);
+    if (ctx->aelt_context) {
+	delete ctx->aelt_context;
 	ctx->aelt_context = nullptr;
     }
 }

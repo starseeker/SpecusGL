@@ -137,6 +137,20 @@ typedef __GLcontextModes GLvisual;
 typedef struct gl_framebuffer GLframebuffer;
 /*@}*/
 
+/**
+ * \name Forward declarations for module-private context types.
+ *
+ * These are stored as typed pointers in GLcontext so that accessor code
+ * does not need explicit casts.  The full definitions live in the respective
+ * module headers (s_context.h, ss_context.h, t_context.h, etc.).
+ */
+/*@{*/
+struct SWcontext;    /**< software rasteriser (swrast) */
+struct SScontext;    /**< swrast setup (swrast_setup) */
+struct TNLcontext;   /**< transform-and-light (tnl) */
+struct vbo_context;  /**< vertex buffer object builder (vbo) */
+struct AEcontext;    /**< vertex array element helper (api_arrayelt) */
+/*@}*/
 
 
 /**
@@ -3287,15 +3301,15 @@ struct __GLcontextRec {
     /**
      * \name Hooks for module contexts.
      *
-     * These will eventually live in the driver or elsewhere.
+     * Typed pointers to private per-context state for each module.
+     * The full struct definitions are in the respective module headers.
      */
     /*@{*/
-    void *swrast_context = nullptr;
-    void *swsetup_context = nullptr;
-    void *swtnl_context = nullptr;
-    void *swtnl_im = nullptr;
-    void *acache_context = nullptr;
-    void *aelt_context = nullptr;
+    SWcontext   *swrast_context  = nullptr;  /**< swrast private context */
+    SScontext   *swsetup_context = nullptr;  /**< swrast_setup private context */
+    TNLcontext  *swtnl_context   = nullptr;  /**< tnl private context */
+    vbo_context *swtnl_im        = nullptr;  /**< vbo builder private context */
+    AEcontext   *aelt_context    = nullptr;  /**< array-element helper context */
     /*@}*/
 };
 

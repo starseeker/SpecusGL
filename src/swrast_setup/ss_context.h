@@ -43,7 +43,7 @@ struct SScontext {
     SWvertex *verts;
 };
 
-#define SWSETUP_CONTEXT(ctx) ((SScontext *)ctx->swsetup_context)
+#define SWSETUP_CONTEXT(ctx) ((ctx)->swsetup_context)
 
 
 
