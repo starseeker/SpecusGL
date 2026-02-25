@@ -397,17 +397,28 @@ enum {
  * Data structure for color tables
  */
 struct gl_color_table {
-    GLenum InternalFormat;      /**< The user-specified format */
-    GLenum _BaseFormat;         /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
-    GLuint Size;                /**< number of entries in table */
+    GLenum InternalFormat = GL_RGBA;  /**< The user-specified format */
+    GLenum _BaseFormat = 0;           /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
+    GLuint Size = 0;                  /**< number of entries in table */
     std::vector<GLfloat> TableF;  /**< Color table, floating point values */
     std::vector<GLubyte> TableUB; /**< Color table, ubyte values */
-    GLubyte RedSize;
-    GLubyte GreenSize;
-    GLubyte BlueSize;
-    GLubyte AlphaSize;
-    GLubyte LuminanceSize;
-    GLubyte IntensitySize;
+    GLubyte RedSize = 0;
+    GLubyte GreenSize = 0;
+    GLubyte BlueSize = 0;
+    GLubyte AlphaSize = 0;
+    GLubyte LuminanceSize = 0;
+    GLubyte IntensitySize = 0;
+
+    /** Reset this table to its initial (empty/default) state. */
+    void init() {
+        TableF.clear();
+        TableUB.clear();
+        Size = 0;
+        InternalFormat = GL_RGBA;
+        _BaseFormat = 0;
+        RedSize = GreenSize = BlueSize = AlphaSize = 0;
+        LuminanceSize = IntensitySize = 0;
+    }
 };
 
 

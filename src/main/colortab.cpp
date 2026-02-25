@@ -1179,13 +1179,16 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 /**********************************************************************/
 
 
+/**
+ * \deprecated  Use gl_color_table::init() or default construction instead.
+ *
+ * Resets \p p to its default state.  Kept for callsites that take a
+ * pointer to an already-existing table.
+ */
 void
 _mesa_init_colortable(struct gl_color_table *p)
 {
-    p->TableF.clear();
-    p->TableUB.clear();
-    p->Size = 0;
-    p->InternalFormat = GL_RGBA;
+    p->init();
 }
 
 
@@ -1193,8 +1196,12 @@ _mesa_init_colortable(struct gl_color_table *p)
 void
 _mesa_free_colortable_data(struct gl_color_table *p)
 {
+    /* std::vector members release their memory in their destructors;
+     * clearing them here returns the storage immediately for reuse. */
     p->TableF.clear();
+    p->TableF.shrink_to_fit();
     p->TableUB.clear();
+    p->TableUB.shrink_to_fit();
 }
 
 
