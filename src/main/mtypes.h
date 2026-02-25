@@ -560,7 +560,7 @@ struct gl_material {
  * Accumulation buffer attribute group (GL_ACCUM_BUFFER_BIT)
  */
 struct gl_accum_attrib {
-    GLfloat ClearColor[4];	/**< Accumulation buffer clear color */
+    GLfloat ClearColor[4] = {};	/**< Accumulation buffer clear color */
 };
 
 
@@ -851,11 +851,11 @@ struct gl_minmax_attrib {
  * Image convolution state.
  */
 struct gl_convolution_attrib {
-    GLenum Format;
-    GLenum InternalFormat;
-    GLuint Width;
-    GLuint Height;
-    GLfloat Filter[MAX_CONVOLUTION_WIDTH * MAX_CONVOLUTION_HEIGHT * 4];
+    GLenum Format = 0;
+    GLenum InternalFormat = 0;
+    GLuint Width = 0;
+    GLuint Height = 0;
+    GLfloat Filter[MAX_CONVOLUTION_WIDTH * MAX_CONVOLUTION_HEIGHT * 4] = {};
 };
 
 
@@ -965,9 +965,9 @@ struct gl_multisample_attrib {
  * A pixelmap (see glPixelMap)
  */
 struct gl_pixelmap {
-    GLint Size;
-    GLfloat Map[MAX_PIXEL_MAP_TABLE];
-    GLubyte Map8[MAX_PIXEL_MAP_TABLE];  /**< converted to 8-bit color */
+    GLint Size = 1;                             /**< size of map (always >= 1) */
+    GLfloat Map[MAX_PIXEL_MAP_TABLE] = {};      /**< the map values */
+    GLubyte Map8[MAX_PIXEL_MAP_TABLE] = {};     /**< converted to 8-bit color */
 };
 
 
@@ -992,58 +992,60 @@ struct gl_pixelmaps {
  * Pixel attribute group (GL_PIXEL_MODE_BIT).
  */
 struct gl_pixel_attrib {
-    GLenum ReadBuffer;		/**< source buffer for glRead/CopyPixels() */
+    GLenum ReadBuffer = 0;    /**< source buffer for glRead/CopyPixels() */
 
     /*--- Begin Pixel Transfer State ---*/
     /* Fields are in the order in which they're applied... */
 
     /* Scale & Bias (index shift, offset) */
-    GLfloat RedBias, RedScale;
-    GLfloat GreenBias, GreenScale;
-    GLfloat BlueBias, BlueScale;
-    GLfloat AlphaBias, AlphaScale;
-    GLfloat DepthBias, DepthScale;
-    GLint IndexShift, IndexOffset;
+    GLfloat RedBias = 0.0f, RedScale = 1.0f;
+    GLfloat GreenBias = 0.0f, GreenScale = 1.0f;
+    GLfloat BlueBias = 0.0f, BlueScale = 1.0f;
+    GLfloat AlphaBias = 0.0f, AlphaScale = 1.0f;
+    GLfloat DepthBias = 0.0f, DepthScale = 1.0f;
+    GLint IndexShift = 0, IndexOffset = 0;
 
     /* Pixel Maps */
     /* Note: actual pixel maps are not part of this attrib group */
-    GLboolean MapColorFlag;
-    GLboolean MapStencilFlag;
+    GLboolean MapColorFlag = GL_FALSE;
+    GLboolean MapStencilFlag = GL_FALSE;
 
     /* There are multiple color table stages: */
-    GLboolean ColorTableEnabled[COLORTABLE_MAX];
+    GLboolean ColorTableEnabled[COLORTABLE_MAX] = {};
+    /** All scale entries default to 1.0; set in _mesa_init_pixel. */
     GLfloat ColorTableScale[COLORTABLE_MAX][4];  /**< RGBA */
-    GLfloat ColorTableBias[COLORTABLE_MAX][4];   /**< RGBA */
+    GLfloat ColorTableBias[COLORTABLE_MAX][4] = {};   /**< RGBA */
 
     /* Convolution (GL_EXT_convolution) */
-    GLboolean Convolution1DEnabled;
-    GLboolean Convolution2DEnabled;
-    GLboolean Separable2DEnabled;
-    GLfloat ConvolutionBorderColor[3][4];
-    GLenum ConvolutionBorderMode[3];
+    GLboolean Convolution1DEnabled = GL_FALSE;
+    GLboolean Convolution2DEnabled = GL_FALSE;
+    GLboolean Separable2DEnabled = GL_FALSE;
+    GLfloat ConvolutionBorderColor[3][4] = {};
+    GLenum ConvolutionBorderMode[3] = {GL_REDUCE, GL_REDUCE, GL_REDUCE};
+    /** All scale entries default to 1.0; set in _mesa_init_pixel. */
     GLfloat ConvolutionFilterScale[3][4];  /**< RGBA */
-    GLfloat ConvolutionFilterBias[3][4];   /**< RGBA */
-    GLfloat PostConvolutionScale[4];  /**< RGBA */
-    GLfloat PostConvolutionBias[4];   /**< RGBA */
+    GLfloat ConvolutionFilterBias[3][4] = {};   /**< RGBA */
+    GLfloat PostConvolutionScale[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat PostConvolutionBias[4] = {};   /**< RGBA */
 
     /* Color matrix (GL_SGI_color_matrix) */
     /* Note: the color matrix is not part of this attrib group */
-    GLfloat PostColorMatrixScale[4];  /**< RGBA */
-    GLfloat PostColorMatrixBias[4];   /**< RGBA */
+    GLfloat PostColorMatrixScale[4] = {1.0f, 1.0f, 1.0f, 1.0f};  /**< RGBA */
+    GLfloat PostColorMatrixBias[4] = {};   /**< RGBA */
 
     /* Histogram & minmax (GL_EXT_histogram) */
     /* Note: histogram and minmax data are not part of this attrib group */
-    GLboolean HistogramEnabled;
-    GLboolean MinMaxEnabled;
+    GLboolean HistogramEnabled = GL_FALSE;
+    GLboolean MinMaxEnabled = GL_FALSE;
 
     /*--- End Pixel Transfer State ---*/
 
     /* Pixel Zoom */
-    GLfloat ZoomX, ZoomY;
+    GLfloat ZoomX = 1.0f, ZoomY = 1.0f;
 
     /** GL_SGI_texture_color_table */
-    GLfloat TextureColorTableScale[4];
-    GLfloat TextureColorTableBias[4];
+    GLfloat TextureColorTableScale[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat TextureColorTableBias[4] = {};
 };
 
 
@@ -1691,17 +1693,17 @@ struct gl_buffer_object {
  * Client pixel packing/unpacking attributes
  */
 struct gl_pixelstore_attrib {
-    GLint Alignment;
-    GLint RowLength;
-    GLint SkipPixels;
-    GLint SkipRows;
-    GLint ImageHeight;     /**< for GL_EXT_texture3D */
-    GLint SkipImages;      /**< for GL_EXT_texture3D */
-    GLboolean SwapBytes;
-    GLboolean LsbFirst;
-    GLboolean ClientStorage; /**< GL_APPLE_client_storage */
-    GLboolean Invert;        /**< GL_MESA_pack_invert */
-    struct gl_buffer_object *BufferObj; /**< GL_ARB_pixel_buffer_object */
+    GLint Alignment = 4;          /**< byte alignment; default 4 for Pack/Unpack */
+    GLint RowLength = 0;
+    GLint SkipPixels = 0;
+    GLint SkipRows = 0;
+    GLint ImageHeight = 0;        /**< for GL_EXT_texture3D */
+    GLint SkipImages = 0;         /**< for GL_EXT_texture3D */
+    GLboolean SwapBytes = GL_FALSE;
+    GLboolean LsbFirst = GL_FALSE;
+    GLboolean ClientStorage = GL_FALSE; /**< GL_APPLE_client_storage */
+    GLboolean Invert = GL_FALSE;        /**< GL_MESA_pack_invert */
+    struct gl_buffer_object *BufferObj = nullptr; /**< GL_ARB_pixel_buffer_object */
 };
 
 
@@ -2181,12 +2183,12 @@ struct gl_shader_program {
  * Context state for GLSL vertex/fragment shaders.
  */
 struct gl_shader_state {
-    struct gl_shader_program *CurrentProgram; /**< The user-bound program */
+    struct gl_shader_program *CurrentProgram = nullptr; /**< The user-bound program */
     /** Driver-selectable options: */
-    GLboolean EmitHighLevelInstructions; /**< IF/ELSE/ENDIF vs. BRA, etc. */
-    GLboolean EmitCondCodes;             /**< Use condition codes? */
-    GLboolean EmitComments;              /**< Annotated instructions */
-    void *MemPool;
+    GLboolean EmitHighLevelInstructions = GL_TRUE; /**< IF/ELSE/ENDIF vs. BRA, etc. */
+    GLboolean EmitCondCodes = GL_TRUE;             /**< Use condition codes? */
+    GLboolean EmitComments = GL_FALSE;             /**< Annotated instructions */
+    void *MemPool = nullptr;
 };
 
 

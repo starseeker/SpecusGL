@@ -1208,14 +1208,16 @@ _mesa_free_colortable_data(struct gl_color_table *p)
 /*
  * Initialize all colortables for a context.
  */
+/**
+ * C++17 note: gl_color_table now carries default member initializers
+ * (InternalFormat=GL_RGBA, Size=0, etc.), so this function is a no-op
+ * and is retained only for API compatibility.
+ */
 void
 _mesa_init_colortables(GLcontext * ctx)
 {
-    GLuint i;
-    for (i = 0; i < COLORTABLE_MAX; i++) {
-	_mesa_init_colortable(&ctx->ColorTable[i]);
-	_mesa_init_colortable(&ctx->ProxyColorTable[i]);
-    }
+    (void) ctx;  /* ColorTable and ProxyColorTable arrays are default-initialised
+                    by gl_color_table member initializers */
 }
 
 

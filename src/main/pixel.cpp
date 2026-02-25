@@ -1423,125 +1423,36 @@ init_pixelmap(struct gl_pixelmap *map)
 
 
 /**
- * Initialize the context's PIXEL attribute group.
+ * C++17 note: most fields of gl_pixel_attrib, gl_pixelstore_attrib,
+ * gl_pixelmap, and gl_convolution_attrib now carry default member
+ * initializers.  The only remaining work here is:
+ *  - setting the 2-D Scale arrays (ColorTableScale, ConvolutionFilterScale)
+ *    which cannot be done with brace-initializers at this level
+ *  - setting context-dependent fields (ReadBuffer, Pack/Unpack.BufferObj)
+ *  - overriding DefaultPacking.Alignment to 1 (differs from the default 4)
  */
 void
 _mesa_init_pixel(GLcontext *ctx)
 {
     int i;
 
-    /* Pixel group */
-    ctx->Pixel.RedBias = 0.0;
-    ctx->Pixel.RedScale = 1.0;
-    ctx->Pixel.GreenBias = 0.0;
-    ctx->Pixel.GreenScale = 1.0;
-    ctx->Pixel.BlueBias = 0.0;
-    ctx->Pixel.BlueScale = 1.0;
-    ctx->Pixel.AlphaBias = 0.0;
-    ctx->Pixel.AlphaScale = 1.0;
-    ctx->Pixel.DepthBias = 0.0;
-    ctx->Pixel.DepthScale = 1.0;
-    ctx->Pixel.IndexOffset = 0;
-    ctx->Pixel.IndexShift = 0;
-    ctx->Pixel.ZoomX = 1.0;
-    ctx->Pixel.ZoomY = 1.0;
-    ctx->Pixel.MapColorFlag = GL_FALSE;
-    ctx->Pixel.MapStencilFlag = GL_FALSE;
-    init_pixelmap(&ctx->PixelMaps.StoS);
-    init_pixelmap(&ctx->PixelMaps.ItoI);
-    init_pixelmap(&ctx->PixelMaps.ItoR);
-    init_pixelmap(&ctx->PixelMaps.ItoG);
-    init_pixelmap(&ctx->PixelMaps.ItoB);
-    init_pixelmap(&ctx->PixelMaps.ItoA);
-    init_pixelmap(&ctx->PixelMaps.RtoR);
-    init_pixelmap(&ctx->PixelMaps.GtoG);
-    init_pixelmap(&ctx->PixelMaps.BtoB);
-    init_pixelmap(&ctx->PixelMaps.AtoA);
-    ctx->Pixel.HistogramEnabled = GL_FALSE;
-    ctx->Pixel.MinMaxEnabled = GL_FALSE;
-    ASSIGN_4V(ctx->Pixel.PostColorMatrixScale, 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Pixel.PostColorMatrixBias, 0.0, 0.0, 0.0, 0.0);
+    /* Set Scale 2-D arrays that default to all-1.0 per RGBA component. */
     for (i = 0; i < COLORTABLE_MAX; i++) {
 	ASSIGN_4V(ctx->Pixel.ColorTableScale[i], 1.0, 1.0, 1.0, 1.0);
-	ASSIGN_4V(ctx->Pixel.ColorTableBias[i], 0.0, 0.0, 0.0, 0.0);
-	ctx->Pixel.ColorTableEnabled[i] = GL_FALSE;
     }
-    ctx->Pixel.Convolution1DEnabled = GL_FALSE;
-    ctx->Pixel.Convolution2DEnabled = GL_FALSE;
-    ctx->Pixel.Separable2DEnabled = GL_FALSE;
     for (i = 0; i < 3; i++) {
-	ASSIGN_4V(ctx->Pixel.ConvolutionBorderColor[i], 0.0, 0.0, 0.0, 0.0);
-	ctx->Pixel.ConvolutionBorderMode[i] = GL_REDUCE;
 	ASSIGN_4V(ctx->Pixel.ConvolutionFilterScale[i], 1.0, 1.0, 1.0, 1.0);
-	ASSIGN_4V(ctx->Pixel.ConvolutionFilterBias[i], 0.0, 0.0, 0.0, 0.0);
     }
-    for (i = 0; i < MAX_CONVOLUTION_WIDTH * MAX_CONVOLUTION_WIDTH * 4; i++) {
-	ctx->Convolution1D.Filter[i] = 0.0;
-	ctx->Convolution2D.Filter[i] = 0.0;
-	ctx->Separable2D.Filter[i] = 0.0;
-    }
-    ASSIGN_4V(ctx->Pixel.PostConvolutionScale, 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Pixel.PostConvolutionBias, 0.0, 0.0, 0.0, 0.0);
-    /* GL_SGI_texture_color_table */
-    ASSIGN_4V(ctx->Pixel.TextureColorTableScale, 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Pixel.TextureColorTableBias, 0.0, 0.0, 0.0, 0.0);
 
-    /* Pixel transfer */
-    ctx->Pack.Alignment = 4;
-    ctx->Pack.RowLength = 0;
-    ctx->Pack.ImageHeight = 0;
-    ctx->Pack.SkipPixels = 0;
-    ctx->Pack.SkipRows = 0;
-    ctx->Pack.SkipImages = 0;
-    ctx->Pack.SwapBytes = GL_FALSE;
-    ctx->Pack.LsbFirst = GL_FALSE;
-    ctx->Pack.ClientStorage = GL_FALSE;
-    ctx->Pack.Invert = GL_FALSE;
-#if FEATURE_EXT_pixel_buffer_object
+    /* Context-dependent: ReadBuffer, Pack/Unpack/DefaultPacking BufferObj. */
+    ctx->Pixel.ReadBuffer = ctx->Visual.doubleBufferMode ? GL_BACK : GL_FRONT;
+
     ctx->Pack.BufferObj = ctx->Array.NullBufferObj;
-#endif
-    ctx->Unpack.Alignment = 4;
-    ctx->Unpack.RowLength = 0;
-    ctx->Unpack.ImageHeight = 0;
-    ctx->Unpack.SkipPixels = 0;
-    ctx->Unpack.SkipRows = 0;
-    ctx->Unpack.SkipImages = 0;
-    ctx->Unpack.SwapBytes = GL_FALSE;
-    ctx->Unpack.LsbFirst = GL_FALSE;
-    ctx->Unpack.ClientStorage = GL_FALSE;
-    ctx->Unpack.Invert = GL_FALSE;
-#if FEATURE_EXT_pixel_buffer_object
     ctx->Unpack.BufferObj = ctx->Array.NullBufferObj;
-#endif
 
-    /*
-     * _mesa_unpack_image() returns image data in this format.  When we
-     * execute image commands (glDrawPixels(), glTexImage(), etc) from
-     * within display lists we have to be sure to set the current
-     * unpacking parameters to these values!
-     */
+    /* DefaultPacking uses alignment 1 (not the default 4). */
     ctx->DefaultPacking.Alignment = 1;
-    ctx->DefaultPacking.RowLength = 0;
-    ctx->DefaultPacking.SkipPixels = 0;
-    ctx->DefaultPacking.SkipRows = 0;
-    ctx->DefaultPacking.ImageHeight = 0;
-    ctx->DefaultPacking.SkipImages = 0;
-    ctx->DefaultPacking.SwapBytes = GL_FALSE;
-    ctx->DefaultPacking.LsbFirst = GL_FALSE;
-    ctx->DefaultPacking.ClientStorage = GL_FALSE;
-    ctx->DefaultPacking.Invert = GL_FALSE;
-#if FEATURE_EXT_pixel_buffer_object
     ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-#endif
-
-    if (ctx->Visual.doubleBufferMode) {
-	ctx->Pixel.ReadBuffer = GL_BACK;
-    } else {
-	ctx->Pixel.ReadBuffer = GL_FRONT;
-    }
-
-    /* Miscellaneous */
-    ctx->_ImageTransferState = 0;
 }
 
 /*

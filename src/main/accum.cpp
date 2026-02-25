@@ -99,11 +99,15 @@ _mesa_Accum(GLenum op, GLfloat value)
 
 
 
+/**
+ * C++17 note: gl_accum_attrib now carries a default member initializer
+ * (ClearColor={}), so this function is a no-op and is retained only for
+ * API compatibility.
+ */
 void
 _mesa_init_accum(GLcontext *ctx)
 {
-    /* Accumulate buffer group */
-    ASSIGN_4V(ctx->Accum.ClearColor, 0.0, 0.0, 0.0, 0.0);
+    (void) ctx;  /* all defaults provided by gl_accum_attrib member initializers */
 }
 
 /*

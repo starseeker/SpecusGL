@@ -842,6 +842,13 @@ check_context_limits(GLcontext *ctx)
  * Initializes all the attributes, calling the respective <tt>init*</tt>
  * functions for the more complex data structures.
  */
+/**
+ * Initialize all context attribute groups.
+ *
+ * Functions that are pure no-ops (because the corresponding struct now uses
+ * default member initializers) have been removed from this list.  Functions
+ * that still need to perform work are retained.
+ */
 static GLboolean
 init_attrib_groups(GLcontext *ctx)
 {
@@ -853,37 +860,23 @@ init_attrib_groups(GLcontext *ctx)
     /* Extensions */
     _mesa_init_extensions(ctx);
 
-    /* Attribute Groups */
-    _mesa_init_accum(ctx);
-    _mesa_init_attrib(ctx);
-    _mesa_init_buffer_objects(ctx);
-    _mesa_init_color(ctx);
-    _mesa_init_colortables(ctx);
-    _mesa_init_current(ctx);
-    _mesa_init_depth(ctx);
-    _mesa_init_debug(ctx);
-    _mesa_init_display_list(ctx);
-    _mesa_init_eval(ctx);
-    _mesa_init_feedback(ctx);
-    _mesa_init_fog(ctx);
-    _mesa_init_histogram(ctx);
-    _mesa_init_hint(ctx);
-    _mesa_init_line(ctx);
-    _mesa_init_lighting(ctx);
-    _mesa_init_matrix(ctx);
-    _mesa_init_multisample(ctx);
-    _mesa_init_pixel(ctx);
-    _mesa_init_point(ctx);
-    _mesa_init_polygon(ctx);
-    _mesa_init_program(ctx);
-    _mesa_init_query(ctx);
-    _mesa_init_rastpos(ctx);
-    _mesa_init_scissor(ctx);
-    _mesa_init_shader_state(ctx);
-    _mesa_init_stencil(ctx);
-    _mesa_init_transform(ctx);
-    _mesa_init_varray(ctx);
-    _mesa_init_viewport(ctx);
+    /* Attribute Groups that still require active initialisation */
+    _mesa_init_buffer_objects(ctx);    /* allocates NullBufferObj */
+    _mesa_init_color(ctx);             /* sets DrawBuffer[0] from doubleBufferMode */
+    _mesa_init_current(ctx);           /* sets vertex attribute defaults (w=1 etc.) */
+    _mesa_init_debug(ctx);             /* reads MESA_NO_DITHER env var */
+    _mesa_init_display_list(ctx);      /* allocates display-list hash table */
+    _mesa_init_eval(ctx);              /* sets up evaluator control-point data */
+    _mesa_init_lighting(ctx);          /* initialises light sources & shine tables */
+    _mesa_init_matrix(ctx);            /* allocates matrix stacks */
+    _mesa_init_pixel(ctx);             /* sets Scale arrays, ReadBuffer, BufferObjs */
+    _mesa_init_point(ctx);             /* sets MaxSize from Const */
+    _mesa_init_polygon(ctx);           /* sets PolygonStipple to all-on */
+    _mesa_init_program(ctx);           /* initialises program state */
+    _mesa_init_query(ctx);             /* allocates query hash table */
+    _mesa_init_rastpos(ctx);           /* sets RasterTexCoords w=1 per unit */
+    _mesa_init_varray(ctx);            /* allocates default array object */
+    _mesa_init_viewport(ctx);          /* sets up initial viewport matrix */
 
     if (!_mesa_init_texture(ctx))
 	return GL_FALSE;
@@ -891,9 +884,9 @@ init_attrib_groups(GLcontext *ctx)
     _mesa_init_texture_s3tc(ctx);
     _mesa_init_texture_fxt1(ctx);
 
-    /* Miscellaneous */
+    /* ctx->NewState and ctx->ErrorValue are already set by member initializers
+     * but NewState must be _NEW_ALL on first use to force full state update. */
     ctx->NewState = _NEW_ALL;
-    ctx->ErrorValue = (GLenum) GL_NO_ERROR;
 
     return GL_TRUE;
 }
