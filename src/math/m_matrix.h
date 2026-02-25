@@ -67,6 +67,11 @@ enum GLmatrixtype {
 
 /**
  * Matrix type to represent 4x4 transformation matrices.
+ *
+ * C++17 modernisation: mutation operations are now also available as member
+ * functions so that callers can write \c mat->translate(x,y,z) instead of
+ * \c _math_matrix_translate(mat,x,y,z).  The legacy free-function forms are
+ * kept as thin inline wrappers for compatibility.
  */
 struct GLmatrix {
     GLfloat *m;		/**< 16 matrix elements (16-byte aligned) */
@@ -78,71 +83,136 @@ struct GLmatrix {
 
     GLmatrix();   /**< Initialises m to identity, inv to nullptr. */
     ~GLmatrix();  /**< Releases aligned m and inv allocations. */
+
+    /** Allocate (or reallocate) the inverse array. */
+    void alloc_inv();
+
+    /** Multiply this matrix by matrix \p b (this = this * b). */
+    void mul(const GLmatrix *b);
+
+    /** Multiply this matrix by a raw 16-float column-major matrix. */
+    void mul(const GLfloat *b);
+
+    /** Load this matrix from a raw 16-float column-major array. */
+    void load(const GLfloat *src);
+
+    /** Apply a translation to this matrix. */
+    void translate(GLfloat x, GLfloat y, GLfloat z);
+
+    /** Apply a rotation of \p angle degrees about axis (x,y,z). */
+    void rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
+
+    /** Apply a non-uniform scale. */
+    void scale(GLfloat x, GLfloat y, GLfloat z);
+
+    /** Set up an orthographic projection. */
+    void ortho(GLfloat left, GLfloat right,
+               GLfloat bottom, GLfloat top,
+               GLfloat nearval, GLfloat farval);
+
+    /** Set up a perspective (frustum) projection. */
+    void frustum(GLfloat left, GLfloat right,
+                 GLfloat bottom, GLfloat top,
+                 GLfloat nearval, GLfloat farval);
+
+    /** Set up a viewport mapping transformation. */
+    void viewport(GLint x, GLint y, GLint width, GLint height,
+                  GLfloat zNear, GLfloat zFar, GLfloat depthMax);
+
+    /** Reset this matrix to the identity. */
+    void set_identity();
+
+    /** Copy \p from into this matrix (including inv if present). */
+    void copy_from(const GLmatrix *from);
+
+    /** (Re-)analyse the matrix to update type and flags. */
+    void analyse();
+
+    /** Print the matrix to stdout (debug helper). */
+    void print() const;
+
+    /** \name Query predicates (const) */
+    /*@{*/
+    [[nodiscard]] bool is_length_preserving() const;
+    [[nodiscard]] bool has_rotation() const;
+    [[nodiscard]] bool is_general_scale() const;
+    [[nodiscard]] bool is_dirty() const;
+    /*@}*/
+
+private:
+    /**
+     * \name Internal helpers – not part of the public interface.
+     * These encapsulate the per-format inversion and analysis routines
+     * that were previously static free functions in m_matrix.cpp.
+     */
+    /*@{*/
+
+    /** Apply a precomputed 4×4 matrix \p fm with extra flags \p fl. */
+    void multf(const GLfloat *fm, GLuint fl);
+
+    /** Compute the inverse and update the matrix. */
+    bool invert();
+
+    /** Determine type and flags from scratch (expensive path). */
+    void analyse_from_scratch();
+
+    /** Determine type from flags (fast path, flags already known-good). */
+    void analyse_from_flags();
+
+    /*@}*/
 };
 
 static_assert(sizeof(GLfloat) == 4, "GLfloat must be 32-bit for 16-byte aligned matrix arrays");
 
-extern void
-_math_matrix_alloc_inv(GLmatrix *m);
 
+/**
+ * Multiply two matrices: \c dest = \c a * \c b.
+ *
+ * This free function remains as-is because the three operands are distinct
+ * and there is no natural "this" matrix to call the method on.
+ */
 extern void
 _math_matrix_mul_matrix(GLmatrix *dest, const GLmatrix *a, const GLmatrix *b);
 
-extern void
-_math_matrix_mul_floats(GLmatrix *dest, const GLfloat *b);
 
-extern void
-_math_matrix_loadf(GLmatrix *mat, const GLfloat *m);
-
-extern void
-_math_matrix_translate(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z);
-
-extern void
-_math_matrix_rotate(GLmatrix *m, GLfloat angle,
-		    GLfloat x, GLfloat y, GLfloat z);
-
-extern void
-_math_matrix_scale(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z);
-
-extern void
-_math_matrix_ortho(GLmatrix *mat,
-		   GLfloat left, GLfloat right,
-		   GLfloat bottom, GLfloat top,
-		   GLfloat nearval, GLfloat farval);
-
-extern void
-_math_matrix_frustum(GLmatrix *mat,
-		     GLfloat left, GLfloat right,
-		     GLfloat bottom, GLfloat top,
-		     GLfloat nearval, GLfloat farval);
-
-extern void
-_math_matrix_viewport(GLmatrix *m, GLint x, GLint y, GLint width, GLint height,
-		      GLfloat zNear, GLfloat zFar, GLfloat depthMax);
-
-extern void
-_math_matrix_set_identity(GLmatrix *dest);
-
-extern void
-_math_matrix_copy(GLmatrix *to, const GLmatrix *from);
-
-extern void
-_math_matrix_analyse(GLmatrix *mat);
-
-extern void
-_math_matrix_print(const GLmatrix *m);
-
-extern GLboolean
-_math_matrix_is_length_preserving(const GLmatrix *m);
-
-extern GLboolean
-_math_matrix_has_rotation(const GLmatrix *m);
-
-extern GLboolean
-_math_matrix_is_general_scale(const GLmatrix *m);
-
-extern GLboolean
-_math_matrix_is_dirty(const GLmatrix *m);
+/**
+ * \name Legacy free-function API (thin wrappers around GLmatrix methods).
+ *
+ * These exist for backward compatibility.  New code should call the
+ * equivalent GLmatrix member function directly.
+ */
+/*@{*/
+inline void _math_matrix_alloc_inv(GLmatrix *m)            { m->alloc_inv(); }
+inline void _math_matrix_mul_floats(GLmatrix *dest, const GLfloat *b) { dest->mul(b); }
+inline void _math_matrix_loadf(GLmatrix *mat, const GLfloat *m)       { mat->load(m); }
+inline void _math_matrix_translate(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
+                                                                       { mat->translate(x, y, z); }
+inline void _math_matrix_rotate(GLmatrix *m, GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
+                                                                       { m->rotate(angle, x, y, z); }
+inline void _math_matrix_scale(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
+                                                                       { mat->scale(x, y, z); }
+inline void _math_matrix_ortho(GLmatrix *mat,
+                               GLfloat left, GLfloat right,
+                               GLfloat bottom, GLfloat top,
+                               GLfloat nearval, GLfloat farval)
+                                                                       { mat->ortho(left, right, bottom, top, nearval, farval); }
+inline void _math_matrix_frustum(GLmatrix *mat,
+                                 GLfloat left, GLfloat right,
+                                 GLfloat bottom, GLfloat top,
+                                 GLfloat nearval, GLfloat farval)
+                                                                       { mat->frustum(left, right, bottom, top, nearval, farval); }
+inline void _math_matrix_viewport(GLmatrix *m, GLint x, GLint y, GLint width, GLint height,
+                                  GLfloat zNear, GLfloat zFar, GLfloat depthMax)
+                                                                       { m->viewport(x, y, width, height, zNear, zFar, depthMax); }
+inline void _math_matrix_set_identity(GLmatrix *dest)                  { dest->set_identity(); }
+inline void _math_matrix_copy(GLmatrix *to, const GLmatrix *from)     { to->copy_from(from); }
+inline void _math_matrix_analyse(GLmatrix *mat)                        { mat->analyse(); }
+inline void _math_matrix_print(const GLmatrix *m)                     { m->print(); }
+inline GLboolean _math_matrix_is_length_preserving(const GLmatrix *m) { return m->is_length_preserving() ? GL_TRUE : GL_FALSE; }
+inline GLboolean _math_matrix_has_rotation(const GLmatrix *m)         { return m->has_rotation() ? GL_TRUE : GL_FALSE; }
+inline GLboolean _math_matrix_is_general_scale(const GLmatrix *m)     { return m->is_general_scale() ? GL_TRUE : GL_FALSE; }
+inline GLboolean _math_matrix_is_dirty(const GLmatrix *m)             { return m->is_dirty() ? GL_TRUE : GL_FALSE; }
+/*@}*/
 
 
 /**

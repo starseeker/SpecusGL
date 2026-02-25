@@ -57,7 +57,7 @@
  *
  * \sa glFrustum().
  *
- * Flushes vertices and validates parameters. Calls _math_matrix_frustum() with
+ * Flushes vertices and validates parameters. Calls Top->frustum() with
  * the top matrix of the current matrix stack and sets
  * __GLcontextRec::NewState.
  */
@@ -78,10 +78,9 @@ _mesa_Frustum(GLdouble left, GLdouble right,
 	return;
     }
 
-    _math_matrix_frustum(ctx->CurrentStack->Top,
-			 (GLfloat) left, (GLfloat) right,
-			 (GLfloat) bottom, (GLfloat) top,
-			 (GLfloat) nearval, (GLfloat) farval);
+    ctx->CurrentStack->Top->frustum((GLfloat) left, (GLfloat) right,
+				    (GLfloat) bottom, (GLfloat) top,
+				    (GLfloat) nearval, (GLfloat) farval);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -98,7 +97,7 @@ _mesa_Frustum(GLdouble left, GLdouble right,
  *
  * \sa glOrtho().
  *
- * Flushes vertices and validates parameters. Calls _math_matrix_ortho() with
+ * Flushes vertices and validates parameters. Calls Top->ortho() with
  * the top matrix of the current matrix stack and sets
  * __GLcontextRec::NewState.
  */
@@ -121,10 +120,9 @@ _mesa_Ortho(GLdouble left, GLdouble right,
 	return;
     }
 
-    _math_matrix_ortho(ctx->CurrentStack->Top,
-		       (GLfloat) left, (GLfloat) right,
-		       (GLfloat) bottom, (GLfloat) top,
-		       (GLfloat) nearval, (GLfloat) farval);
+    ctx->CurrentStack->Top->ortho((GLfloat) left, (GLfloat) right,
+				  (GLfloat) bottom, (GLfloat) top,
+				  (GLfloat) nearval, (GLfloat) farval);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -288,7 +286,7 @@ _mesa_PopMatrix(void)
  *
  * \sa glLoadIdentity().
  *
- * Flushes the vertices and calls _math_matrix_set_identity() with the top-most
+ * Flushes the vertices and calls Top->set_identity() with the top-most
  * matrix in the current stack. Marks __GLcontextRec::NewState with the stack
  * dirty flag.
  */
@@ -301,7 +299,7 @@ _mesa_LoadIdentity(void)
     if (MESA_VERBOSE & VERBOSE_API)
 	_mesa_debug(ctx, "glLoadIdentity()");
 
-    _math_matrix_set_identity(ctx->CurrentStack->Top);
+    ctx->CurrentStack->Top->set_identity();
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -313,7 +311,7 @@ _mesa_LoadIdentity(void)
  *
  * \sa glLoadMatrixf().
  *
- * Flushes the vertices and calls _math_matrix_loadf() with the top-most matrix
+ * Flushes the vertices and calls Top->load() with the top-most matrix
  * in the current stack and the given matrix. Marks __GLcontextRec::NewState
  * with the dirty stack flag.
  */
@@ -331,7 +329,7 @@ _mesa_LoadMatrixf(const GLfloat *m)
 		    m[3], m[7], m[11], m[15]);
 
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
-    _math_matrix_loadf(ctx->CurrentStack->Top, m);
+    ctx->CurrentStack->Top->load(m);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -343,7 +341,7 @@ _mesa_LoadMatrixf(const GLfloat *m)
  *
  * \sa glMultMatrixf().
  *
- * Flushes the vertices and calls _math_matrix_mul_floats() with the top-most
+ * Flushes the vertices and calls Top->mul() with the top-most
  * matrix in the current stack and the given matrix. Marks
  * __GLcontextRec::NewState with the dirty stack flag.
  */
@@ -360,7 +358,7 @@ _mesa_MultMatrixf(const GLfloat *m)
 		    m[2], m[6], m[10], m[14],
 		    m[3], m[7], m[11], m[15]);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
-    _math_matrix_mul_floats(ctx->CurrentStack->Top, m);
+    ctx->CurrentStack->Top->mul(m);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -375,7 +373,7 @@ _mesa_MultMatrixf(const GLfloat *m)
  *
  * \sa glRotatef().
  *
- * Flushes the vertices and calls _math_matrix_rotate() with the top-most
+ * Flushes the vertices and calls Top->rotate() with the top-most
  * matrix in the current stack and the given parameters. Marks
  * __GLcontextRec::NewState with the dirty stack flag.
  */
@@ -385,7 +383,7 @@ _mesa_Rotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
     if (angle != 0.0F) {
-	_math_matrix_rotate(ctx->CurrentStack->Top, angle, x, y, z);
+	ctx->CurrentStack->Top->rotate(angle, x, y, z);
 	ctx->NewState |= ctx->CurrentStack->DirtyFlag;
     }
 }
@@ -400,7 +398,7 @@ _mesa_Rotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
  *
  * \sa glScalef().
  *
- * Flushes the vertices and calls _math_matrix_scale() with the top-most
+ * Flushes the vertices and calls Top->scale() with the top-most
  * matrix in the current stack and the given parameters. Marks
  * __GLcontextRec::NewState with the dirty stack flag.
  */
@@ -409,7 +407,7 @@ _mesa_Scalef(GLfloat x, GLfloat y, GLfloat z)
 {
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
-    _math_matrix_scale(ctx->CurrentStack->Top, x, y, z);
+    ctx->CurrentStack->Top->scale(x, y, z);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -423,7 +421,7 @@ _mesa_Scalef(GLfloat x, GLfloat y, GLfloat z)
  *
  * \sa glTranslatef().
  *
- * Flushes the vertices and calls _math_matrix_translate() with the top-most
+ * Flushes the vertices and calls Top->translate() with the top-most
  * matrix in the current stack and the given parameters. Marks
  * __GLcontextRec::NewState with the dirty stack flag.
  */
@@ -432,7 +430,7 @@ _mesa_Translatef(GLfloat x, GLfloat y, GLfloat z)
 {
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
-    _math_matrix_translate(ctx->CurrentStack->Top, x, y, z);
+    ctx->CurrentStack->Top->translate(x, y, z);
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -582,11 +580,10 @@ _mesa_set_viewport(GLcontext *ctx, GLint x, GLint y,
      * the WindowMap matrix being up to date in the driver's Viewport
      * and DepthRange functions.
      */
-    _math_matrix_viewport(&ctx->Viewport._WindowMap,
-			  ctx->Viewport.X, ctx->Viewport.Y,
-			  ctx->Viewport.Width, ctx->Viewport.Height,
-			  ctx->Viewport.Near, ctx->Viewport.Far,
-			  ctx->DrawBuffer->_DepthMaxF);
+    ctx->Viewport._WindowMap.viewport(ctx->Viewport.X, ctx->Viewport.Y,
+				       ctx->Viewport.Width, ctx->Viewport.Height,
+				       ctx->Viewport.Near, ctx->Viewport.Far,
+				       ctx->DrawBuffer->_DepthMaxF);
 #endif
 
     if (ctx->Driver.Viewport) {
@@ -625,11 +622,10 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
      * the WindowMap matrix being up to date in the driver's Viewport
      * and DepthRange functions.
      */
-    _math_matrix_viewport(&ctx->Viewport._WindowMap,
-			  ctx->Viewport.X, ctx->Viewport.Y,
-			  ctx->Viewport.Width, ctx->Viewport.Height,
-			  ctx->Viewport.Near, ctx->Viewport.Far,
-			  ctx->DrawBuffer->_DepthMaxF);
+    ctx->Viewport._WindowMap.viewport(ctx->Viewport.X, ctx->Viewport.Y,
+				      ctx->Viewport.Width, ctx->Viewport.Height,
+				      ctx->Viewport.Near, ctx->Viewport.Far,
+				      ctx->DrawBuffer->_DepthMaxF);
 #endif
 
     if (ctx->Driver.DepthRange) {
@@ -650,7 +646,7 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
  *
  * \param ctx GL context.
  *
- * Calls _math_matrix_analyse() with the top-matrix of the projection matrix
+ * Calls Top->analyse() with the top-matrix of the projection matrix
  * stack, and recomputes user clip positions if necessary.
  *
  * \note This routine references __GLcontextRec::Tranform attribute values to
@@ -661,7 +657,7 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
 static void
 update_projection(GLcontext *ctx)
 {
-    _math_matrix_analyse(ctx->ProjectionMatrixStack.Top);
+    ctx->ProjectionMatrixStack.Top->analyse();
 
 #if FEATURE_userclip
     /* Recompute clip plane positions in clipspace.  This is also done
@@ -688,7 +684,7 @@ update_projection(GLcontext *ctx)
  *
  * Multiplies the top matrices of the projection and model view stacks into
  * __GLcontextRec::_ModelProjectMatrix via _math_matrix_mul_matrix() and
- * analyzes the resulting matrix via _math_matrix_analyse().
+ * analyzes the resulting matrix via Top->analyse().
  */
 static void
 calculate_model_project_matrix(GLcontext *ctx)
@@ -697,7 +693,7 @@ calculate_model_project_matrix(GLcontext *ctx)
 			    ctx->ProjectionMatrixStack.Top,
 			    ctx->ModelviewMatrixStack.Top);
 
-    _math_matrix_analyse(&ctx->_ModelProjectMatrix);
+    ctx->_ModelProjectMatrix.analyse();
 }
 
 
@@ -715,7 +711,7 @@ calculate_model_project_matrix(GLcontext *ctx)
 void _mesa_update_modelview_project(GLcontext *ctx, GLuint new_state)
 {
     if (new_state & _NEW_MODELVIEW) {
-	_math_matrix_analyse(ctx->ModelviewMatrixStack.Top);
+	ctx->ModelviewMatrixStack.Top->analyse();
 
 	/* Bring cull position uptodate.
 	 */
@@ -750,7 +746,7 @@ void _mesa_update_modelview_project(GLcontext *ctx, GLuint new_state)
  * \param dirtyFlag dirty flag.
  *
  * Allocates an array of \p maxDepth elements for the matrix stack and calls
- * _math_matrix_alloc_inv() for each element to initialize it.
+ * alloc_inv() for each element to initialize it.
  */
 void
 gl_matrix_stack::init(GLuint maxDepth, GLuint dirtyFlag)
@@ -761,7 +757,7 @@ gl_matrix_stack::init(GLuint maxDepth, GLuint dirtyFlag)
     /* GLmatrix constructor handles m/inv initialisation; just alloc inv */
     Stack.resize(maxDepth);
     for (GLuint i = 0; i < maxDepth; i++)
-	_math_matrix_alloc_inv(&Stack[i]);
+	Stack[i].alloc_inv();
     Top = &Stack[0];
 }
 
@@ -776,7 +772,7 @@ gl_matrix_stack::push_matrix()
 {
     if (Depth + 1 >= MaxDepth)
 	return false;
-    _math_matrix_copy(&Stack[Depth + 1], &Stack[Depth]);
+    Stack[Depth + 1].copy_from(&Stack[Depth]);
     ++Depth;
     Top = &Stack[Depth];
     return true;
@@ -898,8 +894,7 @@ void _mesa_init_viewport(GLcontext *ctx)
     ctx->Viewport.Near = 0.0;
     ctx->Viewport.Far = 1.0;
     /* _WindowMap is default-constructed by GLmatrix() */
-    _math_matrix_viewport(&ctx->Viewport._WindowMap, 0, 0, 0, 0,
-			  0.0F, 1.0F, depthMax);
+    ctx->Viewport._WindowMap.viewport(0, 0, 0, 0, 0.0F, 1.0F, depthMax);
 }
 
 

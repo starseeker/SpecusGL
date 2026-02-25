@@ -931,8 +931,8 @@ _mesa_PopAttrib(void)
 		/* lighting enable */
 		_mesa_set_enable(ctx, GL_LIGHTING, light->Enabled);
 		/* per-light state */
-		if (_math_matrix_is_dirty(ctx->ModelviewMatrixStack.Top))
-		    _math_matrix_analyse(ctx->ModelviewMatrixStack.Top);
+		if (ctx->ModelviewMatrixStack.Top->is_dirty())
+		    ctx->ModelviewMatrixStack.Top->analyse();
 
 		for (i = 0; i < ctx->Const.MaxLights; i++) {
 		    GLfloat params[2] = {0.0};
@@ -1093,8 +1093,8 @@ _mesa_PopAttrib(void)
 		const struct gl_transform_attrib *xform;
 		xform = (const struct gl_transform_attrib *) data;
 		_mesa_MatrixMode(xform->MatrixMode);
-		if (_math_matrix_is_dirty(ctx->ProjectionMatrixStack.Top))
-		    _math_matrix_analyse(ctx->ProjectionMatrixStack.Top);
+		if (ctx->ProjectionMatrixStack.Top->is_dirty())
+		    ctx->ProjectionMatrixStack.Top->analyse();
 
 		/* restore clip planes */
 		for (i = 0; i < MAX_CLIP_PLANES; i++) {

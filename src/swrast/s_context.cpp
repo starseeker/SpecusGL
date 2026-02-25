@@ -787,7 +787,7 @@ _swrast_CreateContext(GLcontext *ctx)
 	swrast->TextureSampleF[i] = nullptr;
     }
 
-    swrast->SpanArrays = new sw_span_arrays{};
+    swrast->SpanArrays = new SWspanarrays{};
     if (!swrast->SpanArrays) {
 	delete swrast;
 	return GL_FALSE;

@@ -82,7 +82,7 @@ struct arrays2 {
  * filled in by glDraw/CopyPixels, etc.
  * These arrays are separated out of sw_span to conserve memory.
  */
-typedef struct sw_span_arrays {
+struct SWspanarrays {
     /** Per-fragment attributes (indexed by FRAG_ATTRIB_* tokens) */
     /* XXX someday look at transposing first two indexes for better memory
      * access pattern.
@@ -113,7 +113,7 @@ typedef struct sw_span_arrays {
     GLuint  index[MAX_WIDTH];  /**< Color indexes */
     GLfloat lambda[MAX_TEXTURE_COORD_UNITS][MAX_WIDTH]; /**< Texture LOD */
     GLfloat coverage[MAX_WIDTH];  /**< Fragment coverage for AA/smoothing */
-} SWspanarrays;
+};
 
 
 /**
@@ -128,7 +128,7 @@ typedef struct sw_span_arrays {
  * stream of these structures which would be consumed by one or more
  * span-processing threads which could run in parallel.
  */
-typedef struct sw_span {
+struct SWspan {
     /** Coord of first fragment in horizontal span/run */
     GLint x, y;
 
@@ -194,7 +194,7 @@ typedef struct sw_span {
      * sw_span struct is only about 512 bytes.
      */
     SWspanarrays *array;
-} SWspan;
+};
 
 
 

@@ -1013,7 +1013,7 @@ struct dd_function_table {
  * listed, it must restore them to their original values in
  * the disable() callback, below.
  */
-typedef struct {
+struct GLvertexformat {
     /**
      * \name Vertex
      */
@@ -1117,7 +1117,7 @@ typedef struct {
     void (GLAPIENTRYP EvalMesh2)(GLenum mode, GLint i1, GLint i2, GLint j1, GLint j2);
     /*@}*/
 
-} GLvertexformat;
+};
 
 
 #endif /* DD_INCLUDED */

@@ -19,7 +19,7 @@ struct TextureRenderbuffer : public gl_renderbuffer {
     StoreTexelFunc Store = nullptr;
     GLint Zoffset = 0;
 
-    TextureRenderbuffer() = default;
+    TextureRenderbuffer() : gl_renderbuffer(0) {}
     ~TextureRenderbuffer() override = default;
 
     /* AllocStorage is not legal on a texture wrapper */
@@ -272,8 +272,6 @@ wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 _mesa_error(ctx, GL_OUT_OF_MEMORY, "wrap_texture");
 return -1;
     }
-
-    _mesa_init_renderbuffer(trb, 0);
 
     _mesa_reference_renderbuffer(&att->Renderbuffer, trb);
     return 0;

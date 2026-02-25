@@ -1269,7 +1269,7 @@ _mesa_copy_context(const GLcontext *src, GLcontext *dst, GLuint mask)
 	dst->Viewport.Height = src->Viewport.Height;
 	dst->Viewport.Near = src->Viewport.Near;
 	dst->Viewport.Far = src->Viewport.Far;
-	_math_matrix_copy(&dst->Viewport._WindowMap, &src->Viewport._WindowMap);
+	dst->Viewport._WindowMap.copy_from(&src->Viewport._WindowMap);
     }
 
     /* XXX FIXME:  Call callbacks?

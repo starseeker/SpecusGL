@@ -62,7 +62,7 @@
  *   - On total fallback (vertex format insufficient for state or all
  *     primitives unaccelerated), hook in swrast_setup instead.
  */
-typedef struct {
+struct SWvertex {
     /** win[0], win[1] are the screen-coords of SWvertex.
      * win[2] is the z-buffer coord (if 16-bit Z buffer, in range [0,65535]).
      * win[3] is 1/w where w is the clip-space W coord.  This is the value
@@ -74,7 +74,7 @@ typedef struct {
     GLfloat index;
     GLfloat pointSize;
     GLfloat attrib[FRAG_ATTRIB_MAX][4]; /**< texcoords & varying, more to come */
-} SWvertex;
+};
 
 
 struct swrast_device_driver;

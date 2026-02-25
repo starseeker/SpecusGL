@@ -67,8 +67,8 @@ _mesa_ClipPlane(GLenum plane, const GLdouble *eq)
      * clipping now takes place.  The clip-space equations are recalculated
      * whenever the projection matrix changes.
      */
-    if (_math_matrix_is_dirty(ctx->ModelviewMatrixStack.Top))
-	_math_matrix_analyse(ctx->ModelviewMatrixStack.Top);
+    if (ctx->ModelviewMatrixStack.Top->is_dirty())
+	ctx->ModelviewMatrixStack.Top->analyse();
 
     _mesa_transform_vector(equation, equation,
 			   ctx->ModelviewMatrixStack.Top->inv);
@@ -84,8 +84,8 @@ _mesa_ClipPlane(GLenum plane, const GLdouble *eq)
      * code in _mesa_update_state().
      */
     if (ctx->Transform.ClipPlanesEnabled & (1 << p)) {
-	if (_math_matrix_is_dirty(ctx->ProjectionMatrixStack.Top))
-	    _math_matrix_analyse(ctx->ProjectionMatrixStack.Top);
+	if (ctx->ProjectionMatrixStack.Top->is_dirty())
+	    ctx->ProjectionMatrixStack.Top->analyse();
 
 	_mesa_transform_vector(ctx->Transform._ClipUserPlane[p],
 			       ctx->Transform.EyeUserPlane[p],

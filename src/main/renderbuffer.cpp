@@ -955,67 +955,61 @@ gl_renderbuffer::PutRowRGB(GLcontext *ctx, GLuint count, GLint x, GLint y,
  */
 class SoftRenderbuffer : public gl_renderbuffer {
 public:
-    SoftRenderbuffer() = default;
+    explicit SoftRenderbuffer(GLuint name = 0) : gl_renderbuffer(name) {}
     ~SoftRenderbuffer() override = default;   /* base class frees Data */
 
     GLboolean AllocStorage(GLcontext *ctx, GLenum internalFormat,
 			   GLuint width, GLuint height) override;
 
     void *GetPointer(GLcontext *ctx, GLint x, GLint y) override {
-	return m_GetPointer ? m_GetPointer(ctx, this, x, y) : nullptr;
+	return m_fmt.GetPointer ? m_fmt.GetPointer(ctx, this, x, y) : nullptr;
     }
     void GetRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
 		void *values) override {
-	m_GetRow(ctx, this, count, x, y, values);
+	m_fmt.GetRow(ctx, this, count, x, y, values);
     }
     void GetValues(GLcontext *ctx, GLuint count,
 		   const GLint x[], const GLint y[], void *values) override {
-	m_GetValues(ctx, this, count, x, y, values);
+	m_fmt.GetValues(ctx, this, count, x, y, values);
     }
     void PutRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
 		const void *values, const GLubyte *mask) override {
-	m_PutRow(ctx, this, count, x, y, values, mask);
+	m_fmt.PutRow(ctx, this, count, x, y, values, mask);
     }
     void PutRowRGB(GLcontext *ctx, GLuint count, GLint x, GLint y,
 		   const void *values, const GLubyte *mask) override {
-	if (m_PutRowRGB)
-	    m_PutRowRGB(ctx, this, count, x, y, values, mask);
+	if (m_fmt.PutRowRGB)
+	    m_fmt.PutRowRGB(ctx, this, count, x, y, values, mask);
 	/* else: format doesn't support RGB-only writes; caller should check */
     }
     void PutMonoRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
 		    const void *value, const GLubyte *mask) override {
-	m_PutMonoRow(ctx, this, count, x, y, value, mask);
+	m_fmt.PutMonoRow(ctx, this, count, x, y, value, mask);
     }
     void PutValues(GLcontext *ctx, GLuint count,
 		   const GLint x[], const GLint y[],
 		   const void *values, const GLubyte *mask) override {
-	m_PutValues(ctx, this, count, x, y, values, mask);
+	m_fmt.PutValues(ctx, this, count, x, y, values, mask);
     }
     void PutMonoValues(GLcontext *ctx, GLuint count,
 		       const GLint x[], const GLint y[],
 		       const void *value, const GLubyte *mask) override {
-	m_PutMonoValues(ctx, this, count, x, y, value, mask);
+	m_fmt.PutMonoValues(ctx, this, count, x, y, value, mask);
     }
 
 private:
-    /* Per-format pixel-access helpers (same signature as the old function
-     * pointer fields on gl_renderbuffer).  Set by AllocStorage(). */
-    using GetPtrFn  = void *(*)(GLcontext *, gl_renderbuffer *, GLint, GLint);
-    using GetRowFn  = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, void *);
-    using GetValFn  = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], void *);
-    using PutRowFn  = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *);
-    using PutMRowFn = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *);
-    using PutValFn  = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *);
-    using PutMValFn = void  (*)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *);
-
-    GetPtrFn  m_GetPointer    = nullptr;
-    GetRowFn  m_GetRow        = nullptr;
-    GetValFn  m_GetValues     = nullptr;
-    PutRowFn  m_PutRow        = nullptr;
-    PutRowFn  m_PutRowRGB     = nullptr;
-    PutMRowFn m_PutMonoRow    = nullptr;
-    PutValFn  m_PutValues     = nullptr;
-    PutMValFn m_PutMonoValues = nullptr;
+    /** Per-format pixel-access dispatch table.  Set atomically by AllocStorage(). */
+    struct FormatFuncs {
+        void *(*GetPointer  )(GLcontext *, gl_renderbuffer *, GLint, GLint) = nullptr;
+        void  (*GetRow      )(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, void *) = nullptr;
+        void  (*GetValues   )(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], void *) = nullptr;
+        void  (*PutRow      )(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *) = nullptr;
+        void  (*PutRowRGB   )(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *) = nullptr;
+        void  (*PutMonoRow  )(GLcontext *, gl_renderbuffer *, GLuint, GLint, GLint, const void *, const GLubyte *) = nullptr;
+        void  (*PutValues   )(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *) = nullptr;
+        void  (*PutMonoValues)(GLcontext *, gl_renderbuffer *, GLuint, const GLint [], const GLint [], const void *, const GLubyte *) = nullptr;
+    };
+    FormatFuncs m_fmt{};
 };
 
 
@@ -1054,14 +1048,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_RGB8;
 	    rb->_BaseFormat = GL_RGB;
 	    rb->DataType = GL_UNSIGNED_BYTE;
-	    m_GetPointer = get_pointer_ubyte3;
-	    m_GetRow = get_row_ubyte3;
-	    m_GetValues = get_values_ubyte3;
-	    m_PutRow = put_row_ubyte3;
-	    m_PutRowRGB = put_row_rgb_ubyte3;
-	    m_PutMonoRow = put_mono_row_ubyte3;
-	    m_PutValues = put_values_ubyte3;
-	    m_PutMonoValues = put_mono_values_ubyte3;
+	    m_fmt.GetPointer = get_pointer_ubyte3;
+	    m_fmt.GetRow = get_row_ubyte3;
+	    m_fmt.GetValues = get_values_ubyte3;
+	    m_fmt.PutRow = put_row_ubyte3;
+	    m_fmt.PutRowRGB = put_row_rgb_ubyte3;
+	    m_fmt.PutMonoRow = put_mono_row_ubyte3;
+	    m_fmt.PutValues = put_values_ubyte3;
+	    m_fmt.PutMonoValues = put_mono_values_ubyte3;
 	    rb->RedBits   = 8 * sizeof(GLubyte);
 	    rb->GreenBits = 8 * sizeof(GLubyte);
 	    rb->BlueBits  = 8 * sizeof(GLubyte);
@@ -1076,14 +1070,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_RGBA8;
 	    rb->_BaseFormat = GL_RGBA;
 	    rb->DataType = GL_UNSIGNED_BYTE;
-	    m_GetPointer = get_pointer_ubyte4;
-	    m_GetRow = get_row_ubyte4;
-	    m_GetValues = get_values_ubyte4;
-	    m_PutRow = put_row_ubyte4;
-	    m_PutRowRGB = put_row_rgb_ubyte4;
-	    m_PutMonoRow = put_mono_row_ubyte4;
-	    m_PutValues = put_values_ubyte4;
-	    m_PutMonoValues = put_mono_values_ubyte4;
+	    m_fmt.GetPointer = get_pointer_ubyte4;
+	    m_fmt.GetRow = get_row_ubyte4;
+	    m_fmt.GetValues = get_values_ubyte4;
+	    m_fmt.PutRow = put_row_ubyte4;
+	    m_fmt.PutRowRGB = put_row_rgb_ubyte4;
+	    m_fmt.PutMonoRow = put_mono_row_ubyte4;
+	    m_fmt.PutValues = put_values_ubyte4;
+	    m_fmt.PutMonoValues = put_mono_values_ubyte4;
 	    rb->RedBits   = 8 * sizeof(GLubyte);
 	    rb->GreenBits = 8 * sizeof(GLubyte);
 	    rb->BlueBits  = 8 * sizeof(GLubyte);
@@ -1096,14 +1090,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_RGBA16;
 	    rb->_BaseFormat = GL_RGBA;
 	    rb->DataType = GL_UNSIGNED_SHORT;
-	    m_GetPointer = get_pointer_ushort4;
-	    m_GetRow = get_row_ushort4;
-	    m_GetValues = get_values_ushort4;
-	    m_PutRow = put_row_ushort4;
-	    m_PutRowRGB = put_row_rgb_ushort4;
-	    m_PutMonoRow = put_mono_row_ushort4;
-	    m_PutValues = put_values_ushort4;
-	    m_PutMonoValues = put_mono_values_ushort4;
+	    m_fmt.GetPointer = get_pointer_ushort4;
+	    m_fmt.GetRow = get_row_ushort4;
+	    m_fmt.GetValues = get_values_ushort4;
+	    m_fmt.PutRow = put_row_ushort4;
+	    m_fmt.PutRowRGB = put_row_rgb_ushort4;
+	    m_fmt.PutMonoRow = put_mono_row_ushort4;
+	    m_fmt.PutValues = put_values_ushort4;
+	    m_fmt.PutMonoValues = put_mono_values_ushort4;
 	    rb->RedBits   = 8 * sizeof(GLushort);
 	    rb->GreenBits = 8 * sizeof(GLushort);
 	    rb->BlueBits  = 8 * sizeof(GLushort);
@@ -1117,14 +1111,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_STENCIL_INDEX8_EXT;
 	    rb->_BaseFormat = GL_STENCIL_INDEX;
 	    rb->DataType = GL_UNSIGNED_BYTE;
-	    m_GetPointer = get_pointer_ubyte;
-	    m_GetRow = get_row_ubyte;
-	    m_GetValues = get_values_ubyte;
-	    m_PutRow = put_row_ubyte;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_ubyte;
-	    m_PutValues = put_values_ubyte;
-	    m_PutMonoValues = put_mono_values_ubyte;
+	    m_fmt.GetPointer = get_pointer_ubyte;
+	    m_fmt.GetRow = get_row_ubyte;
+	    m_fmt.GetValues = get_values_ubyte;
+	    m_fmt.PutRow = put_row_ubyte;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_ubyte;
+	    m_fmt.PutValues = put_values_ubyte;
+	    m_fmt.PutMonoValues = put_mono_values_ubyte;
 	    rb->StencilBits = 8 * sizeof(GLubyte);
 	    pixelSize = sizeof(GLubyte);
 	    break;
@@ -1132,14 +1126,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_STENCIL_INDEX16_EXT;
 	    rb->_BaseFormat = GL_STENCIL_INDEX;
 	    rb->DataType = GL_UNSIGNED_SHORT;
-	    m_GetPointer = get_pointer_ushort;
-	    m_GetRow = get_row_ushort;
-	    m_GetValues = get_values_ushort;
-	    m_PutRow = put_row_ushort;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_ushort;
-	    m_PutValues = put_values_ushort;
-	    m_PutMonoValues = put_mono_values_ushort;
+	    m_fmt.GetPointer = get_pointer_ushort;
+	    m_fmt.GetRow = get_row_ushort;
+	    m_fmt.GetValues = get_values_ushort;
+	    m_fmt.PutRow = put_row_ushort;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_ushort;
+	    m_fmt.PutValues = put_values_ushort;
+	    m_fmt.PutMonoValues = put_mono_values_ushort;
 	    rb->StencilBits = 8 * sizeof(GLushort);
 	    pixelSize = sizeof(GLushort);
 	    break;
@@ -1148,14 +1142,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_DEPTH_COMPONENT16;
 	    rb->_BaseFormat = GL_DEPTH_COMPONENT;
 	    rb->DataType = GL_UNSIGNED_SHORT;
-	    m_GetPointer = get_pointer_ushort;
-	    m_GetRow = get_row_ushort;
-	    m_GetValues = get_values_ushort;
-	    m_PutRow = put_row_ushort;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_ushort;
-	    m_PutValues = put_values_ushort;
-	    m_PutMonoValues = put_mono_values_ushort;
+	    m_fmt.GetPointer = get_pointer_ushort;
+	    m_fmt.GetRow = get_row_ushort;
+	    m_fmt.GetValues = get_values_ushort;
+	    m_fmt.PutRow = put_row_ushort;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_ushort;
+	    m_fmt.PutValues = put_values_ushort;
+	    m_fmt.PutMonoValues = put_mono_values_ushort;
 	    rb->DepthBits = 8 * sizeof(GLushort);
 	    pixelSize = sizeof(GLushort);
 	    break;
@@ -1163,14 +1157,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	case GL_DEPTH_COMPONENT32:
 	    rb->_BaseFormat = GL_DEPTH_COMPONENT;
 	    rb->DataType = GL_UNSIGNED_INT;
-	    m_GetPointer = get_pointer_uint;
-	    m_GetRow = get_row_uint;
-	    m_GetValues = get_values_uint;
-	    m_PutRow = put_row_uint;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_uint;
-	    m_PutValues = put_values_uint;
-	    m_PutMonoValues = put_mono_values_uint;
+	    m_fmt.GetPointer = get_pointer_uint;
+	    m_fmt.GetRow = get_row_uint;
+	    m_fmt.GetValues = get_values_uint;
+	    m_fmt.PutRow = put_row_uint;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_uint;
+	    m_fmt.PutValues = put_values_uint;
+	    m_fmt.PutMonoValues = put_mono_values_uint;
 	    if (internalFormat == GL_DEPTH_COMPONENT24) {
 		rb->_ActualFormat = GL_DEPTH_COMPONENT24;
 		rb->DepthBits = 24;
@@ -1185,14 +1179,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_DEPTH24_STENCIL8_EXT;
 	    rb->_BaseFormat = GL_DEPTH_STENCIL_EXT;
 	    rb->DataType = GL_UNSIGNED_INT_24_8_EXT;
-	    m_GetPointer = get_pointer_uint;
-	    m_GetRow = get_row_uint;
-	    m_GetValues = get_values_uint;
-	    m_PutRow = put_row_uint;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_uint;
-	    m_PutValues = put_values_uint;
-	    m_PutMonoValues = put_mono_values_uint;
+	    m_fmt.GetPointer = get_pointer_uint;
+	    m_fmt.GetRow = get_row_uint;
+	    m_fmt.GetValues = get_values_uint;
+	    m_fmt.PutRow = put_row_uint;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_uint;
+	    m_fmt.PutValues = put_values_uint;
+	    m_fmt.PutMonoValues = put_mono_values_uint;
 	    rb->DepthBits = 24;
 	    rb->StencilBits = 8;
 	    pixelSize = sizeof(GLuint);
@@ -1201,14 +1195,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_COLOR_INDEX8_EXT;
 	    rb->_BaseFormat = GL_COLOR_INDEX;
 	    rb->DataType = GL_UNSIGNED_BYTE;
-	    m_GetPointer = get_pointer_ubyte;
-	    m_GetRow = get_row_ubyte;
-	    m_GetValues = get_values_ubyte;
-	    m_PutRow = put_row_ubyte;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_ubyte;
-	    m_PutValues = put_values_ubyte;
-	    m_PutMonoValues = put_mono_values_ubyte;
+	    m_fmt.GetPointer = get_pointer_ubyte;
+	    m_fmt.GetRow = get_row_ubyte;
+	    m_fmt.GetValues = get_values_ubyte;
+	    m_fmt.PutRow = put_row_ubyte;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_ubyte;
+	    m_fmt.PutValues = put_values_ubyte;
+	    m_fmt.PutMonoValues = put_mono_values_ubyte;
 	    rb->IndexBits = 8 * sizeof(GLubyte);
 	    pixelSize = sizeof(GLubyte);
 	    break;
@@ -1216,14 +1210,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = GL_COLOR_INDEX16_EXT;
 	    rb->_BaseFormat = GL_COLOR_INDEX;
 	    rb->DataType = GL_UNSIGNED_SHORT;
-	    m_GetPointer = get_pointer_ushort;
-	    m_GetRow = get_row_ushort;
-	    m_GetValues = get_values_ushort;
-	    m_PutRow = put_row_ushort;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_ushort;
-	    m_PutValues = put_values_ushort;
-	    m_PutMonoValues = put_mono_values_ushort;
+	    m_fmt.GetPointer = get_pointer_ushort;
+	    m_fmt.GetRow = get_row_ushort;
+	    m_fmt.GetValues = get_values_ushort;
+	    m_fmt.PutRow = put_row_ushort;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_ushort;
+	    m_fmt.PutValues = put_values_ushort;
+	    m_fmt.PutMonoValues = put_mono_values_ushort;
 	    rb->IndexBits = 8 * sizeof(GLushort);
 	    pixelSize = sizeof(GLushort);
 	    break;
@@ -1231,14 +1225,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    rb->_ActualFormat = COLOR_INDEX32;
 	    rb->_BaseFormat = GL_COLOR_INDEX;
 	    rb->DataType = GL_UNSIGNED_INT;
-	    m_GetPointer = get_pointer_uint;
-	    m_GetRow = get_row_uint;
-	    m_GetValues = get_values_uint;
-	    m_PutRow = put_row_uint;
-	    m_PutRowRGB = nullptr;
-	    m_PutMonoRow = put_mono_row_uint;
-	    m_PutValues = put_values_uint;
-	    m_PutMonoValues = put_mono_values_uint;
+	    m_fmt.GetPointer = get_pointer_uint;
+	    m_fmt.GetRow = get_row_uint;
+	    m_fmt.GetValues = get_values_uint;
+	    m_fmt.PutRow = put_row_uint;
+	    m_fmt.PutRowRGB = nullptr;
+	    m_fmt.PutMonoRow = put_mono_row_uint;
+	    m_fmt.PutValues = put_values_uint;
+	    m_fmt.PutMonoValues = put_mono_values_uint;
 	    rb->IndexBits = 8 * sizeof(GLuint);
 	    pixelSize = sizeof(GLuint);
 	    break;
@@ -1361,7 +1355,7 @@ static void put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, 
  */
 class AlphaRenderbuffer : public gl_renderbuffer {
 public:
-    AlphaRenderbuffer() = default;
+    AlphaRenderbuffer() : gl_renderbuffer(0) {}
     ~AlphaRenderbuffer() override {
 	/* base class destructor frees Data (the alpha channel buffer) */
 	ASSERT(Wrapped);
@@ -1578,31 +1572,31 @@ copy_buffer_alpha8(struct gl_renderbuffer* dst, struct gl_renderbuffer* src)
 
 /**
  * Initialize the fields of a gl_renderbuffer to default values.
+ *
+ * \deprecated The gl_renderbuffer constructor now performs this
+ *             initialisation.  This shim exists only for call sites
+ *             that pass an already-constructed object; new code should
+ *             pass \p name directly to the derived-class constructor.
  */
 void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 {
-    /* Mutex auto-initializes as std::mutex default-constructs */
-    rb->Magic = RB_MAGIC;
-    rb->ClassID = 0;
-    rb->Name = name;
+    /* Re-apply constructor-time initialisation for the given name.
+     * Most fields are already correct after construction; only Name,
+     * Wrapped (self-pointer) and Magic may need fixing up here. */
+    rb->Magic    = RB_MAGIC;
+    rb->ClassID  = 0;
+    rb->Name     = name;
     rb->RefCount = 0;
-
-    rb->Width = 0;
-    rb->Height = 0;
+    rb->Width    = 0;
+    rb->Height   = 0;
     rb->InternalFormat = GL_NONE;
-    rb->_ActualFormat = GL_NONE;
-    rb->_BaseFormat = GL_NONE;
-    rb->DataType = GL_NONE;
+    rb->_ActualFormat  = GL_NONE;
+    rb->_BaseFormat    = GL_NONE;
+    rb->DataType       = GL_NONE;
     rb->RedBits = rb->GreenBits = rb->BlueBits = rb->AlphaBits = 0;
-    rb->IndexBits = 0;
-    rb->DepthBits = 0;
-    rb->StencilBits = 0;
-    rb->Data = nullptr;
-
-    /* Point back to ourself so that we don't have to check for Wrapped==nullptr
-     * all over the drivers.
-     */
+    rb->IndexBits = rb->DepthBits = rb->StencilBits = 0;
+    rb->Data    = nullptr;
     rb->Wrapped = rb;
 }
 
@@ -1614,9 +1608,7 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 struct gl_renderbuffer *
 _mesa_new_renderbuffer(GLcontext *ctx, GLuint name)
 {
-    auto *rb = new SoftRenderbuffer{};
-    _mesa_init_renderbuffer(rb, name);
-    return rb;
+    return new SoftRenderbuffer{name};
 }
 
 
@@ -1818,7 +1810,6 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating alpha buffer");
 	    return GL_FALSE;
 	}
-	_mesa_init_renderbuffer(arb, 0);
 
 	/* wrap the alpha renderbuffer around the RGB renderbuffer */
 	arb->Wrapped = fb->Attachment[b].Renderbuffer;

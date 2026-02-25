@@ -133,7 +133,7 @@ struct gl_texture_format;
 struct gl_texture_image;
 struct gl_texture_object;
 typedef struct __GLcontextRec GLcontext;
-typedef struct __GLcontextModesRec GLvisual;
+typedef __GLcontextModes GLvisual;
 typedef struct gl_framebuffer GLframebuffer;
 /*@}*/
 
@@ -397,17 +397,28 @@ enum {
  * Data structure for color tables
  */
 struct gl_color_table {
-    GLenum InternalFormat;      /**< The user-specified format */
-    GLenum _BaseFormat;         /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
-    GLuint Size;                /**< number of entries in table */
+    GLenum InternalFormat = GL_RGBA;  /**< The user-specified format */
+    GLenum _BaseFormat = 0;           /**< GL_ALPHA, GL_RGBA, GL_RGB, etc */
+    GLuint Size = 0;                  /**< number of entries in table */
     std::vector<GLfloat> TableF;  /**< Color table, floating point values */
     std::vector<GLubyte> TableUB; /**< Color table, ubyte values */
-    GLubyte RedSize;
-    GLubyte GreenSize;
-    GLubyte BlueSize;
-    GLubyte AlphaSize;
-    GLubyte LuminanceSize;
-    GLubyte IntensitySize;
+    GLubyte RedSize = 0;
+    GLubyte GreenSize = 0;
+    GLubyte BlueSize = 0;
+    GLubyte AlphaSize = 0;
+    GLubyte LuminanceSize = 0;
+    GLubyte IntensitySize = 0;
+
+    /** Reset this table to its initial (empty/default) state. */
+    void init() {
+        TableF.clear();
+        TableUB.clear();
+        Size = 0;
+        InternalFormat = GL_RGBA;
+        _BaseFormat = 0;
+        RedSize = GreenSize = BlueSize = AlphaSize = 0;
+        LuminanceSize = IntensitySize = 0;
+    }
 };
 
 
@@ -2280,6 +2291,22 @@ struct gl_renderbuffer {
     /** Used to wrap one renderbuffer around another. */
     struct gl_renderbuffer *Wrapped;
 
+    /**
+     * Initialise the renderbuffer (replaces _mesa_init_renderbuffer()).
+     *
+     * Sets Magic, Name, RefCount to 0, and Wrapped to point at this object.
+     * All other POD fields are zero-initialised by the default constructor.
+     */
+    explicit gl_renderbuffer(GLuint name = 0)
+        : Magic(RB_MAGIC), ClassID(0), Name(name), RefCount(0),
+          Width(0), Height(0),
+          InternalFormat(GL_NONE), _ActualFormat(GL_NONE), _BaseFormat(GL_NONE),
+          DataType(GL_NONE),
+          RedBits(0), GreenBits(0), BlueBits(0), AlphaBits(0),
+          IndexBits(0), DepthBits(0), StencilBits(0),
+          Data(nullptr), Wrapped(this)
+    {}
+
     /** Virtual destructor – base implementation frees Data. */
     virtual ~gl_renderbuffer();
 
@@ -2351,6 +2378,10 @@ struct gl_renderbuffer_attachment {
  * A framebuffer is a collection of renderbuffers (color, depth, stencil, etc).
  * In C++ terms, think of this as a base class from which device drivers
  * will make derived classes.
+ *
+ * The virtual destructor releases all attached renderbuffers via
+ * _mesa_free_framebuffer_data() and then frees the object itself.  Derived
+ * classes may override the destructor to release driver-private resources.
  */
 struct gl_framebuffer {
     mutable std::mutex Mutex;		   /**< for thread safety */
@@ -2404,8 +2435,8 @@ struct gl_framebuffer {
     struct gl_renderbuffer *_DepthBuffer;
     struct gl_renderbuffer *_StencilBuffer;
 
-    /** Delete this framebuffer */
-    void (*Delete)(struct gl_framebuffer *fb);
+    /** Virtual destructor – releases attached renderbuffers. */
+    virtual ~gl_framebuffer();
 };
 
 
