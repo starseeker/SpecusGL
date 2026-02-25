@@ -955,7 +955,7 @@ update_program(GLcontext *ctx)
     ctx->FragmentProgram._Enabled = ctx->FragmentProgram.Enabled
 				    && !ctx->FragmentProgram.Current->Base.Instructions.empty();
     ctx->ATIFragmentShader._Enabled = ctx->ATIFragmentShader.Enabled
-				      && ctx->ATIFragmentShader.Current->Instructions[0];
+				      && ctx->ATIFragmentShader.Current->isValid;
 
     /*
      * Set the ctx->VertexProgram._Current and ctx->FragmentProgram._Current

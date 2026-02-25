@@ -34,6 +34,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <array>
 #include <mutex>
 #include <vector>
 #include <list>
@@ -2121,8 +2122,41 @@ struct gl_fragment_program_state {
 #define ATI_FS_INPUT_PRIMARY 0
 #define ATI_FS_INPUT_SECONDARY 1
 
-struct atifs_instruction;
-struct atifs_setupinst;
+#define MAX_NUM_INSTRUCTIONS_PER_PASS_ATI 8
+#define MAX_NUM_PASSES_ATI                2
+#define MAX_NUM_FRAGMENT_REGISTERS_ATI    6
+
+struct atifragshader_src_register {
+    GLuint Index;
+    GLuint argRep;
+    GLuint argMod;
+};
+
+struct atifragshader_dst_register {
+    GLuint Index;
+    GLuint dstMod;
+    GLuint dstMask;
+};
+
+#define ATI_FRAGMENT_SHADER_COLOR_OP  0
+#define ATI_FRAGMENT_SHADER_ALPHA_OP  1
+#define ATI_FRAGMENT_SHADER_PASS_OP   2
+#define ATI_FRAGMENT_SHADER_SAMPLE_OP 3
+
+/** Two opcodes – one for color, one for alpha; up to three source registers. */
+struct atifs_instruction {
+    GLenum Opcode[2];
+    GLuint ArgCount[2];
+    struct atifragshader_src_register SrcReg[2][3];
+    struct atifragshader_dst_register DstReg[2];
+};
+
+/** Setup instruction (different from arithmetic shader instruction). */
+struct atifs_setupinst {
+    GLenum Opcode;
+    GLuint src;
+    GLenum swizzle;
+};
 
 /**
  * ATI fragment shader
@@ -2130,8 +2164,8 @@ struct atifs_setupinst;
 struct ati_fragment_shader {
     GLuint Id;
     GLint RefCount;
-    struct atifs_instruction *Instructions[2];
-    struct atifs_setupinst *SetupInst[2];
+    std::array<std::array<atifs_instruction,  MAX_NUM_INSTRUCTIONS_PER_PASS_ATI>, MAX_NUM_PASSES_ATI> Instructions;
+    std::array<std::array<atifs_setupinst, MAX_NUM_FRAGMENT_REGISTERS_ATI>,    MAX_NUM_PASSES_ATI> SetupInst;
     GLfloat Constants[8][4];
     GLbitfield LocalConstDef;  /** Indicates which constants have been set */
     GLubyte numArithInstr[2];
