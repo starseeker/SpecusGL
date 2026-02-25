@@ -899,8 +899,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 	    return;
 	}
 
-	delete[] dstImage->ImageOffsets;
-	dstImage->ImageOffsets = nullptr;
+	dstImage->ImageOffsets.clear();
 
 	/* Free old image data */
 	if (dstImage->Data)

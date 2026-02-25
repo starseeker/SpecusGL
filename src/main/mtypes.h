@@ -1338,8 +1338,8 @@ struct gl_texture_image {
     GLuint CompressedSize;	/**< GL_ARB_texture_compression */
 
     GLuint RowStride;		/**< == Width unless IsClientData and padded */
-    GLuint *ImageOffsets;        /**< if 3D texture: array [Depth] of offsets to
-                                     each 2D slice in 'Data', in texels */
+    std::vector<GLuint> ImageOffsets; /**< if 3D texture: offsets to each 2D
+                                          slice in 'Data', in texels */
     GLvoid *Data;		/**< Image data, accessed via FetchTexel() */
 
     /**
@@ -1348,6 +1348,29 @@ struct gl_texture_image {
     /*@{*/
     void *DriverData;		/**< Arbitrary device driver data */
     /*@}*/
+
+    /**
+     * Initialise this image's dimension and format fields.
+     *
+     * Fills in InternalFormat, Border, Width/Height/Depth, the derived
+     * log2 / log2 / scale fields, ImageOffsets and the IsPowerOfTwo flag.
+     * Requires _BaseFormat to have already been set.
+     *
+     * Replaces _mesa_init_teximage_fields().
+     */
+    void init_fields(GLcontext *ctx, GLenum target,
+                     GLsizei width, GLsizei height, GLsizei depth,
+                     GLint border, GLenum internalFormat);
+
+    /**
+     * Reset all dimension / format fields to their zero/empty state.
+     *
+     * Clears ImageOffsets and sets Data to nullptr.  Called when a texture
+     * level is being invalidated before re-allocation.
+     *
+     * Replaces the zero-out block at the beginning of _mesa_init_teximage_fields().
+     */
+    void clear_fields();
 };
 
 
@@ -1415,6 +1438,43 @@ struct gl_texture_object {
      * allocation.
      */
     void *DriverData;	/**< Arbitrary device driver data */
+
+    /**
+     * Initialise a texture object to its default state.
+     *
+     * This is the canonical initialisation routine for gl_texture_object.
+     * Sets all fields to the OpenGL-specified defaults for an object with
+     * the given \p name and \p target.  Replaces the old free function
+     * _mesa_initialize_texture_object().
+     */
+    void init(GLuint name, GLenum target);
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if the
+     * object should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
+
+    /**
+     * Associate \p texImage with this texture object at the given target and
+     * mipmap level.  Also sets texImage->TexObject back-pointer.
+     *
+     * Replaces _mesa_set_tex_image().
+     */
+    void set_image(GLenum target, GLint level,
+                   struct gl_texture_image *texImage);
 };
 
 
@@ -1603,6 +1663,20 @@ struct gl_buffer_object {
 
     /** Default constructor for zero/null buffer objects. */
     gl_buffer_object() = default;
+
+    /**
+     * Increment the reference count.
+     */
+    void ref() noexcept { ++RefCount; }
+
+    /**
+     * Decrement the reference count and return true if the object should
+     * now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -1866,6 +1940,20 @@ struct gl_program {
     GLuint NumNativeTexInstructions;
     GLuint NumNativeTexIndirections;
     /*@}*/
+
+    /**
+     * Increment the reference count.
+     */
+    void ref() noexcept { ++RefCount; }
+
+    /**
+     * Decrement the reference count and return true if the program should
+     * now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2039,6 +2127,15 @@ struct gl_shader {
     GLboolean CompileStatus;
     std::vector<struct gl_program *> Programs;  /**< Post-compile assembly code */
     std::string InfoLog;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2062,6 +2159,15 @@ struct gl_shader_program {
     GLboolean LinkStatus;   /**< GL_LINK_STATUS */
     GLboolean Validated;
     std::string InfoLog;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2252,6 +2358,24 @@ struct gl_shared_state {
 	_mesa_HashRemove(ATIShaders, id);
     }
 #endif
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * shared state should now be freed (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2351,6 +2475,24 @@ struct gl_renderbuffer {
     virtual void PutMonoValues(GLcontext *ctx, GLuint count,
 			       const GLint x[], const GLint y[],
 			       const void *value, const GLubyte *mask) = 0;
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * renderbuffer should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2437,6 +2579,24 @@ struct gl_framebuffer {
 
     /** Virtual destructor – releases attached renderbuffers. */
     virtual ~gl_framebuffer();
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * framebuffer should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 

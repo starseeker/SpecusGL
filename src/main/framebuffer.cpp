@@ -229,10 +229,7 @@ _mesa_reference_framebuffer(struct gl_framebuffer **ptr,
     }
     assert(!*ptr);
     assert(fb);
-    {
-	std::lock_guard<std::mutex> lock(fb->Mutex);
-	fb->RefCount++;
-    }
+    fb->ref();
     *ptr = fb;
 }
 
@@ -248,16 +245,7 @@ _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
 {
     assert(fb);
     if (*fb) {
-	GLboolean deleteFlag = GL_FALSE;
-
-	{
-	    std::lock_guard<std::mutex> lock((*fb)->Mutex);
-	    ASSERT((*fb)->RefCount > 0);
-	    (*fb)->RefCount--;
-	    deleteFlag = ((*fb)->RefCount == 0);
-	}
-
-	if (deleteFlag)
+	if ((*fb)->unref())
 	    delete *fb;
 
 	*fb = nullptr;

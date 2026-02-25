@@ -1199,8 +1199,8 @@ _mesa_PushClientAttrib(GLbitfield mask)
     if (mask & GL_CLIENT_PIXEL_STORE_BIT) {
 	struct gl_pixelstore_attrib *attr;
 #if FEATURE_EXT_pixel_buffer_object
-	ctx->Pack.BufferObj->RefCount++;
-	ctx->Unpack.BufferObj->RefCount++;
+	ctx->Pack.BufferObj->ref();
+	ctx->Unpack.BufferObj->ref();
 #endif
 	/* packing attribs */
 	attr = new gl_pixelstore_attrib{};
@@ -1220,8 +1220,8 @@ _mesa_PushClientAttrib(GLbitfield mask)
 
 #if FEATURE_ARB_vertex_buffer_object
 	/* increment ref counts since we're copying pointers to these objects */
-	ctx->Array.ArrayBufferObj->RefCount++;
-	ctx->Array.ElementArrayBufferObj->RefCount++;
+	ctx->Array.ArrayBufferObj->ref();
+	ctx->Array.ElementArrayBufferObj->ref();
 #endif
 
 	*attr = ctx->Array;
@@ -1254,8 +1254,7 @@ _mesa_PopClientAttrib(void)
 	switch (kind) {
 	    case GL_CLIENT_PACK_BIT:
 #if FEATURE_EXT_pixel_buffer_object
-		ctx->Pack.BufferObj->RefCount--;
-		if (ctx->Pack.BufferObj->RefCount <= 0) {
+		if (ctx->Pack.BufferObj->unref()) {
 		    _mesa_remove_buffer_object(ctx, ctx->Pack.BufferObj);
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Pack.BufferObj);
 		}
@@ -1265,8 +1264,7 @@ _mesa_PopClientAttrib(void)
 		break;
 	    case GL_CLIENT_UNPACK_BIT:
 #if FEATURE_EXT_pixel_buffer_object
-		ctx->Unpack.BufferObj->RefCount--;
-		if (ctx->Unpack.BufferObj->RefCount <= 0) {
+		if (ctx->Unpack.BufferObj->unref()) {
 		    _mesa_remove_buffer_object(ctx, ctx->Unpack.BufferObj);
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Unpack.BufferObj);
 		}

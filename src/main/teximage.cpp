@@ -617,40 +617,17 @@ texture_face(GLenum target)
  *
  * This was basically prompted by the introduction of cube maps.
  */
+/**
+ * Convenience wrapper around gl_texture_object::set_image().
+ * Kept for compatibility with existing call sites.
+ */
 void
 _mesa_set_tex_image(struct gl_texture_object *tObj,
 		    GLenum target, GLint level,
 		    struct gl_texture_image *texImage)
 {
     ASSERT(tObj);
-    ASSERT(texImage);
-    switch (target) {
-	case GL_TEXTURE_1D:
-	case GL_TEXTURE_2D:
-	case GL_TEXTURE_3D:
-	    tObj->Image[0][level] = texImage;
-	    break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB: {
-	    GLuint face = ((GLuint) target -
-			   (GLuint) GL_TEXTURE_CUBE_MAP_POSITIVE_X);
-	    tObj->Image[face][level] = texImage;
-	}
-	break;
-	case GL_TEXTURE_RECTANGLE_NV:
-	    ASSERT(level == 0);
-	    tObj->Image[0][level] = texImage;
-	    break;
-	default:
-	    _mesa_problem(nullptr, "bad target in _mesa_set_tex_image()");
-	    return;
-    }
-    /* Set the 'back' pointer */
-    texImage->TexObject = tObj;
+    tObj->set_image(target, level, texImage);
 }
 
 
@@ -711,8 +688,6 @@ _mesa_delete_texture_image(GLcontext *ctx, struct gl_texture_image *texImage)
     ctx->Driver.FreeTexImageData(ctx, texImage);
 
     ASSERT(texImage->Data == nullptr);
-    if (texImage->ImageOffsets)
-	delete[] texImage->ImageOffsets;
     delete texImage;
 }
 
@@ -1083,50 +1058,122 @@ make_null_texture(GLint width, GLint height, GLint depth, GLenum format)
  * required fields get initialized properly by the Driver.TexImage[123]D
  * functions.
  */
+/**
+ * gl_texture_image::clear_fields – zero out all dimension/format fields.
+ *
+ * This is the canonical implementation; the free function clear_teximage_fields()
+ * is kept as a thin wrapper for internal call sites that still use it.
+ */
+void
+gl_texture_image::clear_fields()
+{
+    _BaseFormat = 0;
+    InternalFormat = 0;
+    Border = 0;
+    Width = 0;
+    Height = 0;
+    Depth = 0;
+    RowStride = 0;
+    ImageOffsets.clear();
+    Width2 = 0;
+    Height2 = 0;
+    Depth2 = 0;
+    WidthLog2 = 0;
+    HeightLog2 = 0;
+    DepthLog2 = 0;
+    Data = nullptr;
+    TexFormat = &_mesa_null_texformat;
+    FetchTexelc = nullptr;
+    FetchTexelf = nullptr;
+    IsCompressed = 0;
+    CompressedSize = 0;
+}
+
+
 static void
 clear_teximage_fields(struct gl_texture_image *img)
 {
     ASSERT(img);
-    img->_BaseFormat = 0;
-    img->InternalFormat = 0;
-    img->Border = 0;
-    img->Width = 0;
-    img->Height = 0;
-    img->Depth = 0;
-    img->RowStride = 0;
-    if (img->ImageOffsets) {
-	delete[] img->ImageOffsets;
-	img->ImageOffsets = nullptr;
+    img->clear_fields();
+}
+
+
+/**
+ * gl_texture_image::init_fields – canonical initialisation of dimension/format fields.
+ *
+ * See _mesa_init_teximage_fields() for full documentation of the parameters.
+ */
+void
+gl_texture_image::init_fields(GLcontext *ctx, GLenum target,
+                               GLsizei width, GLsizei height, GLsizei depth,
+                               GLint border, GLenum internalFormat)
+{
+    GLint i;
+
+    ASSERT(width >= 0);
+    ASSERT(height >= 0);
+    ASSERT(depth >= 0);
+
+    _BaseFormat = _mesa_base_tex_format(ctx, internalFormat);
+    ASSERT(_BaseFormat > 0);
+    InternalFormat = internalFormat;
+    Border = border;
+    Width = width;
+    Height = height;
+    Depth = depth;
+    Width2 = width - 2 * border;
+    Height2 = height - 2 * border;
+    Depth2 = depth - 2 * border;
+    WidthLog2 = logbase2(Width2);
+    if (height == 1)  /* 1-D texture */
+	HeightLog2 = 0;
+    else
+	HeightLog2 = logbase2(Height2);
+    if (depth == 1)   /* 2-D texture */
+	DepthLog2 = 0;
+    else
+	DepthLog2 = logbase2(Depth2);
+    MaxLog2 = MAX2(WidthLog2, HeightLog2);
+    IsCompressed = GL_FALSE;
+    CompressedSize = 0;
+
+    if ((width == 1 || _mesa_bitcount(Width2) == 1) &&
+	(height == 1 || _mesa_bitcount(Height2) == 1) &&
+	(depth == 1 || _mesa_bitcount(Depth2) == 1))
+	_IsPowerOfTwo = GL_TRUE;
+    else
+	_IsPowerOfTwo = GL_FALSE;
+
+    /* RowStride and ImageOffsets[] describe how to address texels in 'Data' */
+    RowStride = width;
+    /* Initialise the ImageOffsets vector with typical per-slice values.
+     * We populate it for 1D/2D textures too to avoid special-case code
+     * in the texstore routines.
+     */
+    ImageOffsets.resize(depth);
+    for (i = 0; i < depth; i++) {
+	ImageOffsets[i] = i * width * height;
     }
-    img->Width2 = 0;
-    img->Height2 = 0;
-    img->Depth2 = 0;
-    img->WidthLog2 = 0;
-    img->HeightLog2 = 0;
-    img->DepthLog2 = 0;
-    img->Data = nullptr;
-    img->TexFormat = &_mesa_null_texformat;
-    img->FetchTexelc = nullptr;
-    img->FetchTexelf = nullptr;
-    img->IsCompressed = 0;
-    img->CompressedSize = 0;
+
+    /* Compute Width/Height/DepthScale for mipmap lod computation */
+    if (target == GL_TEXTURE_RECTANGLE_NV) {
+	/* scale = 1.0 since texture coords directly map to texels */
+	WidthScale = 1.0;
+	HeightScale = 1.0;
+	DepthScale = 1.0;
+    } else {
+	WidthScale = (GLfloat) Width;
+	HeightScale = (GLfloat) Height;
+	DepthScale = (GLfloat) Depth;
+    }
 }
 
 
 /**
  * Initialize basic fields of the gl_texture_image struct.
  *
- * \param ctx GL context.
- * \param target texture target (GL_TEXTURE_1D, GL_TEXTURE_RECTANGLE, etc).
- * \param img texture image structure to be initialized.
- * \param width image width.
- * \param height image height.
- * \param depth image depth.
- * \param border image border.
- * \param internalFormat internal format.
- *
- * Fills in the fields of \p img with the given information.
- * Note: width, height and depth include the border.
+ * Delegates to gl_texture_image::init_fields().  Kept as a free function
+ * for compatibility with existing call sites.
  */
 void
 _mesa_init_teximage_fields(GLcontext *ctx, GLenum target,
@@ -1134,65 +1181,8 @@ _mesa_init_teximage_fields(GLcontext *ctx, GLenum target,
 			   GLsizei width, GLsizei height, GLsizei depth,
 			   GLint border, GLenum internalFormat)
 {
-    GLint i;
-
     ASSERT(img);
-    ASSERT(width >= 0);
-    ASSERT(height >= 0);
-    ASSERT(depth >= 0);
-
-    img->_BaseFormat = _mesa_base_tex_format(ctx, internalFormat);
-    ASSERT(img->_BaseFormat > 0);
-    img->InternalFormat = internalFormat;
-    img->Border = border;
-    img->Width = width;
-    img->Height = height;
-    img->Depth = depth;
-    img->Width2 = width - 2 * border;   /* == 1 << img->WidthLog2; */
-    img->Height2 = height - 2 * border; /* == 1 << img->HeightLog2; */
-    img->Depth2 = depth - 2 * border;   /* == 1 << img->DepthLog2; */
-    img->WidthLog2 = logbase2(img->Width2);
-    if (height == 1)  /* 1-D texture */
-	img->HeightLog2 = 0;
-    else
-	img->HeightLog2 = logbase2(img->Height2);
-    if (depth == 1)   /* 2-D texture */
-	img->DepthLog2 = 0;
-    else
-	img->DepthLog2 = logbase2(img->Depth2);
-    img->MaxLog2 = MAX2(img->WidthLog2, img->HeightLog2);
-    img->IsCompressed = GL_FALSE;
-    img->CompressedSize = 0;
-
-    if ((width == 1 || _mesa_bitcount(img->Width2) == 1) &&
-	(height == 1 || _mesa_bitcount(img->Height2) == 1) &&
-	(depth == 1 || _mesa_bitcount(img->Depth2) == 1))
-	img->_IsPowerOfTwo = GL_TRUE;
-    else
-	img->_IsPowerOfTwo = GL_FALSE;
-
-    /* RowStride and ImageOffsets[] describe how to address texels in 'Data' */
-    img->RowStride = width;
-    /* Allocate the ImageOffsets array and initialize to typical values.
-     * We allocate the array for 1D/2D textures too in order to avoid special-
-     * case code in the texstore routines.
-     */
-    img->ImageOffsets = new GLuint[depth];
-    for (i = 0; i < depth; i++) {
-	img->ImageOffsets[i] = i * width * height;
-    }
-
-    /* Compute Width/Height/DepthScale for mipmap lod computation */
-    if (target == GL_TEXTURE_RECTANGLE_NV) {
-	/* scale = 1.0 since texture coords directly map to texels */
-	img->WidthScale = 1.0;
-	img->HeightScale = 1.0;
-	img->DepthScale = 1.0;
-    } else {
-	img->WidthScale = (GLfloat) img->Width;
-	img->HeightScale = (GLfloat) img->Height;
-	img->DepthScale = (GLfloat) img->Depth;
-    }
+    img->init_fields(ctx, target, width, height, depth, border, internalFormat);
 }
 
 

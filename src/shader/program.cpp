@@ -66,7 +66,7 @@ _mesa_init_program(GLcontext *ctx)
     ctx->VertexProgram.TwoSideEnabled = GL_FALSE;
     ctx->VertexProgram.Current = (struct gl_vertex_program *) ctx->Shared->DefaultVertexProgram;
     assert(ctx->VertexProgram.Current);
-    ctx->VertexProgram.Current->Base.RefCount++;
+    ctx->VertexProgram.Current->Base.ref();
     for (i = 0; i < MAX_NV_VERTEX_PROGRAM_PARAMS / 4; i++) {
 	ctx->VertexProgram.TrackMatrix[i] = GL_NONE;
 	ctx->VertexProgram.TrackMatrixTransform[i] = GL_IDENTITY_NV;
@@ -77,7 +77,7 @@ _mesa_init_program(GLcontext *ctx)
     ctx->FragmentProgram.Enabled = GL_FALSE;
     ctx->FragmentProgram.Current = (struct gl_fragment_program *) ctx->Shared->DefaultFragmentProgram;
     assert(ctx->FragmentProgram.Current);
-    ctx->FragmentProgram.Current->Base.RefCount++;
+    ctx->FragmentProgram.Current->Base.ref();
 #endif
 
     /* XXX probably move this stuff */
@@ -98,15 +98,13 @@ _mesa_free_program_data(GLcontext *ctx)
 {
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
     if (ctx->VertexProgram.Current) {
-	ctx->VertexProgram.Current->Base.RefCount--;
-	if (ctx->VertexProgram.Current->Base.RefCount <= 0)
+	if (ctx->VertexProgram.Current->Base.unref())
 	    ctx->Driver.DeleteProgram(ctx, &(ctx->VertexProgram.Current->Base));
     }
 #endif
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program
     if (ctx->FragmentProgram.Current) {
-	ctx->FragmentProgram.Current->Base.RefCount--;
-	if (ctx->FragmentProgram.Current->Base.RefCount <= 0)
+	if (ctx->FragmentProgram.Current->Base.unref())
 	    ctx->Driver.DeleteProgram(ctx, &(ctx->FragmentProgram.Current->Base));
     }
 #endif
@@ -489,9 +487,7 @@ _mesa_BindProgram(GLenum target, GLuint id)
     /* unbind/delete oldProg */
     if (curProg->Id != 0) {
 	/* decrement refcount on previously bound fragment program */
-	curProg->RefCount--;
-	/* and delete if refcount goes below one */
-	if (curProg->RefCount <= 0) {
+	if (curProg->unref()) {
 	    /* the program ID was already removed from the hash table */
 	    ctx->Driver.DeleteProgram(ctx, curProg);
 	}
@@ -504,7 +500,7 @@ _mesa_BindProgram(GLenum target, GLuint id)
 	       target == GL_FRAGMENT_PROGRAM_ARB) {
 	ctx->FragmentProgram.Current = (struct gl_fragment_program *) newProg;
     }
-    newProg->RefCount++;
+    newProg->ref();
 
     /* Never null pointers */
     ASSERT(ctx->VertexProgram.Current);
@@ -559,8 +555,7 @@ _mesa_DeletePrograms(GLsizei n, const GLuint *ids)
 		}
 		/* The ID is immediately available for re-use now */
 		ctx->Shared->remove_program(ids[i]);
-		prog->RefCount--;
-		if (prog->RefCount <= 0) {
+		if (prog->unref()) {
 		    ctx->Driver.DeleteProgram(ctx, prog);
 		}
 	    }

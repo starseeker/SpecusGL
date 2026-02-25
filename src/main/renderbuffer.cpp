@@ -2188,21 +2188,11 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
     }
 
     if (*ptr) {
-	/* Unreference the old renderbuffer */
-	GLboolean deleteFlag = GL_FALSE;
+	/* Unreference the old renderbuffer using the new unref() method. */
 	struct gl_renderbuffer *oldRb = *ptr;
 
 	assert(oldRb->Magic == RB_MAGIC);
-	{
-	    std::lock_guard<std::mutex> lock(oldRb->Mutex);
-	    assert(oldRb->Magic == RB_MAGIC);
-	    ASSERT(oldRb->RefCount > 0);
-	    oldRb->RefCount--;
-	    /*printf("RB DECR %p (%d) to %d\n", (void*) oldRb, oldRb->Name, oldRb->RefCount);*/
-	    deleteFlag = (oldRb->RefCount == 0);
-	}
-
-	if (deleteFlag) {
+	if (oldRb->unref()) {
 	    oldRb->Magic = 0; /* now invalid memory! */
 	    delete oldRb;
 	}
@@ -2213,12 +2203,8 @@ _mesa_reference_renderbuffer(struct gl_renderbuffer **ptr,
 
     if (rb) {
 	assert(rb->Magic == RB_MAGIC);
-	/* reference new renderbuffer */
-	{
-	    std::lock_guard<std::mutex> lock(rb->Mutex);
-	    rb->RefCount++;
-	    /*printf("RB INCR %p (%d) to %d\n", (void*) rb, rb->Name, rb->RefCount);*/
-	}
+	/* Reference new renderbuffer using the new ref() method. */
+	rb->ref();
 	*ptr = rb;
     }
 }

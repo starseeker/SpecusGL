@@ -55,8 +55,7 @@ struct DepthStencilWrapper : public gl_renderbuffer {
     ~DepthStencilWrapper() override {
 /* Decrement reference count on the wrapped buffer and delete if zero. */
 ASSERT(Wrapped);
-Wrapped->RefCount--;
-if (Wrapped->RefCount <= 0)
+if (Wrapped->unref())
     delete Wrapped;
     }
 

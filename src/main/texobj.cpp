@@ -81,20 +81,35 @@ _mesa_new_texture_object(GLcontext *ctx, GLuint name, GLenum target)
 {
     (void) ctx;
     auto *obj = new gl_texture_object{};
-    _mesa_initialize_texture_object(obj, name, target);
+    obj->init(name, target);
     return obj;
 }
 
 
 /**
  * Initialize a new texture object to default values.
- * \param obj  the texture object
- * \param name  the texture name
- * \param target  the texture target
+ *
+ * Delegates to the gl_texture_object::init() method.  Kept as a free
+ * function for compatibility with existing call sites.
  */
 void
 _mesa_initialize_texture_object(struct gl_texture_object *obj,
 				GLuint name, GLenum target)
+{
+    obj->init(name, target);
+}
+
+
+/**
+ * gl_texture_object::init – canonical initialisation.
+ *
+ * Sets all fields to the OpenGL-specified defaults for an object with
+ * the given name and target.  The struct is assumed to be
+ * value-initialised (all POD zeroed, std::mutex default-constructed) by
+ * the caller.
+ */
+void
+gl_texture_object::init(GLuint name, GLenum target)
 {
     ASSERT(target == 0 ||
 	   target == GL_TEXTURE_1D ||
@@ -103,39 +118,35 @@ _mesa_initialize_texture_object(struct gl_texture_object *obj,
 	   target == GL_TEXTURE_CUBE_MAP_ARB ||
 	   target == GL_TEXTURE_RECTANGLE_NV);
 
-    /* obj is value-initialized by the caller (_mesa_new_texture_object uses
-     * new gl_texture_object{}) so all POD fields are already zeroed and
-     * std::mutex is already properly default-constructed.
-     * Set only the non-zero fields: */
-    obj->RefCount = 1;
-    obj->Name = name;
-    obj->Target = target;
-    obj->Priority = 1.0F;
+    RefCount = 1;
+    Name = name;
+    Target = target;
+    Priority = 1.0F;
     if (target == GL_TEXTURE_RECTANGLE_NV) {
-	obj->WrapS = GL_CLAMP_TO_EDGE;
-	obj->WrapT = GL_CLAMP_TO_EDGE;
-	obj->WrapR = GL_CLAMP_TO_EDGE;
-	obj->MinFilter = GL_LINEAR;
+	WrapS = GL_CLAMP_TO_EDGE;
+	WrapT = GL_CLAMP_TO_EDGE;
+	WrapR = GL_CLAMP_TO_EDGE;
+	MinFilter = GL_LINEAR;
     } else {
-	obj->WrapS = GL_REPEAT;
-	obj->WrapT = GL_REPEAT;
-	obj->WrapR = GL_REPEAT;
-	obj->MinFilter = GL_NEAREST_MIPMAP_LINEAR;
+	WrapS = GL_REPEAT;
+	WrapT = GL_REPEAT;
+	WrapR = GL_REPEAT;
+	MinFilter = GL_NEAREST_MIPMAP_LINEAR;
     }
-    obj->MagFilter = GL_LINEAR;
-    obj->MinLod = -1000.0;
-    obj->MaxLod = 1000.0;
-    obj->LodBias = 0.0;
-    obj->BaseLevel = 0;
-    obj->MaxLevel = 1000;
-    obj->MaxAnisotropy = 1.0;
-    obj->CompareFlag = GL_FALSE;                      /* SGIX_shadow */
-    obj->CompareOperator = GL_TEXTURE_LEQUAL_R_SGIX;  /* SGIX_shadow */
-    obj->CompareMode = GL_NONE;         /* ARB_shadow */
-    obj->CompareFunc = GL_LEQUAL;       /* ARB_shadow */
-    obj->DepthMode = GL_LUMINANCE;      /* ARB_depth_texture */
-    obj->ShadowAmbient = 0.0F;          /* ARB/SGIX_shadow_ambient */
-    _mesa_init_colortable(&obj->Palette);
+    MagFilter = GL_LINEAR;
+    MinLod = -1000.0;
+    MaxLod = 1000.0;
+    LodBias = 0.0;
+    BaseLevel = 0;
+    MaxLevel = 1000;
+    MaxAnisotropy = 1.0;
+    CompareFlag = GL_FALSE;                      /* SGIX_shadow */
+    CompareOperator = GL_TEXTURE_LEQUAL_R_SGIX;  /* SGIX_shadow */
+    CompareMode = GL_NONE;         /* ARB_shadow */
+    CompareFunc = GL_LEQUAL;       /* ARB_shadow */
+    DepthMode = GL_LUMINANCE;      /* ARB_depth_texture */
+    ShadowAmbient = 0.0F;          /* ARB/SGIX_shadow_ambient */
+    _mesa_init_colortable(&Palette);
 }
 
 
@@ -263,20 +274,13 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
     }
 
     if (*ptr) {
-	/* Unreference the old texture */
-	GLboolean deleteFlag = GL_FALSE;
+	/* Unreference the old texture using the new unref() method. */
 	struct gl_texture_object *oldTex = *ptr;
 
 	assert(valid_texture_object(oldTex));
 
-	{
-	    std::lock_guard<std::mutex> lock(oldTex->Mutex);
-	    ASSERT(oldTex->RefCount > 0);
-	    oldTex->RefCount--;
-	    deleteFlag = (oldTex->RefCount == 0);
-	}
-
-	if (deleteFlag) {
+	if (oldTex->unref()) {
+	    /* Reference count reached zero – delete the object. */
 	    GET_CURRENT_CONTEXT(ctx);
 	    if (ctx)
 		ctx->Driver.DeleteTexture(ctx, oldTex);
@@ -289,17 +293,16 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
     assert(!*ptr);
 
     if (tex) {
-	/* reference new texture */
+	/* Reference the new texture using the new ref() method. */
 	assert(valid_texture_object(tex));
 	{
 	    std::lock_guard<std::mutex> lock(tex->Mutex);
 	    if (tex->RefCount == 0) {
-		/* this texture's being deleted (look just above) */
-		/* Not sure this can every really happen.  Warn if it does. */
+		/* This texture is being deleted (see above). */
 		_mesa_problem(nullptr, "referencing deleted texture object");
 		*ptr = nullptr;
 	    } else {
-		tex->RefCount++;
+		++tex->RefCount;
 		*ptr = tex;
 	    }
 	}
@@ -1075,6 +1078,47 @@ void _mesa_unlock_context_textures(GLcontext *ctx)
 }
 
 /*@}*/
+
+
+/**
+ * gl_texture_object::set_image – canonical image-assignment method.
+ *
+ * Associates \p texImage with this object at the face and level implied by
+ * \p target and \p level.  Sets the back-pointer texImage->TexObject = this.
+ * Replaces the free function _mesa_set_tex_image().
+ */
+void
+gl_texture_object::set_image(GLenum target, GLint level,
+                              struct gl_texture_image *texImage)
+{
+    ASSERT(texImage);
+    switch (target) {
+	case GL_TEXTURE_1D:
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_3D:
+	    Image[0][level] = texImage;
+	    break;
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB: {
+	    GLuint face = ((GLuint) target -
+			   (GLuint) GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	    Image[face][level] = texImage;
+	}
+	break;
+	case GL_TEXTURE_RECTANGLE_NV:
+	    ASSERT(level == 0);
+	    Image[0][level] = texImage;
+	    break;
+	default:
+	    _mesa_problem(nullptr, "bad target in gl_texture_object::set_image()");
+	    return;
+    }
+    texImage->TexObject = this;
+}
 
 
 
