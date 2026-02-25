@@ -534,7 +534,7 @@ _slang_link(GLcontext *ctx,
     _mesa_clear_shader_program_data(ctx, shProg);
 
     /* check that all programs compiled successfully */
-    for (i = 0; i < shProg->NumShaders; i++) {
+    for (i = 0; i < shProg->Shaders.size(); i++) {
 	if (!shProg->Shaders[i]->CompileStatus) {
 	    link_error(shProg, "linking with uncompiled shader\n");
 	    return;
@@ -549,7 +549,7 @@ _slang_link(GLcontext *ctx,
      */
     vertProg = NULL;
     fragProg = NULL;
-    for (i = 0; i < shProg->NumShaders; i++) {
+    for (i = 0; i < shProg->Shaders.size(); i++) {
 	if (shProg->Shaders[i]->Type == GL_VERTEX_SHADER)
 	    vertProg = vertex_program(shProg->Shaders[i]->Programs[0]);
 	else if (shProg->Shaders[i]->Type == GL_FRAGMENT_SHADER)

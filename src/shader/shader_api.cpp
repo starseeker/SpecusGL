@@ -122,13 +122,10 @@ _mesa_free_shader_program_data(GLcontext *ctx,
     }
 
     /* detach shaders */
-    for (i = 0; i < shProg->NumShaders; i++) {
-	_mesa_reference_shader(ctx, &shProg->Shaders[i], nullptr);
+    for (auto *& sh : shProg->Shaders) {
+	_mesa_reference_shader(ctx, &sh, nullptr);
     }
-    shProg->NumShaders = 0;
-
-    delete[] shProg->Shaders;
-    shProg->Shaders = nullptr;
+    shProg->Shaders.clear();
 
     shProg->InfoLog.clear();
 }
@@ -434,28 +431,16 @@ _mesa_attach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	return;
     }
 
-    n = shProg->NumShaders;
-
-    for (i = 0; i < n; i++) {
-	if (shProg->Shaders[i] == sh) {
+    for (auto *existing : shProg->Shaders) {
+	if (existing == sh) {
 	    /* already attached */
 	    return;
 	}
     }
 
-    /* grow list */
-    {
-	auto *newList = new struct gl_shader *[n + 1];
-	if (n > 0)
-	    std::copy(shProg->Shaders, shProg->Shaders + n, newList);
-	delete[] shProg->Shaders;
-	shProg->Shaders = newList;
-    }
-
     /* append */
-    shProg->Shaders[n] = nullptr; /* since realloc() didn't zero the new space */
-    _mesa_reference_shader(ctx, &shProg->Shaders[n], sh);
-    shProg->NumShaders++;
+    shProg->Shaders.push_back(nullptr);
+    _mesa_reference_shader(ctx, &shProg->Shaders.back(), sh);
 }
 
 
@@ -604,32 +589,19 @@ _mesa_detach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	return;
     }
 
-    n = shProg->NumShaders;
-
-    for (i = 0; i < n; i++) {
-	if (shProg->Shaders[i]->Name == shader) {
+    for (auto it = shProg->Shaders.begin(); it != shProg->Shaders.end(); ++it) {
+	if ((*it)->Name == shader) {
 	    /* found it */
-	    struct gl_shader **newList;
 
-	    /* derefernce */
-	    _mesa_reference_shader(ctx, &shProg->Shaders[i], nullptr);
-
-	    /* alloc new, smaller array */
-	    newList = new struct gl_shader *[n > 1 ? n - 1 : 1];
-	    for (j = 0; j < i; j++) {
-		newList[j] = shProg->Shaders[j];
-	    }
-	    while (++i < n)
-		newList[j++] = shProg->Shaders[i];
-	    delete[] shProg->Shaders;
-
-	    shProg->Shaders = newList;
-	    shProg->NumShaders = n - 1;
+	    /* dereference */
+	    _mesa_reference_shader(ctx, &(*it), nullptr);
+	    shProg->Shaders.erase(it);
+	    n = (GLuint) shProg->Shaders.size();
 
 #ifdef DEBUG
 	    /* sanity check */
 	    {
-		for (j = 0; j < shProg->NumShaders; j++) {
+		for (j = 0; j < static_cast<GLuint>(shProg->Shaders.size()); j++) {
 		    assert(shProg->Shaders[j]->Type == GL_VERTEX_SHADER ||
 			   shProg->Shaders[j]->Type == GL_FRAGMENT_SHADER);
 		    assert(shProg->Shaders[j]->RefCount > 0);
@@ -739,7 +711,7 @@ _mesa_get_attached_shaders(GLcontext *ctx, GLuint program, GLsizei maxCount,
 	= _mesa_lookup_shader_program(ctx, program);
     if (shProg) {
 	GLint i;
-	for (i = 0; i < maxCount && i < shProg->NumShaders; i++) {
+	for (i = 0; i < maxCount && i < (GLsizei) shProg->Shaders.size(); i++) {
 	    obj[i] = shProg->Shaders[i]->Name;
 	}
 	if (count)
@@ -830,7 +802,7 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 	    *params = (GLsizei) shProg->InfoLog.size() + 1;
 	    break;
 	case GL_ATTACHED_SHADERS:
-	    *params = shProg->NumShaders;
+	    *params = static_cast<GLuint>(shProg->Shaders.size());
 	    break;
 	case GL_ACTIVE_ATTRIBUTES:
 	    *params = shProg->Attributes ? shProg->Attributes->NumParameters() : 0;

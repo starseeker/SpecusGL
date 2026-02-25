@@ -2043,8 +2043,7 @@ struct gl_shader_program {
     GLint RefCount;  /**< Reference count */
     GLboolean DeletePending;
 
-    GLuint NumShaders;          /**< number of attached shaders */
-    struct gl_shader **Shaders; /**< List of attached the shaders */
+    std::vector<struct gl_shader *> Shaders; /**< Attached shaders */
 
     /* post-link info: */
     struct gl_vertex_program *VertexProgram;     /**< Linked vertex program */
