@@ -57,8 +57,16 @@ struct vp_stage_data {
     GLvector4f results[VERT_RESULT_MAX];
 
     GLvector4f ndcCoords;              /**< normalized device coords */
-    GLubyte *clipmask;                 /**< clip flags */
-    GLubyte ormask, andmask;           /**< for clipping */
+    GLubyte *clipmask  = nullptr;      /**< clip flags */
+    GLubyte ormask     = 0;
+    GLubyte andmask    = 0;
+
+    ~vp_stage_data()
+    {
+	/* results[] and ndcCoords freed automatically by GLvector4f destructors */
+	ALIGN_FREE(clipmask);
+	clipmask = nullptr;
+    }
 };
 
 
@@ -497,16 +505,7 @@ dtr(struct tnl_pipeline_stage *stage)
     struct vp_stage_data *store = VP_STAGE_DATA(stage);
 
     if (store) {
-	GLuint i;
-
-	/* free the vertex program result arrays */
-	for (i = 0; i < VERT_RESULT_MAX; i++)
-	    _mesa_vector4f_free(&store->results[i]);
-
-	/* free misc arrays */
-	_mesa_vector4f_free(&store->ndcCoords);
-	ALIGN_FREE(store->clipmask);
-
+	/* GLvector4f members and clipmask released by vp_stage_data dtor */
 	delete store;
 	stage->privatePtr = nullptr;
     }

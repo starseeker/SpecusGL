@@ -93,8 +93,7 @@ free_point_data(struct tnl_pipeline_stage *stage)
 {
     struct point_stage_data *store = POINT_STAGE_DATA(stage);
     if (store) {
-	_mesa_vector4f_free(&store->PointSize);
-	delete store;
+	delete store;  /* PointSize released by GLvector4f destructor */
 	stage->privatePtr = nullptr;
     }
 }

@@ -163,8 +163,7 @@ free_normal_data(struct tnl_pipeline_stage *stage)
 {
     struct normal_stage_data *store = NORMAL_STAGE_DATA(stage);
     if (store) {
-	_mesa_vector4f_free(&store->normal);
-	delete store;
+	delete store;  /* normal released by GLvector4f destructor */
 	stage->privatePtr = nullptr;
     }
 }

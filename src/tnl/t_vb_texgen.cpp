@@ -64,17 +64,24 @@ struct texgen_stage_data {
 
     /* Per-texunit derived state.
      */
-    GLuint TexgenSize[MAX_TEXTURE_COORD_UNITS];
-    texgen_func TexgenFunc[MAX_TEXTURE_COORD_UNITS];
+    GLuint TexgenSize[MAX_TEXTURE_COORD_UNITS] = {};
+    texgen_func TexgenFunc[MAX_TEXTURE_COORD_UNITS] = {};
 
     /* Temporary values used in texgen.
      */
-    GLfloat(*tmp_f)[3];
-    GLfloat *tmp_m;
+    GLfloat(*tmp_f)[3] = nullptr;
+    GLfloat *tmp_m     = nullptr;
 
     /* Buffered outputs of the stage.
      */
     GLvector4f texcoord[MAX_TEXTURE_COORD_UNITS];
+
+    ~texgen_stage_data()
+    {
+	/* texcoord[] freed automatically by GLvector4f destructors */
+	delete[] tmp_f;
+	delete[] tmp_m;
+    }
 };
 
 
@@ -576,19 +583,11 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
 
 
 static void free_texgen_data(struct tnl_pipeline_stage *stage)
-
 {
     struct texgen_stage_data *store = TEXGEN_STAGE_DATA(stage);
-    GLuint i;
 
     if (store) {
-	for (i = 0 ; i < MAX_TEXTURE_COORD_UNITS ; i++)
-	    if (store->texcoord[i].data)
-		_mesa_vector4f_free(&store->texcoord[i]);
-
-
-	if (store->tmp_f) delete[] store->tmp_f;
-	if (store->tmp_m) delete[] store->tmp_m;
+	/* texcoord[], tmp_f, tmp_m released by texgen_stage_data dtor */
 	delete store;
 	stage->privatePtr = nullptr;
     }

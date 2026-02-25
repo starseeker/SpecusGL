@@ -334,13 +334,9 @@ static void dtr(struct tnl_pipeline_stage *stage)
     struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
 
     if (store) {
-	_mesa_vector4f_free(&store->Input);
-	_mesa_vector4f_free(&store->LitColor[0]);
-	_mesa_vector4f_free(&store->LitColor[1]);
-	_mesa_vector4f_free(&store->LitSecondary[0]);
-	_mesa_vector4f_free(&store->LitSecondary[1]);
-	_mesa_vector4f_free(&store->LitIndex[0]);
-	_mesa_vector4f_free(&store->LitIndex[1]);
+	/* GLvector4f members (Input, LitColor, LitSecondary, LitIndex)
+	 * are released automatically by their destructors.
+	 * light_func_tab points to a static array – not owned here. */
 	delete store;
 	stage->privatePtr = nullptr;
     }

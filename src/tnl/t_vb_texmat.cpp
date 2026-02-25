@@ -106,12 +106,9 @@ static GLboolean alloc_texmat_data(GLcontext *ctx,
 static void free_texmat_data(struct tnl_pipeline_stage *stage)
 {
     struct texmat_stage_data *store = TEXMAT_STAGE_DATA(stage);
-    GLuint i;
 
     if (store) {
-	for (i = 0; i < MAX_TEXTURE_COORD_UNITS; i++)
-	    if (store->texcoord[i].data)
-		_mesa_vector4f_free(&store->texcoord[i]);
+	/* texcoord[] freed automatically by GLvector4f destructors */
 	delete store;
 	stage->privatePtr = nullptr;
     }

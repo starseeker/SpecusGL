@@ -44,9 +44,16 @@ struct vertex_stage_data {
     GLvector4f eye;
     GLvector4f clip;
     GLvector4f proj;
-    GLubyte *clipmask;
-    GLubyte ormask;
-    GLubyte andmask;
+    GLubyte *clipmask = nullptr;
+    GLubyte ormask    = 0;
+    GLubyte andmask   = 0;
+
+    ~vertex_stage_data()
+    {
+	/* eye, clip, proj freed automatically by GLvector4f destructors */
+	ALIGN_FREE(clipmask);
+	clipmask = nullptr;
+    }
 };
 
 #define VERTEX_STAGE_DATA(stage) ((struct vertex_stage_data *)stage->privatePtr)
@@ -240,10 +247,7 @@ static void dtr(struct tnl_pipeline_stage *stage)
     struct vertex_stage_data *store = VERTEX_STAGE_DATA(stage);
 
     if (store) {
-	_mesa_vector4f_free(&store->eye);
-	_mesa_vector4f_free(&store->clip);
-	_mesa_vector4f_free(&store->proj);
-	ALIGN_FREE(store->clipmask);
+	/* GLvector4f members and clipmask released by vertex_stage_data dtor */
 	delete store;
 	stage->privatePtr = nullptr;
 	stage->run = init_vertex_stage;
