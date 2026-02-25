@@ -214,14 +214,14 @@ static void matmul34(GLfloat *product, const GLfloat *a, const GLfloat *b)
  * Joins both flags and marks the type and inverse as dirty.  Calls matmul34()
  * if both matrices are 3D, or matmul4() otherwise.
  */
-static void matrix_multf(GLmatrix *mat, const GLfloat *m, GLuint flags)
+void GLmatrix::multf(const GLfloat *fm, GLuint fl)
 {
-    mat->flags |= (flags | MAT_DIRTY_TYPE | MAT_DIRTY_INVERSE);
+    flags |= (fl | MAT_DIRTY_TYPE | MAT_DIRTY_INVERSE);
 
-    if (TEST_MAT_FLAGS(mat, MAT_FLAGS_3D))
-	matmul34(mat->m, mat->m, m);
+    if (TEST_MAT_FLAGS(this, MAT_FLAGS_3D))
+	matmul34(m, m, fm);
     else
-	matmul4(mat->m, mat->m, m);
+	matmul4(m, m, fm);
 }
 
 /**
@@ -815,26 +815,23 @@ static inv_mat_func inv_mat_tab[7] = {
 };
 
 /**
- * Compute inverse of a transformation matrix.
+ * Compute inverse of this transformation matrix.
  *
- * \param mat pointer to a GLmatrix structure. The matrix inverse will be
- * stored in the GLmatrix::inv attribute.
- *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (singular matrix).
  *
  * Calls the matrix inversion function in inv_mat_tab corresponding to the
  * given matrix type.  In case of failure, updates the MAT_FLAG_SINGULAR flag,
  * and copies the identity matrix into GLmatrix::inv.
  */
-static GLboolean matrix_invert(GLmatrix *mat)
+bool GLmatrix::invert()
 {
-    if (inv_mat_tab[mat->type](mat)) {
-	mat->flags &= ~MAT_FLAG_SINGULAR;
-	return GL_TRUE;
+    if (inv_mat_tab[type](this)) {
+	flags &= ~MAT_FLAG_SINGULAR;
+	return true;
     } else {
-	mat->flags |= MAT_FLAG_SINGULAR;
-	memcpy(mat->inv, Identity, sizeof(Identity));
-	return GL_FALSE;
+	flags |= MAT_FLAG_SINGULAR;
+	memcpy(inv, Identity, sizeof(Identity));
+	return false;
     }
 }
 
@@ -1014,7 +1011,7 @@ GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
     }
 #undef M
 
-    matrix_multf(this, rmat, MAT_FLAG_ROTATION);
+    multf(rmat, MAT_FLAG_ROTATION);
 }
 
 /**
@@ -1065,7 +1062,7 @@ GLmatrix::frustum(GLfloat left, GLfloat right,
     M(3,3) = 0.0F;
 #undef M
 
-    matrix_multf(this, fmat, MAT_FLAG_PERSPECTIVE);
+    multf(fmat, MAT_FLAG_PERSPECTIVE);
 }
 
 /**
@@ -1111,7 +1108,7 @@ GLmatrix::ortho(GLfloat left, GLfloat right,
     M(3,3) = 1.0F;
 #undef M
 
-    matrix_multf(this, omat, (MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION));
+    multf(omat, (MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION));
 }
 
 /**
@@ -1269,13 +1266,10 @@ GLmatrix::set_identity()
 /**
  * Determine type and flags from scratch.
  *
- * \param mat matrix.
- *
  * This is expensive enough to only want to do it once.
  */
-static void analyse_from_scratch(GLmatrix *mat)
+void GLmatrix::analyse_from_scratch()
 {
-    const GLfloat *m = mat->m;
     GLuint mask = 0;
     GLuint i;
 
@@ -1288,51 +1282,51 @@ static void analyse_from_scratch(GLmatrix *mat)
     if (m[10] == 1.0F) mask |= (1<<26);
     if (m[15] == 1.0F) mask |= (1<<31);
 
-    mat->flags &= ~MAT_FLAGS_GEOMETRY;
+    flags &= ~MAT_FLAGS_GEOMETRY;
 
     /* Check for translation - no-one really cares
      */
     if ((mask & MASK_NO_TRX) != MASK_NO_TRX)
-	mat->flags |= MAT_FLAG_TRANSLATION;
+	flags |= MAT_FLAG_TRANSLATION;
 
     /* Do the real work
      */
     if (mask == (GLuint) MASK_IDENTITY) {
-	mat->type = MATRIX_IDENTITY;
+	type = MATRIX_IDENTITY;
     } else if ((mask & MASK_2D_NO_ROT) == (GLuint) MASK_2D_NO_ROT) {
-	mat->type = MATRIX_2D_NO_ROT;
+	type = MATRIX_2D_NO_ROT;
 
 	if ((mask & MASK_NO_2D_SCALE) != MASK_NO_2D_SCALE)
-	    mat->flags |= MAT_FLAG_GENERAL_SCALE;
+	    flags |= MAT_FLAG_GENERAL_SCALE;
     } else if ((mask & MASK_2D) == (GLuint) MASK_2D) {
 	GLfloat mm = DOT2(m, m);
 	GLfloat m4m4 = DOT2(m+4,m+4);
 	GLfloat mm4 = DOT2(m,m+4);
 
-	mat->type = MATRIX_2D;
+	type = MATRIX_2D;
 
 	/* Check for scale */
 	if (SQ(mm-1) > SQ(1e-6) ||
 	    SQ(m4m4-1) > SQ(1e-6))
-	    mat->flags |= MAT_FLAG_GENERAL_SCALE;
+	    flags |= MAT_FLAG_GENERAL_SCALE;
 
 	/* Check for rotation */
 	if (SQ(mm4) > SQ(1e-6))
-	    mat->flags |= MAT_FLAG_GENERAL_3D;
+	    flags |= MAT_FLAG_GENERAL_3D;
 	else
-	    mat->flags |= MAT_FLAG_ROTATION;
+	    flags |= MAT_FLAG_ROTATION;
 
     } else if ((mask & MASK_3D_NO_ROT) == (GLuint) MASK_3D_NO_ROT) {
-	mat->type = MATRIX_3D_NO_ROT;
+	type = MATRIX_3D_NO_ROT;
 
 	/* Check for scale */
 	if (SQ(m[0]-m[5]) < SQ(1e-6) &&
 	    SQ(m[0]-m[10]) < SQ(1e-6)) {
 	    if (SQ(m[0]-1.0) > SQ(1e-6)) {
-		mat->flags |= MAT_FLAG_UNIFORM_SCALE;
+		flags |= MAT_FLAG_UNIFORM_SCALE;
 	    }
 	} else {
-	    mat->flags |= MAT_FLAG_GENERAL_SCALE;
+	    flags |= MAT_FLAG_GENERAL_SCALE;
 	}
     } else if ((mask & MASK_3D) == (GLuint) MASK_3D) {
 	GLfloat c1 = DOT3(m,m);
@@ -1341,15 +1335,15 @@ static void analyse_from_scratch(GLmatrix *mat)
 	GLfloat d1 = DOT3(m, m+4);
 	GLfloat cp[3];
 
-	mat->type = MATRIX_3D;
+	type = MATRIX_3D;
 
 	/* Check for scale */
 	if (SQ(c1-c2) < SQ(1e-6) && SQ(c1-c3) < SQ(1e-6)) {
 	    if (SQ(c1-1.0) > SQ(1e-6))
-		mat->flags |= MAT_FLAG_UNIFORM_SCALE;
+		flags |= MAT_FLAG_UNIFORM_SCALE;
 	    /* else no scale at all */
 	} else {
-	    mat->flags |= MAT_FLAG_GENERAL_SCALE;
+	    flags |= MAT_FLAG_GENERAL_SCALE;
 	}
 
 	/* Check for rotation */
@@ -1357,18 +1351,18 @@ static void analyse_from_scratch(GLmatrix *mat)
 	    CROSS3(cp, m, m+4);
 	    SUB_3V(cp, cp, (m+8));
 	    if (LEN_SQUARED_3FV(cp) < SQ(1e-6))
-		mat->flags |= MAT_FLAG_ROTATION;
+		flags |= MAT_FLAG_ROTATION;
 	    else
-		mat->flags |= MAT_FLAG_GENERAL_3D;
+		flags |= MAT_FLAG_GENERAL_3D;
 	} else {
-	    mat->flags |= MAT_FLAG_GENERAL_3D; /* shear, etc */
+	    flags |= MAT_FLAG_GENERAL_3D; /* shear, etc */
 	}
     } else if ((mask & MASK_PERSPECTIVE) == MASK_PERSPECTIVE && m[11]==-1.0F) {
-	mat->type = MATRIX_PERSPECTIVE;
-	mat->flags |= MAT_FLAG_GENERAL;
+	type = MATRIX_PERSPECTIVE;
+	flags |= MAT_FLAG_GENERAL;
     } else {
-	mat->type = MATRIX_GENERAL;
-	mat->flags |= MAT_FLAG_GENERAL;
+	type = MATRIX_GENERAL;
+	flags |= MAT_FLAG_GENERAL;
     }
 }
 
@@ -1377,35 +1371,33 @@ static void analyse_from_scratch(GLmatrix *mat)
  *
  * This is the more common operation, hopefully.
  */
-static void analyse_from_flags(GLmatrix *mat)
+void GLmatrix::analyse_from_flags()
 {
-    const GLfloat *m = mat->m;
-
-    if (TEST_MAT_FLAGS(mat, 0)) {
-	mat->type = MATRIX_IDENTITY;
-    } else if (TEST_MAT_FLAGS(mat, (MAT_FLAG_TRANSLATION |
-				    MAT_FLAG_UNIFORM_SCALE |
-				    MAT_FLAG_GENERAL_SCALE))) {
+    if (TEST_MAT_FLAGS(this, 0)) {
+	type = MATRIX_IDENTITY;
+    } else if (TEST_MAT_FLAGS(this, (MAT_FLAG_TRANSLATION |
+				     MAT_FLAG_UNIFORM_SCALE |
+				     MAT_FLAG_GENERAL_SCALE))) {
 	if (m[10]==1.0F && m[14]==0.0F) {
-	    mat->type = MATRIX_2D_NO_ROT;
+	    type = MATRIX_2D_NO_ROT;
 	} else {
-	    mat->type = MATRIX_3D_NO_ROT;
+	    type = MATRIX_3D_NO_ROT;
 	}
-    } else if (TEST_MAT_FLAGS(mat, MAT_FLAGS_3D)) {
+    } else if (TEST_MAT_FLAGS(this, MAT_FLAGS_3D)) {
 	if (m[ 8]==0.0F
-	    &&                             m[ 9]==0.0F
+	    &&                           m[ 9]==0.0F
 	    && m[2]==0.0F && m[6]==0.0F && m[10]==1.0F && m[14]==0.0F) {
-	    mat->type = MATRIX_2D;
+	    type = MATRIX_2D;
 	} else {
-	    mat->type = MATRIX_3D;
+	    type = MATRIX_3D;
 	}
-    } else if (m[4]==0.0F                 && m[12]==0.0F
-	       && m[1]==0.0F                               && m[13]==0.0F
+    } else if (m[4]==0.0F                && m[12]==0.0F
+	       && m[1]==0.0F                              && m[13]==0.0F
 	       && m[2]==0.0F && m[6]==0.0F
 	       && m[3]==0.0F && m[7]==0.0F && m[11]==-1.0F && m[15]==0.0F) {
-	mat->type = MATRIX_PERSPECTIVE;
+	type = MATRIX_PERSPECTIVE;
     } else {
-	mat->type = MATRIX_GENERAL;
+	type = MATRIX_GENERAL;
     }
 }
 
@@ -1417,20 +1409,20 @@ static void analyse_from_flags(GLmatrix *mat)
  * If the matrix type is dirty then calls either analyse_from_scratch() or
  * analyse_from_flags() to determine its type, according to whether the flags
  * are dirty or not, respectively. If the matrix has an inverse and it's dirty
- * then calls matrix_invert(). Finally clears the dirty flags.
+ * then calls invert(). Finally clears the dirty flags.
  */
 void
 GLmatrix::analyse()
 {
     if (flags & MAT_DIRTY_TYPE) {
 	if (flags & MAT_DIRTY_FLAGS)
-	    analyse_from_scratch(this);
+	    analyse_from_scratch();
 	else
-	    analyse_from_flags(this);
+	    analyse_from_flags();
     }
 
     if (inv && (flags & MAT_DIRTY_INVERSE)) {
-	matrix_invert(this);
+	invert();
     }
 
     flags &= ~(MAT_DIRTY_FLAGS|
@@ -1499,7 +1491,7 @@ GLmatrix::copy_from(const GLmatrix *from)
 
     if (inv != 0) {
 	if (from->inv == 0) {
-	    matrix_invert(this);
+	    invert();
 	} else {
 	    memcpy(inv, from->inv, sizeof(GLfloat)*16);
 	}

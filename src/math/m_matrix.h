@@ -138,6 +138,28 @@ struct GLmatrix {
     [[nodiscard]] bool is_general_scale() const;
     [[nodiscard]] bool is_dirty() const;
     /*@}*/
+
+private:
+    /**
+     * \name Internal helpers – not part of the public interface.
+     * These encapsulate the per-format inversion and analysis routines
+     * that were previously static free functions in m_matrix.cpp.
+     */
+    /*@{*/
+
+    /** Apply a precomputed 4×4 matrix \p fm with extra flags \p fl. */
+    void multf(const GLfloat *fm, GLuint fl);
+
+    /** Compute the inverse and update the matrix. */
+    bool invert();
+
+    /** Determine type and flags from scratch (expensive path). */
+    void analyse_from_scratch();
+
+    /** Determine type from flags (fast path, flags already known-good). */
+    void analyse_from_flags();
+
+    /*@}*/
 };
 
 static_assert(sizeof(GLfloat) == 4, "GLfloat must be 32-bit for 16-byte aligned matrix arrays");
