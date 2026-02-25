@@ -1080,6 +1080,47 @@ void _mesa_unlock_context_textures(GLcontext *ctx)
 /*@}*/
 
 
+/**
+ * gl_texture_object::set_image – canonical image-assignment method.
+ *
+ * Associates \p texImage with this object at the face and level implied by
+ * \p target and \p level.  Sets the back-pointer texImage->TexObject = this.
+ * Replaces the free function _mesa_set_tex_image().
+ */
+void
+gl_texture_object::set_image(GLenum target, GLint level,
+                              struct gl_texture_image *texImage)
+{
+    ASSERT(texImage);
+    switch (target) {
+	case GL_TEXTURE_1D:
+	case GL_TEXTURE_2D:
+	case GL_TEXTURE_3D:
+	    Image[0][level] = texImage;
+	    break;
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
+	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
+	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB: {
+	    GLuint face = ((GLuint) target -
+			   (GLuint) GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	    Image[face][level] = texImage;
+	}
+	break;
+	case GL_TEXTURE_RECTANGLE_NV:
+	    ASSERT(level == 0);
+	    Image[0][level] = texImage;
+	    break;
+	default:
+	    _mesa_problem(nullptr, "bad target in gl_texture_object::set_image()");
+	    return;
+    }
+    texImage->TexObject = this;
+}
+
+
 
 /*
  * Local Variables:

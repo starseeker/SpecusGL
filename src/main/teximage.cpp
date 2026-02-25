@@ -617,40 +617,17 @@ texture_face(GLenum target)
  *
  * This was basically prompted by the introduction of cube maps.
  */
+/**
+ * Convenience wrapper around gl_texture_object::set_image().
+ * Kept for compatibility with existing call sites.
+ */
 void
 _mesa_set_tex_image(struct gl_texture_object *tObj,
 		    GLenum target, GLint level,
 		    struct gl_texture_image *texImage)
 {
     ASSERT(tObj);
-    ASSERT(texImage);
-    switch (target) {
-	case GL_TEXTURE_1D:
-	case GL_TEXTURE_2D:
-	case GL_TEXTURE_3D:
-	    tObj->Image[0][level] = texImage;
-	    break;
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_X_ARB:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Y_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
-	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
-	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB: {
-	    GLuint face = ((GLuint) target -
-			   (GLuint) GL_TEXTURE_CUBE_MAP_POSITIVE_X);
-	    tObj->Image[face][level] = texImage;
-	}
-	break;
-	case GL_TEXTURE_RECTANGLE_NV:
-	    ASSERT(level == 0);
-	    tObj->Image[0][level] = texImage;
-	    break;
-	default:
-	    _mesa_problem(nullptr, "bad target in _mesa_set_tex_image()");
-	    return;
-    }
-    /* Set the 'back' pointer */
-    texImage->TexObject = tObj;
+    tObj->set_image(target, level, texImage);
 }
 
 

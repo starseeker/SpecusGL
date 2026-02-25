@@ -1443,6 +1443,15 @@ struct gl_texture_object {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Associate \p texImage with this texture object at the given target and
+     * mipmap level.  Also sets texImage->TexObject back-pointer.
+     *
+     * Replaces _mesa_set_tex_image().
+     */
+    void set_image(GLenum target, GLint level,
+                   struct gl_texture_image *texImage);
 };
 
 
