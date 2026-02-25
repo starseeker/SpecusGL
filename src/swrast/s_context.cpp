@@ -196,7 +196,7 @@ _swrast_update_fog_state(GLcontext *ctx)
 
     /* determine if fog is needed, and if so, which fog mode */
     swrast->_FogEnabled = GL_FALSE;
-    if (fp && fp->Base.Target == GL_FRAGMENT_PROGRAM_ARB) {
+    if (fp && fp->Target == GL_FRAGMENT_PROGRAM_ARB) {
 	if (fp->FogOption != GL_NONE) {
 	    swrast->_FogEnabled = GL_TRUE;
 	    swrast->_FogMode = fp->FogOption;
@@ -221,9 +221,9 @@ _swrast_update_fragment_program(GLcontext *ctx, GLbitfield newState)
 	/* XXX Need a way to trigger the initial loading of parameters
 	 * even when there's no recent state changes.
 	 */
-	if (fp->Base.Parameters->StateFlags & newState)
+	if (fp->Parameters->StateFlags & newState)
 #endif
-	    _mesa_load_state_parameters(ctx, fp->Base.Parameters);
+	    _mesa_load_state_parameters(ctx, fp->Parameters);
     }
 }
 
@@ -514,7 +514,7 @@ _swrast_update_fragment_attribs(GLcontext *ctx)
     GLuint attribsMask;
 
     if (ctx->FragmentProgram._Current) {
-	attribsMask = ctx->FragmentProgram._Current->Base.InputsRead;
+	attribsMask = ctx->FragmentProgram._Current->InputsRead;
     } else {
 	GLuint u;
 	attribsMask = 0x0;
@@ -572,7 +572,7 @@ _swrast_update_color_outputs(GLcontext *ctx)
 
     if (ctx->FragmentProgram._Current) {
 	const GLbitfield outputsWritten
-	    = ctx->FragmentProgram._Current->Base.OutputsWritten;
+	    = ctx->FragmentProgram._Current->OutputsWritten;
 	GLuint output;
 	for (output = 0; output < ctx->Const.MaxDrawBuffers; output++) {
 	    if ((outputsWritten & (1 << (FRAG_RESULT_DATA0 + output)))

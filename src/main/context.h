@@ -276,10 +276,10 @@ do {									\
     || (CTX)->Fog.ColorSumEnabled					\
     || ((CTX)->VertexProgram._Current &&				\
         ((CTX)->VertexProgram._Current != (CTX)->VertexProgram._TnlProgram) &&    \
-        ((CTX)->VertexProgram._Current->Base.InputsRead & VERT_BIT_COLOR1)) \
+        ((CTX)->VertexProgram._Current->InputsRead & VERT_BIT_COLOR1)) \
     || ((CTX)->FragmentProgram._Current &&				\
         ((CTX)->FragmentProgram._Current != (CTX)->FragmentProgram._TexEnvProgram) &&  \
-        ((CTX)->FragmentProgram._Current->Base.InputsRead & FRAG_BIT_COL1)) \
+        ((CTX)->FragmentProgram._Current->InputsRead & FRAG_BIT_COL1)) \
    )
 
 

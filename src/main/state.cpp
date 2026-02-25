@@ -951,9 +951,9 @@ update_program(GLcontext *ctx)
 
     /* These _Enabled flags indicate if the program is enabled AND valid. */
     ctx->VertexProgram._Enabled = ctx->VertexProgram.Enabled
-				  && !ctx->VertexProgram.Current->Base.Instructions.empty();
+				  && !ctx->VertexProgram.Current->Instructions.empty();
     ctx->FragmentProgram._Enabled = ctx->FragmentProgram.Enabled
-				    && !ctx->FragmentProgram.Current->Base.Instructions.empty();
+				    && !ctx->FragmentProgram.Current->Instructions.empty();
     ctx->ATIFragmentShader._Enabled = ctx->ATIFragmentShader.Enabled
 				      && ctx->ATIFragmentShader.Current->isValid;
 

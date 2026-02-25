@@ -2028,17 +2028,16 @@ struct gl_program {
 
 
 /** Vertex program object */
-struct gl_vertex_program {
-    struct gl_program Base;   /**< base class */
+/** Vertex program object */
+struct gl_vertex_program : gl_program {
     GLboolean IsNVProgram;    /**< is this a GL_NV_vertex_program program? */
     GLboolean IsPositionInvariant;
-    void *TnlData;		/**< should probably use Base.DriverData */
+    void *TnlData;		/**< should probably use DriverData */
 };
 
 
 /** Fragment program object */
-struct gl_fragment_program {
-    struct gl_program Base;   /**< base class */
+struct gl_fragment_program : gl_program {
     GLenum FogOption;
     GLboolean UsesKill;
 };

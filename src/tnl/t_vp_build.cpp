@@ -106,7 +106,7 @@ static state_key make_state_key(GLcontext *ctx)
      */
     assert(fp);
 
-    key.fragprog_inputs_read = fp->Base.InputsRead;
+    key.fragprog_inputs_read = fp->InputsRead;
 
     key.separate_specular = (ctx->Light.Model.ColorControl ==
 			      GL_SEPARATE_SPECULAR_COLOR);
@@ -316,8 +316,8 @@ static struct ureg get_temp(struct tnl_program *p)
 	_mesa_exit(1);
     }
 
-    if ((GLuint) bit > p->program->Base.NumTemporaries)
-	p->program->Base.NumTemporaries = bit;
+    if ((GLuint) bit > p->program->NumTemporaries)
+	p->program->NumTemporaries = bit;
 
     if (bit > 0)
 	p->temp_in_use |= 1<<(bit-1);
@@ -351,13 +351,13 @@ static void release_temps(struct tnl_program *p)
 
 static struct ureg register_input(struct tnl_program *p, GLuint input)
 {
-    p->program->Base.InputsRead |= (1<<input);
+    p->program->InputsRead |= (1<<input);
     return make_ureg(PROGRAM_INPUT, input);
 }
 
 static struct ureg register_output(struct tnl_program *p, GLuint output)
 {
-    p->program->Base.OutputsWritten |= (1<<output);
+    p->program->OutputsWritten |= (1<<output);
     return make_ureg(PROGRAM_OUTPUT, output);
 }
 
@@ -374,7 +374,7 @@ static struct ureg register_const4f(struct tnl_program *p,
     values[1] = s1;
     values[2] = s2;
     values[3] = s3;
-    idx = _mesa_add_unnamed_constant(p->program->Base.Parameters, values, 4,
+    idx = _mesa_add_unnamed_constant(p->program->Parameters, values, 4,
 				     &swizzle);
     ASSERT(swizzle == SWIZZLE_NOOP);
     return make_ureg(PROGRAM_STATE_VAR, idx);
@@ -412,7 +412,7 @@ static struct ureg register_param5(struct tnl_program *p,
     tokens[2] = static_cast<gl_state_index>(s2);
     tokens[3] = static_cast<gl_state_index>(s3);
     tokens[4] = static_cast<gl_state_index>(s4);
-    idx = _mesa_add_state_reference(p->program->Base.Parameters, tokens);
+    idx = _mesa_add_state_reference(p->program->Parameters, tokens);
     return make_ureg(PROGRAM_STATE_VAR, idx);
 }
 
@@ -506,10 +506,10 @@ static void emit_op3fn(struct tnl_program *p,
 		       const char *fn,
 		       GLuint line)
 {
-    p->program->Base.Instructions.emplace_back();
-    struct prog_instruction *inst = &p->program->Base.Instructions.back();
+    p->program->Instructions.emplace_back();
+    struct prog_instruction *inst = &p->program->Instructions.back();
 
-    if (p->program->Base.Instructions.size() > MAX_INSN) {
+    if (p->program->Instructions.size() > MAX_INSN) {
 	_mesa_problem(0, "Out of instructions in emit_op3fn\n");
 	return;
     }
@@ -1420,15 +1420,15 @@ create_new_program(const struct state_key *key,
     else
 	p.temp_reserved = ~((1<<max_temps)-1);
 
-    p.program->Base.Instructions.clear();
-    p.program->Base.Instructions.reserve(MAX_INSN);
-    p.program->Base.String.clear();
-    p.program->Base.NumTemporaries =
-	p.program->Base.NumParameters =
-	    p.program->Base.NumAttributes = p.program->Base.NumAddressRegs = 0;
-    p.program->Base.Parameters = _mesa_new_parameter_list();
-    p.program->Base.InputsRead = 0;
-    p.program->Base.OutputsWritten = 0;
+    p.program->Instructions.clear();
+    p.program->Instructions.reserve(MAX_INSN);
+    p.program->String.clear();
+    p.program->NumTemporaries =
+	p.program->NumParameters =
+	    p.program->NumAttributes = p.program->NumAddressRegs = 0;
+    p.program->Parameters = _mesa_new_parameter_list();
+    p.program->InputsRead = 0;
+    p.program->OutputsWritten = 0;
 
     build_tnl_program(&p);
 }
@@ -1457,7 +1457,7 @@ void _tnl_UpdateFixedFunctionProgram(GLcontext *ctx)
 
 	    if (ctx->Driver.ProgramStringNotify)
 		ctx->Driver.ProgramStringNotify(ctx, GL_VERTEX_PROGRAM_ARB,
-						&ctx->VertexProgram._TnlProgram->Base);
+						ctx->VertexProgram._TnlProgram);
 
 	    tnl->vp_cache->map.emplace(key, ctx->VertexProgram._TnlProgram);
 	}

@@ -3805,37 +3805,37 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     /* Copy the relevant contents of the arb_program struct into the
      * fragment_program struct.
      */
-    program->Base.String          = ap.Base.String;
-    program->Base.NumTemporaries  = ap.Base.NumTemporaries;
-    program->Base.NumParameters   = ap.Base.NumParameters;
-    program->Base.NumAttributes   = ap.Base.NumAttributes;
-    program->Base.NumAddressRegs  = ap.Base.NumAddressRegs;
-    program->Base.NumNativeInstructions = ap.Base.NumNativeInstructions;
-    program->Base.NumNativeTemporaries = ap.Base.NumNativeTemporaries;
-    program->Base.NumNativeParameters = ap.Base.NumNativeParameters;
-    program->Base.NumNativeAttributes = ap.Base.NumNativeAttributes;
-    program->Base.NumNativeAddressRegs = ap.Base.NumNativeAddressRegs;
-    program->Base.NumAluInstructions   = ap.Base.NumAluInstructions;
-    program->Base.NumTexInstructions   = ap.Base.NumTexInstructions;
-    program->Base.NumTexIndirections   = ap.Base.NumTexIndirections;
-    program->Base.NumNativeAluInstructions = ap.Base.NumAluInstructions;
-    program->Base.NumNativeTexInstructions = ap.Base.NumTexInstructions;
-    program->Base.NumNativeTexIndirections = ap.Base.NumTexIndirections;
-    program->Base.InputsRead      = ap.Base.InputsRead;
-    program->Base.OutputsWritten  = ap.Base.OutputsWritten;
+    program->String          = ap.Base.String;
+    program->NumTemporaries  = ap.Base.NumTemporaries;
+    program->NumParameters   = ap.Base.NumParameters;
+    program->NumAttributes   = ap.Base.NumAttributes;
+    program->NumAddressRegs  = ap.Base.NumAddressRegs;
+    program->NumNativeInstructions = ap.Base.NumNativeInstructions;
+    program->NumNativeTemporaries = ap.Base.NumNativeTemporaries;
+    program->NumNativeParameters = ap.Base.NumNativeParameters;
+    program->NumNativeAttributes = ap.Base.NumNativeAttributes;
+    program->NumNativeAddressRegs = ap.Base.NumNativeAddressRegs;
+    program->NumAluInstructions   = ap.Base.NumAluInstructions;
+    program->NumTexInstructions   = ap.Base.NumTexInstructions;
+    program->NumTexIndirections   = ap.Base.NumTexIndirections;
+    program->NumNativeAluInstructions = ap.Base.NumAluInstructions;
+    program->NumNativeTexInstructions = ap.Base.NumTexInstructions;
+    program->NumNativeTexIndirections = ap.Base.NumTexIndirections;
+    program->InputsRead      = ap.Base.InputsRead;
+    program->OutputsWritten  = ap.Base.OutputsWritten;
     for (i = 0; i < MAX_TEXTURE_IMAGE_UNITS; i++)
-	program->Base.TexturesUsed[i] = ap.TexturesUsed[i];
+	program->TexturesUsed[i] = ap.TexturesUsed[i];
     program->FogOption          = ap.FogOption;
     program->UsesKill          = ap.UsesKill;
 
-    program->Base.Instructions = std::move(ap.Base.Instructions);
+    program->Instructions = std::move(ap.Base.Instructions);
 
-    if (program->Base.Parameters)
-	_mesa_free_parameter_list(program->Base.Parameters);
-    program->Base.Parameters    = ap.Base.Parameters;
+    if (program->Parameters)
+	_mesa_free_parameter_list(program->Parameters);
+    program->Parameters    = ap.Base.Parameters;
 
 #if DEBUG_FP
-    _mesa_printf("____________Fragment program %u ________\n", program->Base.ID);
+    _mesa_printf("____________Fragment program %u ________\n", program->ID);
     _mesa_print_program(&program->Base);
 #endif
 }
@@ -3864,28 +3864,28 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
     /* Copy the relevant contents of the arb_program struct into the
      * vertex_program struct.
      */
-    program->Base.String          = ap.Base.String;
-    program->Base.NumTemporaries  = ap.Base.NumTemporaries;
-    program->Base.NumParameters   = ap.Base.NumParameters;
-    program->Base.NumAttributes   = ap.Base.NumAttributes;
-    program->Base.NumAddressRegs  = ap.Base.NumAddressRegs;
-    program->Base.NumNativeInstructions = ap.Base.NumNativeInstructions;
-    program->Base.NumNativeTemporaries = ap.Base.NumNativeTemporaries;
-    program->Base.NumNativeParameters = ap.Base.NumNativeParameters;
-    program->Base.NumNativeAttributes = ap.Base.NumNativeAttributes;
-    program->Base.NumNativeAddressRegs = ap.Base.NumNativeAddressRegs;
-    program->Base.InputsRead     = ap.Base.InputsRead;
-    program->Base.OutputsWritten = ap.Base.OutputsWritten;
+    program->String          = ap.Base.String;
+    program->NumTemporaries  = ap.Base.NumTemporaries;
+    program->NumParameters   = ap.Base.NumParameters;
+    program->NumAttributes   = ap.Base.NumAttributes;
+    program->NumAddressRegs  = ap.Base.NumAddressRegs;
+    program->NumNativeInstructions = ap.Base.NumNativeInstructions;
+    program->NumNativeTemporaries = ap.Base.NumNativeTemporaries;
+    program->NumNativeParameters = ap.Base.NumNativeParameters;
+    program->NumNativeAttributes = ap.Base.NumNativeAttributes;
+    program->NumNativeAddressRegs = ap.Base.NumNativeAddressRegs;
+    program->InputsRead     = ap.Base.InputsRead;
+    program->OutputsWritten = ap.Base.OutputsWritten;
     program->IsPositionInvariant = ap.HintPositionInvariant;
 
-    program->Base.Instructions = std::move(ap.Base.Instructions);
+    program->Instructions = std::move(ap.Base.Instructions);
 
-    if (program->Base.Parameters)
-	_mesa_free_parameter_list(program->Base.Parameters);
-    program->Base.Parameters = ap.Base.Parameters;
+    if (program->Parameters)
+	_mesa_free_parameter_list(program->Parameters);
+    program->Parameters = ap.Base.Parameters;
 
 #if DEBUG_VP
-    _mesa_printf("____________Vertex program %u __________\n", program->Base.Id);
+    _mesa_printf("____________Vertex program %u __________\n", program->Id);
     _mesa_print_program(&program->Base);
 #endif
 }

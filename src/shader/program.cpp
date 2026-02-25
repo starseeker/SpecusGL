@@ -62,18 +62,18 @@ _mesa_init_program(GLcontext *ctx)
     GLuint i;
 
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
-    ctx->VertexProgram.Current = (struct gl_vertex_program *) ctx->Shared->DefaultVertexProgram;
+    ctx->VertexProgram.Current = static_cast<gl_vertex_program *>(ctx->Shared->DefaultVertexProgram);
     assert(ctx->VertexProgram.Current);
-    ctx->VertexProgram.Current->Base.ref();
+    ctx->VertexProgram.Current->ref();
     for (i = 0; i < MAX_NV_VERTEX_PROGRAM_PARAMS / 4; i++) {
 	ctx->VertexProgram.TrackMatrixTransform[i] = GL_IDENTITY_NV;
     }
 #endif
 
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program
-    ctx->FragmentProgram.Current = (struct gl_fragment_program *) ctx->Shared->DefaultFragmentProgram;
+    ctx->FragmentProgram.Current = static_cast<gl_fragment_program *>(ctx->Shared->DefaultFragmentProgram);
     assert(ctx->FragmentProgram.Current);
-    ctx->FragmentProgram.Current->Base.ref();
+    ctx->FragmentProgram.Current->ref();
 #endif
 
 #if FEATURE_ATI_fragment_shader
@@ -92,14 +92,14 @@ _mesa_free_program_data(GLcontext *ctx)
 {
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
     if (ctx->VertexProgram.Current) {
-	if (ctx->VertexProgram.Current->Base.unref())
-	    ctx->Driver.DeleteProgram(ctx, &(ctx->VertexProgram.Current->Base));
+	if (ctx->VertexProgram.Current->unref())
+	    ctx->Driver.DeleteProgram(ctx, ctx->VertexProgram.Current);
     }
 #endif
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program
     if (ctx->FragmentProgram.Current) {
-	if (ctx->FragmentProgram.Current->Base.unref())
-	    ctx->Driver.DeleteProgram(ctx, &(ctx->FragmentProgram.Current->Base));
+	if (ctx->FragmentProgram.Current->unref())
+	    ctx->Driver.DeleteProgram(ctx, ctx->FragmentProgram.Current);
     }
 #endif
     /* XXX probably move this stuff */
@@ -193,7 +193,7 @@ _mesa_init_fragment_program(GLcontext *ctx, struct gl_fragment_program *prog,
 			    GLenum target, GLuint id)
 {
     if (prog)
-	return _mesa_init_program_struct(ctx, &prog->Base, target, id);
+	return _mesa_init_program_struct(ctx, prog, target, id);
     else
 	return nullptr;
 }
@@ -207,7 +207,7 @@ _mesa_init_vertex_program(GLcontext *ctx, struct gl_vertex_program *prog,
 			  GLenum target, GLuint id)
 {
     if (prog)
-	return _mesa_init_program_struct(ctx, &prog->Base, target, id);
+	return _mesa_init_program_struct(ctx, prog, target, id);
     else
 	return nullptr;
 }
@@ -276,12 +276,12 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
 
     /* XXX this is a little ugly */
     if (prog->Target == GL_VERTEX_PROGRAM_ARB) {
-	struct gl_vertex_program *vprog = (struct gl_vertex_program *) prog;
+	struct gl_vertex_program *vprog = static_cast<gl_vertex_program *>(prog);
 	if (vprog->TnlData)
 	    delete static_cast<char *>(vprog->TnlData); /* should always be nullptr */
 	delete vprog;
     } else {
-	delete (struct gl_fragment_program *) prog;
+	delete static_cast<gl_fragment_program *>(prog);
     }
 }
 
@@ -351,14 +351,14 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 	case GL_VERTEX_PROGRAM_ARB: {
 	    const struct gl_vertex_program *vp
 		= (const struct gl_vertex_program *) prog;
-	    struct gl_vertex_program *vpc = (struct gl_vertex_program *) clone;
+	    struct gl_vertex_program *vpc = static_cast<gl_vertex_program *>(clone);
 	    vpc->IsPositionInvariant = vp->IsPositionInvariant;
 	}
 	break;
 	case GL_FRAGMENT_PROGRAM_ARB: {
 	    const struct gl_fragment_program *fp
 		= (const struct gl_fragment_program *) prog;
-	    struct gl_fragment_program *fpc = (struct gl_fragment_program *) clone;
+	    struct gl_fragment_program *fpc = static_cast<gl_fragment_program *>(clone);
 	    fpc->FogOption = fp->FogOption;
 	    fpc->UsesKill = fp->UsesKill;
 	}
@@ -417,12 +417,12 @@ _mesa_BindProgram(GLenum target, GLuint id)
     if ((target == GL_VERTEX_PROGRAM_ARB) && /* == GL_VERTEX_PROGRAM_NV */
 	(ctx->Extensions.NV_vertex_program ||
 	 ctx->Extensions.ARB_vertex_program)) {
-	curProg = &ctx->VertexProgram.Current->Base;
+	curProg = ctx->VertexProgram.Current;
     } else if ((target == GL_FRAGMENT_PROGRAM_NV
 		&& ctx->Extensions.NV_fragment_program) ||
 	       (target == GL_FRAGMENT_PROGRAM_ARB
 		&& ctx->Extensions.ARB_fragment_program)) {
-	curProg = &ctx->FragmentProgram.Current->Base;
+	curProg = ctx->FragmentProgram.Current;
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glBindProgramNV/ARB(target)");
 	return;
@@ -476,10 +476,10 @@ _mesa_BindProgram(GLenum target, GLuint id)
 
     /* bind newProg */
     if (target == GL_VERTEX_PROGRAM_ARB) { /* == GL_VERTEX_PROGRAM_NV */
-	ctx->VertexProgram.Current = (struct gl_vertex_program *) newProg;
+	ctx->VertexProgram.Current = static_cast<gl_vertex_program *>(newProg);
     } else if (target == GL_FRAGMENT_PROGRAM_NV ||
 	       target == GL_FRAGMENT_PROGRAM_ARB) {
-	ctx->FragmentProgram.Current = (struct gl_fragment_program *) newProg;
+	ctx->FragmentProgram.Current = static_cast<gl_fragment_program *>(newProg);
     }
     newProg->ref();
 
@@ -519,14 +519,14 @@ _mesa_DeletePrograms(GLsizei n, const GLuint *ids)
 		if (prog->Target == GL_VERTEX_PROGRAM_ARB || /* == GL_VERTEX_PROGRAM_NV */
 		    prog->Target == GL_VERTEX_STATE_PROGRAM_NV) {
 		    if (ctx->VertexProgram.Current &&
-			ctx->VertexProgram.Current->Base.Id == ids[i]) {
+			ctx->VertexProgram.Current->Id == ids[i]) {
 			/* unbind this currently bound program */
 			_mesa_BindProgram(prog->Target, 0);
 		    }
 		} else if (prog->Target == GL_FRAGMENT_PROGRAM_NV ||
 			   prog->Target == GL_FRAGMENT_PROGRAM_ARB) {
 		    if (ctx->FragmentProgram.Current &&
-			ctx->FragmentProgram.Current->Base.Id == ids[i]) {
+			ctx->FragmentProgram.Current->Id == ids[i]) {
 			/* unbind this currently bound program */
 			_mesa_BindProgram(prog->Target, 0);
 		    }

@@ -2687,9 +2687,9 @@ update_texture_state(GLcontext *ctx)
 	if (fprog || vprog) {
 	    enableBits = 0x0;
 	    if (fprog)
-		enableBits |= fprog->Base.TexturesUsed[unit];
+		enableBits |= fprog->TexturesUsed[unit];
 	    if (vprog)
-		enableBits |= vprog->Base.TexturesUsed[unit];
+		enableBits |= vprog->TexturesUsed[unit];
 	} else {
 	    if (!texUnit->Enabled)
 		continue;
@@ -2807,7 +2807,7 @@ update_texture_state(GLcontext *ctx)
     if (fprog) {
 	const GLuint coordMask = (1 << MAX_TEXTURE_COORD_UNITS) - 1;
 	ctx->Texture._EnabledCoordUnits
-	    = (fprog->Base.InputsRead >> FRAG_ATTRIB_TEX0) & coordMask;
+	    = (fprog->InputsRead >> FRAG_ATTRIB_TEX0) & coordMask;
     } else {
 	ctx->Texture._EnabledCoordUnits = ctx->Texture._EnabledUnits;
     }

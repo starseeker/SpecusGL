@@ -73,20 +73,20 @@ _mesa_clear_shader_program_data(GLcontext *ctx,
 				struct gl_shader_program *shProg)
 {
     if (shProg->VertexProgram) {
-	if (shProg->VertexProgram->Base.Parameters == shProg->Uniforms) {
+	if (shProg->VertexProgram->Parameters == shProg->Uniforms) {
 	    /* to prevent a double-free in the next call */
-	    shProg->VertexProgram->Base.Parameters = nullptr;
+	    shProg->VertexProgram->Parameters = nullptr;
 	}
-	ctx->Driver.DeleteProgram(ctx, &shProg->VertexProgram->Base);
+	ctx->Driver.DeleteProgram(ctx, shProg->VertexProgram);
 	shProg->VertexProgram = nullptr;
     }
 
     if (shProg->FragmentProgram) {
-	if (shProg->FragmentProgram->Base.Parameters == shProg->Uniforms) {
+	if (shProg->FragmentProgram->Parameters == shProg->Uniforms) {
 	    /* to prevent a double-free in the next call */
-	    shProg->FragmentProgram->Base.Parameters = nullptr;
+	    shProg->FragmentProgram->Parameters = nullptr;
 	}
-	ctx->Driver.DeleteProgram(ctx, &shProg->FragmentProgram->Base);
+	ctx->Driver.DeleteProgram(ctx, shProg->FragmentProgram);
 	shProg->FragmentProgram = nullptr;
     }
 
@@ -467,7 +467,7 @@ _mesa_bind_attrib_location(GLcontext *ctx, GLuint program, GLuint index,
 	/* If the index changed, need to search/replace references to that attribute
 	 * in the vertex program.
 	 */
-	_slang_remap_attribute(&shProg->VertexProgram->Base, oldIndex, index);
+	_slang_remap_attribute(shProg->VertexProgram, oldIndex, index);
     }
 }
 
@@ -1252,9 +1252,9 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
 
     if (shProg->Uniforms->Parameters[location].Type == PROGRAM_SAMPLER) {
 	if (shProg->VertexProgram)
-	    _slang_resolve_samplers(shProg, &shProg->VertexProgram->Base);
+	    _slang_resolve_samplers(shProg, shProg->VertexProgram);
 	if (shProg->FragmentProgram)
-	    _slang_resolve_samplers(shProg, &shProg->FragmentProgram->Base);
+	    _slang_resolve_samplers(shProg, shProg->FragmentProgram);
 	FLUSH_VERTICES(ctx, _NEW_TEXTURE);
     }
 }
