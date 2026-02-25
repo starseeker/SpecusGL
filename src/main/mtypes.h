@@ -2308,6 +2308,24 @@ struct gl_shared_state {
 	_mesa_HashRemove(ATIShaders, id);
     }
 #endif
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * shared state should now be freed (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2511,6 +2529,24 @@ struct gl_framebuffer {
 
     /** Virtual destructor – releases attached renderbuffers. */
     virtual ~gl_framebuffer();
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * framebuffer should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 

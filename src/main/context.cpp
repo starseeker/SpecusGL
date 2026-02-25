@@ -991,10 +991,7 @@ _mesa_initialize_context(GLcontext *ctx,
 	    return GL_FALSE;
 	}
     }
-    {
-	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	ctx->Shared->RefCount++;
-    }
+    ctx->Shared->ref();
 
     if (!init_attrib_groups(ctx)) {
 	free_shared_state(ctx, ctx->Shared);
@@ -1120,12 +1117,7 @@ _mesa_free_context_data(GLcontext *ctx)
     delete ctx->Save;
 
     /* Shared context state (display lists, textures, etc) */
-    {
-	std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	ctx->Shared->RefCount--;
-	assert(ctx->Shared->RefCount >= 0);
-    }
-    if (ctx->Shared->RefCount == 0) {
+    if (ctx->Shared->unref()) {
 	/* free shared state */
 	free_shared_state(ctx, ctx->Shared);
     }
@@ -1483,18 +1475,10 @@ GLboolean
 _mesa_share_state(GLcontext *ctx, GLcontext *ctxToShare)
 {
     if (ctx && ctxToShare && ctx->Shared && ctxToShare->Shared) {
-	{
-	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	    ctx->Shared->RefCount--;
-	}
-	if (ctx->Shared->RefCount == 0) {
+	if (ctx->Shared->unref())
 	    free_shared_state(ctx, ctx->Shared);
-	}
 	ctx->Shared = ctxToShare->Shared;
-	{
-	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	    ctx->Shared->RefCount++;
-	}
+	ctx->Shared->ref();
 	return GL_TRUE;
     } else {
 	return GL_FALSE;
