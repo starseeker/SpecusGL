@@ -38,11 +38,11 @@
 void
 _mesa_init_instructions(struct prog_instruction *inst, GLuint count)
 {
-    GLuint i;
+    for (GLuint i = 0; i < count; i++) {
+	/* Assign a default-constructed instruction to properly reset all fields,
+	 * including the std::string Comment (avoids undefined memset). */
+	inst[i] = prog_instruction{};
 
-    _mesa_bzero(inst, count * sizeof(struct prog_instruction));
-
-    for (i = 0; i < count; i++) {
 	inst[i].SrcReg[0].File = PROGRAM_UNDEFINED;
 	inst[i].SrcReg[0].Swizzle = SWIZZLE_NOOP;
 	inst[i].SrcReg[1].File = PROGRAM_UNDEFINED;
