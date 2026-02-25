@@ -2029,8 +2029,7 @@ struct gl_shader {
 
     std::string Source;  /**< Source code string */
     GLboolean CompileStatus;
-    GLuint NumPrograms;  /**< size of Programs[] array */
-    struct gl_program **Programs;  /**< Post-compile assembly code */
+    std::vector<struct gl_program *> Programs;  /**< Post-compile assembly code */
     std::string InfoLog;
 };
 

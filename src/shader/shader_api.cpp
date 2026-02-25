@@ -234,12 +234,11 @@ void
 _mesa_free_shader(GLcontext *ctx, struct gl_shader *sh)
 {
     GLuint i;
-    for (i = 0; i < sh->NumPrograms; i++) {
-	assert(sh->Programs[i]);
-	ctx->Driver.DeleteProgram(ctx, sh->Programs[i]);
+    for (auto *prog : sh->Programs) {
+	assert(prog);
+	ctx->Driver.DeleteProgram(ctx, prog);
     }
-    delete[] sh->Programs;
-    sh->Programs = nullptr;
+    /* Programs vector clears itself on delete */
     delete sh;
 }
 

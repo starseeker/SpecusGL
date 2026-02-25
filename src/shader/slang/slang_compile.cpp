@@ -2116,16 +2116,14 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
     ctx->Shader.MemPool = _slang_new_mempool(1024*1024);
 
     /* XXX temporary hack */
-    if (!shader->Programs) {
+    if (shader->Programs.empty()) {
 	GLenum progTarget;
 	if (shader->Type == GL_VERTEX_SHADER)
 	    progTarget = GL_VERTEX_PROGRAM_ARB;
 	else
 	    progTarget = GL_FRAGMENT_PROGRAM_ARB;
-	shader->Programs
-	    = (struct gl_program **) malloc(sizeof(struct gl_program*));
+	shader->Programs.resize(1);
 	shader->Programs[0] = ctx->Driver.NewProgram(ctx, progTarget, 1);
-	shader->NumPrograms = 1;
 
 	shader->Programs[0]->Parameters = _mesa_new_parameter_list();
 	shader->Programs[0]->Varying = _mesa_new_parameter_list();
