@@ -335,9 +335,9 @@ static GLboolean run_render(GLcontext *ctx,
 
 const struct tnl_pipeline_stage _tnl_render_stage = {
     "render",			/* name */
-    nullptr,			/* private data */
-    nullptr,			/* creator */
-    nullptr,			/* destructor */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter */
+    nullptr,			/* create */
     nullptr,			/* validate */
     run_render			/* run */
 };

@@ -238,30 +238,26 @@ struct vertex_buffer {
 struct tnl_pipeline_stage {
     const char *name;
 
-    /* Private data for the pipeline stage:
-     */
+    /** Private data for the pipeline stage (set by create, freed by privateDeleter). */
     void *privatePtr;
 
-    /* Allocate private data
+    /**
+     * Type-erased deleter for privatePtr.  Set by the stage's create function.
+     * Replaces the old per-stage destroy callback; called automatically by
+     * _tnl_destroy_pipeline().  Keeps each stage free of boilerplate
+     * delete-and-null cleanup code.
      */
+    void (*privateDeleter)(void *);
+
+    /** Allocate private data (called once when the pipeline is installed). */
     GLboolean(*create)(GLcontext *ctx, struct tnl_pipeline_stage *);
 
-    /* Free private data.
-     */
-    void (*destroy)(struct tnl_pipeline_stage *);
-
-    /* Called on any statechange or input array size change or
-     * input array change to/from zero stride.
-     */
+    /** Called on any statechange, input array size change, or stride change. */
     void (*validate)(GLcontext *ctx, struct tnl_pipeline_stage *);
 
-    /* Called from _tnl_run_pipeline().  The stage.changed_inputs value
-     * encodes all inputs to thee struct which have changed.  If
-     * non-zero, recompute all affected outputs of the stage, otherwise
-     * execute any 'sideeffects' of the stage.
-     *
-     * Return value: GL_TRUE - keep going
-     *               GL_FALSE - finished pipeline
+    /**
+     * Called from _tnl_run_pipeline().
+     * Return value: GL_TRUE - keep going, GL_FALSE - finished pipeline.
      */
     GLboolean(*run)(GLcontext *ctx, struct tnl_pipeline_stage *);
 };

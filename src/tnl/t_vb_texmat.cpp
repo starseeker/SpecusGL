@@ -88,41 +88,29 @@ static GLboolean alloc_texmat_data(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-    struct texmat_stage_data *store;
     GLuint i;
 
-    stage->privatePtr = new texmat_stage_data{};
-    store = TEXMAT_STAGE_DATA(stage);
+    auto *store = new texmat_stage_data{};
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<texmat_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
-	_mesa_vector4f_alloc(&store->texcoord[i], 0, VB->Size, 32);
+	store->texcoord[i].alloc(0, VB->Size, 32);
 
     return GL_TRUE;
 }
 
 
-static void free_texmat_data(struct tnl_pipeline_stage *stage)
-{
-    struct texmat_stage_data *store = TEXMAT_STAGE_DATA(stage);
-
-    if (store) {
-	/* texcoord[] freed automatically by GLvector4f destructors */
-	delete store;
-	stage->privatePtr = nullptr;
-    }
-}
-
-
 
 const struct tnl_pipeline_stage _tnl_texture_transform_stage = {
-    "texture transform",			/* name */
-    nullptr,				/* private data */
-    alloc_texmat_data,
-    free_texmat_data,			/* destructor */
-    nullptr,
-    run_texmat_stage,
+    "texture transform",	/* name */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    alloc_texmat_data,		/* create */
+    nullptr,			/* validate */
+    run_texmat_stage,		/* run */
 };
 
 /*

@@ -568,12 +568,13 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
     GLuint i;
     auto *store = new texgen_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<texgen_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
-	_mesa_vector4f_alloc(&store->texcoord[i], 0, VB->Size, 32);
+	store->texcoord[i].alloc(0, VB->Size, 32);
 
     store->tmp_f = new GLfloat[VB->Size][3];
     store->tmp_m = new GLfloat[VB->Size];
@@ -582,25 +583,13 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
 }
 
 
-static void free_texgen_data(struct tnl_pipeline_stage *stage)
-{
-    struct texgen_stage_data *store = TEXGEN_STAGE_DATA(stage);
-
-    if (store) {
-	/* texcoord[], tmp_f, tmp_m released by texgen_stage_data dtor */
-	delete store;
-	stage->privatePtr = nullptr;
-    }
-}
-
-
 
 const struct tnl_pipeline_stage _tnl_texgen_stage = {
     "texgen",			/* name */
-    nullptr,			/* private data */
-    alloc_texgen_data,		/* destructor */
-    free_texgen_data,		/* destructor */
-    validate_texgen_stage,		/* check */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    alloc_texgen_data,		/* create */
+    validate_texgen_stage,	/* validate */
     run_texgen_stage		/* run -- initially set to alloc data */
 };
 

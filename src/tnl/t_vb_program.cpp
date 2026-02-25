@@ -474,37 +474,22 @@ init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     const GLuint size = VB->Size;
     GLuint i;
     auto *store = new vp_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<vp_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
     /* Allocate arrays of vertex output values */
     for (i = 0; i < VERT_RESULT_MAX; i++) {
-	_mesa_vector4f_alloc(&store->results[i], 0, size, 32);
+	store->results[i].alloc(0, size, 32);
 	store->results[i].size = 4;
     }
 
     /* a few other misc allocations */
-    _mesa_vector4f_alloc(&store->ndcCoords, 0, size, 32);
+    store->ndcCoords.alloc(0, size, 32);
     store->clipmask = make_aligned_array<GLubyte>(size, 32);
 
     return GL_TRUE;
-}
-
-
-/**
- * Destructor for this pipeline stage.
- */
-static void
-dtr(struct tnl_pipeline_stage *stage)
-{
-    struct vp_stage_data *store = VP_STAGE_DATA(stage);
-
-    if (store) {
-	/* GLvector4f members and clipmask released by vp_stage_data dtor */
-	delete store;
-	stage->privatePtr = nullptr;
-    }
 }
 
 
@@ -523,9 +508,9 @@ validate_vp_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
  */
 const struct tnl_pipeline_stage _tnl_vertex_program_stage = {
     "vertex-program",
-    nullptr,			/* private_data */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
     init_vp,			/* create */
-    dtr,				/* destroy */
     validate_vp_stage, 		/* validate */
     run_vp			/* run -- initially set to ctr */
 };

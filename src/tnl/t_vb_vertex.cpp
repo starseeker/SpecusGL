@@ -216,17 +216,17 @@ static GLboolean init_vertex_stage(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-    struct vertex_stage_data *store;
     GLuint size = VB->Size;
 
-    stage->privatePtr = new vertex_stage_data{};
-    store = VERTEX_STAGE_DATA(stage);
+    auto *store = new vertex_stage_data{};
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<vertex_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
-    _mesa_vector4f_alloc(&store->eye, 0, size, 32);
-    _mesa_vector4f_alloc(&store->clip, 0, size, 32);
-    _mesa_vector4f_alloc(&store->proj, 0, size, 32);
+    store->eye.alloc(0, size, 32);
+    store->clip.alloc(0, size, 32);
+    store->proj.alloc(0, size, 32);
 
     store->clipmask = make_aligned_array<GLubyte>(size, 32);
 
@@ -239,25 +239,13 @@ static GLboolean init_vertex_stage(GLcontext *ctx,
     return GL_TRUE;
 }
 
-static void dtr(struct tnl_pipeline_stage *stage)
-{
-    struct vertex_stage_data *store = VERTEX_STAGE_DATA(stage);
-
-    if (store) {
-	/* GLvector4f members and clipmask released by vertex_stage_data dtor */
-	delete store;
-	stage->privatePtr = nullptr;
-	stage->run = init_vertex_stage;
-    }
-}
-
 
 const struct tnl_pipeline_stage _tnl_vertex_transform_stage = {
     "modelview/project/cliptest/divide",
-    nullptr,			/* private data */
-    init_vertex_stage,
-    dtr,				/* destructor */
-    nullptr,
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    init_vertex_stage,		/* create */
+    nullptr,			/* validate */
     run_vertex_stage		/* run -- initially set to init */
 };
 

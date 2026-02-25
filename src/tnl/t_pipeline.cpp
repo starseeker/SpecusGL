@@ -44,11 +44,19 @@ void _tnl_install_pipeline(GLcontext *ctx,
 
     tnl->pipeline.new_state = ~0;
 
-    /* Create a writeable copy of each stage.
+    /* Initialise each stage from its descriptor.  Copy only the
+     * descriptor fields (name, create, validate, run); privatePtr and
+     * privateDeleter start null and are filled in by create().
+     * Avoids memcpy of a struct that now has semantic field ordering.
      */
     for (i = 0 ; i < MAX_PIPELINE_STAGES && stages[i] ; i++) {
 	struct tnl_pipeline_stage *s = &tnl->pipeline.stages[i];
-	memcpy(s, stages[i], sizeof(*s));
+	s->name          = stages[i]->name;
+	s->privatePtr    = nullptr;
+	s->privateDeleter = nullptr;
+	s->create        = stages[i]->create;
+	s->validate      = stages[i]->validate;
+	s->run           = stages[i]->run;
 	if (s->create)
 	    s->create(ctx, s);
     }
@@ -63,8 +71,11 @@ void _tnl_destroy_pipeline(GLcontext *ctx)
 
     for (i = 0 ; i < tnl->pipeline.nr_stages ; i++) {
 	struct tnl_pipeline_stage *s = &tnl->pipeline.stages[i];
-	if (s->destroy)
-	    s->destroy(s);
+	if (s->privatePtr && s->privateDeleter) {
+	    s->privateDeleter(s->privatePtr);
+	    s->privatePtr     = nullptr;
+	    s->privateDeleter = nullptr;
+	}
     }
 
     tnl->pipeline.nr_stages = 0;
