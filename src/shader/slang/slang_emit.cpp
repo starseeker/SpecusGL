@@ -47,6 +47,8 @@
 #include "slang_emit.h"
 #include "slang_mem.h"
 
+#include <vector>
+
 
 #define PEEPHOLE_OPTIMIZATIONS 1
 #define ANNOTATE 0
@@ -56,7 +58,7 @@ typedef struct {
     slang_info_log *log;
     slang_var_table *vt;
     struct gl_program *prog;
-    struct gl_program **Subroutines;
+    std::vector<struct gl_program *> Subroutines;
     GLuint NumSubroutines;
 
     /* code-gen options */
@@ -72,13 +74,10 @@ static struct gl_program *
 new_subroutine(slang_emit_info *emitInfo, GLuint *id)
 {
     GET_CURRENT_CONTEXT(ctx);
-    const GLuint n = emitInfo->NumSubroutines;
+    const GLuint n = static_cast<GLuint>(emitInfo->Subroutines.size());
 
-    emitInfo->Subroutines = (struct gl_program **)
-			    _mesa_realloc(emitInfo->Subroutines,
-					  n * sizeof(struct gl_program *),
-					  (n + 1) * sizeof(struct gl_program *));
-    emitInfo->Subroutines[n] = ctx->Driver.NewProgram(ctx, emitInfo->prog->Target, 0);
+    emitInfo->Subroutines.push_back(
+	ctx->Driver.NewProgram(ctx, emitInfo->prog->Target, 0));
     emitInfo->Subroutines[n]->Parameters = emitInfo->prog->Parameters;
     emitInfo->NumSubroutines++;
     *id = n;
@@ -1726,10 +1725,9 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_program *mainP = emitInfo->prog;
-    GLuint *subroutineLoc, i, total;
+    GLuint i, total;
 
-    subroutineLoc
-	= (GLuint *) malloc(emitInfo->NumSubroutines * sizeof(GLuint));
+    std::vector<GLuint> subroutineLoc(emitInfo->NumSubroutines);
 
     /* total number of instructions */
     total = mainP->NumInstructions;
@@ -1765,11 +1763,8 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 	_mesa_delete_program(ctx, sub);
     }
 
-    /* free subroutine list */
-    if (emitInfo->Subroutines) {
-	free(emitInfo->Subroutines);
-	emitInfo->Subroutines = nullptr;
-    }
+    /* clear subroutine list (vector cleans up memory automatically) */
+    emitInfo->Subroutines.clear();
     emitInfo->NumSubroutines = 0;
 
     /* Examine CAL instructions.
@@ -1785,8 +1780,6 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 	    inst->BranchTarget = subroutineLoc[f];
 	}
     }
-
-    free(subroutineLoc);
 }
 
 
@@ -1804,7 +1797,6 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
     emitInfo.log = log;
     emitInfo.vt = vt;
     emitInfo.prog = prog;
-    emitInfo.Subroutines = nullptr;
     emitInfo.NumSubroutines = 0;
 
     emitInfo.EmitHighLevelInstructions = ctx->Shader.EmitHighLevelInstructions;
