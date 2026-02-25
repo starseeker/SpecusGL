@@ -937,7 +937,7 @@ struct gl_line_attrib {
  * Display list attribute group (GL_LIST_BIT).
  */
 struct gl_list_attrib {
-    GLuint ListBase;
+    GLuint ListBase = 0;
 };
 
 
@@ -3115,13 +3115,13 @@ struct mesa_display_list {
  * State used during display list compilation and execution.
  */
 struct gl_dlist_state {
-    GLuint CallDepth;		/**< Current recursion calling depth */
+    GLuint CallDepth = 0;	/**< Current recursion calling depth */
 
-    struct mesa_display_list *CurrentList;
-    Node *CurrentListPtr;	/**< Head of list being compiled */
-    GLuint CurrentListNum;	/**< Number of the list being compiled */
-    Node *CurrentBlock;		/**< Pointer to current block of nodes */
-    GLuint CurrentPos;		/**< Index into current block of nodes */
+    struct mesa_display_list *CurrentList = nullptr;
+    Node *CurrentListPtr = nullptr;	/**< Head of list being compiled */
+    GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
+    Node *CurrentBlock = nullptr;	/**< Pointer to current block of nodes */
+    GLuint CurrentPos = 0;	/**< Index into current block of nodes */
 
     GLvertexformat ListVtxfmt;
 
@@ -3192,8 +3192,8 @@ struct __GLcontextRec {
     /** \name Display lists */
     struct gl_dlist_state ListState;
 
-    GLboolean ExecuteFlag;	/**< Execute GL commands? */
-    GLboolean CompileFlag;	/**< Compile GL commands into display list? */
+    GLboolean ExecuteFlag = GL_TRUE;	/**< Execute GL commands? */
+    GLboolean CompileFlag = GL_FALSE;	/**< Compile GL commands into display list? */
 
     /** Extension information */
     struct gl_extensions Extensions;

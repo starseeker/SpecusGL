@@ -8482,18 +8482,9 @@ _mesa_init_display_list(GLcontext *ctx)
 	tableInitialized = GL_TRUE;
     }
 
-    /* Display list */
-    ctx->ListState.CallDepth = 0;
-    ctx->ExecuteFlag = GL_TRUE;
-    ctx->CompileFlag = GL_FALSE;
-    ctx->ListState.CurrentListPtr = nullptr;
-    ctx->ListState.CurrentBlock = nullptr;
-    ctx->ListState.CurrentListNum = 0;
-    ctx->ListState.CurrentPos = 0;
-
-    /* Display List group */
-    ctx->List.ListBase = 0;
-
+    /* All gl_dlist_state / ExecuteFlag / CompileFlag fields are
+     * default-initialised by in-class member initializers.
+     * Only ListVtxfmt requires active initialisation. */
     _mesa_save_vtxfmt_init(&ctx->ListState.ListVtxfmt);
 }
 
