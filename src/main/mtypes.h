@@ -2127,6 +2127,15 @@ struct gl_shader {
     GLboolean CompileStatus;
     std::vector<struct gl_program *> Programs;  /**< Post-compile assembly code */
     std::string InfoLog;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -2150,6 +2159,15 @@ struct gl_shader_program {
     GLboolean LinkStatus;   /**< GL_LINK_STATUS */
     GLboolean Validated;
     std::string InfoLog;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 

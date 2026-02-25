@@ -162,16 +162,10 @@ _mesa_reference_shader_program(GLcontext *ctx,
     }
     if (*ptr) {
 	/* Unreference the old shader program */
-	GLboolean deleteFlag = GL_FALSE;
 	struct gl_shader_program *old = *ptr;
 
 	ASSERT(old->RefCount > 0);
-	old->RefCount--;
-	/*printf("SHPROG DECR %p (%d) to %d\n",
-	  (void*) old, old->Name, old->RefCount);*/
-	deleteFlag = (old->RefCount == 0);
-
-	if (deleteFlag) {
+	if (old->unref()) {
 	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader_program(ctx, old);
 	}
@@ -181,9 +175,7 @@ _mesa_reference_shader_program(GLcontext *ctx,
     assert(!*ptr);
 
     if (shProg) {
-	shProg->RefCount++;
-	/*printf("SHPROG INCR %p (%d) to %d\n",
-	  (void*) shProg, shProg->Name, shProg->RefCount);*/
+	shProg->ref();
 	*ptr = shProg;
     }
 }
@@ -258,16 +250,10 @@ _mesa_reference_shader(GLcontext *ctx, struct gl_shader **ptr,
     }
     if (*ptr) {
 	/* Unreference the old shader */
-	GLboolean deleteFlag = GL_FALSE;
 	struct gl_shader *old = *ptr;
 
 	ASSERT(old->RefCount > 0);
-	old->RefCount--;
-	/*printf("SHADER DECR %p (%d) to %d\n",
-	  (void*) old, old->Name, old->RefCount);*/
-	deleteFlag = (old->RefCount == 0);
-
-	if (deleteFlag) {
+	if (old->unref()) {
 	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader(ctx, old);
 	}
@@ -278,9 +264,7 @@ _mesa_reference_shader(GLcontext *ctx, struct gl_shader **ptr,
 
     if (sh) {
 	/* reference new */
-	sh->RefCount++;
-	/*printf("SHADER INCR %p (%d) to %d\n",
-	  (void*) sh, sh->Name, sh->RefCount);*/
+	sh->ref();
 	*ptr = sh;
     }
 }
