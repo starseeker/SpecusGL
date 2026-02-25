@@ -55,7 +55,7 @@
  * optimization!  If we find that's not true on some systems, convert
  * to a macro.
  */
-static INLINE GLfloat
+static inline GLfloat
 lerp_2d(GLfloat a, GLfloat b,
 	GLfloat v00, GLfloat v10, GLfloat v01, GLfloat v11)
 {
@@ -69,7 +69,7 @@ lerp_2d(GLfloat a, GLfloat b,
  * Do 2D/biliner interpolation of integer values.
  * \sa lerp_2d
  */
-static INLINE GLint
+static inline GLint
 ilerp_2d(GLint ia, GLint ib,
 	 GLint v00, GLint v10, GLint v01, GLint v11)
 {
@@ -84,7 +84,7 @@ ilerp_2d(GLint ia, GLint ib,
  * Do 3D/trilinear interpolation of float values.
  * \sa lerp_2d
  */
-static INLINE GLfloat
+static inline GLfloat
 lerp_3d(GLfloat a, GLfloat b, GLfloat c,
 	GLfloat v000, GLfloat v100, GLfloat v010, GLfloat v110,
 	GLfloat v001, GLfloat v101, GLfloat v011, GLfloat v111)
@@ -103,7 +103,7 @@ lerp_3d(GLfloat a, GLfloat b, GLfloat c,
  * Do 3D/trilinear interpolation of integer values.
  * \sa lerp_2d
  */
-static INLINE GLint
+static inline GLint
 ilerp_3d(GLint ia, GLint ib, GLint ic,
 	 GLint v000, GLint v100, GLint v010, GLint v110,
 	 GLint v001, GLint v101, GLint v011, GLint v111)
@@ -122,7 +122,7 @@ ilerp_3d(GLint ia, GLint ib, GLint ic,
 /**
  * Do linear interpolation of colors.
  */
-static INLINE void
+static inline void
 lerp_rgba(GLchan result[4], GLfloat t, const GLchan a[4], const GLchan b[4])
 {
 #if CHAN_TYPE == GL_FLOAT
@@ -150,7 +150,7 @@ lerp_rgba(GLchan result[4], GLfloat t, const GLchan a[4], const GLchan b[4])
 /**
  * Do bilinear interpolation of colors.
  */
-static INLINE void
+static inline void
 lerp_rgba_2d(GLchan result[4], GLfloat a, GLfloat b,
 	     const GLchan t00[4], const GLchan t10[4],
 	     const GLchan t01[4], const GLchan t11[4])
@@ -177,7 +177,7 @@ lerp_rgba_2d(GLchan result[4], GLfloat a, GLfloat b,
 }
 
 
-static INLINE void
+static inline void
 lerp_rgba_f(GLfloat result[4], GLfloat t,
 	    const GLfloat a[4], const GLfloat b[4])
 {
@@ -187,7 +187,7 @@ lerp_rgba_f(GLfloat result[4], GLfloat t,
     result[3] = a[3] + t * (b[3] - a[3]);
 }
 
-static INLINE void
+static inline void
 lerp_rgba_2d_f(GLfloat result[4], GLfloat a, GLfloat b,
 	       const GLfloat t00[4], const GLfloat t10[4],
 	       const GLfloat t01[4], const GLfloat t11[4])
@@ -201,7 +201,7 @@ lerp_rgba_2d_f(GLfloat result[4], GLfloat a, GLfloat b,
 /**
  * Do trilinear interpolation of colors.
  */
-static INLINE void
+static inline void
 lerp_rgba_3d(GLchan result[4], GLfloat a, GLfloat b, GLfloat c,
 	     const GLchan t000[4], const GLchan t100[4],
 	     const GLchan t010[4], const GLchan t110[4],
@@ -237,7 +237,7 @@ lerp_rgba_3d(GLchan result[4], GLfloat a, GLfloat b, GLfloat c,
  * Compute the remainder of a divided by b, but be careful with
  * negative values so that GL_REPEAT mode works right.
  */
-static INLINE GLint
+static inline GLint
 repeat_remainder(GLint a, GLint b)
 {
     if (a >= 0)
@@ -507,7 +507,7 @@ repeat_remainder(GLint a, GLint b)
  * For linear interpolation between mipmap levels N and N+1, this function
  * computes N.
  */
-static INLINE GLint
+static inline GLint
 linear_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
 {
     if (lambda < 0.0F)
@@ -522,7 +522,7 @@ linear_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
 /**
  * Compute the nearest mipmap level to take texels from.
  */
-static INLINE GLint
+static inline GLint
 nearest_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
 {
     GLfloat l;
@@ -569,7 +569,7 @@ nearest_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
  * will be minified, magnified, or split between the two.  This function
  * determines the subranges in [0, n-1] that are to be minified or magnified.
  */
-static INLINE void
+static inline void
 compute_min_mag_ranges(const struct gl_texture_object *tObj,
 		       GLuint n, const GLfloat lambda[],
 		       GLuint *minStart, GLuint *minEnd,
@@ -931,7 +931,7 @@ sample_lambda_1d(GLcontext *ctx,
 
 
 /* Float-output nearest 2D sample (helper) */
-static INLINE void
+static inline void
 sample_2d_nearest_f(GLcontext *ctx,
 		    const struct gl_texture_object *tObj,
 		    const struct gl_texture_image *img,
@@ -953,7 +953,7 @@ sample_2d_nearest_f(GLcontext *ctx,
 }
 
 /* Float-output linear 2D sample (helper) */
-static INLINE void
+static inline void
 sample_2d_linear_f(GLcontext *ctx,
 		   const struct gl_texture_object *tObj,
 		   const struct gl_texture_image *img,
@@ -996,7 +996,7 @@ sample_2d_linear_f(GLcontext *ctx,
 /*
  * Return the texture sample for coordinate (s,t) using GL_NEAREST filter.
  */
-static INLINE void
+static inline void
 sample_2d_nearest(GLcontext *ctx,
 		  const struct gl_texture_object *tObj,
 		  const struct gl_texture_image *img,
@@ -1030,7 +1030,7 @@ sample_2d_nearest(GLcontext *ctx,
  * Return the texture sample for coordinate (s,t) using GL_LINEAR filter.
  * New sampling code contributed by Lynn Quam <quam@ai.sri.com>.
  */
-static INLINE void
+static inline void
 sample_2d_linear(GLcontext *ctx,
 		 const struct gl_texture_object *tObj,
 		 const struct gl_texture_image *img,
@@ -1097,7 +1097,7 @@ sample_2d_linear(GLcontext *ctx,
  * As above, but we know WRAP_S == REPEAT and WRAP_T == REPEAT.
  * We don't have to worry about the texture border.
  */
-static INLINE void
+static inline void
 sample_2d_linear_repeat(GLcontext *ctx,
 			const struct gl_texture_object *tObj,
 			const struct gl_texture_image *img,
@@ -2273,7 +2273,7 @@ sample_lambda_cube(GLcontext *ctx,
 /**
  * Do clamp/wrap for a texture rectangle coord, GL_NEAREST filter mode.
  */
-static INLINE GLint
+static inline GLint
 clamp_rect_coord_nearest(GLenum wrapMode, GLfloat coord, GLint max)
 {
     if (wrapMode == GL_CLAMP) {
@@ -2289,7 +2289,7 @@ clamp_rect_coord_nearest(GLenum wrapMode, GLfloat coord, GLint max)
 /*
  * As above, but GL_LINEAR filtering.
  */
-static INLINE void
+static inline void
 clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
 			GLint *i0out, GLint *i1out)
 {

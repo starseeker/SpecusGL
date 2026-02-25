@@ -151,7 +151,7 @@ do {									\
    if (ctx->Driver.CurrentSavePrimitive <= GL_POLYGON ||		\
        ctx->Driver.CurrentSavePrimitive == PRIM_INSIDE_UNKNOWN_PRIM) {	\
       _mesa_compile_error( ctx, GL_INVALID_OPERATION, "begin/end" );	\
-      delete[] _tofree;						\
+      ::operator delete[](_tofree);					\
       return;								\
    }									\
 } while (0)
@@ -460,7 +460,7 @@ make_list(GLuint list, GLuint count)
 /**
  * Lookup function to just encapsulate casting.
  */
-static INLINE struct mesa_display_list *
+static inline struct mesa_display_list *
 lookup_list(GLcontext *ctx, GLuint list)
 {
     return (struct mesa_display_list *)

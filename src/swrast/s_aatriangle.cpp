@@ -44,7 +44,7 @@
  * vertices and the given Z values.
  * A point (x,y,z) lies on plane iff a*x+b*y+c*z+d = 0.
  */
-static INLINE void
+static inline void
 compute_plane(const GLfloat v0[], const GLfloat v1[], const GLfloat v2[],
 	      GLfloat z0, GLfloat z1, GLfloat z2, GLfloat plane[4])
 {
@@ -77,7 +77,7 @@ compute_plane(const GLfloat v0[], const GLfloat v1[], const GLfloat v2[],
 /*
  * Compute coefficients of a plane with a constant Z value.
  */
-static INLINE void
+static inline void
 constant_plane(GLfloat value, GLfloat plane[4])
 {
     plane[0] = 0.0;
@@ -99,7 +99,7 @@ do {					\
 /*
  * Solve plane equation for Z at (X,Y).
  */
-static INLINE GLfloat
+static inline GLfloat
 solve_plane(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     ASSERT(plane[2] != 0.0F);
@@ -114,7 +114,7 @@ solve_plane(GLfloat x, GLfloat y, const GLfloat plane[4])
 /*
  * Return 1 / solve_plane().
  */
-static INLINE GLfloat
+static inline GLfloat
 solve_plane_recip(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     const GLfloat denom = plane[3] + plane[0] * x + plane[1] * y;
@@ -128,7 +128,7 @@ solve_plane_recip(GLfloat x, GLfloat y, const GLfloat plane[4])
 /*
  * Solve plane and return clamped GLchan value.
  */
-static INLINE GLchan
+static inline GLchan
 solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     const GLfloat z = (plane[3] + plane[0] * x + plane[1] * y) / -plane[2];
@@ -369,7 +369,7 @@ index_aa_tri(GLcontext *ctx,
  * \param cx, cy  fragment center position
  * \param unit  texture unit
  */
-static INLINE GLfloat
+static inline GLfloat
 compute_lambda(GLcontext *ctx,
 	       const GLfloat sPlane[4], const GLfloat tPlane[4],
 	       const GLfloat qPlane[4], GLfloat cx, GLfloat cy,

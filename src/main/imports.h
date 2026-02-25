@@ -158,7 +158,7 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 /* Pretty fast, and accurate.
  * Based on code from http://www.flipcode.com/totd/
  */
-static INLINE GLfloat LOG2(GLfloat val)
+static inline GLfloat LOG2(GLfloat val)
 {
     fi_type num;
     GLint log_2;
@@ -182,7 +182,7 @@ static INLINE GLfloat LOG2(GLfloat val)
  *** IS_INF_OR_NAN: test if float is infinite or NaN
  ***/
 #ifdef USE_IEEE
-static INLINE int IS_INF_OR_NAN(float x)
+static inline int IS_INF_OR_NAN(float x)
 {
     fi_type tmp;
     tmp.f = x;
@@ -203,7 +203,7 @@ static INLINE int IS_INF_OR_NAN(float x)
  *** IS_NEGATIVE: test if float is negative
  ***/
 #if defined(USE_IEEE)
-static INLINE int GET_FLOAT_BITS(float x)
+static inline int GET_FLOAT_BITS(float x)
 {
     fi_type fi;
     fi.f = x;
@@ -249,7 +249,7 @@ static INLINE int GET_FLOAT_BITS(float x)
  *** IFLOOR: return (as an integer) floor of float
  ***/
 #if   defined(USE_IEEE)
-static INLINE int ifloor(float f)
+static inline int ifloor(float f)
 {
     int ai, bi;
     double af, bf;
@@ -265,7 +265,7 @@ static INLINE int ifloor(float f)
 }
 #define IFLOOR(x)  ifloor(x)
 #else
-static INLINE int ifloor(float f)
+static inline int ifloor(float f)
 {
     int i = IROUND(f);
     return (i > f) ? i - 1 : i;
@@ -278,7 +278,7 @@ static INLINE int ifloor(float f)
  *** ICEIL: return (as an integer) ceiling of float
  ***/
 #if   defined(USE_IEEE)
-static INLINE int iceil(float f)
+static inline int iceil(float f)
 {
     int ai, bi;
     double af, bf;
@@ -293,7 +293,7 @@ static INLINE int iceil(float f)
 }
 #define ICEIL(x)  iceil(x)
 #else
-static INLINE int iceil(float f)
+static inline int iceil(float f)
 {
     int i = IROUND(f);
     return (i < f) ? i + 1 : i;
@@ -417,7 +417,7 @@ do {									\
 /**
  * Return 1 if this is a little endian machine, 0 if big endian.
  */
-static INLINE GLboolean
+static inline GLboolean
 _mesa_little_endian(void)
 {
     const GLuint ui = 1; /* intentionally not static */

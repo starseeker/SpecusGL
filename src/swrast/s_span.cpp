@@ -322,7 +322,7 @@ interpolate_colors(SWspan *span)
 /**
  * Interpolate specular/secondary colors.
  */
-static INLINE void
+static inline void
 interpolate_specular(SWspan *span)
 {
     const GLuint n = span->end;
@@ -435,7 +435,7 @@ interpolate_specular(SWspan *span)
 
 
 /* Fill in the span.color.index array from the interpolation values */
-static INLINE void
+static inline void
 interpolate_indexes(GLcontext *ctx, SWspan *span)
 {
     GLfixed index = span->index;
@@ -466,7 +466,7 @@ interpolate_indexes(GLcontext *ctx, SWspan *span)
 
 
 /* Fill in the span.array.fog values from the interpolation values */
-static INLINE void
+static inline void
 interpolate_fog(const GLcontext *ctx, SWspan *span)
 {
     GLfloat(*fog)[4] = span->array->attribs[FRAG_ATTRIB_FOGC];
@@ -718,7 +718,7 @@ interpolate_texcoords(GLcontext *ctx, SWspan *span)
  * XXX since interpolants/arrays are getting uniformed, we might merge
  * this with interpolate_texcoords(), interpolate_Fog(), etc. someday.
  */
-static INLINE void
+static inline void
 interpolate_varying(GLcontext *ctx, SWspan *span)
 {
     GLuint var;
@@ -763,7 +763,7 @@ interpolate_varying(GLcontext *ctx, SWspan *span)
 /**
  * Fill in the arrays->attribs[FRAG_ATTRIB_WPOS] array.
  */
-static INLINE void
+static inline void
 interpolate_wpos(GLcontext *ctx, SWspan *span)
 {
     GLfloat(*wpos)[4] = span->array->attribs[FRAG_ATTRIB_WPOS];
@@ -796,7 +796,7 @@ interpolate_wpos(GLcontext *ctx, SWspan *span)
 /**
  * Apply the current polygon stipple pattern to a span of pixels.
  */
-static INLINE void
+static inline void
 stipple_polygon_span(GLcontext *ctx, SWspan *span)
 {
     GLubyte *mask = span->array->mask;
@@ -840,7 +840,7 @@ stipple_polygon_span(GLcontext *ctx, SWspan *span)
  * Return:   GL_TRUE   some pixels still visible
  *           GL_FALSE  nothing visible
  */
-static INLINE GLuint
+static inline GLuint
 clip_span(GLcontext *ctx, SWspan *span)
 {
     const GLint xmin = ctx->DrawBuffer->_Xmin;
@@ -1128,7 +1128,7 @@ _swrast_write_index_span(GLcontext *ctx, SWspan *span)
  * Add specular color to base color.  This is used only when
  * GL_LIGHT_MODEL_COLOR_CONTROL = GL_SEPARATE_SPECULAR_COLOR.
  */
-static INLINE void
+static inline void
 add_specular(GLcontext *ctx, SWspan *span)
 {
     switch (span->array->ChanType) {
@@ -1185,7 +1185,7 @@ add_specular(GLcontext *ctx, SWspan *span)
 /**
  * Apply antialiasing coverage value to alpha values.
  */
-static INLINE void
+static inline void
 apply_aa_coverage(SWspan *span)
 {
     const GLfloat *coverage = span->array->coverage;
@@ -1216,7 +1216,7 @@ apply_aa_coverage(SWspan *span)
 /**
  * Clamp span's float colors to [0,1]
  */
-static INLINE void
+static inline void
 clamp_colors(SWspan *span)
 {
     GLfloat(*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
@@ -1237,7 +1237,7 @@ clamp_colors(SWspan *span)
  * program that writes to gl_FragData[1] or higher.
  * \param output  which fragment program color output is being processed
  */
-static INLINE void
+static inline void
 convert_color_type(SWspan *span, GLenum newType, GLuint output)
 {
     GLvoid *src, *dst;
@@ -1272,7 +1272,7 @@ convert_color_type(SWspan *span, GLenum newType, GLuint output)
 /**
  * Apply fragment shader, fragment program or normal texturing to span.
  */
-static INLINE void
+static inline void
 shade_texture_span(GLcontext *ctx, SWspan *span)
 {
     GLbitfield inputsRead;

@@ -85,7 +85,7 @@ struct vbo_context {
 };
 
 
-static INLINE struct vbo_context *vbo_context(GLcontext *ctx)
+static inline struct vbo_context *vbo_context(GLcontext *ctx)
 {
     return ctx->swtnl_im;
 }
@@ -96,7 +96,7 @@ enum {
     VP_ARB
 };
 
-static INLINE GLuint get_program_mode(GLcontext *ctx)
+static inline GLuint get_program_mode(GLcontext *ctx)
 {
     if (!ctx->VertexProgram._Current)
 	return VP_NONE;

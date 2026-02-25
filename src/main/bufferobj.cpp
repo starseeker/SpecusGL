@@ -49,7 +49,7 @@
  * \return   A pointer to the buffer object bound to \c target in the
  *           specified context or \c nullptr if \c target is invalid.
  */
-static INLINE struct gl_buffer_object *
+static inline struct gl_buffer_object *
 get_buffer(GLcontext *ctx, GLenum target)
 {
     struct gl_buffer_object * bufObj = nullptr;

@@ -134,9 +134,6 @@
 #define _NORMAPIP *
 
 
-/* Function inlining - in C++17, 'inline' is standard and sufficient */
-#define INLINE inline
-
 /* Prevent inlining.  Used to keep the auto-vectorizer from operating on a
  * function in a caller context where it generates incorrect code (e.g. the
  * interpolate_colors() loop inlined into _swrast_write_rgba_span() produces
