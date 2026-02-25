@@ -221,8 +221,10 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
 
     (void) cycles;
 
-    mat->m = new (std::align_val_t{16}) GLfloat[16];
-    mat->inv = m = mat->m;
+    /* mat->m is already allocated (16-byte aligned) by the GLmatrix
+     * constructor – reuse it directly, then provide inv separately. */
+    m = mat->m;
+    mat->alloc_inv();  /* allocates mat->inv; will be set after init_matrix */
 
     init_matrix(m);
 
@@ -247,6 +249,9 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
 	    }
 	}
     }
+
+    /* The reference functions read mat->inv; copy m data into it. */
+    memcpy(mat->inv, mat->m, 16 * sizeof(GLfloat));
 
     for (i = 0 ; i < TEST_COUNT ; i++) {
 	ASSIGN_3V(d[i],  0.0, 0.0, 0.0);
