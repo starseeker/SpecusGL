@@ -107,11 +107,7 @@ struct prog_instruction *
     _mesa_copy_instructions(struct prog_instruction *dest,
 			const struct prog_instruction *src, GLuint n)
 {
-    GLuint i;
-    memcpy(dest, src, n * sizeof(struct prog_instruction));
-    for (i = 0; i < n; i++) {
-	dest[i].Comment = src[i].Comment;
-    }
+    std::copy(src, src + n, dest);
     return dest;
 }
 

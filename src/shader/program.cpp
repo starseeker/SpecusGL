@@ -39,6 +39,8 @@
 #include "atifragshader.h"
 #endif
 
+#include <algorithm>
+
 
 /**
  * A pointer to this dummy program is put into the hash table when
@@ -340,16 +342,15 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 			    prog->NumInstructions);
     clone->InputsRead = prog->InputsRead;
     clone->OutputsWritten = prog->OutputsWritten;
-    memcpy(clone->TexturesUsed, prog->TexturesUsed, sizeof(prog->TexturesUsed));
+    std::copy(std::begin(prog->TexturesUsed), std::end(prog->TexturesUsed), std::begin(clone->TexturesUsed));
 
     if (prog->Parameters)
 	clone->Parameters = _mesa_clone_parameter_list(prog->Parameters);
-    memcpy(clone->LocalParams, prog->LocalParams, sizeof(clone->LocalParams));
+    std::copy(&prog->LocalParams[0][0], &prog->LocalParams[MAX_PROGRAM_LOCAL_PARAMS][0], &clone->LocalParams[0][0]);
     if (prog->Varying)
 	clone->Varying = _mesa_clone_parameter_list(prog->Varying);
     if (prog->Attributes)
 	clone->Attributes = _mesa_clone_parameter_list(prog->Attributes);
-    memcpy(clone->LocalParams, prog->LocalParams, sizeof(clone->LocalParams));
     clone->NumInstructions = prog->NumInstructions;
     clone->NumTemporaries = prog->NumTemporaries;
     clone->NumParameters = prog->NumParameters;

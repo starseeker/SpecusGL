@@ -1687,11 +1687,11 @@ struct gl_array_attrib {
  * Feedback buffer state
  */
 struct gl_feedback {
-    GLenum Type;
-    GLbitfield _Mask;		/* FB_* bits */
-    GLfloat *Buffer;
-    GLuint BufferSize;
-    GLuint Count;
+    GLenum Type{GL_2D};
+    GLbitfield _Mask{0};	/* FB_* bits */
+    GLfloat *Buffer{nullptr};
+    GLuint BufferSize{0};
+    GLuint Count{0};
 };
 
 
@@ -1699,15 +1699,15 @@ struct gl_feedback {
  * Selection buffer state
  */
 struct gl_selection {
-    GLuint *Buffer;	/**< selection buffer */
-    GLuint BufferSize;	/**< size of the selection buffer */
-    GLuint BufferCount;	/**< number of values in the selection buffer */
-    GLuint Hits;		/**< number of records in the selection buffer */
-    GLuint NameStackDepth; /**< name stack depth */
-    GLuint NameStack[MAX_NAME_STACK_DEPTH]; /**< name stack */
-    GLboolean HitFlag;	/**< hit flag */
-    GLfloat HitMinZ;	/**< minimum hit depth */
-    GLfloat HitMaxZ;	/**< maximum hit depth */
+    GLuint *Buffer{nullptr};	/**< selection buffer */
+    GLuint BufferSize{0};	/**< size of the selection buffer */
+    GLuint BufferCount{0};	/**< number of values in the selection buffer */
+    GLuint Hits{0};		/**< number of records in the selection buffer */
+    GLuint NameStackDepth{0}; /**< name stack depth */
+    GLuint NameStack[MAX_NAME_STACK_DEPTH]{}; /**< name stack */
+    GLboolean HitFlag{GL_FALSE};	/**< hit flag */
+    GLfloat HitMinZ{0.0f};	/**< minimum hit depth */
+    GLfloat HitMaxZ{0.0f};	/**< maximum hit depth */
 };
 
 
