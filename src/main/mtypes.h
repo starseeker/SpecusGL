@@ -2351,6 +2351,10 @@ struct gl_renderbuffer_attachment {
  * A framebuffer is a collection of renderbuffers (color, depth, stencil, etc).
  * In C++ terms, think of this as a base class from which device drivers
  * will make derived classes.
+ *
+ * The virtual destructor releases all attached renderbuffers via
+ * _mesa_free_framebuffer_data() and then frees the object itself.  Derived
+ * classes may override the destructor to release driver-private resources.
  */
 struct gl_framebuffer {
     mutable std::mutex Mutex;		   /**< for thread safety */
@@ -2404,8 +2408,8 @@ struct gl_framebuffer {
     struct gl_renderbuffer *_DepthBuffer;
     struct gl_renderbuffer *_StencilBuffer;
 
-    /** Delete this framebuffer */
-    void (*Delete)(struct gl_framebuffer *fb);
+    /** Virtual destructor – releases attached renderbuffers. */
+    virtual ~gl_framebuffer();
 };
 
 

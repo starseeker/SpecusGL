@@ -117,7 +117,6 @@ _mesa_new_framebuffer(GLcontext *ctx, GLuint name)
 	fb->_ColorDrawBufferMask[0] = BUFFER_BIT_COLOR0;
 	fb->ColorReadBuffer = GL_COLOR_ATTACHMENT0_EXT;
 	fb->_ColorReadBufferIndex = BUFFER_COLOR0;
-	fb->Delete = _mesa_destroy_framebuffer;
     }
     return fb;
 }
@@ -155,24 +154,30 @@ _mesa_initialize_framebuffer(struct gl_framebuffer *fb, const GLvisual *visual)
 	fb->_ColorReadBufferIndex = BUFFER_FRONT_LEFT;
     }
 
-    fb->Delete = _mesa_destroy_framebuffer;
     fb->_Status = GL_FRAMEBUFFER_COMPLETE_EXT;
-
     compute_depth_max(fb);
 }
 
 
 /**
+ * Virtual destructor for gl_framebuffer: releases all attached renderbuffers.
+ * This replaces the former raw Delete function pointer.
+ */
+gl_framebuffer::~gl_framebuffer()
+{
+    _mesa_free_framebuffer_data(this);
+}
+
+
+/**
  * Deallocate buffer and everything attached to it.
- * Typically called via the gl_framebuffer->Delete() method.
+ * Calls delete on the framebuffer, which triggers the virtual destructor.
  */
 void
 _mesa_destroy_framebuffer(struct gl_framebuffer *fb)
 {
-    if (fb) {
-	_mesa_free_framebuffer_data(fb);
+    if (fb)
 	delete fb;
-    }
 }
 
 
@@ -253,7 +258,7 @@ _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
 	}
 
 	if (deleteFlag)
-	    (*fb)->Delete(*fb);
+	    delete *fb;
 
 	*fb = nullptr;
     }
