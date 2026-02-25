@@ -1176,7 +1176,7 @@ _swrast_texture_span(GLcontext *ctx, SWspan *span)
 	    const struct gl_texture_object *curObj = texUnit->_Current;
 	    GLfloat *lambda = span->array->lambda[unit];
 	    GLchan(*texels)[4] = (GLchan(*)[4])
-				 (swrast->TexelBuffer + unit * (span->end * 4 * sizeof(GLchan)));
+				 (swrast->TexelBuffer.get() + unit * (span->end * 4 * sizeof(GLchan)));
 
 	    /* adjust texture lod (lambda) */
 	    if (span->arrayMask & SPAN_LAMBDA) {
@@ -1230,12 +1230,12 @@ _swrast_texture_span(GLcontext *ctx, SWspan *span)
 	    if (texUnit->_CurrentCombine != &texUnit->_EnvMode) {
 		texture_combine(ctx, unit, span->end,
 				(CONST GLchan(*)[4]) primary_rgba,
-				swrast->TexelBuffer,
+				swrast->TexelBuffer.get(),
 				span->array->rgba);
 	    } else {
 		/* conventional texture blend */
 		const GLchan(*texels)[4] = (const GLchan(*)[4])
-					   (swrast->TexelBuffer + unit *
+					   (swrast->TexelBuffer.get() + unit *
 					    (span->end * 4 * sizeof(GLchan)));
 		texture_apply(ctx, texUnit, span->end,
 			      (CONST GLchan(*)[4]) primary_rgba, texels,

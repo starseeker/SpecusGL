@@ -50,6 +50,8 @@
 #include "s_span.h"
 #include "prog_execute.h"
 
+#include <memory>
+
 
 typedef void (*texture_sample_func)(GLcontext *ctx,
 				    const struct gl_texture_object *tObj,
@@ -210,8 +212,8 @@ struct SWcontext {
      * this object is big and causes problems when allocated on the stack
      * on some systems.
      */
-    SWspanarrays *SpanArrays;
-    SWspanarrays *ZoomedArrays;  /**< For pixel zooming */
+    std::unique_ptr<SWspanarrays> SpanArrays;
+    std::unique_ptr<SWspanarrays> ZoomedArrays;  /**< For pixel zooming */
 
     /**
      * Used to buffer N GL_POINTS, instead of rendering one by one.
@@ -227,7 +229,7 @@ struct SWcontext {
     /** Buffer for saving the sampled texture colors.
      * Needed for GL_ARB_texture_env_crossbar implementation.
      */
-    GLchan *TexelBuffer;
+    std::unique_ptr<GLchan[]> TexelBuffer;
 
     validate_texture_image_func ValidateTextureImage;
 
