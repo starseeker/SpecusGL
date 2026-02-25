@@ -119,7 +119,7 @@ typedef void (*validate_texture_image_func)(GLcontext *ctx,
  * \struct SWcontext
  * \brief  Per-context state that's private to the software rasterizer module.
  */
-typedef struct {
+struct SWcontext {
     /** Driver interface:
      */
     struct swrast_device_driver Driver;
@@ -234,7 +234,7 @@ typedef struct {
     /** State used during execution of fragment programs */
     struct gl_program_machine FragProgMachine;
 
-} SWcontext;
+};
 
 
 extern void

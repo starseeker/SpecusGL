@@ -62,7 +62,7 @@
  * end of _mesa_transform_vb, and avoids the need for a multiplication in
  * the transformation routines.
  */
-typedef struct {
+struct GLvector4f {
     GLfloat(*data)[4];	/* may be malloc'd or point to client data */
     GLfloat *start;	/* points somewhere inside of <data> */
     GLuint count;	/* size of the vector (in elements) */
@@ -70,7 +70,7 @@ typedef struct {
     GLuint size;		/* 2-4 for vertices and 1-4 for texcoords */
     GLuint flags;	/* which columns are dirty */
     void *storage;	/* self-allocated storage */
-} GLvector4f;
+};
 
 
 extern void _mesa_vector4f_init(GLvector4f *v, GLuint flags,

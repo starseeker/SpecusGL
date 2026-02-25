@@ -509,7 +509,7 @@ struct tnl_device_driver {
 /**
  * Context state for T&L context.
  */
-typedef struct {
+struct TNLcontext {
     /* Driver interface.
      */
     struct tnl_device_driver Driver;
@@ -543,7 +543,7 @@ typedef struct {
      */
     struct tnl_vp_cache *vp_cache;
 
-} TNLcontext;
+};
 
 
 
