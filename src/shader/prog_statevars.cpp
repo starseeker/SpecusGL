@@ -676,7 +676,6 @@ append_index(char *dst, GLint index)
 /**
  * Make a string from the given state vector.
  * For example, return "state.matrix.texture[2].inverse".
- * Use free() to deallocate the string.
  */
 std::string
 _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])

@@ -204,9 +204,9 @@ _mesa_test_hash_functions(void)
     t->insert(10, reinterpret_cast<void *>(0xBEEF));
     t->insert(0xFFFFFF00, reinterpret_cast<void *>(0xCAFE));
     _mesa_problem(nullptr, "hash_test: lookup(10) = %p",
-  t->lookup(10));
+		  t->lookup(10));
     _mesa_problem(nullptr, "hash_test: findFreeKeyBlock(100) = %u",
-  t->findFreeKeyBlock(100));
+		  t->findFreeKeyBlock(100));
     delete t;
 }
 

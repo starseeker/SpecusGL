@@ -1337,7 +1337,8 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     GLuint x, y;
     const GLubyte *data;
     GLuint *encoded = (GLuint *)dest;
-    void *newSource = nullptr;
+    GLchan *newSourceGLchan = nullptr;  /* upscaled buffer */
+    GLubyte *newSourceGLubyte = nullptr; /* channel-converted buffer */
 
     assert(comps == 3 || comps == 4);
 
@@ -1345,16 +1346,16 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     if ((width & 7) | (height & 3)) {
 	GLint newWidth = (width + 7) & ~7;
 	GLint newHeight = (height + 3) & ~3;
-	newSource = new GLchan[comps * newWidth * newHeight];
-	if (!newSource) {
+	newSourceGLchan = new GLchan[comps * newWidth * newHeight];
+	if (!newSourceGLchan) {
 	    GET_CURRENT_CONTEXT(ctx);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "texture compression");
 	    goto cleanUp;
 	}
 	_mesa_upscale_teximage2d(width, height, newWidth, newHeight,
 				 comps, (const GLchan *) source,
-				 srcRowStride, (GLchan *) newSource);
-	source = newSource;
+				 srcRowStride, newSourceGLchan);
+	source = newSourceGLchan;
 	width = newWidth;
 	height = newHeight;
 	srcRowStride = comps * newWidth;
@@ -1374,10 +1375,9 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 	for (i = 0; i < n; i++) {
 	    dest[i] = CHAN_TO_UBYTE(src[i]);
 	}
-	if (newSource != nullptr) {
-	    delete[] static_cast<GLchan *>(newSource);
-	}
-	newSource = dest;  /* we'll delete this buffer before returning */
+	delete[] newSourceGLchan;
+	newSourceGLchan = nullptr;
+	newSourceGLubyte = dest;  /* we'll delete this buffer before returning */
 	source = dest;  /* the new, GLubyte incoming image */
     }
 
@@ -1400,7 +1400,8 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     }
 
 cleanUp:
-    delete[] static_cast<GLchan *>(newSource);
+    delete[] newSourceGLchan;
+    delete[] newSourceGLubyte;
 }
 
 

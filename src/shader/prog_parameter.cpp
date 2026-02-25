@@ -399,8 +399,6 @@ gl_program_parameter_list::lookup_parameter_index(GLsizei nameLen, const char *n
 {
     GLint i;
 
-    (void)this; /* always valid in a const method */
-
     if (nameLen == -1) {
 	/* name is null-terminated */
 	for (i = 0; i < (GLint) NumParameters(); i++) {

@@ -478,7 +478,7 @@ add_function_name(const char * funcName)
 	if (entrypoint != nullptr) {
 	    entry = & ExtEntryTable[NumExtEntryPoints];
 	    ExtEntryTable[NumExtEntryPoints].name = funcName;
-	    ExtEntryTable[NumExtEntryPoints].parameter_signature = nullptr;
+	    ExtEntryTable[NumExtEntryPoints].parameter_signature = {};
 	    ExtEntryTable[NumExtEntryPoints].dispatch_offset = ~0;
 	    ExtEntryTable[NumExtEntryPoints].dispatch_stub = entrypoint;
 	    NumExtEntryPoints++;
