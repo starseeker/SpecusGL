@@ -69,36 +69,6 @@ struct _mesa_HashTable {
     [[nodiscard]] GLuint findFreeKeyBlock(GLuint numKeys);
 };
 
-/* Legacy C-style wrappers – prefer member functions for new code. */
-[[nodiscard]] inline _mesa_HashTable *_mesa_NewHashTable() { return new _mesa_HashTable{}; }
-inline void _mesa_DeleteHashTable(_mesa_HashTable *t) { delete t; }
-
-[[nodiscard]] inline void *_mesa_HashLookup(const _mesa_HashTable *t, GLuint key)
-{ return t->lookup(key); }
-
-inline void _mesa_HashInsert(_mesa_HashTable *t, GLuint key, void *data)
-{ t->insert(key, data); }
-
-inline void _mesa_HashRemove(_mesa_HashTable *t, GLuint key)
-{ t->remove(key); }
-
-inline void _mesa_HashDeleteAll(_mesa_HashTable *t,
-    std::function<void(GLuint, void *)> cb) { t->deleteAll(cb); }
-
-inline void _mesa_HashWalk(const _mesa_HashTable *t,
-    std::function<void(GLuint, void *)> cb) { t->walk(cb); }
-
-[[nodiscard]] inline GLuint _mesa_HashFirstEntry(_mesa_HashTable *t)
-{ return t->firstEntry(); }
-
-[[nodiscard]] inline GLuint _mesa_HashNextEntry(const _mesa_HashTable *t, GLuint key)
-{ return t->nextEntry(key); }
-
-inline void _mesa_HashPrint(const _mesa_HashTable *t) { t->print(); }
-
-[[nodiscard]] inline GLuint _mesa_HashFindFreeKeyBlock(_mesa_HashTable *t, GLuint n)
-{ return t->findFreeKeyBlock(n); }
-
 extern void _mesa_test_hash_functions(void);
 
 
