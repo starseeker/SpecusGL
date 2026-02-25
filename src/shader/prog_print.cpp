@@ -716,10 +716,10 @@ _mesa_print_program_opt(const struct gl_program *prog,
 	    break;
     }
 
-    for (i = 0; i < prog->NumInstructions; i++) {
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
 	if (lineNumbers)
 	    _mesa_printf("%3d: ", i);
-	indent = _mesa_print_instruction_opt(prog->Instructions + i,
+	indent = _mesa_print_instruction_opt(&prog->Instructions[i],
 					     indent, mode, prog);
     }
 }
@@ -733,7 +733,7 @@ _mesa_print_program_parameters(GLcontext *ctx, const struct gl_program *prog)
 {
     _mesa_printf("InputsRead: 0x%x\n", prog->InputsRead);
     _mesa_printf("OutputsWritten: 0x%x\n", prog->OutputsWritten);
-    _mesa_printf("NumInstructions=%d\n", prog->NumInstructions);
+    _mesa_printf("NumInstructions=%d\n", (int)prog->Instructions.size());
     _mesa_printf("NumTemporaries=%d\n", prog->NumTemporaries);
     _mesa_printf("NumParameters=%d\n", prog->NumParameters);
     _mesa_printf("NumAttributes=%d\n", prog->NumAttributes);

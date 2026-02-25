@@ -1952,7 +1952,7 @@ enum register_file {
 
 
 /** Vertex and fragment instructions */
-struct prog_instruction;
+#include "prog_instruction.h"
 struct gl_program_parameter_list;
 
 
@@ -1967,7 +1967,7 @@ struct gl_program {
     GLenum Format;    /**< String encoding format */
     GLboolean Resident;
 
-    struct prog_instruction *Instructions;
+    std::vector<prog_instruction> Instructions;
 
     GLbitfield InputsRead;     /**< Bitmask of which input regs are read */
     GLbitfield OutputsWritten; /**< Bitmask of which output regs are written to */
@@ -1985,7 +1985,6 @@ struct gl_program {
 
     /** Logical counts */
     /*@{*/
-    GLuint NumInstructions;
     GLuint NumTemporaries;
     GLuint NumParameters;
     GLuint NumAttributes;

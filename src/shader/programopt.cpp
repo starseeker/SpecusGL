@@ -37,6 +37,8 @@
 #include "prog_statevars.h"
 #include "programopt.h"
 #include "prog_instruction.h"
+#include <algorithm>
+#include <vector>
 
 
 /**
@@ -47,8 +49,7 @@
 void
 _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
 {
-    struct prog_instruction *newInst;
-    const GLuint origLen = vprog->Base.NumInstructions;
+    const GLuint origLen = static_cast<GLuint>(vprog->Base.Instructions.size());
     const GLuint newLen = origLen + 4;
     GLuint i;
 
@@ -69,13 +70,7 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
 					      mvpState[i]);
     }
 
-    /* Alloc storage for new instructions */
-    newInst = _mesa_alloc_instructions(newLen);
-    if (!newInst) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY,
-		    "glProgramString(inserting position_invariant code)");
-	return;
-    }
+    std::vector<prog_instruction> newInst(newLen);
 
     /*
      * Generated instructions:
@@ -84,7 +79,7 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
      * newInst[2] = DP4 result.position.z, mvp.row[2], vertex.position;
      * newInst[3] = DP4 result.position.w, mvp.row[3], vertex.position;
      */
-    _mesa_init_instructions(newInst, 4);
+    _mesa_init_instructions(newInst.data(), 4);
     for (i = 0; i < 4; i++) {
 	newInst[i].Opcode = OPCODE_DP4;
 	newInst[i].DstReg.File = PROGRAM_OUTPUT;
@@ -99,14 +94,11 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
     }
 
     /* Append original instructions after new instructions */
-    _mesa_copy_instructions(newInst + 4, vprog->Base.Instructions, origLen);
-
-    /* free old instructions */
-    delete[] vprog->Base.Instructions;
+    std::copy(vprog->Base.Instructions.begin(), vprog->Base.Instructions.end(),
+	      newInst.begin() + 4);
 
     /* install new instructions */
-    vprog->Base.Instructions = newInst;
-    vprog->Base.NumInstructions = newLen;
+    vprog->Base.Instructions = std::move(newInst);
     vprog->Base.InputsRead |= VERT_BIT_POS;
     vprog->Base.OutputsWritten |= (1 << VERT_RESULT_HPOS);
 }
@@ -128,8 +120,8 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
 	= { STATE_INTERNAL, STATE_FOG_PARAMS_OPTIMIZED, static_cast<gl_state_index>(0), static_cast<gl_state_index>(0), static_cast<gl_state_index>(0) };
     static const gl_state_index fogColorState[STATE_LENGTH]
 	= { STATE_FOG_COLOR, static_cast<gl_state_index>(0), static_cast<gl_state_index>(0), static_cast<gl_state_index>(0), static_cast<gl_state_index>(0)};
-    struct prog_instruction *newInst, *inst;
-    const GLuint origLen = fprog->Base.NumInstructions;
+    struct prog_instruction *inst;
+    const GLuint origLen = static_cast<GLuint>(fprog->Base.Instructions.size());
     const GLuint newLen = origLen + 5;
     GLuint i;
     GLint fogPRefOpt, fogColorRef; /* state references */
@@ -142,15 +134,11 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
     }
 
     /* Alloc storage for new instructions */
-    newInst = _mesa_alloc_instructions(newLen);
-    if (!newInst) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY,
-		    "glProgramString(inserting fog_option code)");
-	return;
-    }
+    std::vector<prog_instruction> newInst(newLen);
 
     /* Copy orig instructions into new instruction buffer */
-    _mesa_copy_instructions(newInst, fprog->Base.Instructions, origLen);
+    std::copy(fprog->Base.Instructions.begin(), fprog->Base.Instructions.end(),
+	      newInst.begin());
 
     /* PARAM fogParamsRefOpt = internal optimized fog params; */
     fogPRefOpt
@@ -165,8 +153,8 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
     fogFactorTemp = fprog->Base.NumTemporaries++;
 
     /* Scan program to find where result.color is written */
-    inst = newInst;
-    for (i = 0; i < fprog->Base.NumInstructions; i++) {
+    inst = newInst.data();
+    for (i = 0; i < origLen; i++) {
 	if (inst->Opcode == OPCODE_END)
 	    break;
 	if (inst->DstReg.File == PROGRAM_OUTPUT &&
@@ -273,12 +261,10 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
     inst->Opcode = OPCODE_END;
     inst++;
 
-    /* free old instructions */
-    delete[] fprog->Base.Instructions;
-
     /* install new instructions */
-    fprog->Base.Instructions = newInst;
-    fprog->Base.NumInstructions = inst - newInst;
+    GLuint finalCount = static_cast<GLuint>(inst - newInst.data());
+    fprog->Base.Instructions = std::move(newInst);
+    fprog->Base.Instructions.resize(finalCount);
     fprog->Base.InputsRead |= FRAG_BIT_FOGC;
     /* XXX do this?  fprog->FogOption = GL_NONE; */
 }
@@ -317,8 +303,8 @@ _mesa_count_texture_indirections(struct gl_program *prog)
     GLbitfield aluTemps = 0x0;
     GLuint i;
 
-    for (i = 0; i < prog->NumInstructions; i++) {
-	const struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	const struct prog_instruction *inst = &prog->Instructions[i];
 
 	if (is_texture_instruction(inst)) {
 	    if (((inst->SrcReg[0].File == PROGRAM_TEMPORARY) &&
@@ -357,8 +343,8 @@ _mesa_count_texture_instructions(struct gl_program *prog)
 {
     GLuint i;
     prog->NumTexInstructions = 0;
-    for (i = 0; i < prog->NumInstructions; i++) {
-	prog->NumTexInstructions += is_texture_instruction(prog->Instructions + i);
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	prog->NumTexInstructions += is_texture_instruction(&prog->Instructions[i]);
     }
 }
 

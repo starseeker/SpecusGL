@@ -1233,7 +1233,6 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 {
     struct parse_state parseState;
     struct prog_instruction instBuffer[MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS];
-    struct prog_instruction *newInst;
     GLenum target;
     std::string programString(reinterpret_cast<const char *>(str), len);
 
@@ -1299,24 +1298,14 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 	    }
 	}
 
-	/* copy the compiled instructions */
-	assert(parseState.numInst <= MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS);
-	newInst = _mesa_alloc_instructions(parseState.numInst);
-	if (!newInst) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	    return;  /* out of memory */
-	}
-	_mesa_copy_instructions(newInst, instBuffer, parseState.numInst);
-
 	/* install the program */
 	program->Base.Target = target;
 	program->Base.String = programString;
 	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	program->Base.Instructions = newInst;
+	program->Base.Instructions.assign(instBuffer, instBuffer + parseState.numInst);
 	program->Base.InputsRead = parseState.inputsRead;
 	if (parseState.isPositionInvariant)
 	    program->Base.InputsRead |= VERT_BIT_POS;
-	program->Base.NumInstructions = parseState.numInst;
 	program->Base.OutputsWritten = parseState.outputsWritten;
 	program->IsPositionInvariant = parseState.isPositionInvariant;
 	program->IsNVProgram = GL_TRUE;
@@ -1474,9 +1463,8 @@ _mesa_print_nv_vertex_instruction(const struct prog_instruction *inst)
 void
 _mesa_print_nv_vertex_program(const struct gl_vertex_program *program)
 {
-    const struct prog_instruction *inst;
-
-    for (inst = program->Base.Instructions; ; inst++) {
+    for (GLuint _i = 0; _i < (GLuint)program->Base.Instructions.size(); _i++) {
+	const struct prog_instruction *inst = &program->Base.Instructions[_i];
 	_mesa_print_nv_vertex_instruction(inst);
 	if (inst->Opcode == OPCODE_END)
 	    return;

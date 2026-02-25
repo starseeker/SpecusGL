@@ -48,6 +48,7 @@
 #include "slang_mem.h"
 
 #include <vector>
+#include <algorithm>
 
 
 #define PEEPHOLE_OPTIMIZATIONS 1
@@ -267,20 +268,17 @@ static struct prog_instruction *
 
 #if 0
     /* print prev inst */
-    if (prog->NumInstructions > 0) {
-	_mesa_print_instruction(prog->Instructions + prog->NumInstructions - 1);
+    if (!prog->Instructions.empty()) {
+	_mesa_print_instruction(&prog->Instructions.back());
     }
 #endif
-    prog->Instructions = _mesa_realloc_instructions(prog->Instructions,
-			 prog->NumInstructions,
-			 prog->NumInstructions + 1);
-    inst = prog->Instructions + prog->NumInstructions;
-    prog->NumInstructions++;
+    prog->Instructions.emplace_back();
+    inst = &prog->Instructions.back();
     _mesa_init_instructions(inst, 1);
     inst->Opcode = opcode;
     inst->BranchTarget = -1; /* invalid */
     /*
-    printf("New inst %d: %p %s\n", prog->NumInstructions-1,(void*)inst,
+    printf("New inst %d: %p %s\n", static_cast<GLuint>(prog->Instructions.size())-1,(void*)inst,
            _mesa_opcode_string(inst->Opcode));
     */
     return inst;
@@ -294,10 +292,10 @@ static struct prog_instruction *
     prev_instruction(slang_emit_info *emitInfo)
 {
     struct gl_program *prog = emitInfo->prog;
-    if (prog->NumInstructions == 0)
+    if (prog->Instructions.empty())
 	return nullptr;
     else
-	return prog->Instructions + prog->NumInstructions - 1;
+	return &prog->Instructions.back();
 }
 
 
@@ -765,11 +763,11 @@ emit_label(slang_emit_info *emitInfo, const slang_ir_node *n)
 #if 0
     /* XXX this fails in loop tail code - investigate someday */
     assert(_slang_label_get_location(n->Label) < 0);
-    _slang_label_set_location(n->Label, emitInfo->prog->NumInstructions,
+    _slang_label_set_location(n->Label, static_cast<GLuint>(emitInfo->prog->Instructions.size()),
 			      emitInfo->prog);
 #else
     if (_slang_label_get_location(n->Label) < 0)
-	_slang_label_set_location(n->Label, emitInfo->prog->NumInstructions,
+	_slang_label_set_location(n->Label, static_cast<GLuint>(emitInfo->prog->Instructions.size()),
 				  emitInfo->prog);
 #endif
     return nullptr;
@@ -795,7 +793,7 @@ emit_fcall(slang_emit_info *emitInfo, slang_ir_node *n)
     progSave = emitInfo->prog;
     emitInfo->prog = new_subroutine(emitInfo, &subroutineId);
 
-    _slang_label_set_location(n->Label, emitInfo->prog->NumInstructions,
+    _slang_label_set_location(n->Label, static_cast<GLuint>(emitInfo->prog->Instructions.size()),
 			      emitInfo->prog);
 
     if (emitInfo->EmitBeginEndSub) {
@@ -1138,7 +1136,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
     assert(n->Children[0]->Store->Size == 1); /* a bool! */
 #endif
 
-    ifInstLoc = prog->NumInstructions;
+    ifInstLoc = static_cast<GLuint>(prog->Instructions.size());
     if (emitInfo->EmitHighLevelInstructions) {
 	struct prog_instruction *ifInst = new_instruction(emitInfo, OPCODE_IF);
 	if (emitInfo->EmitCondCodes) {
@@ -1164,7 +1162,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (n->Children[2]) {
 	/* have else body */
-	elseInstLoc = prog->NumInstructions;
+	elseInstLoc = static_cast<GLuint>(prog->Instructions.size());
 	if (emitInfo->EmitHighLevelInstructions) {
 	    (void) new_instruction(emitInfo, OPCODE_ELSE);
 	} else {
@@ -1174,11 +1172,11 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
 	    inst->Comment = "else";
 	    inst->DstReg.CondMask = COND_TR;  /* always branch */
 	}
-	prog->Instructions[ifInstLoc].BranchTarget = prog->NumInstructions;
+	prog->Instructions[ifInstLoc].BranchTarget = static_cast<GLuint>(prog->Instructions.size());
 	emit(emitInfo, n->Children[2]);
     } else {
 	/* no else body */
-	prog->Instructions[ifInstLoc].BranchTarget = prog->NumInstructions;
+	prog->Instructions[ifInstLoc].BranchTarget = static_cast<GLuint>(prog->Instructions.size());
     }
 
     if (emitInfo->EmitHighLevelInstructions) {
@@ -1186,7 +1184,7 @@ emit_if(slang_emit_info *emitInfo, slang_ir_node *n)
     }
 
     if (n->Children[2]) {
-	prog->Instructions[elseInstLoc].BranchTarget = prog->NumInstructions;
+	prog->Instructions[elseInstLoc].BranchTarget = static_cast<GLuint>(prog->Instructions.size());
     }
     return nullptr;
 }
@@ -1201,7 +1199,7 @@ emit_loop(slang_emit_info *emitInfo, slang_ir_node *n)
     slang_ir_node *ir;
 
     /* emit OPCODE_BGNLOOP */
-    beginInstLoc = prog->NumInstructions;
+    beginInstLoc = static_cast<GLuint>(prog->Instructions.size());
     if (emitInfo->EmitHighLevelInstructions) {
 	(void) new_instruction(emitInfo, OPCODE_BGNLOOP);
     }
@@ -1216,7 +1214,7 @@ emit_loop(slang_emit_info *emitInfo, slang_ir_node *n)
 	emit(emitInfo, n->Children[1]);
     }
 
-    endInstLoc = prog->NumInstructions;
+    endInstLoc = static_cast<GLuint>(prog->Instructions.size());
     if (emitInfo->EmitHighLevelInstructions) {
 	/* emit OPCODE_ENDLOOP */
 	endInst = new_instruction(emitInfo, OPCODE_ENDLOOP);
@@ -1230,7 +1228,7 @@ emit_loop(slang_emit_info *emitInfo, slang_ir_node *n)
 
     if (emitInfo->EmitHighLevelInstructions) {
 	/* BGNLOOP's BranchTarget points to the ENDLOOP inst */
-	prog->Instructions[beginInstLoc].BranchTarget = prog->NumInstructions -1;
+	prog->Instructions[beginInstLoc].BranchTarget = static_cast<GLuint>(prog->Instructions.size()) -1;
     }
 
     /* Done emitting loop code.  Now walk over the loop's linked list of
@@ -1238,7 +1236,7 @@ emit_loop(slang_emit_info *emitInfo, slang_ir_node *n)
      * will point to the ENDLOOP+1 or BGNLOOP instructions, respectively).
      */
     for (ir = n->List; ir; ir = ir->List) {
-	struct prog_instruction *inst = prog->Instructions + ir->InstLocation;
+	struct prog_instruction *inst = &prog->Instructions[ir->InstLocation];
 	assert(inst->BranchTarget < 0);
 	if (ir->Opcode == IR_BREAK ||
 	    ir->Opcode == IR_BREAK_IF_TRUE) {
@@ -1288,7 +1286,7 @@ emit_cont_break(slang_emit_info *emitInfo, slang_ir_node *n)
     } else {
 	opcode = OPCODE_BRA;
     }
-    n->InstLocation = emitInfo->prog->NumInstructions;
+    n->InstLocation = static_cast<GLuint>(emitInfo->prog->Instructions.size());
     inst = new_instruction(emitInfo, opcode);
     inst->DstReg.CondMask = COND_TR;  /* always true */
     return inst;
@@ -1314,7 +1312,7 @@ emit_cont_break_if_true(slang_emit_info *emitInfo, slang_ir_node *n)
 	inst->CondUpdate = GL_TRUE;
     }
 
-    n->InstLocation = emitInfo->prog->NumInstructions;
+    n->InstLocation = static_cast<GLuint>(emitInfo->prog->Instructions.size());
 
     /* opcode selection */
     if (emitInfo->EmitHighLevelInstructions) {
@@ -1335,16 +1333,16 @@ emit_cont_break_if_true(slang_emit_info *emitInfo, slang_ir_node *n)
 	     * ENDIF
 	     */
 	    GLint ifInstLoc;
-	    ifInstLoc = emitInfo->prog->NumInstructions;
+	    ifInstLoc = static_cast<GLuint>(emitInfo->prog->Instructions.size());
 	    inst = new_instruction(emitInfo, OPCODE_IF);
 	    storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
-	    n->InstLocation = emitInfo->prog->NumInstructions;
+	    n->InstLocation = static_cast<GLuint>(emitInfo->prog->Instructions.size());
 
 	    new_instruction(emitInfo, opcode);
 	    inst = new_instruction(emitInfo, OPCODE_ENDIF);
 
 	    emitInfo->prog->Instructions[ifInstLoc].BranchTarget
-		= emitInfo->prog->NumInstructions;
+		= static_cast<GLuint>(emitInfo->prog->Instructions.size());
 	    return inst;
 	}
     } else {
@@ -1730,18 +1728,18 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
     std::vector<GLuint> subroutineLoc(emitInfo->NumSubroutines);
 
     /* total number of instructions */
-    total = mainP->NumInstructions;
+    total = static_cast<GLuint>(mainP->Instructions.size());
     for (i = 0; i < emitInfo->NumSubroutines; i++) {
 	subroutineLoc[i] = total;
-	total += emitInfo->Subroutines[i]->NumInstructions;
+	total += static_cast<GLuint>(emitInfo->Subroutines[i]->Instructions.size());
     }
 
     /* adjust BrancTargets within the functions */
     for (i = 0; i < emitInfo->NumSubroutines; i++) {
 	struct gl_program *sub = emitInfo->Subroutines[i];
 	GLuint j;
-	for (j = 0; j < sub->NumInstructions; j++) {
-	    struct prog_instruction *inst = sub->Instructions + j;
+	for (j = 0; j < static_cast<GLuint>(sub->Instructions.size()); j++) {
+	    struct prog_instruction *inst = &sub->Instructions[j];
 	    if (inst->Opcode != OPCODE_CAL && inst->BranchTarget >= 0) {
 		inst->BranchTarget += subroutineLoc[i];
 	    }
@@ -1749,15 +1747,11 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
     }
 
     /* append subroutines' instructions after main's instructions */
-    mainP->Instructions = _mesa_realloc_instructions(mainP->Instructions,
-			  mainP->NumInstructions,
-			  total);
-    mainP->NumInstructions = total;
+    mainP->Instructions.resize(total);
     for (i = 0; i < emitInfo->NumSubroutines; i++) {
 	struct gl_program *sub = emitInfo->Subroutines[i];
-	_mesa_copy_instructions(mainP->Instructions + subroutineLoc[i],
-				sub->Instructions,
-				sub->NumInstructions);
+	std::copy(sub->Instructions.begin(), sub->Instructions.end(),
+		  mainP->Instructions.begin() + subroutineLoc[i]);
 	/* delete subroutine code */
 	sub->Parameters = nullptr; /* prevent double-free */
 	_mesa_delete_program(ctx, sub);
@@ -1773,8 +1767,8 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
      * emitInfo->Subroutines list).
      * Translate that into an actual instruction location now.
      */
-    for (i = 0; i < mainP->NumInstructions; i++) {
-	struct prog_instruction *inst = mainP->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(mainP->Instructions.size()); i++) {
+	struct prog_instruction *inst = &mainP->Instructions[i];
 	if (inst->Opcode == OPCODE_CAL) {
 	    const GLuint f = inst->BranchTarget;
 	    inst->BranchTarget = subroutineLoc[f];
@@ -1822,7 +1816,7 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
     success = GL_TRUE;
 
 #if 0
-    printf("*********** End emit code (%u inst):\n", prog->NumInstructions);
+    printf("*********** End emit code (%u inst):\n", static_cast<GLuint>(prog->Instructions.size()));
     _mesa_print_program(prog);
     _mesa_print_program_parameters(ctx,prog);
 #endif

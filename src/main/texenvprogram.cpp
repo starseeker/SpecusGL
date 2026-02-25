@@ -519,10 +519,9 @@ emit_op(struct texenv_fragment_program *p,
 	struct ureg src1,
 	struct ureg src2)
 {
-    GLuint nr = p->program->Base.NumInstructions++;
-    struct prog_instruction *inst = &p->program->Base.Instructions[nr];
-
-    assert(nr < MAX_INSTRUCTIONS);
+    assert(p->program->Base.Instructions.size() < MAX_INSTRUCTIONS);
+    p->program->Base.Instructions.emplace_back();
+    struct prog_instruction *inst = &p->program->Base.Instructions.back();
 
     _mesa_init_instructions(inst, 1);
     inst->Opcode = op;
@@ -1052,7 +1051,6 @@ static void
 create_new_program(GLcontext *ctx, struct state_key *key,
 		   struct gl_fragment_program *program)
 {
-    struct prog_instruction instBuffer[MAX_INSTRUCTIONS];
     struct texenv_fragment_program p;
     GLuint unit;
     struct ureg cf, out;
@@ -1062,19 +1060,15 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     p.state = key;
     p.program = program;
 
-    /* During code generation, use locally-allocated instruction buffer,
-     * then alloc dynamic storage below.
-     */
-    p.program->Base.Instructions = instBuffer;
     p.program->Base.Target = GL_FRAGMENT_PROGRAM_ARB;
     p.program->Base.NumTexIndirections = 1;	/* correct? */
     p.program->Base.NumTexInstructions = 0;
     p.program->Base.NumAluInstructions = 0;
     p.program->Base.String.clear();
-    p.program->Base.NumInstructions =
-	p.program->Base.NumTemporaries =
-	    p.program->Base.NumParameters =
-		p.program->Base.NumAttributes = p.program->Base.NumAddressRegs = 0;
+    p.program->Base.Instructions.clear();
+    p.program->Base.NumTemporaries =
+	p.program->Base.NumParameters =
+	    p.program->Base.NumAttributes = p.program->Base.NumAddressRegs = 0;
     p.program->Base.Parameters = _mesa_new_parameter_list();
 
     p.program->Base.InputsRead = 0;
@@ -1148,18 +1142,9 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     if (p.program->Base.NumAluInstructions > ctx->Const.FragmentProgram.MaxAluInstructions)
 	program_error(&p, "Exceeded max ALU instructions");
 
-    ASSERT(p.program->Base.NumInstructions <= MAX_INSTRUCTIONS);
+    ASSERT(p.program->Base.Instructions.size() <= MAX_INSTRUCTIONS);
 
-    /* Allocate final instruction array */
-    program->Base.Instructions
-	= _mesa_alloc_instructions(program->Base.NumInstructions);
-    if (!program->Base.Instructions) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY,
-		    "generating tex env program");
-	return;
-    }
-    _mesa_copy_instructions(program->Base.Instructions, instBuffer,
-			    program->Base.NumInstructions);
+    /* Instructions are already in the vector, no copy needed */
 
     /* Notify driver the fragment program has (actually) changed.
      */

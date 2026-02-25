@@ -468,7 +468,7 @@ _mesa_execute_program(GLcontext * ctx,
 		      const struct gl_program *program,
 		      struct gl_program_machine *machine)
 {
-    const GLuint numInst = program->NumInstructions;
+    const GLuint numInst = static_cast<GLuint>(program->Instructions.size());
     const GLuint maxExec = 10000;
     GLint pc, numExec = 0;
 
@@ -485,7 +485,7 @@ _mesa_execute_program(GLcontext * ctx,
     }
 
     for (pc = 0; pc < numInst; pc++) {
-	const struct prog_instruction *inst = program->Instructions + pc;
+	const struct prog_instruction *inst = &program->Instructions[pc];
 
 	if (DEBUG_PROG) {
 	    _mesa_print_instruction(inst);

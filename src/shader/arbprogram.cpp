@@ -611,7 +611,7 @@ _mesa_GetProgramivARB(GLenum target, GLenum pname, GLint *params)
 	    *params = prog->Id;
 	    return;
 	case GL_PROGRAM_INSTRUCTIONS_ARB:
-	    *params = prog->NumInstructions;
+	    *params = static_cast<GLint>(prog->Instructions.size());
 	    return;
 	case GL_MAX_PROGRAM_INSTRUCTIONS_ARB:
 	    *params = limits->MaxInstructions;
