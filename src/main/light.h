@@ -108,8 +108,6 @@ extern GLuint _mesa_material_bitmask(GLcontext *ctx,
 				     GLuint legal,
 				     const char *);
 
-extern void _mesa_invalidate_spot_exp_table(struct gl_light *l);
-
 extern void _mesa_invalidate_shine_table(GLcontext *ctx, GLuint i);
 
 extern void _mesa_validate_all_lighting_tables(GLcontext *ctx);
@@ -137,7 +135,6 @@ extern void _mesa_allow_light_in_model(GLcontext *ctx, GLboolean flag);
 #else
 #define _mesa_update_color_material( c, r ) ((void)0)
 #define _mesa_validate_all_lighting_tables( c ) ((void)0)
-#define _mesa_invalidate_spot_exp_table( l ) ((void)0)
 #define _mesa_material_bitmask( c, f, p, l, s ) 0
 #define _mesa_init_lighting( c ) ((void)0)
 #define _mesa_free_lighting_data( c ) ((void)0)

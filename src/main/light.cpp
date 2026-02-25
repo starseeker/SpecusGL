@@ -121,7 +121,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
 	    light->SpotExponent = params[0];
-	    _mesa_invalidate_spot_exp_table(light);
+	    light->invalidate_spot_exp_table();
 	    break;
 	case GL_SPOT_CUTOFF:
 	    ASSERT(params[0] == 180.0 || (params[0] >= 0.0 && params[0] <= 90.0));
@@ -887,21 +887,14 @@ _mesa_GetMaterialiv(GLenum face, GLenum pname, GLint *params)
  * this function to recompute the exponent lookup table.
  */
 void
-_mesa_invalidate_spot_exp_table(struct gl_light *l)
-{
-    l->_SpotExpTable[0][0] = -1;
-}
-
-
-static void
-validate_spot_exp_table(struct gl_light *l)
+gl_light::validate_spot_exp_table()
 {
     GLint i;
-    GLdouble exponent = l->SpotExponent;
+    GLdouble exponent = SpotExponent;
     GLdouble tmp = 0;
     GLint clamp = 0;
 
-    l->_SpotExpTable[0][0] = 0.0;
+    _SpotExpTable[0][0] = 0.0;
 
     for (i = EXP_TABLE_SIZE - 1; i > 0 ; i--) {
 	if (clamp == 0) {
@@ -911,15 +904,13 @@ validate_spot_exp_table(struct gl_light *l)
 		clamp = 1;
 	    }
 	}
-	l->_SpotExpTable[i][0] = (GLfloat) tmp;
+	_SpotExpTable[i][0] = (GLfloat) tmp;
     }
     for (i = 0; i < EXP_TABLE_SIZE - 1; i++) {
-	l->_SpotExpTable[i][1] = (l->_SpotExpTable[i+1][0] -
-				  l->_SpotExpTable[i][0]);
+	_SpotExpTable[i][1] = (_SpotExpTable[i+1][0] - _SpotExpTable[i][0]);
     }
-    l->_SpotExpTable[EXP_TABLE_SIZE-1][1] = 0.0;
+    _SpotExpTable[EXP_TABLE_SIZE-1][1] = 0.0;
 }
-
 
 
 /* Calculate a new shine table.  Doing this here saves a branch in
@@ -1004,7 +995,7 @@ _mesa_validate_all_lighting_tables(GLcontext *ctx)
 
     for (i = 0; i < ctx->Const.MaxLights; i++)
 	if (ctx->Light.Light[i]._SpotExpTable[0][0] == -1)
-	    validate_spot_exp_table(&ctx->Light.Light[i]);
+	    ctx->Light.Light[i].validate_spot_exp_table();
 }
 
 
@@ -1262,7 +1253,7 @@ init_light(struct gl_light *l, GLuint n)
     ASSIGN_4V(l->EyePosition, 0.0, 0.0, 1.0, 0.0);
     ASSIGN_3V(l->EyeDirection, 0.0, 0.0, -1.0);
     l->SpotExponent = 0.0;
-    _mesa_invalidate_spot_exp_table(l);
+    l->invalidate_spot_exp_table();
     l->SpotCutoff = 180.0;
     l->_CosCutoffNeg = -1.0f;
     l->_CosCutoff = 0.0;		/* KW: -ve values not admitted */

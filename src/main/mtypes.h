@@ -547,6 +547,12 @@ struct gl_light {
     GLfloat _dli;		/**< CI diffuse light intensity */
     GLfloat _sli;		/**< CI specular light intensity */
     /*@}*/
+
+    /** Mark the spot-exponent lookup table as needing recomputation. */
+    void invalidate_spot_exp_table() noexcept { _SpotExpTable[0][0] = -1.0f; }
+
+    /** Rebuild the spot-exponent lookup table from SpotExponent. */
+    void validate_spot_exp_table();
 };
 
 
