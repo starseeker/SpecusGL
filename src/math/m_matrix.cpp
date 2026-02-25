@@ -251,21 +251,20 @@ _math_matrix_mul_matrix(GLmatrix *dest, const GLmatrix *a, const GLmatrix *b)
 /**
  * Matrix multiplication.
  *
- * \param dest left and destination matrix.
- * \param m right matrix array.
+ * \param b right matrix array.
  *
  * Marks the matrix flags with general flag, and type and inverse dirty flags.
  * Calls matmul4() for the multiplication.
  */
 void
-_math_matrix_mul_floats(GLmatrix *dest, const GLfloat *m)
+GLmatrix::mul(const GLfloat *b)
 {
-    dest->flags |= (MAT_FLAG_GENERAL |
-		    MAT_DIRTY_TYPE |
-		    MAT_DIRTY_INVERSE |
-		    MAT_DIRTY_FLAGS);
+    flags |= (MAT_FLAG_GENERAL |
+	      MAT_DIRTY_TYPE |
+	      MAT_DIRTY_INVERSE |
+	      MAT_DIRTY_FLAGS);
 
-    matmul4(dest->m, dest->m, m);
+    matmul4(m, m, b);
 }
 
 /*@}*/
@@ -291,20 +290,18 @@ static void print_matrix_floats(const GLfloat m[16])
 }
 
 /**
- * Dumps the contents of a GLmatrix structure.
- *
- * \param m pointer to the GLmatrix structure.
+ * Dumps the contents of this GLmatrix to debug output.
  */
 void
-_math_matrix_print(const GLmatrix *m)
+GLmatrix::print() const
 {
-    _mesa_debug(nullptr, "Matrix type: %s, flags: %x\n", types[m->type], m->flags);
-    print_matrix_floats(m->m);
+    _mesa_debug(nullptr, "Matrix type: %s, flags: %x\n", types[type], flags);
+    print_matrix_floats(m);
     _mesa_debug(nullptr, "Inverse: \n");
-    if (m->inv) {
+    if (inv) {
 	GLfloat prod[16];
-	print_matrix_floats(m->inv);
-	matmul4(prod, m->m, m->inv);
+	print_matrix_floats(inv);
+	matmul4(prod, m, inv);
 	_mesa_debug(nullptr, "Mat * Inverse:\n");
 	print_matrix_floats(prod);
     } else {
@@ -857,20 +854,19 @@ static GLboolean matrix_invert(GLmatrix *mat)
  * Optimizations contributed by Rudolf Opalla (rudi@khm.de).
  */
 void
-_math_matrix_rotate(GLmatrix *mat,
-		    GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
+GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
     GLfloat xx, yy, zz, xy, yz, zx, xs, ys, zs, one_c, s, c;
-    GLfloat m[16];
+    GLfloat rmat[16];  /* local rotation matrix (renamed to avoid clash with member m) */
     GLboolean optimized;
 
     s = (GLfloat) sin(angle * DEG2RAD);
     c = (GLfloat) cos(angle * DEG2RAD);
 
-    memcpy(m, Identity, sizeof(GLfloat)*16);
+    memcpy(rmat, Identity, sizeof(GLfloat)*16);
     optimized = GL_FALSE;
 
-#define M(row,col)  m[col*4+row]
+#define M(row,col)  rmat[col*4+row]
 
     if (x == 0.0F) {
 	if (y == 0.0F) {
@@ -1018,7 +1014,7 @@ _math_matrix_rotate(GLmatrix *mat,
     }
 #undef M
 
-    matrix_multf(mat, m, MAT_FLAG_ROTATION);
+    matrix_multf(this, rmat, MAT_FLAG_ROTATION);
 }
 
 /**
@@ -1036,13 +1032,12 @@ _math_matrix_rotate(GLmatrix *mat,
  * MAT_FLAG_PERSPECTIVE flag.
  */
 void
-_math_matrix_frustum(GLmatrix *mat,
-		     GLfloat left, GLfloat right,
-		     GLfloat bottom, GLfloat top,
-		     GLfloat nearval, GLfloat farval)
+GLmatrix::frustum(GLfloat left, GLfloat right,
+		  GLfloat bottom, GLfloat top,
+		  GLfloat nearval, GLfloat farval)
 {
     GLfloat x, y, a, b, c, d;
-    GLfloat m[16];
+    GLfloat fmat[16];  /* local frustum matrix (renamed to avoid clash with member m) */
 
     x = (2.0F*nearval) / (right-left);
     y = (2.0F*nearval) / (top-bottom);
@@ -1051,7 +1046,7 @@ _math_matrix_frustum(GLmatrix *mat,
     c = -(farval+nearval) / (farval-nearval);
     d = -(2.0F*farval*nearval) / (farval-nearval);  /* error? */
 
-#define M(row,col)  m[col*4+row]
+#define M(row,col)  fmat[col*4+row]
     M(0,0) = x;
     M(0,1) = 0.0F;
     M(0,2) = a;
@@ -1070,7 +1065,7 @@ _math_matrix_frustum(GLmatrix *mat,
     M(3,3) = 0.0F;
 #undef M
 
-    matrix_multf(mat, m, MAT_FLAG_PERSPECTIVE);
+    matrix_multf(this, fmat, MAT_FLAG_PERSPECTIVE);
 }
 
 /**
@@ -1088,14 +1083,13 @@ _math_matrix_frustum(GLmatrix *mat,
  * MAT_FLAG_GENERAL_SCALE and MAT_FLAG_TRANSLATION flags.
  */
 void
-_math_matrix_ortho(GLmatrix *mat,
-		   GLfloat left, GLfloat right,
-		   GLfloat bottom, GLfloat top,
-		   GLfloat nearval, GLfloat farval)
+GLmatrix::ortho(GLfloat left, GLfloat right,
+		GLfloat bottom, GLfloat top,
+		GLfloat nearval, GLfloat farval)
 {
-    GLfloat m[16];
+    GLfloat omat[16];  /* local ortho matrix (renamed to avoid clash with member m) */
 
-#define M(row,col)  m[col*4+row]
+#define M(row,col)  omat[col*4+row]
     M(0,0) = 2.0F / (right-left);
     M(0,1) = 0.0F;
     M(0,2) = 0.0F;
@@ -1117,7 +1111,7 @@ _math_matrix_ortho(GLmatrix *mat,
     M(3,3) = 1.0F;
 #undef M
 
-    matrix_multf(mat, m, (MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION));
+    matrix_multf(this, omat, (MAT_FLAG_GENERAL_SCALE|MAT_FLAG_TRANSLATION));
 }
 
 /**
@@ -1134,9 +1128,8 @@ _math_matrix_ortho(GLmatrix *mat,
  * MAT_DIRTY_INVERSE dirty flags.
  */
 void
-_math_matrix_scale(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
+GLmatrix::scale(GLfloat x, GLfloat y, GLfloat z)
 {
-    GLfloat *m = mat->m;
     m[0] *= x;
     m[4] *= y;
     m[8]  *= z;
@@ -1151,12 +1144,12 @@ _math_matrix_scale(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
     m[11] *= z;
 
     if (FABSF(x - y) < 1e-8 && FABSF(x - z) < 1e-8)
-	mat->flags |= MAT_FLAG_UNIFORM_SCALE;
+	flags |= MAT_FLAG_UNIFORM_SCALE;
     else
-	mat->flags |= MAT_FLAG_GENERAL_SCALE;
+	flags |= MAT_FLAG_GENERAL_SCALE;
 
-    mat->flags |= (MAT_DIRTY_TYPE |
-		   MAT_DIRTY_INVERSE);
+    flags |= (MAT_DIRTY_TYPE |
+	      MAT_DIRTY_INVERSE);
 }
 
 /**
@@ -1172,17 +1165,16 @@ _math_matrix_scale(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
  * dirty flags.
  */
 void
-_math_matrix_translate(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
+GLmatrix::translate(GLfloat x, GLfloat y, GLfloat z)
 {
-    GLfloat *m = mat->m;
     m[12] = m[0] * x + m[4] * y + m[8]  * z + m[12];
     m[13] = m[1] * x + m[5] * y + m[9]  * z + m[13];
     m[14] = m[2] * x + m[6] * y + m[10] * z + m[14];
     m[15] = m[3] * x + m[7] * y + m[11] * z + m[15];
 
-    mat->flags |= (MAT_FLAG_TRANSLATION |
-		   MAT_DIRTY_TYPE |
-		   MAT_DIRTY_INVERSE);
+    flags |= (MAT_FLAG_TRANSLATION |
+	      MAT_DIRTY_TYPE |
+	      MAT_DIRTY_INVERSE);
 }
 
 
@@ -1191,17 +1183,17 @@ _math_matrix_translate(GLmatrix *mat, GLfloat x, GLfloat y, GLfloat z)
  * Transforms Normalized Device Coords to window/Z values.
  */
 void
-_math_matrix_viewport(GLmatrix *m, GLint x, GLint y, GLint width, GLint height,
-		      GLfloat zNear, GLfloat zFar, GLfloat depthMax)
+GLmatrix::viewport(GLint x, GLint y, GLint width, GLint height,
+		   GLfloat zNear, GLfloat zFar, GLfloat depthMax)
 {
-    m->m[MAT_SX] = (GLfloat) width / 2.0F;
-    m->m[MAT_TX] = m->m[MAT_SX] + x;
-    m->m[MAT_SY] = (GLfloat) height / 2.0F;
-    m->m[MAT_TY] = m->m[MAT_SY] + y;
-    m->m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
-    m->m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
-    m->flags = MAT_FLAG_GENERAL_SCALE | MAT_FLAG_TRANSLATION;
-    m->type = MATRIX_3D_NO_ROT;
+    m[MAT_SX] = (GLfloat) width / 2.0F;
+    m[MAT_TX] = m[MAT_SX] + x;
+    m[MAT_SY] = (GLfloat) height / 2.0F;
+    m[MAT_TY] = m[MAT_SY] + y;
+    m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
+    m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
+    flags = MAT_FLAG_GENERAL_SCALE | MAT_FLAG_TRANSLATION;
+    type = MATRIX_3D_NO_ROT;
 }
 
 
@@ -1214,17 +1206,17 @@ _math_matrix_viewport(GLmatrix *m, GLint x, GLint y, GLint width, GLint height,
  * Sets the matrix type to identity, and clear the dirty flags.
  */
 void
-_math_matrix_set_identity(GLmatrix *mat)
+GLmatrix::set_identity()
 {
-    memcpy(mat->m, Identity, 16*sizeof(GLfloat));
+    memcpy(m, Identity, 16*sizeof(GLfloat));
 
-    if (mat->inv)
-	memcpy(mat->inv, Identity, 16*sizeof(GLfloat));
+    if (inv)
+	memcpy(inv, Identity, 16*sizeof(GLfloat));
 
-    mat->type = MATRIX_IDENTITY;
-    mat->flags &= ~(MAT_DIRTY_FLAGS|
-		    MAT_DIRTY_TYPE|
-		    MAT_DIRTY_INVERSE);
+    type = MATRIX_IDENTITY;
+    flags &= ~(MAT_DIRTY_FLAGS|
+	       MAT_DIRTY_TYPE|
+	       MAT_DIRTY_INVERSE);
 }
 
 /*@}*/
@@ -1428,65 +1420,61 @@ static void analyse_from_flags(GLmatrix *mat)
  * then calls matrix_invert(). Finally clears the dirty flags.
  */
 void
-_math_matrix_analyse(GLmatrix *mat)
+GLmatrix::analyse()
 {
-    if (mat->flags & MAT_DIRTY_TYPE) {
-	if (mat->flags & MAT_DIRTY_FLAGS)
-	    analyse_from_scratch(mat);
+    if (flags & MAT_DIRTY_TYPE) {
+	if (flags & MAT_DIRTY_FLAGS)
+	    analyse_from_scratch(this);
 	else
-	    analyse_from_flags(mat);
+	    analyse_from_flags(this);
     }
 
-    if (mat->inv && (mat->flags & MAT_DIRTY_INVERSE)) {
-	matrix_invert(mat);
+    if (inv && (flags & MAT_DIRTY_INVERSE)) {
+	matrix_invert(this);
     }
 
-    mat->flags &= ~(MAT_DIRTY_FLAGS|
-		    MAT_DIRTY_TYPE|
-		    MAT_DIRTY_INVERSE);
+    flags &= ~(MAT_DIRTY_FLAGS|
+	       MAT_DIRTY_TYPE|
+	       MAT_DIRTY_INVERSE);
 }
 
 /*@}*/
 
 
-/**
- * Test if the given matrix preserves vector lengths.
- */
-GLboolean
-_math_matrix_is_length_preserving(const GLmatrix *m)
+bool
+GLmatrix::is_length_preserving() const
 {
-    return TEST_MAT_FLAGS(m, MAT_FLAGS_LENGTH_PRESERVING);
+    return TEST_MAT_FLAGS(this, MAT_FLAGS_LENGTH_PRESERVING);
 }
 
 
 /**
- * Test if the given matrix does any rotation.
- * (or perhaps if the upper-left 3x3 is non-identity)
+ * Test if this matrix does any rotation.
  */
-GLboolean
-_math_matrix_has_rotation(const GLmatrix *m)
+bool
+GLmatrix::has_rotation() const
 {
-    if (m->flags & (MAT_FLAG_GENERAL |
-		    MAT_FLAG_ROTATION |
-		    MAT_FLAG_GENERAL_3D |
-		    MAT_FLAG_PERSPECTIVE))
-	return GL_TRUE;
+    if (flags & (MAT_FLAG_GENERAL |
+		 MAT_FLAG_ROTATION |
+		 MAT_FLAG_GENERAL_3D |
+		 MAT_FLAG_PERSPECTIVE))
+	return true;
     else
-	return GL_FALSE;
+	return false;
 }
 
 
-GLboolean
-_math_matrix_is_general_scale(const GLmatrix *m)
+bool
+GLmatrix::is_general_scale() const
 {
-    return (m->flags & MAT_FLAG_GENERAL_SCALE) ? GL_TRUE : GL_FALSE;
+    return (flags & MAT_FLAG_GENERAL_SCALE) != 0;
 }
 
 
-GLboolean
-_math_matrix_is_dirty(const GLmatrix *m)
+bool
+GLmatrix::is_dirty() const
 {
-    return (m->flags & MAT_DIRTY) ? GL_TRUE : GL_FALSE;
+    return (flags & MAT_DIRTY) != 0;
 }
 
 
@@ -1503,17 +1491,17 @@ _math_matrix_is_dirty(const GLmatrix *m)
  * Copies all fields in GLmatrix, creating an inverse array if necessary.
  */
 void
-_math_matrix_copy(GLmatrix *to, const GLmatrix *from)
+GLmatrix::copy_from(const GLmatrix *from)
 {
-    memcpy(to->m, from->m, sizeof(Identity));
-    to->flags = from->flags;
-    to->type = from->type;
+    memcpy(m, from->m, sizeof(Identity));
+    flags = from->flags;
+    type = from->type;
 
-    if (to->inv != 0) {
+    if (inv != 0) {
 	if (from->inv == 0) {
-	    matrix_invert(to);
+	    matrix_invert(this);
 	} else {
-	    memcpy(to->inv, from->inv, sizeof(GLfloat)*16);
+	    memcpy(inv, from->inv, sizeof(GLfloat)*16);
 	}
     }
 }
@@ -1528,10 +1516,10 @@ _math_matrix_copy(GLmatrix *to, const GLmatrix *from)
  * flags.
  */
 void
-_math_matrix_loadf(GLmatrix *mat, const GLfloat *m)
+GLmatrix::load(const GLfloat *src)
 {
-    memcpy(mat->m, m, 16*sizeof(GLfloat));
-    mat->flags = (MAT_FLAG_GENERAL | MAT_DIRTY);
+    memcpy(m, src, 16*sizeof(GLfloat));
+    flags = (MAT_FLAG_GENERAL | MAT_DIRTY);
 }
 
 /**
@@ -1570,12 +1558,12 @@ GLmatrix::~GLmatrix()
  * Allocates the matrix inverse, GLmatrix::inv, and sets it to Identity.
  */
 void
-_math_matrix_alloc_inv(GLmatrix *m)
+GLmatrix::alloc_inv()
 {
-    if (!m->inv) {
-	m->inv = new (std::align_val_t{16}) GLfloat[16];
-	if (m->inv)
-	    memcpy(m->inv, Identity, 16 * sizeof(GLfloat));
+    if (!inv) {
+	inv = new (std::align_val_t{16}) GLfloat[16];
+	if (inv)
+	    memcpy(inv, Identity, 16 * sizeof(GLfloat));
     }
 }
 
