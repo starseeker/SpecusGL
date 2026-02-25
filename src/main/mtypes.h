@@ -3193,10 +3193,9 @@ struct gl_dlist_state {
     GLuint CallDepth = 0;	/**< Current recursion calling depth */
 
     struct mesa_display_list *CurrentList = nullptr;
-    Node *CurrentListPtr = nullptr;	/**< Head of list being compiled */
     GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
-    Node *CurrentBlock = nullptr;	/**< Pointer to current block of nodes */
-    GLuint CurrentPos = 0;	/**< Index into current block of nodes */
+    GLuint CurrentPos = 0;	/**< Write index into CurrentList->node */
+    GLuint CurrentCapacity = 0;	/**< Allocated nodes in CurrentList->node */
 
     GLvertexformat ListVtxfmt;
 
