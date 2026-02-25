@@ -154,15 +154,9 @@ _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 
 /** Reallocate memory */
 void *
-_mesa_realloc(void *oldBuffer, size_t oldSize, size_t newSize)
+_mesa_realloc(void *oldBuffer, size_t /*oldSize*/, size_t newSize)
 {
-    const size_t copySize = (oldSize < newSize) ? oldSize : newSize;
-    void *newBuffer = malloc(newSize);
-    if (newBuffer && oldBuffer && copySize > 0)
-	memcpy(newBuffer, oldBuffer, copySize);
-    if (oldBuffer)
-	free(oldBuffer);
-    return newBuffer;
+    return std::realloc(oldBuffer, newSize);
 }
 
 /**
@@ -678,20 +672,14 @@ _mesa_getenv(const char *var)
 
 /**
  * Implemented using malloc() and _mesa_strcpy.
- * Note that nullptr is handled accordingly.
+ /**
+ * Duplicates a string.  Returns nullptr if s is nullptr.
+ * Uses strdup() internally; the returned string must be freed with free()/std::free().
  */
 char *
 _mesa_strdup(const char *s)
 {
-    if (s) {
-	const size_t l = strlen(s);
-	char *s2 = (char *) malloc(l + 1);
-	if (s2)
-	    memcpy(s2, s, l + 1);
-	return s2;
-    } else {
-	return nullptr;
-    }
+    return s ? strdup(s) : nullptr;
 }
 
 /*@}*/

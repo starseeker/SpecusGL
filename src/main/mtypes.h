@@ -1631,6 +1631,20 @@ struct gl_buffer_object {
 
     /** Default constructor for zero/null buffer objects. */
     gl_buffer_object() = default;
+
+    /**
+     * Increment the reference count.
+     */
+    void ref() noexcept { ++RefCount; }
+
+    /**
+     * Decrement the reference count and return true if the object should
+     * now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
@@ -1894,6 +1908,20 @@ struct gl_program {
     GLuint NumNativeTexInstructions;
     GLuint NumNativeTexIndirections;
     /*@}*/
+
+    /**
+     * Increment the reference count.
+     */
+    void ref() noexcept { ++RefCount; }
+
+    /**
+     * Decrement the reference count and return true if the program should
+     * now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 

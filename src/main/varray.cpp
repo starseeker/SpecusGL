@@ -62,14 +62,13 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
     array->Normalized = normalized;
     array->Ptr = (const GLubyte *) ptr;
 #if FEATURE_ARB_vertex_buffer_object
-    array->BufferObj->RefCount--;
-    if (array->BufferObj->RefCount <= 0) {
+    if (array->BufferObj->unref()) {
 	ASSERT(array->BufferObj->Name);
 	_mesa_remove_buffer_object(ctx, array->BufferObj);
 	(*ctx->Driver.DeleteBuffer)(ctx, array->BufferObj);
     }
     array->BufferObj = ctx->Array.ArrayBufferObj;
-    array->BufferObj->RefCount++;
+    array->BufferObj->ref();
     /* Compute the index of the last array element that's inside the buffer.
      * Later in glDrawArrays we'll check if start + count > _MaxElement to
      * be sure we won't go out of bounds.

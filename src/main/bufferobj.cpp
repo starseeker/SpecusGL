@@ -169,8 +169,7 @@ void
 _mesa_unbind_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 {
     if (bufObj != ctx->Array.NullBufferObj) {
-	bufObj->RefCount--;
-	if (bufObj->RefCount <= 0) {
+	if (bufObj->unref()) {
 	    ASSERT(ctx->Array.ArrayBufferObj != bufObj);
 	    ASSERT(ctx->Array.ElementArrayBufferObj != bufObj);
 	    ASSERT(ctx->Array.ArrayObj->Vertex.BufferObj != bufObj);
@@ -512,7 +511,7 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
 
     /* Make new binding */
     *bindTarget = newBufObj;
-    newBufObj->RefCount++;
+    newBufObj->ref();
 
     /* Pass BindBuffer call to device driver */
     if (ctx->Driver.BindBuffer)
@@ -520,9 +519,7 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
 
     /* decr ref count on old buffer obj, delete if needed */
     if (oldBufObj) {
-	oldBufObj->RefCount--;
-	assert(oldBufObj->RefCount >= 0);
-	if (oldBufObj->RefCount == 0) {
+	if (oldBufObj->unref()) {
 	    assert(oldBufObj->Name != 0);
 	    ASSERT(ctx->Driver.DeleteBuffer);
 	    ctx->Driver.DeleteBuffer(ctx, oldBufObj);
