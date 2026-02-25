@@ -649,7 +649,7 @@ _mesa_GenTextures(GLsizei n, GLuint *textures)
      */
     std::lock_guard<std::mutex> genLock(GenTexturesLock);
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Shared->TexObjects, n);
+    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->TexObjects, n);
 
     /* Allocate new, empty texture objects */
     for (i = 0; i < n; i++) {

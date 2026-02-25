@@ -1339,11 +1339,14 @@ _mesa_free_attrib_data(GLcontext *ctx)
 }
 
 
+/**
+ * C++17 note: AttribStack and ClientAttribStack are std::vector members
+ * of __GLcontextRec and are default-initialised empty.  This function is
+ * a no-op and is retained only for API compatibility.
+ */
 void _mesa_init_attrib(GLcontext *ctx)
 {
-    /* Renderer and client attribute stacks start empty. */
-    ctx->AttribStack.clear();
-    ctx->ClientAttribStack.clear();
+    (void) ctx;  /* AttribStack and ClientAttribStack are empty by std::vector default */
 }
 
 /*

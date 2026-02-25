@@ -514,13 +514,15 @@ _mesa_RenderMode(GLenum mode)
 /**
  * Initialize context feedback data.
  */
+/**
+ * C++17 note: gl_feedback and gl_selection carry default member initializers,
+ * and ctx->RenderMode now defaults to GL_RENDER via a member initializer on
+ * __GLcontextRec.  This function is a no-op and is retained only for API
+ * compatibility.
+ */
 void _mesa_init_feedback(GLcontext * ctx)
 {
-    /* Feedback and Selection are zero/default-initialized via their struct
-     * default member initializers (see mtypes.h). */
-
-    /* Miscellaneous */
-    ctx->RenderMode = GL_RENDER;
+    (void) ctx;  /* all defaults provided by member initializers */
 }
 
 /*@}*/

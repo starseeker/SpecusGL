@@ -92,7 +92,7 @@ _mesa_lookup_renderbuffer(GLcontext *ctx, GLuint id)
 	return nullptr;
 
     rb = (struct gl_renderbuffer *)
-	 _mesa_HashLookup(ctx->Shared->RenderBuffers, id);
+	 _mesa_HashLookup(&ctx->Shared->RenderBuffers, id);
     return rb;
 }
 
@@ -109,7 +109,7 @@ _mesa_lookup_framebuffer(GLcontext *ctx, GLuint id)
 	return nullptr;
 
     fb = (struct gl_framebuffer *)
-	 _mesa_HashLookup(ctx->Shared->FrameBuffers, id);
+	 _mesa_HashLookup(&ctx->Shared->FrameBuffers, id);
     return fb;
 }
 
@@ -576,7 +576,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 		return;
 	    }
 	    ASSERT(newRb);
-	    _mesa_HashInsert(ctx->Shared->RenderBuffers, renderbuffer, newRb);
+	    _mesa_HashInsert(&ctx->Shared->RenderBuffers, renderbuffer, newRb);
 	    newRb->RefCount = 1; /* referenced by hash table */
 	}
     } else {
@@ -614,7 +614,7 @@ _mesa_DeleteRenderbuffersEXT(GLsizei n, const GLuint *renderbuffers)
 		 * But the object will not be freed until it's no longer
 		 * referenced anywhere else.
 		 */
-		_mesa_HashRemove(ctx->Shared->RenderBuffers, renderbuffers[i]);
+		_mesa_HashRemove(&ctx->Shared->RenderBuffers, renderbuffers[i]);
 
 		if (rb != &DummyRenderbuffer) {
 		    /* no longer referenced by hash table */
@@ -643,7 +643,7 @@ _mesa_GenRenderbuffersEXT(GLsizei n, GLuint *renderbuffers)
     if (!renderbuffers)
 	return;
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Shared->RenderBuffers, n);
+    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->RenderBuffers, n);
 
     for (i = 0; i < n; i++) {
 	GLuint name = first + i;
@@ -651,7 +651,7 @@ _mesa_GenRenderbuffersEXT(GLsizei n, GLuint *renderbuffers)
 	/* insert dummy placeholder into hash table */
 	{
 	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	    _mesa_HashInsert(ctx->Shared->RenderBuffers, name, &DummyRenderbuffer);
+	    _mesa_HashInsert(&ctx->Shared->RenderBuffers, name, &DummyRenderbuffer);
 	}
     }
 }
@@ -974,7 +974,7 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindFramebufferEXT");
 		return;
 	    }
-	    _mesa_HashInsert(ctx->Shared->FrameBuffers, framebuffer, newFb);
+	    _mesa_HashInsert(&ctx->Shared->FrameBuffers, framebuffer, newFb);
 	    ASSERT(newFb->RefCount == 1);
 	}
     } else {
@@ -1043,7 +1043,7 @@ _mesa_DeleteFramebuffersEXT(GLsizei n, const GLuint *framebuffers)
 		}
 
 		/* remove from hash table immediately, to free the ID */
-		_mesa_HashRemove(ctx->Shared->FrameBuffers, framebuffers[i]);
+		_mesa_HashRemove(&ctx->Shared->FrameBuffers, framebuffers[i]);
 
 		if (fb != &DummyFramebuffer) {
 		    /* But the object will not be freed until it's no longer
@@ -1074,7 +1074,7 @@ _mesa_GenFramebuffersEXT(GLsizei n, GLuint *framebuffers)
     if (!framebuffers)
 	return;
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Shared->FrameBuffers, n);
+    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->FrameBuffers, n);
 
     for (i = 0; i < n; i++) {
 	GLuint name = first + i;
@@ -1082,7 +1082,7 @@ _mesa_GenFramebuffersEXT(GLsizei n, GLuint *framebuffers)
 	/* insert dummy placeholder into hash table */
 	{
 	    std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
-	    _mesa_HashInsert(ctx->Shared->FrameBuffers, name, &DummyFramebuffer);
+	    _mesa_HashInsert(&ctx->Shared->FrameBuffers, name, &DummyFramebuffer);
 	}
     }
 }

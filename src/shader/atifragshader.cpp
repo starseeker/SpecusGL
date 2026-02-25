@@ -194,7 +194,7 @@ _mesa_GenFragmentShadersATI(GLuint range)
 	return 0;
     }
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Shared->ATIShaders, range);
+    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->ATIShaders, range);
     for (i = 0; i < range; i++) {
 	ctx->Shared->insert_ati_shader(first + i, &DummyShader);
     }

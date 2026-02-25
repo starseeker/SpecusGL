@@ -110,15 +110,14 @@ _mesa_LineStipple(GLint factor, GLushort pattern)
  * Initializes __GLcontextRec::Line and line related constants in
  * __GLcontextRec::Const.
  */
+/**
+ * C++17 note: gl_line_attrib now carries all default member initializers
+ * (Width=1.0, _Width=1.0, StipplePattern=0xffff, StippleFactor=1), so
+ * this function is a no-op and is retained only for API compatibility.
+ */
 void GLAPIENTRY _mesa_init_line(GLcontext * ctx)
 {
-    /* Line group */
-    ctx->Line.SmoothFlag = GL_FALSE;
-    ctx->Line.StippleFlag = GL_FALSE;
-    ctx->Line.Width = 1.0;
-    ctx->Line._Width = 1.0;
-    ctx->Line.StipplePattern = 0xffff;
-    ctx->Line.StippleFactor = 1;
+    (void) ctx;  /* all defaults provided by gl_line_attrib member initializers */
 }
 
 /*

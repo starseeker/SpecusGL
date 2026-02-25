@@ -968,18 +968,18 @@ void glWindowPos4fMESA(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
  * __GLcontextRec::Current, and adds the extension entry points to the
  * dispatcher.
  */
+/**
+ * C++17 note: most fields of gl_current_attrib now have default member
+ * initializers (RasterPos.w=1, RasterColor=white, RasterIndex=1,
+ * RasterPosValid=GL_TRUE).  RasterTexCoords cannot be fully initialised
+ * by a member initializer (w=1.0 per unit), so that is done here.
+ */
 void _mesa_init_rastpos(GLcontext * ctx)
 {
     int i;
 
-    ASSIGN_4V(ctx->Current.RasterPos, 0.0, 0.0, 0.0, 1.0);
-    ctx->Current.RasterDistance = 0.0;
-    ASSIGN_4V(ctx->Current.RasterColor, 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Current.RasterSecondaryColor, 0.0, 0.0, 0.0, 1.0);
-    ctx->Current.RasterIndex = 1.0;
-    for (i=0; i<MAX_TEXTURE_UNITS; i++)
+    for (i = 0; i < MAX_TEXTURE_UNITS; i++)
 	ASSIGN_4V(ctx->Current.RasterTexCoords[i], 0.0, 0.0, 0.0, 1.0);
-    ctx->Current.RasterPosValid = GL_TRUE;
 }
 
 /*@}*/
