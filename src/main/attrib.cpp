@@ -77,17 +77,11 @@ struct texture_state {
 };
 
 
-/**
- * Free the data pointed to by an attrib entry, using the correct deallocator.
- */
-static void
-free_attrib_data(GLbitfield kind, void *data)
-{
-    if (kind == GL_POLYGON_STIPPLE_BIT)
-	delete[] static_cast<GLuint*>(data);
-    else
-	::operator delete(data);  /* safe: all non-stipple data is POD */
-}
+/** Typed deleter for POD attribute snapshots (most attribute groups). */
+static void del_attrib_pod(void *p) { ::operator delete(p); }
+
+/** Typed deleter for the polygon stipple (GLuint[32] array). */
+static void del_attrib_stipple(void *p) { delete[] static_cast<GLuint*>(p); }
 
 
 void GLAPIENTRY
@@ -111,14 +105,14 @@ _mesa_PushAttrib(GLbitfield mask)
 	struct gl_accum_attrib *attr;
 	attr = new gl_accum_attrib{};
 	*attr = ctx->Accum;
-	ctx->AttribStack.back().emplace_back(GL_ACCUM_BUFFER_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_ACCUM_BUFFER_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_COLOR_BUFFER_BIT) {
 	struct gl_colorbuffer_attrib *attr;
 	attr = new gl_colorbuffer_attrib{};
 	*attr = ctx->Color;
-	ctx->AttribStack.back().emplace_back(GL_COLOR_BUFFER_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_COLOR_BUFFER_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_CURRENT_BIT) {
@@ -126,14 +120,14 @@ _mesa_PushAttrib(GLbitfield mask)
 	FLUSH_CURRENT(ctx, 0);
 	attr = new gl_current_attrib{};
 	*attr = ctx->Current;
-	ctx->AttribStack.back().emplace_back(GL_CURRENT_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_CURRENT_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_DEPTH_BUFFER_BIT) {
 	struct gl_depthbuffer_attrib *attr;
 	attr = new gl_depthbuffer_attrib{};
 	*attr = ctx->Depth;
-	ctx->AttribStack.back().emplace_back(GL_DEPTH_BUFFER_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_DEPTH_BUFFER_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_ENABLE_BIT) {
@@ -213,28 +207,28 @@ _mesa_PushAttrib(GLbitfield mask)
 	attr->VertexProgram = ctx->VertexProgram.Enabled;
 	attr->VertexProgramPointSize = ctx->VertexProgram.PointSizeEnabled;
 	attr->VertexProgramTwoSide = ctx->VertexProgram.TwoSideEnabled;
-	ctx->AttribStack.back().emplace_back(GL_ENABLE_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_ENABLE_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_EVAL_BIT) {
 	struct gl_eval_attrib *attr;
 	attr = new gl_eval_attrib{};
 	*attr = ctx->Eval;
-	ctx->AttribStack.back().emplace_back(GL_EVAL_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_EVAL_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_FOG_BIT) {
 	struct gl_fog_attrib *attr;
 	attr = new gl_fog_attrib{};
 	*attr = ctx->Fog;
-	ctx->AttribStack.back().emplace_back(GL_FOG_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_FOG_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_HINT_BIT) {
 	struct gl_hint_attrib *attr;
 	attr = new gl_hint_attrib{};
 	*attr = ctx->Hint;
-	ctx->AttribStack.back().emplace_back(GL_HINT_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_HINT_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_LIGHTING_BIT) {
@@ -242,21 +236,21 @@ _mesa_PushAttrib(GLbitfield mask)
 	FLUSH_CURRENT(ctx, 0);	/* flush material changes */
 	attr = new gl_light_attrib{};
 	*attr = ctx->Light;
-	ctx->AttribStack.back().emplace_back(GL_LIGHTING_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_LIGHTING_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_LINE_BIT) {
 	struct gl_line_attrib *attr;
 	attr = new gl_line_attrib{};
 	*attr = ctx->Line;
-	ctx->AttribStack.back().emplace_back(GL_LINE_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_LINE_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_LIST_BIT) {
 	struct gl_list_attrib *attr;
 	attr = new gl_list_attrib{};
 	*attr = ctx->List;
-	ctx->AttribStack.back().emplace_back(GL_LIST_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_LIST_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_PIXEL_MODE_BIT) {
@@ -265,41 +259,41 @@ _mesa_PushAttrib(GLbitfield mask)
 	*attr = ctx->Pixel;
 	/* push the Read FBO's ReadBuffer state, not ctx->Pixel.ReadBuffer */
 	attr->ReadBuffer = ctx->ReadBuffer->ColorReadBuffer;
-	ctx->AttribStack.back().emplace_back(GL_PIXEL_MODE_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_PIXEL_MODE_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_POINT_BIT) {
 	struct gl_point_attrib *attr;
 	attr = new gl_point_attrib{};
 	*attr = ctx->Point;
-	ctx->AttribStack.back().emplace_back(GL_POINT_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_POINT_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_POLYGON_BIT) {
 	struct gl_polygon_attrib *attr;
 	attr = new gl_polygon_attrib{};
 	*attr = ctx->Polygon;
-	ctx->AttribStack.back().emplace_back(GL_POLYGON_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_POLYGON_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_POLYGON_STIPPLE_BIT) {
 	GLuint *stipple = new GLuint[32];
 	std::copy(ctx->PolygonStipple, ctx->PolygonStipple + 32, stipple);
-	ctx->AttribStack.back().emplace_back(GL_POLYGON_STIPPLE_BIT, stipple);
+	ctx->AttribStack.back().emplace_back(GL_POLYGON_STIPPLE_BIT, stipple, del_attrib_stipple);
     }
 
     if (mask & GL_SCISSOR_BIT) {
 	struct gl_scissor_attrib *attr;
 	attr = new gl_scissor_attrib{};
 	*attr = ctx->Scissor;
-	ctx->AttribStack.back().emplace_back(GL_SCISSOR_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_SCISSOR_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_STENCIL_BUFFER_BIT) {
 	struct gl_stencil_attrib *attr;
 	attr = new gl_stencil_attrib{};
 	*attr = ctx->Stencil;
-	ctx->AttribStack.back().emplace_back(GL_STENCIL_BUFFER_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_STENCIL_BUFFER_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_TEXTURE_BIT) {
@@ -338,21 +332,21 @@ _mesa_PushAttrib(GLbitfield mask)
 
 	_mesa_unlock_context_textures(ctx);
 
-	ctx->AttribStack.back().emplace_back(GL_TEXTURE_BIT, texstate);
+	ctx->AttribStack.back().emplace_back(GL_TEXTURE_BIT, texstate, del_attrib_pod);
     }
 
     if (mask & GL_TRANSFORM_BIT) {
 	struct gl_transform_attrib *attr;
 	attr = new gl_transform_attrib{};
 	*attr = ctx->Transform;
-	ctx->AttribStack.back().emplace_back(GL_TRANSFORM_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_TRANSFORM_BIT, attr, del_attrib_pod);
     }
 
     if (mask & GL_VIEWPORT_BIT) {
 	struct gl_viewport_attrib *attr;
 	attr = new gl_viewport_attrib{};
 	*attr = ctx->Viewport;
-	ctx->AttribStack.back().emplace_back(GL_VIEWPORT_BIT, attr);
+	ctx->AttribStack.back().emplace_back(GL_VIEWPORT_BIT, attr, del_attrib_pod);
     }
 
     /* GL_ARB_multisample */
@@ -360,7 +354,7 @@ _mesa_PushAttrib(GLbitfield mask)
 	struct gl_multisample_attrib *attr;
 	attr = new gl_multisample_attrib{};
 	*attr = ctx->Multisample;
-	ctx->AttribStack.back().emplace_back(GL_MULTISAMPLE_BIT_ARB, attr);
+	ctx->AttribStack.back().emplace_back(GL_MULTISAMPLE_BIT_ARB, attr, del_attrib_pod);
     }
 
 }
@@ -784,7 +778,9 @@ _mesa_PopAttrib(void)
 	return;
     }
 
-    for (auto& [kind, data] : ctx->AttribStack.back()) {
+    for (auto& entry : ctx->AttribStack.back()) {
+	const GLbitfield kind = entry.kind;
+	void *const data = entry.data;
 
 	if (MESA_VERBOSE & VERBOSE_API) {
 	    _mesa_debug(ctx, "glPopAttrib %s\n",
@@ -1146,10 +1142,8 @@ _mesa_PopAttrib(void)
 		_mesa_problem(ctx, "Bad attrib flag in PopAttrib");
 		break;
 	}
-
-	free_attrib_data(kind, data);
     }
-    ctx->AttribStack.pop_back();
+    ctx->AttribStack.pop_back();  /* gl_attrib_entry destructors free the data */
 }
 
 
@@ -1205,11 +1199,11 @@ _mesa_PushClientAttrib(GLbitfield mask)
 	/* packing attribs */
 	attr = new gl_pixelstore_attrib{};
 	*attr = ctx->Pack;
-	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_PACK_BIT, attr);
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_PACK_BIT, attr, del_attrib_pod);
 	/* unpacking attribs */
 	attr = new gl_pixelstore_attrib{};
 	*attr = ctx->Unpack;
-	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_UNPACK_BIT, attr);
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_UNPACK_BIT, attr, del_attrib_pod);
     }
     if (mask & GL_CLIENT_VERTEX_ARRAY_BIT) {
 	struct gl_array_attrib *attr;
@@ -1229,7 +1223,7 @@ _mesa_PushClientAttrib(GLbitfield mask)
 
 	attr->ArrayObj = obj;
 
-	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_VERTEX_ARRAY_BIT, attr);
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_VERTEX_ARRAY_BIT, attr, del_attrib_pod);
 	/* bump reference counts on buffer objects */
 	adjust_buffer_object_ref_counts(&ctx->Array, 1);
     }
@@ -1250,7 +1244,9 @@ _mesa_PopClientAttrib(void)
 	return;
     }
 
-    for (auto& [kind, data] : ctx->ClientAttribStack.back()) {
+    for (auto& entry : ctx->ClientAttribStack.back()) {
+	const GLbitfield kind = entry.kind;
+	void *const data = entry.data;
 	switch (kind) {
 	    case GL_CLIENT_PACK_BIT:
 #if FEATURE_EXT_pixel_buffer_object
@@ -1307,21 +1303,23 @@ _mesa_PopClientAttrib(void)
 		_mesa_problem(ctx, "Bad attrib flag in PopClientAttrib");
 		break;
 	}
-
-	free_attrib_data(kind, data);
     }
-    ctx->ClientAttribStack.pop_back();
+    ctx->ClientAttribStack.pop_back();  /* gl_attrib_entry destructors free the data */
 }
 
 
 void
 _mesa_free_attrib_data(GLcontext *ctx)
 {
-    /* Release all texture object references held by the attrib stack. */
+    /* Release all texture object references held by the attrib stack before
+     * the entries are freed.  The gl_attrib_entry destructors handle freeing
+     * the data snapshots; we just need to drop the texture object refcounts
+     * while the data is still valid.
+     */
     for (auto& level : ctx->AttribStack) {
-	for (auto& [kind, data] : level) {
-	    if (kind == GL_TEXTURE_BIT) {
-		struct texture_state *texstate = (struct texture_state *) data;
+	for (auto& entry : level) {
+	    if (entry.kind == GL_TEXTURE_BIT) {
+		struct texture_state *texstate = (struct texture_state *) entry.data;
 		GLuint u;
 		/* clear references to the saved texture objects */
 		for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
@@ -1332,10 +1330,9 @@ _mesa_free_attrib_data(GLcontext *ctx)
 		    _mesa_reference_texobj(&texstate->SavedRefRect[u], nullptr);
 		}
 	    }
-	    free_attrib_data(kind, data);
 	}
     }
-    ctx->AttribStack.clear();
+    ctx->AttribStack.clear();  /* gl_attrib_entry destructors free snapshot data */
 }
 
 
