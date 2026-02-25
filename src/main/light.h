@@ -92,7 +92,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params);
  */
 #define GET_SHINE_TAB_ENTRY( table, dp, result )			\
 do {									\
-   struct gl_shine_tab *_tab = table;					\
+   const struct gl_shine_tab *_tab = &*table;				\
    float f = (dp * (SHINE_TABLE_SIZE-1));				\
    int k = (int) f;							\
    if (k < 0 /* gcc may cast an overflow float value to negative int value*/ \

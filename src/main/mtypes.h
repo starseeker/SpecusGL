@@ -507,7 +507,6 @@ struct gl_color_table {
 struct gl_shine_tab {
     GLfloat tab[SHINE_TABLE_SIZE+1];
     GLfloat shininess;
-    GLuint refcount;
 };
 
 
@@ -3372,7 +3371,7 @@ struct __GLcontextRec {
 
     GLuint TextureStateTimestamp; /* detect changes to shared state */
 
-    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables (point into _ShineTabList) */
+    std::list<gl_shine_tab>::iterator _ShineTable[2]; /**< Active shine tables (iterators into _ShineTabList; end() = none) */
     std::list<gl_shine_tab> _ShineTabList;  /**< MRU pool of shine tables */
     /**@}*/
 

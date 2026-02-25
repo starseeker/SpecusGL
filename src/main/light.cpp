@@ -930,9 +930,7 @@ void
 _mesa_invalidate_shine_table(GLcontext *ctx, GLuint side)
 {
     ASSERT(side < 2);
-    if (ctx->_ShineTable[side])
-	ctx->_ShineTable[side]->refcount--;
-    ctx->_ShineTable[side] = nullptr;
+    ctx->_ShineTable[side] = ctx->_ShineTabList.end();
 }
 
 
@@ -940,28 +938,29 @@ static void
 validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 {
     ASSERT(side < 2);
+    const auto end = ctx->_ShineTabList.end();
 
     /* Search the MRU pool for an existing entry with matching shininess */
-    gl_shine_tab *s = nullptr;
-    for (auto& entry : ctx->_ShineTabList) {
-	if (entry.shininess == shininess) {
-	    s = &entry;
+    auto it = end;
+    for (auto cur = ctx->_ShineTabList.begin(); cur != end; ++cur) {
+	if (cur->shininess == shininess) {
+	    it = cur;
 	    break;
 	}
     }
 
-    if (!s) {
+    if (it == end) {
 	/* Not found – reuse the least-recently-used (= front) entry
-	 * that has no current references. */
-	for (auto& entry : ctx->_ShineTabList) {
-	    if (entry.refcount == 0) {
-		s = &entry;
+	 * that is not currently pinned by either _ShineTable slot. */
+	for (auto cur = ctx->_ShineTabList.begin(); cur != end; ++cur) {
+	    if (cur != ctx->_ShineTable[0] && cur != ctx->_ShineTable[1]) {
+		it = cur;
 		break;
 	    }
 	}
 
 	GLint j;
-	GLfloat *m = s->tab;
+	GLfloat *m = it->tab;
 	m[0] = 0.0;
 	if (shininess == 0.0) {
 	    for (j = 1 ; j <= SHINE_TABLE_SIZE ; j++)
@@ -980,20 +979,12 @@ validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 	    m[SHINE_TABLE_SIZE] = 1.0;
 	}
 
-	s->shininess = shininess;
+	it->shininess = shininess;
     }
 
-    if (ctx->_ShineTable[side])
-	ctx->_ShineTable[side]->refcount--;
-
-    ctx->_ShineTable[side] = s;
-    /* Move s to tail of the MRU list using splice */
-    auto it = ctx->_ShineTabList.begin();
-    for (; it != ctx->_ShineTabList.end(); ++it) {
-	if (&*it == s) break;
-    }
+    ctx->_ShineTable[side] = it;
+    /* Move it to tail of the MRU list using splice */
     ctx->_ShineTabList.splice(ctx->_ShineTabList.end(), ctx->_ShineTabList, it);
-    s->refcount++;
 }
 
 
@@ -1004,11 +995,11 @@ _mesa_validate_all_lighting_tables(GLcontext *ctx)
     GLfloat shininess;
 
     shininess = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_SHININESS][0];
-    if (!ctx->_ShineTable[0] || ctx->_ShineTable[0]->shininess != shininess)
+    if (ctx->_ShineTable[0] == ctx->_ShineTabList.end() || ctx->_ShineTable[0]->shininess != shininess)
 	validate_shine_table(ctx, 0, shininess);
 
     shininess = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_SHININESS][0];
-    if (!ctx->_ShineTable[1] || ctx->_ShineTable[1]->shininess != shininess)
+    if (ctx->_ShineTable[1] == ctx->_ShineTabList.end() || ctx->_ShineTable[1]->shininess != shininess)
 	validate_shine_table(ctx, 1, shininess);
 
     for (i = 0; i < ctx->Const.MaxLights; i++)
@@ -1351,13 +1342,12 @@ _mesa_init_lighting(GLcontext *ctx)
 
     /* Lighting miscellaneous */
     ctx->_ShineTabList.clear();
-    ctx->_ShineTable[0] = nullptr;
-    ctx->_ShineTable[1] = nullptr;
+    ctx->_ShineTable[0] = ctx->_ShineTabList.end();
+    ctx->_ShineTable[1] = ctx->_ShineTabList.end();
     /* Allocate 10 (arbitrary) shininess lookup tables */
     for (i = 0 ; i < 10 ; i++) {
 	ctx->_ShineTabList.push_back({});
 	ctx->_ShineTabList.back().shininess = -1;
-	ctx->_ShineTabList.back().refcount = 0;
     }
 
     /* Miscellaneous */
