@@ -34,6 +34,8 @@
 #include "imports.h"
 #include "arbprogparse.h"
 #include <string>
+#include <algorithm>
+#include <utility>
 #include "grammar_mesa.h"
 #include "program.h"
 #include "prog_parameter.h"
@@ -3393,6 +3395,7 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 			   ? ctx->Const.FragmentProgram.MaxInstructions
 			   : ctx->Const.VertexProgram.MaxInstructions;
     GLint err = 0;
+    GLuint numInst = 0;
 
     ASSERT(MAX_INSTRUCTIONS >= maxInst);
 
@@ -3445,7 +3448,7 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 
 	    case INSTRUCTION:
 		/* check length */
-		if (Program->Base.NumInstructions + 1 >= maxInst) {
+		if (numInst + 1 >= maxInst) {
 		    program_error(ctx, Program->Position,
 				  "Max instruction count exceeded");
 		    return 1;
@@ -3454,14 +3457,14 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 		/* parse the current instruction */
 		if (Program->Base.Target == GL_FRAGMENT_PROGRAM_ARB) {
 		    err = parse_fp_instruction(ctx, &inst, vc_head, Program,
-					       &Program->Base.Instructions[Program->Base.NumInstructions]);
+					       &Program->Base.Instructions[numInst]);
 		} else {
 		    err = parse_vp_instruction(ctx, &inst, vc_head, Program,
-					       &Program->Base.Instructions[Program->Base.NumInstructions]);
+					       &Program->Base.Instructions[numInst]);
 		}
 
 		/* increment instuction count */
-		Program->Base.NumInstructions++;
+		numInst++;
 		break;
 
 	    case DECLARATION:
@@ -3478,21 +3481,22 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 
     /* Finally, tag on an OPCODE_END instruction */
     {
-	const GLuint numInst = Program->Base.NumInstructions;
-	_mesa_init_instructions(Program->Base.Instructions + numInst, 1);
+	_mesa_init_instructions(&Program->Base.Instructions[numInst], 1);
 	Program->Base.Instructions[numInst].Opcode = OPCODE_END;
 	/* YYY Wrong Position in program, whatever, at least not random -> crash
 	 Program->Position = parse_position (&inst);
 	*/
 	Program->Base.Instructions[numInst].StringPos = Program->Position;
     }
-    Program->Base.NumInstructions++;
+    numInst++;
+
+    Program->Base.Instructions.resize(numInst);
 
     /*
      * Initialize native counts to logical counts.  The device driver may
      * change them if program is translated into a hardware program.
      */
-    Program->Base.NumNativeInstructions = Program->Base.NumInstructions;
+    Program->Base.NumNativeInstructions = numInst;
     Program->Base.NumNativeTemporaries = Program->Base.NumTemporaries;
     Program->Base.NumNativeParameters = Program->Base.NumParameters;
     Program->Base.NumNativeAttributes = Program->Base.NumAttributes;
@@ -3738,11 +3742,10 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 
     /* Initialize the arb_program struct */
     program->Base.String.assign(reinterpret_cast<const char *>(strzVec.data()), len);
-    program->Base.Instructions = _mesa_alloc_instructions(MAX_INSTRUCTIONS);
-    program->Base.NumInstructions =
-	program->Base.NumTemporaries =
-	    program->Base.NumParameters =
-		program->Base.NumAttributes = program->Base.NumAddressRegs = 0;
+    program->Base.Instructions.resize(MAX_INSTRUCTIONS);
+    program->Base.NumTemporaries =
+	program->Base.NumParameters =
+	    program->Base.NumAttributes = program->Base.NumAddressRegs = 0;
     program->Base.Parameters = _mesa_new_parameter_list();
     program->Base.InputsRead = 0x0;
     program->Base.OutputsWritten = 0x0;
@@ -3780,14 +3783,6 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 
     free(parsed);
 
-    /* Reallocate the instruction array from size [MAX_INSTRUCTIONS]
-     * to size [ap.Base.NumInstructions].
-     */
-    program->Base.Instructions
-	= _mesa_realloc_instructions(program->Base.Instructions,
-				     MAX_INSTRUCTIONS,
-				     program->Base.NumInstructions);
-
     return !err;
 }
 
@@ -3811,7 +3806,6 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
      * fragment_program struct.
      */
     program->Base.String          = ap.Base.String;
-    program->Base.NumInstructions = ap.Base.NumInstructions;
     program->Base.NumTemporaries  = ap.Base.NumTemporaries;
     program->Base.NumParameters   = ap.Base.NumParameters;
     program->Base.NumAttributes   = ap.Base.NumAttributes;
@@ -3834,9 +3828,7 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     program->FogOption          = ap.FogOption;
     program->UsesKill          = ap.UsesKill;
 
-    if (program->Base.Instructions)
-	delete[] program->Base.Instructions;
-    program->Base.Instructions = ap.Base.Instructions;
+    program->Base.Instructions = std::move(ap.Base.Instructions);
 
     if (program->Base.Parameters)
 	_mesa_free_parameter_list(program->Base.Parameters);
@@ -3873,7 +3865,6 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
      * vertex_program struct.
      */
     program->Base.String          = ap.Base.String;
-    program->Base.NumInstructions = ap.Base.NumInstructions;
     program->Base.NumTemporaries  = ap.Base.NumTemporaries;
     program->Base.NumParameters   = ap.Base.NumParameters;
     program->Base.NumAttributes   = ap.Base.NumAttributes;
@@ -3887,9 +3878,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
     program->Base.OutputsWritten = ap.Base.OutputsWritten;
     program->IsPositionInvariant = ap.HintPositionInvariant;
 
-    if (program->Base.Instructions)
-	delete[] program->Base.Instructions;
-    program->Base.Instructions = ap.Base.Instructions;
+    program->Base.Instructions = std::move(ap.Base.Instructions);
 
     if (program->Base.Parameters)
 	_mesa_free_parameter_list(program->Base.Parameters);

@@ -1424,7 +1424,6 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 {
     struct parse_state parseState;
     struct prog_instruction instBuffer[MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS];
-    struct prog_instruction *newInst;
     GLenum target;
     std::string programString(reinterpret_cast<const char *>(str), len);
 
@@ -1476,21 +1475,11 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 	    return;
 	}
 
-	/* copy the compiled instructions */
-	assert(parseState.numInst <= MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS);
-	newInst = _mesa_alloc_instructions(parseState.numInst);
-	if (!newInst) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	    return;  /* out of memory */
-	}
-	_mesa_copy_instructions(newInst, instBuffer, parseState.numInst);
-
 	/* install the program */
 	program->Base.Target = target;
 	program->Base.String = programString;
 	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	program->Base.Instructions = newInst;
-	program->Base.NumInstructions = parseState.numInst;
+	program->Base.Instructions.assign(instBuffer, instBuffer + parseState.numInst);
 	program->Base.InputsRead = parseState.inputsRead;
 	program->Base.OutputsWritten = parseState.outputsWritten;
 	for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++)
@@ -1669,9 +1658,9 @@ PrintDstReg(const struct prog_dst_register *dst)
 void
 _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 {
-    const struct prog_instruction *inst;
-
-    for (inst = program->Base.Instructions; inst->Opcode != OPCODE_END; inst++) {
+    for (GLuint _i = 0; _i < (GLuint)program->Base.Instructions.size(); _i++) {
+	const struct prog_instruction *inst = &program->Base.Instructions[_i];
+	if (inst->Opcode == OPCODE_END) break;
 	int i;
 	for (i = 0; Instructions[i].name; i++) {
 	    if (inst->Opcode == Instructions[i].opcode) {

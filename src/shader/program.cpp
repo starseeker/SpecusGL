@@ -259,14 +259,9 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog == &_mesa_DummyProgram)
 	return;
 
-    if (prog->Instructions) {
-	GLuint i;
-	for (i = 0; i < prog->NumInstructions; i++) {
-	    if (prog->Instructions[i].Data)
-		delete[] static_cast<GLubyte *>(prog->Instructions[i].Data);
-	    /* Comment is now std::string, no explicit free needed */
-	}
-	delete[] prog->Instructions;
+    for (auto &inst : prog->Instructions) {
+	if (inst.Data)
+	    delete[] static_cast<GLubyte *>(inst.Data);
     }
 
     if (prog->Parameters) {
@@ -324,13 +319,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
     clone->String = prog->String;
     clone->RefCount = 1;
     clone->Format = prog->Format;
-    clone->Instructions = _mesa_alloc_instructions(prog->NumInstructions);
-    if (!clone->Instructions) {
-	ctx->Driver.DeleteProgram(ctx, clone);
-	return nullptr;
-    }
-    _mesa_copy_instructions(clone->Instructions, prog->Instructions,
-			    prog->NumInstructions);
+    clone->Instructions = prog->Instructions;
     clone->InputsRead = prog->InputsRead;
     clone->OutputsWritten = prog->OutputsWritten;
     std::copy(std::begin(prog->TexturesUsed), std::end(prog->TexturesUsed), std::begin(clone->TexturesUsed));
@@ -342,7 +331,6 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 	clone->Varying = _mesa_clone_parameter_list(prog->Varying);
     if (prog->Attributes)
 	clone->Attributes = _mesa_clone_parameter_list(prog->Attributes);
-    clone->NumInstructions = prog->NumInstructions;
     clone->NumTemporaries = prog->NumTemporaries;
     clone->NumParameters = prog->NumParameters;
     clone->NumAttributes = prog->NumAttributes;

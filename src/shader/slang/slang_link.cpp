@@ -95,8 +95,8 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     /* OK, now scan the program/shader instructions looking for varying vars,
      * replacing the old index with the new index.
      */
-    for (i = 0; i < prog->NumInstructions; i++) {
-	struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	struct prog_instruction *inst = &prog->Instructions[i];
 	GLuint j;
 
 	if (inst->DstReg.File == PROGRAM_VARYING) {
@@ -241,8 +241,8 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     /* OK, now scan the program/shader instructions looking for uniform vars,
      * replacing the old index with the new index.
      */
-    for (i = 0; i < prog->NumInstructions; i++) {
-	struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	struct prog_instruction *inst = &prog->Instructions[i];
 	GLuint j;
 
 	if (is_uniform(inst->DstReg.File)) {
@@ -301,8 +301,8 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
     /*
      * Scan program for generic attribute references
      */
-    for (i = 0; i < prog->NumInstructions; i++) {
-	struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	struct prog_instruction *inst = &prog->Instructions[i];
 	for (j = 0; j < 3; j++) {
 	    if (inst->SrcReg[j].File == PROGRAM_INPUT &&
 		inst->SrcReg[j].Index >= VERT_ATTRIB_GENERIC0) {
@@ -358,8 +358,8 @@ _slang_count_temporaries(struct gl_program *prog)
     GLuint i, j;
     GLint maxIndex = -1;
 
-    for (i = 0; i < prog->NumInstructions; i++) {
-	const struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	const struct prog_instruction *inst = &prog->Instructions[i];
 	const GLuint numSrc = _mesa_num_inst_src_regs(inst->Opcode);
 	for (j = 0; j < numSrc; j++) {
 	    if (inst->SrcReg[j].File == PROGRAM_TEMPORARY) {
@@ -389,8 +389,8 @@ _slang_update_inputs_outputs(struct gl_program *prog)
     prog->InputsRead = 0x0;
     prog->OutputsWritten = 0x0;
 
-    for (i = 0; i < prog->NumInstructions; i++) {
-	const struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	const struct prog_instruction *inst = &prog->Instructions[i];
 	const GLuint numSrc = _mesa_num_inst_src_regs(inst->Opcode);
 	for (j = 0; j < numSrc; j++) {
 	    if (inst->SrcReg[j].File == PROGRAM_INPUT) {
@@ -418,8 +418,8 @@ _slang_remap_attribute(struct gl_program *prog, GLuint oldAttrib, GLuint newAttr
 
     assert(prog->Target == GL_VERTEX_PROGRAM_ARB);
 
-    for (i = 0; i < prog->NumInstructions; i++) {
-	struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	struct prog_instruction *inst = &prog->Instructions[i];
 	for (j = 0; j < 3; j++) {
 	    if (inst->SrcReg[j].File == PROGRAM_INPUT) {
 		if (inst->SrcReg[j].Index == VERT_ATTRIB_GENERIC0 + oldAttrib) {
@@ -448,8 +448,8 @@ _slang_resolve_samplers(struct gl_shader_program *shProg,
     for (i = 0; i < MAX_TEXTURE_IMAGE_UNITS; i++)
 	prog->TexturesUsed[i] = 0;
 
-    for (i = 0; i < prog->NumInstructions; i++) {
-	struct prog_instruction *inst = prog->Instructions + i;
+    for (i = 0; i < static_cast<GLuint>(prog->Instructions.size()); i++) {
+	struct prog_instruction *inst = &prog->Instructions[i];
 	if (inst->Opcode == OPCODE_TEX ||
 	    inst->Opcode == OPCODE_TXB ||
 	    inst->Opcode == OPCODE_TXP) {

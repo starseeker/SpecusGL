@@ -376,7 +376,7 @@ typedef enum {
     OPCODE_ATTR_4F_ARB,
     OPCODE_MATERIAL,
     OPCODE_BEGIN,
-    OPCODE_END,
+    DLIST_OPCODE_END,
     OPCODE_RECTF,
     OPCODE_EVAL_C1,
     OPCODE_EVAL_C2,
@@ -5185,7 +5185,7 @@ save_End(void)
 {
     GET_CURRENT_CONTEXT(ctx);
     SAVE_FLUSH_VERTICES(ctx);
-    (void) ALLOC_INSTRUCTION(ctx, OPCODE_END, 0);
+    (void) ALLOC_INSTRUCTION(ctx, DLIST_OPCODE_END, 0);
     ctx->Driver.CurrentSavePrimitive = PRIM_OUTSIDE_BEGIN_END;
     if (ctx->ExecuteFlag) {
 	CALL_End(ctx->Exec, ());
@@ -6499,7 +6499,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		case OPCODE_BEGIN:
 		    CALL_Begin(ctx->Exec, (n[1].e));
 		    break;
-		case OPCODE_END:
+		case DLIST_OPCODE_END:
 		    CALL_End(ctx->Exec, ());
 		    break;
 		case OPCODE_RECTF:
@@ -8308,7 +8308,7 @@ print_list(GLcontext *ctx, GLuint list)
 		case OPCODE_BEGIN:
 		    _mesa_printf("BEGIN %x\n", n[1].i);
 		    break;
-		case OPCODE_END:
+		case DLIST_OPCODE_END:
 		    _mesa_printf("END\n");
 		    break;
 		case OPCODE_RECTF:

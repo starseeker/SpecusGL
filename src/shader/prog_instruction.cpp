@@ -61,55 +61,6 @@ _mesa_init_instructions(struct prog_instruction *inst, GLuint count)
 }
 
 
-/**
- * Allocate an array of program instructions.
- * \param numInst  number of instructions
- * \return pointer to instruction memory
- */
-struct prog_instruction *
-    _mesa_alloc_instructions(GLuint numInst)
-{
-    return new prog_instruction[numInst]();
-}
-
-
-/**
- * Reallocate memory storing an array of program instructions.
- * This is used when we need to append additional instructions onto an
- * program.
- * \param oldInst  pointer to first of old/src instructions
- * \param numOldInst  number of instructions at <oldInst>
- * \param numNewInst  desired size of new instruction array.
- * \return  pointer to start of new instruction array.
- */
-struct prog_instruction *
-    _mesa_realloc_instructions(struct prog_instruction *oldInst,
-			   GLuint numOldInst, GLuint numNewInst)
-{
-    struct prog_instruction *newInst = new prog_instruction[numNewInst]();
-    if (oldInst) {
-	const GLuint copyCount = (numOldInst < numNewInst) ? numOldInst : numNewInst;
-	std::copy(oldInst, oldInst + copyCount, newInst);
-	delete[] oldInst;
-    }
-    return newInst;
-}
-
-
-/**
- * Copy an array of program instructions.
- * \param dest  pointer to destination.
- * \param src  pointer to source.
- * \param n  number of instructions to copy.
- * \return pointer to destination.
- */
-struct prog_instruction *
-    _mesa_copy_instructions(struct prog_instruction *dest,
-			const struct prog_instruction *src, GLuint n)
-{
-    std::copy(src, src + n, dest);
-    return dest;
-}
 
 
 /**
