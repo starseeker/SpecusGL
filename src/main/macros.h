@@ -600,11 +600,36 @@ do {                                    \
 } while(0)
 
 /*@}*/
-
-
+/**
+ * Type-safe clamp/min/max helpers (C++17).
+ *
+ * These replace the old single-argument-type macros below.  Using function
+ * templates avoids the double-evaluation and side-effect hazards of the old
+ * macro forms while still accepting mixed-type arguments via common_type
+ * promotion.
+ */
+template<typename T, typename U, typename V>
+[[nodiscard]] constexpr auto mesa_clamp(T x, U lo, V hi) noexcept
+{
+    using R = std::common_type_t<T, U, V>;
+    R rx = static_cast<R>(x), rlo = static_cast<R>(lo), rhi = static_cast<R>(hi);
+    return rx < rlo ? rlo : (rx > rhi ? rhi : rx);
+}
+template<typename T, typename U>
+[[nodiscard]] constexpr auto mesa_min2(T a, U b) noexcept
+{
+    using R = std::common_type_t<T, U>;
+    return static_cast<R>(a) < static_cast<R>(b) ? static_cast<R>(a) : static_cast<R>(b);
+}
+template<typename T, typename U>
+[[nodiscard]] constexpr auto mesa_max2(T a, U b) noexcept
+{
+    using R = std::common_type_t<T, U>;
+    return static_cast<R>(a) > static_cast<R>(b) ? static_cast<R>(a) : static_cast<R>(b);
+}
 
 /** Clamp X to [MIN,MAX] */
-#define CLAMP( X, MIN, MAX )  ( (X)<(MIN) ? (MIN) : ((X)>(MAX) ? (MAX) : (X)) )
+#define CLAMP(X, MIN, MAX)  mesa_clamp(X, MIN, MAX)
 
 /** Assign X to CLAMP(X, MIN, MAX) */
 #define CLAMP_SELF(x, mn, mx)  \
@@ -613,10 +638,10 @@ do {                                    \
 
 
 /** Minimum of two values: */
-#define MIN2( A, B )   ( (A)<(B) ? (A) : (B) )
+#define MIN2(A, B)   mesa_min2(A, B)
 
 /** Maximum of two values: */
-#define MAX2( A, B )   ( (A)>(B) ? (A) : (B) )
+#define MAX2(A, B)   mesa_max2(A, B)
 
 /** Dot product of two 2-element vectors */
 #define DOT2( a, b )  ( (a)[0]*(b)[0] + (a)[1]*(b)[1] )
