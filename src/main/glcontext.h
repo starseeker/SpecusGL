@@ -46,8 +46,8 @@
 
 typedef struct __GLcontextRec __GLcontext;
 
-typedef struct __GLcontextModesRec {
-    struct __GLcontextModesRec * next;
+struct __GLcontextModes {
+    struct __GLcontextModes * next;
 
     GLboolean rgbMode;
     GLboolean floatMode;
@@ -78,7 +78,7 @@ typedef struct __GLcontextModesRec {
     GLint sampleBuffers;
     GLint samples;
 
-} __GLcontextModes;
+};
 
 #endif /* __gl_core_h_ */
 
