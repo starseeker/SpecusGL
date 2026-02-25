@@ -357,7 +357,7 @@ _mesa_GenVertexArraysAPPLE(GLsizei n, GLuint *arrays)
      */
     std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
-    first = _mesa_HashFindFreeKeyBlock(ctx->Shared->ArrayObjects, n);
+    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->ArrayObjects, n);
 
     /* Allocate new, empty array objects and return identifiers */
     for (i = 0; i < n; i++) {

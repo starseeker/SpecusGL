@@ -464,7 +464,7 @@ static INLINE struct mesa_display_list *
 lookup_list(GLcontext *ctx, GLuint list)
 {
     return (struct mesa_display_list *)
-	   _mesa_HashLookup(ctx->Shared->DisplayList, list);
+	   _mesa_HashLookup(&ctx->Shared->DisplayList, list);
 }
 
 
@@ -637,7 +637,7 @@ destroy_list(GLcontext *ctx, GLuint list)
 	return;
 
     _mesa_delete_list(ctx, dlist);
-    _mesa_HashRemove(ctx->Shared->DisplayList, list);
+    _mesa_HashRemove(&ctx->Shared->DisplayList, list);
 }
 
 
@@ -6614,12 +6614,12 @@ _mesa_GenLists(GLsizei range)
      */
     std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
-    base = _mesa_HashFindFreeKeyBlock(ctx->Shared->DisplayList, range);
+    base = _mesa_HashFindFreeKeyBlock(&ctx->Shared->DisplayList, range);
     if (base) {
 	/* reserve the list IDs by with empty/dummy lists */
 	GLint i;
 	for (i = 0; i < range; i++) {
-	    _mesa_HashInsert(ctx->Shared->DisplayList, base + i,
+	    _mesa_HashInsert(&ctx->Shared->DisplayList, base + i,
 			     make_list(base + i, 1));
 	}
     }
@@ -6710,7 +6710,7 @@ _mesa_EndList(void)
     /* Destroy old list, if any */
     destroy_list(ctx, ctx->ListState.CurrentListNum);
     /* Install the list */
-    _mesa_HashInsert(ctx->Shared->DisplayList, ctx->ListState.CurrentListNum,
+    _mesa_HashInsert(&ctx->Shared->DisplayList, ctx->ListState.CurrentListNum,
 		     ctx->ListState.CurrentList);
 
 

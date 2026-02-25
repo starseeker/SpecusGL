@@ -478,7 +478,7 @@ _mesa_create_shader(GLcontext *ctx, GLenum type)
     struct gl_shader *sh;
     GLuint name;
 
-    name = _mesa_HashFindFreeKeyBlock(ctx->Shared->ShaderObjects, 1);
+    name = _mesa_HashFindFreeKeyBlock(&ctx->Shared->ShaderObjects, 1);
 
     switch (type) {
 	case GL_FRAGMENT_SHADER:
@@ -502,7 +502,7 @@ _mesa_create_program(GLcontext *ctx)
     GLuint name;
     struct gl_shader_program *shProg;
 
-    name = _mesa_HashFindFreeKeyBlock(ctx->Shared->ShaderObjects, 1);
+    name = _mesa_HashFindFreeKeyBlock(&ctx->Shared->ShaderObjects, 1);
     shProg = _mesa_new_shader_program(ctx, name);
 
     ctx->Shared->insert_shader_object(name, shProg);
