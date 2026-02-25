@@ -73,7 +73,7 @@ _tnl_CreateContext(GLcontext *ctx)
     tnl->Driver.Render.PrimTabVerts = _tnl_render_tab_verts;
     tnl->Driver.NotifyMaterialChange = _mesa_validate_all_lighting_tables;
 
-    tnl->nr_blocks = 0;
+    /* blocks vector is default-constructed (empty); no init needed. */
 
     return GL_TRUE;
 }

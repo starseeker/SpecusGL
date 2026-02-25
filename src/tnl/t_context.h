@@ -60,7 +60,9 @@
 
 #include "vbo/vbo.h"
 
+#include <memory>
 #include <unordered_map>
+#include <vector>
 
 #define MAX_PIPELINE_STAGES     30
 
@@ -534,10 +536,9 @@ struct TNLcontext {
 
     GLvector4f tmp_inputs[VERT_ATTRIB_MAX];
 
-    /* Temp storage for t_draw.c:
-     */
-    GLubyte *block[VERT_ATTRIB_MAX];
-    GLuint nr_blocks;
+    /** Temporary buffers allocated by t_draw.cpp for vertex conversion.
+     *  Each element is owned (auto-freed when the vector is cleared). */
+    std::vector<std::unique_ptr<GLubyte[]>> blocks;
 
     /* Cache of fixed-function-replacing vertex programs:
      */
