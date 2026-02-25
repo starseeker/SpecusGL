@@ -61,6 +61,7 @@
 
 #include "vbo/vbo.h"
 
+#include <bitset>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -493,17 +494,35 @@ struct tnl_device_driver {
 };
 
 
-#define DECLARE_RENDERINPUTS(name) BITSET64_DECLARE(name, _TNL_ATTRIB_MAX)
-#define RENDERINPUTS_COPY BITSET64_COPY
-#define RENDERINPUTS_EQUAL BITSET64_EQUAL
-#define RENDERINPUTS_ZERO BITSET64_ZERO
-#define RENDERINPUTS_ONES BITSET64_ONES
-#define RENDERINPUTS_TEST BITSET64_TEST
-#define RENDERINPUTS_SET BITSET64_SET
-#define RENDERINPUTS_CLEAR BITSET64_CLEAR
-#define RENDERINPUTS_TEST_RANGE BITSET64_TEST_RANGE
-#define RENDERINPUTS_SET_RANGE BITSET64_SET_RANGE
-#define RENDERINPUTS_CLEAR_RANGE BITSET64_CLEAR_RANGE
+/**
+ * Bitset used to record which vertex attributes are needed for rendering.
+ * Replaces the old C-macro BITSET64 pattern; std::bitset<N> is type-safe
+ * and eliminates the latent out-of-bounds access the BITSET64_COPY /
+ * BITSET64_EQUAL macros caused when _TNL_ATTRIB_MAX == 32 (only one
+ * GLuint word was allocated, but both [0] and [1] were read).
+ */
+using RenderInputsBitset = std::bitset<_TNL_ATTRIB_MAX>;
+
+/**
+ * Test whether any bit in the closed range [lo, hi] is set.
+ * Replaces RENDERINPUTS_TEST_RANGE / BITSET64_TEST_RANGE.
+ */
+static inline bool renderinputs_test_range(const RenderInputsBitset &bs,
+					   GLuint lo, GLuint hi)
+{
+    for (GLuint i = lo; i <= hi; i++)
+	if (bs.test(i)) return true;
+    return false;
+}
+
+#define DECLARE_RENDERINPUTS(name) RenderInputsBitset name
+#define RENDERINPUTS_COPY(dst, src)      ((dst) = (src))
+#define RENDERINPUTS_EQUAL(a, b)         ((a) == (b))
+#define RENDERINPUTS_ZERO(x)             ((x).reset())
+#define RENDERINPUTS_TEST(x, b)          ((x).test(b))
+#define RENDERINPUTS_SET(x, b)           ((x).set(b))
+#define RENDERINPUTS_CLEAR(x, b)         ((x).reset(b))
+#define RENDERINPUTS_TEST_RANGE(x, lo, hi) renderinputs_test_range((x), (lo), (hi))
 
 
 /**
