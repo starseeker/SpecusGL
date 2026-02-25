@@ -313,7 +313,7 @@ interpolate_colors(SWspan *span)
 	}
 	break;
 	default:
-	    _mesa_problem(NULL, "bad datatype in interpolate_colors");
+	    _mesa_problem(nullptr, "bad datatype in interpolate_colors");
     }
     span->arrayMask |= SPAN_RGBA;
 }
@@ -428,7 +428,7 @@ interpolate_specular(SWspan *span)
 	}
 	break;
 	default:
-	    _mesa_problem(NULL, "bad datatype in interpolate_specular");
+	    _mesa_problem(nullptr, "bad datatype in interpolate_specular");
     }
     span->arrayMask |= SPAN_SPEC;
 }
@@ -1605,7 +1605,7 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 		    ASSERT(rb->PutRow);
 		    rb->PutRow(ctx, span->end, span->x, span->y,
 			       colorData,
-			       span->writeAll ? NULL: span->array->mask);
+			       span->writeAll ? nullptr: span->array->mask);
 		}
 
 		if (buf + 1 < numDrawBuffers) {
@@ -1682,7 +1682,7 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    rb->GetRow(ctx, length, x + skip, y, temp);
 	    _mesa_convert_colors(rb->DataType, temp,
 				 dstType, (GLubyte *) rgba + skip * RGBA_PIXEL_SIZE(dstType),
-				 length, NULL);
+				 length, nullptr);
 	}
     }
 }
@@ -1820,7 +1820,7 @@ _swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
     }
 
     rb->PutRow(ctx, count, x, y,
-	       (const GLubyte *) values + skip * valueSize, NULL);
+	       (const GLubyte *) values + skip * valueSize, nullptr);
 }
 
 

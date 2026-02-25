@@ -37,6 +37,8 @@
 #ifndef PROG_INSTRUCTION_H
 #define PROG_INSTRUCTION_H
 
+#include <string>
+
 
 
 
@@ -418,7 +420,7 @@ struct prog_instruction {
      */
     GLint Sampler;
 
-    const char *Comment;
+    std::string Comment;
 };
 
 

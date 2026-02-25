@@ -130,7 +130,7 @@ static const struct instruction_pattern Instructions[] = {
     { "UP4UB", OPCODE_UP4UB, INPUT_1S, OUTPUT_V,            _C | _S },
     { "X2D", OPCODE_X2D, INPUT_3V, OUTPUT_V, _R | _H |      _C | _S },
     { "PRINT", OPCODE_PRINT, INPUT_1V_S, OUTPUT_NONE, 0               },
-    { NULL, (enum prog_opcode) -1, 0, 0, 0 }
+    { nullptr, (enum prog_opcode) -1, 0, 0, 0 }
 };
 
 
@@ -164,19 +164,17 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 {
 #ifdef DEBUG
     GLint line, column;
-    const GLubyte *lineStr;
-    lineStr = _mesa_find_line_column(parseState->start,
-				     parseState->pos, &line, &column);
+    std::string lineStr = _mesa_find_line_column(parseState->start,
+					       parseState->pos, &line, &column);
     _mesa_debug(parseState->ctx,
 		"nvfragparse.c(%d): line %d, column %d:%s (%s)\n",
-		lineNo, line, column, (char *) lineStr, msg);
-    free((void *) lineStr);
+		lineNo, line, column, lineStr.c_str(), msg);
 #else
     (void) lineNo;
 #endif
 
     /* Check that no error was already recorded.  Only record the first one. */
-    if (parseState->ctx->Program.ErrorString[0] == 0) {
+    if (parseState->ctx->Program.ErrorString.empty()) {
 	_mesa_set_program_error(parseState->ctx,
 				parseState->pos - parseState->start,
 				msg);
@@ -214,7 +212,7 @@ static struct instruction_pattern
     MatchInstruction(const GLubyte *token)
 {
     const struct instruction_pattern *inst;
-    struct instruction_pattern result = {NULL, (enum prog_opcode) -1, 0, 0, 0};
+    struct instruction_pattern result = {nullptr, (enum prog_opcode) -1, 0, 0, 0};
 
     for (inst = Instructions; inst->name; inst++) {
 	if (strncmp((const char *) token, inst->name, 3) == 0) {
@@ -378,7 +376,7 @@ Peek_Token(struct parse_state *parseState, GLubyte *token)
 
 static const char *InputRegisters[MAX_NV_FRAGMENT_PROGRAM_INPUTS + 1] = {
     "WPOS", "COL0", "COL1", "FOGC",
-    "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7", NULL
+    "TEX0", "TEX1", "TEX2", "TEX3", "TEX4", "TEX5", "TEX6", "TEX7", nullptr
 };
 
 static const char *OutputRegisters[MAX_NV_FRAGMENT_PROGRAM_OUTPUTS + 1] = {
@@ -387,7 +385,7 @@ static const char *OutputRegisters[MAX_NV_FRAGMENT_PROGRAM_OUTPUTS + 1] = {
     /*
     "TEX0", "TEX1", "TEX2", "TEX3",
     */
-    "DEPR", NULL
+    "DEPR", nullptr
 };
 
 
@@ -453,7 +451,7 @@ Parse_Identifier(struct parse_state *parseState, GLubyte *ident)
 static GLboolean
 Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 {
-    char *end = NULL;
+    char *end = nullptr;
 
     *number = (GLfloat) strtod((const char *) parseState->pos, &end);
 
@@ -1022,7 +1020,7 @@ Parse_VectorSrc(struct parse_state *parseState,
 	if (!Parse_ScalarConstant(parseState, values))
 	    RETURN_ERROR;
 	paramIndex = _mesa_add_unnamed_constant(parseState->parameters,
-						values, 4, NULL);
+						values, 4, nullptr);
 	srcReg->File = PROGRAM_NAMED_PARAM;
 	srcReg->Index = paramIndex;
     } else if (token[0] == '{') {
@@ -1033,7 +1031,7 @@ Parse_VectorSrc(struct parse_state *parseState,
 	if (!Parse_VectorConstant(parseState, values))
 	    RETURN_ERROR;
 	paramIndex = _mesa_add_unnamed_constant(parseState->parameters,
-						values, 4, NULL);
+						values, 4, nullptr);
 	srcReg->File = PROGRAM_NAMED_PARAM;
 	srcReg->Index = paramIndex;
     } else {
@@ -1120,7 +1118,7 @@ Parse_ScalarSrcReg(struct parse_state *parseState,
 	if (!Parse_VectorConstant(parseState, values))
 	    RETURN_ERROR;
 	paramIndex = _mesa_add_unnamed_constant(parseState->parameters,
-						values, 4, NULL);
+						values, 4, nullptr);
 	srcReg->File = PROGRAM_NAMED_PARAM;
 	srcReg->Index = paramIndex;
     } else if (IsLetter(token[0])) {
@@ -1143,7 +1141,7 @@ Parse_ScalarSrcReg(struct parse_state *parseState,
 	if (!Parse_ScalarConstant(parseState, values))
 	    RETURN_ERROR;
 	paramIndex = _mesa_add_unnamed_constant(parseState->parameters,
-						values, 4, NULL);
+						values, 4, nullptr);
 	srcReg->Index = paramIndex;
 	srcReg->File = PROGRAM_NAMED_PARAM;
 	needSuffix = GL_FALSE;
@@ -1199,8 +1197,7 @@ Parse_PrintInstruction(struct parse_state *parseState,
     for (len = 0; str[len] != '\''; len++) /* find closing quote */
 	;
     parseState->pos += len + 1;
-    msg = (GLubyte*) malloc(len + 1);
-
+    msg = new GLubyte[len + 1];
     memcpy(msg, str, len);
     msg[len] = 0;
     inst->Data = msg;
@@ -1429,42 +1426,32 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
     struct prog_instruction instBuffer[MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS];
     struct prog_instruction *newInst;
     GLenum target;
-    GLubyte *programString;
+    std::string programString(reinterpret_cast<const char *>(str), len);
 
-    /* Make a null-terminated copy of the program string */
-    programString = (GLubyte *) malloc(len + 1);
-    if (!programString) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	return;
-    }
-    memcpy(programString, str, len);
-    programString[len] = 0;
 
     /* Get ready to parse */
     _mesa_bzero(&parseState, sizeof(struct parse_state));
     parseState.ctx = ctx;
-    parseState.start = programString;
+    parseState.start = reinterpret_cast<const GLubyte *>(programString.c_str());
     parseState.program = program;
     parseState.numInst = 0;
-    parseState.curLine = programString;
+    parseState.curLine = parseState.start;
     parseState.parameters = _mesa_new_parameter_list();
 
     /* Reset error state */
-    _mesa_set_program_error(ctx, -1, NULL);
+    _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check the program header */
-    if (strncmp((const char *) programString, "!!FP1.0", 7) == 0) {
+    if (strncmp(programString.c_str(), "!!FP1.0", 7) == 0) {
 	target = GL_FRAGMENT_PROGRAM_NV;
-	parseState.pos = programString + 7;
-    } else if (strncmp((const char *) programString, "!!FCP1.0", 8) == 0) {
+	parseState.pos = parseState.start + 7;
+    } else if (strncmp(programString.c_str(), "!!FCP1.0", 8) == 0) {
 	/* fragment / register combiner program - not supported */
-	free(programString);
 	_mesa_set_program_error(ctx, 0, "Invalid fragment program header");
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glLoadProgramNV(bad header)");
 	return;
     } else {
 	/* invalid header */
-	free(programString);
 	_mesa_set_program_error(ctx, 0, "Invalid fragment program header");
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glLoadProgramNV(bad header)");
 	return;
@@ -1472,7 +1459,6 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 
     /* make sure target and header match */
     if (target != dstTarget) {
-	free(programString);
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glLoadProgramNV(target mismatch 0x%x != 0x%x)",
 		    target, dstTarget);
@@ -1501,14 +1487,8 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 
 	/* install the program */
 	program->Base.Target = target;
-	if (program->Base.String) {
-	    free(program->Base.String);
-	}
 	program->Base.String = programString;
 	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	if (program->Base.Instructions) {
-	    free(program->Base.Instructions);
-	}
 	program->Base.Instructions = newInst;
 	program->Base.NumInstructions = parseState.numInst;
 	program->Base.InputsRead = parseState.inputsRead;
@@ -1561,7 +1541,7 @@ PrintSrcReg(const struct gl_fragment_program *program,
 	} else {
 	    ASSERT(program->Base.Parameters->Parameters[src->Index].Type
 		   == PROGRAM_NAMED_PARAM);
-	    _mesa_printf("%s", program->Base.Parameters->Parameters[src->Index].Name);
+	    _mesa_printf("%s", program->Base.Parameters->Parameters[src->Index].Name.c_str());
 	}
     } else if (src->File == PROGRAM_OUTPUT) {
 	_mesa_printf("o[%s]", OutputRegisters[src->Index]);
@@ -1577,7 +1557,7 @@ PrintSrcReg(const struct gl_fragment_program *program,
     } else if (src->File == PROGRAM_WRITE_ONLY) {
 	_mesa_printf("%cC", "HR"[src->Index]);
     } else {
-	_mesa_problem(NULL, "Invalid fragment register %d", src->Index);
+	_mesa_problem(nullptr, "Invalid fragment register %d", src->Index);
 	return;
     }
     if (GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 1) &&
@@ -1617,7 +1597,7 @@ PrintTextureSrc(const struct prog_instruction *inst)
 	    _mesa_printf("CUBE");
 	    break;
 	default:
-	    _mesa_problem(NULL, "Invalid textue target in PrintTextureSrc");
+	    _mesa_problem(nullptr, "Invalid textue target in PrintTextureSrc");
     }
 }
 

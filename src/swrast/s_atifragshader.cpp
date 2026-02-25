@@ -317,8 +317,8 @@ execute_shader(GLcontext *ctx, const struct ati_fragment_shader *shader,
 	       GLuint column)
 {
     GLuint pc = 0;
-    struct atifs_instruction *inst = NULL;
-    struct atifs_setupinst *texinst = NULL;
+    struct atifs_instruction *inst = nullptr;
+    struct atifs_setupinst *texinst = nullptr;
     GLint optype = 0;
     GLuint i = 0;
     GLint j = 0, pass = 0;
@@ -326,7 +326,7 @@ execute_shader(GLcontext *ctx, const struct ati_fragment_shader *shader,
     GLfloat src[2][3][4] = { 0 };
     GLfloat zeros[4] = { 0.0, 0.0, 0.0, 0.0 };
     GLfloat ones[4] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat dst[2][4] = { 0 }, *dstp = NULL;
+    GLfloat dst[2][4] = { 0 }, *dstp = nullptr;
 
     for (pass = 0; pass < shader->NumPasses; pass++) {
 	if (pass > 0)

@@ -96,7 +96,7 @@ static void choose_emit_func(GLcontext *ctx, GLuint count, GLubyte *dest)
 	a[j].emit = a[j].insert[vptr->size - 1]; /* not always used */
     }
 
-    vtx->emit = NULL;
+    vtx->emit = nullptr;
 
     /* Does this match an existing (hardwired, codegen or known-bad)
      * fastpath?
@@ -419,7 +419,7 @@ void _tnl_init_vertices(GLcontext *ctx,
 {
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
 
-    _tnl_install_attrs(ctx, NULL, 0, NULL, 0);
+    _tnl_install_attrs(ctx, nullptr, 0, nullptr, 0);
 
     vtx->need_extras = GL_TRUE;
     if (max_vertex_size > vtx->max_vertex_size) {
@@ -455,7 +455,7 @@ void _tnl_init_vertices(GLcontext *ctx,
     vtx->identity[2] = 0.0;
     vtx->identity[3] = 1.0;
 
-    vtx->codegen_emit = NULL;
+    vtx->codegen_emit = nullptr;
 
 #ifdef USE_SSE_ASM
     if (!_mesa_getenv("MESA_NO_CODEGEN"))
@@ -471,16 +471,16 @@ void _tnl_free_vertices(GLcontext *ctx)
 
     if (vtx->vertex_buf) {
 	ALIGN_FREE(vtx->vertex_buf);
-	vtx->vertex_buf = NULL;
+	vtx->vertex_buf = nullptr;
     }
 
     for (fp = vtx->fastpath ; fp ; fp = tmp) {
 	tmp = fp->next;
-	free(fp->attr);
-	free(fp);
+	delete[] fp->attr;
+	delete fp;
     }
 
-    vtx->fastpath = NULL;
+    vtx->fastpath = nullptr;
 }
 
 /*

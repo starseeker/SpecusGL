@@ -180,11 +180,11 @@ static struct vbo_save_vertex_store *alloc_vertex_store(GLcontext *ctx)
     ctx->Driver.BufferData(ctx,
 			   GL_ARRAY_BUFFER_ARB,
 			   VBO_SAVE_BUFFER_SIZE * sizeof(GLfloat),
-			   NULL,
+			   nullptr,
 			   GL_STATIC_DRAW_ARB,
 			   vertex_store->bufferobj);
 
-    vertex_store->buffer = NULL;
+    vertex_store->buffer = nullptr;
     vertex_store->used = 0;
     vertex_store->refcount = 1;
 
@@ -217,7 +217,7 @@ static GLfloat *map_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *v
 static void unmap_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vertex_store)
 {
     ctx->Driver.UnmapBuffer(ctx, GL_ARRAY_BUFFER_ARB, vertex_store->bufferobj);
-    vertex_store->buffer = NULL;
+    vertex_store->buffer = nullptr;
 }
 
 
@@ -335,7 +335,7 @@ static void _save_compile_vertex_list(GLcontext *ctx)
 	 */
 	save->vertex_store->refcount--;
 	assert(save->vertex_store->refcount != 0);
-	save->vertex_store = NULL;
+	save->vertex_store = nullptr;
 
 	/* Allocate and map new store:
 	 */
@@ -501,7 +501,7 @@ static void _save_upgrade_vertex(GLcontext *ctx,
 	    save->attrptr[i] = tmp;
 	    tmp += save->attrsz[i];
 	} else
-	    save->attrptr[i] = NULL; /* will not be dereferenced. */
+	    save->attrptr[i] = nullptr; /* will not be dereferenced. */
     }
 
     /* Copy from current to repopulate the vertex with correct values.
@@ -1105,14 +1105,14 @@ static void vbo_print_vertex_list(GLcontext *ctx, void *data)
     GLuint i;
     (void) ctx;
 
-    _mesa_debug(NULL, "VBO-VERTEX-LIST, %u vertices %d primitives, %d vertsize\n",
+    _mesa_debug(nullptr, "VBO-VERTEX-LIST, %u vertices %d primitives, %d vertsize\n",
 		node->count,
 		node->prim_count,
 		node->vertex_size);
 
     for (i = 0 ; i < node->prim_count ; i++) {
 	struct _mesa_prim *prim = &node->prim[i];
-	_mesa_debug(NULL, "   prim %d: %s%s %d..%d %s %s\n",
+	_mesa_debug(nullptr, "   prim %d: %s%s %d..%d %s %s\n",
 		    i,
 		    _mesa_lookup_enum_by_nr(prim->mode),
 		    prim->weak ? " (weak)" : "",

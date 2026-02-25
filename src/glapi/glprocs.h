@@ -2184,7 +2184,7 @@ static const glprocs_table_t static_functions[] = {
     NAME_FUNC_OFFSET(18698, glPointParameterivNV, _gloffset_PointParameterivNV),
     NAME_FUNC_OFFSET(18717, gl_dispatch_stub_749, _gloffset_BlendEquationSeparateEXT),
     NAME_FUNC_OFFSET(18741, gl_dispatch_stub_749, _gloffset_BlendEquationSeparateEXT),
-    {-1, NULL, 0}
+    {-1, nullptr, 0}
 };
 
 #undef NAME_FUNC_OFFSET

@@ -56,7 +56,7 @@ long counter_overhead = 0;
  * used to determine if we should benchmark the functions as well as
  * verify their correctness.
  */
-char *mesa_profile = NULL;
+char *mesa_profile = nullptr;
 
 
 static int m_general[16] = {
@@ -192,7 +192,7 @@ static int test_transform_function(transform_func func, int psize,
     (void) cycles;
 
     if (psize > 4) {
-	_mesa_problem(NULL, "test_transform_function called with psize > 4\n");
+	_mesa_problem(nullptr, "test_transform_function called with psize > 4\n");
 	return 0;
     }
 
@@ -328,7 +328,7 @@ void _math_test_all_transform_functions(char *description)
 		char buf[100];
 		_mesa_sprintf(buf, "_mesa_transform_tab[0][%d][%s] failed test (%s)",
 			      psize, mstrings[mtype], description);
-		_mesa_problem(NULL, buf);
+		_mesa_problem(nullptr, buf);
 	    }
 #ifdef RUN_DEBUG_BENCHMARK
 	    if (mesa_profile)

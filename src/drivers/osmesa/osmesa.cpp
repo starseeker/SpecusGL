@@ -66,7 +66,7 @@ struct osmesa_context {
     GLenum format;		/*< User-specified context format */
     GLint userRowLength;		/*< user-specified number of pixels per row */
     GLint rInd, gInd, bInd, aInd;/*< index offsets for RGBA formats */
-    GLvoid *rowaddr[MAX_HEIGHT];	/*< address of first pixel in each image row */
+    std::vector<GLvoid *> rowaddr;  /*< address of first pixel in each image row */
     GLboolean yup;		/*< TRUE  -> Y increases upward */
     /*< FALSE -> Y increases downward */
     GLboolean enable_fxaa;	/*< TRUE to enable FXAA post-processing */
@@ -860,6 +860,7 @@ osmesa_context::compute_row_addresses()
 
     bytesPerRow = rowlength * bytesPerPixel;
 
+    rowaddr.resize(height);
     if (yup) {
 	/* Y=0 is bottom line of window */
 	for (i = 0; i < height; i++) {

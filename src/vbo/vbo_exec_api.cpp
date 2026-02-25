@@ -256,7 +256,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
 	    exec->vtx.attrptr[i] = tmp;
 	    tmp += exec->vtx.attrsz[i];
 	} else
-	    exec->vtx.attrptr[i] = NULL; /* will not be dereferenced */
+	    exec->vtx.attrptr[i] = nullptr; /* will not be dereferenced */
     }
 
     /* Copy from current to repopulate the vertex with correct values.
@@ -681,7 +681,7 @@ void vbo_exec_vtx_destroy(struct vbo_exec_context *exec)
 {
     if (exec->vtx.buffer_map) {
 	ALIGN_FREE(exec->vtx.buffer_map);
-	exec->vtx.buffer_map = NULL;
+	exec->vtx.buffer_map = nullptr;
     }
 }
 

@@ -39,6 +39,7 @@
 #include "texcompress.h"
 #include "texformat.h"
 #include "texstore.h"
+#include <vector>
 
 
 static void
@@ -71,7 +72,7 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
     GLint srcRowStride;
     GLubyte *dst;
     const GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgb_fxt1);
     ASSERT(dstXoffset % 8 == 0);
@@ -85,16 +86,16 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGB/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
 	srcRowStride = 3 * srcWidth;
     } else {
 	pixels = (const GLchan *) srcAddr;
@@ -109,8 +110,6 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
     fxt1_encode(srcWidth, srcHeight, 3, pixels, srcRowStride,
 		dst, dstRowStride);
 
-    if (tempImage)
-	free((void*) tempImage);
 
     return GL_TRUE;
 }
@@ -126,7 +125,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
     GLint srcRowStride;
     GLubyte *dst;
     GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
-    const GLchan *tempImage = NULL;
+    std::vector<GLchan> tempVec;
 
     ASSERT(dstFormat == &_mesa_texformat_rgba_fxt1);
     ASSERT(dstXoffset % 8 == 0);
@@ -140,16 +139,16 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 	ctx->_ImageTransferState ||
 	srcPacking->SwapBytes) {
 	/* convert image to RGBA/GLchan */
-	tempImage = _mesa_make_temp_chan_image(ctx, dims,
+	tempVec = _mesa_make_temp_chan_image(ctx, dims,
 					       baseInternalFormat,
 					       dstFormat->BaseFormat,
 					       srcWidth, srcHeight, srcDepth,
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
-	if (!tempImage)
+	if (tempVec.empty())
 	    return GL_FALSE; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
-	pixels = tempImage;
+	pixels = tempVec.data();
 	srcRowStride = 4 * srcWidth;
     } else {
 	pixels = (const GLchan *) srcAddr;
@@ -164,8 +163,6 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
     fxt1_encode(srcWidth, srcHeight, 4, pixels, srcRowStride,
 		dst, dstRowStride);
 
-    if (tempImage)
-	free((void*) tempImage);
 
     return GL_TRUE;
 }
@@ -236,13 +233,13 @@ const struct gl_texture_format _mesa_texformat_rgb_fxt1 = {
     0,					/* StencilBits */
     0,					/* TexelBytes */
     texstore_rgb_fxt1,			/* StoreTexImageFunc */
-    NULL, /*impossible*/ 		/* FetchTexel1D */
+    nullptr, /*impossible*/ 		/* FetchTexel1D */
     fetch_texel_2d_rgb_fxt1, 		/* FetchTexel2D */
-    NULL, /*impossible*/ 		/* FetchTexel3D */
-    NULL, /*impossible*/ 		/* FetchTexel1Df */
+    nullptr, /*impossible*/ 		/* FetchTexel3D */
+    nullptr, /*impossible*/ 		/* FetchTexel1Df */
     fetch_texel_2d_f_rgb_fxt1, 		/* FetchTexel2Df */
-    NULL, /*impossible*/ 		/* FetchTexel3Df */
-    NULL					/* StoreTexel */
+    nullptr, /*impossible*/ 		/* FetchTexel3Df */
+    nullptr					/* StoreTexel */
 };
 
 const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
@@ -260,13 +257,13 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
     0,					/* StencilBits */
     0,					/* TexelBytes */
     texstore_rgba_fxt1,			/* StoreTexImageFunc */
-    NULL, /*impossible*/ 		/* FetchTexel1D */
+    nullptr, /*impossible*/ 		/* FetchTexel1D */
     fetch_texel_2d_rgba_fxt1, 		/* FetchTexel2D */
-    NULL, /*impossible*/ 		/* FetchTexel3D */
-    NULL, /*impossible*/ 		/* FetchTexel1Df */
+    nullptr, /*impossible*/ 		/* FetchTexel3D */
+    nullptr, /*impossible*/ 		/* FetchTexel1Df */
     fetch_texel_2d_f_rgba_fxt1, 		/* FetchTexel2Df */
-    NULL, /*impossible*/ 		/* FetchTexel3Df */
-    NULL					/* StoreTexel */
+    nullptr, /*impossible*/ 		/* FetchTexel3Df */
+    nullptr					/* StoreTexel */
 };
 
 
@@ -1132,8 +1129,8 @@ fxt1_quantize_MIXED0(GLuint *cc,
     GLint minColR = 0, maxColR = 0;
     GLint minVal;
     GLint maxVal;
-    GLint maxVarL = fxt1_variance(NULL, input, n_comp, N_TEXELS / 2);
-    GLint maxVarR = fxt1_variance(NULL, &input[N_TEXELS / 2], n_comp, N_TEXELS / 2);
+    GLint maxVarL = fxt1_variance(nullptr, input, n_comp, N_TEXELS / 2);
+    GLint maxVarR = fxt1_variance(nullptr, &input[N_TEXELS / 2], n_comp, N_TEXELS / 2);
 
     /* Scan the channel with max variance for lo & hi
      * and use those as the two representative colors.
@@ -1340,7 +1337,8 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     GLuint x, y;
     const GLubyte *data;
     GLuint *encoded = (GLuint *)dest;
-    void *newSource = NULL;
+    GLchan *newSourceGLchan = nullptr;  /* upscaled buffer */
+    GLubyte *newSourceGLubyte = nullptr; /* channel-converted buffer */
 
     assert(comps == 3 || comps == 4);
 
@@ -1348,16 +1346,16 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     if ((width & 7) | (height & 3)) {
 	GLint newWidth = (width + 7) & ~7;
 	GLint newHeight = (height + 3) & ~3;
-	newSource = malloc(comps * newWidth * newHeight * sizeof(GLchan));
-	if (!newSource) {
+	newSourceGLchan = new GLchan[comps * newWidth * newHeight];
+	if (!newSourceGLchan) {
 	    GET_CURRENT_CONTEXT(ctx);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "texture compression");
 	    goto cleanUp;
 	}
 	_mesa_upscale_teximage2d(width, height, newWidth, newHeight,
 				 comps, (const GLchan *) source,
-				 srcRowStride, (GLchan *) newSource);
-	source = newSource;
+				 srcRowStride, newSourceGLchan);
+	source = newSourceGLchan;
 	width = newWidth;
 	height = newHeight;
 	srcRowStride = comps * newWidth;
@@ -1367,7 +1365,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     if (CHAN_TYPE != GL_UNSIGNED_BYTE) {
 	const GLuint n = width * height * comps;
 	const GLchan *src = (const GLchan *) source;
-	GLubyte *dest = (GLubyte *) malloc(n * sizeof(GLubyte));
+	GLubyte *dest = new GLubyte[n];
 	GLuint i;
 	if (!dest) {
 	    GET_CURRENT_CONTEXT(ctx);
@@ -1377,10 +1375,9 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 	for (i = 0; i < n; i++) {
 	    dest[i] = CHAN_TO_UBYTE(src[i]);
 	}
-	if (newSource != NULL) {
-	    free(newSource);
-	}
-	newSource = dest;  /* we'll free this buffer before returning */
+	delete[] newSourceGLchan;
+	newSourceGLchan = nullptr;
+	newSourceGLubyte = dest;  /* we'll delete this buffer before returning */
 	source = dest;  /* the new, GLubyte incoming image */
     }
 
@@ -1403,9 +1400,8 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     }
 
 cleanUp:
-    if (newSource != NULL) {
-	free(newSource);
-    }
+    delete[] newSourceGLchan;
+    delete[] newSourceGLubyte;
 }
 
 

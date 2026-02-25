@@ -99,7 +99,7 @@ static void flush_vertex(struct split_context *split)
 		split->array,
 		split->dstprim,
 		split->dstprim_nr,
-		NULL,
+		nullptr,
 		min_index,
 		max_index);
 
@@ -197,7 +197,7 @@ static void split_prims(struct split_context *split)
 		    available = align(split->limits->max_verts - csr - 1, 2);
 		}
 	    }
-	} else if (split->ib == NULL) {
+	} else if (split->ib == nullptr) {
 	    /* XXX: could at least send the first max_verts off from the
 	     * inplace buffers.
 	     */

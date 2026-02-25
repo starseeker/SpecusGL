@@ -135,7 +135,7 @@ static void vbo_bind_vertex_list(GLcontext *ctx,
 	GLuint src = map[attr];
 
 	if (node->attrsz[src]) {
-	    arrays[attr].Ptr = (const GLubyte *)NULL + buffer_offset;
+	    arrays[attr].Ptr = (const GLubyte *)nullptr + buffer_offset;
 	    arrays[attr].Size = node->attrsz[src];
 	    arrays[attr].StrideB = node->vertex_size * sizeof(GLfloat);
 	    arrays[attr].Stride = node->vertex_size * sizeof(GLfloat);
@@ -220,7 +220,7 @@ void vbo_save_playback_vertex_list(GLcontext *ctx, void *data)
 				     save->inputs,
 				     node->prim,
 				     node->prim_count,
-				     NULL,
+				     nullptr,
 				     0,	/* Node is a VBO, so this is ok */
 				     node->count - 1);
     }

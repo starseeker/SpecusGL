@@ -339,23 +339,13 @@ read_rgba_pixels(GLcontext *ctx,
     ASSERT(width <= MAX_WIDTH);
 
     if (ctx->Pixel.Convolution2DEnabled || ctx->Pixel.Separable2DEnabled) {
-	GLfloat *dest, *src, *tmpImage, *convImage;
+	std::vector<GLfloat> tmpVec(static_cast<size_t>(width) * height * 4);
+	std::vector<GLfloat> convVec(static_cast<size_t>(width) * height * 4);
+	GLfloat *dest, *src;
 	GLint row;
 
-	tmpImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glReadPixels");
-	    return;
-	}
-	convImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!convImage) {
-	    free(tmpImage);
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glReadPixels");
-	    return;
-	}
-
 	/* read full RGBA, FLOAT image */
-	dest = tmpImage;
+	dest = tmpVec.data();
 	for (row = 0; row < height; row++, y++) {
 	    if (fb->Visual.rgbMode) {
 		_swrast_read_rgba_span(ctx, rb, width, x, y, GL_FLOAT, dest);
@@ -376,15 +366,16 @@ read_rgba_pixels(GLcontext *ctx,
 
 	/* do convolution */
 	if (ctx->Pixel.Convolution2DEnabled) {
-	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_2d_image(ctx, &width, &height, tmpVec.data(), convVec.data());
 	} else {
 	    ASSERT(ctx->Pixel.Separable2DEnabled);
-	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_sep_image(ctx, &width, &height, tmpVec.data(), convVec.data());
 	}
-	free(tmpImage);
+	/* tmpVec is no longer needed */
+	tmpVec = {};
 
 	/* finish transfer ops and pack the resulting image */
-	src = convImage;
+	src = convVec.data();
 	for (row = 0; row < height; row++) {
 	    GLvoid *dest;
 	    dest = _mesa_image_address2d(packing, pixels, width, height,
@@ -394,7 +385,6 @@ read_rgba_pixels(GLcontext *ctx,
 				       transferOps & IMAGE_POST_CONVOLUTION_BITS);
 	    src += width * 4;
 	}
-	free(convImage);
     } else {
 	/* no convolution */
 	const GLint dstStride

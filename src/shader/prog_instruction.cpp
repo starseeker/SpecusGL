@@ -27,6 +27,7 @@
 #include "imports.h"
 #include "mtypes.h"
 #include "prog_instruction.h"
+#include <algorithm>
 
 
 /**
@@ -37,11 +38,11 @@
 void
 _mesa_init_instructions(struct prog_instruction *inst, GLuint count)
 {
-    GLuint i;
+    for (GLuint i = 0; i < count; i++) {
+	/* Assign a default-constructed instruction to properly reset all fields,
+	 * including the std::string Comment (avoids undefined memset). */
+	inst[i] = prog_instruction{};
 
-    _mesa_bzero(inst, count * sizeof(struct prog_instruction));
-
-    for (i = 0; i < count; i++) {
 	inst[i].SrcReg[0].File = PROGRAM_UNDEFINED;
 	inst[i].SrcReg[0].Swizzle = SWIZZLE_NOOP;
 	inst[i].SrcReg[1].File = PROGRAM_UNDEFINED;
@@ -68,8 +69,7 @@ _mesa_init_instructions(struct prog_instruction *inst, GLuint count)
 struct prog_instruction *
     _mesa_alloc_instructions(GLuint numInst)
 {
-    return (struct prog_instruction *)
-	   calloc(1,numInst * sizeof(struct prog_instruction));
+    return new prog_instruction[numInst]();
 }
 
 
@@ -86,13 +86,12 @@ struct prog_instruction *
     _mesa_realloc_instructions(struct prog_instruction *oldInst,
 			   GLuint numOldInst, GLuint numNewInst)
 {
-    struct prog_instruction *newInst;
-
-    newInst = (struct prog_instruction *)
-	      _mesa_realloc(oldInst,
-			    numOldInst * sizeof(struct prog_instruction),
-			    numNewInst * sizeof(struct prog_instruction));
-
+    struct prog_instruction *newInst = new prog_instruction[numNewInst]();
+    if (oldInst) {
+	const GLuint copyCount = (numOldInst < numNewInst) ? numOldInst : numNewInst;
+	std::copy(oldInst, oldInst + copyCount, newInst);
+	delete[] oldInst;
+    }
     return newInst;
 }
 
@@ -111,8 +110,7 @@ struct prog_instruction *
     GLuint i;
     memcpy(dest, src, n * sizeof(struct prog_instruction));
     for (i = 0; i < n; i++) {
-	if (src[i].Comment)
-	    dest[i].Comment = _mesa_strdup(src[i].Comment);
+	dest[i].Comment = src[i].Comment;
     }
     return dest;
 }

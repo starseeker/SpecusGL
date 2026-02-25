@@ -98,7 +98,8 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     const GLbitfield transferOps = ctx->_ImageTransferState;
     const GLboolean sink = (ctx->Pixel.MinMaxEnabled && ctx->MinMax.Sink)
 			   || (ctx->Pixel.HistogramEnabled && ctx->Histogram.Sink);
-    GLfloat *dest, *tmpImage, *convImage;
+    std::vector<GLfloat> tmpVec, convVec;
+    GLfloat *dest;
     SWspan span;
 
     INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_RGBA);
@@ -110,20 +111,11 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     _swrast_span_default_secondary_color(ctx, &span);
 
     /* allocate space for GLfloat image */
-    tmpImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-    if (!tmpImage) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	return;
-    }
-    convImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-    if (!convImage) {
-	free(tmpImage);
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	return;
-    }
+    tmpVec.resize(static_cast<size_t>(width) * height * 4);
+    convVec.resize(static_cast<size_t>(width) * height * 4);
 
     /* read source image as float/RGBA */
-    dest = tmpImage;
+    dest = tmpVec.data();
     for (row = 0; row < height; row++) {
 	_swrast_read_rgba_span(ctx, ctx->ReadBuffer->_ColorReadBuffer,
 			       width, srcx, srcy + row, GL_FLOAT, dest);
@@ -132,7 +124,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     /* do the image transfer ops which preceed convolution */
     for (row = 0; row < height; row++) {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4])(tmpImage + row * width * 4);
+	GLfloat(*rgba)[4] = (GLfloat(*)[4])(tmpVec.data() + row * width * 4);
 	_mesa_apply_rgba_transfer_ops(ctx,
 				      transferOps & IMAGE_PRE_CONVOLUTION_BITS,
 				      width, rgba);
@@ -140,16 +132,17 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     /* do convolution */
     if (ctx->Pixel.Convolution2DEnabled) {
-	_mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage);
+	_mesa_convolve_2d_image(ctx, &width, &height, tmpVec.data(), convVec.data());
     } else {
 	ASSERT(ctx->Pixel.Separable2DEnabled);
-	_mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage);
+	_mesa_convolve_sep_image(ctx, &width, &height, tmpVec.data(), convVec.data());
     }
-    free(tmpImage);
+    /* tmpVec is no longer needed */
+    tmpVec = {};
 
     /* do remaining post-convolution image transfer ops */
     for (row = 0; row < height; row++) {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4])(convImage + row * width * 4);
+	GLfloat(*rgba)[4] = (GLfloat(*)[4])(convVec.data() + row * width * 4);
 	_mesa_apply_rgba_transfer_ops(ctx,
 				      transferOps & IMAGE_POST_CONVOLUTION_BITS,
 				      width, rgba);
@@ -158,7 +151,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     if (!sink) {
 	/* write the new image */
 	for (row = 0; row < height; row++) {
-	    const GLfloat *src = convImage + row * width * 4;
+	    const GLfloat *src = convVec.data() + row * width * 4;
 	    GLvoid *rgba = (GLvoid *) span.array->attribs[FRAG_ATTRIB_COL0];
 
 	    /* copy convolved colors into span array */
@@ -179,7 +172,6 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	span.array->ChanType = CHAN_TYPE;
     }
 
-    free(convImage);
 }
 
 
@@ -190,7 +182,8 @@ static void
 copy_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 		 GLint width, GLint height, GLint destx, GLint desty)
 {
-    GLfloat *tmpImage, *p;
+    std::vector<GLfloat> tmpVec;
+    GLfloat *p = nullptr;
     GLint sy, dy, stepy, row;
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0F || ctx->Pixel.ZoomY != 1.0F;
     GLint overlapping;
@@ -251,22 +244,16 @@ copy_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     _swrast_span_default_secondary_color(ctx, &span);
 
     if (overlapping) {
-	tmpImage = (GLfloat *) malloc(width * height * sizeof(GLfloat) * 4);
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	    return;
-	}
+	tmpVec.resize(static_cast<size_t>(width) * height * 4);
 	/* read the source image as RGBA/float */
-	p = tmpImage;
+	p = tmpVec.data();
 	for (row = 0; row < height; row++) {
 	    _swrast_read_rgba_span(ctx, ctx->ReadBuffer->_ColorReadBuffer,
 				   width, srcx, sy + row, GL_FLOAT, p);
 	    p += width * 4;
 	}
-	p = tmpImage;
+	p = tmpVec.data();
     } else {
-	tmpImage = NULL;  /* silence compiler warnings */
-	p = NULL;
     }
 
     ASSERT(width < MAX_WIDTH);
@@ -304,8 +291,6 @@ copy_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     span.array->ChanType = CHAN_TYPE; /* restore */
 
-    if (overlapping)
-	free(tmpImage);
 }
 
 
@@ -314,7 +299,8 @@ copy_ci_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	       GLint width, GLint height,
 	       GLint destx, GLint desty)
 {
-    GLuint *tmpImage,*p;
+    std::vector<GLuint> tmpVec;
+    GLuint *p = nullptr;
     GLint sy, dy, stepy;
     GLint j;
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0F || ctx->Pixel.ZoomY != 1.0F;
@@ -355,22 +341,16 @@ copy_ci_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     if (overlapping) {
 	GLint ssy = sy;
-	tmpImage = (GLuint *) malloc(width * height * sizeof(GLuint));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	    return;
-	}
+	tmpVec.resize(static_cast<size_t>(width) * height);
 	/* read the image */
-	p = tmpImage;
+	p = tmpVec.data();
 	for (j = 0; j < height; j++, ssy += stepy) {
 	    _swrast_read_index_span(ctx, ctx->ReadBuffer->_ColorReadBuffer,
 				    width, srcx, ssy, p);
 	    p += width;
 	}
-	p = tmpImage;
+	p = tmpVec.data();
     } else {
-	tmpImage = NULL;  /* silence compiler warning */
-	p = NULL;
     }
 
     for (j = 0; j < height; j++, sy += stepy, dy += stepy) {
@@ -397,8 +377,6 @@ copy_ci_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	    _swrast_write_index_span(ctx, &span);
     }
 
-    if (overlapping)
-	free(tmpImage);
 }
 
 
@@ -447,7 +425,8 @@ copy_depth_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 {
     struct gl_framebuffer *fb = ctx->ReadBuffer;
     struct gl_renderbuffer *readRb = fb->_DepthBuffer;
-    GLfloat *p, *tmpImage;
+    std::vector<GLfloat> tmpVec;
+    GLfloat *p = nullptr;
     GLint sy, dy, stepy;
     GLint i, j;
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0F || ctx->Pixel.ZoomY != 1.0F;
@@ -495,20 +474,14 @@ copy_depth_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     if (overlapping) {
 	GLint ssy = sy;
-	tmpImage = (GLfloat *) malloc(width * height * sizeof(GLfloat));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	    return;
-	}
-	p = tmpImage;
+	tmpVec.resize(static_cast<size_t>(width) * height);
+	p = tmpVec.data();
 	for (j = 0; j < height; j++, ssy += stepy) {
 	    _swrast_read_depth_span_float(ctx, readRb, width, srcx, ssy, p);
 	    p += width;
 	}
-	p = tmpImage;
+	p = tmpVec.data();
     } else {
-	tmpImage = NULL;  /* silence compiler warning */
-	p = NULL;
     }
 
     for (j = 0; j < height; j++, sy += stepy, dy += stepy) {
@@ -541,8 +514,6 @@ copy_depth_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	}
     }
 
-    if (overlapping)
-	free(tmpImage);
 }
 
 
@@ -556,7 +527,8 @@ copy_stencil_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     struct gl_renderbuffer *rb = fb->_StencilBuffer;
     GLint sy, dy, stepy;
     GLint j;
-    GLstencil *p, *tmpImage;
+    std::vector<GLstencil> tmpVec;
+    GLstencil *p = nullptr;
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0F || ctx->Pixel.ZoomY != 1.0F;
     GLint overlapping;
 
@@ -587,20 +559,14 @@ copy_stencil_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     if (overlapping) {
 	GLint ssy = sy;
-	tmpImage = (GLstencil *) malloc(width * height * sizeof(GLstencil));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-	    return;
-	}
-	p = tmpImage;
+	tmpVec.resize(static_cast<size_t>(width) * height);
+	p = tmpVec.data();
 	for (j = 0; j < height; j++, ssy += stepy) {
 	    _swrast_read_stencil_span(ctx, rb, width, srcx, ssy, p);
 	    p += width;
 	}
-	p = tmpImage;
+	p = tmpVec.data();
     } else {
-	tmpImage = NULL;  /* silence compiler warning */
-	p = NULL;
     }
 
     for (j = 0; j < height; j++, sy += stepy, dy += stepy) {
@@ -625,8 +591,6 @@ copy_stencil_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	}
     }
 
-    if (overlapping)
-	free(tmpImage);
 }
 
 
@@ -644,8 +608,10 @@ copy_depth_stencil_pixels(GLcontext *ctx,
     struct gl_renderbuffer *stencilReadRb, *depthReadRb, *depthDrawRb;
     GLint sy, dy, stepy;
     GLint j;
-    GLstencil *tempStencilImage = NULL, *stencilPtr = NULL;
-    GLfloat *tempDepthImage = NULL, *depthPtr = NULL;
+    std::vector<GLstencil> tempStencilVec;
+    GLstencil *stencilPtr = nullptr;
+    std::vector<GLfloat> tempDepthVec;
+    GLfloat *depthPtr = nullptr;
     const GLfloat depthScale = ctx->DrawBuffer->_DepthMaxF;
     const GLuint stencilMask = ctx->Stencil.WriteMask[0];
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0F || ctx->Pixel.ZoomY != 1.0F;
@@ -685,40 +651,29 @@ copy_depth_stencil_pixels(GLcontext *ctx,
 	GLint ssy = sy;
 
 	if (stencilMask != 0x0) {
-	    tempStencilImage
-		= (GLstencil *) malloc(width * height * sizeof(GLstencil));
-	    if (!tempStencilImage) {
-		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-		return;
-	    }
+	    tempStencilVec.resize(static_cast<size_t>(width) * height);
 
 	    /* get copy of stencil pixels */
-	    stencilPtr = tempStencilImage;
+	    stencilPtr = tempStencilVec.data();
 	    for (j = 0; j < height; j++, ssy += stepy) {
 		_swrast_read_stencil_span(ctx, stencilReadRb,
 					  width, srcX, ssy, stencilPtr);
 		stencilPtr += width;
 	    }
-	    stencilPtr = tempStencilImage;
+	    stencilPtr = tempStencilVec.data();
 	}
 
 	if (ctx->Depth.Mask) {
-	    tempDepthImage
-		= (GLfloat *) malloc(width * height * sizeof(GLfloat));
-	    if (!tempDepthImage) {
-		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyPixels");
-		free(tempStencilImage);
-		return;
-	    }
+	    tempDepthVec.resize(static_cast<size_t>(width) * height);
 
 	    /* get copy of depth pixels */
-	    depthPtr = tempDepthImage;
+	    depthPtr = tempDepthVec.data();
 	    for (j = 0; j < height; j++, ssy += stepy) {
 		_swrast_read_depth_span_float(ctx, depthReadRb,
 					      width, srcX, ssy, depthPtr);
 		depthPtr += width;
 	    }
-	    depthPtr = tempDepthImage;
+	    depthPtr = tempDepthVec.data();
 	}
     }
 
@@ -791,11 +746,7 @@ copy_depth_stencil_pixels(GLcontext *ctx,
 	}
     }
 
-    if (tempStencilImage)
-	free(tempStencilImage);
 
-    if (tempDepthImage)
-	free(tempDepthImage);
 }
 
 
@@ -868,7 +819,7 @@ fast_copy_pixels(GLcontext *ctx,
     for (row = 0; row < height; row++) {
 	GLuint temp[MAX_WIDTH][4];
 	srcRb->GetRow(ctx, width, srcX, srcY, temp);
-	dstRb->PutRow(ctx, width, dstX, dstY, temp, NULL);
+	dstRb->PutRow(ctx, width, dstX, dstY, temp, nullptr);
 	srcY += yStep;
 	dstY += yStep;
     }

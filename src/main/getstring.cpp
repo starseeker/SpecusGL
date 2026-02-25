@@ -62,9 +62,9 @@ _mesa_GetString(GLenum name)
 #endif
 
     if (!ctx)
-	return NULL;
+	return nullptr;
 
-    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, NULL);
+    ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, nullptr);
 
     /* this is a required driver function */
     assert(ctx->Driver.GetString);
@@ -152,7 +152,7 @@ _mesa_GetString(GLenum name)
 		ctx->Extensions.ARB_fragment_program ||
 		ctx->Extensions.NV_vertex_program ||
 		ctx->Extensions.ARB_vertex_program) {
-		return (const GLubyte *) ctx->Program.ErrorString;
+		return (const GLubyte *) ctx->Program.ErrorString.c_str();
 	    }
 	    /* FALL-THROUGH */
 #endif

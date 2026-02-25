@@ -67,14 +67,14 @@ _mesa_init_driver_functions(struct dd_function_table *driver)
 {
     _mesa_bzero(driver, sizeof(*driver));
 
-    driver->GetString = NULL;  /* REQUIRED! */
-    driver->UpdateState = NULL;  /* REQUIRED! */
-    driver->GetBufferSize = NULL;  /* REQUIRED! */
+    driver->GetString = nullptr;  /* REQUIRED! */
+    driver->UpdateState = nullptr;  /* REQUIRED! */
+    driver->GetBufferSize = nullptr;  /* REQUIRED! */
     driver->ResizeBuffers = _mesa_resize_framebuffer;
-    driver->Error = NULL;
+    driver->Error = nullptr;
 
-    driver->Finish = NULL;
-    driver->Flush = NULL;
+    driver->Finish = nullptr;
+    driver->Flush = nullptr;
 
     /* framebuffer/image functions */
     driver->Clear = _swrast_Clear;
@@ -107,18 +107,18 @@ _mesa_init_driver_functions(struct dd_function_table *driver)
     driver->CompressedTexSubImage3D = _mesa_store_compressed_texsubimage3d;
     driver->GetCompressedTexImage = _mesa_get_compressed_teximage;
     driver->CompressedTextureSize = _mesa_compressed_texture_size;
-    driver->BindTexture = NULL;
+    driver->BindTexture = nullptr;
     driver->NewTextureObject = _mesa_new_texture_object;
     driver->DeleteTexture = _mesa_delete_texture_object;
     driver->NewTextureImage = _mesa_new_texture_image;
     driver->FreeTexImageData = _mesa_free_texture_image_data;
-    driver->MapTexture = NULL;
-    driver->UnmapTexture = NULL;
+    driver->MapTexture = nullptr;
+    driver->UnmapTexture = nullptr;
     driver->TextureMemCpy = memcpy;
-    driver->IsTextureResident = NULL;
-    driver->PrioritizeTexture = NULL;
-    driver->ActiveTexture = NULL;
-    driver->UpdateTexturePalette = NULL;
+    driver->IsTextureResident = nullptr;
+    driver->PrioritizeTexture = nullptr;
+    driver->ActiveTexture = nullptr;
+    driver->UpdateTexturePalette = nullptr;
 
     /* imaging */
     driver->CopyColorTable = _swrast_CopyColorTable;
@@ -127,80 +127,80 @@ _mesa_init_driver_functions(struct dd_function_table *driver)
     driver->CopyConvolutionFilter2D = _swrast_CopyConvolutionFilter2D;
 
     /* Vertex/fragment programs */
-    driver->BindProgram = NULL;
+    driver->BindProgram = nullptr;
     driver->NewProgram = _mesa_new_program;
     driver->DeleteProgram = _mesa_delete_program;
 
     /* simple state commands */
-    driver->AlphaFunc = NULL;
-    driver->BlendColor = NULL;
-    driver->BlendEquationSeparate = NULL;
-    driver->BlendFuncSeparate = NULL;
-    driver->ClearColor = NULL;
-    driver->ClearDepth = NULL;
-    driver->ClearIndex = NULL;
-    driver->ClearStencil = NULL;
-    driver->ClipPlane = NULL;
-    driver->ColorMask = NULL;
-    driver->ColorMaterial = NULL;
-    driver->CullFace = NULL;
-    driver->DrawBuffer = NULL;
-    driver->DrawBuffers = NULL;
-    driver->FrontFace = NULL;
-    driver->DepthFunc = NULL;
-    driver->DepthMask = NULL;
-    driver->DepthRange = NULL;
-    driver->Enable = NULL;
-    driver->Fogfv = NULL;
-    driver->Hint = NULL;
-    driver->IndexMask = NULL;
-    driver->Lightfv = NULL;
-    driver->LightModelfv = NULL;
-    driver->LineStipple = NULL;
-    driver->LineWidth = NULL;
-    driver->LogicOpcode = NULL;
-    driver->PointParameterfv = NULL;
-    driver->PointSize = NULL;
-    driver->PolygonMode = NULL;
-    driver->PolygonOffset = NULL;
-    driver->PolygonStipple = NULL;
-    driver->ReadBuffer = NULL;
-    driver->RenderMode = NULL;
-    driver->Scissor = NULL;
-    driver->ShadeModel = NULL;
-    driver->StencilFuncSeparate = NULL;
-    driver->StencilOpSeparate = NULL;
-    driver->StencilMaskSeparate = NULL;
-    driver->TexGen = NULL;
-    driver->TexEnv = NULL;
-    driver->TexParameter = NULL;
-    driver->TextureMatrix = NULL;
-    driver->Viewport = NULL;
+    driver->AlphaFunc = nullptr;
+    driver->BlendColor = nullptr;
+    driver->BlendEquationSeparate = nullptr;
+    driver->BlendFuncSeparate = nullptr;
+    driver->ClearColor = nullptr;
+    driver->ClearDepth = nullptr;
+    driver->ClearIndex = nullptr;
+    driver->ClearStencil = nullptr;
+    driver->ClipPlane = nullptr;
+    driver->ColorMask = nullptr;
+    driver->ColorMaterial = nullptr;
+    driver->CullFace = nullptr;
+    driver->DrawBuffer = nullptr;
+    driver->DrawBuffers = nullptr;
+    driver->FrontFace = nullptr;
+    driver->DepthFunc = nullptr;
+    driver->DepthMask = nullptr;
+    driver->DepthRange = nullptr;
+    driver->Enable = nullptr;
+    driver->Fogfv = nullptr;
+    driver->Hint = nullptr;
+    driver->IndexMask = nullptr;
+    driver->Lightfv = nullptr;
+    driver->LightModelfv = nullptr;
+    driver->LineStipple = nullptr;
+    driver->LineWidth = nullptr;
+    driver->LogicOpcode = nullptr;
+    driver->PointParameterfv = nullptr;
+    driver->PointSize = nullptr;
+    driver->PolygonMode = nullptr;
+    driver->PolygonOffset = nullptr;
+    driver->PolygonStipple = nullptr;
+    driver->ReadBuffer = nullptr;
+    driver->RenderMode = nullptr;
+    driver->Scissor = nullptr;
+    driver->ShadeModel = nullptr;
+    driver->StencilFuncSeparate = nullptr;
+    driver->StencilOpSeparate = nullptr;
+    driver->StencilMaskSeparate = nullptr;
+    driver->TexGen = nullptr;
+    driver->TexEnv = nullptr;
+    driver->TexParameter = nullptr;
+    driver->TextureMatrix = nullptr;
+    driver->Viewport = nullptr;
 
     /* vertex arrays */
-    driver->VertexPointer = NULL;
-    driver->NormalPointer = NULL;
-    driver->ColorPointer = NULL;
-    driver->FogCoordPointer = NULL;
-    driver->IndexPointer = NULL;
-    driver->SecondaryColorPointer = NULL;
-    driver->TexCoordPointer = NULL;
-    driver->EdgeFlagPointer = NULL;
-    driver->VertexAttribPointer = NULL;
-    driver->LockArraysEXT = NULL;
-    driver->UnlockArraysEXT = NULL;
+    driver->VertexPointer = nullptr;
+    driver->NormalPointer = nullptr;
+    driver->ColorPointer = nullptr;
+    driver->FogCoordPointer = nullptr;
+    driver->IndexPointer = nullptr;
+    driver->SecondaryColorPointer = nullptr;
+    driver->TexCoordPointer = nullptr;
+    driver->EdgeFlagPointer = nullptr;
+    driver->VertexAttribPointer = nullptr;
+    driver->LockArraysEXT = nullptr;
+    driver->UnlockArraysEXT = nullptr;
 
     /* state queries */
-    driver->GetBooleanv = NULL;
-    driver->GetDoublev = NULL;
-    driver->GetFloatv = NULL;
-    driver->GetIntegerv = NULL;
-    driver->GetPointerv = NULL;
+    driver->GetBooleanv = nullptr;
+    driver->GetDoublev = nullptr;
+    driver->GetFloatv = nullptr;
+    driver->GetIntegerv = nullptr;
+    driver->GetPointerv = nullptr;
 
 #if FEATURE_ARB_vertex_buffer_object
     driver->NewBufferObject = _mesa_new_buffer_object;
     driver->DeleteBuffer = _mesa_delete_buffer_object;
-    driver->BindBuffer = NULL;
+    driver->BindBuffer = nullptr;
     driver->BufferData = _mesa_buffer_data;
     driver->BufferSubData = _mesa_buffer_subdata;
     driver->GetBufferSubData = _mesa_buffer_get_subdata;
@@ -222,33 +222,33 @@ _mesa_init_driver_functions(struct dd_function_table *driver)
 
     /* query objects */
     driver->NewQueryObject = _mesa_new_query_object;
-    driver->BeginQuery = NULL;
-    driver->EndQuery = NULL;
+    driver->BeginQuery = nullptr;
+    driver->EndQuery = nullptr;
 
     /* APPLE_vertex_array_object */
     driver->NewArrayObject = _mesa_new_array_object;
     driver->DeleteArrayObject = _mesa_delete_array_object;
-    driver->BindArrayObject = NULL;
+    driver->BindArrayObject = nullptr;
 
     /* T&L stuff */
     driver->NeedValidate = GL_FALSE;
-    driver->ValidateTnlModule = NULL;
+    driver->ValidateTnlModule = nullptr;
     driver->CurrentExecPrimitive = 0;
     driver->CurrentSavePrimitive = 0;
     driver->NeedFlush = 0;
     driver->SaveNeedFlush = 0;
 
     driver->ProgramStringNotify = _tnl_program_string;
-    driver->FlushVertices = NULL;
-    driver->SaveFlushVertices = NULL;
-    driver->NotifySaveBegin = NULL;
-    driver->LightingSpaceChange = NULL;
+    driver->FlushVertices = nullptr;
+    driver->SaveFlushVertices = nullptr;
+    driver->NotifySaveBegin = nullptr;
+    driver->LightingSpaceChange = nullptr;
 
     /* display list */
-    driver->NewList = NULL;
-    driver->EndList = NULL;
-    driver->BeginCallList = NULL;
-    driver->EndCallList = NULL;
+    driver->NewList = nullptr;
+    driver->EndList = nullptr;
+    driver->BeginCallList = nullptr;
+    driver->EndCallList = nullptr;
 
 
     /* XXX temporary here */

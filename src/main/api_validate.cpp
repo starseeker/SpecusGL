@@ -38,7 +38,7 @@ max_buffer_index(GLcontext *ctx, GLuint count, GLenum type,
 		 const void *indices,
 		 struct gl_buffer_object *elementBuf)
 {
-    const GLubyte *map = NULL;
+    const GLubyte *map = nullptr;
     GLuint max = 0;
     GLint i;
 

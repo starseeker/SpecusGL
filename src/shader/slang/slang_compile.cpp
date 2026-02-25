@@ -2084,7 +2084,7 @@ compile_shader(GLcontext *ctx, slang_code_object * object,
     _slang_code_object_dtr(object);
     _slang_code_object_ctr(object);
 
-    success = compile_object(&id, shader->Source, object, type, infolog, program);
+    success = compile_object(&id, shader->Source.c_str(), object, type, infolog, program);
     if (id != 0)
 	grammar_destroy(id);
     if (!success)
@@ -2110,22 +2110,20 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
 	type = SLANG_UNIT_FRAGMENT_SHADER;
     }
 
-    if (!shader->Source)
+    if (shader->Source.empty())
 	return GL_FALSE;
 
     ctx->Shader.MemPool = _slang_new_mempool(1024*1024);
 
     /* XXX temporary hack */
-    if (!shader->Programs) {
+    if (shader->Programs.empty()) {
 	GLenum progTarget;
 	if (shader->Type == GL_VERTEX_SHADER)
 	    progTarget = GL_VERTEX_PROGRAM_ARB;
 	else
 	    progTarget = GL_FRAGMENT_PROGRAM_ARB;
-	shader->Programs
-	    = (struct gl_program **) malloc(sizeof(struct gl_program*));
+	shader->Programs.resize(1);
 	shader->Programs[0] = ctx->Driver.NewProgram(ctx, progTarget, 1);
-	shader->NumPrograms = 1;
 
 	shader->Programs[0]->Parameters = _mesa_new_parameter_list();
 	shader->Programs[0]->Varying = _mesa_new_parameter_list();
@@ -2138,14 +2136,11 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
     success = compile_shader(ctx, &obj, type, &info_log, shader);
 
     /* free shader's prev info log */
-    if (shader->InfoLog) {
-	free(shader->InfoLog);
-	shader->InfoLog = NULL;
-    }
+    shader->InfoLog.clear();
 
     if (info_log.text) {
 	/* copy info-log string to shader object */
-	shader->InfoLog = _mesa_strdup(info_log.text);
+	shader->InfoLog = info_log.text ? info_log.text : "";
     }
 
     if (info_log.error_flag) {

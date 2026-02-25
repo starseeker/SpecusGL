@@ -288,19 +288,19 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
     ref2->flags = 0;
 
     if (norm_normalize_types[mtype] == 0) {
-	ref_norm_transform_rescale(mat, scale, source, NULL, ref);
+	ref_norm_transform_rescale(mat, scale, source, nullptr, ref);
     } else {
-	ref_norm_transform_normalize(mat, scale, source, NULL, ref);
+	ref_norm_transform_normalize(mat, scale, source, nullptr, ref);
 	ref_norm_transform_normalize(mat, scale, source, length, ref2);
     }
 
     if (mesa_profile) {
 	BEGIN_RACE(*cycles);
-	func(mat, scale, source, NULL, dest);
+	func(mat, scale, source, nullptr, dest);
 	END_RACE(*cycles);
 	func(mat, scale, source, length, dest2);
     } else {
-	func(mat, scale, source, NULL, dest);
+	func(mat, scale, source, nullptr, dest);
 	func(mat, scale, source, length, dest2);
     }
 
@@ -375,7 +375,7 @@ void _math_test_all_normal_transform_functions(char *description)
 	    char buf[100];
 	    _mesa_sprintf(buf, "_mesa_normal_tab[0][%s] failed test (%s)",
 			  norm_strings[mtype], description);
-	    _mesa_problem(NULL, buf);
+	    _mesa_problem(nullptr, buf);
 	}
 
 #ifdef RUN_DEBUG_BENCHMARK

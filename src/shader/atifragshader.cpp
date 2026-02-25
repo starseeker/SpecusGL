@@ -283,7 +283,7 @@ _mesa_DeleteFragmentShaderATI(GLuint id)
 	if (prog && (prog != &DummyShader)) {
 	    prog->RefCount--;
 	    if (prog->RefCount <= 0) {
-		free(prog);
+		delete prog;
 	    }
 	}
     }
@@ -307,10 +307,10 @@ _mesa_BeginFragmentShaderATI(void)
        (or, could use the same mem but would need to reinitialize) */
     /* no idea if it's allowed to redefine a shader */
     for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
-	if (ctx->ATIFragmentShader.Current->Instructions[i])
-	    free(ctx->ATIFragmentShader.Current->Instructions[i]);
-	if (ctx->ATIFragmentShader.Current->SetupInst[i])
-	    free(ctx->ATIFragmentShader.Current->SetupInst[i]);
+	delete[] ctx->ATIFragmentShader.Current->Instructions[i];
+	ctx->ATIFragmentShader.Current->Instructions[i] = nullptr;
+	delete[] ctx->ATIFragmentShader.Current->SetupInst[i];
+	ctx->ATIFragmentShader.Current->SetupInst[i] = nullptr;
     }
 
     /* allocate the instructions here */

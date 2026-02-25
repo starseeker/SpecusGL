@@ -343,13 +343,13 @@ static void dtr(struct tnl_pipeline_stage *stage)
 	_mesa_vector4f_free(&store->LitIndex[0]);
 	_mesa_vector4f_free(&store->LitIndex[1]);
 	delete store;
-	stage->privatePtr = NULL;
+	stage->privatePtr = nullptr;
     }
 }
 
 const struct tnl_pipeline_stage _tnl_lighting_stage = {
     "lighting",			/* name */
-    NULL,			/* private_data */
+    nullptr,			/* private_data */
     init_lighting,
     dtr,				/* destroy */
     validate_lighting,

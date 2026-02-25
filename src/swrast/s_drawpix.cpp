@@ -34,6 +34,7 @@
 #include "state.h"
 
 #include "s_context.h"
+#include <vector>
 #include "mtypes.h"
 #include "swrast.h"
 #include "s_span.h"
@@ -119,7 +120,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	if (simpleZoom) {
 	    GLint row;
 	    for (row = 0; row < drawHeight; row++) {
-		rb->PutRow(ctx, drawWidth, destX, destY, src, NULL);
+		rb->PutRow(ctx, drawWidth, destX, destY, src, nullptr);
 		src += srcStride;
 		destY += yStep;
 	    }
@@ -148,7 +149,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	if (simpleZoom) {
 	    GLint row;
 	    for (row = 0; row < drawHeight; row++) {
-		rb->PutRowRGB(ctx, drawWidth, destX, destY, src, NULL);
+		rb->PutRowRGB(ctx, drawWidth, destX, destY, src, nullptr);
 		src += srcStride;
 		destY += yStep;
 	    }
@@ -188,7 +189,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    rgb[i][1] = src[i];
 		    rgb[i][2] = src[i];
 		}
-		rb->PutRowRGB(ctx, drawWidth, destX, destY, rgb, NULL);
+		rb->PutRowRGB(ctx, drawWidth, destX, destY, rgb, nullptr);
 		src += unpack.RowLength;
 		destY += yStep;
 	    }
@@ -231,7 +232,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    span.array->rgba[i][3] = *ptr++;
 		}
 		rb->PutRow(ctx, drawWidth, destX, destY,
-			   span.array->rgba, NULL);
+			   span.array->rgba, nullptr);
 		src += unpack.RowLength*2;
 		destY += yStep;
 	    }
@@ -272,7 +273,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    _mesa_map_ci8_to_rgba8(ctx, drawWidth, src,
 					   span.array->color.sz1.rgba);
 		    rb->PutRow(ctx, drawWidth, destX, destY,
-			       span.array->color.sz1.rgba, NULL);
+			       span.array->color.sz1.rgba, nullptr);
 		    src += unpack.RowLength;
 		    destY += yStep;
 		}
@@ -302,7 +303,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    GLint col;
 		    for (col = 0; col < drawWidth; col++)
 			index32[col] = src[col];
-		    rb->PutRow(ctx, drawWidth, destX, destY, index32, NULL);
+		    rb->PutRow(ctx, drawWidth, destX, destY, index32, nullptr);
 		    src += unpack.RowLength;
 		    destY += yStep;
 		}
@@ -537,7 +538,7 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 {
     const GLint imgX = x, imgY = y;
     const GLboolean zoom = ctx->Pixel.ZoomX!=1.0 || ctx->Pixel.ZoomY!=1.0;
-    GLfloat *convImage = NULL;
+    std::vector<GLfloat> convImage;
     GLbitfield transferOps = ctx->_ImageTransferState;
     SWspan span;
 
@@ -563,19 +564,11 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	 * rasterize the image.
 	 */
 	GLint row;
-	GLfloat *dest, *tmpImage;
+	GLfloat *dest;
+	std::vector<GLfloat> tmpImageVec(width * height * 4);
+	GLfloat *tmpImage = tmpImageVec.data();
 
-	tmpImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!tmpImage) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glDrawPixels");
-	    return;
-	}
-	convImage = (GLfloat *) malloc(width * height * 4 * sizeof(GLfloat));
-	if (!convImage) {
-	    free(tmpImage);
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glDrawPixels");
-	    return;
-	}
+	convImage.resize(width * height * 4);
 
 	/* Unpack the image and apply transfer ops up to convolution */
 	dest = tmpImage;
@@ -590,16 +583,15 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 
 	/* do convolution */
 	if (ctx->Pixel.Convolution2DEnabled) {
-	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage.data());
 	} else {
 	    ASSERT(ctx->Pixel.Separable2DEnabled);
-	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage);
+	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage.data());
 	}
-	free(tmpImage);
 
 	/* continue transfer ops and draw the convolved image */
 	unpack = &ctx->DefaultPacking;
-	pixels = convImage;
+	pixels = convImage.data();
 	format = GL_RGBA;
 	type = GL_FLOAT;
 	transferOps &= IMAGE_POST_CONVOLUTION_BITS;
@@ -672,10 +664,8 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	span.array->ChanType = CHAN_TYPE;
     }
 
-    if (convImage) {
-	free(convImage);
-    }
 }
+
 
 
 /**
@@ -732,7 +722,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 	    const GLuint *src = (const GLuint *)
 				_mesa_image_address2d(&clippedUnpack, pixels, width, height,
 					GL_DEPTH_STENCIL_EXT, type, i, 0);
-	    depthRb->PutRow(ctx, width, x, y + i, src, NULL);
+	    depthRb->PutRow(ctx, width, x, y + i, src, nullptr);
 	}
     } else {
 	/* sub-optimal cases:
@@ -761,7 +751,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 			_swrast_write_zoomed_z_span(ctx, imgX, imgY, width,
 						    x, y + i, zValues);
 		    else
-			depthRb->PutRow(ctx, width, x, y + i, zValues,NULL);
+			depthRb->PutRow(ctx, width, x, y + i, zValues,nullptr);
 		} else if (!scaleOrBias && ctx->DrawBuffer->Visual.depthBits == 16) {
 		    /* fast path 16-bit zbuffer */
 		    GLushort zValues[MAX_WIDTH];
@@ -774,7 +764,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 			_swrast_write_zoomed_z_span(ctx, imgX, imgY, width,
 						    x, y + i, zValues);
 		    else
-			depthRb->PutRow(ctx, width, x, y + i, zValues,NULL);
+			depthRb->PutRow(ctx, width, x, y + i, zValues,nullptr);
 		} else {
 		    /* general case */
 		    GLuint zValues[MAX_WIDTH];  /* 16 or 32-bit Z value storage */
@@ -785,7 +775,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 			_swrast_write_zoomed_z_span(ctx, imgX, imgY, width, x,
 						    y + i, zValues);
 		    } else {
-			depthRb->PutRow(ctx, width, x, y + i, zValues,NULL);
+			depthRb->PutRow(ctx, width, x, y + i, zValues,nullptr);
 		    }
 		}
 	    }

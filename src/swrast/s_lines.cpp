@@ -236,7 +236,7 @@ _mesa_print_line_function(GLcontext *ctx)
 #ifdef DEBUG
 
 /* record the current line function name */
-static const char *lineFuncName = NULL;
+static const char *lineFuncName = nullptr;
 
 #define USE(lineFunc)                   \
 do {                                    \

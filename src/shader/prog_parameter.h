@@ -36,6 +36,9 @@
 #include "mtypes.h"
 #include "prog_statevars.h"
 
+#include <string>
+#include <vector>
+
 
 /**
  * Program parameter.
@@ -45,7 +48,7 @@
  * Used by shaders for uniforms, constants, varying vars, etc.
  */
 struct gl_program_parameter {
-    const char *Name;        /**< Null-terminated string */
+    std::string Name;        /**< Parameter name */
     enum register_file Type; /**< PROGRAM_NAMED_PARAM, CONSTANT or STATE_VAR */
     GLenum DataType;         /**< GL_FLOAT, GL_FLOAT_VEC2, etc */
     GLuint Size;             /**< Number of components (1..4) */
@@ -58,87 +61,115 @@ struct gl_program_parameter {
 
 /**
  * List of gl_program_parameter instances.
+ * Manages its own parameter values memory.
  */
 struct gl_program_parameter_list {
-    GLuint Size;           /**< allocated size of Parameters, ParameterValues */
-    GLuint NumParameters;  /**< number of parameters in arrays */
-    struct gl_program_parameter *Parameters; /**< Array [Size] */
-    GLfloat(*ParameterValues)[4];         /**< Array [Size] of GLfloat[4] */
-    GLbitfield StateFlags; /**< _NEW_* flags indicating which state changes
-                               might invalidate ParameterValues[] */
+    std::vector<gl_program_parameter> Parameters; /**< Parameter descriptors */
+    GLfloat(*ParameterValues)[4] = nullptr;   /**< Array [NumParameters] of GLfloat[4] */
+    GLuint ParameterValueCapacity = 0;         /**< allocated size of ParameterValues */
+    GLbitfield StateFlags = 0; /**< _NEW_* flags indicating which state changes
+                                   might invalidate ParameterValues[] */
+
+    gl_program_parameter_list() = default;
+    ~gl_program_parameter_list();
+
+    /* Prevent accidental copies - use clone() explicitly */
+    gl_program_parameter_list(const gl_program_parameter_list &) = delete;
+    gl_program_parameter_list & operator=(const gl_program_parameter_list &) = delete;
+
+    GLuint NumParameters() const { return static_cast<GLuint>(Parameters.size()); }
+
+    GLint add_parameter(enum register_file type, const char *name,
+                        GLuint size, GLenum datatype, const GLfloat *values,
+                        const gl_state_index state[STATE_LENGTH]);
+    GLint add_named_parameter(const char *name, const GLfloat values[4]);
+    GLint add_named_constant(const char *name, const GLfloat values[4], GLuint size);
+    GLint add_unnamed_constant(const GLfloat values[4], GLuint size, GLuint *swizzleOut);
+    GLint add_uniform(const char *name, GLuint size, GLenum datatype);
+    GLint add_sampler(const char *name, GLenum datatype);
+    GLint add_varying(const char *name, GLuint size);
+    GLint add_attribute(const char *name, GLint size, GLint attrib);
+    GLint add_state_reference(const gl_state_index stateTokens[STATE_LENGTH]);
+
+    GLfloat *lookup_parameter_value(GLsizei nameLen, const char *name) const;
+    GLint lookup_parameter_index(GLsizei nameLen, const char *name) const;
+    GLboolean lookup_parameter_constant(const GLfloat v[], GLuint vSize,
+                                        GLint *posOut, GLuint *swizzleOut) const;
+    GLuint longest_parameter_name(enum register_file type) const;
+    GLuint num_parameters_of_type(enum register_file type) const;
+    gl_program_parameter_list *clone() const;
 };
 
+/* Legacy C-style wrappers – prefer member functions for new code. */
+inline gl_program_parameter_list *
+_mesa_new_parameter_list() { return new gl_program_parameter_list{}; }
 
-extern struct gl_program_parameter_list *
-_mesa_new_parameter_list(void);
+inline void
+_mesa_free_parameter_list(gl_program_parameter_list *p) { delete p; }
 
-extern void
-_mesa_free_parameter_list(struct gl_program_parameter_list *paramList);
+inline gl_program_parameter_list *
+_mesa_clone_parameter_list(const gl_program_parameter_list *l)
+{ return l ? l->clone() : nullptr; }
 
-extern struct gl_program_parameter_list *
-_mesa_clone_parameter_list(const struct gl_program_parameter_list *list);
+inline GLint
+_mesa_add_parameter(gl_program_parameter_list *p,
+    enum register_file type, const char *name, GLuint size,
+    GLenum datatype, const GLfloat *values,
+    const gl_state_index state[STATE_LENGTH])
+{ return p->add_parameter(type, name, size, datatype, values, state); }
 
-extern GLint
-_mesa_add_parameter(struct gl_program_parameter_list *paramList,
-		    enum register_file type, const char *name,
-		    GLuint size, GLenum datatype, const GLfloat *values,
-		    const gl_state_index state[STATE_LENGTH]);
+inline GLint _mesa_add_named_parameter(gl_program_parameter_list *p,
+    const char *name, const GLfloat v[4])
+{ return p->add_named_parameter(name, v); }
 
-extern GLint
-_mesa_add_named_parameter(struct gl_program_parameter_list *paramList,
-			  const char *name, const GLfloat values[4]);
+inline GLint _mesa_add_named_constant(gl_program_parameter_list *p,
+    const char *name, const GLfloat v[4], GLuint size)
+{ return p->add_named_constant(name, v, size); }
 
-extern GLint
-_mesa_add_named_constant(struct gl_program_parameter_list *paramList,
-			 const char *name, const GLfloat values[4],
-			 GLuint size);
+inline GLint _mesa_add_unnamed_constant(gl_program_parameter_list *p,
+    const GLfloat v[4], GLuint size, GLuint *swizzleOut)
+{ return p->add_unnamed_constant(v, size, swizzleOut); }
 
-extern GLint
-_mesa_add_unnamed_constant(struct gl_program_parameter_list *paramList,
-			   const GLfloat values[4], GLuint size,
-			   GLuint *swizzleOut);
+inline GLint _mesa_add_uniform(gl_program_parameter_list *p,
+    const char *name, GLuint size, GLenum datatype)
+{ return p->add_uniform(name, size, datatype); }
 
-extern GLint
-_mesa_add_uniform(struct gl_program_parameter_list *paramList,
-		  const char *name, GLuint size, GLenum datatype);
+inline GLint _mesa_add_sampler(gl_program_parameter_list *p,
+    const char *name, GLenum datatype)
+{ return p->add_sampler(name, datatype); }
 
-extern GLint
-_mesa_add_sampler(struct gl_program_parameter_list *paramList,
-		  const char *name, GLenum datatype);
+inline GLint _mesa_add_varying(gl_program_parameter_list *p,
+    const char *name, GLuint size)
+{ return p->add_varying(name, size); }
 
-extern GLint
-_mesa_add_varying(struct gl_program_parameter_list *paramList,
-		  const char *name, GLuint size);
+inline GLint _mesa_add_attribute(gl_program_parameter_list *p,
+    const char *name, GLint size, GLint attrib)
+{ return p->add_attribute(name, size, attrib); }
 
-extern GLint
-_mesa_add_attribute(struct gl_program_parameter_list *paramList,
-		    const char *name, GLint size, GLint attrib);
+inline GLint _mesa_add_state_reference(gl_program_parameter_list *p,
+    const gl_state_index stateTokens[STATE_LENGTH])
+{ return p->add_state_reference(stateTokens); }
 
-extern GLint
-_mesa_add_state_reference(struct gl_program_parameter_list *paramList,
-			  const gl_state_index stateTokens[STATE_LENGTH]);
+inline GLfloat *_mesa_lookup_parameter_value(
+    const gl_program_parameter_list *p, GLsizei nameLen, const char *name)
+{ return p ? p->lookup_parameter_value(nameLen, name) : nullptr; }
 
-extern GLfloat *
-_mesa_lookup_parameter_value(const struct gl_program_parameter_list *paramList,
-			     GLsizei nameLen, const char *name);
+inline GLint _mesa_lookup_parameter_index(
+    const gl_program_parameter_list *p, GLsizei nameLen, const char *name)
+{ return p ? p->lookup_parameter_index(nameLen, name) : -1; }
 
-extern GLint
-_mesa_lookup_parameter_index(const struct gl_program_parameter_list *paramList,
-			     GLsizei nameLen, const char *name);
+inline GLboolean _mesa_lookup_parameter_constant(
+    const gl_program_parameter_list *l, const GLfloat v[], GLuint vSize,
+    GLint *posOut, GLuint *swizzleOut)
+{ return l ? l->lookup_parameter_constant(v, vSize, posOut, swizzleOut) : GL_FALSE; }
 
-extern GLboolean
-_mesa_lookup_parameter_constant(const struct gl_program_parameter_list *list,
-				const GLfloat v[], GLuint vSize,
-				GLint *posOut, GLuint *swizzleOut);
+inline GLuint _mesa_longest_parameter_name(
+    const gl_program_parameter_list *l, enum register_file type)
+{ return l ? l->longest_parameter_name(type) : 0; }
 
-extern GLuint
-_mesa_longest_parameter_name(const struct gl_program_parameter_list *list,
-			     enum register_file type);
-
-extern GLuint
-_mesa_num_parameters_of_type(const struct gl_program_parameter_list *list,
-			     enum register_file type);
-
+inline GLuint _mesa_num_parameters_of_type(
+    const gl_program_parameter_list *l, enum register_file type)
+{ return l ? l->num_parameters_of_type(type) : 0; }
 
 
 

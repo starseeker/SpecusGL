@@ -221,7 +221,7 @@ void vbo_exec_vtx_flush(struct vbo_exec_context *exec)
 					 exec->vtx.inputs,
 					 exec->vtx.prim,
 					 exec->vtx.prim_count,
-					 NULL,
+					 nullptr,
 					 0,
 					 exec->vtx.vert_count - 1);
 	}

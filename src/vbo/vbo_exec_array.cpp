@@ -260,7 +260,7 @@ vbo_exec_DrawArrays(GLenum mode, GLint start, GLsizei count)
     prim[0].count = count;
     prim[0].indexed = 0;
 
-    vbo->draw_prims(ctx, exec->array.inputs, prim, 1, NULL, start, start + count - 1);
+    vbo->draw_prims(ctx, exec->array.inputs, prim, 1, nullptr, start, start + count - 1);
 }
 
 

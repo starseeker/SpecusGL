@@ -121,7 +121,7 @@ _mesa_GetBooleanv(GLenum pname, GLboolean *params)
 	    params[0] = FLOAT_TO_BOOLEAN(ctx->Color.AlphaRef);
 	    break;
 	case GL_ATTRIB_STACK_DEPTH:
-	    params[0] = INT_TO_BOOLEAN(ctx->AttribStackDepth);
+	    params[0] = INT_TO_BOOLEAN(static_cast<GLuint>(ctx->AttribStack.size()));
 	    break;
 	case GL_AUTO_NORMAL:
 	    params[0] = ctx->Eval.AutoNormal;
@@ -172,7 +172,7 @@ _mesa_GetBooleanv(GLenum pname, GLboolean *params)
 	    params[0] = FLOAT_TO_BOOLEAN(ctx->Pixel.BlueScale);
 	    break;
 	case GL_CLIENT_ATTRIB_STACK_DEPTH:
-	    params[0] = INT_TO_BOOLEAN(ctx->ClientAttribStackDepth);
+	    params[0] = INT_TO_BOOLEAN(static_cast<GLuint>(ctx->ClientAttribStack.size()));
 	    break;
 	case GL_CLIP_PLANE0:
 	    params[0] = (ctx->Transform.ClipPlanesEnabled >> 0) & 1;
@@ -1065,7 +1065,7 @@ _mesa_GetBooleanv(GLenum pname, GLboolean *params)
 	    break;
 	case GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetBooleanv");
-	    params[0] = INT_TO_BOOLEAN(_mesa_get_compressed_formats(ctx, NULL, GL_FALSE));
+	    params[0] = INT_TO_BOOLEAN(_mesa_get_compressed_formats(ctx, nullptr, GL_FALSE));
 	    break;
 	case GL_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetBooleanv");
@@ -1943,7 +1943,7 @@ _mesa_GetFloatv(GLenum pname, GLfloat *params)
 	    params[0] = ctx->Color.AlphaRef;
 	    break;
 	case GL_ATTRIB_STACK_DEPTH:
-	    params[0] = (GLfloat)(ctx->AttribStackDepth);
+	    params[0] = (GLfloat)(static_cast<GLuint>(ctx->AttribStack.size()));
 	    break;
 	case GL_AUTO_NORMAL:
 	    params[0] = BOOLEAN_TO_FLOAT(ctx->Eval.AutoNormal);
@@ -1994,7 +1994,7 @@ _mesa_GetFloatv(GLenum pname, GLfloat *params)
 	    params[0] = ctx->Pixel.BlueScale;
 	    break;
 	case GL_CLIENT_ATTRIB_STACK_DEPTH:
-	    params[0] = (GLfloat)(ctx->ClientAttribStackDepth);
+	    params[0] = (GLfloat)(static_cast<GLuint>(ctx->ClientAttribStack.size()));
 	    break;
 	case GL_CLIP_PLANE0:
 	    params[0] = BOOLEAN_TO_FLOAT((ctx->Transform.ClipPlanesEnabled >> 0) & 1);
@@ -2884,7 +2884,7 @@ _mesa_GetFloatv(GLenum pname, GLfloat *params)
 	    break;
 	case GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetFloatv");
-	    params[0] = (GLfloat)(_mesa_get_compressed_formats(ctx, NULL, GL_FALSE));
+	    params[0] = (GLfloat)(_mesa_get_compressed_formats(ctx, nullptr, GL_FALSE));
 	    break;
 	case GL_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetFloatv");
@@ -3760,7 +3760,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = FLOAT_TO_INT(ctx->Color.AlphaRef);
 	    break;
 	case GL_ATTRIB_STACK_DEPTH:
-	    params[0] = ctx->AttribStackDepth;
+	    params[0] = static_cast<GLuint>(ctx->AttribStack.size());
 	    break;
 	case GL_AUTO_NORMAL:
 	    params[0] = BOOLEAN_TO_INT(ctx->Eval.AutoNormal);
@@ -3811,7 +3811,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = IROUND(ctx->Pixel.BlueScale);
 	    break;
 	case GL_CLIENT_ATTRIB_STACK_DEPTH:
-	    params[0] = ctx->ClientAttribStackDepth;
+	    params[0] = static_cast<GLuint>(ctx->ClientAttribStack.size());
 	    break;
 	case GL_CLIP_PLANE0:
 	    params[0] = BOOLEAN_TO_INT((ctx->Transform.ClipPlanesEnabled >> 0) & 1);
@@ -4701,7 +4701,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetIntegerv");
-	    params[0] = _mesa_get_compressed_formats(ctx, NULL, GL_FALSE);
+	    params[0] = _mesa_get_compressed_formats(ctx, nullptr, GL_FALSE);
 	    break;
 	case GL_COMPRESSED_TEXTURE_FORMATS_ARB:
 	    CHECK_EXT1(ARB_texture_compression, "GetIntegerv");

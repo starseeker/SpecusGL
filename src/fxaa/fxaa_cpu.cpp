@@ -11,7 +11,7 @@
  */
 
 #include "fxaa_cpu.h"
-#include <stdlib.h>
+#include <vector>
 #include <string.h>
 #include <math.h>
 
@@ -152,14 +152,13 @@ static int vtkEndpointSearchCPU(
 
 void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p) {
     // If out == in, use a temp buffer to avoid read/write hazards.
-    uint8_t* temp = NULL;
     ImageRGBA8 dst = *out;
 
     int inPlace = (in->rgba == out->rgba);
+    std::vector<uint8_t> tempVec;
     if (inPlace) {
-	temp = (uint8_t*)malloc((size_t)in->strideBytes * (size_t)in->height);
-	if (!temp) return;
-	dst.rgba = temp;
+	tempVec.resize((size_t)in->strideBytes * (size_t)in->height);
+	dst.rgba = tempVec.data();
 	dst.width = in->width;
 	dst.height = in->height;
 	dst.strideBytes = in->strideBytes;
@@ -280,7 +279,6 @@ void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p
 
     if (inPlace) {
 	memcpy(out->rgba, dst.rgba, (size_t)dst.strideBytes * (size_t)dst.height);
-	free(temp);
     }
 }
 
@@ -311,8 +309,8 @@ void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAPara
      * Current approach prioritizes correctness and code clarity.
      */
     size_t bufferSize = (size_t)in->strideBytes * (size_t)in->height;
-    uint8_t* srgbBuffer = (uint8_t*)malloc(bufferSize);
-    if (!srgbBuffer) return;
+    std::vector<uint8_t> srgbVec(bufferSize);
+    uint8_t* srgbBuffer = srgbVec.data();
 
     /* Convert linear RGB to sRGB */
     for (int y = 0; y < in->height; ++y) {
@@ -337,11 +335,8 @@ void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAPara
 
     /* Apply FXAA in sRGB space */
     ImageRGBA8 srgbImg = { srgbBuffer, in->width, in->height, in->strideBytes };
-    uint8_t* fxaaBuffer = (uint8_t*)malloc(bufferSize);
-    if (!fxaaBuffer) {
-	free(srgbBuffer);
-	return;
-    }
+    std::vector<uint8_t> fxaaVec(bufferSize);
+    uint8_t* fxaaBuffer = fxaaVec.data();
     ImageRGBA8 fxaaImg = { fxaaBuffer, in->width, in->height, in->strideBytes };
 
     fxaa_apply_rgba8(&srgbImg, &fxaaImg, p);
@@ -367,8 +362,6 @@ void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAPara
 	}
     }
 
-    free(srgbBuffer);
-    free(fxaaBuffer);
 }
 
 /*

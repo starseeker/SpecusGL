@@ -63,7 +63,7 @@ _mesa_FeedbackBuffer(GLsizei size, GLenum type, GLfloat *buffer)
 	return;
     }
     if (!buffer) {
-	_mesa_error(ctx, GL_INVALID_VALUE, "glFeedbackBuffer(buffer==NULL)");
+	_mesa_error(ctx, GL_INVALID_VALUE, "glFeedbackBuffer(buffer==nullptr)");
 	ctx->Feedback.BufferSize = 0;
 	return;
     }
@@ -260,7 +260,7 @@ static void write_hit_record(GLcontext *ctx)
     /* HitMinZ and HitMaxZ are in [0,1].  Multiply these values by */
     /* 2^32-1 and round to nearest unsigned integer. */
 
-    assert(ctx != NULL);   /* this line magically fixes a SunOS 5.x/gcc bug */
+    assert(ctx != nullptr);   /* this line magically fixes a SunOS 5.x/gcc bug */
     zmin = (GLuint)((GLfloat) zscale * ctx->Select.HitMinZ);
     zmax = (GLuint)((GLfloat) zscale * ctx->Select.HitMaxZ);
 
@@ -518,12 +518,12 @@ void _mesa_init_feedback(GLcontext * ctx)
 {
     /* Feedback */
     ctx->Feedback.Type = GL_2D;   /* TODO: verify */
-    ctx->Feedback.Buffer = NULL;
+    ctx->Feedback.Buffer = nullptr;
     ctx->Feedback.BufferSize = 0;
     ctx->Feedback.Count = 0;
 
     /* Selection/picking */
-    ctx->Select.Buffer = NULL;
+    ctx->Select.Buffer = nullptr;
     ctx->Select.BufferSize = 0;
     ctx->Select.BufferCount = 0;
     ctx->Select.Hits = 0;

@@ -91,7 +91,7 @@ static GLboolean alloc_texmat_data(GLcontext *ctx,
     struct texmat_stage_data *store;
     GLuint i;
 
-    stage->privatePtr = calloc(1,sizeof(*store));
+    stage->privatePtr = new texmat_stage_data{};
     store = TEXMAT_STAGE_DATA(stage);
     if (!store)
 	return GL_FALSE;
@@ -112,8 +112,8 @@ static void free_texmat_data(struct tnl_pipeline_stage *stage)
 	for (i = 0; i < MAX_TEXTURE_COORD_UNITS; i++)
 	    if (store->texcoord[i].data)
 		_mesa_vector4f_free(&store->texcoord[i]);
-	free(store);
-	stage->privatePtr = NULL;
+	delete store;
+	stage->privatePtr = nullptr;
     }
 }
 
@@ -121,10 +121,10 @@ static void free_texmat_data(struct tnl_pipeline_stage *stage)
 
 const struct tnl_pipeline_stage _tnl_texture_transform_stage = {
     "texture transform",			/* name */
-    NULL,				/* private data */
+    nullptr,				/* private data */
     alloc_texmat_data,
     free_texmat_data,			/* destructor */
-    NULL,
+    nullptr,
     run_texmat_stage,
 };
 

@@ -76,7 +76,7 @@ _glthread_GetID(void)
 void
 _glthread_InitTSD(_glthread_TSD *tsd)
 {
-    if (pthread_key_create(&tsd->key, NULL/*free*/) != 0) {
+    if (pthread_key_create(&tsd->key, nullptr/*free*/) != 0) {
 	perror(INIT_TSD_ERROR);
 	exit(-1);
     }
@@ -131,7 +131,7 @@ _glthread_GetID(void)
 void
 _glthread_InitTSD(_glthread_TSD *tsd)
 {
-    if ((errno = mutex_init(&tsd->keylock, 0, NULL)) != 0 ||
+    if ((errno = mutex_init(&tsd->keylock, 0, nullptr)) != 0 ||
 	(errno = thr_keycreate(&(tsd->key), free)) != 0) {
 	perror(INIT_TSD_ERROR);
 	exit(-1);
@@ -253,7 +253,7 @@ _glthread_GetID(void)
 void
 _glthread_InitTSD(_glthread_TSD *tsd)
 {
-    if (xthread_key_create(&tsd->key, NULL) != 0) {
+    if (xthread_key_create(&tsd->key, nullptr) != 0) {
 	perror(INIT_TSD_ERROR);
 	exit(-1);
     }
@@ -310,7 +310,7 @@ void *
 _glthread_GetTSD(_glthread_TSD *tsd)
 {
     (void) tsd;
-    return NULL;
+    return nullptr;
 }
 
 

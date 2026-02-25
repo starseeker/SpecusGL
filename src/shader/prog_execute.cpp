@@ -80,7 +80,7 @@ get_register_pointer(const struct prog_src_register *source,
 	    ASSERT(source->File == PROGRAM_LOCAL_PARAM ||
 		   source->File == PROGRAM_STATE_VAR);
 	    params = machine->CurProgram->Parameters;
-	    if (reg < 0 || reg >= params->NumParameters)
+	    if (reg < 0 || reg >= params->NumParameters())
 		return ZeroVec;
 	    else
 		return params->ParameterValues[reg];
@@ -121,14 +121,14 @@ get_register_pointer(const struct prog_src_register *source,
 	/* Fallthrough */
 	case PROGRAM_NAMED_PARAM:
 	    ASSERT(source->Index <
-		   (GLint) machine->CurProgram->Parameters->NumParameters);
+		   (GLint) machine->CurProgram->Parameters->NumParameters());
 	    return machine->CurProgram->Parameters->ParameterValues[source->Index];
 
 	default:
-	    _mesa_problem(NULL,
+	    _mesa_problem(nullptr,
 			  "Invalid input register file %d in get_register_pointer()",
 			  source->File);
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -382,7 +382,7 @@ store_vector4(const struct prog_instruction *inst,
 	case PROGRAM_WRITE_ONLY:
 	    return;
 	default:
-	    _mesa_problem(NULL, "bad register file in store_vector4(fp)");
+	    _mesa_problem(nullptr, "bad register file in store_vector4(fp)");
 	    return;
     }
 

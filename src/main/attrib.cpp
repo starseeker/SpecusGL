@@ -77,73 +77,47 @@ struct texture_state {
 
 
 /**
- * Allocate a new attribute state node.  These nodes have a
- * "kind" value and a pointer to a struct of state data.
- */
-static struct gl_attrib_node *
-new_attrib_node(GLbitfield kind)
-{
-    auto *an = new gl_attrib_node{};
-    an->kind = kind;
-    return an;
-}
-
-
-/**
- * Delete the data associated with a gl_attrib_node, using the correct type.
- * GL_POLYGON_STIPPLE_BIT stores a GLuint[32] array; everything else stores
- * a single POD struct (no non-trivial destructor), so ::operator delete is
- * safe and avoids a lengthy switch statement.
+ * Free the data pointed to by an attrib entry, using the correct deallocator.
  */
 static void
-free_attrib_node_data(struct gl_attrib_node *attr)
+free_attrib_data(GLbitfield kind, void *data)
 {
-    if (attr->kind == GL_POLYGON_STIPPLE_BIT)
-	delete[] static_cast<GLuint*>(attr->data);
+    if (kind == GL_POLYGON_STIPPLE_BIT)
+	delete[] static_cast<GLuint*>(data);
     else
-	::operator delete(attr->data);  /* safe: all non-stipple data is POD */
+	::operator delete(data);  /* safe: all non-stipple data is POD */
 }
 
 
 void GLAPIENTRY
 _mesa_PushAttrib(GLbitfield mask)
 {
-    struct gl_attrib_node *newnode;
-    struct gl_attrib_node *head;
-
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     if (MESA_VERBOSE & VERBOSE_API)
 	_mesa_debug(ctx, "glPushAttrib %x\n", (int) mask);
 
-    if (ctx->AttribStackDepth >= MAX_ATTRIB_STACK_DEPTH) {
+    if (ctx->AttribStack.size() >= MAX_ATTRIB_STACK_DEPTH) {
 	_mesa_error(ctx, GL_STACK_OVERFLOW, "glPushAttrib");
 	return;
     }
 
-    /* Build linked list of attribute nodes which save all attribute */
-    /* groups specified by the mask. */
-    head = NULL;
+    /* Push a new level and populate it with copies of requested groups. */
+    ctx->AttribStack.emplace_back();
 
     if (mask & GL_ACCUM_BUFFER_BIT) {
 	struct gl_accum_attrib *attr;
 	attr = new gl_accum_attrib{};
 	memcpy(attr, &ctx->Accum, sizeof(struct gl_accum_attrib));
-	newnode = new_attrib_node(GL_ACCUM_BUFFER_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_ACCUM_BUFFER_BIT, attr);
     }
 
     if (mask & GL_COLOR_BUFFER_BIT) {
 	struct gl_colorbuffer_attrib *attr;
 	attr = new gl_colorbuffer_attrib{};
 	memcpy(attr, &ctx->Color, sizeof(struct gl_colorbuffer_attrib));
-	newnode = new_attrib_node(GL_COLOR_BUFFER_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_COLOR_BUFFER_BIT, attr);
     }
 
     if (mask & GL_CURRENT_BIT) {
@@ -151,20 +125,14 @@ _mesa_PushAttrib(GLbitfield mask)
 	FLUSH_CURRENT(ctx, 0);
 	attr = new gl_current_attrib{};
 	memcpy(attr, &ctx->Current, sizeof(struct gl_current_attrib));
-	newnode = new_attrib_node(GL_CURRENT_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_CURRENT_BIT, attr);
     }
 
     if (mask & GL_DEPTH_BUFFER_BIT) {
 	struct gl_depthbuffer_attrib *attr;
 	attr = new gl_depthbuffer_attrib{};
 	memcpy(attr, &ctx->Depth, sizeof(struct gl_depthbuffer_attrib));
-	newnode = new_attrib_node(GL_DEPTH_BUFFER_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_DEPTH_BUFFER_BIT, attr);
     }
 
     if (mask & GL_ENABLE_BIT) {
@@ -244,40 +212,28 @@ _mesa_PushAttrib(GLbitfield mask)
 	attr->VertexProgram = ctx->VertexProgram.Enabled;
 	attr->VertexProgramPointSize = ctx->VertexProgram.PointSizeEnabled;
 	attr->VertexProgramTwoSide = ctx->VertexProgram.TwoSideEnabled;
-	newnode = new_attrib_node(GL_ENABLE_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_ENABLE_BIT, attr);
     }
 
     if (mask & GL_EVAL_BIT) {
 	struct gl_eval_attrib *attr;
 	attr = new gl_eval_attrib{};
 	memcpy(attr, &ctx->Eval, sizeof(struct gl_eval_attrib));
-	newnode = new_attrib_node(GL_EVAL_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_EVAL_BIT, attr);
     }
 
     if (mask & GL_FOG_BIT) {
 	struct gl_fog_attrib *attr;
 	attr = new gl_fog_attrib{};
 	memcpy(attr, &ctx->Fog, sizeof(struct gl_fog_attrib));
-	newnode = new_attrib_node(GL_FOG_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_FOG_BIT, attr);
     }
 
     if (mask & GL_HINT_BIT) {
 	struct gl_hint_attrib *attr;
 	attr = new gl_hint_attrib{};
 	memcpy(attr, &ctx->Hint, sizeof(struct gl_hint_attrib));
-	newnode = new_attrib_node(GL_HINT_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_HINT_BIT, attr);
     }
 
     if (mask & GL_LIGHTING_BIT) {
@@ -285,30 +241,21 @@ _mesa_PushAttrib(GLbitfield mask)
 	FLUSH_CURRENT(ctx, 0);	/* flush material changes */
 	attr = new gl_light_attrib{};
 	memcpy(attr, &ctx->Light, sizeof(struct gl_light_attrib));
-	newnode = new_attrib_node(GL_LIGHTING_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_LIGHTING_BIT, attr);
     }
 
     if (mask & GL_LINE_BIT) {
 	struct gl_line_attrib *attr;
 	attr = new gl_line_attrib{};
 	memcpy(attr, &ctx->Line, sizeof(struct gl_line_attrib));
-	newnode = new_attrib_node(GL_LINE_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_LINE_BIT, attr);
     }
 
     if (mask & GL_LIST_BIT) {
 	struct gl_list_attrib *attr;
 	attr = new gl_list_attrib{};
 	memcpy(attr, &ctx->List, sizeof(struct gl_list_attrib));
-	newnode = new_attrib_node(GL_LIST_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_LIST_BIT, attr);
     }
 
     if (mask & GL_PIXEL_MODE_BIT) {
@@ -317,69 +264,46 @@ _mesa_PushAttrib(GLbitfield mask)
 	memcpy(attr, &ctx->Pixel, sizeof(struct gl_pixel_attrib));
 	/* push the Read FBO's ReadBuffer state, not ctx->Pixel.ReadBuffer */
 	attr->ReadBuffer = ctx->ReadBuffer->ColorReadBuffer;
-	newnode = new_attrib_node(GL_PIXEL_MODE_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_PIXEL_MODE_BIT, attr);
     }
 
     if (mask & GL_POINT_BIT) {
 	struct gl_point_attrib *attr;
 	attr = new gl_point_attrib{};
 	memcpy(attr, &ctx->Point, sizeof(struct gl_point_attrib));
-	newnode = new_attrib_node(GL_POINT_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_POINT_BIT, attr);
     }
 
     if (mask & GL_POLYGON_BIT) {
 	struct gl_polygon_attrib *attr;
 	attr = new gl_polygon_attrib{};
 	memcpy(attr, &ctx->Polygon, sizeof(struct gl_polygon_attrib));
-	newnode = new_attrib_node(GL_POLYGON_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_POLYGON_BIT, attr);
     }
 
     if (mask & GL_POLYGON_STIPPLE_BIT) {
 	GLuint *stipple = new GLuint[32];
 	memcpy(stipple, ctx->PolygonStipple, 32*sizeof(GLuint));
-	newnode = new_attrib_node(GL_POLYGON_STIPPLE_BIT);
-	newnode->data = stipple;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_POLYGON_STIPPLE_BIT, stipple);
     }
 
     if (mask & GL_SCISSOR_BIT) {
 	struct gl_scissor_attrib *attr;
 	attr = new gl_scissor_attrib{};
 	memcpy(attr, &ctx->Scissor, sizeof(struct gl_scissor_attrib));
-	newnode = new_attrib_node(GL_SCISSOR_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_SCISSOR_BIT, attr);
     }
 
     if (mask & GL_STENCIL_BUFFER_BIT) {
 	struct gl_stencil_attrib *attr;
 	attr = new gl_stencil_attrib{};
 	memcpy(attr, &ctx->Stencil, sizeof(struct gl_stencil_attrib));
-	newnode = new_attrib_node(GL_STENCIL_BUFFER_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_STENCIL_BUFFER_BIT, attr);
     }
 
     if (mask & GL_TEXTURE_BIT) {
 	struct texture_state *texstate = new texture_state{};
 	GLuint u;
-
-	if (!texstate) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glPushAttrib(GL_TEXTURE_BIT)");
-	    goto end;
-	}
 
 	_mesa_lock_context_textures(ctx);
 
@@ -413,30 +337,21 @@ _mesa_PushAttrib(GLbitfield mask)
 
 	_mesa_unlock_context_textures(ctx);
 
-	newnode = new_attrib_node(GL_TEXTURE_BIT);
-	newnode->data = texstate;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_TEXTURE_BIT, texstate);
     }
 
     if (mask & GL_TRANSFORM_BIT) {
 	struct gl_transform_attrib *attr;
 	attr = new gl_transform_attrib{};
 	memcpy(attr, &ctx->Transform, sizeof(struct gl_transform_attrib));
-	newnode = new_attrib_node(GL_TRANSFORM_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_TRANSFORM_BIT, attr);
     }
 
     if (mask & GL_VIEWPORT_BIT) {
 	struct gl_viewport_attrib *attr;
 	attr = new gl_viewport_attrib{};
 	memcpy(attr, &ctx->Viewport, sizeof(struct gl_viewport_attrib));
-	newnode = new_attrib_node(GL_VIEWPORT_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_VIEWPORT_BIT, attr);
     }
 
     /* GL_ARB_multisample */
@@ -444,15 +359,9 @@ _mesa_PushAttrib(GLbitfield mask)
 	struct gl_multisample_attrib *attr;
 	attr = new gl_multisample_attrib{};
 	memcpy(attr, &ctx->Multisample, sizeof(struct gl_multisample_attrib));
-	newnode = new_attrib_node(GL_MULTISAMPLE_BIT_ARB);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->AttribStack.back().emplace_back(GL_MULTISAMPLE_BIT_ARB, attr);
     }
 
-end:
-    ctx->AttribStack[ctx->AttribStackDepth] = head;
-    ctx->AttribStackDepth++;
 }
 
 
@@ -767,7 +676,7 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 
 	/* Restore texture object state for each target */
 	for (tgt = 0; tgt < NUM_TEXTURE_TARGETS; tgt++) {
-	    const struct gl_texture_object *obj = NULL;
+	    const struct gl_texture_object *obj = nullptr;
 	    GLfloat bordColor[4];
 	    GLenum target;
 
@@ -840,11 +749,11 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 	}
 
 	/* remove saved references to the texture objects */
-	_mesa_reference_texobj(&texstate->SavedRef1D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRef2D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRef3D[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRefCube[u], NULL);
-	_mesa_reference_texobj(&texstate->SavedRefRect[u], NULL);
+	_mesa_reference_texobj(&texstate->SavedRef1D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRef2D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRef3D[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRefCube[u], nullptr);
+	_mesa_reference_texobj(&texstate->SavedRefRect[u], nullptr);
     }
 
     _mesa_ActiveTextureARB(GL_TEXTURE0_ARB + texstate->Texture.CurrentUnit);
@@ -866,29 +775,25 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 void GLAPIENTRY
 _mesa_PopAttrib(void)
 {
-    struct gl_attrib_node *attr, *next;
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-    if (ctx->AttribStackDepth == 0) {
+    if (ctx->AttribStack.empty()) {
 	_mesa_error(ctx, GL_STACK_UNDERFLOW, "glPopAttrib");
 	return;
     }
 
-    ctx->AttribStackDepth--;
-    attr = ctx->AttribStack[ctx->AttribStackDepth];
-
-    while (attr) {
+    for (auto& [kind, data] : ctx->AttribStack.back()) {
 
 	if (MESA_VERBOSE & VERBOSE_API) {
 	    _mesa_debug(ctx, "glPopAttrib %s\n",
-			_mesa_lookup_enum_by_nr(attr->kind));
+			_mesa_lookup_enum_by_nr(kind));
 	}
 
-	switch (attr->kind) {
+	switch (kind) {
 	    case GL_ACCUM_BUFFER_BIT: {
 		const struct gl_accum_attrib *accum;
-		accum = (const struct gl_accum_attrib *) attr->data;
+		accum = (const struct gl_accum_attrib *) data;
 		_mesa_ClearAccum(accum->ClearColor[0],
 				 accum->ClearColor[1],
 				 accum->ClearColor[2],
@@ -897,7 +802,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_COLOR_BUFFER_BIT: {
 		const struct gl_colorbuffer_attrib *color;
-		color = (const struct gl_colorbuffer_attrib *) attr->data;
+		color = (const struct gl_colorbuffer_attrib *) data;
 		_mesa_ClearIndex((GLfloat) color->ClearIndex);
 		_mesa_ClearColor(color->ClearColor[0],
 				 color->ClearColor[1],
@@ -968,12 +873,12 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_CURRENT_BIT:
 		FLUSH_CURRENT(ctx, 0);
-		memcpy(&ctx->Current, attr->data,
+		memcpy(&ctx->Current, data,
 		       sizeof(struct gl_current_attrib));
 		break;
 	    case GL_DEPTH_BUFFER_BIT: {
 		const struct gl_depthbuffer_attrib *depth;
-		depth = (const struct gl_depthbuffer_attrib *) attr->data;
+		depth = (const struct gl_depthbuffer_attrib *) data;
 		_mesa_DepthFunc(depth->Func);
 		_mesa_ClearDepth(depth->Clear);
 		_mesa_set_enable(ctx, GL_DEPTH_TEST, depth->Test);
@@ -982,18 +887,18 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_ENABLE_BIT: {
 		const struct gl_enable_attrib *enable;
-		enable = (const struct gl_enable_attrib *) attr->data;
+		enable = (const struct gl_enable_attrib *) data;
 		pop_enable_group(ctx, enable);
 		ctx->NewState |= _NEW_ALL;
 	    }
 	    break;
 	    case GL_EVAL_BIT:
-		memcpy(&ctx->Eval, attr->data, sizeof(struct gl_eval_attrib));
+		memcpy(&ctx->Eval, data, sizeof(struct gl_eval_attrib));
 		ctx->NewState |= _NEW_EVAL;
 		break;
 	    case GL_FOG_BIT: {
 		const struct gl_fog_attrib *fog;
-		fog = (const struct gl_fog_attrib *) attr->data;
+		fog = (const struct gl_fog_attrib *) data;
 		_mesa_set_enable(ctx, GL_FOG, fog->Enabled);
 		_mesa_Fogfv(GL_FOG_COLOR, fog->Color);
 		_mesa_Fogf(GL_FOG_DENSITY, fog->Density);
@@ -1005,7 +910,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_HINT_BIT: {
 		const struct gl_hint_attrib *hint;
-		hint = (const struct gl_hint_attrib *) attr->data;
+		hint = (const struct gl_hint_attrib *) data;
 		_mesa_Hint(GL_PERSPECTIVE_CORRECTION_HINT,
 			   hint->PerspectiveCorrection);
 		_mesa_Hint(GL_POINT_SMOOTH_HINT, hint->PointSmooth);
@@ -1022,7 +927,7 @@ _mesa_PopAttrib(void)
 	    case GL_LIGHTING_BIT: {
 		GLuint i;
 		const struct gl_light_attrib *light;
-		light = (const struct gl_light_attrib *) attr->data;
+		light = (const struct gl_light_attrib *) data;
 		/* lighting enable */
 		_mesa_set_enable(ctx, GL_LIGHTING, light->Enabled);
 		/* per-light state */
@@ -1072,7 +977,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_LINE_BIT: {
 		const struct gl_line_attrib *line;
-		line = (const struct gl_line_attrib *) attr->data;
+		line = (const struct gl_line_attrib *) data;
 		_mesa_set_enable(ctx, GL_LINE_SMOOTH, line->SmoothFlag);
 		_mesa_set_enable(ctx, GL_LINE_STIPPLE, line->StippleFlag);
 		_mesa_LineStipple(line->StippleFactor, line->StipplePattern);
@@ -1080,17 +985,17 @@ _mesa_PopAttrib(void)
 	    }
 	    break;
 	    case GL_LIST_BIT:
-		memcpy(&ctx->List, attr->data, sizeof(struct gl_list_attrib));
+		memcpy(&ctx->List, data, sizeof(struct gl_list_attrib));
 		break;
 	    case GL_PIXEL_MODE_BIT:
-		memcpy(&ctx->Pixel, attr->data, sizeof(struct gl_pixel_attrib));
+		memcpy(&ctx->Pixel, data, sizeof(struct gl_pixel_attrib));
 		/* XXX what other pixel state needs to be set by function calls? */
 		_mesa_ReadBuffer(ctx->Pixel.ReadBuffer);
 		ctx->NewState |= _NEW_PIXEL;
 		break;
 	    case GL_POINT_BIT: {
 		const struct gl_point_attrib *point;
-		point = (const struct gl_point_attrib *) attr->data;
+		point = (const struct gl_point_attrib *) data;
 		_mesa_PointSize(point->Size);
 		_mesa_set_enable(ctx, GL_POINT_SMOOTH, point->SmoothFlag);
 		if (ctx->Extensions.EXT_point_parameters) {
@@ -1121,7 +1026,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_POLYGON_BIT: {
 		const struct gl_polygon_attrib *polygon;
-		polygon = (const struct gl_polygon_attrib *) attr->data;
+		polygon = (const struct gl_polygon_attrib *) data;
 		_mesa_CullFace(polygon->CullFaceMode);
 		_mesa_FrontFace(polygon->FrontFace);
 		_mesa_PolygonMode(GL_FRONT, polygon->FrontMode);
@@ -1140,14 +1045,14 @@ _mesa_PopAttrib(void)
 	    }
 	    break;
 	    case GL_POLYGON_STIPPLE_BIT:
-		memcpy(ctx->PolygonStipple, attr->data, 32*sizeof(GLuint));
+		memcpy(ctx->PolygonStipple, data, 32*sizeof(GLuint));
 		ctx->NewState |= _NEW_POLYGONSTIPPLE;
 		if (ctx->Driver.PolygonStipple)
-		    ctx->Driver.PolygonStipple(ctx, (const GLubyte *) attr->data);
+		    ctx->Driver.PolygonStipple(ctx, (const GLubyte *) data);
 		break;
 	    case GL_SCISSOR_BIT: {
 		const struct gl_scissor_attrib *scissor;
-		scissor = (const struct gl_scissor_attrib *) attr->data;
+		scissor = (const struct gl_scissor_attrib *) data;
 		_mesa_Scissor(scissor->X, scissor->Y,
 			      scissor->Width, scissor->Height);
 		_mesa_set_enable(ctx, GL_SCISSOR_TEST, scissor->Enabled);
@@ -1155,7 +1060,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_STENCIL_BUFFER_BIT: {
 		const struct gl_stencil_attrib *stencil;
-		stencil = (const struct gl_stencil_attrib *) attr->data;
+		stencil = (const struct gl_stencil_attrib *) data;
 		_mesa_set_enable(ctx, GL_STENCIL_TEST, stencil->Enabled);
 		_mesa_ClearStencil(stencil->Clear);
 		if (ctx->Extensions.EXT_stencil_two_side) {
@@ -1187,7 +1092,7 @@ _mesa_PopAttrib(void)
 	    case GL_TRANSFORM_BIT: {
 		GLuint i;
 		const struct gl_transform_attrib *xform;
-		xform = (const struct gl_transform_attrib *) attr->data;
+		xform = (const struct gl_transform_attrib *) data;
 		_mesa_MatrixMode(xform->MatrixMode);
 		if (_math_matrix_is_dirty(ctx->ProjectionMatrixStack.Top))
 		    _math_matrix_analyse(ctx->ProjectionMatrixStack.Top);
@@ -1218,21 +1123,21 @@ _mesa_PopAttrib(void)
 		/* Take care of texture object reference counters */
 	    {
 		struct texture_state *texstate
-		    = (struct texture_state *) attr->data;
+		    = (struct texture_state *) data;
 		pop_texture_group(ctx, texstate);
 		ctx->NewState |= _NEW_TEXTURE;
 	    }
 	    break;
 	    case GL_VIEWPORT_BIT: {
 		const struct gl_viewport_attrib *vp;
-		vp = (const struct gl_viewport_attrib *) attr->data;
+		vp = (const struct gl_viewport_attrib *) data;
 		_mesa_Viewport(vp->X, vp->Y, vp->Width, vp->Height);
 		_mesa_DepthRange(vp->Near, vp->Far);
 	    }
 	    break;
 	    case GL_MULTISAMPLE_BIT_ARB: {
 		const struct gl_multisample_attrib *ms;
-		ms = (const struct gl_multisample_attrib *) attr->data;
+		ms = (const struct gl_multisample_attrib *) data;
 		_mesa_SampleCoverageARB(ms->SampleCoverageValue,
 					ms->SampleCoverageInvert);
 	    }
@@ -1243,11 +1148,9 @@ _mesa_PopAttrib(void)
 		break;
 	}
 
-	next = attr->next;
-	free_attrib_node_data(attr);
-	delete attr;
-	attr = next;
+	free_attrib_data(kind, data);
     }
+    ctx->AttribStack.pop_back();
 }
 
 
@@ -1283,20 +1186,16 @@ adjust_buffer_object_ref_counts(struct gl_array_attrib *array, GLint step)
 void GLAPIENTRY
 _mesa_PushClientAttrib(GLbitfield mask)
 {
-    struct gl_attrib_node *newnode;
-    struct gl_attrib_node *head;
-
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    if (ctx->ClientAttribStackDepth >= MAX_CLIENT_ATTRIB_STACK_DEPTH) {
+    if (ctx->ClientAttribStack.size() >= MAX_CLIENT_ATTRIB_STACK_DEPTH) {
 	_mesa_error(ctx, GL_STACK_OVERFLOW, "glPushClientAttrib");
 	return;
     }
 
-    /* Build linked list of attribute nodes which save all attribute */
-    /* groups specified by the mask. */
-    head = NULL;
+    /* Push a new level and populate it with copies of requested groups. */
+    ctx->ClientAttribStack.emplace_back();
 
     if (mask & GL_CLIENT_PIXEL_STORE_BIT) {
 	struct gl_pixelstore_attrib *attr;
@@ -1307,17 +1206,11 @@ _mesa_PushClientAttrib(GLbitfield mask)
 	/* packing attribs */
 	attr = new gl_pixelstore_attrib{};
 	memcpy(attr, &ctx->Pack, sizeof(struct gl_pixelstore_attrib));
-	newnode = new_attrib_node(GL_CLIENT_PACK_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_PACK_BIT, attr);
 	/* unpacking attribs */
 	attr = new gl_pixelstore_attrib{};
 	memcpy(attr, &ctx->Unpack, sizeof(struct gl_pixelstore_attrib));
-	newnode = new_attrib_node(GL_CLIENT_UNPACK_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_UNPACK_BIT, attr);
     }
     if (mask & GL_CLIENT_VERTEX_ARRAY_BIT) {
 	struct gl_array_attrib *attr;
@@ -1337,16 +1230,11 @@ _mesa_PushClientAttrib(GLbitfield mask)
 
 	attr->ArrayObj = obj;
 
-	newnode = new_attrib_node(GL_CLIENT_VERTEX_ARRAY_BIT);
-	newnode->data = attr;
-	newnode->next = head;
-	head = newnode;
+	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_VERTEX_ARRAY_BIT, attr);
 	/* bump reference counts on buffer objects */
 	adjust_buffer_object_ref_counts(&ctx->Array, 1);
     }
 
-    ctx->ClientAttribStack[ctx->ClientAttribStackDepth] = head;
-    ctx->ClientAttribStackDepth++;
 }
 
 
@@ -1355,21 +1243,16 @@ _mesa_PushClientAttrib(GLbitfield mask)
 void GLAPIENTRY
 _mesa_PopClientAttrib(void)
 {
-    struct gl_attrib_node *attr, *next;
-
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
-    if (ctx->ClientAttribStackDepth == 0) {
+    if (ctx->ClientAttribStack.empty()) {
 	_mesa_error(ctx, GL_STACK_UNDERFLOW, "glPopClientAttrib");
 	return;
     }
 
-    ctx->ClientAttribStackDepth--;
-    attr = ctx->ClientAttribStack[ctx->ClientAttribStackDepth];
-
-    while (attr) {
-	switch (attr->kind) {
+    for (auto& [kind, data] : ctx->ClientAttribStack.back()) {
+	switch (kind) {
 	    case GL_CLIENT_PACK_BIT:
 #if FEATURE_EXT_pixel_buffer_object
 		ctx->Pack.BufferObj->RefCount--;
@@ -1378,7 +1261,7 @@ _mesa_PopClientAttrib(void)
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Pack.BufferObj);
 		}
 #endif
-		memcpy(&ctx->Pack, attr->data,
+		memcpy(&ctx->Pack, data,
 		       sizeof(struct gl_pixelstore_attrib));
 		ctx->NewState |= _NEW_PACKUNPACK;
 		break;
@@ -1390,33 +1273,33 @@ _mesa_PopClientAttrib(void)
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Unpack.BufferObj);
 		}
 #endif
-		memcpy(&ctx->Unpack, attr->data,
+		memcpy(&ctx->Unpack, data,
 		       sizeof(struct gl_pixelstore_attrib));
 		ctx->NewState |= _NEW_PACKUNPACK;
 		break;
 	    case GL_CLIENT_VERTEX_ARRAY_BIT: {
-		struct gl_array_attrib * data =
-		    (struct gl_array_attrib *) attr->data;
+		struct gl_array_attrib *const array_data =
+		    (struct gl_array_attrib *) data;
 
 		adjust_buffer_object_ref_counts(&ctx->Array, -1);
 
-		ctx->Array.ActiveTexture = data->ActiveTexture;
-		ctx->Array.LockFirst = data->LockFirst;
-		ctx->Array.LockCount = data->LockCount;
+		ctx->Array.ActiveTexture = array_data->ActiveTexture;
+		ctx->Array.LockFirst = array_data->LockFirst;
+		ctx->Array.LockCount = array_data->LockCount;
 
-		_mesa_BindVertexArrayAPPLE(data->ArrayObj->Name);
+		_mesa_BindVertexArrayAPPLE(array_data->ArrayObj->Name);
 
 #if FEATURE_ARB_vertex_buffer_object
 		_mesa_BindBufferARB(GL_ARRAY_BUFFER_ARB,
-				    data->ArrayBufferObj->Name);
+				    array_data->ArrayBufferObj->Name);
 		_mesa_BindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
-				    data->ElementArrayBufferObj->Name);
+				    array_data->ElementArrayBufferObj->Name);
 #endif
 
-		memcpy(ctx->Array.ArrayObj, data->ArrayObj,
+		memcpy(ctx->Array.ArrayObj, array_data->ArrayObj,
 		       sizeof(struct gl_array_object));
 
-		delete data->ArrayObj;
+		delete array_data->ArrayObj;
 
 		/* FIXME: Should some bits in ctx->Array->NewState also be set
 		 * FIXME: here?  It seems like it should be set to inclusive-or
@@ -1431,53 +1314,42 @@ _mesa_PopClientAttrib(void)
 		break;
 	}
 
-	next = attr->next;
-	free_attrib_node_data(attr);
-	delete attr;
-	attr = next;
+	free_attrib_data(kind, data);
     }
+    ctx->ClientAttribStack.pop_back();
 }
 
 
 void
 _mesa_free_attrib_data(GLcontext *ctx)
 {
-    while (ctx->AttribStackDepth > 0) {
-	struct gl_attrib_node *attr, *next;
-
-	ctx->AttribStackDepth--;
-	attr = ctx->AttribStack[ctx->AttribStackDepth];
-
-	while (attr) {
-	    if (attr->kind == GL_TEXTURE_BIT) {
-		struct texture_state *texstate = (struct texture_state*)attr->data;
+    /* Release all texture object references held by the attrib stack. */
+    for (auto& level : ctx->AttribStack) {
+	for (auto& [kind, data] : level) {
+	    if (kind == GL_TEXTURE_BIT) {
+		struct texture_state *texstate = (struct texture_state *) data;
 		GLuint u;
 		/* clear references to the saved texture objects */
 		for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
-		    _mesa_reference_texobj(&texstate->SavedRef1D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRef2D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRef3D[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRefCube[u], NULL);
-		    _mesa_reference_texobj(&texstate->SavedRefRect[u], NULL);
+		    _mesa_reference_texobj(&texstate->SavedRef1D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRef2D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRef3D[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRefCube[u], nullptr);
+		    _mesa_reference_texobj(&texstate->SavedRefRect[u], nullptr);
 		}
-	    } else {
-		/* any other chunks of state that requires special handling? */
 	    }
-
-	    next = attr->next;
-	    free_attrib_node_data(attr);
-	    delete attr;
-	    attr = next;
+	    free_attrib_data(kind, data);
 	}
     }
+    ctx->AttribStack.clear();
 }
 
 
 void _mesa_init_attrib(GLcontext *ctx)
 {
-    /* Renderer and client attribute stacks */
-    ctx->AttribStackDepth = 0;
-    ctx->ClientAttribStackDepth = 0;
+    /* Renderer and client attribute stacks start empty. */
+    ctx->AttribStack.clear();
+    ctx->ClientAttribStack.clear();
 }
 
 /*

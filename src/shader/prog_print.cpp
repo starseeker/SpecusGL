@@ -226,17 +226,16 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 		    sprintf(str, "uniform[%d]", index);
 		    break;
 		case PROGRAM_STATE_VAR: {
-		    struct gl_program_parameter *param = prog->Parameters->Parameters + index;
-		    const char *sstr = _mesa_program_state_string(param->StateIndexes);
-		    sprintf(str, "%s", sstr);
-		    free((void *)sstr);
+		    struct gl_program_parameter *param = &prog->Parameters->Parameters[index];
+		    std::string sstr = _mesa_program_state_string(param->StateIndexes);
+		    sprintf(str, "%s", sstr.c_str());
 		}
 		break;
 		case PROGRAM_ADDRESS:
 		    sprintf(str, "A%d", index);
 		    break;
 		default:
-		    _mesa_problem(NULL, "bad file in reg_string()");
+		    _mesa_problem(nullptr, "bad file in reg_string()");
 	    }
 	    break;
 
@@ -270,12 +269,12 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 		    sprintf(str, "state[%d]", index);
 		    break;
 		default:
-		    _mesa_problem(NULL, "bad file in reg_string()");
+		    _mesa_problem(nullptr, "bad file in reg_string()");
 	    }
 	    break;
 
 	default:
-	    _mesa_problem(NULL, "bad mode in reg_string()");
+	    _mesa_problem(nullptr, "bad mode in reg_string()");
     }
 
     return str;
@@ -431,8 +430,8 @@ print_src_reg(const struct prog_src_register *srcReg, gl_prog_print_mode mode,
 static void
 print_comment(const struct prog_instruction *inst)
 {
-    if (inst->Comment)
-	_mesa_printf(";  # %s\n", inst->Comment);
+    if (!inst->Comment.empty())
+	_mesa_printf(";  # %s\n", inst->Comment.c_str());
     else
 	_mesa_printf(";\n");
 }
@@ -478,7 +477,7 @@ void
 _mesa_print_alu_instruction(const struct prog_instruction *inst,
 			    const char *opcode_string, GLuint numRegs)
 {
-    print_alu_instruction(inst, opcode_string, numRegs, PROG_PRINT_DEBUG, NULL);
+    print_alu_instruction(inst, opcode_string, numRegs, PROG_PRINT_DEBUG, nullptr);
 }
 
 
@@ -486,7 +485,7 @@ void
 _mesa_print_instruction(const struct prog_instruction *inst)
 {
     /* note: 4th param should be ignored for PROG_PRINT_DEBUG */
-    _mesa_print_instruction_opt(inst, 0, PROG_PRINT_DEBUG, NULL);
+    _mesa_print_instruction_opt(inst, 0, PROG_PRINT_DEBUG, nullptr);
 }
 
 
@@ -522,8 +521,8 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 			     _mesa_swizzle_string(inst->SrcReg[0].Swizzle,
 						  inst->SrcReg[0].NegateBase, GL_FALSE));
 	    }
-	    if (inst->Comment)
-		_mesa_printf("  # %s", inst->Comment);
+	    if (!inst->Comment.empty())
+		_mesa_printf("  # %s", inst->Comment.c_str());
 	    print_comment(inst);
 	    break;
 	case OPCODE_SWZ:
@@ -624,7 +623,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 
 	case OPCODE_BGNSUB:
 	    if (mode == PROG_PRINT_NV) {
-		_mesa_printf("%s:\n", inst->Comment); /* comment is label */
+		_mesa_printf("%s:\n", inst->Comment.c_str()); /* comment is label */
 		return indent;
 	    } else {
 		_mesa_printf("BGNSUB");
@@ -639,7 +638,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    break;
 	case OPCODE_CAL:
 	    if (mode == PROG_PRINT_NV) {
-		_mesa_printf("CAL %s;  # (goto %d)\n", inst->Comment, inst->BranchTarget);
+		_mesa_printf("CAL %s;  # (goto %d)\n", inst->Comment.c_str(), inst->BranchTarget);
 	    } else {
 		_mesa_printf("CAL %u", inst->BranchTarget);
 		print_comment(inst);
@@ -659,9 +658,9 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    if (mode == PROG_PRINT_DEBUG) {
 		_mesa_printf("NOP");
 		print_comment(inst);
-	    } else if (inst->Comment) {
+	    } else if (!inst->Comment.empty()) {
 		/* ARB/NV extensions don't have NOP instruction */
-		_mesa_printf("# %s\n", inst->Comment);
+		_mesa_printf("# %s\n", inst->Comment.c_str());
 	    }
 	    break;
 	/* XXX may need other special-case instructions */
@@ -760,13 +759,13 @@ _mesa_print_parameter_list(const struct gl_program_parameter_list *list)
     GLuint i;
 
     _mesa_printf("param list %p\n", (void *) list);
-    for (i = 0; i < list->NumParameters; i++) {
-	struct gl_program_parameter *param = list->Parameters + i;
+    for (i = 0; i < list->NumParameters(); i++) {
+	const struct gl_program_parameter *param = &list->Parameters[i];
 	const GLfloat *v = list->ParameterValues[i];
 	_mesa_printf("param[%d] sz=%d %s %s = {%.3g, %.3g, %.3g, %.3g};\n",
 		     i, param->Size,
 		     file_string(list->Parameters[i].Type, mode),
-		     param->Name, v[0], v[1], v[2], v[3]);
+		     param->Name.c_str(), v[0], v[1], v[2], v[3]);
     }
 }
 

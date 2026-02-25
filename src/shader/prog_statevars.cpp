@@ -498,7 +498,7 @@ _mesa_program_state_flags(const gl_state_index state[STATE_LENGTH])
 	    }
 
 	default:
-	    _mesa_problem(NULL, "unexpected state[0] in make_state_flags()");
+	    _mesa_problem(nullptr, "unexpected state[0] in make_state_flags()");
 	    return 0;
     }
 }
@@ -676,9 +676,8 @@ append_index(char *dst, GLint index)
 /**
  * Make a string from the given state vector.
  * For example, return "state.matrix.texture[2].inverse".
- * Use free() to deallocate the string.
  */
-const char *
+std::string
 _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 {
     char str[1000] = "";
@@ -771,11 +770,11 @@ _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 	case STATE_INTERNAL:
 	    break;
 	default:
-	    _mesa_problem(NULL, "Invalid state in _mesa_program_state_string");
+	    _mesa_problem(nullptr, "Invalid state in _mesa_program_state_string");
 	    break;
     }
 
-    return _mesa_strdup(str);
+    return str;
 }
 
 
@@ -794,7 +793,7 @@ _mesa_load_state_parameters(GLcontext *ctx,
     if (!paramList)
 	return;
 
-    for (i = 0; i < paramList->NumParameters; i++) {
+    for (i = 0; i < paramList->NumParameters(); i++) {
 	if (paramList->Parameters[i].Type == PROGRAM_STATE_VAR) {
 	    _mesa_fetch_state(ctx,
 			      (gl_state_index *) paramList->Parameters[i].StateIndexes,

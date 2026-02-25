@@ -54,6 +54,7 @@
 #include "enable.h"
 #include "enums.h"
 #include "eval.h"
+#include <algorithm>
 #include "extensions.h"
 #include "feedback.h"
 #include "get.h"
@@ -150,7 +151,7 @@ do {									\
    if (ctx->Driver.CurrentSavePrimitive <= GL_POLYGON ||		\
        ctx->Driver.CurrentSavePrimitive == PRIM_INSIDE_UNKNOWN_PRIM) {	\
       _mesa_compile_error( ctx, GL_INVALID_OPERATION, "begin/end" );	\
-      free(_tofree);						\
+      delete[] _tofree;						\
       return;								\
    }									\
 } while (0)
@@ -493,108 +494,108 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 	    switch (n[0].opcode) {
 		/* for some commands, we need to free malloc'd memory */
 		case OPCODE_MAP1:
-		    free(n[6].data);
+		    delete[] static_cast<GLfloat *>(n[6].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_MAP2:
-		    free(n[10].data);
+		    delete[] static_cast<GLfloat *>(n[10].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_DRAW_PIXELS:
-		    free(n[5].data);
+		    delete[] static_cast<GLubyte *>(n[5].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_BITMAP:
-		    free(n[7].data);
+		    delete[] static_cast<GLubyte *>(n[7].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COLOR_TABLE:
-		    free(n[6].data);
+		    delete[] static_cast<GLubyte *>(n[6].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COLOR_SUB_TABLE:
-		    free(n[6].data);
+		    delete[] static_cast<GLubyte *>(n[6].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_CONVOLUTION_FILTER_1D:
-		    free(n[6].data);
+		    delete[] static_cast<GLubyte *>(n[6].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_CONVOLUTION_FILTER_2D:
-		    free(n[7].data);
+		    delete[] static_cast<GLubyte *>(n[7].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_POLYGON_STIPPLE:
-		    free(n[1].data);
+		    delete[] static_cast<GLubyte *>(n[1].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_IMAGE1D:
-		    free(n[8].data);
+		    delete[] static_cast<GLubyte *>(n[8].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_IMAGE2D:
-		    free(n[9].data);
+		    delete[] static_cast<GLubyte *>(n[9].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_IMAGE3D:
-		    free(n[10].data);
+		    delete[] static_cast<GLubyte *>(n[10].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_SUB_IMAGE1D:
-		    free(n[7].data);
+		    delete[] static_cast<GLubyte *>(n[7].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_SUB_IMAGE2D:
-		    free(n[9].data);
+		    delete[] static_cast<GLubyte *>(n[9].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_TEX_SUB_IMAGE3D:
-		    free(n[11].data);
+		    delete[] static_cast<GLubyte *>(n[11].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_IMAGE_1D:
-		    free(n[7].data);
+		    delete[] static_cast<GLubyte *>(n[7].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_IMAGE_2D:
-		    free(n[8].data);
+		    delete[] static_cast<GLubyte *>(n[8].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_IMAGE_3D:
-		    free(n[9].data);
+		    delete[] static_cast<GLubyte *>(n[9].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_SUB_IMAGE_1D:
-		    free(n[7].data);
+		    delete[] static_cast<GLubyte *>(n[7].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_SUB_IMAGE_2D:
-		    free(n[9].data);
+		    delete[] static_cast<GLubyte *>(n[9].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_COMPRESSED_TEX_SUB_IMAGE_3D:
-		    free(n[11].data);
+		    delete[] static_cast<GLubyte *>(n[11].data);
 		    n += InstSize[n[0].opcode];
 		    break;
 #if FEATURE_NV_vertex_program
 		case OPCODE_LOAD_PROGRAM_NV:
-		    free(n[4].data);      /* program string */
+		    delete[] static_cast<GLubyte *>(n[4].data);  /* program string */
 		    n += InstSize[n[0].opcode];
 		    break;
 		case OPCODE_REQUEST_RESIDENT_PROGRAMS_NV:
-		    free(n[2].data);      /* array of program ids */
+		    delete[] static_cast<GLuint *>(n[2].data);   /* array of program ids */
 		    n += InstSize[n[0].opcode];
 		    break;
 #endif
 #if FEATURE_NV_fragment_program
 		case OPCODE_PROGRAM_NAMED_PARAMETER_NV:
-		    free(n[3].data);      /* parameter name */
+		    delete[] static_cast<GLubyte *>(n[3].data);  /* parameter name */
 		    n += InstSize[n[0].opcode];
 		    break;
 #endif
 #if FEATURE_ARB_vertex_program || FEATURE_ARB_fragment_program
 		case OPCODE_PROGRAM_STRING_ARB:
-		    free(n[4].data);      /* program string */
+		    delete[] static_cast<GLubyte *>(n[4].data);  /* program string */
 		    n += InstSize[n[0].opcode];
 		    break;
 #endif
@@ -2298,7 +2299,9 @@ save_Map1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP1, 6);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points1d(target, stride, order, points);
+	auto pntsVec = _mesa_copy_map_points1d(target, stride, order, points);
+	GLfloat *pnts = new GLfloat[pntsVec.size()];
+	std::copy(pntsVec.begin(), pntsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = (GLfloat) u1;
 	n[3].f = (GLfloat) u2;
@@ -2320,7 +2323,9 @@ save_Map1f(GLenum target, GLfloat u1, GLfloat u2, GLint stride,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP1, 6);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points1f(target, stride, order, points);
+	auto pntsVec = _mesa_copy_map_points1f(target, stride, order, points);
+	GLfloat *pnts = new GLfloat[pntsVec.size()];
+	std::copy(pntsVec.begin(), pntsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = u1;
 	n[3].f = u2;
@@ -2345,8 +2350,10 @@ save_Map2d(GLenum target,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP2, 10);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points2d(target, ustride, uorder,
-						vstride, vorder, points);
+	auto ptsVec = _mesa_copy_map_points2d(target, ustride, uorder,
+					      vstride, vorder, points);
+	auto *pnts = new GLfloat[ptsVec.size()];
+	std::copy(ptsVec.begin(), ptsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = (GLfloat) u1;
 	n[3].f = (GLfloat) u2;
@@ -2357,7 +2364,7 @@ save_Map2d(GLenum target,
 	n[7].i = _mesa_evaluator_components(target);      /*vstride */
 	n[8].i = uorder;
 	n[9].i = vorder;
-	n[10].data = (void *) pnts;
+	n[10].data = pnts;
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map2d(ctx->Exec, (target,
@@ -2378,8 +2385,10 @@ save_Map2f(GLenum target,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_MAP2, 10);
     if (n) {
-	GLfloat *pnts = _mesa_copy_map_points2f(target, ustride, uorder,
-						vstride, vorder, points);
+	auto ptsVec = _mesa_copy_map_points2f(target, ustride, uorder,
+					      vstride, vorder, points);
+	auto *pnts = new GLfloat[ptsVec.size()];
+	std::copy(ptsVec.begin(), ptsVec.end(), pnts);
 	n[1].e = target;
 	n[2].f = u1;
 	n[3].f = u2;
@@ -2390,7 +2399,7 @@ save_Map2f(GLenum target,
 	n[7].i = _mesa_evaluator_components(target);      /*vstride */
 	n[8].i = uorder;
 	n[9].i = vorder;
-	n[10].data = (void *) pnts;
+	n[10].data = pnts;
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map2f(ctx->Exec, (target, u1, u2, ustride, uorder,
@@ -2566,7 +2575,7 @@ save_PixelMapfv(GLenum map, GLint mapsize, const GLfloat *values)
     if (n) {
 	n[1].e = map;
 	n[2].i = mapsize;
-	n[3].data = (void *) malloc(mapsize * sizeof(GLfloat));
+	n[3].data = new GLfloat[mapsize];
 	memcpy(n[3].data, (void *) values, mapsize * sizeof(GLfloat));
     }
     if (ctx->ExecuteFlag) {
@@ -3971,11 +3980,7 @@ save_CompressedTexImage1DARB(GLenum target, GLint level,
 	GLvoid *image;
 	ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 	/* make copy of image */
-	image = malloc(imageSize);
-	if (!image) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage1DARB");
-	    return;
-	}
+	image = new GLubyte[imageSize];
 	memcpy(image, data, imageSize);
 	n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_IMAGE_1D, 7);
 	n[1].e = target;
@@ -4011,11 +4016,7 @@ save_CompressedTexImage2DARB(GLenum target, GLint level,
 	GLvoid *image;
 	ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 	/* make copy of image */
-	image = malloc(imageSize);
-	if (!image) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage2DARB");
-	    return;
-	}
+	image = new GLubyte[imageSize];
 	memcpy(image, data, imageSize);
 	n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_IMAGE_2D, 8);
 	n[1].e = target;
@@ -4052,11 +4053,7 @@ save_CompressedTexImage3DARB(GLenum target, GLint level,
 	GLvoid *image;
 	ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 	/* make copy of image */
-	image = malloc(imageSize);
-	if (!image) {
-	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage3DARB");
-	    return;
-	}
+	image = new GLubyte[imageSize];
 	memcpy(image, data, imageSize);
 	n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_IMAGE_3D, 9);
 	n[1].e = target;
@@ -4090,11 +4087,7 @@ save_CompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 
     /* make copy of image */
-    image = malloc(imageSize);
-    if (!image) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexSubImage1DARB");
-	return;
-    }
+    image = new GLubyte[imageSize];
     memcpy(image, data, imageSize);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_SUB_IMAGE_1D, 7);
     n[1].e = target;
@@ -4125,11 +4118,7 @@ save_CompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 
     /* make copy of image */
-    image = malloc(imageSize);
-    if (!image) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexSubImage2DARB");
-	return;
-    }
+    image = new GLubyte[imageSize];
     memcpy(image, data, imageSize);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_SUB_IMAGE_2D, 9);
     n[1].e = target;
@@ -4162,11 +4151,7 @@ save_CompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
 
     /* make copy of image */
-    image = malloc(imageSize);
-    if (!image) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexSubImage3DARB");
-	return;
-    }
+    image = new GLubyte[imageSize];
     memcpy(image, data, imageSize);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_COMPRESSED_TEX_SUB_IMAGE_3D, 11);
     n[1].e = target;
@@ -4330,11 +4315,7 @@ save_LoadProgramNV(GLenum target, GLuint id, GLsizei len,
     Node *n;
     GLubyte *programCopy;
 
-    programCopy = (GLubyte *) malloc(len);
-    if (!programCopy) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
-	return;
-    }
+    programCopy = new GLubyte[len];
     memcpy(programCopy, program, len);
 
     ASSERT_OUTSIDE_SAVE_BEGIN_END_FREE_AND_FLUSH(ctx, programCopy);
@@ -4345,7 +4326,7 @@ save_LoadProgramNV(GLenum target, GLuint id, GLsizei len,
 	n[3].i = len;
 	n[4].data = programCopy;
     } else {
-	free(programCopy);
+	delete[] programCopy;
     }
     if (ctx->ExecuteFlag) {
 	CALL_LoadProgramNV(ctx->Exec, (target, id, len, program));
@@ -4358,11 +4339,7 @@ save_RequestResidentProgramsNV(GLsizei num, const GLuint * ids)
 {
     GET_CURRENT_CONTEXT(ctx);
     Node *n;
-    GLuint *idCopy = (GLuint *) malloc(num * sizeof(GLuint));
-    if (!idCopy) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glRequestResidentProgramsNV");
-	return;
-    }
+    GLuint *idCopy = new GLuint[num];
     memcpy(idCopy, ids, num * sizeof(GLuint));
     ASSERT_OUTSIDE_SAVE_BEGIN_END_FREE_AND_FLUSH(ctx, idCopy);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_TRACK_MATRIX_NV, 2);
@@ -4370,7 +4347,7 @@ save_RequestResidentProgramsNV(GLsizei num, const GLuint * ids)
 	n[1].i = num;
 	n[2].data = idCopy;
     } else {
-	free(idCopy);
+	delete[] idCopy;
     }
     if (ctx->ExecuteFlag) {
 	CALL_RequestResidentProgramsNV(ctx->Exec, (num, ids));
@@ -4529,11 +4506,7 @@ save_ProgramNamedParameter4fNV(GLuint id, GLsizei len, const GLubyte * name,
 {
     GET_CURRENT_CONTEXT(ctx);
     Node *n;
-    GLubyte *nameCopy = (GLubyte *) malloc(len);
-    if (!nameCopy) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glProgramNamedParameter4fNV");
-	return;
-    }
+    GLubyte *nameCopy = new GLubyte[len];
     memcpy(nameCopy, name, len);
 
     ASSERT_OUTSIDE_SAVE_BEGIN_END_FREE_AND_FLUSH(ctx, nameCopy);
@@ -4547,7 +4520,7 @@ save_ProgramNamedParameter4fNV(GLuint id, GLsizei len, const GLubyte * name,
 	n[6].f = z;
 	n[7].f = w;
     } else {
-	free(nameCopy);
+	delete[] nameCopy;
     }
     if (ctx->ExecuteFlag) {
 	CALL_ProgramNamedParameter4fNV(ctx->Exec, (id, len, name, x, y, z, w));
@@ -4631,11 +4604,7 @@ save_ProgramStringARB(GLenum target, GLenum format, GLsizei len,
     Node *n;
     GLubyte *programCopy;
 
-    programCopy = (GLubyte *) malloc(len);
-    if (!programCopy) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glProgramStringARB");
-	return;
-    }
+    programCopy = new GLubyte[len];
     memcpy(programCopy, string, len);
 
     ASSERT_OUTSIDE_SAVE_BEGIN_END_FREE_AND_FLUSH(ctx, programCopy);
@@ -4646,7 +4615,7 @@ save_ProgramStringARB(GLenum target, GLenum format, GLsizei len,
 	n[3].i = len;
 	n[4].data = programCopy;
     } else {
-	free(programCopy);
+	delete[] programCopy;
     }
     if (ctx->ExecuteFlag) {
 	CALL_ProgramStringARB(ctx->Exec, (target, format, len, string));

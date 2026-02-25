@@ -968,7 +968,7 @@ update_program(GLcontext *ctx)
      *   3. Programs derived from fixed-function state.
      */
 
-    ctx->FragmentProgram._Current = NULL;
+    ctx->FragmentProgram._Current = nullptr;
 
     if (shProg && shProg->LinkStatus) {
 	/* Use shader programs */
@@ -986,10 +986,10 @@ update_program(GLcontext *ctx)
 	     * The _Current pointer will get set in
 	     * _tnl_UpdateFixedFunctionProgram() later if appropriate.
 	     */
-	    ctx->VertexProgram._Current = NULL;
+	    ctx->VertexProgram._Current = nullptr;
 	} else {
 	    /* no vertex program */
-	    ctx->VertexProgram._Current = NULL;
+	    ctx->VertexProgram._Current = nullptr;
 	}
 
 	if (ctx->FragmentProgram._Enabled) {
@@ -1000,10 +1000,10 @@ update_program(GLcontext *ctx)
 	     * The _Current pointer will get set in _mesa_UpdateTexEnvProgram()
 	     * later if appropriate.
 	     */
-	    ctx->FragmentProgram._Current = NULL;
+	    ctx->FragmentProgram._Current = nullptr;
 	} else {
 	    /* no fragment program */
-	    ctx->FragmentProgram._Current = NULL;
+	    ctx->FragmentProgram._Current = nullptr;
 	}
     }
 

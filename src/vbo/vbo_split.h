@@ -61,7 +61,7 @@ void vbo_split_inplace(GLcontext *ctx,
 		       vbo_draw_func draw,
 		       const struct split_limits *limits);
 
-/* Requires ib != NULL:
+/* Requires ib != nullptr:
  */
 void vbo_split_copy(GLcontext *ctx,
 		    const struct gl_client_array *arrays[],

@@ -280,7 +280,7 @@ get_pixelmap(GLcontext *ctx, GLenum map)
 	case GL_PIXEL_MAP_A_TO_A:
 	    return &ctx->PixelMaps.AtoA;
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -1117,7 +1117,7 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	    }
 	    break;
 	default:
-	    _mesa_problem(NULL, "Bad format in _mesa_lookup_rgba_float");
+	    _mesa_problem(nullptr, "Bad format in _mesa_lookup_rgba_float");
 	    return;
     }
 }
@@ -1254,7 +1254,7 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 	    }
 	    break;
 	default:
-	    _mesa_problem(NULL, "Bad format in _mesa_lookup_rgba_chan");
+	    _mesa_problem(nullptr, "Bad format in _mesa_lookup_rgba_chan");
 	    return;
     }
 }

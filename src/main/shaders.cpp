@@ -373,7 +373,7 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
     GLsizei totalLength;
     GLcharARB *source;
 
-    if (string == NULL) {
+    if (string == nullptr) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glShaderSourceARB");
 	return;
     }
@@ -385,11 +385,11 @@ _mesa_ShaderSourceARB(GLhandleARB shaderObj, GLsizei count,
     std::vector<GLint> offsets(count);
 
     for (GLsizei i = 0; i < count; i++) {
-	if (string[i] == NULL) {
+	if (string[i] == nullptr) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glShaderSourceARB(null string)");
 	    return;
 	}
-	if (length == NULL || length[i] < 0)
+	if (length == nullptr || length[i] < 0)
 	    offsets[i] = strlen(string[i]);
 	else
 	    offsets[i] = length[i];

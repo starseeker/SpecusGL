@@ -44,6 +44,7 @@
 #include "eval.h"
 #include "macros.h"
 #include "mtypes.h"
+#include <vector>
 
 
 /*
@@ -153,10 +154,10 @@ get_1d_map(GLcontext *ctx, GLenum target)
 	case GL_MAP1_VERTEX_ATTRIB14_4_NV:
 	case GL_MAP1_VERTEX_ATTRIB15_4_NV:
 	    if (!ctx->Extensions.NV_vertex_program)
-		return NULL;
+		return nullptr;
 	    return &ctx->EvalMap.Map1Attrib[target - GL_MAP1_VERTEX_ATTRIB0_4_NV];
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -203,10 +204,10 @@ get_2d_map(GLcontext *ctx, GLenum target)
 	case GL_MAP2_VERTEX_ATTRIB14_4_NV:
 	case GL_MAP2_VERTEX_ATTRIB15_4_NV:
 	    if (!ctx->Extensions.NV_vertex_program)
-		return NULL;
+		return nullptr;
 	    return &ctx->EvalMap.Map2Attrib[target - GL_MAP2_VERTEX_ATTRIB0_4_NV];
 	default:
-	    return NULL;
+	    return nullptr;
     }
 }
 
@@ -220,25 +221,22 @@ get_2d_map(GLcontext *ctx, GLenum target)
  * Copy 1-parametric evaluator control points from user-specified
  * memory space to a buffer of contiguous control points.
  * \param see glMap1f for details
- * \return pointer to buffer of contiguous control points or NULL if out
+ * \return pointer to buffer of contiguous control points or nullptr if out
  *          of memory.
  */
-GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
-				 const GLfloat *points)
+std::vector<GLfloat> _mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
+					  const GLfloat *points)
 {
-    GLfloat *buffer, *p;
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return NULL;
+	return {};
 
-    buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
-
-    if (buffer)
-	for (i = 0, p = buffer; i < uorder; i++, points += ustride)
-	    for (k = 0; k < size; k++)
-		*p++ = points[k];
-
+    std::vector<GLfloat> buffer(uorder * size);
+    GLfloat *p = buffer.data();
+    for (i = 0; i < uorder; i++, points += ustride)
+	for (k = 0; k < size; k++)
+	    *p++ = points[k];
     return buffer;
 }
 
@@ -247,22 +245,19 @@ GLfloat *_mesa_copy_map_points1f(GLenum target, GLint ustride, GLint uorder,
 /*
  * Same as above but convert doubles to floats.
  */
-GLfloat *_mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
-				 const GLdouble *points)
+std::vector<GLfloat> _mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
+					  const GLdouble *points)
 {
-    GLfloat *buffer, *p;
     GLint i, k, size = _mesa_evaluator_components(target);
 
     if (!points || !size)
-	return NULL;
+	return {};
 
-    buffer = (GLfloat *) malloc(uorder * size * sizeof(GLfloat));
-
-    if (buffer)
-	for (i = 0, p = buffer; i < uorder; i++, points += ustride)
-	    for (k = 0; k < size; k++)
-		*p++ = (GLfloat) points[k];
-
+    std::vector<GLfloat> buffer(uorder * size);
+    GLfloat *p = buffer.data();
+    for (i = 0; i < uorder; i++, points += ustride)
+	for (k = 0; k < size; k++)
+	    *p++ = (GLfloat) points[k];
     return buffer;
 }
 
@@ -275,43 +270,34 @@ GLfloat *_mesa_copy_map_points1d(GLenum target, GLint ustride, GLint uorder,
  * de Casteljau evaluation schemes.
  *
  * \param see glMap2f for details
- * \return pointer to buffer of contiguous control points or NULL if out
- *          of memory.
+ * \return vector of contiguous control points, empty if no points.
  */
-GLfloat *_mesa_copy_map_points2f(GLenum target,
+std::vector<GLfloat> _mesa_copy_map_points2f(GLenum target,
 				 GLint ustride, GLint uorder,
 				 GLint vstride, GLint vorder,
 				 const GLfloat *points)
 {
-    GLfloat *buffer, *p;
     GLint i, j, k, size, dsize, hsize;
     GLint uinc;
 
     size = _mesa_evaluator_components(target);
 
-    if (!points || size==0) {
-	return NULL;
-    }
+    if (!points || size==0)
+	return {};
 
-    /* max(uorder, vorder) additional points are used in      */
-    /* horner evaluation and uorder*vorder additional */
-    /* values are needed for de Casteljau                     */
     dsize = (uorder == 2 && vorder == 2)? 0 : uorder*vorder;
     hsize = (uorder > vorder ? uorder : vorder)*size;
 
-    if (hsize>dsize)
-	buffer = (GLfloat *) malloc((uorder*vorder*size+hsize)*sizeof(GLfloat));
-    else
-	buffer = (GLfloat *) malloc((uorder*vorder*size+dsize)*sizeof(GLfloat));
+    const GLint bufSize = uorder*vorder*size + (hsize > dsize ? hsize : dsize);
+    std::vector<GLfloat> buffer(bufSize);
 
-    /* compute the increment value for the u-loop */
     uinc = ustride - vorder*vstride;
 
-    if (buffer)
-	for (i=0, p=buffer; i<uorder; i++, points += uinc)
-	    for (j=0; j<vorder; j++, points += vstride)
-		for (k=0; k<size; k++)
-		    *p++ = points[k];
+    GLfloat *p = buffer.data();
+    for (i=0; i<uorder; i++, points += uinc)
+	for (j=0; j<vorder; j++, points += vstride)
+	    for (k=0; k<size; k++)
+		*p++ = points[k];
 
     return buffer;
 }
@@ -321,40 +307,32 @@ GLfloat *_mesa_copy_map_points2f(GLenum target,
 /*
  * Same as above but convert doubles to floats.
  */
-GLfloat *_mesa_copy_map_points2d(GLenum target,
+std::vector<GLfloat> _mesa_copy_map_points2d(GLenum target,
 				 GLint ustride, GLint uorder,
 				 GLint vstride, GLint vorder,
 				 const GLdouble *points)
 {
-    GLfloat *buffer, *p;
     GLint i, j, k, size, hsize, dsize;
     GLint uinc;
 
     size = _mesa_evaluator_components(target);
 
-    if (!points || size==0) {
-	return NULL;
-    }
+    if (!points || size==0)
+	return {};
 
-    /* max(uorder, vorder) additional points are used in      */
-    /* horner evaluation and uorder*vorder additional */
-    /* values are needed for de Casteljau                     */
     dsize = (uorder == 2 && vorder == 2)? 0 : uorder*vorder;
     hsize = (uorder > vorder ? uorder : vorder)*size;
 
-    if (hsize>dsize)
-	buffer = (GLfloat *) malloc((uorder*vorder*size+hsize)*sizeof(GLfloat));
-    else
-	buffer = (GLfloat *) malloc((uorder*vorder*size+dsize)*sizeof(GLfloat));
+    const GLint bufSize = uorder*vorder*size + (hsize > dsize ? hsize : dsize);
+    std::vector<GLfloat> buffer(bufSize);
 
-    /* compute the increment value for the u-loop */
     uinc = ustride - vorder*vstride;
 
-    if (buffer)
-	for (i=0, p=buffer; i<uorder; i++, points += uinc)
-	    for (j=0; j<vorder; j++, points += vstride)
-		for (k=0; k<size; k++)
-		    *p++ = (GLfloat) points[k];
+    GLfloat *p = buffer.data();
+    for (i=0; i<uorder; i++, points += uinc)
+	for (j=0; j<vorder; j++, points += vstride)
+	    for (k=0; k<size; k++)
+		*p++ = (GLfloat) points[k];
 
     return buffer;
 }
@@ -376,8 +354,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
 {
     GET_CURRENT_CONTEXT(ctx);
     GLint k;
-    GLfloat *pnts;
-    struct gl_1d_map *map = NULL;
+    struct gl_1d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
     ASSERT(type == GL_FLOAT || type == GL_DOUBLE);
@@ -418,6 +395,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     }
 
     /* make copy of the control points */
+    std::vector<GLfloat> pnts;
     if (type == GL_FLOAT)
 	pnts = _mesa_copy_map_points1f(target, ustride, uorder, (GLfloat*) points);
     else
@@ -429,13 +407,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     map->u1 = u1;
     map->u2 = u2;
     map->du = 1.0F / (u2 - u1);
-    if (pnts) {
-	const int npts = uorder * _mesa_evaluator_components(target);
-	map->Points.assign(pnts, pnts + npts);
-	free(pnts);
-    } else {
-	map->Points.clear();
-    }
+    map->Points = std::move(pnts);
 }
 
 
@@ -463,8 +435,7 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
 {
     GET_CURRENT_CONTEXT(ctx);
     GLint k;
-    GLfloat *pnts;
-    struct gl_2d_map *map = NULL;
+    struct gl_2d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
     ASSERT(type == GL_FLOAT || type == GL_DOUBLE);
@@ -516,13 +487,11 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     }
 
     /* make copy of the control points */
-    if (type == GL_FLOAT)
-	pnts = _mesa_copy_map_points2f(target, ustride, uorder,
-				       vstride, vorder, (GLfloat*) points);
-    else
-	pnts = _mesa_copy_map_points2d(target, ustride, uorder,
-				       vstride, vorder, (GLdouble*) points);
-
+    auto pnts = (type == GL_FLOAT)
+	? _mesa_copy_map_points2f(target, ustride, uorder,
+				  vstride, vorder, (const GLfloat*) points)
+	: _mesa_copy_map_points2d(target, ustride, uorder,
+				  vstride, vorder, (const GLdouble*) points);
 
     FLUSH_VERTICES(ctx, _NEW_EVAL);
     map->Uorder = uorder;
@@ -533,10 +502,9 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     map->v1 = v1;
     map->v2 = v2;
     map->dv = 1.0F / (v2 - v1);
-    if (pnts) {
+    if (!pnts.empty()) {
 	const int npts = uorder * vorder * _mesa_evaluator_components(target);
-	map->Points.assign(pnts, pnts + npts);
-	free(pnts);
+	map->Points.assign(pnts.begin(), pnts.begin() + npts);
     } else {
 	map->Points.clear();
     }

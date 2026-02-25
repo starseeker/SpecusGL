@@ -917,10 +917,8 @@ put_mono_values_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb,
  */
 gl_renderbuffer::~gl_renderbuffer()
 {
-    if (Data) {
-	free(Data);
-	Data = nullptr;
-    }
+    delete[] static_cast<GLubyte *>(Data);
+    Data = nullptr;
 }
 
 GLboolean
@@ -1258,14 +1256,12 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
     ASSERT(m_PutMonoValues);
 
     /* free old buffer storage */
-    if (rb->Data) {
-	free(rb->Data);
-	rb->Data = nullptr;
-    }
+    delete[] static_cast<GLubyte *>(rb->Data);
+    rb->Data = nullptr;
 
     if (width > 0 && height > 0) {
 	/* allocate new buffer storage */
-	rb->Data = malloc(width * height * pixelSize);
+	rb->Data = new GLubyte[width * height * pixelSize];
 	if (rb->Data == nullptr) {
 	    rb->Width = 0;
 	    rb->Height = 0;
@@ -1324,11 +1320,10 @@ alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
     }
 
     /* next, resize my alpha buffer */
-    if (arb->Data) {
-	free(arb->Data);
-    }
+    delete[] static_cast<GLubyte *>(arb->Data);
+    arb->Data = nullptr;
 
-    arb->Data = malloc(width * height * sizeof(GLubyte));
+    arb->Data = new GLubyte[width * height * sizeof(GLubyte)];
     if (arb->Data == nullptr) {
 	arb->Width = 0;
 	arb->Height = 0;

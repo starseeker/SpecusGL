@@ -431,7 +431,7 @@ _swrast_eject_texture_images(GLcontext *ctx)
 			struct gl_texture_image *texImg = texObj->Image[face][lvl];
 			if (texImg && texImg->Data) {
 			    _mesa_free_texmemory(texImg->Data);
-			    texImg->Data = NULL;
+			    texImg->Data = nullptr;
 			}
 		    }
 		}
@@ -481,8 +481,8 @@ _swrast_invalidate_state(GLcontext *ctx, GLbitfield new_state)
 
     if (new_state & _SWRAST_NEW_TEXTURE_SAMPLE_FUNC)
 	for (i = 0 ; i < ctx->Const.MaxTextureImageUnits ; i++) {
-	    swrast->TextureSample[i] = NULL;
-	    swrast->TextureSampleF[i] = NULL;
+	    swrast->TextureSample[i] = nullptr;
+	    swrast->TextureSampleF[i] = nullptr;
 	}
 }
 
@@ -495,7 +495,7 @@ _swrast_update_texture_samplers(GLcontext *ctx)
 
     for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++) {
 	const struct gl_texture_object *tObj = ctx->Texture.Unit[u]._Current;
-	/* Note: If tObj is NULL, the sample function will be a simple
+	/* Note: If tObj is nullptr, the sample function will be a simple
 	 * function that just returns opaque black (0,0,0,1).
 	 */
 	swrast->TextureSample[u] = _swrast_choose_texture_sample_func(ctx, tObj);
@@ -783,8 +783,8 @@ _swrast_CreateContext(GLcontext *ctx)
     swrast->_IntegerAccumScaler = 0.0;
 
     for (i = 0; i < MAX_TEXTURE_IMAGE_UNITS; i++) {
-	swrast->TextureSample[i] = NULL;
-	swrast->TextureSampleF[i] = NULL;
+	swrast->TextureSample[i] = nullptr;
+	swrast->TextureSampleF[i] = nullptr;
     }
 
     swrast->SpanArrays = new sw_span_arrays{};

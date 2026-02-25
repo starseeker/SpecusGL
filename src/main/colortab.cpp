@@ -151,7 +151,7 @@ set_component_sizes(struct gl_color_table *table)
 	    table->LuminanceSize = 0;
 	    break;
 	default:
-	    _mesa_problem(NULL, "unexpected format in set_component_sizes");
+	    _mesa_problem(nullptr, "unexpected format in set_component_sizes");
     }
 }
 
@@ -295,8 +295,8 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
     static const GLfloat zero[4] = { 0.0, 0.0, 0.0, 0.0 };
     GET_CURRENT_CONTEXT(ctx);
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-    struct gl_texture_object *texObj = NULL;
-    struct gl_color_table *table = NULL;
+    struct gl_texture_object *texObj = nullptr;
+    struct gl_color_table *table = nullptr;
     GLboolean proxy = GL_FALSE;
     GLint baseFormat;
     const GLfloat *scale = one, *bias = zero;
@@ -470,7 +470,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
     set_component_sizes(table);
 
     if (texObj || target == GL_SHARED_TEXTURE_PALETTE_EXT) {
-	/* texture object palette, texObj==NULL means the shared palette */
+	/* texture object palette, texObj==nullptr means the shared palette */
 	if (ctx->Driver.UpdateTexturePalette) {
 	    (*ctx->Driver.UpdateTexturePalette)(ctx, texObj);
 	}
@@ -490,8 +490,8 @@ _mesa_ColorSubTable(GLenum target, GLsizei start,
     static const GLfloat zero[4] = { 0.0, 0.0, 0.0, 0.0 };
     GET_CURRENT_CONTEXT(ctx);
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-    struct gl_texture_object *texObj = NULL;
-    struct gl_color_table *table = NULL;
+    struct gl_texture_object *texObj = nullptr;
+    struct gl_color_table *table = nullptr;
     const GLfloat *scale = one, *bias = zero;
 
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
@@ -625,7 +625,7 @@ _mesa_GetColorTable(GLenum target, GLenum format,
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-    struct gl_color_table *table = NULL;
+    struct gl_color_table *table = nullptr;
     GLfloat rgba[MAX_COLOR_TABLE_SIZE][4];
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
 
@@ -859,7 +859,7 @@ _mesa_GetColorTableParameterfv(GLenum target, GLenum pname, GLfloat *params)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-    struct gl_color_table *table = NULL;
+    struct gl_color_table *table = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     switch (target) {
@@ -1005,7 +1005,7 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
-    struct gl_color_table *table = NULL;
+    struct gl_color_table *table = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     switch (target) {

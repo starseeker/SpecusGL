@@ -151,7 +151,7 @@ static void _tnl_import_array(GLcontext *ctx,
 				    VEC_NOT_WRITEABLE |
 				    (stride == 4*sizeof(GLfloat) ? 0 : VEC_BAD_STRIDE));
 
-    VB->AttribPtr[attrib]->storage = NULL;
+    VB->AttribPtr[attrib]->storage = nullptr;
 }
 
 #define CLIPVERTS  ((6 + MAX_CLIP_PLANES) * 2)
@@ -227,11 +227,11 @@ static void bind_inputs(GLcontext *ctx,
     VB->ObjPtr = VB->AttribPtr[_TNL_ATTRIB_POS];
     VB->NormalPtr = VB->AttribPtr[_TNL_ATTRIB_NORMAL];
     VB->ColorPtr[0] = VB->AttribPtr[_TNL_ATTRIB_COLOR0];
-    VB->ColorPtr[1] = NULL;
+    VB->ColorPtr[1] = nullptr;
     VB->IndexPtr[0] = VB->AttribPtr[_TNL_ATTRIB_COLOR_INDEX];
-    VB->IndexPtr[1] = NULL;
+    VB->IndexPtr[1] = nullptr;
     VB->SecondaryColorPtr[0] = VB->AttribPtr[_TNL_ATTRIB_COLOR1];
-    VB->SecondaryColorPtr[1] = NULL;
+    VB->SecondaryColorPtr[1] = nullptr;
     VB->FogCoordPtr = VB->AttribPtr[_TNL_ATTRIB_FOG];
 
     for (i = 0; i < ctx->Const.MaxTextureCoordUnits; i++) {
@@ -249,7 +249,7 @@ static void bind_inputs(GLcontext *ctx,
 					    VB->Count);
     } else {
 	/* the data previously pointed to by EdgeFlag may have been freed */
-	VB->EdgeFlag = NULL;
+	VB->EdgeFlag = nullptr;
     }
 }
 
@@ -267,7 +267,7 @@ static void bind_indices(GLcontext *ctx,
     void *ptr;
 
     if (!ib) {
-	VB->Elts = NULL;
+	VB->Elts = nullptr;
 	return;
     }
 

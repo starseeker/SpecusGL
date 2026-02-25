@@ -309,7 +309,7 @@ static GLboolean run_render(GLcontext *ctx,
 	    assert((prim & PRIM_MODE_MASK) <= GL_POLYGON);
 
 	    if (MESA_VERBOSE & VERBOSE_PRIMS)
-		_mesa_debug(NULL, "MESA prim %s %d..%d\n",
+		_mesa_debug(nullptr, "MESA prim %s %d..%d\n",
 			    _mesa_lookup_enum_by_nr(prim & PRIM_MODE_MASK),
 			    start, start+length);
 
@@ -335,10 +335,10 @@ static GLboolean run_render(GLcontext *ctx,
 
 const struct tnl_pipeline_stage _tnl_render_stage = {
     "render",			/* name */
-    NULL,			/* private data */
-    NULL,			/* creator */
-    NULL,			/* destructor */
-    NULL,			/* validate */
+    nullptr,			/* private data */
+    nullptr,			/* creator */
+    nullptr,			/* destructor */
+    nullptr,			/* validate */
     run_render			/* run */
 };
 

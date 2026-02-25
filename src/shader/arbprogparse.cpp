@@ -33,6 +33,7 @@
 #include "glheader.h"
 #include "imports.h"
 #include "arbprogparse.h"
+#include <string>
 #include "grammar_mesa.h"
 #include "program.h"
 #include "prog_parameter.h"
@@ -542,20 +543,14 @@ struct var_cache {
 static GLvoid
 var_cache_create(struct var_cache **va)
 {
-    *va = (struct var_cache *) malloc(sizeof(struct var_cache));
-    if (*va) {
-	(**va).name = NULL;
-	(**va).type = vt_none;
-	(**va).attrib_binding = ~0;
-	(**va).attrib_is_generic = 0;
-	(**va).temp_binding = ~0;
-	(**va).output_binding = ~0;
-	(**va).param_binding_type = ~0;
-	(**va).param_binding_begin = ~0;
-	(**va).param_binding_length = ~0;
-	(**va).alias_binding = NULL;
-	(**va).next = NULL;
-    }
+    *va = new var_cache{};
+    (**va).type = vt_none;
+    (**va).attrib_binding = ~0;
+    (**va).temp_binding = ~0;
+    (**va).output_binding = ~0;
+    (**va).param_binding_type = ~0;
+    (**va).param_binding_begin = ~0;
+    (**va).param_binding_length = ~0;
 }
 
 static GLvoid
@@ -563,8 +558,8 @@ var_cache_destroy(struct var_cache **va)
 {
     if (*va) {
 	var_cache_destroy(&(**va).next);
-	free(*va);
-	*va = NULL;
+	delete *va;
+	*va = nullptr;
     }
 }
 
@@ -592,7 +587,7 @@ var_cache_find(struct var_cache *va, const GLubyte * name)
 	va = va->next;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 
@@ -608,15 +603,8 @@ static void
 program_error(GLcontext *ctx, GLint position, const char *descrip)
 {
     if (descrip) {
-	const char *prefix = "glProgramString(", *suffix = ")";
-	char *str = (char *) malloc(strlen(descrip) +
-					  strlen(prefix) +
-					  strlen(suffix) + 1);
-	if (str) {
-	    _mesa_sprintf(str, "%s%s%s", prefix, descrip, suffix);
-	    _mesa_error(ctx, GL_INVALID_OPERATION, str);
-	    free(str);
-	}
+	std::string msg = std::string("glProgramString(") + descrip + ")";
+	_mesa_error(ctx, GL_INVALID_OPERATION, msg.c_str());
     }
     _mesa_set_program_error(ctx, position, descrip);
 }
@@ -630,26 +618,10 @@ program_error2(GLcontext *ctx, GLint position, const char *descrip,
 	       const char *var)
 {
     if (descrip) {
-	const char *prefix = "glProgramString(", *suffix = ")";
-	char *str = (char *) malloc(strlen(descrip) +
-					  strlen(": ") +
-					  strlen(var) +
-					  strlen(prefix) +
-					  strlen(suffix) + 1);
-	if (str) {
-	    _mesa_sprintf(str, "%s%s: %s%s", prefix, descrip, var, suffix);
-	    _mesa_error(ctx, GL_INVALID_OPERATION, str);
-	    free(str);
-	}
-
-	str = (char *) malloc(strlen(descrip) +
-					  strlen(": ") +
-					  strlen(var) + 1);
-	if (str) {
-	    _mesa_sprintf(str, "%s: %s", descrip, var);
-	    _mesa_set_program_error(ctx, position, str);
-	    free(str);
-	}
+	std::string msg = std::string("glProgramString(") + descrip + ": " + var + ")";
+	_mesa_error(ctx, GL_INVALID_OPERATION, msg.c_str());
+	std::string detail = std::string(descrip) + ": " + var;
+	_mesa_set_program_error(ctx, position, detail.c_str());
     }
 }
 
@@ -685,7 +657,7 @@ parse_string(const GLubyte ** inst, struct var_cache **vc_head,
 	     struct arb_program *Program, GLuint * found)
 {
     const GLubyte *i = *inst;
-    struct var_cache *va = NULL;
+    struct var_cache *va = nullptr;
     (void) Program;
 
     *inst += strlen((char *) i) + 1;
@@ -772,7 +744,7 @@ parse_integer(const GLubyte ** inst, struct arb_program *Program)
 /**
   Accumulate this string of digits, and return them as
   a large integer represented in floating point (for range).
-  If scale is not NULL, also accumulates a power-of-ten
+  If scale is not nullptr, also accumulates a power-of-ten
   integer scale factor that represents the number of digits
   in the string.
 */
@@ -2343,7 +2315,7 @@ parse_swizzle_mask(const GLubyte ** inst, GLubyte *swizzle, GLint len)
 		swizzle[i] = SWIZZLE_W;
 		break;
 	    default:
-		_mesa_problem(NULL, "bad component in parse_swizzle_mask()");
+		_mesa_problem(nullptr, "bad component in parse_swizzle_mask()");
 		return;
 	}
     }
@@ -2390,7 +2362,7 @@ parse_extended_swizzle_mask(const GLubyte **inst, GLubyte swizzle[4],
 		swizzle[i] = SWIZZLE_W;
 		break;
 	    default:
-		_mesa_problem(NULL, "bad case in parse_extended_swizzle_mask()");
+		_mesa_problem(nullptr, "bad case in parse_extended_swizzle_mask()");
 		return;
 	}
     }
@@ -2404,7 +2376,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 	      enum register_file * File, GLint * Index,
 	      GLboolean *IsRelOffset)
 {
-    struct var_cache *src = NULL;
+    struct var_cache *src = nullptr;
     GLuint binding = 0;
     GLuint is_generic = 0;
     GLuint found = 0;
@@ -3371,13 +3343,11 @@ debug_variables(GLcontext * ctx, struct var_cache *vc_head,
 		b = vc->param_binding_begin;
 		for (a = 0; a < vc->param_binding_length; a++) {
 		    fprintf(stderr, "%s\n",
-			    Program->Base.Parameters->Parameters[a + b].Name);
+			    Program->Base.Parameters->Parameters[a + b].Name.c_str());
 		    if (Program->Base.Parameters->Parameters[a + b].Type == PROGRAM_STATE_VAR) {
-			const char *s;
-			s = _mesa_program_state_string(Program->Base.Parameters->Parameters
-						       [a + b].StateIndexes);
-			fprintf(stderr, "%s\n", s);
-			free((char *) s);
+			std::string s = _mesa_program_state_string(Program->Base.Parameters->Parameters
+							    [a + b].StateIndexes);
+			fprintf(stderr, "%s\n", s.c_str());
 		    } else
 			fprintf(stderr, "%f %f %f %f\n",
 				Program->Base.Parameters->ParameterValues[a + b][0],
@@ -3639,14 +3609,15 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
     struct var_cache *vc_head;
     grammar arbprogram_syn_id;
     GLubyte *parsed, *inst;
-    GLubyte *strz = NULL;
+    std::vector<GLubyte> strzVec;
+    GLubyte *strz = nullptr;
     static int arbprogram_syn_is_ok = 0;		/* XXX temporary */
 
     /* set the program target before parsing */
     program->Base.Target = target;
 
     /* Reset error state */
-    _mesa_set_program_error(ctx, -1, NULL);
+    _mesa_set_program_error(ctx, -1, nullptr);
 
     /* check if arb_grammar_text (arbprogram.syn) is syntactically correct */
     if (!arbprogram_syn_is_ok) {
@@ -3669,7 +3640,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 
 	/* 'parsed' is unused here */
 	free(parsed);
-	parsed = NULL;
+	parsed = nullptr;
 
 	/* NOTE: we can't destroy grammar_syn_id right here because
 	 * grammar_destroy() can reset the last error
@@ -3712,7 +3683,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	return GL_FALSE;
     }
 
-    /* check for NULL character occurences */
+    /* check for nullptr character occurences */
     {
 	GLint i;
 	for (i = 0; i < len; i++) {
@@ -3725,14 +3696,9 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
     }
 
     /* copy the program string to a null-terminated string */
-    strz = (GLubyte *) malloc(len + 1);
-    if (!strz) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glProgramStringARB");
-	grammar_destroy(arbprogram_syn_id);
-	return GL_FALSE;
-    }
-    memcpy(strz, str, len);
-    strz[len] = '\0';
+    strzVec.assign(str, str + len);
+    strzVec.push_back(0);
+    strz = strzVec.data();
 
     /* do a fast check on program string - initial production buffer is 4K */
     err = !grammar_fast_check(arbprogram_syn_id, strz,
@@ -3756,8 +3722,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	} while (0)
 #endif
 
-	    free(strz);
-	free(parsed);
+		free(parsed);
 
 	grammar_destroy(arbprogram_syn_id);
 	return GL_FALSE;
@@ -3772,7 +3737,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
      */
 
     /* Initialize the arb_program struct */
-    program->Base.String = strz;
+    program->Base.String.assign(reinterpret_cast<const char *>(strzVec.data()), len);
     program->Base.Instructions = _mesa_alloc_instructions(MAX_INSTRUCTIONS);
     program->Base.NumInstructions =
 	program->Base.NumTemporaries =
@@ -3793,7 +3758,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	    program->NumTexIndirections = 0;
     program->UsesKill = 0;
 
-    vc_head = NULL;
+    vc_head = nullptr;
 
     /* Start examining the tokens in the array */
     inst = parsed;
@@ -3870,7 +3835,7 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     program->UsesKill          = ap.UsesKill;
 
     if (program->Base.Instructions)
-	free(program->Base.Instructions);
+	delete[] program->Base.Instructions;
     program->Base.Instructions = ap.Base.Instructions;
 
     if (program->Base.Parameters)
@@ -3923,7 +3888,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
     program->IsPositionInvariant = ap.HintPositionInvariant;
 
     if (program->Base.Instructions)
-	free(program->Base.Instructions);
+	delete[] program->Base.Instructions;
     program->Base.Instructions = ap.Base.Instructions;
 
     if (program->Base.Parameters)

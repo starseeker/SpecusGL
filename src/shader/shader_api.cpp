@@ -122,20 +122,12 @@ _mesa_free_shader_program_data(GLcontext *ctx,
     }
 
     /* detach shaders */
-    for (i = 0; i < shProg->NumShaders; i++) {
-	_mesa_reference_shader(ctx, &shProg->Shaders[i], nullptr);
+    for (auto *& sh : shProg->Shaders) {
+	_mesa_reference_shader(ctx, &sh, nullptr);
     }
-    shProg->NumShaders = 0;
+    shProg->Shaders.clear();
 
-    if (shProg->Shaders) {
-	free(shProg->Shaders);
-	shProg->Shaders = nullptr;
-    }
-
-    if (shProg->InfoLog) {
-	free(shProg->InfoLog);
-	shProg->InfoLog = nullptr;
-    }
+    shProg->InfoLog.clear();
 }
 
 
@@ -239,16 +231,11 @@ void
 _mesa_free_shader(GLcontext *ctx, struct gl_shader *sh)
 {
     GLuint i;
-    if (sh->Source)
-	delete[] sh->Source;
-    if (sh->InfoLog)
-	free(sh->InfoLog);
-    for (i = 0; i < sh->NumPrograms; i++) {
-	assert(sh->Programs[i]);
-	ctx->Driver.DeleteProgram(ctx, sh->Programs[i]);
+    for (auto *prog : sh->Programs) {
+	assert(prog);
+	ctx->Driver.DeleteProgram(ctx, prog);
     }
-    if (sh->Programs)
-	free(sh->Programs);
+    /* Programs vector clears itself on delete */
     delete sh;
 }
 
@@ -444,29 +431,16 @@ _mesa_attach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	return;
     }
 
-    n = shProg->NumShaders;
-
-    for (i = 0; i < n; i++) {
-	if (shProg->Shaders[i] == sh) {
+    for (auto *existing : shProg->Shaders) {
+	if (existing == sh) {
 	    /* already attached */
 	    return;
 	}
     }
 
-    /* grow list */
-    shProg->Shaders = (struct gl_shader **)
-		      _mesa_realloc(shProg->Shaders,
-				    n * sizeof(struct gl_shader *),
-				    (n + 1) * sizeof(struct gl_shader *));
-    if (!shProg->Shaders) {
-	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glAttachShader");
-	return;
-    }
-
     /* append */
-    shProg->Shaders[n] = nullptr; /* since realloc() didn't zero the new space */
-    _mesa_reference_shader(ctx, &shProg->Shaders[n], sh);
-    shProg->NumShaders++;
+    shProg->Shaders.push_back(nullptr);
+    _mesa_reference_shader(ctx, &shProg->Shaders.back(), sh);
 }
 
 
@@ -615,37 +589,19 @@ _mesa_detach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	return;
     }
 
-    n = shProg->NumShaders;
-
-    for (i = 0; i < n; i++) {
-	if (shProg->Shaders[i]->Name == shader) {
+    for (auto it = shProg->Shaders.begin(); it != shProg->Shaders.end(); ++it) {
+	if ((*it)->Name == shader) {
 	    /* found it */
-	    struct gl_shader **newList;
 
-	    /* derefernce */
-	    _mesa_reference_shader(ctx, &shProg->Shaders[i], nullptr);
-
-	    /* alloc new, smaller array */
-	    newList = (struct gl_shader **)
-		      malloc((n - 1) * sizeof(struct gl_shader *));
-	    if (!newList) {
-		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glDetachShader");
-		return;
-	    }
-	    for (j = 0; j < i; j++) {
-		newList[j] = shProg->Shaders[j];
-	    }
-	    while (++i < n)
-		newList[j++] = shProg->Shaders[i];
-	    free(shProg->Shaders);
-
-	    shProg->Shaders = newList;
-	    shProg->NumShaders = n - 1;
+	    /* dereference */
+	    _mesa_reference_shader(ctx, &(*it), nullptr);
+	    shProg->Shaders.erase(it);
+	    n = (GLuint) shProg->Shaders.size();
 
 #ifdef DEBUG
 	    /* sanity check */
 	    {
-		for (j = 0; j < shProg->NumShaders; j++) {
+		for (j = 0; j < static_cast<GLuint>(shProg->Shaders.size()); j++) {
 		    assert(shProg->Shaders[j]->Type == GL_VERTEX_SHADER ||
 			   shProg->Shaders[j]->Type == GL_FRAGMENT_SHADER);
 		    assert(shProg->Shaders[j]->RefCount > 0);
@@ -680,13 +636,13 @@ _mesa_get_active_attrib(GLcontext *ctx, GLuint program, GLuint index,
 	return;
     }
 
-    if (!shProg->Attributes || index >= shProg->Attributes->NumParameters) {
+    if (!shProg->Attributes || index >= shProg->Attributes->NumParameters()) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetActiveAttrib(index)");
 	return;
     }
 
     copy_string(nameOut, maxLength, length,
-		shProg->Attributes->Parameters[index].Name);
+		shProg->Attributes->Parameters[index].Name.c_str());
     sz = shProg->Attributes->Parameters[index].Size;
     if (size)
 	*size = 1;   /* attributes may not be arrays */
@@ -712,13 +668,13 @@ _mesa_get_active_uniform(GLcontext *ctx, GLuint program, GLuint index,
 	return;
     }
 
-    if (!shProg->Uniforms || index >= shProg->Uniforms->NumParameters) {
+    if (!shProg->Uniforms || index >= shProg->Uniforms->NumParameters()) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetActiveUniform(index)");
 	return;
     }
 
     ind = 0;
-    for (j = 0; j < shProg->Uniforms->NumParameters; j++) {
+    for (j = 0; j < shProg->Uniforms->NumParameters(); j++) {
 	if (shProg->Uniforms->Parameters[j].Type == PROGRAM_UNIFORM ||
 	    shProg->Uniforms->Parameters[j].Type == PROGRAM_SAMPLER) {
 	    if (ind == index) {
@@ -726,7 +682,7 @@ _mesa_get_active_uniform(GLcontext *ctx, GLuint program, GLuint index,
 		GLenum uType = shProg->Uniforms->Parameters[j].DataType;
 		/* found it */
 		copy_string(nameOut, maxLength, length,
-			    shProg->Uniforms->Parameters[j].Name);
+			    shProg->Uniforms->Parameters[j].Name.c_str());
 		if (size && sizeof_glsl_type(uType)) {
 		    /* convert from floats to 'type' (eg: sizeof(mat4x4)=1) */
 		    if (sizeof_glsl_type(uType))
@@ -755,7 +711,7 @@ _mesa_get_attached_shaders(GLcontext *ctx, GLuint program, GLsizei maxCount,
 	= _mesa_lookup_shader_program(ctx, program);
     if (shProg) {
 	GLint i;
-	for (i = 0; i < maxCount && i < shProg->NumShaders; i++) {
+	for (i = 0; i < maxCount && i < (GLsizei) shProg->Shaders.size(); i++) {
 	    obj[i] = shProg->Shaders[i]->Name;
 	}
 	if (count)
@@ -843,13 +799,13 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 	    *params = shProg->Validated;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = shProg->InfoLog ? strlen(shProg->InfoLog) + 1 : 0;
+	    *params = (GLsizei) shProg->InfoLog.size() + 1;
 	    break;
 	case GL_ATTACHED_SHADERS:
-	    *params = shProg->NumShaders;
+	    *params = static_cast<GLuint>(shProg->Shaders.size());
 	    break;
 	case GL_ACTIVE_ATTRIBUTES:
-	    *params = shProg->Attributes ? shProg->Attributes->NumParameters : 0;
+	    *params = shProg->Attributes ? shProg->Attributes->NumParameters() : 0;
 	    break;
 	case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
 	    *params = _mesa_longest_parameter_name(shProg->Attributes,
@@ -895,10 +851,10 @@ _mesa_get_shaderiv(GLcontext *ctx, GLuint name, GLenum pname, GLint *params)
 	    *params = shader->CompileStatus;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = shader->InfoLog ? strlen(shader->InfoLog) + 1 : 0;
+	    *params = (GLsizei) shader->InfoLog.size() + 1;
 	    break;
 	case GL_SHADER_SOURCE_LENGTH:
-	    *params = shader->Source ? strlen((char *) shader->Source) + 1 : 0;
+	    *params = (GLsizei) shader->Source.size() + 1;
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetShaderiv(pname)");
@@ -917,7 +873,7 @@ _mesa_get_program_info_log(GLcontext *ctx, GLuint program, GLsizei bufSize,
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetProgramInfoLog(program)");
 	return;
     }
-    copy_string(infoLog, bufSize, length, shProg->InfoLog);
+    copy_string(infoLog, bufSize, length, shProg->InfoLog.c_str());
 }
 
 
@@ -930,7 +886,7 @@ _mesa_get_shader_info_log(GLcontext *ctx, GLuint shader, GLsizei bufSize,
 	_mesa_error(ctx, GL_INVALID_VALUE, "glGetShaderInfoLog(shader)");
 	return;
     }
-    copy_string(infoLog, bufSize, length, sh->InfoLog);
+    copy_string(infoLog, bufSize, length, sh->InfoLog.c_str());
 }
 
 
@@ -951,7 +907,7 @@ _mesa_get_shader_source(GLcontext *ctx, GLuint shader, GLsizei maxLength,
 	_mesa_error(ctx, err, "glGetShaderSource(shader)");
 	return;
     }
-    copy_string(sourceOut, maxLength, length, sh->Source);
+    copy_string(sourceOut, maxLength, length, sh->Source.c_str());
 }
 
 
@@ -969,7 +925,7 @@ get_uniformfv(GLcontext *ctx, GLuint program, GLint location,
 	= _mesa_lookup_shader_program(ctx, program);
     if (shProg) {
 	GLint i;
-	if (location >= 0 && location < shProg->Uniforms->NumParameters) {
+	if (location >= 0 && location < shProg->Uniforms->NumParameters()) {
 	    GLuint uSize;
 	    GLenum uType;
 	    GLint rows = 0;
@@ -1054,15 +1010,15 @@ _mesa_get_uniform_location(GLcontext *ctx, GLuint program, const GLchar *name)
 	= _mesa_lookup_shader_program(ctx, program);
     if (shProg) {
 	GLuint loc;
-	for (loc = 0; loc < shProg->Uniforms->NumParameters; loc++) {
+	for (loc = 0; loc < shProg->Uniforms->NumParameters(); loc++) {
 	    const struct gl_program_parameter *u
-		    = shProg->Uniforms->Parameters + loc;
+		    = &shProg->Uniforms->Parameters[loc];
 	    /* XXX this is a temporary simplification / short-cut.
 	     * We need to handle things like "e.c[0].b" as seen in the
 	     * GLSL orange book, page 189.
 	     */
 	    if ((u->Type == PROGRAM_UNIFORM ||
-		 u->Type == PROGRAM_SAMPLER) && !strcmp(u->Name, name)) {
+		 u->Type == PROGRAM_SAMPLER) && (u->Name == name)) {
 		return loc;
 	    }
 	}
@@ -1107,9 +1063,6 @@ _mesa_shader_source(GLcontext *ctx, GLuint shader, const GLchar *source)
     }
 
     /* free old shader source string and install new one */
-    if (sh->Source) {
-	delete[] sh->Source;
-    }
     sh->Source = source;
     sh->CompileStatus = GL_FALSE;
 }
@@ -1204,7 +1157,7 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
     /* The spec says this is GL_INVALID_OPERATION, although it seems like it
      * ought to be GL_INVALID_VALUE
      */
-    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters) {
+    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters()) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUniform(location)");
 	return;
     }
@@ -1344,7 +1297,7 @@ _mesa_uniform_matrix(GLcontext *ctx, GLint cols, GLint rows,
     /* The spec says this is GL_INVALID_OPERATION, although it seems like it
      * ought to be GL_INVALID_VALUE
      */
-    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters) {
+    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters()) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUniformMatrix(location)");
 	return;
     }

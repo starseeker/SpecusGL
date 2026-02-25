@@ -45,7 +45,7 @@
  * formats that are supported.
  *
  * \param ctx  the GL context
- * \param formats  the resulting format list (may be NULL).
+ * \param formats  the resulting format list (may be nullptr).
  * \param all  if true return all formats, even those with  some kind
  *             of restrictions/limitations (See GL_ARB_texture_compression
  *             spec for more info).
@@ -254,7 +254,7 @@ _mesa_compressed_row_stride(GLuint mesaFormat, GLsizei width)
 	    stride = ((width + 3) / 4) * 16; /* 16 bytes per 4x4 tile */
 	    break;
 	default:
-	    _mesa_problem(NULL, "bad mesaFormat in _mesa_compressed_row_stride");
+	    _mesa_problem(nullptr, "bad mesaFormat in _mesa_compressed_row_stride");
 	    return 0;
     }
 
@@ -302,8 +302,8 @@ _mesa_compressed_image_address(GLint col, GLint row, GLint img,
 	    addr = (GLubyte *) image + 16 * (((width + 3) / 4) * (row / 4) + col / 4);
 	    break;
 	default:
-	    _mesa_problem(NULL, "bad mesaFormat in _mesa_compressed_image_address");
-	    addr = NULL;
+	    _mesa_problem(nullptr, "bad mesaFormat in _mesa_compressed_image_address");
+	    addr = nullptr;
     }
 
     return addr;

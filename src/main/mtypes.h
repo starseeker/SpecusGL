@@ -1565,13 +1565,15 @@ struct gl_viewport_attrib {
 
 
 /**
- * Node for the attribute stack.
+ * A single saved attribute group entry: a bit-mask identifying the group
+ * and the opaque heap-allocated state snapshot.
  */
-struct gl_attrib_node {
-    GLbitfield kind;
-    void *data;
-    struct gl_attrib_node *next;
-};
+using gl_attrib_entry = std::pair<GLbitfield, void *>;
+
+/**
+ * One level of the attribute stack: a collection of saved groups.
+ */
+using gl_attrib_level = std::vector<gl_attrib_entry>;
 
 
 /**
@@ -1812,7 +1814,7 @@ struct gl_program_parameter_list;
  */
 struct gl_program {
     GLuint Id;
-    GLubyte *String;  /**< Null-terminated program text */
+    std::string String;  /**< Program text (null-terminated) */
     GLint RefCount;
     GLenum Target;    /**< GL_VERTEX/FRAGMENT_PROGRAM_ARB, GL_FRAGMENT_PROGRAM_NV */
     GLenum Format;    /**< String encoding format */
@@ -1881,7 +1883,7 @@ struct gl_fragment_program {
  */
 struct gl_program_state {
     GLint ErrorPos;                       /* GL_PROGRAM_ERROR_POSITION_ARB/NV */
-    const char *ErrorString;              /* GL_PROGRAM_ERROR_STRING_ARB/NV */
+    std::string ErrorString;              /* GL_PROGRAM_ERROR_STRING_ARB/NV */
 };
 
 
@@ -2025,11 +2027,10 @@ struct gl_shader {
     GLint RefCount;  /**< Reference count */
     GLboolean DeletePending;
 
-    const GLchar *Source;  /**< Source code string */
+    std::string Source;  /**< Source code string */
     GLboolean CompileStatus;
-    GLuint NumPrograms;  /**< size of Programs[] array */
-    struct gl_program **Programs;  /**< Post-compile assembly code */
-    GLchar *InfoLog;
+    std::vector<struct gl_program *> Programs;  /**< Post-compile assembly code */
+    std::string InfoLog;
 };
 
 
@@ -2042,8 +2043,7 @@ struct gl_shader_program {
     GLint RefCount;  /**< Reference count */
     GLboolean DeletePending;
 
-    GLuint NumShaders;          /**< number of attached shaders */
-    struct gl_shader **Shaders; /**< List of attached the shaders */
+    std::vector<struct gl_shader *> Shaders; /**< Attached shaders */
 
     /* post-link info: */
     struct gl_vertex_program *VertexProgram;     /**< Linked vertex program */
@@ -2053,7 +2053,7 @@ struct gl_shader_program {
     struct gl_program_parameter_list *Attributes; /**< Vertex attributes */
     GLboolean LinkStatus;   /**< GL_LINK_STATUS */
     GLboolean Validated;
-    GLchar *InfoLog;
+    std::string InfoLog;
 };
 
 
@@ -2972,8 +2972,7 @@ struct __GLcontextRec {
 
     /** \name State attribute stack (for glPush/PopAttrib) */
     /*@{*/
-    GLuint AttribStackDepth;
-    struct gl_attrib_node *AttribStack[MAX_ATTRIB_STACK_DEPTH];
+    std::vector<gl_attrib_level> AttribStack; /**< attribute push/pop stack */
     /*@}*/
 
     /** \name Renderer attribute groups
@@ -3006,8 +3005,7 @@ struct __GLcontextRec {
 
     /** \name Client attribute stack */
     /*@{*/
-    GLuint ClientAttribStackDepth;
-    struct gl_attrib_node *ClientAttribStack[MAX_CLIENT_ATTRIB_STACK_DEPTH];
+    std::vector<gl_attrib_level> ClientAttribStack; /**< client attribute push/pop stack */
     /*@}*/
 
     /** \name Client attribute groups */

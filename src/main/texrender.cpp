@@ -265,7 +265,7 @@ static int
 wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 {
     ASSERT(att->Type == GL_TEXTURE);
-    ASSERT(att->Renderbuffer == NULL);
+    ASSERT(att->Renderbuffer == nullptr);
 
     auto *trb = new TextureRenderbuffer{};
     if (!trb) {

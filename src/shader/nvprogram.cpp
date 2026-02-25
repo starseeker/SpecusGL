@@ -253,7 +253,7 @@ _mesa_GetProgramivNV(GLuint id, GLenum pname, GLint *params)
 	    *params = prog->Target;
 	    return;
 	case GL_PROGRAM_LENGTH_NV:
-	    *params = prog->String ?(GLint)strlen((char *) prog->String) : 0;
+	    *params = (GLint) prog->String.size();
 	    return;
 	case GL_PROGRAM_RESIDENT_NV:
 	    *params = prog->Resident;
@@ -290,8 +290,8 @@ _mesa_GetProgramStringNV(GLuint id, GLenum pname, GLubyte *program)
 	return;
     }
 
-    if (prog->String) {
-	memcpy(program, prog->String, strlen((char *) prog->String));
+    if (!prog->String.empty()) {
+	memcpy(program, prog->String.c_str(), prog->String.size());
     } else {
 	program[0] = 0;
     }

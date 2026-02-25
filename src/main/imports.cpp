@@ -95,7 +95,7 @@ _mesa_align_calloc(size_t bytes, unsigned long alignment)
     void *mem;
 
     mem = _aligned_malloc(bytes, alignment);
-    if (mem != NULL) {
+    if (mem != nullptr) {
 	(void) memset(mem, 0, bytes);
     }
 
@@ -103,7 +103,7 @@ _mesa_align_calloc(size_t bytes, unsigned long alignment)
 #else
     const size_t sz = (bytes + alignment - 1) & ~(size_t)(alignment - 1);
     void *mem = std::aligned_alloc(alignment, sz);
-    if (mem != NULL) {
+    if (mem != nullptr) {
 	(void) memset(mem, 0, bytes);
     }
 
@@ -581,7 +581,7 @@ _mesa_float_to_half(float val)
 		    m = 1;
 		    break;
 		default:
-		    _mesa_warning(NULL,
+		    _mesa_warning(nullptr,
 				  "float_to_half: logical error in denorm creation!\n");
 		    break;
 	    }
@@ -663,7 +663,7 @@ char *
 _mesa_getenv(const char *var)
 {
 #if defined(_XBOX)
-    return NULL;
+    return nullptr;
 #else
     return getenv(var);
 #endif
@@ -678,7 +678,7 @@ _mesa_getenv(const char *var)
 
 /**
  * Implemented using malloc() and _mesa_strcpy.
- * Note that NULL is handled accordingly.
+ * Note that nullptr is handled accordingly.
  */
 char *
 _mesa_strdup(const char *s)
@@ -690,7 +690,7 @@ _mesa_strdup(const char *s)
 	    memcpy(s2, s, l + 1);
 	return s2;
     } else {
-	return NULL;
+	return nullptr;
     }
 }
 

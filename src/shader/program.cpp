@@ -56,7 +56,7 @@ _mesa_init_program(GLcontext *ctx)
     GLuint i;
 
     ctx->Program.ErrorPos = -1;
-    ctx->Program.ErrorString = _mesa_strdup("");
+    ctx->Program.ErrorString = "";
 
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
     ctx->VertexProgram.Enabled = GL_FALSE;
@@ -117,8 +117,8 @@ _mesa_free_program_data(GLcontext *ctx)
 	}
     }
 #endif
-    free((void *) ctx->Program.ErrorString);
-}
+    }
+
 
 
 
@@ -131,10 +131,7 @@ void
 _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string)
 {
     ctx->Program.ErrorPos = pos;
-    free((void *) ctx->Program.ErrorString);
-    if (!string)
-	string = "";
-    ctx->Program.ErrorString = _mesa_strdup(string);
+    ctx->Program.ErrorString = string ? string : "";
 }
 
 
@@ -148,14 +145,12 @@ _mesa_set_program_error(GLcontext *ctx, GLint pos, const char *string)
  * \param col     returns the column number corresponding to 'pos'.
  * \return copy of the line containing 'pos'.
  */
-const GLubyte *
+std::string
 _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
 		       GLint *line, GLint *col)
 {
     const GLubyte *lineStart = string;
     const GLubyte *p = string;
-    GLubyte *s;
-    int len;
 
     *line = 1;
 
@@ -172,12 +167,8 @@ _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
     /* return copy of this line */
     while (*p != 0 && *p != '\n')
 	p++;
-    len = p - lineStart;
-    s = (GLubyte *) malloc(len + 1);
-    memcpy(s, lineStart, len);
-    s[len] = 0;
-
-    return s;
+    return std::string(reinterpret_cast<const char *>(lineStart),
+			  reinterpret_cast<const char *>(p));
 }
 
 
@@ -275,18 +266,14 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog == &_mesa_DummyProgram)
 	return;
 
-    if (prog->String)
-	free(prog->String);
-
     if (prog->Instructions) {
 	GLuint i;
 	for (i = 0; i < prog->NumInstructions; i++) {
 	    if (prog->Instructions[i].Data)
-		free(prog->Instructions[i].Data);
-	    if (prog->Instructions[i].Comment)
-		free((char *) prog->Instructions[i].Comment);
+		delete[] static_cast<GLubyte *>(prog->Instructions[i].Data);
+	    /* Comment is now std::string, no explicit free needed */
 	}
-	free(prog->Instructions);
+	delete[] prog->Instructions;
     }
 
     if (prog->Parameters) {
@@ -303,7 +290,7 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog->Target == GL_VERTEX_PROGRAM_ARB) {
 	struct gl_vertex_program *vprog = (struct gl_vertex_program *) prog;
 	if (vprog->TnlData)
-	    free(vprog->TnlData);
+	    delete static_cast<char *>(vprog->TnlData); /* should always be nullptr */
 	delete vprog;
     } else {
 	delete (struct gl_fragment_program *) prog;
@@ -341,7 +328,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
 	return nullptr;
 
     assert(clone->Target == prog->Target);
-    clone->String = (GLubyte *) _mesa_strdup((char *) prog->String);
+    clone->String = prog->String;
     clone->RefCount = 1;
     clone->Format = prog->Format;
     clone->Instructions = _mesa_alloc_instructions(prog->NumInstructions);

@@ -60,6 +60,8 @@
 
 #include "vbo/vbo.h"
 
+#include <unordered_map>
+
 #define MAX_PIPELINE_STAGES     30
 
 /*
@@ -383,18 +385,11 @@ struct tnl_clipspace {
 };
 
 
-struct tnl_cache_item {
-    GLuint hash;
-    void *key;
-    void *data;
-    struct tnl_cache_item *next;
-};
-
-struct tnl_cache {
-    struct tnl_cache_item **items;
-    GLuint size, n_items;
-};
-
+/* Forward-declared here so TNLcontext can hold it by pointer.
+ * The full definition (which requires state_key from t_vp_build.cpp)
+ * lives in t_vp_build.cpp itself.
+ */
+struct tnl_vp_cache;
 
 struct tnl_device_driver {
     /***
@@ -546,7 +541,7 @@ typedef struct {
 
     /* Cache of fixed-function-replacing vertex programs:
      */
-    struct tnl_cache *vp_cache;
+    struct tnl_vp_cache *vp_cache;
 
 } TNLcontext;
 
