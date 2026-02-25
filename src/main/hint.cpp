@@ -140,16 +140,8 @@ _mesa_Hint(GLenum target, GLenum mode)
 
 void _mesa_init_hint(GLcontext * ctx)
 {
-    /* Hint group */
-    ctx->Hint.PerspectiveCorrection = GL_DONT_CARE;
-    ctx->Hint.PointSmooth = GL_DONT_CARE;
-    ctx->Hint.LineSmooth = GL_DONT_CARE;
-    ctx->Hint.PolygonSmooth = GL_DONT_CARE;
-    ctx->Hint.Fog = GL_DONT_CARE;
-    ctx->Hint.ClipVolumeClipping = GL_DONT_CARE;
-    ctx->Hint.TextureCompression = GL_DONT_CARE;
-    ctx->Hint.GenerateMipmap = GL_DONT_CARE;
-    ctx->Hint.FragmentShaderDerivative = GL_DONT_CARE;
+    /* gl_hint_attrib fields default to GL_DONT_CARE via in-class initializers */
+    (void) ctx;
 }
 
 /*

@@ -2138,9 +2138,9 @@ _slang_compile(GLcontext *ctx, struct gl_shader *shader)
     /* free shader's prev info log */
     shader->InfoLog.clear();
 
-    if (info_log.text) {
-	/* copy info-log string to shader object */
-	shader->InfoLog = info_log.text ? info_log.text : "";
+    /* copy info-log string to shader object */
+    if (!info_log.text.empty()) {
+	shader->InfoLog = info_log.text;
     }
 
     if (info_log.error_flag) {

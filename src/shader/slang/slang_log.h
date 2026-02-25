@@ -26,13 +26,13 @@
 #ifndef SLANG_LOG_H
 #define SLANG_LOG_H
 
-
+#include <string>
 
 
 typedef struct slang_info_log_ {
-    char *text;
-    GLboolean dont_free_text;
-    GLboolean error_flag;
+    std::string text;
+    bool dont_free_text{false};
+    bool error_flag{false};
 } slang_info_log;
 
 

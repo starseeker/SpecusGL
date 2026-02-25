@@ -792,15 +792,15 @@ struct gl_fog_attrib {
  * Values are always one of GL_FASTEST, GL_NICEST, or GL_DONT_CARE.
  */
 struct gl_hint_attrib {
-    GLenum PerspectiveCorrection;
-    GLenum PointSmooth;
-    GLenum LineSmooth;
-    GLenum PolygonSmooth;
-    GLenum Fog;
-    GLenum ClipVolumeClipping;   /**< GL_EXT_clip_volume_hint */
-    GLenum TextureCompression;   /**< GL_ARB_texture_compression */
-    GLenum GenerateMipmap;       /**< GL_SGIS_generate_mipmap */
-    GLenum FragmentShaderDerivative; /**< GL_ARB_fragment_shader */
+    GLenum PerspectiveCorrection{GL_DONT_CARE};
+    GLenum PointSmooth{GL_DONT_CARE};
+    GLenum LineSmooth{GL_DONT_CARE};
+    GLenum PolygonSmooth{GL_DONT_CARE};
+    GLenum Fog{GL_DONT_CARE};
+    GLenum ClipVolumeClipping{GL_DONT_CARE};   /**< GL_EXT_clip_volume_hint */
+    GLenum TextureCompression{GL_DONT_CARE};   /**< GL_ARB_texture_compression */
+    GLenum GenerateMipmap{GL_DONT_CARE};       /**< GL_SGIS_generate_mipmap */
+    GLenum FragmentShaderDerivative{GL_DONT_CARE}; /**< GL_ARB_fragment_shader */
 };
 
 

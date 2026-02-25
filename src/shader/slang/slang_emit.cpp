@@ -933,7 +933,7 @@ emit_move(slang_emit_info *emitInfo, slang_ir_node *n)
     inst = emit(emitInfo, n->Children[1]);
 
     if (!n->Children[1]->Store || n->Children[1]->Store->Index < 0) {
-	if (!emitInfo->log->text) {
+	if (emitInfo->log->text.empty()) {
 	    slang_info_log_error(emitInfo->log, "invalid assignment");
 	}
 	return nullptr;
