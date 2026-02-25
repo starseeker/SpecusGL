@@ -60,6 +60,7 @@
 #include "math/m_xform.h"
 
 #include "vbo/vbo.h"
+#include "t_vp_build.h"   /* for tnl_vp_cache (used via unique_ptr below) */
 
 #include <bitset>
 #include <memory>
@@ -386,12 +387,6 @@ struct tnl_clipspace {
 };
 
 
-/* Forward-declared here so TNLcontext can hold it by pointer.
- * The full definition (which requires state_key from t_vp_build.cpp)
- * lives in t_vp_build.cpp itself.
- */
-struct tnl_vp_cache;
-
 struct tnl_device_driver {
     /***
      *** TNL Pipeline
@@ -557,9 +552,8 @@ struct TNLcontext {
      *  Each element is owned (auto-freed when the vector is cleared). */
     std::vector<std::unique_ptr<GLubyte[]>> blocks;
 
-    /* Cache of fixed-function-replacing vertex programs:
-     */
-    struct tnl_vp_cache *vp_cache;
+    /** Cache of fixed-function-replacing vertex programs (RAII-owned). */
+    std::unique_ptr<tnl_vp_cache> vp_cache;
 
 };
 
