@@ -205,7 +205,7 @@ do {								\
    (S).arrayMask = (ARRAY_MASK);				\
    (S).end = (END);						\
    (S).facing = 0;						\
-   (S).array = SWRAST_CONTEXT(ctx)->SpanArrays;			\
+   (S).array = SWRAST_CONTEXT(ctx)->SpanArrays.get();			\
 } while (0)
 
 

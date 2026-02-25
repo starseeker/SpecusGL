@@ -169,7 +169,7 @@ GLboolean _vbo_CreateContext(GLcontext *ctx)
     using VboCtx = struct vbo_context;
     auto *vbo = new VboCtx{};
 
-    ctx->swtnl_im = (void *)vbo;
+    ctx->swtnl_im = vbo;
 
     /* Initialize the arrayelt helper
      */

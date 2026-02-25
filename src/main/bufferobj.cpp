@@ -374,8 +374,7 @@ _mesa_init_buffer_objects(GLcontext *ctx)
      * it never gets deleted.
      */
     ctx->Array.NullBufferObj = _mesa_new_buffer_object(ctx, 0, 0);
-    if (ctx->Array.NullBufferObj)
-	ctx->Array.NullBufferObj->RefCount = 1000;
+    ctx->Array.NullBufferObj->RefCount = 1000;
 
     ctx->Array.ArrayBufferObj = ctx->Array.NullBufferObj;
     ctx->Array.ElementArrayBufferObj = ctx->Array.NullBufferObj;
@@ -656,7 +655,7 @@ _mesa_GenBuffersARB(GLsizei n, GLuint *buffer)
      */
     std::lock_guard<std::mutex> lock(ctx->Shared->Mutex);
 
-    first = _mesa_HashFindFreeKeyBlock(&ctx->Shared->BufferObjects, n);
+    first = ctx->Shared->BufferObjects.findFreeKeyBlock(n);
 
     /* Allocate new, empty buffer objects and return identifiers */
     for (i = 0; i < n; i++) {

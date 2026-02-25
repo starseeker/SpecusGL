@@ -137,6 +137,20 @@ typedef __GLcontextModes GLvisual;
 typedef struct gl_framebuffer GLframebuffer;
 /*@}*/
 
+/**
+ * \name Forward declarations for module-private context types.
+ *
+ * These are stored as typed pointers in GLcontext so that accessor code
+ * does not need explicit casts.  The full definitions live in the respective
+ * module headers (s_context.h, ss_context.h, t_context.h, etc.).
+ */
+/*@{*/
+struct SWcontext;    /**< software rasteriser (swrast) */
+struct SScontext;    /**< swrast setup (swrast_setup) */
+struct TNLcontext;   /**< transform-and-light (tnl) */
+struct vbo_context;  /**< vertex buffer object builder (vbo) */
+struct AEcontext;    /**< vertex array element helper (api_arrayelt) */
+/*@}*/
 
 
 /**
@@ -923,7 +937,7 @@ struct gl_line_attrib {
  * Display list attribute group (GL_LIST_BIT).
  */
 struct gl_list_attrib {
-    GLuint ListBase;
+    GLuint ListBase = 0;
 };
 
 
@@ -2086,6 +2100,15 @@ struct ati_fragment_shader {
     GLboolean interpinp1;
     GLboolean isValid;
     GLuint swizzlerq;
+
+    /** Increment the reference count. */
+    void ref() noexcept { ++RefCount; }
+
+    /** Decrement the reference count; return true if the object should be freed. */
+    [[nodiscard]] bool unref() noexcept {
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 /**
@@ -2115,9 +2138,9 @@ struct gl_query_object {
  * Context state for query objects.
  */
 struct gl_query_state {
-    struct _mesa_HashTable *QueryObjects;
-    struct gl_query_object *CurrentOcclusionObject; /* GL_ARB_occlusion_query */
-    struct gl_query_object *CurrentTimerObject;     /* GL_EXT_timer_query */
+    _mesa_HashTable QueryObjects;                   /**< All query objects */
+    struct gl_query_object *CurrentOcclusionObject = nullptr; /* GL_ARB_occlusion_query */
+    struct gl_query_object *CurrentTimerObject = nullptr;     /* GL_EXT_timer_query */
 };
 
 
@@ -2384,6 +2407,15 @@ struct gl_shared_state {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Release all driver-owned objects stored in this shared state.
+     *
+     * Must be called before deleting the gl_shared_state object.
+     * Requires \p ctx so that driver-provided Delete callbacks can be invoked.
+     * Replaces the old free_shared_state() free function in context.cpp.
+     */
+    void cleanup(struct __GLcontextRec *ctx);
 };
 
 
@@ -3083,13 +3115,13 @@ struct mesa_display_list {
  * State used during display list compilation and execution.
  */
 struct gl_dlist_state {
-    GLuint CallDepth;		/**< Current recursion calling depth */
+    GLuint CallDepth = 0;	/**< Current recursion calling depth */
 
-    struct mesa_display_list *CurrentList;
-    Node *CurrentListPtr;	/**< Head of list being compiled */
-    GLuint CurrentListNum;	/**< Number of the list being compiled */
-    Node *CurrentBlock;		/**< Pointer to current block of nodes */
-    GLuint CurrentPos;		/**< Index into current block of nodes */
+    struct mesa_display_list *CurrentList = nullptr;
+    Node *CurrentListPtr = nullptr;	/**< Head of list being compiled */
+    GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
+    Node *CurrentBlock = nullptr;	/**< Pointer to current block of nodes */
+    GLuint CurrentPos = 0;	/**< Index into current block of nodes */
 
     GLvertexformat ListVtxfmt;
 
@@ -3160,8 +3192,8 @@ struct __GLcontextRec {
     /** \name Display lists */
     struct gl_dlist_state ListState;
 
-    GLboolean ExecuteFlag;	/**< Execute GL commands? */
-    GLboolean CompileFlag;	/**< Compile GL commands into display list? */
+    GLboolean ExecuteFlag = GL_TRUE;	/**< Execute GL commands? */
+    GLboolean CompileFlag = GL_FALSE;	/**< Compile GL commands into display list? */
 
     /** Extension information */
     struct gl_extensions Extensions;
@@ -3287,15 +3319,15 @@ struct __GLcontextRec {
     /**
      * \name Hooks for module contexts.
      *
-     * These will eventually live in the driver or elsewhere.
+     * Typed pointers to private per-context state for each module.
+     * The full struct definitions are in the respective module headers.
      */
     /*@{*/
-    void *swrast_context = nullptr;
-    void *swsetup_context = nullptr;
-    void *swtnl_context = nullptr;
-    void *swtnl_im = nullptr;
-    void *acache_context = nullptr;
-    void *aelt_context = nullptr;
+    SWcontext   *swrast_context  = nullptr;  /**< swrast private context */
+    SScontext   *swsetup_context = nullptr;  /**< swrast_setup private context */
+    TNLcontext  *swtnl_context   = nullptr;  /**< tnl private context */
+    vbo_context *swtnl_im        = nullptr;  /**< vbo builder private context */
+    AEcontext   *aelt_context    = nullptr;  /**< array-element helper context */
     /*@}*/
 };
 

@@ -87,7 +87,7 @@ struct vbo_context {
 
 static INLINE struct vbo_context *vbo_context(GLcontext *ctx)
 {
-    return (struct vbo_context *)(ctx->swtnl_im);
+    return ctx->swtnl_im;
 }
 
 enum {

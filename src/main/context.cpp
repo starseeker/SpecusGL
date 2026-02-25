@@ -405,8 +405,6 @@ static GLboolean
 alloc_shared_state(GLcontext *ctx)
 {
     struct gl_shared_state *ss = new gl_shared_state{};
-    if (!ss)
-	return GL_FALSE;
 
     ctx->Shared = ss;
 
@@ -498,52 +496,58 @@ cleanup:
  *
  * \sa alloc_shared_state().
  */
-static void
-free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
+
+/**
+ * gl_shared_state::cleanup – release all driver-owned objects stored in this
+ * shared state.  Implements the bulk of what used to be the free_shared_state()
+ * free function.
+ */
+void
+gl_shared_state::cleanup(GLcontext *ctx)
 {
     /*
      * Free display lists
      */
-    ss->DisplayList.deleteAll([ctx](GLuint, void *data) {
+    DisplayList.deleteAll([ctx](GLuint, void *data) {
 	_mesa_delete_list(ctx, static_cast<mesa_display_list *>(data));
     });
 
 #if defined(FEATURE_NV_vertex_program) || defined(FEATURE_NV_fragment_program)
-    ss->Programs.deleteAll([ctx](GLuint, void *data) {
+    Programs.deleteAll([ctx](GLuint, void *data) {
 	ctx->Driver.DeleteProgram(ctx, static_cast<gl_program *>(data));
     });
 #endif
 #if FEATURE_ARB_vertex_program
-    ctx->Driver.DeleteProgram(ctx, ss->DefaultVertexProgram);
+    ctx->Driver.DeleteProgram(ctx, DefaultVertexProgram);
 #endif
 #if FEATURE_ARB_fragment_program
-    ctx->Driver.DeleteProgram(ctx, ss->DefaultFragmentProgram);
+    ctx->Driver.DeleteProgram(ctx, DefaultFragmentProgram);
 #endif
 
 #if FEATURE_ATI_fragment_shader
-    ss->ATIShaders.deleteAll([ctx](GLuint, void *data) {
+    ATIShaders.deleteAll([ctx](GLuint, void *data) {
 	_mesa_delete_ati_fragment_shader(ctx, static_cast<ati_fragment_shader *>(data));
     });
-    _mesa_delete_ati_fragment_shader(ctx, ss->DefaultFragmentShader);
+    _mesa_delete_ati_fragment_shader(ctx, DefaultFragmentShader);
 #endif
 
 #if FEATURE_ARB_vertex_buffer_object || FEATURE_ARB_pixel_buffer_object
-    ss->BufferObjects.deleteAll([ctx](GLuint, void *data) {
+    BufferObjects.deleteAll([ctx](GLuint, void *data) {
 	ctx->Driver.DeleteBuffer(ctx, static_cast<gl_buffer_object *>(data));
     });
 #endif
 
-    ss->ArrayObjects.deleteAll([ctx](GLuint, void *data) {
+    ArrayObjects.deleteAll([ctx](GLuint, void *data) {
 	_mesa_delete_array_object(ctx, static_cast<gl_array_object *>(data));
     });
 
 #if FEATURE_ARB_shader_objects
-    ss->ShaderObjects.walk([ctx](GLuint, void *data) {
+    ShaderObjects.walk([ctx](GLuint, void *data) {
 	auto *shProg = static_cast<gl_shader_program *>(data);
 	if (shProg->Type == GL_SHADER_PROGRAM_MESA)
 	    _mesa_free_shader_program_data(ctx, shProg);
     });
-    ss->ShaderObjects.deleteAll([ctx](GLuint, void *data) {
+    ShaderObjects.deleteAll([ctx](GLuint, void *data) {
 	auto *sh = static_cast<gl_shader *>(data);
 	if (sh->Type == GL_FRAGMENT_SHADER || sh->Type == GL_VERTEX_SHADER) {
 	    _mesa_free_shader(ctx, sh);
@@ -556,12 +560,12 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
 #endif
 
 #if FEATURE_EXT_framebuffer_object
-    ss->FrameBuffers.deleteAll([](GLuint, void *data) {
+    FrameBuffers.deleteAll([](GLuint, void *data) {
 	auto *fb = static_cast<gl_framebuffer *>(data);
 	fb->RefCount = 0;
 	delete fb;
     });
-    ss->RenderBuffers.deleteAll([](GLuint, void *data) {
+    RenderBuffers.deleteAll([](GLuint, void *data) {
 	auto *rb = static_cast<gl_renderbuffer *>(data);
 	rb->RefCount = 0;
 	delete rb;
@@ -573,15 +577,20 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
      * been bound to FBOs).
      */
     ASSERT(ctx->Driver.DeleteTexture);
-    ctx->Driver.DeleteTexture(ctx, ss->Default1D);
-    ctx->Driver.DeleteTexture(ctx, ss->Default2D);
-    ctx->Driver.DeleteTexture(ctx, ss->Default3D);
-    ctx->Driver.DeleteTexture(ctx, ss->DefaultCubeMap);
-    ctx->Driver.DeleteTexture(ctx, ss->DefaultRect);
-    ss->TexObjects.deleteAll([ctx](GLuint, void *data) {
+    ctx->Driver.DeleteTexture(ctx, Default1D);
+    ctx->Driver.DeleteTexture(ctx, Default2D);
+    ctx->Driver.DeleteTexture(ctx, Default3D);
+    ctx->Driver.DeleteTexture(ctx, DefaultCubeMap);
+    ctx->Driver.DeleteTexture(ctx, DefaultRect);
+    TexObjects.deleteAll([ctx](GLuint, void *data) {
 	ctx->Driver.DeleteTexture(ctx, static_cast<gl_texture_object *>(data));
     });
+}
 
+static void
+free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
+{
+    ss->cleanup(ctx);
     delete ss;
 }
 

@@ -49,10 +49,6 @@ _tnl_CreateContext(GLcontext *ctx)
      */
     ctx->swtnl_context = tnl = new TNLcontext{};
 
-    if (!tnl) {
-	return GL_FALSE;
-    }
-
     /* Initialize the VB.
      */
     tnl->vb.Size = ctx->Const.MaxArrayLockSize + MAX_CLIPPED_VERTICES;

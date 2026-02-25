@@ -787,11 +787,7 @@ _swrast_CreateContext(GLcontext *ctx)
 	swrast->TextureSampleF[i] = nullptr;
     }
 
-    swrast->SpanArrays = new SWspanarrays{};
-    if (!swrast->SpanArrays) {
-	delete swrast;
-	return GL_FALSE;
-    }
+    swrast->SpanArrays = std::make_unique<SWspanarrays>();
     swrast->SpanArrays->ChanType = CHAN_TYPE;
 #if CHAN_TYPE == GL_UNSIGNED_BYTE
     swrast->SpanArrays->rgba = swrast->SpanArrays->color.sz1.rgba;
@@ -808,15 +804,10 @@ _swrast_CreateContext(GLcontext *ctx)
     swrast->PointSpan.primitive = GL_POINT;
     swrast->PointSpan.end = 0;
     swrast->PointSpan.facing = 0;
-    swrast->PointSpan.array = swrast->SpanArrays;
+    swrast->PointSpan.array = swrast->SpanArrays.get();
 
-    swrast->TexelBuffer = new GLchan[ctx->Const.MaxTextureImageUnits *
-				    MAX_WIDTH * 4];
-    if (!swrast->TexelBuffer) {
-	delete swrast->SpanArrays;
-	delete swrast;
-	return GL_FALSE;
-    }
+    swrast->TexelBuffer = std::make_unique<GLchan[]>(
+        ctx->Const.MaxTextureImageUnits * MAX_WIDTH * 4);
 
     ctx->swrast_context = swrast;
 
@@ -832,10 +823,8 @@ _swrast_DestroyContext(GLcontext *ctx)
 	_mesa_debug(ctx, "_swrast_DestroyContext\n");
     }
 
-    delete swrast->SpanArrays;
-    if (swrast->ZoomedArrays)
-	delete swrast->ZoomedArrays;
-    delete[] swrast->TexelBuffer;
+    /* unique_ptr members (SpanArrays, ZoomedArrays, TexelBuffer) free
+     * themselves; just delete the context object. */
     delete swrast;
 
     ctx->swrast_context = 0;

@@ -142,9 +142,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 
     if (!swrast->ZoomedArrays) {
 	/* allocate on demand */
-	swrast->ZoomedArrays = new SWspanarrays{};
-	if (!swrast->ZoomedArrays)
-	    return;
+	swrast->ZoomedArrays = std::make_unique<SWspanarrays>();
     }
 
     zoomedWidth = x1 - x0;
@@ -158,7 +156,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
     INIT_SPAN(zoomed, GL_BITMAP, 0, 0, 0);
     zoomed.x = x0;
     zoomed.end = zoomedWidth;
-    zoomed.array = swrast->ZoomedArrays;
+    zoomed.array = swrast->ZoomedArrays.get();
     zoomed.array->ChanType = span->array->ChanType;
     /* XXX temporary */
 #if CHAN_TYPE == GL_UNSIGNED_BYTE
