@@ -35,41 +35,71 @@
 #include "glheader.h"
 
 #include <functional>
+#include <mutex>
+#include <unordered_map>
 
 
+/**
+ * Hash table with GLuint keys and void* values.
+ *
+ * All insert/remove operations are thread-safe via an internal mutex.
+ * Lookup does not acquire the mutex to match the original Mesa behaviour.
+ */
+struct _mesa_HashTable {
+    std::unordered_map<GLuint, void *> entries; /**< key → data mapping */
+    GLuint maxKey{0};                           /**< highest key inserted so far */
+    mutable std::mutex mutex;                   /**< guards entries and maxKey */
+    bool inDeleteAll{false};                    /**< true during DeleteAll callback */
 
+    _mesa_HashTable() = default;
+    ~_mesa_HashTable() = default;
 
+    /* Non-copyable */
+    _mesa_HashTable(const _mesa_HashTable &) = delete;
+    _mesa_HashTable & operator=(const _mesa_HashTable &) = delete;
 
-[[nodiscard]] extern struct _mesa_HashTable *_mesa_NewHashTable(void);
+    [[nodiscard]] void *lookup(GLuint key) const;
+    void insert(GLuint key, void *data);
+    void remove(GLuint key);
+    void deleteAll(std::function<void(GLuint, void *)> callback);
+    void walk(std::function<void(GLuint, void *)> callback) const;
+    [[nodiscard]] GLuint firstEntry();
+    [[nodiscard]] GLuint nextEntry(GLuint key) const;
+    void print() const;
+    [[nodiscard]] GLuint findFreeKeyBlock(GLuint numKeys);
+};
 
-extern void _mesa_DeleteHashTable(struct _mesa_HashTable *table);
+/* Legacy C-style wrappers – prefer member functions for new code. */
+[[nodiscard]] inline _mesa_HashTable *_mesa_NewHashTable() { return new _mesa_HashTable{}; }
+inline void _mesa_DeleteHashTable(_mesa_HashTable *t) { delete t; }
 
-[[nodiscard]] extern void *_mesa_HashLookup(const struct _mesa_HashTable *table, GLuint key);
+[[nodiscard]] inline void *_mesa_HashLookup(const _mesa_HashTable *t, GLuint key)
+{ return t->lookup(key); }
 
-extern void _mesa_HashInsert(struct _mesa_HashTable *table, GLuint key, void *data);
+inline void _mesa_HashInsert(_mesa_HashTable *t, GLuint key, void *data)
+{ t->insert(key, data); }
 
-extern void _mesa_HashRemove(struct _mesa_HashTable *table, GLuint key);
+inline void _mesa_HashRemove(_mesa_HashTable *t, GLuint key)
+{ t->remove(key); }
 
-extern void
-_mesa_HashDeleteAll(struct _mesa_HashTable *table,
-		    std::function<void(GLuint key, void *data)> callback);
+inline void _mesa_HashDeleteAll(_mesa_HashTable *t,
+    std::function<void(GLuint, void *)> cb) { t->deleteAll(cb); }
 
-extern void
-_mesa_HashWalk(const struct _mesa_HashTable *table,
-	       std::function<void(GLuint key, void *data)> callback);
+inline void _mesa_HashWalk(const _mesa_HashTable *t,
+    std::function<void(GLuint, void *)> cb) { t->walk(cb); }
 
-[[nodiscard]] extern GLuint _mesa_HashFirstEntry(struct _mesa_HashTable *table);
+[[nodiscard]] inline GLuint _mesa_HashFirstEntry(_mesa_HashTable *t)
+{ return t->firstEntry(); }
 
-[[nodiscard]] extern GLuint _mesa_HashNextEntry(const struct _mesa_HashTable *table, GLuint key);
+[[nodiscard]] inline GLuint _mesa_HashNextEntry(const _mesa_HashTable *t, GLuint key)
+{ return t->nextEntry(key); }
 
-extern void _mesa_HashPrint(const struct _mesa_HashTable *table);
+inline void _mesa_HashPrint(const _mesa_HashTable *t) { t->print(); }
 
-[[nodiscard]] extern GLuint _mesa_HashFindFreeKeyBlock(struct _mesa_HashTable *table, GLuint numKeys);
+[[nodiscard]] inline GLuint _mesa_HashFindFreeKeyBlock(_mesa_HashTable *t, GLuint n)
+{ return t->findFreeKeyBlock(n); }
 
 extern void _mesa_test_hash_functions(void);
-
-
-
 
 
 #endif
