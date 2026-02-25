@@ -47,8 +47,8 @@
 #define GLHEADER_H
 
 #include <assert.h>
+#include <cmath>
 #include <ctype.h>
-#include <math.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>

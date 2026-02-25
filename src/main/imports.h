@@ -136,24 +136,19 @@ typedef union {
 #define IEEE_ONE 0x3f800000
 
 
-/***
- *** SQRTF: single-precision square root
- ***/
-#if 0 /* _mesa_sqrtf() not accurate enough - temporarily disabled */
-#  define SQRTF(X)  _mesa_sqrtf(X)
-#else
-#  define SQRTF(X)  (float) sqrt((float) (X))
-#endif
-
-
-/***
- *** INV_SQRTF: single-precision inverse square root
- ***/
-#if 0
-#define INV_SQRTF(X) _mesa_inv_sqrt(X)
-#else
-#define INV_SQRTF(X) (1.0F / SQRTF(X))  /* this is faster on a P4 */
-#endif
+/**
+ * Single-precision math wrappers: inline functions instead of macros to
+ * provide proper type checking and avoid double-evaluation hazards.
+ */
+inline float SQRTF(float x)    { return std::sqrt(x); }
+inline float INV_SQRTF(float x) { return 1.0f / SQRTF(x); }
+inline float CEILF(float x)    { return std::ceil(x); }
+inline float FLOORF(float x)   { return std::floor(x); }
+inline float FABSF(float x)    { return std::fabs(x); }
+inline float LOGF(float x)     { return std::log(x); }
+inline float EXPF(float x)     { return std::exp(x); }
+inline float LDEXPF(float x, int e) { return std::ldexp(x, e); }
+inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 
 
 /***
@@ -232,34 +227,6 @@ static INLINE int GET_FLOAT_BITS(float x)
 #define DIFFERENT_SIGNS(x,y) ((x) * (y) <= 0.0F && (x) - (y) != 0.0F)
 #endif
 
-
-/***
- *** CEILF: ceiling of float
- *** FLOORF: floor of float
- *** FABSF: absolute value of float
- *** LOGF: the natural logarithm (base e) of the value
- *** EXPF: raise e to the value
- *** LDEXPF: multiply value by an integral power of two
- *** FREXPF: extract mantissa and exponent from value
- ***/
-#if defined(__gnu_linux__)
-/* C99 functions */
-#define CEILF(x)   ceilf(x)
-#define FLOORF(x)  floorf(x)
-#define FABSF(x)   fabsf(x)
-#define LOGF(x)    logf(x)
-#define EXPF(x)    expf(x)
-#define LDEXPF(x,y)  ldexpf(x,y)
-#define FREXPF(x,y)  frexpf(x,y)
-#else
-#define CEILF(x)   ((GLfloat) ceil(x))
-#define FLOORF(x)  ((GLfloat) floor(x))
-#define FABSF(x)   ((GLfloat) fabs(x))
-#define LOGF(x)    ((GLfloat) log(x))
-#define EXPF(x)    ((GLfloat) exp(x))
-#define LDEXPF(x,y)  ((GLfloat) ldexp(x,y))
-#define FREXPF(x,y)  ((GLfloat) frexp(x,y))
-#endif
 
 
 /***
