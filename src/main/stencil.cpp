@@ -531,27 +531,16 @@ _mesa_update_stencil(GLcontext *ctx)
  *
  * Initializes __GLcontextRec::Stencil attribute group.
  */
+/**
+ * C++17 note: gl_stencil_attrib now carries all default member initializers
+ * (Function=GL_ALWAYS, FailFunc/ZPassFunc/ZFailFunc=GL_KEEP,
+ * ValueMask/WriteMask=~0U), so this function is a no-op and is retained
+ * only for API compatibility.
+ */
 void
 _mesa_init_stencil(GLcontext *ctx)
 {
-    ctx->Stencil.Enabled = GL_FALSE;
-    ctx->Stencil.TestTwoSide = GL_FALSE;
-    ctx->Stencil.ActiveFace = 0;  /* 0 = GL_FRONT, 1 = GL_BACK */
-    ctx->Stencil.Function[0] = GL_ALWAYS;
-    ctx->Stencil.Function[1] = GL_ALWAYS;
-    ctx->Stencil.FailFunc[0] = GL_KEEP;
-    ctx->Stencil.FailFunc[1] = GL_KEEP;
-    ctx->Stencil.ZPassFunc[0] = GL_KEEP;
-    ctx->Stencil.ZPassFunc[1] = GL_KEEP;
-    ctx->Stencil.ZFailFunc[0] = GL_KEEP;
-    ctx->Stencil.ZFailFunc[1] = GL_KEEP;
-    ctx->Stencil.Ref[0] = 0;
-    ctx->Stencil.Ref[1] = 0;
-    ctx->Stencil.ValueMask[0] = ~0U;
-    ctx->Stencil.ValueMask[1] = ~0U;
-    ctx->Stencil.WriteMask[0] = ~0U;
-    ctx->Stencil.WriteMask[1] = ~0U;
-    ctx->Stencil.Clear = 0;
+    (void) ctx;  /* all defaults provided by gl_stencil_attrib member initializers */
 }
 
 /*

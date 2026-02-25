@@ -856,44 +856,26 @@ void _mesa_free_matrix_data(GLcontext *ctx)
  *
  * \todo Move this to a new file with other 'transform' routines.
  */
+/**
+ * C++17 note: gl_transform_attrib now carries all default member initializers
+ * (MatrixMode=GL_MODELVIEW, CullObjPos/CullEyePos={0,0,1,0}), so this
+ * function is a no-op and is retained only for API compatibility.
+ */
 void _mesa_init_transform(GLcontext *ctx)
 {
-    GLint i;
-
-    /* Transformation group */
-    ctx->Transform.MatrixMode = GL_MODELVIEW;
-    ctx->Transform.Normalize = GL_FALSE;
-    ctx->Transform.RescaleNormals = GL_FALSE;
-    ctx->Transform.RasterPositionUnclipped = GL_FALSE;
-    for (i=0; i<MAX_CLIP_PLANES; i++) {
-	ASSIGN_4V(ctx->Transform.EyeUserPlane[i], 0.0, 0.0, 0.0, 0.0);
-    }
-    ctx->Transform.ClipPlanesEnabled = 0;
-
-    ASSIGN_4V(ctx->Transform.CullObjPos, 0.0, 0.0, 1.0, 0.0);
-    ASSIGN_4V(ctx->Transform.CullEyePos, 0.0, 0.0, 1.0, 0.0);
+    (void) ctx;  /* all defaults provided by gl_transform_attrib member initializers */
 }
 
 
 /**
- * Initialize the context viewport attribute group.
- *
- * \param ctx GL context.
- *
- * \todo Move this to a new file with other 'viewport' routines.
+ * C++17 note: gl_viewport_attrib now carries default member initializers
+ * (Near=0.0, Far=1.0).  The only remaining work is initialising the
+ * _WindowMap matrix with a concrete viewport call, which requires a
+ * runtime depth-range value.
  */
 void _mesa_init_viewport(GLcontext *ctx)
 {
-    GLfloat depthMax = 65535.0F; /* sorf of arbitrary */
-
-    /* Viewport group */
-    ctx->Viewport.X = 0;
-    ctx->Viewport.Y = 0;
-    ctx->Viewport.Width = 0;
-    ctx->Viewport.Height = 0;
-    ctx->Viewport.Near = 0.0;
-    ctx->Viewport.Far = 1.0;
-    /* _WindowMap is default-constructed by GLmatrix() */
+    GLfloat depthMax = 65535.0F; /* somewhat arbitrary initial value */
     ctx->Viewport._WindowMap.viewport(0, 0, 0, 0, 0.0F, 1.0F, depthMax);
 }
 

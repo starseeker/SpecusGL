@@ -262,28 +262,17 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
  * Initializes __GLcontextRec::Point and point related constants in
  * __GLcontextRec::Const.
  */
+/**
+ * C++17 note: gl_point_attrib now carries all default member initializers
+ * for all fields with static GL defaults (Size=1.0, _Size=1.0,
+ * Params={1,0,0}, Threshold=1.0, SpriteRMode=GL_ZERO,
+ * SpriteOrigin=GL_UPPER_LEFT).  The only remaining work is setting MaxSize,
+ * which depends on context constants computed after init.
+ */
 void
 _mesa_init_point(GLcontext *ctx)
 {
-    GLuint i;
-
-    ctx->Point.SmoothFlag = GL_FALSE;
-    ctx->Point.Size = 1.0;
-    ctx->Point._Size = 1.0;
-    ctx->Point.Params[0] = 1.0;
-    ctx->Point.Params[1] = 0.0;
-    ctx->Point.Params[2] = 0.0;
-    ctx->Point._Attenuated = GL_FALSE;
-    ctx->Point.MinSize = 0.0;
-    ctx->Point.MaxSize
-	= MAX2(ctx->Const.MaxPointSize, ctx->Const.MaxPointSizeAA);
-    ctx->Point.Threshold = 1.0;
-    ctx->Point.PointSprite = GL_FALSE; /* GL_ARB/NV_point_sprite */
-    ctx->Point.SpriteRMode = GL_ZERO; /* GL_NV_point_sprite (only!) */
-    ctx->Point.SpriteOrigin = GL_UPPER_LEFT; /* GL_ARB_point_sprite */
-    for (i = 0; i < MAX_TEXTURE_UNITS; i++) {
-	ctx->Point.CoordReplace[i] = GL_FALSE; /* GL_ARB/NV_point_sprite */
-    }
+    ctx->Point.MaxSize = MAX2(ctx->Const.MaxPointSize, ctx->Const.MaxPointSizeAA);
 }
 
 /*

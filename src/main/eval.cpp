@@ -817,75 +817,47 @@ init_2d_map(struct gl_2d_map *map, int n, const float *initial)
 }
 
 
+/**
+ * C++17 note: gl_eval_attrib now carries all default member initializers
+ * (all Map* enable bits GL_FALSE, MapGrid values set to their OpenGL
+ * defaults).  The gl_evaluators (EvalMap) still need their initial
+ * control-point data set up here.
+ */
 void _mesa_init_eval(GLcontext *ctx)
 {
     int i;
 
-    /* Evaluators group */
-    ctx->Eval.Map1Color4 = GL_FALSE;
-    ctx->Eval.Map1Index = GL_FALSE;
-    ctx->Eval.Map1Normal = GL_FALSE;
-    ctx->Eval.Map1TextureCoord1 = GL_FALSE;
-    ctx->Eval.Map1TextureCoord2 = GL_FALSE;
-    ctx->Eval.Map1TextureCoord3 = GL_FALSE;
-    ctx->Eval.Map1TextureCoord4 = GL_FALSE;
-    ctx->Eval.Map1Vertex3 = GL_FALSE;
-    ctx->Eval.Map1Vertex4 = GL_FALSE;
-    memset(ctx->Eval.Map1Attrib, 0, sizeof(ctx->Eval.Map1Attrib));
-    ctx->Eval.Map2Color4 = GL_FALSE;
-    ctx->Eval.Map2Index = GL_FALSE;
-    ctx->Eval.Map2Normal = GL_FALSE;
-    ctx->Eval.Map2TextureCoord1 = GL_FALSE;
-    ctx->Eval.Map2TextureCoord2 = GL_FALSE;
-    ctx->Eval.Map2TextureCoord3 = GL_FALSE;
-    ctx->Eval.Map2TextureCoord4 = GL_FALSE;
-    ctx->Eval.Map2Vertex3 = GL_FALSE;
-    ctx->Eval.Map2Vertex4 = GL_FALSE;
-    memset(ctx->Eval.Map2Attrib, 0, sizeof(ctx->Eval.Map2Attrib));
-    ctx->Eval.AutoNormal = GL_FALSE;
-    ctx->Eval.MapGrid1un = 1;
-    ctx->Eval.MapGrid1u1 = 0.0;
-    ctx->Eval.MapGrid1u2 = 1.0;
-    ctx->Eval.MapGrid2un = 1;
-    ctx->Eval.MapGrid2vn = 1;
-    ctx->Eval.MapGrid2u1 = 0.0;
-    ctx->Eval.MapGrid2u2 = 1.0;
-    ctx->Eval.MapGrid2v1 = 0.0;
-    ctx->Eval.MapGrid2v2 = 1.0;
+    /* Evaluator data: set initial control points for each map. */
+    static GLfloat vertex[4]   = { 0.0, 0.0, 0.0, 1.0 };
+    static GLfloat normal[3]   = { 0.0, 0.0, 1.0 };
+    static GLfloat index[1]    = { 1.0 };
+    static GLfloat color[4]    = { 1.0, 1.0, 1.0, 1.0 };
+    static GLfloat texcoord[4] = { 0.0, 0.0, 0.0, 1.0 };
+    static GLfloat attrib[4]   = { 0.0, 0.0, 0.0, 1.0 };
 
-    /* Evaluator data */
-    {
-	static GLfloat vertex[4] = { 0.0, 0.0, 0.0, 1.0 };
-	static GLfloat normal[3] = { 0.0, 0.0, 1.0 };
-	static GLfloat index[1] = { 1.0 };
-	static GLfloat color[4] = { 1.0, 1.0, 1.0, 1.0 };
-	static GLfloat texcoord[4] = { 0.0, 0.0, 0.0, 1.0 };
-	static GLfloat attrib[4] = { 0.0, 0.0, 0.0, 1.0 };
+    init_1d_map(&ctx->EvalMap.Map1Vertex3, 3, vertex);
+    init_1d_map(&ctx->EvalMap.Map1Vertex4, 4, vertex);
+    init_1d_map(&ctx->EvalMap.Map1Index, 1, index);
+    init_1d_map(&ctx->EvalMap.Map1Color4, 4, color);
+    init_1d_map(&ctx->EvalMap.Map1Normal, 3, normal);
+    init_1d_map(&ctx->EvalMap.Map1Texture1, 1, texcoord);
+    init_1d_map(&ctx->EvalMap.Map1Texture2, 2, texcoord);
+    init_1d_map(&ctx->EvalMap.Map1Texture3, 3, texcoord);
+    init_1d_map(&ctx->EvalMap.Map1Texture4, 4, texcoord);
+    for (i = 0; i < 16; i++)
+	init_1d_map(ctx->EvalMap.Map1Attrib + i, 4, attrib);
 
-	init_1d_map(&ctx->EvalMap.Map1Vertex3, 3, vertex);
-	init_1d_map(&ctx->EvalMap.Map1Vertex4, 4, vertex);
-	init_1d_map(&ctx->EvalMap.Map1Index, 1, index);
-	init_1d_map(&ctx->EvalMap.Map1Color4, 4, color);
-	init_1d_map(&ctx->EvalMap.Map1Normal, 3, normal);
-	init_1d_map(&ctx->EvalMap.Map1Texture1, 1, texcoord);
-	init_1d_map(&ctx->EvalMap.Map1Texture2, 2, texcoord);
-	init_1d_map(&ctx->EvalMap.Map1Texture3, 3, texcoord);
-	init_1d_map(&ctx->EvalMap.Map1Texture4, 4, texcoord);
-	for (i = 0; i < 16; i++)
-	    init_1d_map(ctx->EvalMap.Map1Attrib + i, 4, attrib);
-
-	init_2d_map(&ctx->EvalMap.Map2Vertex3, 3, vertex);
-	init_2d_map(&ctx->EvalMap.Map2Vertex4, 4, vertex);
-	init_2d_map(&ctx->EvalMap.Map2Index, 1, index);
-	init_2d_map(&ctx->EvalMap.Map2Color4, 4, color);
-	init_2d_map(&ctx->EvalMap.Map2Normal, 3, normal);
-	init_2d_map(&ctx->EvalMap.Map2Texture1, 1, texcoord);
-	init_2d_map(&ctx->EvalMap.Map2Texture2, 2, texcoord);
-	init_2d_map(&ctx->EvalMap.Map2Texture3, 3, texcoord);
-	init_2d_map(&ctx->EvalMap.Map2Texture4, 4, texcoord);
-	for (i = 0; i < 16; i++)
-	    init_2d_map(ctx->EvalMap.Map2Attrib + i, 4, attrib);
-    }
+    init_2d_map(&ctx->EvalMap.Map2Vertex3, 3, vertex);
+    init_2d_map(&ctx->EvalMap.Map2Vertex4, 4, vertex);
+    init_2d_map(&ctx->EvalMap.Map2Index, 1, index);
+    init_2d_map(&ctx->EvalMap.Map2Color4, 4, color);
+    init_2d_map(&ctx->EvalMap.Map2Normal, 3, normal);
+    init_2d_map(&ctx->EvalMap.Map2Texture1, 1, texcoord);
+    init_2d_map(&ctx->EvalMap.Map2Texture2, 2, texcoord);
+    init_2d_map(&ctx->EvalMap.Map2Texture3, 3, texcoord);
+    init_2d_map(&ctx->EvalMap.Map2Texture4, 4, texcoord);
+    for (i = 0; i < 16; i++)
+	init_2d_map(ctx->EvalMap.Map2Attrib + i, 4, attrib);
 }
 
 

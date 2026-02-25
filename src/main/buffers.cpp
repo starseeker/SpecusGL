@@ -749,33 +749,29 @@ _mesa_Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
 
 /**
  * Initialize the context's scissor state.
- * \param ctx  the GL context.
+ *
+ * C++17 note: gl_scissor_attrib now carries all default member initializers
+ * (all zeros), so this function is a no-op and is retained only for API
+ * compatibility.
  */
 void
 _mesa_init_scissor(GLcontext *ctx)
 {
-    /* Scissor group */
-    ctx->Scissor.Enabled = GL_FALSE;
-    ctx->Scissor.X = 0;
-    ctx->Scissor.Y = 0;
-    ctx->Scissor.Width = 0;
-    ctx->Scissor.Height = 0;
+    (void) ctx;  /* all defaults provided by gl_scissor_attrib member initializers */
 }
 
 
 /**
  * Initialize the context's multisample state.
- * \param ctx  the GL context.
+ *
+ * C++17 note: gl_multisample_attrib now carries all default member
+ * initializers (SampleCoverageValue=1.0), so this function is a no-op
+ * and is retained only for API compatibility.
  */
 void
 _mesa_init_multisample(GLcontext *ctx)
 {
-    ctx->Multisample.Enabled = GL_FALSE;
-    ctx->Multisample.SampleAlphaToCoverage = GL_FALSE;
-    ctx->Multisample.SampleAlphaToOne = GL_FALSE;
-    ctx->Multisample.SampleCoverage = GL_FALSE;
-    ctx->Multisample.SampleCoverageValue = 1.0;
-    ctx->Multisample.SampleCoverageInvert = GL_FALSE;
+    (void) ctx;  /* all defaults provided by gl_multisample_attrib member initializers */
 }
 
 /*@}*/

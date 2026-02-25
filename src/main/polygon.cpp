@@ -330,25 +330,16 @@ _mesa_PolygonOffsetEXT(GLfloat factor, GLfloat bias)
  * Initializes __GLcontextRec::Polygon and __GLcontextRec::PolygonStipple
  * attribute groups.
  */
+/**
+ * C++17 note: gl_polygon_attrib now carries all default member initializers
+ * (FrontFace=GL_CCW, FrontMode=GL_FILL, BackMode=GL_FILL,
+ * CullFaceMode=GL_BACK).  The only remaining work is initialising the
+ * PolygonStipple array (a plain C array in __GLcontextRec that cannot
+ * easily be default-initialised to 0xff).
+ */
 void _mesa_init_polygon(GLcontext * ctx)
 {
-    /* Polygon group */
-    ctx->Polygon.CullFlag = GL_FALSE;
-    ctx->Polygon.CullFaceMode = GL_BACK;
-    ctx->Polygon.FrontFace = GL_CCW;
-    ctx->Polygon._FrontBit = 0;
-    ctx->Polygon.FrontMode = GL_FILL;
-    ctx->Polygon.BackMode = GL_FILL;
-    ctx->Polygon.SmoothFlag = GL_FALSE;
-    ctx->Polygon.StippleFlag = GL_FALSE;
-    ctx->Polygon.OffsetFactor = 0.0F;
-    ctx->Polygon.OffsetUnits = 0.0F;
-    ctx->Polygon.OffsetPoint = GL_FALSE;
-    ctx->Polygon.OffsetLine = GL_FALSE;
-    ctx->Polygon.OffsetFill = GL_FALSE;
-
-
-    /* Polygon Stipple group */
+    /* Polygon Stipple group: all bits set means no stippling */
     memset(ctx->PolygonStipple, 0xff, 32*sizeof(GLuint));
 }
 

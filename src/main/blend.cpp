@@ -559,41 +559,16 @@ _mesa_ClampColorARB(GLenum target, GLenum clamp)
  * Initializes the related fields in the context color attribute group,
  * __GLcontextRec::Color.
  */
+/**
+ * C++17 note: gl_colorbuffer_attrib now carries default member initializers
+ * for all fields that have static GL defaults.  This function only needs to
+ * set DrawBuffer[0] which depends on the context's double-buffer mode.
+ */
 void _mesa_init_color(GLcontext * ctx)
 {
-    /* Color buffer group */
-    ctx->Color.IndexMask = ~0u;
-    ctx->Color.ColorMask[0] = 0xff;
-    ctx->Color.ColorMask[1] = 0xff;
-    ctx->Color.ColorMask[2] = 0xff;
-    ctx->Color.ColorMask[3] = 0xff;
-    ctx->Color.ClearIndex = 0;
-    ASSIGN_4V(ctx->Color.ClearColor, 0, 0, 0, 0);
-    ctx->Color.AlphaEnabled = GL_FALSE;
-    ctx->Color.AlphaFunc = GL_ALWAYS;
-    ctx->Color.AlphaRef = 0;
-    ctx->Color.BlendEnabled = GL_FALSE;
-    ctx->Color.BlendSrcRGB = GL_ONE;
-    ctx->Color.BlendDstRGB = GL_ZERO;
-    ctx->Color.BlendSrcA = GL_ONE;
-    ctx->Color.BlendDstA = GL_ZERO;
-    ctx->Color.BlendEquationRGB = GL_FUNC_ADD;
-    ctx->Color.BlendEquationA = GL_FUNC_ADD;
-    ASSIGN_4V(ctx->Color.BlendColor, 0.0, 0.0, 0.0, 0.0);
-    ctx->Color.IndexLogicOpEnabled = GL_FALSE;
-    ctx->Color.ColorLogicOpEnabled = GL_FALSE;
-    ctx->Color._LogicOpEnabled = GL_FALSE;
-    ctx->Color.LogicOp = GL_COPY;
-    ctx->Color.DitherFlag = GL_TRUE;
-
-    if (ctx->Visual.doubleBufferMode) {
-	ctx->Color.DrawBuffer[0] = GL_BACK;
-    } else {
-	ctx->Color.DrawBuffer[0] = GL_FRONT;
-    }
-
-    ctx->Color.ClampFragmentColor = GL_FIXED_ONLY_ARB;
-    ctx->Color.ClampReadColor = GL_FIXED_ONLY_ARB;
+    /* Most color-buffer fields are default-initialised by gl_colorbuffer_attrib.
+     * The only context-dependent field is DrawBuffer[0]. */
+    ctx->Color.DrawBuffer[0] = ctx->Visual.doubleBufferMode ? GL_BACK : GL_FRONT;
 }
 
 /*@}*/

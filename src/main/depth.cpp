@@ -152,37 +152,14 @@ _mesa_DepthBoundsEXT(GLclampd zmin, GLclampd zmax)
 
 /**
  * Initialize the depth buffer attribute group in the given context.
+ *
+ * C++17 note: gl_depthbuffer_attrib now carries its own default member
+ * initializers (Func=GL_LESS, Clear=1.0, Mask=GL_TRUE), so this function
+ * is a no-op and is retained only for API compatibility.
  */
 void _mesa_init_depth(GLcontext * ctx)
 {
-    /* Depth buffer group */
-    ctx->Depth.Test = GL_FALSE;
-    ctx->Depth.Clear = 1.0;
-    ctx->Depth.Func = GL_LESS;
-    ctx->Depth.Mask = GL_TRUE;
-
-    /* XXX this is now per-framebuffer state */
-#if 00
-    /* Z buffer stuff */
-    if (ctx->Visual.depthBits == 0) {
-	/* Special case.  Even if we don't have a depth buffer we need
-	 * good values for DepthMax for Z vertex transformation purposes
-	 * and for per-fragment fog computation.
-	 */
-	ctx->DepthMax = (1 << 16) - 1;
-	ctx->DepthMaxF = (GLfloat) ctx->DepthMax;
-    } else if (ctx->Visual.depthBits < 32) {
-	ctx->DepthMax = (1 << ctx->Visual.depthBits) - 1;
-	ctx->DepthMaxF = (GLfloat) ctx->DepthMax;
-    } else {
-	/* Special case since shift values greater than or equal to the
-	 * number of bits in the left hand expression's type are undefined.
-	 */
-	ctx->DepthMax = 0xffffffff;
-	ctx->DepthMaxF = (GLfloat) ctx->DepthMax;
-    }
-    ctx->MRD = 1.0;  /* Minimum resolvable depth value, for polygon offset */
-#endif
+    (void) ctx;  /* all defaults provided by gl_depthbuffer_attrib member initializers */
 }
 
 /*

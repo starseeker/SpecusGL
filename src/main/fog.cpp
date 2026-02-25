@@ -175,19 +175,15 @@ _mesa_Fogfv(GLenum pname, const GLfloat *params)
 /*****                      Initialization                        *****/
 /**********************************************************************/
 
+/**
+ * C++17 note: gl_fog_attrib now carries all default member initializers
+ * (Mode=GL_EXP, Density=1.0, End=1.0, _Scale=1.0,
+ * FogCoordinateSource=GL_FRAGMENT_DEPTH_EXT), so this function is a no-op
+ * and is retained only for API compatibility.
+ */
 void _mesa_init_fog(GLcontext * ctx)
 {
-    /* Fog group */
-    ctx->Fog.Enabled = GL_FALSE;
-    ctx->Fog.Mode = GL_EXP;
-    ASSIGN_4V(ctx->Fog.Color, 0.0, 0.0, 0.0, 0.0);
-    ctx->Fog.Index = 0.0;
-    ctx->Fog.Density = 1.0;
-    ctx->Fog.Start = 0.0;
-    ctx->Fog.End = 1.0;
-    ctx->Fog.ColorSumEnabled = GL_FALSE;
-    ctx->Fog.FogCoordinateSource = GL_FRAGMENT_DEPTH_EXT;
-    ctx->Fog._Scale = 1.0f;
+    (void) ctx;  /* all defaults provided by gl_fog_attrib member initializers */
 }
 
 /*
