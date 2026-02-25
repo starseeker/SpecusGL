@@ -36,6 +36,7 @@
 
 #include <mutex>
 #include <vector>
+#include <list>
 #include <string>
 #include <unordered_map>
 
@@ -478,7 +479,6 @@ struct gl_color_table {
  * Material shininess lookup table.
  */
 struct gl_shine_tab {
-    struct gl_shine_tab *next, *prev;
     GLfloat tab[SHINE_TABLE_SIZE+1];
     GLfloat shininess;
     GLuint refcount;
@@ -489,9 +489,6 @@ struct gl_shine_tab {
  * Light source state.
  */
 struct gl_light {
-    struct gl_light *next;	/**< double linked list with sentinel */
-    struct gl_light *prev;
-
     GLfloat Ambient[4];		/**< ambient color */
     GLfloat Diffuse[4];		/**< diffuse color */
     GLfloat Specular[4];		/**< specular color */
@@ -878,7 +875,7 @@ struct gl_light_attrib {
     GLboolean ColorMaterialEnabled;
     GLenum ClampVertexColor;
 
-    struct gl_light EnabledList;         /**< List sentinel */
+    std::vector<gl_light *> EnabledList; /**< Pointers to enabled lights */
 
     /**
      * Derived state for optimizations:
@@ -3068,8 +3065,8 @@ struct __GLcontextRec {
 
     GLuint TextureStateTimestamp; /* detect changes to shared state */
 
-    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables */
-    struct gl_shine_tab *_ShineTabList;  /**< MRU list of inactive shine tables */
+    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables (point into _ShineTabList) */
+    std::list<gl_shine_tab> _ShineTabList;  /**< MRU pool of shine tables */
     /**@}*/
 
     struct gl_list_extensions ListExt; /**< driver dlist extensions */

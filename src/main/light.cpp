@@ -29,7 +29,6 @@
 #include "enums.h"
 #include "light.h"
 #include "macros.h"
-#include "simple_list.h"
 #include "mtypes.h"
 #include "math/m_matrix.h"
 
@@ -606,7 +605,6 @@ _mesa_copy_materials(struct gl_material *dst,
 void
 _mesa_update_material(GLcontext *ctx, GLuint bitmask)
 {
-    struct gl_light *light, *list = &ctx->Light.EnabledList;
     GLfloat(*mat)[4] = ctx->Light.Material.Attrib;
 
     if (MESA_VERBOSE&VERBOSE_IMMEDIATE)
@@ -617,14 +615,14 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
 
     /* update material ambience */
     if (bitmask & MAT_BIT_FRONT_AMBIENT) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatAmbient[0], light->Ambient,
 		     mat[MAT_ATTRIB_FRONT_AMBIENT]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_AMBIENT) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatAmbient[1], light->Ambient,
 		     mat[MAT_ATTRIB_BACK_AMBIENT]);
 	}
@@ -645,14 +643,14 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
 
     /* update material diffuse values */
     if (bitmask & MAT_BIT_FRONT_DIFFUSE) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatDiffuse[0], light->Diffuse,
 		     mat[MAT_ATTRIB_FRONT_DIFFUSE]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_DIFFUSE) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatDiffuse[1], light->Diffuse,
 		     mat[MAT_ATTRIB_BACK_DIFFUSE]);
 	}
@@ -660,14 +658,14 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
 
     /* update material specular values */
     if (bitmask & MAT_BIT_FRONT_SPECULAR) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatSpecular[0], light->Specular,
 		     mat[MAT_ATTRIB_FRONT_SPECULAR]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_SPECULAR) {
-	foreach (light, list) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    SCALE_3V(light->_MatSpecular[1], light->Specular,
 		     mat[MAT_ATTRIB_BACK_SPECULAR]);
 	}
@@ -941,24 +939,29 @@ _mesa_invalidate_shine_table(GLcontext *ctx, GLuint side)
 static void
 validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 {
-    struct gl_shine_tab *list = ctx->_ShineTabList;
-    struct gl_shine_tab *s;
-
     ASSERT(side < 2);
 
-    foreach (s, list)
-	if (s->shininess == shininess)
+    /* Search the MRU pool for an existing entry with matching shininess */
+    gl_shine_tab *s = nullptr;
+    for (auto& entry : ctx->_ShineTabList) {
+	if (entry.shininess == shininess) {
+	    s = &entry;
 	    break;
+	}
+    }
 
-    if (s == list) {
-	GLint j;
-	GLfloat *m;
-
-	foreach (s, list)
-	    if (s->refcount == 0)
+    if (!s) {
+	/* Not found – reuse the least-recently-used (= front) entry
+	 * that has no current references. */
+	for (auto& entry : ctx->_ShineTabList) {
+	    if (entry.refcount == 0) {
+		s = &entry;
 		break;
+	    }
+	}
 
-	m = s->tab;
+	GLint j;
+	GLfloat *m = s->tab;
 	m[0] = 0.0;
 	if (shininess == 0.0) {
 	    for (j = 1 ; j <= SHINE_TABLE_SIZE ; j++)
@@ -984,7 +987,12 @@ validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 	ctx->_ShineTable[side]->refcount--;
 
     ctx->_ShineTable[side] = s;
-    move_to_tail(list, s);
+    /* Move s to tail of the MRU list using splice */
+    auto it = ctx->_ShineTabList.begin();
+    for (; it != ctx->_ShineTabList.end(); ++it) {
+	if (&*it == s) break;
+    }
+    ctx->_ShineTabList.splice(ctx->_ShineTabList.end(), ctx->_ShineTabList, it);
     s->refcount++;
 }
 
@@ -1018,14 +1026,13 @@ _mesa_validate_all_lighting_tables(GLcontext *ctx)
 void
 _mesa_update_lighting(GLcontext *ctx)
 {
-    struct gl_light *light;
     ctx->Light._NeedEyeCoords = GL_FALSE;
     ctx->Light._Flags = 0;
 
     if (!ctx->Light.Enabled)
 	return;
 
-    foreach (light, &ctx->Light.EnabledList) {
+    for (auto *light : ctx->Light.EnabledList) {
 	ctx->Light._Flags |= light->_Flags;
     }
 
@@ -1068,7 +1075,7 @@ _mesa_update_lighting(GLcontext *ctx)
 				  MAT_BIT_FRONT_SPECULAR);
     } else {
 	static const GLfloat ci[3] = { .30F, .59F, .11F };
-	foreach (light, &ctx->Light.EnabledList) {
+	for (auto *light : ctx->Light.EnabledList) {
 	    light->_dli = DOT3(ci, light->Diffuse);
 	    light->_sli = DOT3(ci, light->Specular);
 	}
@@ -1089,7 +1096,6 @@ _mesa_update_lighting(GLcontext *ctx)
 static void
 compute_light_positions(GLcontext *ctx)
 {
-    struct gl_light *light;
     static const GLfloat eye_z[3] = { 0, 0, 1 };
 
     if (!ctx->Light.Enabled)
@@ -1101,7 +1107,7 @@ compute_light_positions(GLcontext *ctx)
 	TRANSFORM_NORMAL(ctx->_EyeZDir, eye_z, ctx->ModelviewMatrixStack.Top->m);
     }
 
-    foreach (light, &ctx->Light.EnabledList) {
+    for (auto *light : ctx->Light.EnabledList) {
 
 	if (ctx->_NeedEyeCoords) {
 	    /* _Position is in eye coordinate space */
@@ -1254,8 +1260,6 @@ _mesa_allow_light_in_model(GLcontext *ctx, GLboolean flag)
 static void
 init_light(struct gl_light *l, GLuint n)
 {
-    make_empty_list(l);
-
     ASSIGN_4V(l->Ambient, 0.0, 0.0, 0.0, 1.0);
     if (n==0) {
 	ASSIGN_4V(l->Diffuse, 1.0, 1.0, 1.0, 1.0);
@@ -1329,7 +1333,7 @@ _mesa_init_lighting(GLcontext *ctx)
     for (i = 0; i < MAX_LIGHTS; i++) {
 	init_light(&ctx->Light.Light[i], i);
     }
-    make_empty_list(&ctx->Light.EnabledList);
+    ctx->Light.EnabledList.clear();
 
     init_lightmodel(&ctx->Light.Model);
     init_material(&ctx->Light.Material);
@@ -1346,14 +1350,14 @@ _mesa_init_lighting(GLcontext *ctx)
     ctx->Light.ClampVertexColor = GL_TRUE;
 
     /* Lighting miscellaneous */
-    ctx->_ShineTabList = new gl_shine_tab{};
-    make_empty_list(ctx->_ShineTabList);
+    ctx->_ShineTabList.clear();
+    ctx->_ShineTable[0] = nullptr;
+    ctx->_ShineTable[1] = nullptr;
     /* Allocate 10 (arbitrary) shininess lookup tables */
     for (i = 0 ; i < 10 ; i++) {
-	auto *s = new gl_shine_tab{};
-	s->shininess = -1;
-	s->refcount = 0;
-	insert_at_tail(ctx->_ShineTabList, s);
+	ctx->_ShineTabList.push_back({});
+	ctx->_ShineTabList.back().shininess = -1;
+	ctx->_ShineTabList.back().refcount = 0;
     }
 
     /* Miscellaneous */
@@ -1369,13 +1373,8 @@ _mesa_init_lighting(GLcontext *ctx)
 void
 _mesa_free_lighting_data(GLcontext *ctx)
 {
-    struct gl_shine_tab *s, *tmps;
-
-    /* Free lighting shininess exponentiation table */
-    foreach_s(s, tmps, ctx->_ShineTabList) {
-	delete s;
-    }
-    delete ctx->_ShineTabList;
+    /* _ShineTabList is a std::list and cleans itself up automatically */
+    ctx->_ShineTabList.clear();
 }
 
 /*

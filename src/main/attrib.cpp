@@ -43,12 +43,13 @@
 #include "matrix.h"
 #include "points.h"
 #include "polygon.h"
-#include "simple_list.h"
 #include "stencil.h"
 #include "texobj.h"
 #include "texstate.h"
 #include "mtypes.h"
 #include "math/m_xform.h"
+
+#include <algorithm>
 
 
 /**
@@ -109,14 +110,14 @@ _mesa_PushAttrib(GLbitfield mask)
     if (mask & GL_ACCUM_BUFFER_BIT) {
 	struct gl_accum_attrib *attr;
 	attr = new gl_accum_attrib{};
-	memcpy(attr, &ctx->Accum, sizeof(struct gl_accum_attrib));
+	*attr = ctx->Accum;
 	ctx->AttribStack.back().emplace_back(GL_ACCUM_BUFFER_BIT, attr);
     }
 
     if (mask & GL_COLOR_BUFFER_BIT) {
 	struct gl_colorbuffer_attrib *attr;
 	attr = new gl_colorbuffer_attrib{};
-	memcpy(attr, &ctx->Color, sizeof(struct gl_colorbuffer_attrib));
+	*attr = ctx->Color;
 	ctx->AttribStack.back().emplace_back(GL_COLOR_BUFFER_BIT, attr);
     }
 
@@ -124,14 +125,14 @@ _mesa_PushAttrib(GLbitfield mask)
 	struct gl_current_attrib *attr;
 	FLUSH_CURRENT(ctx, 0);
 	attr = new gl_current_attrib{};
-	memcpy(attr, &ctx->Current, sizeof(struct gl_current_attrib));
+	*attr = ctx->Current;
 	ctx->AttribStack.back().emplace_back(GL_CURRENT_BIT, attr);
     }
 
     if (mask & GL_DEPTH_BUFFER_BIT) {
 	struct gl_depthbuffer_attrib *attr;
 	attr = new gl_depthbuffer_attrib{};
-	memcpy(attr, &ctx->Depth, sizeof(struct gl_depthbuffer_attrib));
+	*attr = ctx->Depth;
 	ctx->AttribStack.back().emplace_back(GL_DEPTH_BUFFER_BIT, attr);
     }
 
@@ -174,7 +175,7 @@ _mesa_PushAttrib(GLbitfield mask)
 	attr->Map1TextureCoord4 = ctx->Eval.Map1TextureCoord4;
 	attr->Map1Vertex3 = ctx->Eval.Map1Vertex3;
 	attr->Map1Vertex4 = ctx->Eval.Map1Vertex4;
-	memcpy(attr->Map1Attrib, ctx->Eval.Map1Attrib, sizeof(ctx->Eval.Map1Attrib));
+	std::copy(std::begin(ctx->Eval.Map1Attrib), std::end(ctx->Eval.Map1Attrib), std::begin(attr->Map1Attrib));
 	attr->Map2Color4 = ctx->Eval.Map2Color4;
 	attr->Map2Index = ctx->Eval.Map2Index;
 	attr->Map2Normal = ctx->Eval.Map2Normal;
@@ -184,7 +185,7 @@ _mesa_PushAttrib(GLbitfield mask)
 	attr->Map2TextureCoord4 = ctx->Eval.Map2TextureCoord4;
 	attr->Map2Vertex3 = ctx->Eval.Map2Vertex3;
 	attr->Map2Vertex4 = ctx->Eval.Map2Vertex4;
-	memcpy(attr->Map2Attrib, ctx->Eval.Map2Attrib, sizeof(ctx->Eval.Map2Attrib));
+	std::copy(std::begin(ctx->Eval.Map2Attrib), std::end(ctx->Eval.Map2Attrib), std::begin(attr->Map2Attrib));
 	attr->Normalize = ctx->Transform.Normalize;
 	attr->RasterPositionUnclipped = ctx->Transform.RasterPositionUnclipped;
 	attr->PointSmooth = ctx->Point.SmoothFlag;
@@ -218,21 +219,21 @@ _mesa_PushAttrib(GLbitfield mask)
     if (mask & GL_EVAL_BIT) {
 	struct gl_eval_attrib *attr;
 	attr = new gl_eval_attrib{};
-	memcpy(attr, &ctx->Eval, sizeof(struct gl_eval_attrib));
+	*attr = ctx->Eval;
 	ctx->AttribStack.back().emplace_back(GL_EVAL_BIT, attr);
     }
 
     if (mask & GL_FOG_BIT) {
 	struct gl_fog_attrib *attr;
 	attr = new gl_fog_attrib{};
-	memcpy(attr, &ctx->Fog, sizeof(struct gl_fog_attrib));
+	*attr = ctx->Fog;
 	ctx->AttribStack.back().emplace_back(GL_FOG_BIT, attr);
     }
 
     if (mask & GL_HINT_BIT) {
 	struct gl_hint_attrib *attr;
 	attr = new gl_hint_attrib{};
-	memcpy(attr, &ctx->Hint, sizeof(struct gl_hint_attrib));
+	*attr = ctx->Hint;
 	ctx->AttribStack.back().emplace_back(GL_HINT_BIT, attr);
     }
 
@@ -240,28 +241,28 @@ _mesa_PushAttrib(GLbitfield mask)
 	struct gl_light_attrib *attr;
 	FLUSH_CURRENT(ctx, 0);	/* flush material changes */
 	attr = new gl_light_attrib{};
-	memcpy(attr, &ctx->Light, sizeof(struct gl_light_attrib));
+	*attr = ctx->Light;
 	ctx->AttribStack.back().emplace_back(GL_LIGHTING_BIT, attr);
     }
 
     if (mask & GL_LINE_BIT) {
 	struct gl_line_attrib *attr;
 	attr = new gl_line_attrib{};
-	memcpy(attr, &ctx->Line, sizeof(struct gl_line_attrib));
+	*attr = ctx->Line;
 	ctx->AttribStack.back().emplace_back(GL_LINE_BIT, attr);
     }
 
     if (mask & GL_LIST_BIT) {
 	struct gl_list_attrib *attr;
 	attr = new gl_list_attrib{};
-	memcpy(attr, &ctx->List, sizeof(struct gl_list_attrib));
+	*attr = ctx->List;
 	ctx->AttribStack.back().emplace_back(GL_LIST_BIT, attr);
     }
 
     if (mask & GL_PIXEL_MODE_BIT) {
 	struct gl_pixel_attrib *attr;
 	attr = new gl_pixel_attrib{};
-	memcpy(attr, &ctx->Pixel, sizeof(struct gl_pixel_attrib));
+	*attr = ctx->Pixel;
 	/* push the Read FBO's ReadBuffer state, not ctx->Pixel.ReadBuffer */
 	attr->ReadBuffer = ctx->ReadBuffer->ColorReadBuffer;
 	ctx->AttribStack.back().emplace_back(GL_PIXEL_MODE_BIT, attr);
@@ -270,34 +271,34 @@ _mesa_PushAttrib(GLbitfield mask)
     if (mask & GL_POINT_BIT) {
 	struct gl_point_attrib *attr;
 	attr = new gl_point_attrib{};
-	memcpy(attr, &ctx->Point, sizeof(struct gl_point_attrib));
+	*attr = ctx->Point;
 	ctx->AttribStack.back().emplace_back(GL_POINT_BIT, attr);
     }
 
     if (mask & GL_POLYGON_BIT) {
 	struct gl_polygon_attrib *attr;
 	attr = new gl_polygon_attrib{};
-	memcpy(attr, &ctx->Polygon, sizeof(struct gl_polygon_attrib));
+	*attr = ctx->Polygon;
 	ctx->AttribStack.back().emplace_back(GL_POLYGON_BIT, attr);
     }
 
     if (mask & GL_POLYGON_STIPPLE_BIT) {
 	GLuint *stipple = new GLuint[32];
-	memcpy(stipple, ctx->PolygonStipple, 32*sizeof(GLuint));
+	std::copy(ctx->PolygonStipple, ctx->PolygonStipple + 32, stipple);
 	ctx->AttribStack.back().emplace_back(GL_POLYGON_STIPPLE_BIT, stipple);
     }
 
     if (mask & GL_SCISSOR_BIT) {
 	struct gl_scissor_attrib *attr;
 	attr = new gl_scissor_attrib{};
-	memcpy(attr, &ctx->Scissor, sizeof(struct gl_scissor_attrib));
+	*attr = ctx->Scissor;
 	ctx->AttribStack.back().emplace_back(GL_SCISSOR_BIT, attr);
     }
 
     if (mask & GL_STENCIL_BUFFER_BIT) {
 	struct gl_stencil_attrib *attr;
 	attr = new gl_stencil_attrib{};
-	memcpy(attr, &ctx->Stencil, sizeof(struct gl_stencil_attrib));
+	*attr = ctx->Stencil;
 	ctx->AttribStack.back().emplace_back(GL_STENCIL_BUFFER_BIT, attr);
     }
 
@@ -308,7 +309,7 @@ _mesa_PushAttrib(GLbitfield mask)
 	_mesa_lock_context_textures(ctx);
 
 	/* copy/save the bulk of texture state here */
-	memcpy(&texstate->Texture, &ctx->Texture, sizeof(ctx->Texture));
+	texstate->Texture = ctx->Texture;
 
 	/* Save references to the currently bound texture objects so they don't
 	 * accidentally get deleted while referenced in the attribute stack.
@@ -343,14 +344,14 @@ _mesa_PushAttrib(GLbitfield mask)
     if (mask & GL_TRANSFORM_BIT) {
 	struct gl_transform_attrib *attr;
 	attr = new gl_transform_attrib{};
-	memcpy(attr, &ctx->Transform, sizeof(struct gl_transform_attrib));
+	*attr = ctx->Transform;
 	ctx->AttribStack.back().emplace_back(GL_TRANSFORM_BIT, attr);
     }
 
     if (mask & GL_VIEWPORT_BIT) {
 	struct gl_viewport_attrib *attr;
 	attr = new gl_viewport_attrib{};
-	memcpy(attr, &ctx->Viewport, sizeof(struct gl_viewport_attrib));
+	*attr = ctx->Viewport;
 	ctx->AttribStack.back().emplace_back(GL_VIEWPORT_BIT, attr);
     }
 
@@ -358,7 +359,7 @@ _mesa_PushAttrib(GLbitfield mask)
     if (mask & GL_MULTISAMPLE_BIT_ARB) {
 	struct gl_multisample_attrib *attr;
 	attr = new gl_multisample_attrib{};
-	memcpy(attr, &ctx->Multisample, sizeof(struct gl_multisample_attrib));
+	*attr = ctx->Multisample;
 	ctx->AttribStack.back().emplace_back(GL_MULTISAMPLE_BIT_ARB, attr);
     }
 
@@ -873,8 +874,7 @@ _mesa_PopAttrib(void)
 	    break;
 	    case GL_CURRENT_BIT:
 		FLUSH_CURRENT(ctx, 0);
-		memcpy(&ctx->Current, data,
-		       sizeof(struct gl_current_attrib));
+		ctx->Current = *static_cast<const struct gl_current_attrib *>(data);
 		break;
 	    case GL_DEPTH_BUFFER_BIT: {
 		const struct gl_depthbuffer_attrib *depth;
@@ -893,7 +893,7 @@ _mesa_PopAttrib(void)
 	    }
 	    break;
 	    case GL_EVAL_BIT:
-		memcpy(&ctx->Eval, data, sizeof(struct gl_eval_attrib));
+		ctx->Eval = *static_cast<const struct gl_eval_attrib *>(data);
 		ctx->NewState |= _NEW_EVAL;
 		break;
 	    case GL_FOG_BIT: {
@@ -971,8 +971,7 @@ _mesa_PopAttrib(void)
 		_mesa_set_enable(ctx, GL_COLOR_MATERIAL,
 				 light->ColorMaterialEnabled);
 		/* materials */
-		memcpy(&ctx->Light.Material, &light->Material,
-		       sizeof(struct gl_material));
+		ctx->Light.Material = light->Material;
 	    }
 	    break;
 	    case GL_LINE_BIT: {
@@ -985,10 +984,10 @@ _mesa_PopAttrib(void)
 	    }
 	    break;
 	    case GL_LIST_BIT:
-		memcpy(&ctx->List, data, sizeof(struct gl_list_attrib));
+		ctx->List = *static_cast<const struct gl_list_attrib *>(data);
 		break;
 	    case GL_PIXEL_MODE_BIT:
-		memcpy(&ctx->Pixel, data, sizeof(struct gl_pixel_attrib));
+		ctx->Pixel = *static_cast<const struct gl_pixel_attrib *>(data);
 		/* XXX what other pixel state needs to be set by function calls? */
 		_mesa_ReadBuffer(ctx->Pixel.ReadBuffer);
 		ctx->NewState |= _NEW_PIXEL;
@@ -1045,7 +1044,7 @@ _mesa_PopAttrib(void)
 	    }
 	    break;
 	    case GL_POLYGON_STIPPLE_BIT:
-		memcpy(ctx->PolygonStipple, data, 32*sizeof(GLuint));
+		std::copy(static_cast<const GLuint *>(data), static_cast<const GLuint *>(data) + 32, ctx->PolygonStipple);
 		ctx->NewState |= _NEW_POLYGONSTIPPLE;
 		if (ctx->Driver.PolygonStipple)
 		    ctx->Driver.PolygonStipple(ctx, (const GLubyte *) data);
@@ -1205,11 +1204,11 @@ _mesa_PushClientAttrib(GLbitfield mask)
 #endif
 	/* packing attribs */
 	attr = new gl_pixelstore_attrib{};
-	memcpy(attr, &ctx->Pack, sizeof(struct gl_pixelstore_attrib));
+	*attr = ctx->Pack;
 	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_PACK_BIT, attr);
 	/* unpacking attribs */
 	attr = new gl_pixelstore_attrib{};
-	memcpy(attr, &ctx->Unpack, sizeof(struct gl_pixelstore_attrib));
+	*attr = ctx->Unpack;
 	ctx->ClientAttribStack.back().emplace_back(GL_CLIENT_UNPACK_BIT, attr);
     }
     if (mask & GL_CLIENT_VERTEX_ARRAY_BIT) {
@@ -1225,8 +1224,8 @@ _mesa_PushClientAttrib(GLbitfield mask)
 	ctx->Array.ElementArrayBufferObj->RefCount++;
 #endif
 
-	memcpy(attr, &ctx->Array, sizeof(struct gl_array_attrib));
-	memcpy(obj, ctx->Array.ArrayObj, sizeof(struct gl_array_object));
+	*attr = ctx->Array;
+	*obj = *ctx->Array.ArrayObj;
 
 	attr->ArrayObj = obj;
 
@@ -1261,8 +1260,7 @@ _mesa_PopClientAttrib(void)
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Pack.BufferObj);
 		}
 #endif
-		memcpy(&ctx->Pack, data,
-		       sizeof(struct gl_pixelstore_attrib));
+		ctx->Pack = *static_cast<const struct gl_pixelstore_attrib *>(data);
 		ctx->NewState |= _NEW_PACKUNPACK;
 		break;
 	    case GL_CLIENT_UNPACK_BIT:
@@ -1273,8 +1271,7 @@ _mesa_PopClientAttrib(void)
 		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Unpack.BufferObj);
 		}
 #endif
-		memcpy(&ctx->Unpack, data,
-		       sizeof(struct gl_pixelstore_attrib));
+		ctx->Unpack = *static_cast<const struct gl_pixelstore_attrib *>(data);
 		ctx->NewState |= _NEW_PACKUNPACK;
 		break;
 	    case GL_CLIENT_VERTEX_ARRAY_BIT: {
@@ -1296,8 +1293,7 @@ _mesa_PopClientAttrib(void)
 				    array_data->ElementArrayBufferObj->Name);
 #endif
 
-		memcpy(ctx->Array.ArrayObj, array_data->ArrayObj,
-		       sizeof(struct gl_array_object));
+		*ctx->Array.ArrayObj = *array_data->ArrayObj;
 
 		delete array_data->ArrayObj;
 

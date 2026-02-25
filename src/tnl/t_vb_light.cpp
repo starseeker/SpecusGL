@@ -29,7 +29,6 @@
 #include "light.h"
 #include "macros.h"
 #include "imports.h"
-#include "simple_list.h"
 #include "mtypes.h"
 
 #include "math/m_translate.h"
@@ -271,7 +270,7 @@ static void validate_lighting(GLcontext *ctx,
 	    else
 		tab = _tnl_light_tab;
 	} else {
-	    if (ctx->Light.EnabledList.next == ctx->Light.EnabledList.prev)
+	    if (ctx->Light.EnabledList.size() == 1)
 		tab = _tnl_light_fast_single_tab;
 	    else
 		tab = _tnl_light_fast_tab;

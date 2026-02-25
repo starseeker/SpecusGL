@@ -33,11 +33,12 @@
 #include "enable.h"
 #include "light.h"
 #include "macros.h"
-#include "simple_list.h"
 #include "mtypes.h"
 #include "enums.h"
 #include "math/m_matrix.h"
 #include "math/m_xform.h"
+
+#include <algorithm>
 
 
 
@@ -352,10 +353,11 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
 	    ctx->Light.Light[cap-GL_LIGHT0].Enabled = state;
 	    if (state) {
-		insert_at_tail(&ctx->Light.EnabledList,
-			       &ctx->Light.Light[cap-GL_LIGHT0]);
+		ctx->Light.EnabledList.push_back(&ctx->Light.Light[cap-GL_LIGHT0]);
 	    } else {
-		remove_from_list(&ctx->Light.Light[cap-GL_LIGHT0]);
+		auto& el = ctx->Light.EnabledList;
+		el.erase(std::find(el.begin(), el.end(),
+				   &ctx->Light.Light[cap-GL_LIGHT0]));
 	    }
 	    break;
 	case GL_LIGHTING:
