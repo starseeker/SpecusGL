@@ -2379,6 +2379,24 @@ struct gl_renderbuffer {
     virtual void PutMonoValues(GLcontext *ctx, GLuint count,
 			       const GLint x[], const GLint y[],
 			       const void *value, const GLubyte *mask) = 0;
+
+    /**
+     * Increment the reference count (thread-safe).
+     */
+    void ref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        ++RefCount;
+    }
+
+    /**
+     * Decrement the reference count (thread-safe) and return true if this
+     * renderbuffer should now be deleted (RefCount reached zero).
+     */
+    [[nodiscard]] bool unref() {
+        std::lock_guard<std::mutex> lock(Mutex);
+        assert(RefCount > 0);
+        return --RefCount == 0;
+    }
 };
 
 
