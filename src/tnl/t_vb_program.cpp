@@ -56,17 +56,13 @@ struct vp_stage_data {
     /** The results of running the vertex program go into these arrays. */
     GLvector4f results[VERT_RESULT_MAX];
 
-    GLvector4f ndcCoords;              /**< normalized device coords */
-    GLubyte *clipmask  = nullptr;      /**< clip flags */
-    GLubyte ormask     = 0;
-    GLubyte andmask    = 0;
+    GLvector4f ndcCoords;                        /**< normalized device coords */
+    aligned_array_ptr<GLubyte> clipmask;         /**< clip flags (RAII) */
+    GLubyte ormask  = 0;
+    GLubyte andmask = 0;
 
-    ~vp_stage_data()
-    {
-	/* results[] and ndcCoords freed automatically by GLvector4f destructors */
-	ALIGN_FREE(clipmask);
-	clipmask = nullptr;
-    }
+    /* results[], ndcCoords freed by GLvector4f destructors;
+     * clipmask freed by aligned_array_ptr destructor. */
 };
 
 
@@ -134,14 +130,14 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 	VB->NdcPtr =
 	    _mesa_clip_tab[VB->ClipPtr->size](VB->ClipPtr,
 					      &store->ndcCoords,
-					      store->clipmask,
+					      store->clipmask.get(),
 					      &store->ormask,
 					      &store->andmask);
     } else {
 	VB->NdcPtr = nullptr;
 	_mesa_clip_np_tab[VB->ClipPtr->size](VB->ClipPtr,
 					     nullptr,
-					     store->clipmask,
+					     store->clipmask.get(),
 					     &store->ormask,
 					     &store->andmask);
     }
@@ -158,7 +154,7 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 	    ctx->VertexProgram.Current->IsPositionInvariant)) {
 	userclip(ctx,
 		 VB->ClipPtr,
-		 store->clipmask,
+		 store->clipmask.get(),
 		 &store->ormask,
 		 &store->andmask);
 
@@ -169,7 +165,7 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 
     VB->ClipAndMask = store->andmask;
     VB->ClipOrMask = store->ormask;
-    VB->ClipMask = store->clipmask;
+    VB->ClipMask = store->clipmask.get();
 
     return GL_TRUE;
 }
@@ -490,7 +486,7 @@ init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 
     /* a few other misc allocations */
     _mesa_vector4f_alloc(&store->ndcCoords, 0, size, 32);
-    store->clipmask = (GLubyte *) ALIGN_MALLOC(sizeof(GLubyte)*size, 32);
+    store->clipmask = make_aligned_array<GLubyte>(size, 32);
 
     return GL_TRUE;
 }

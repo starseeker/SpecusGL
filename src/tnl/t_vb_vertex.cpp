@@ -44,16 +44,13 @@ struct vertex_stage_data {
     GLvector4f eye;
     GLvector4f clip;
     GLvector4f proj;
-    GLubyte *clipmask = nullptr;
-    GLubyte ormask    = 0;
-    GLubyte andmask   = 0;
+    /** Aligned clip-mask buffer (freed automatically by aligned_array_ptr). */
+    aligned_array_ptr<GLubyte> clipmask;
+    GLubyte ormask  = 0;
+    GLubyte andmask = 0;
 
-    ~vertex_stage_data()
-    {
-	/* eye, clip, proj freed automatically by GLvector4f destructors */
-	ALIGN_FREE(clipmask);
-	clipmask = nullptr;
-    }
+    /* eye, clip, proj freed by GLvector4f destructors;
+     * clipmask freed by aligned_array_ptr destructor. */
 };
 
 #define VERTEX_STAGE_DATA(stage) ((struct vertex_stage_data *)stage->privatePtr)
@@ -177,14 +174,14 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
 	VB->NdcPtr =
 	    _mesa_clip_tab[VB->ClipPtr->size](VB->ClipPtr,
 					      &store->proj,
-					      store->clipmask,
+					      store->clipmask.get(),
 					      &store->ormask,
 					      &store->andmask);
     } else {
 	VB->NdcPtr = nullptr;
 	_mesa_clip_np_tab[VB->ClipPtr->size](VB->ClipPtr,
 					     nullptr,
-					     store->clipmask,
+					     store->clipmask.get(),
 					     &store->ormask,
 					     &store->andmask);
     }
@@ -199,7 +196,7 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
     if (ctx->Transform.ClipPlanesEnabled) {
 	usercliptab[VB->ClipPtr->size](ctx,
 				       VB->ClipPtr,
-				       store->clipmask,
+				       store->clipmask.get(),
 				       &store->ormask,
 				       &store->andmask);
 
@@ -209,7 +206,7 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
 
     VB->ClipAndMask = store->andmask;
     VB->ClipOrMask = store->ormask;
-    VB->ClipMask = store->clipmask;
+    VB->ClipMask = store->clipmask.get();
 
     return GL_TRUE;
 }
@@ -231,7 +228,7 @@ static GLboolean init_vertex_stage(GLcontext *ctx,
     _mesa_vector4f_alloc(&store->clip, 0, size, 32);
     _mesa_vector4f_alloc(&store->proj, 0, size, 32);
 
-    store->clipmask = (GLubyte *) ALIGN_MALLOC(sizeof(GLubyte)*size, 32);
+    store->clipmask = make_aligned_array<GLubyte>(size, 32);
 
     if (!store->clipmask ||
 	!store->eye.data ||
