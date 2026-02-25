@@ -79,7 +79,7 @@ struct osmesa_context {
 };
 
 
-static INLINE OSMesaContext
+static inline OSMesaContext
 OSMESA_CONTEXT(GLcontext *ctx)
 {
     /* Just cast, since we're using structure containment */

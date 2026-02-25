@@ -44,20 +44,17 @@
 static GLubyte *get_space(GLcontext *ctx, GLuint bytes)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    GLubyte *space = new GLubyte[bytes];
-
-    tnl->block[tnl->nr_blocks++] = space;
-    return space;
+    auto space = std::make_unique<GLubyte[]>(bytes);
+    GLubyte *raw = space.get();
+    tnl->blocks.push_back(std::move(space));
+    return raw;
 }
 
 
 static void free_space(GLcontext *ctx)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
-    GLuint i;
-    for (i = 0; i < tnl->nr_blocks; i++)
-	delete[] tnl->block[i];
-    tnl->nr_blocks = 0;
+    tnl->blocks.clear();  /* unique_ptr destructors free each block */
 }
 
 

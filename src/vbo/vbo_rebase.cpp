@@ -52,6 +52,7 @@
 
 #include "vbo.h"
 
+#include <vector>
 
 #define REBASE(TYPE) 						\
 static void *rebase_##TYPE( const void *ptr,			\
@@ -105,7 +106,7 @@ void vbo_rebase_prims(GLcontext *ctx,
     const struct gl_client_array *tmp_array_pointers[VERT_ATTRIB_MAX];
 
     struct _mesa_index_buffer tmp_ib;
-    struct _mesa_prim *tmp_prims = nullptr;
+    std::vector<struct _mesa_prim> tmp_prims_vec;
     void *tmp_indices = nullptr;
     GLuint i;
 
@@ -158,18 +159,18 @@ void vbo_rebase_prims(GLcontext *ctx,
     } else {
 	/* Otherwise the primitives need adjustment.
 	 */
-	tmp_prims = new struct _mesa_prim[nr_prims];
+	tmp_prims_vec.resize(nr_prims);
 
 	for (i = 0; i < nr_prims; i++) {
 	    /* If this fails, it could indicate an application error:
 	     */
 	    assert(prim[i].start >= min_index);
 
-	    tmp_prims[i] = prim[i];
-	    tmp_prims[i].start -= min_index;
+	    tmp_prims_vec[i] = prim[i];
+	    tmp_prims_vec[i].start -= min_index;
 	}
 
-	prim = tmp_prims;
+	prim = tmp_prims_vec.data();
     }
 
     /* Just need to adjust the pointer values on each incoming array.
@@ -198,10 +199,8 @@ void vbo_rebase_prims(GLcontext *ctx,
 	 0,
 	 max_index - min_index);
 
+    /* tmp_prims_vec freed automatically; tmp_indices is a legacy void* allocation. */
     delete[] static_cast<GLubyte*>(tmp_indices);
-
-    if (tmp_prims)
-	delete[] tmp_prims;
 }
 
 

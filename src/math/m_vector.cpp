@@ -71,70 +71,98 @@ static const GLubyte size_bits[5] = {
 
 
 
-/*
- * Initialize GLvector objects.
- * Input: v - the vector object to initialize.
- *        flags - bitwise-OR of VEC_* flags
- *        storage - pointer to storage for the vector's data
+/* ------------------------------------------------------------------ */
+/* GLvector4f member method implementations                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Destructor – releases self-allocated storage if VEC_MALLOC is set.
  */
-
-
-void _mesa_vector4f_init(GLvector4f *v, GLuint flags, GLfloat(*storage)[4])
+GLvector4f::~GLvector4f()
 {
-    v->stride = 4 * sizeof(GLfloat);
-    v->size = 2;   /* may change: 2-4 for vertices and 1-4 for texcoords */
-    v->data = storage;
-    v->start = (GLfloat *) storage;
-    v->count = 0;
-    v->flags = size_bits[4] | flags ;
+    if (flags & VEC_MALLOC) {
+	std::free(storage);
+	data    = nullptr;
+	start   = nullptr;
+	storage = nullptr;
+	flags  &= ~VEC_MALLOC;
+    }
 }
 
-
-
-
-/*
- * Initialize GLvector objects and allocate storage.
- * Input: v - the vector object
- *        sz - unused????
- *        flags - bitwise-OR of VEC_* flags
- *        count - number of elements to allocate in vector
- *        alignment - desired memory alignment for the data (in bytes)
+/**
+ * Move constructor – transfers ownership and resets the source.
  */
-
-
-void _mesa_vector4f_alloc(GLvector4f *v, GLuint flags, GLuint count,
-			  GLuint alignment)
+GLvector4f::GLvector4f(GLvector4f &&o) noexcept
+    : data(o.data), start(o.start), count(o.count),
+      stride(o.stride), size(o.size), flags(o.flags), storage(o.storage)
 {
-    const size_t sz = count * 4 * sizeof(GLfloat);
-    /* std::aligned_alloc requires size to be a multiple of alignment */
+    o.data = nullptr; o.start = nullptr; o.storage = nullptr;
+    o.count = 0; o.stride = 0; o.size = 0; o.flags = 0;
+}
+
+/**
+ * Move assignment – transfers ownership and resets the source.
+ */
+GLvector4f &GLvector4f::operator=(GLvector4f &&o) noexcept
+{
+    if (this != &o) {
+	/* Release existing storage first. */
+	if (flags & VEC_MALLOC)
+	    std::free(storage);
+	data = o.data; start = o.start; count = o.count;
+	stride = o.stride; size = o.size; flags = o.flags; storage = o.storage;
+	o.data = nullptr; o.start = nullptr; o.storage = nullptr;
+	o.count = 0; o.stride = 0; o.size = 0; o.flags = 0;
+    }
+    return *this;
+}
+
+/**
+ * Initialise this vector to point at externally-owned storage.
+ * No allocation is performed; VEC_MALLOC is NOT set.
+ */
+void GLvector4f::init(GLuint flags_in, GLfloat (*ext_storage)[4])
+{
+    stride  = 4 * sizeof(GLfloat);
+    size    = 2;   /* may change: 2-4 for vertices and 1-4 for texcoords */
+    data    = ext_storage;
+    start   = reinterpret_cast<GLfloat *>(ext_storage);
+    count   = 0;
+    flags   = size_bits[4] | flags_in;
+    storage = nullptr;
+}
+
+/**
+ * Allocate aligned self-owned storage for \p count_in elements.
+ * Sets the VEC_MALLOC flag; the destructor will release this memory.
+ */
+void GLvector4f::alloc(GLuint flags_in, GLuint count_in, GLuint alignment)
+{
+    const size_t sz = count_in * 4 * sizeof(GLfloat);
+    /* std::aligned_alloc requires size to be a multiple of alignment. */
     const size_t aligned_sz = (sz + alignment - 1) & ~(size_t)(alignment - 1);
-    v->stride = 4 * sizeof(GLfloat);
-    v->size = 2;
-    v->storage = std::aligned_alloc(alignment, aligned_sz);
-    v->start = (GLfloat *) v->storage;
-    v->data = (GLfloat(*)[4]) v->storage;
-    v->count = 0;
-    v->flags = size_bits[4] | flags | VEC_MALLOC ;
+    stride  = 4 * sizeof(GLfloat);
+    size    = 2;
+    storage = std::aligned_alloc(alignment, aligned_sz);
+    start   = static_cast<GLfloat *>(storage);
+    data    = static_cast<GLfloat (*)[4]>(storage);
+    count   = 0;
+    flags   = size_bits[4] | flags_in | VEC_MALLOC;
 }
 
-
-
-
-/*
- * Vector deallocation.  Free whatever memory is pointed to by the
- * vector's storage field if the VEC_MALLOC flag is set.
- * DO NOT free the GLvector object itself, though.
+/**
+ * Release self-owned storage and reset all fields.
+ * Calling this is optional when the destructor will run; use it to
+ * release memory early (e.g., before a re-alloc at a different size).
  */
-
-
-void _mesa_vector4f_free(GLvector4f *v)
+void GLvector4f::free()
 {
-    if (v->flags & VEC_MALLOC) {
-	std::free(v->storage);
-	v->data = nullptr;
-	v->start = nullptr;
-	v->storage = nullptr;
-	v->flags &= ~VEC_MALLOC;
+    if (flags & VEC_MALLOC) {
+	std::free(storage);
+	data    = nullptr;
+	start   = nullptr;
+	storage = nullptr;
+	flags  &= ~VEC_MALLOC;
     }
 }
 

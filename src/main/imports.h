@@ -72,6 +72,46 @@
 
 /*@}*/
 
+/* Forward declarations needed by the RAII types below. */
+extern void *_mesa_align_malloc(size_t bytes, unsigned long alignment);
+extern void *_mesa_align_calloc(size_t bytes, unsigned long alignment);
+extern void  _mesa_align_free(void *ptr);
+
+
+/**
+ * Custom deleter that calls _mesa_align_free() so it can be used with
+ * std::unique_ptr to own aligned buffers allocated via ALIGN_MALLOC or
+ * ALIGN_CALLOC.
+ *
+ * Usage example (replaces ALIGN_MALLOC + ALIGN_FREE):
+ * \code
+ *   aligned_array_ptr<GLubyte> buf = make_aligned_array<GLubyte>(count, 32);
+ *   // buf is freed automatically when it goes out of scope
+ * \endcode
+ */
+struct MesaAlignedDeleter {
+    void operator()(void *ptr) const noexcept { _mesa_align_free(ptr); }
+};
+
+/** RAII wrapper for an array allocated with ALIGN_MALLOC / ALIGN_CALLOC. */
+template <typename T>
+using aligned_array_ptr = std::unique_ptr<T, MesaAlignedDeleter>;
+
+/**
+ * Allocate an aligned array of \p count elements of type T.
+ * Returns an aligned_array_ptr that calls _mesa_align_free on destruction.
+ * Pass \p zero_init=true to zero-fill the allocation (like ALIGN_CALLOC).
+ */
+template <typename T>
+[[nodiscard]] inline aligned_array_ptr<T>
+make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false)
+{
+    const size_t bytes = count * sizeof(T);
+    void *raw = zero_init ? _mesa_align_calloc(bytes, alignment)
+                          : _mesa_align_malloc(bytes, alignment);
+    return aligned_array_ptr<T>{static_cast<T *>(raw)};
+}
+
 
 /*
  * For GL_ARB_vertex_buffer_object we need to treat vertex array pointers
@@ -158,7 +198,7 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 /* Pretty fast, and accurate.
  * Based on code from http://www.flipcode.com/totd/
  */
-static INLINE GLfloat LOG2(GLfloat val)
+static inline GLfloat LOG2(GLfloat val)
 {
     fi_type num;
     GLint log_2;
@@ -182,7 +222,7 @@ static INLINE GLfloat LOG2(GLfloat val)
  *** IS_INF_OR_NAN: test if float is infinite or NaN
  ***/
 #ifdef USE_IEEE
-static INLINE int IS_INF_OR_NAN(float x)
+static inline int IS_INF_OR_NAN(float x)
 {
     fi_type tmp;
     tmp.f = x;
@@ -203,7 +243,7 @@ static INLINE int IS_INF_OR_NAN(float x)
  *** IS_NEGATIVE: test if float is negative
  ***/
 #if defined(USE_IEEE)
-static INLINE int GET_FLOAT_BITS(float x)
+static inline int GET_FLOAT_BITS(float x)
 {
     fi_type fi;
     fi.f = x;
@@ -249,7 +289,7 @@ static INLINE int GET_FLOAT_BITS(float x)
  *** IFLOOR: return (as an integer) floor of float
  ***/
 #if   defined(USE_IEEE)
-static INLINE int ifloor(float f)
+static inline int ifloor(float f)
 {
     int ai, bi;
     double af, bf;
@@ -265,7 +305,7 @@ static INLINE int ifloor(float f)
 }
 #define IFLOOR(x)  ifloor(x)
 #else
-static INLINE int ifloor(float f)
+static inline int ifloor(float f)
 {
     int i = IROUND(f);
     return (i > f) ? i - 1 : i;
@@ -278,7 +318,7 @@ static INLINE int ifloor(float f)
  *** ICEIL: return (as an integer) ceiling of float
  ***/
 #if   defined(USE_IEEE)
-static INLINE int iceil(float f)
+static inline int iceil(float f)
 {
     int ai, bi;
     double af, bf;
@@ -293,7 +333,7 @@ static INLINE int iceil(float f)
 }
 #define ICEIL(x)  iceil(x)
 #else
-static INLINE int iceil(float f)
+static inline int iceil(float f)
 {
     int i = IROUND(f);
     return (i < f) ? i + 1 : i;
@@ -417,7 +457,7 @@ do {									\
 /**
  * Return 1 if this is a little endian machine, 0 if big endian.
  */
-static INLINE GLboolean
+static inline GLboolean
 _mesa_little_endian(void)
 {
     const GLuint ui = 1; /* intentionally not static */

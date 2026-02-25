@@ -196,7 +196,8 @@ static int test_transform_function(transform_func func, int psize,
 	return 0;
     }
 
-    mat->m = new (std::align_val_t{16}) GLfloat[16];
+    /* mat->m is already allocated (16-byte aligned) by the GLmatrix
+     * constructor – reuse it directly. */
     mat->type = mtypes[mtype];
 
     m = mat->m;

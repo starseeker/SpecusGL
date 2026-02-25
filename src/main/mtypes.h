@@ -1655,10 +1655,53 @@ struct gl_viewport_attrib {
 
 
 /**
- * A single saved attribute group entry: a bit-mask identifying the group
- * and the opaque heap-allocated state snapshot.
+ * A single saved attribute group entry.
+ *
+ * Stores the bit-mask identifying the attribute group together with an
+ * opaque heap-allocated state snapshot and a type-erased deleter.  The
+ * destructor automatically frees the snapshot, eliminating the need for
+ * the old per-type free_attrib_data() dispatch function.
+ *
+ * The deleter must be set to a non-null function when data is non-null;
+ * calling code is responsible for this invariant.
  */
-using gl_attrib_entry = std::pair<GLbitfield, void *>;
+struct gl_attrib_entry {
+    GLbitfield kind    = 0;
+    void      *data    = nullptr;
+    void     (*deleter)(void *) = nullptr;
+
+    gl_attrib_entry() = default;
+    gl_attrib_entry(GLbitfield k, void *d, void(*del)(void*))
+        : kind(k), data(d), deleter(del) {}
+
+    /** RAII destructor: frees the owned snapshot via the typed deleter. */
+    ~gl_attrib_entry()
+    {
+        if (data && deleter)
+            deleter(data);
+    }
+
+    /** Non-copyable (owns a heap allocation). */
+    gl_attrib_entry(const gl_attrib_entry &) = delete;
+    gl_attrib_entry &operator=(const gl_attrib_entry &) = delete;
+
+    /** Movable: transfers ownership and resets source. */
+    gl_attrib_entry(gl_attrib_entry &&o) noexcept
+        : kind(o.kind), data(o.data), deleter(o.deleter)
+    {
+        o.data    = nullptr;
+        o.deleter = nullptr;
+    }
+    gl_attrib_entry &operator=(gl_attrib_entry &&o) noexcept
+    {
+        if (this != &o) {
+            if (data && deleter) deleter(data);
+            kind = o.kind; data = o.data; deleter = o.deleter;
+            o.data = nullptr; o.deleter = nullptr;
+        }
+        return *this;
+    }
+};
 
 /**
  * One level of the attribute stack: a collection of saved groups.

@@ -146,35 +146,21 @@ alloc_normal_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     auto *store = new normal_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<normal_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
-    _mesa_vector4f_alloc(&store->normal, 0, tnl->vb.Size, 32);
+    store->normal.alloc(0, tnl->vb.Size, 32);
     return GL_TRUE;
-}
-
-
-/**
- * Free stage's private data.
- */
-static void
-free_normal_data(struct tnl_pipeline_stage *stage)
-{
-    struct normal_stage_data *store = NORMAL_STAGE_DATA(stage);
-    if (store) {
-	_mesa_vector4f_free(&store->normal);
-	delete store;
-	stage->privatePtr = nullptr;
-    }
 }
 
 
 const struct tnl_pipeline_stage _tnl_normal_transform_stage = {
     "normal transform",		/* name */
     nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
     alloc_normal_data,		/* create */
-    free_normal_data,		/* destroy */
     validate_normal_stage,	/* validate */
     run_normal_stage             /* run */
 };

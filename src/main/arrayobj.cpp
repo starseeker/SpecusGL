@@ -60,7 +60,7 @@
  * non-existent.
  */
 
-static INLINE struct gl_array_object *
+static inline struct gl_array_object *
 lookup_arrayobj(GLcontext *ctx, GLuint id)
 {
     return (id == 0) ? nullptr : ctx->Shared->lookup_arrayobj(id);

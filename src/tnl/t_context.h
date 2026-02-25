@@ -52,6 +52,7 @@
 
 
 #include "glheader.h"
+#include "imports.h"
 #include "mtypes.h"
 
 #include "math/m_matrix.h"
@@ -59,8 +60,12 @@
 #include "math/m_xform.h"
 
 #include "vbo/vbo.h"
+#include "t_vp_build.h"   /* for tnl_vp_cache (used via unique_ptr below) */
 
+#include <bitset>
+#include <memory>
 #include <unordered_map>
+#include <vector>
 
 #define MAX_PIPELINE_STAGES     30
 
@@ -178,7 +183,7 @@ enum {
 #define PRIM_END       0x20
 #define PRIM_MODE_MASK 0x0f
 
-static INLINE GLuint _tnl_translate_prim(const struct _mesa_prim *prim)
+static inline GLuint _tnl_translate_prim(const struct _mesa_prim *prim)
 {
     GLuint flag;
     flag = prim->mode;
@@ -235,30 +240,26 @@ struct vertex_buffer {
 struct tnl_pipeline_stage {
     const char *name;
 
-    /* Private data for the pipeline stage:
-     */
+    /** Private data for the pipeline stage (set by create, freed by privateDeleter). */
     void *privatePtr;
 
-    /* Allocate private data
+    /**
+     * Type-erased deleter for privatePtr.  Set by the stage's create function.
+     * Replaces the old per-stage destroy callback; called automatically by
+     * _tnl_destroy_pipeline().  Keeps each stage free of boilerplate
+     * delete-and-null cleanup code.
      */
+    void (*privateDeleter)(void *);
+
+    /** Allocate private data (called once when the pipeline is installed). */
     GLboolean(*create)(GLcontext *ctx, struct tnl_pipeline_stage *);
 
-    /* Free private data.
-     */
-    void (*destroy)(struct tnl_pipeline_stage *);
-
-    /* Called on any statechange or input array size change or
-     * input array change to/from zero stride.
-     */
+    /** Called on any statechange, input array size change, or stride change. */
     void (*validate)(GLcontext *ctx, struct tnl_pipeline_stage *);
 
-    /* Called from _tnl_run_pipeline().  The stage.changed_inputs value
-     * encodes all inputs to thee struct which have changed.  If
-     * non-zero, recompute all affected outputs of the stage, otherwise
-     * execute any 'sideeffects' of the stage.
-     *
-     * Return value: GL_TRUE - keep going
-     *               GL_FALSE - finished pipeline
+    /**
+     * Called from _tnl_run_pipeline().
+     * Return value: GL_TRUE - keep going, GL_FALSE - finished pipeline.
      */
     GLboolean(*run)(GLcontext *ctx, struct tnl_pipeline_stage *);
 };
@@ -360,7 +361,8 @@ struct tnl_clipspace {
 
     GLuint new_inputs;
 
-    GLubyte *vertex_buf;
+    /** Aligned pixel buffer owned by this clipspace (RAII). */
+    aligned_array_ptr<GLubyte> vertex_buf;
     GLuint vertex_size;
     GLuint max_vertex_size;
 
@@ -384,12 +386,6 @@ struct tnl_clipspace {
     void (*codegen_emit)(GLcontext *ctx);
 };
 
-
-/* Forward-declared here so TNLcontext can hold it by pointer.
- * The full definition (which requires state_key from t_vp_build.cpp)
- * lives in t_vp_build.cpp itself.
- */
-struct tnl_vp_cache;
 
 struct tnl_device_driver {
     /***
@@ -493,17 +489,35 @@ struct tnl_device_driver {
 };
 
 
-#define DECLARE_RENDERINPUTS(name) BITSET64_DECLARE(name, _TNL_ATTRIB_MAX)
-#define RENDERINPUTS_COPY BITSET64_COPY
-#define RENDERINPUTS_EQUAL BITSET64_EQUAL
-#define RENDERINPUTS_ZERO BITSET64_ZERO
-#define RENDERINPUTS_ONES BITSET64_ONES
-#define RENDERINPUTS_TEST BITSET64_TEST
-#define RENDERINPUTS_SET BITSET64_SET
-#define RENDERINPUTS_CLEAR BITSET64_CLEAR
-#define RENDERINPUTS_TEST_RANGE BITSET64_TEST_RANGE
-#define RENDERINPUTS_SET_RANGE BITSET64_SET_RANGE
-#define RENDERINPUTS_CLEAR_RANGE BITSET64_CLEAR_RANGE
+/**
+ * Bitset used to record which vertex attributes are needed for rendering.
+ * Replaces the old C-macro BITSET64 pattern; std::bitset<N> is type-safe
+ * and eliminates the latent out-of-bounds access the BITSET64_COPY /
+ * BITSET64_EQUAL macros caused when _TNL_ATTRIB_MAX == 32 (only one
+ * GLuint word was allocated, but both [0] and [1] were read).
+ */
+using RenderInputsBitset = std::bitset<_TNL_ATTRIB_MAX>;
+
+/**
+ * Test whether any bit in the closed range [lo, hi] is set.
+ * Replaces RENDERINPUTS_TEST_RANGE / BITSET64_TEST_RANGE.
+ */
+static inline bool renderinputs_test_range(const RenderInputsBitset &bs,
+					   GLuint lo, GLuint hi)
+{
+    for (GLuint i = lo; i <= hi; i++)
+	if (bs.test(i)) return true;
+    return false;
+}
+
+#define DECLARE_RENDERINPUTS(name) RenderInputsBitset name
+#define RENDERINPUTS_COPY(dst, src)      ((dst) = (src))
+#define RENDERINPUTS_EQUAL(a, b)         ((a) == (b))
+#define RENDERINPUTS_ZERO(x)             ((x).reset())
+#define RENDERINPUTS_TEST(x, b)          ((x).test(b))
+#define RENDERINPUTS_SET(x, b)           ((x).set(b))
+#define RENDERINPUTS_CLEAR(x, b)         ((x).reset(b))
+#define RENDERINPUTS_TEST_RANGE(x, lo, hi) renderinputs_test_range((x), (lo), (hi))
 
 
 /**
@@ -534,14 +548,12 @@ struct TNLcontext {
 
     GLvector4f tmp_inputs[VERT_ATTRIB_MAX];
 
-    /* Temp storage for t_draw.c:
-     */
-    GLubyte *block[VERT_ATTRIB_MAX];
-    GLuint nr_blocks;
+    /** Temporary buffers allocated by t_draw.cpp for vertex conversion.
+     *  Each element is owned (auto-freed when the vector is cleared). */
+    std::vector<std::unique_ptr<GLubyte[]>> blocks;
 
-    /* Cache of fixed-function-replacing vertex programs:
-     */
-    struct tnl_vp_cache *vp_cache;
+    /** Cache of fixed-function-replacing vertex programs (RAII-owned). */
+    std::unique_ptr<tnl_vp_cache> vp_cache;
 
 };
 

@@ -297,7 +297,8 @@ static GLboolean init_lighting(GLcontext *ctx,
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     GLuint size = tnl->vb.Size;
     auto *store = new light_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<light_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
@@ -305,13 +306,13 @@ static GLboolean init_lighting(GLcontext *ctx,
      */
     init_lighting_tables();
 
-    _mesa_vector4f_alloc(&store->Input, 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitColor[0], 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitColor[1], 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitSecondary[0], 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitSecondary[1], 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitIndex[0], 0, size, 32);
-    _mesa_vector4f_alloc(&store->LitIndex[1], 0, size, 32);
+    store->Input.alloc(0, size, 32);
+    store->LitColor[0].alloc(0, size, 32);
+    store->LitColor[1].alloc(0, size, 32);
+    store->LitSecondary[0].alloc(0, size, 32);
+    store->LitSecondary[1].alloc(0, size, 32);
+    store->LitIndex[0].alloc(0, size, 32);
+    store->LitIndex[1].alloc(0, size, 32);
 
     store->LitColor[0].size = 4;
     store->LitColor[1].size = 4;
@@ -327,32 +328,13 @@ static GLboolean init_lighting(GLcontext *ctx,
 }
 
 
-
-
-static void dtr(struct tnl_pipeline_stage *stage)
-{
-    struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
-
-    if (store) {
-	_mesa_vector4f_free(&store->Input);
-	_mesa_vector4f_free(&store->LitColor[0]);
-	_mesa_vector4f_free(&store->LitColor[1]);
-	_mesa_vector4f_free(&store->LitSecondary[0]);
-	_mesa_vector4f_free(&store->LitSecondary[1]);
-	_mesa_vector4f_free(&store->LitIndex[0]);
-	_mesa_vector4f_free(&store->LitIndex[1]);
-	delete store;
-	stage->privatePtr = nullptr;
-    }
-}
-
 const struct tnl_pipeline_stage _tnl_lighting_stage = {
     "lighting",			/* name */
-    nullptr,			/* private_data */
-    init_lighting,
-    dtr,				/* destroy */
-    validate_lighting,
-    run_lighting
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    init_lighting,		/* create */
+    validate_lighting,		/* validate */
+    run_lighting		/* run */
 };
 
 /*

@@ -53,31 +53,89 @@
 
 
 
-/* Wrap all the information about vectors up in a struct.  Has
- * additional fields compared to the other vectors to help us track of
- * different vertex sizes, and whether we need to clean columns out
- * because they contain non-(0,0,0,1) values.
+/**
+ * A 4-component float vector array used throughout the T&L pipeline.
+ *
+ * C++17 modernisation: the struct now owns its storage via RAII.
+ * Callers may still use the legacy free-function wrappers
+ * (_mesa_vector4f_alloc, _mesa_vector4f_free, etc.) which are kept for
+ * backward compatibility but are now thin wrappers around member methods.
  *
  * The start field is used to reserve data for copied vertices at the
  * end of _mesa_transform_vb, and avoids the need for a multiplication in
  * the transformation routines.
  */
 struct GLvector4f {
-    GLfloat(*data)[4];	/* may be malloc'd or point to client data */
-    GLfloat *start;	/* points somewhere inside of <data> */
-    GLuint count;	/* size of the vector (in elements) */
-    GLuint stride;	/* stride from one element to the next (in bytes) */
-    GLuint size;		/* 2-4 for vertices and 1-4 for texcoords */
-    GLuint flags;	/* which columns are dirty */
-    void *storage;	/* self-allocated storage */
+    GLfloat(*data)[4] = nullptr;  /**< may be self-alloc'd or point to client data */
+    GLfloat *start    = nullptr;  /**< points somewhere inside <data> */
+    GLuint count      = 0;        /**< number of elements */
+    GLuint stride     = 0;        /**< bytes from one element to the next */
+    GLuint size       = 0;        /**< 2-4 for vertices, 1-4 for texcoords */
+    GLuint flags      = 0;        /**< VEC_* flags (VEC_MALLOC, VEC_DIRTY_*, etc.) */
+    void  *storage    = nullptr;  /**< self-allocated aligned storage (VEC_MALLOC) */
+
+    /** Default constructor – zero-initialised, owns no storage. */
+    GLvector4f() = default;
+
+    /**
+     * Destructor – releases self-allocated storage (VEC_MALLOC flag).
+     * Safe to call on vectors that were only initialised with external storage.
+     */
+    ~GLvector4f();
+
+    /** GLvector4f is non-copyable to prevent double-free of owned storage. */
+    GLvector4f(const GLvector4f &) = delete;
+    GLvector4f &operator=(const GLvector4f &) = delete;
+
+    /** Move constructor – transfers ownership and resets the source. */
+    GLvector4f(GLvector4f &&o) noexcept;
+    GLvector4f &operator=(GLvector4f &&o) noexcept;
+
+    /**
+     * Initialise this vector to point at externally-owned storage.
+     * Equivalent to the old _mesa_vector4f_init() free-function.
+     */
+    void init(GLuint flags_in, GLfloat (*ext_storage)[4]);
+
+    /**
+     * Allocate aligned self-owned storage for \p count elements.
+     * Sets the VEC_MALLOC flag; the destructor will release this memory.
+     * Equivalent to the old _mesa_vector4f_alloc() free-function.
+     */
+    void alloc(GLuint flags_in, GLuint count_in, GLuint alignment);
+
+    /**
+     * Release self-owned storage (if VEC_MALLOC is set) and reset all fields.
+     * Calling this is optional when the destructor will run, but callers that
+     * need to release memory early (e.g., to re-alloc at a different size) can
+     * use it explicitly.  Equivalent to the old _mesa_vector4f_free().
+     */
+    void free();
 };
 
 
-extern void _mesa_vector4f_init(GLvector4f *v, GLuint flags,
-				GLfloat(*storage)[4]);
-extern void _mesa_vector4f_alloc(GLvector4f *v, GLuint flags,
-				 GLuint count, GLuint alignment);
-extern void _mesa_vector4f_free(GLvector4f *v);
+/* --------------------------------------------------------------------- */
+/* Legacy free-function wrappers – kept for backward compatibility.       */
+/* New code should call the member methods directly.                       */
+/* --------------------------------------------------------------------- */
+
+inline void _mesa_vector4f_init(GLvector4f *v, GLuint flags,
+                                GLfloat (*storage)[4])
+{
+    v->init(flags, storage);
+}
+
+inline void _mesa_vector4f_alloc(GLvector4f *v, GLuint flags,
+                                 GLuint count, GLuint alignment)
+{
+    v->alloc(flags, count, alignment);
+}
+
+inline void _mesa_vector4f_free(GLvector4f *v)
+{
+    v->free();
+}
+
 extern void _mesa_vector4f_print(GLvector4f *v, GLubyte *, GLboolean);
 extern void _mesa_vector4f_clean_elem(GLvector4f *vec, GLuint nr, GLuint elt);
 

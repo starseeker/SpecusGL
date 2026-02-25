@@ -237,7 +237,7 @@ void *_tnl_get_vertex(GLcontext *ctx, GLuint nr)
 {
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
 
-    return vtx->vertex_buf + nr * vtx->vertex_size;
+    return vtx->vertex_buf.get() + nr * vtx->vertex_size;
 }
 
 void _tnl_invalidate_vertex_state(GLcontext *ctx, GLuint new_state)
@@ -390,8 +390,7 @@ void _tnl_build_vertices(GLcontext *ctx,
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
     update_input_ptrs(ctx, start);
     vtx->emit(ctx, end - start,
-	      (GLubyte *)(vtx->vertex_buf +
-			  start * vtx->vertex_size));
+	      vtx->vertex_buf.get() + start * vtx->vertex_size);
 }
 
 /* Emit VB vertices start..end to dest.  Note that VB vertex at
@@ -425,7 +424,7 @@ void _tnl_init_vertices(GLcontext *ctx,
     if (max_vertex_size > vtx->max_vertex_size) {
 	_tnl_free_vertices(ctx);
 	vtx->max_vertex_size = max_vertex_size;
-	vtx->vertex_buf = (GLubyte *)ALIGN_CALLOC(vb_size * max_vertex_size, 32);
+	vtx->vertex_buf = make_aligned_array<GLubyte>(vb_size * max_vertex_size, 32, /*zero=*/true);
 	invalidate_funcs(vtx);
     }
 
@@ -469,10 +468,8 @@ void _tnl_free_vertices(GLcontext *ctx)
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
     struct tnl_clipspace_fastpath *fp, *tmp;
 
-    if (vtx->vertex_buf) {
-	ALIGN_FREE(vtx->vertex_buf);
-	vtx->vertex_buf = nullptr;
-    }
+    /* vertex_buf is an aligned_array_ptr – just reset it. */
+    vtx->vertex_buf.reset();
 
     for (fp = vtx->fastpath ; fp ; fp = tmp) {
 	tmp = fp->next;

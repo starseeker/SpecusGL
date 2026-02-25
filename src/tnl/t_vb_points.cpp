@@ -79,33 +79,22 @@ alloc_point_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
     auto *store = new point_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<point_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
-    _mesa_vector4f_alloc(&store->PointSize, 0, VB->Size, 32);
+    store->PointSize.alloc(0, VB->Size, 32);
     return GL_TRUE;
-}
-
-
-static void
-free_point_data(struct tnl_pipeline_stage *stage)
-{
-    struct point_stage_data *store = POINT_STAGE_DATA(stage);
-    if (store) {
-	_mesa_vector4f_free(&store->PointSize);
-	delete store;
-	stage->privatePtr = nullptr;
-    }
 }
 
 
 const struct tnl_pipeline_stage _tnl_point_attenuation_stage = {
     "point size attenuation",	/* name */
-    nullptr,			/* stage private data */
-    alloc_point_data,		/* alloc data */
-    free_point_data,		/* destructor */
-    nullptr,
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    alloc_point_data,		/* create */
+    nullptr,			/* validate */
     run_point_stage		/* run */
 };
 

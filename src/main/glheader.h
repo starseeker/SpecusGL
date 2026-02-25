@@ -50,6 +50,7 @@
 #include <cmath>
 #include <ctype.h>
 #include <limits.h>
+#include <memory>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -133,9 +134,6 @@
 #define _NORMAPI
 #define _NORMAPIP *
 
-
-/* Function inlining - in C++17, 'inline' is standard and sufficient */
-#define INLINE inline
 
 /* Prevent inlining.  Used to keep the auto-vectorizer from operating on a
  * function in a caller context where it generates incorrect code (e.g. the

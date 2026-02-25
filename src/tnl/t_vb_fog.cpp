@@ -237,11 +237,12 @@ alloc_fog_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     auto *store = new fog_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<fog_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
-    _mesa_vector4f_alloc(&store->fogcoord, 0, tnl->vb.Size, 32);
+    store->fogcoord.alloc(0, tnl->vb.Size, 32);
 
     if (!inited)
 	init_static_data();
@@ -250,24 +251,12 @@ alloc_fog_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 }
 
 
-static void
-free_fog_data(struct tnl_pipeline_stage *stage)
-{
-    struct fog_stage_data *store = FOG_STAGE_DATA(stage);
-    if (store) {
-	_mesa_vector4f_free(&store->fogcoord);
-	delete store;
-	stage->privatePtr = nullptr;
-    }
-}
-
-
 const struct tnl_pipeline_stage _tnl_fog_coordinate_stage = {
     "build fog coordinates",	/* name */
-    nullptr,			/* private_data */
-    alloc_fog_data,		/* dtr */
-    free_fog_data,		/* dtr */
-    nullptr,		/* check */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    alloc_fog_data,		/* create */
+    nullptr,			/* validate */
     run_fog_stage		/* run -- initially set to init. */
 };
 

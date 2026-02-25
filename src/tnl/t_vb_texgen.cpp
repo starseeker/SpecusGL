@@ -64,17 +64,24 @@ struct texgen_stage_data {
 
     /* Per-texunit derived state.
      */
-    GLuint TexgenSize[MAX_TEXTURE_COORD_UNITS];
-    texgen_func TexgenFunc[MAX_TEXTURE_COORD_UNITS];
+    GLuint TexgenSize[MAX_TEXTURE_COORD_UNITS] = {};
+    texgen_func TexgenFunc[MAX_TEXTURE_COORD_UNITS] = {};
 
     /* Temporary values used in texgen.
      */
-    GLfloat(*tmp_f)[3];
-    GLfloat *tmp_m;
+    GLfloat(*tmp_f)[3] = nullptr;
+    GLfloat *tmp_m     = nullptr;
 
     /* Buffered outputs of the stage.
      */
     GLvector4f texcoord[MAX_TEXTURE_COORD_UNITS];
+
+    ~texgen_stage_data()
+    {
+	/* texcoord[] freed automatically by GLvector4f destructors */
+	delete[] tmp_f;
+	delete[] tmp_m;
+    }
 };
 
 
@@ -561,12 +568,13 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
     GLuint i;
     auto *store = new texgen_stage_data{};
-    stage->privatePtr = store;
+    stage->privatePtr    = store;
+    stage->privateDeleter = [](void *p){ delete static_cast<texgen_stage_data *>(p); };
     if (!store)
 	return GL_FALSE;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
-	_mesa_vector4f_alloc(&store->texcoord[i], 0, VB->Size, 32);
+	store->texcoord[i].alloc(0, VB->Size, 32);
 
     store->tmp_f = new GLfloat[VB->Size][3];
     store->tmp_m = new GLfloat[VB->Size];
@@ -575,33 +583,13 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
 }
 
 
-static void free_texgen_data(struct tnl_pipeline_stage *stage)
-
-{
-    struct texgen_stage_data *store = TEXGEN_STAGE_DATA(stage);
-    GLuint i;
-
-    if (store) {
-	for (i = 0 ; i < MAX_TEXTURE_COORD_UNITS ; i++)
-	    if (store->texcoord[i].data)
-		_mesa_vector4f_free(&store->texcoord[i]);
-
-
-	if (store->tmp_f) delete[] store->tmp_f;
-	if (store->tmp_m) delete[] store->tmp_m;
-	delete store;
-	stage->privatePtr = nullptr;
-    }
-}
-
-
 
 const struct tnl_pipeline_stage _tnl_texgen_stage = {
     "texgen",			/* name */
-    nullptr,			/* private data */
-    alloc_texgen_data,		/* destructor */
-    free_texgen_data,		/* destructor */
-    validate_texgen_stage,		/* check */
+    nullptr,			/* privatePtr */
+    nullptr,			/* privateDeleter (set by create) */
+    alloc_texgen_data,		/* create */
+    validate_texgen_stage,	/* validate */
     run_texgen_stage		/* run -- initially set to alloc data */
 };
 
