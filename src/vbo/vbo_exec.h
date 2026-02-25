@@ -39,6 +39,7 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "mtypes.h"
 #include "vbo.h"
 #include "vbo_attrib.h"
+#include "imports.h"
 
 
 #define VBO_MAX_PRIM 64
@@ -79,7 +80,8 @@ struct vbo_exec_context {
 
     struct {
 	struct gl_buffer_object *bufferobj;
-	GLubyte *buffer_map;
+	/** Aligned vertex data buffer (owned, freed automatically). */
+	aligned_array_ptr<GLubyte> buffer_map;
 
 	GLuint vertex_size;
 

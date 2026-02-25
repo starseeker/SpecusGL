@@ -72,6 +72,46 @@
 
 /*@}*/
 
+/* Forward declarations needed by the RAII types below. */
+extern void *_mesa_align_malloc(size_t bytes, unsigned long alignment);
+extern void *_mesa_align_calloc(size_t bytes, unsigned long alignment);
+extern void  _mesa_align_free(void *ptr);
+
+
+/**
+ * Custom deleter that calls _mesa_align_free() so it can be used with
+ * std::unique_ptr to own aligned buffers allocated via ALIGN_MALLOC or
+ * ALIGN_CALLOC.
+ *
+ * Usage example (replaces ALIGN_MALLOC + ALIGN_FREE):
+ * \code
+ *   aligned_array_ptr<GLubyte> buf = make_aligned_array<GLubyte>(count, 32);
+ *   // buf is freed automatically when it goes out of scope
+ * \endcode
+ */
+struct MesaAlignedDeleter {
+    void operator()(void *ptr) const noexcept { _mesa_align_free(ptr); }
+};
+
+/** RAII wrapper for an array allocated with ALIGN_MALLOC / ALIGN_CALLOC. */
+template <typename T>
+using aligned_array_ptr = std::unique_ptr<T, MesaAlignedDeleter>;
+
+/**
+ * Allocate an aligned array of \p count elements of type T.
+ * Returns an aligned_array_ptr that calls _mesa_align_free on destruction.
+ * Pass \p zero_init=true to zero-fill the allocation (like ALIGN_CALLOC).
+ */
+template <typename T>
+[[nodiscard]] inline aligned_array_ptr<T>
+make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false)
+{
+    const size_t bytes = count * sizeof(T);
+    void *raw = zero_init ? _mesa_align_calloc(bytes, alignment)
+                          : _mesa_align_malloc(bytes, alignment);
+    return aligned_array_ptr<T>{static_cast<T *>(raw)};
+}
+
 
 /*
  * For GL_ARB_vertex_buffer_object we need to treat vertex array pointers

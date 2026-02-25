@@ -69,7 +69,7 @@ static GLuint vbo_copy_vertices(struct vbo_exec_context *exec)
     GLuint ovf, i;
     GLuint sz = exec->vtx.vertex_size;
     GLfloat *dst = exec->vtx.copied.buffer;
-    GLfloat *src = ((GLfloat *)exec->vtx.buffer_map +
+    GLfloat *src = (reinterpret_cast<GLfloat *>(exec->vtx.buffer_map.get()) +
 		    exec->vtx.prim[exec->vtx.prim_count-1].start *
 		    exec->vtx.vertex_size);
 
@@ -151,7 +151,7 @@ static void vbo_exec_bind_arrays(GLcontext *ctx)
     struct vbo_exec_context *exec = &vbo->exec;
     struct gl_client_array *arrays = exec->vtx.arrays;
     GLuint count = exec->vtx.vert_count;
-    GLubyte *data = exec->vtx.buffer_map;
+    GLubyte *data = exec->vtx.buffer_map.get();
     const GLuint *map;
     GLuint attr;
 
@@ -229,7 +229,7 @@ void vbo_exec_vtx_flush(struct vbo_exec_context *exec)
 
     exec->vtx.prim_count = 0;
     exec->vtx.vert_count = 0;
-    exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map;
+    exec->vtx.vbptr = reinterpret_cast<GLfloat *>(exec->vtx.buffer_map.get());
 }
 
 /*

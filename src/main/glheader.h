@@ -50,6 +50,7 @@
 #include <cmath>
 #include <ctype.h>
 #include <limits.h>
+#include <memory>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

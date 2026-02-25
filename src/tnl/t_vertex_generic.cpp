@@ -1034,9 +1034,9 @@ void _tnl_generic_interp(GLcontext *ctx,
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     struct vertex_buffer *VB = &tnl->vb;
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
-    const GLubyte *vin  = vtx->vertex_buf + ein  * vtx->vertex_size;
-    const GLubyte *vout = vtx->vertex_buf + eout * vtx->vertex_size;
-    GLubyte *vdst = vtx->vertex_buf + edst * vtx->vertex_size;
+    const GLubyte *vin  = vtx->vertex_buf.get() + ein  * vtx->vertex_size;
+    const GLubyte *vout = vtx->vertex_buf.get() + eout * vtx->vertex_size;
+    GLubyte *vdst = vtx->vertex_buf.get() + edst * vtx->vertex_size;
     const struct tnl_clipspace_attr *a = vtx->attr;
     const GLuint attr_count = vtx->attr_count;
     GLuint j;
@@ -1082,8 +1082,8 @@ void _tnl_generic_interp(GLcontext *ctx,
 void _tnl_generic_copy_pv(GLcontext *ctx, GLuint edst, GLuint esrc)
 {
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
-    GLubyte *vsrc = vtx->vertex_buf + esrc * vtx->vertex_size;
-    GLubyte *vdst = vtx->vertex_buf + edst * vtx->vertex_size;
+    GLubyte *vsrc = vtx->vertex_buf.get() + esrc * vtx->vertex_size;
+    GLubyte *vdst = vtx->vertex_buf.get() + edst * vtx->vertex_size;
     const struct tnl_clipspace_attr *a = vtx->attr;
     const GLuint attr_count = vtx->attr_count;
     GLuint j;

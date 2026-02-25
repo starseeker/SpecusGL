@@ -52,6 +52,7 @@
 
 
 #include "glheader.h"
+#include "imports.h"
 #include "mtypes.h"
 
 #include "math/m_matrix.h"
@@ -362,7 +363,8 @@ struct tnl_clipspace {
 
     GLuint new_inputs;
 
-    GLubyte *vertex_buf;
+    /** Aligned pixel buffer owned by this clipspace (RAII). */
+    aligned_array_ptr<GLubyte> vertex_buf;
     GLuint vertex_size;
     GLuint max_vertex_size;
 

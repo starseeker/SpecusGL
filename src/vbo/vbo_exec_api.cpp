@@ -59,7 +59,7 @@ static void vbo_exec_wrap_buffers(struct vbo_exec_context *exec)
     if (exec->vtx.prim_count == 0) {
 	exec->vtx.copied.nr = 0;
 	exec->vtx.vert_count = 0;
-	exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map;
+	exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map.get();
     } else {
 	GLuint last_begin = exec->vtx.prim[exec->vtx.prim_count-1].begin;
 	GLuint last_count;
@@ -246,7 +246,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
     exec->vtx.vertex_size += newsz - oldsz;
     exec->vtx.max_vert = VBO_VERT_BUFFER_SIZE / exec->vtx.vertex_size;
     exec->vtx.vert_count = 0;
-    exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map;
+    exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map.get();
 
 
     /* Recalculate all the attrptr[] values
@@ -273,7 +273,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
 	GLfloat *dest = exec->vtx.vbptr;
 	GLuint j;
 
-	assert(exec->vtx.vbptr == (GLfloat *)exec->vtx.buffer_map);
+	assert(exec->vtx.vbptr == (GLfloat *)exec->vtx.buffer_map.get());
 
 	for (i = 0 ; i < exec->vtx.copied.nr ; i++) {
 	    for (j = 0 ; j < VBO_ATTRIB_MAX ; j++) {
@@ -653,7 +653,7 @@ void vbo_exec_vtx_init(struct vbo_exec_context *exec)
      * continuously.
      */
     exec->vtx.bufferobj = ctx->Array.NullBufferObj;
-    exec->vtx.buffer_map = static_cast<GLubyte*>(ALIGN_MALLOC(VBO_VERT_BUFFER_SIZE * sizeof(GLfloat), 64));
+    exec->vtx.buffer_map = make_aligned_array<GLubyte>(VBO_VERT_BUFFER_SIZE * sizeof(GLfloat), 64);
 
     vbo_exec_vtxfmt_init(exec);
 
@@ -679,10 +679,8 @@ void vbo_exec_vtx_init(struct vbo_exec_context *exec)
 
 void vbo_exec_vtx_destroy(struct vbo_exec_context *exec)
 {
-    if (exec->vtx.buffer_map) {
-	ALIGN_FREE(exec->vtx.buffer_map);
-	exec->vtx.buffer_map = nullptr;
-    }
+    /* buffer_map is an aligned_array_ptr – freed automatically on reset/destruction */
+    exec->vtx.buffer_map.reset();
 }
 
 

@@ -240,7 +240,7 @@ _swsetup_Wakeup(GLcontext *ctx)
     _tnl_need_projected_coords(ctx, GL_TRUE);
     _swsetup_InvalidateState(ctx, ~0);
 
-    swsetup->verts = (SWvertex *)tnl->clipspace.vertex_buf;
+    swsetup->verts = reinterpret_cast<SWvertex *>(tnl->clipspace.vertex_buf.get());
     RENDERINPUTS_ZERO(swsetup->last_index_bitset);
 }
 
