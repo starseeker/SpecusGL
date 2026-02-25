@@ -32,6 +32,8 @@
 #include "enums.h"
 #include "vbo_split.h"
 
+#include <vector>
+
 
 #define MAX_PRIM 32
 
@@ -208,7 +210,7 @@ static void split_prims(struct split_context *split)
 	     */
 	    struct _mesa_index_buffer ib;
 	    struct _mesa_prim tmpprim;
-	    GLuint *elts = new GLuint[count];
+	    std::vector<GLuint> elts(count);
 	    GLuint j;
 
 	    for (j = 0; j < count; j++)
@@ -217,7 +219,7 @@ static void split_prims(struct split_context *split)
 	    ib.count = count;
 	    ib.type = GL_UNSIGNED_INT;
 	    ib.obj = split->ctx->Array.NullBufferObj;
-	    ib.ptr = elts;
+	    ib.ptr = elts.data();
 
 	    tmpprim = *prim;
 	    tmpprim.indexed = 1;
@@ -232,8 +234,6 @@ static void split_prims(struct split_context *split)
 			   &ib,
 			   split->draw,
 			   split->limits);
-
-	    delete[] elts;
 	} else {
 	    flush_vertex(split);
 

@@ -38,6 +38,8 @@
 #include "vbo_split.h"
 #include "vbo.h"
 
+#include <vector>
+
 
 #define ELT_TABLE_SIZE 16
 
@@ -70,7 +72,8 @@ struct copy_context {
     const struct gl_client_array *dstarray_ptr[VERT_ATTRIB_MAX];
     struct _mesa_index_buffer dstib;
 
-    GLuint *translated_elt_buf;
+    /** Widened element indices (UNSIGNED_BYTE/SHORT → GLuint); empty for UNSIGNED_INT. */
+    std::vector<GLuint> translated_elt_buf;
     const GLuint *srcelt;
 
     /* A baby hash table to avoid re-emitting (some) duplicate
@@ -83,15 +86,17 @@ struct copy_context {
 
 
     GLuint vertex_size;
-    GLubyte *dstbuf;
-    GLubyte *dstptr;		/* dstptr == dstbuf + dstelt_max * vertsize */
+    /** Output vertex buffer (owned, freed automatically). */
+    std::vector<GLubyte> dstbuf;
+    GLubyte *dstptr;		/* cursor into dstbuf */
     GLuint dstbuf_size;	/* in vertices */
     GLuint dstbuf_nr;		/* count of emitted vertices, also the
 				 * largest value in dstelt.  Our
 				 * MaxIndex.
 				 */
 
-    GLuint *dstelt;
+    /** Output element list (owned, freed automatically). */
+    std::vector<GLuint> dstelt;
     GLuint dstelt_nr;
     GLuint dstelt_size;
 
@@ -175,7 +180,7 @@ static void flush(struct copy_context *copy)
     copy->dstprim_nr = 0;
     copy->dstelt_nr = 0;
     copy->dstbuf_nr = 0;
-    copy->dstptr = copy->dstbuf;
+    copy->dstptr = copy->dstbuf.data();
 
     /* Clear the vertex cache:
      */
@@ -238,7 +243,7 @@ static GLuint elt(struct copy_context *copy, GLuint elt_idx)
 	copy->dstptr += copy->vertex_size;
 
 	assert(csr == copy->dstptr);
-	assert(copy->dstptr == (copy->dstbuf +
+	assert(copy->dstptr == (copy->dstbuf.data() +
 				copy->dstbuf_nr *
 				copy->vertex_size));
     }
@@ -420,23 +425,23 @@ static void replay_init(struct copy_context *copy)
 
     switch (copy->ib->type) {
 	case GL_UNSIGNED_BYTE:
-	    copy->translated_elt_buf = new GLuint[copy->ib->count];
-	    copy->srcelt = copy->translated_elt_buf;
+	    copy->translated_elt_buf.resize(copy->ib->count);
+	    copy->srcelt = copy->translated_elt_buf.data();
 
 	    for (i = 0; i < copy->ib->count; i++)
 		copy->translated_elt_buf[i] = ((const GLubyte *)srcptr)[i];
 	    break;
 
 	case GL_UNSIGNED_SHORT:
-	    copy->translated_elt_buf = new GLuint[copy->ib->count];
-	    copy->srcelt = copy->translated_elt_buf;
+	    copy->translated_elt_buf.resize(copy->ib->count);
+	    copy->srcelt = copy->translated_elt_buf.data();
 
 	    for (i = 0; i < copy->ib->count; i++)
 		copy->translated_elt_buf[i] = ((const GLushort *)srcptr)[i];
 	    break;
 
 	case GL_UNSIGNED_INT:
-	    copy->translated_elt_buf = nullptr;
+	    copy->translated_elt_buf.clear();
 	    copy->srcelt = (const GLuint *)srcptr;
 	    break;
     }
@@ -454,8 +459,8 @@ static void replay_init(struct copy_context *copy)
      *
      * XXX:  This should be a VBO!
      */
-    copy->dstbuf = new GLubyte[copy->dstbuf_size * copy->vertex_size];
-    copy->dstptr = copy->dstbuf;
+    copy->dstbuf.resize(copy->dstbuf_size * copy->vertex_size);
+    copy->dstptr = copy->dstbuf.data();
 
     /* Setup new vertex arrays to point into the output buffer:
      */
@@ -467,7 +472,7 @@ static void replay_init(struct copy_context *copy)
 	dst->Type = src->Type;
 	dst->Stride = copy->vertex_size;
 	dst->StrideB = copy->vertex_size;
-	dst->Ptr = copy->dstbuf + offset;
+	dst->Ptr = copy->dstbuf.data() + offset;
 	dst->Enabled = GL_TRUE;
 	dst->Normalized = src->Normalized;
 	dst->BufferObj = ctx->Array.NullBufferObj;
@@ -482,7 +487,7 @@ static void replay_init(struct copy_context *copy)
 			     copy->ib->count * 2 + 3);
     copy->dstelt_size = MIN2(copy->dstelt_size,
 			     copy->limits->max_indices);
-    copy->dstelt = new GLuint[copy->dstelt_size];
+    copy->dstelt.resize(copy->dstelt_size);
     copy->dstelt_nr = 0;
 
     /* Setup the new index buffer to point to the allocated element
@@ -491,7 +496,7 @@ static void replay_init(struct copy_context *copy)
     copy->dstib.count = 0;	/* duplicates dstelt_nr */
     copy->dstib.type = GL_UNSIGNED_INT;
     copy->dstib.obj = ctx->Array.NullBufferObj;
-    copy->dstib.ptr = copy->dstelt;
+    copy->dstib.ptr = copy->dstelt.data();
 }
 
 
@@ -500,11 +505,10 @@ static void replay_finish(struct copy_context *copy)
     GLcontext *ctx = copy->ctx;
     GLuint i;
 
-    /* Free our vertex and index buffers:
+    /* Vertex and index buffers (translated_elt_buf, dstbuf, dstelt) are
+     * std::vector members and are freed automatically when copy_context
+     * goes out of scope.  No explicit deallocation needed here.
      */
-    delete[] copy->translated_elt_buf;
-    delete[] copy->dstbuf;
-    delete[] copy->dstelt;
 
     /* Unmap VBO's
      */
