@@ -887,7 +887,7 @@ osmesa_context::compute_row_addresses()
  */
 class OsMesaRenderbuffer : public gl_renderbuffer {
 public:
-    OsMesaRenderbuffer() = default;
+    OsMesaRenderbuffer() : gl_renderbuffer(0) {}
     ~OsMesaRenderbuffer() override {
 	/* Data is the user-provided buffer – do NOT free it. */
 	Data = nullptr;
@@ -1081,9 +1081,7 @@ private:
 static struct gl_renderbuffer *
 new_osmesa_renderbuffer(GLcontext *ctx, GLenum format, GLenum type)
 {
-    const GLuint name = 0;
     auto *rb = new OsMesaRenderbuffer{};
-    _mesa_init_renderbuffer(rb, name);
     rb->RefCount = 1;
 
     if (format == OSMESA_COLOR_INDEX) {

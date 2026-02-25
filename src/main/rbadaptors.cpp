@@ -46,7 +46,7 @@
  * Handles the common AllocStorage and destructor logic.
  */
 struct WrappedRenderbuffer : public gl_renderbuffer {
-    WrappedRenderbuffer() = default;
+    explicit WrappedRenderbuffer(GLuint name = 0) : gl_renderbuffer(name) {}
     ~WrappedRenderbuffer() override {
 _mesa_reference_renderbuffer(&Wrapped, nullptr);
     }
@@ -70,7 +70,7 @@ return b;
  */
 
 struct RB16Wrap8 : public WrappedRenderbuffer {
-    RB16Wrap8() = default;
+    explicit RB16Wrap8(GLuint name = 0) : WrappedRenderbuffer(name) {}
 
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
@@ -181,8 +181,7 @@ _mesa_new_renderbuffer_16wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8)
     ASSERT(rb8->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb8->_BaseFormat == GL_RGBA);
 
-    auto *rb16 = new RB16Wrap8{};
-    _mesa_init_renderbuffer(rb16, rb8->Name);
+    auto *rb16 = new RB16Wrap8{rb8->Name};
 
     {
 std::lock_guard<std::mutex> lock(rb8->Mutex);
@@ -208,7 +207,7 @@ rb8->RefCount++;
  */
 
 struct RB32Wrap8 : public WrappedRenderbuffer {
-    RB32Wrap8() = default;
+    explicit RB32Wrap8(GLuint name = 0) : WrappedRenderbuffer(name) {}
 
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
@@ -319,8 +318,7 @@ _mesa_new_renderbuffer_32wrap8(GLcontext *ctx, struct gl_renderbuffer *rb8)
     ASSERT(rb8->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb8->_BaseFormat == GL_RGBA);
 
-    auto *rb32 = new RB32Wrap8{};
-    _mesa_init_renderbuffer(rb32, rb8->Name);
+    auto *rb32 = new RB32Wrap8{rb8->Name};
 
     {
 std::lock_guard<std::mutex> lock(rb8->Mutex);
@@ -346,7 +344,7 @@ rb8->RefCount++;
  */
 
 struct RB32Wrap16 : public WrappedRenderbuffer {
-    RB32Wrap16() = default;
+    explicit RB32Wrap16(GLuint name = 0) : WrappedRenderbuffer(name) {}
 
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
@@ -457,8 +455,7 @@ _mesa_new_renderbuffer_32wrap16(GLcontext *ctx, struct gl_renderbuffer *rb16)
     ASSERT(rb16->DataType == GL_UNSIGNED_SHORT);
     ASSERT(rb16->_BaseFormat == GL_RGBA);
 
-    auto *rb32 = new RB32Wrap16{};
-    _mesa_init_renderbuffer(rb32, rb16->Name);
+    auto *rb32 = new RB32Wrap16{rb16->Name};
 
     {
 std::lock_guard<std::mutex> lock(rb16->Mutex);

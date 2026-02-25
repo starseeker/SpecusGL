@@ -2280,6 +2280,22 @@ struct gl_renderbuffer {
     /** Used to wrap one renderbuffer around another. */
     struct gl_renderbuffer *Wrapped;
 
+    /**
+     * Initialise the renderbuffer (replaces _mesa_init_renderbuffer()).
+     *
+     * Sets Magic, Name, RefCount to 0, and Wrapped to point at this object.
+     * All other POD fields are zero-initialised by the default constructor.
+     */
+    explicit gl_renderbuffer(GLuint name = 0)
+        : Magic(RB_MAGIC), ClassID(0), Name(name), RefCount(0),
+          Width(0), Height(0),
+          InternalFormat(GL_NONE), _ActualFormat(GL_NONE), _BaseFormat(GL_NONE),
+          DataType(GL_NONE),
+          RedBits(0), GreenBits(0), BlueBits(0), AlphaBits(0),
+          IndexBits(0), DepthBits(0), StencilBits(0),
+          Data(nullptr), Wrapped(this)
+    {}
+
     /** Virtual destructor – base implementation frees Data. */
     virtual ~gl_renderbuffer();
 

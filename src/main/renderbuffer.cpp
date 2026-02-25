@@ -955,7 +955,7 @@ gl_renderbuffer::PutRowRGB(GLcontext *ctx, GLuint count, GLint x, GLint y,
  */
 class SoftRenderbuffer : public gl_renderbuffer {
 public:
-    SoftRenderbuffer() = default;
+    explicit SoftRenderbuffer(GLuint name = 0) : gl_renderbuffer(name) {}
     ~SoftRenderbuffer() override = default;   /* base class frees Data */
 
     GLboolean AllocStorage(GLcontext *ctx, GLenum internalFormat,
@@ -1361,7 +1361,7 @@ static void put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, 
  */
 class AlphaRenderbuffer : public gl_renderbuffer {
 public:
-    AlphaRenderbuffer() = default;
+    AlphaRenderbuffer() : gl_renderbuffer(0) {}
     ~AlphaRenderbuffer() override {
 	/* base class destructor frees Data (the alpha channel buffer) */
 	ASSERT(Wrapped);
@@ -1578,31 +1578,31 @@ copy_buffer_alpha8(struct gl_renderbuffer* dst, struct gl_renderbuffer* src)
 
 /**
  * Initialize the fields of a gl_renderbuffer to default values.
+ *
+ * \deprecated The gl_renderbuffer constructor now performs this
+ *             initialisation.  This shim exists only for call sites
+ *             that pass an already-constructed object; new code should
+ *             pass \p name directly to the derived-class constructor.
  */
 void
 _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 {
-    /* Mutex auto-initializes as std::mutex default-constructs */
-    rb->Magic = RB_MAGIC;
-    rb->ClassID = 0;
-    rb->Name = name;
+    /* Re-apply constructor-time initialisation for the given name.
+     * Most fields are already correct after construction; only Name,
+     * Wrapped (self-pointer) and Magic may need fixing up here. */
+    rb->Magic    = RB_MAGIC;
+    rb->ClassID  = 0;
+    rb->Name     = name;
     rb->RefCount = 0;
-
-    rb->Width = 0;
-    rb->Height = 0;
+    rb->Width    = 0;
+    rb->Height   = 0;
     rb->InternalFormat = GL_NONE;
-    rb->_ActualFormat = GL_NONE;
-    rb->_BaseFormat = GL_NONE;
-    rb->DataType = GL_NONE;
+    rb->_ActualFormat  = GL_NONE;
+    rb->_BaseFormat    = GL_NONE;
+    rb->DataType       = GL_NONE;
     rb->RedBits = rb->GreenBits = rb->BlueBits = rb->AlphaBits = 0;
-    rb->IndexBits = 0;
-    rb->DepthBits = 0;
-    rb->StencilBits = 0;
-    rb->Data = nullptr;
-
-    /* Point back to ourself so that we don't have to check for Wrapped==nullptr
-     * all over the drivers.
-     */
+    rb->IndexBits = rb->DepthBits = rb->StencilBits = 0;
+    rb->Data    = nullptr;
     rb->Wrapped = rb;
 }
 
@@ -1614,9 +1614,7 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
 struct gl_renderbuffer *
 _mesa_new_renderbuffer(GLcontext *ctx, GLuint name)
 {
-    auto *rb = new SoftRenderbuffer{};
-    _mesa_init_renderbuffer(rb, name);
-    return rb;
+    return new SoftRenderbuffer{name};
 }
 
 
@@ -1818,7 +1816,6 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating alpha buffer");
 	    return GL_FALSE;
 	}
-	_mesa_init_renderbuffer(arb, 0);
 
 	/* wrap the alpha renderbuffer around the RGB renderbuffer */
 	arb->Wrapped = fb->Attachment[b].Renderbuffer;

@@ -51,7 +51,7 @@
  * depth-only or stencil-only pixel access.
  */
 struct DepthStencilWrapper : public gl_renderbuffer {
-    DepthStencilWrapper() = default;
+    DepthStencilWrapper() : gl_renderbuffer(0) {}
     ~DepthStencilWrapper() override {
 /* Decrement reference count on the wrapped buffer and delete if zero. */
 ASSERT(Wrapped);
@@ -234,7 +234,6 @@ _mesa_new_z24_renderbuffer_wrapper(GLcontext *ctx,
     ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
 
     auto *z24rb = new Z24RenderbufferWrapper{};
-    _mesa_init_renderbuffer(z24rb, 0);
 
     z24rb->Wrapped = dsrb;
     z24rb->Name = dsrb->Name;
@@ -405,7 +404,6 @@ _mesa_new_s8_renderbuffer_wrapper(GLcontext *ctx, struct gl_renderbuffer *dsrb)
     ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
 
     auto *s8rb = new S8RenderbufferWrapper{};
-    _mesa_init_renderbuffer(s8rb, 0);
 
     s8rb->Wrapped = dsrb;
     s8rb->Name = dsrb->Name;
