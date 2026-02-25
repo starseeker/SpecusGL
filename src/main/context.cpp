@@ -1089,16 +1089,17 @@ _mesa_free_context_data(GLcontext *ctx)
     _mesa_unreference_framebuffer(&ctx->DrawBuffer);
     _mesa_unreference_framebuffer(&ctx->ReadBuffer);
 
-    _mesa_free_attrib_data(ctx);
-    _mesa_free_lighting_data(ctx);
-    _mesa_free_eval_data(ctx);
-    _mesa_free_texture_data(ctx);
-    _mesa_free_matrix_data(ctx);
-    _mesa_free_viewport_data(ctx);
-    _mesa_free_colortables_data(ctx);
-    _mesa_free_program_data(ctx);
-    _mesa_free_shader_state(ctx);
-    _mesa_free_query_data(ctx);
+    _mesa_free_attrib_data(ctx);         /* releases texture references on attrib stack */
+    _mesa_free_texture_data(ctx);        /* frees texture objects */
+    _mesa_free_matrix_data(ctx);         /* early release of matrix stack memory */
+    _mesa_free_program_data(ctx);        /* releases shared program references */
+    _mesa_free_shader_state(ctx);        /* cleans up GLSL shader state */
+    _mesa_free_query_data(ctx);          /* frees query objects */
+
+    /* Note: _mesa_free_eval_data, _mesa_free_viewport_data,
+     * _mesa_free_lighting_data, and _mesa_free_colortables_data are
+     * all no-ops; the corresponding std::vector/std::list members
+     * are freed by __GLcontextRec's destructor. */
 
 #if FEATURE_ARB_vertex_buffer_object
     _mesa_delete_buffer_object(ctx, ctx->Array.NullBufferObj);

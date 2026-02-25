@@ -50,39 +50,33 @@ struct gl_program _mesa_DummyProgram;
 
 
 /**
- * Init context's vertex/fragment program state
+ * C++17 note: gl_program_state, gl_vertex_program_state, gl_fragment_program_state,
+ * and gl_ati_fragment_shader_state now carry default member initializers for
+ * all static fields.  The remaining work here is wiring up the shared default
+ * program objects (context-dependent) and setting TrackMatrixTransform to
+ * GL_IDENTITY_NV (cannot be done by a member initializer on a GLenum array).
  */
 void
 _mesa_init_program(GLcontext *ctx)
 {
     GLuint i;
 
-    ctx->Program.ErrorPos = -1;
-    ctx->Program.ErrorString = "";
-
 #if FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
-    ctx->VertexProgram.Enabled = GL_FALSE;
-    ctx->VertexProgram.PointSizeEnabled = GL_FALSE;
-    ctx->VertexProgram.TwoSideEnabled = GL_FALSE;
     ctx->VertexProgram.Current = (struct gl_vertex_program *) ctx->Shared->DefaultVertexProgram;
     assert(ctx->VertexProgram.Current);
     ctx->VertexProgram.Current->Base.ref();
     for (i = 0; i < MAX_NV_VERTEX_PROGRAM_PARAMS / 4; i++) {
-	ctx->VertexProgram.TrackMatrix[i] = GL_NONE;
 	ctx->VertexProgram.TrackMatrixTransform[i] = GL_IDENTITY_NV;
     }
 #endif
 
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program
-    ctx->FragmentProgram.Enabled = GL_FALSE;
     ctx->FragmentProgram.Current = (struct gl_fragment_program *) ctx->Shared->DefaultFragmentProgram;
     assert(ctx->FragmentProgram.Current);
     ctx->FragmentProgram.Current->Base.ref();
 #endif
 
-    /* XXX probably move this stuff */
 #if FEATURE_ATI_fragment_shader
-    ctx->ATIFragmentShader.Enabled = GL_FALSE;
     ctx->ATIFragmentShader.Current = (struct ati_fragment_shader *) ctx->Shared->DefaultFragmentShader;
     assert(ctx->ATIFragmentShader.Current);
     ctx->ATIFragmentShader.Current->RefCount++;

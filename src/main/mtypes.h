@@ -1986,8 +1986,8 @@ struct gl_fragment_program {
  * State common to vertex and fragment programs.
  */
 struct gl_program_state {
-    GLint ErrorPos;                       /* GL_PROGRAM_ERROR_POSITION_ARB/NV */
-    std::string ErrorString;              /* GL_PROGRAM_ERROR_STRING_ARB/NV */
+    GLint ErrorPos = -1;                 /* GL_PROGRAM_ERROR_POSITION_ARB/NV */
+    std::string ErrorString;             /* GL_PROGRAM_ERROR_STRING_ARB/NV */
 };
 
 
@@ -1995,34 +1995,34 @@ struct gl_program_state {
  * Context state for vertex programs.
  */
 struct gl_vertex_program_state {
-    GLboolean Enabled;               /**< GL_VERTEX_PROGRAM_ARB/NV */
-    GLboolean _Enabled;              /**< Enabled and valid program? */
-    GLboolean PointSizeEnabled;      /**< GL_VERTEX_PROGRAM_POINT_SIZE_ARB/NV */
-    GLboolean TwoSideEnabled;        /**< GL_VERTEX_PROGRAM_TWO_SIDE_ARB/NV */
-    struct gl_vertex_program *Current;  /**< user-bound vertex program */
+    GLboolean Enabled = GL_FALSE;        /**< GL_VERTEX_PROGRAM_ARB/NV */
+    GLboolean _Enabled = GL_FALSE;       /**< Enabled and valid program? */
+    GLboolean PointSizeEnabled = GL_FALSE; /**< GL_VERTEX_PROGRAM_POINT_SIZE_ARB/NV */
+    GLboolean TwoSideEnabled = GL_FALSE; /**< GL_VERTEX_PROGRAM_TWO_SIDE_ARB/NV */
+    struct gl_vertex_program *Current = nullptr;  /**< user-bound vertex program */
 
     /** Currently enabled and valid program (including internal programs
      * and compiled shader programs).
      */
-    struct gl_vertex_program *_Current;
+    struct gl_vertex_program *_Current = nullptr;
 
-    GLfloat Parameters[MAX_PROGRAM_ENV_PARAMS][4]; /**< Env params */
+    GLfloat Parameters[MAX_PROGRAM_ENV_PARAMS][4] = {}; /**< Env params */
 
     /* For GL_NV_vertex_program only: */
-    GLenum TrackMatrix[MAX_PROGRAM_ENV_PARAMS / 4];
-    GLenum TrackMatrixTransform[MAX_PROGRAM_ENV_PARAMS / 4];
+    GLenum TrackMatrix[MAX_PROGRAM_ENV_PARAMS / 4] = {};
+    GLenum TrackMatrixTransform[MAX_PROGRAM_ENV_PARAMS / 4] = {};
 
     /** Should fixed-function T&L be implemented with a vertex prog? */
-    GLboolean _MaintainTnlProgram;
+    GLboolean _MaintainTnlProgram = GL_FALSE;
 
     /** Program to emulate fixed-function T&L (see above) */
-    struct gl_vertex_program *_TnlProgram;
+    struct gl_vertex_program *_TnlProgram = nullptr;
 
 #if FEATURE_MESA_program_debug
-    GLprogramcallbackMESA Callback;
-    GLvoid *CallbackData;
-    GLboolean CallbackEnabled;
-    GLuint CurrentPosition;
+    GLprogramcallbackMESA Callback = nullptr;
+    GLvoid *CallbackData = nullptr;
+    GLboolean CallbackEnabled = GL_FALSE;
+    GLuint CurrentPosition = 0;
 #endif
 };
 
@@ -2031,30 +2031,30 @@ struct gl_vertex_program_state {
  * Context state for fragment programs.
  */
 struct gl_fragment_program_state {
-    GLboolean Enabled;     /**< User-set fragment program enable flag */
-    GLboolean _Enabled;    /**< Fragment program enabled and valid? */
-    GLboolean _Active;
-    struct gl_fragment_program *Current;  /**< User-bound fragment program */
+    GLboolean Enabled = GL_FALSE;      /**< User-set fragment program enable flag */
+    GLboolean _Enabled = GL_FALSE;     /**< Fragment program enabled and valid? */
+    GLboolean _Active = GL_FALSE;
+    struct gl_fragment_program *Current = nullptr;  /**< User-bound fragment program */
 
     /** Currently enabled and valid program (including internal programs
      * and compiled shader programs).
      */
-    struct gl_fragment_program *_Current;
+    struct gl_fragment_program *_Current = nullptr;
 
-    GLfloat Parameters[MAX_PROGRAM_ENV_PARAMS][4]; /**< Env params */
+    GLfloat Parameters[MAX_PROGRAM_ENV_PARAMS][4] = {}; /**< Env params */
 
     /** Should fixed-function texturing be implemented with a fragment prog? */
-    GLboolean _MaintainTexEnvProgram;
-    GLboolean _UseTexEnvProgram;
+    GLboolean _MaintainTexEnvProgram = GL_FALSE;
+    GLboolean _UseTexEnvProgram = GL_FALSE;
 
     /** Program to emulate fixed-function texture env/combine (see above) */
-    struct gl_fragment_program *_TexEnvProgram;
+    struct gl_fragment_program *_TexEnvProgram = nullptr;
 
 #if FEATURE_MESA_program_debug
-    GLprogramcallbackMESA Callback;
-    GLvoid *CallbackData;
-    GLboolean CallbackEnabled;
-    GLuint CurrentPosition;
+    GLprogramcallbackMESA Callback = nullptr;
+    GLvoid *CallbackData = nullptr;
+    GLboolean CallbackEnabled = GL_FALSE;
+    GLuint CurrentPosition = 0;
 #endif
 };
 
@@ -2092,11 +2092,11 @@ struct ati_fragment_shader {
  * Context state for GL_ATI_fragment_shader
  */
 struct gl_ati_fragment_shader_state {
-    GLboolean Enabled;
-    GLboolean _Enabled;                      /** enabled and valid shader? */
-    GLboolean Compiling;
-    GLfloat GlobalConstants[8][4];
-    struct ati_fragment_shader *Current;
+    GLboolean Enabled = GL_FALSE;
+    GLboolean _Enabled = GL_FALSE;               /** enabled and valid shader? */
+    GLboolean Compiling = GL_FALSE;
+    GLfloat GlobalConstants[8][4] = {};
+    struct ati_fragment_shader *Current = nullptr;
 };
 
 
