@@ -899,8 +899,8 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 	    return;
 	}
 
-	if (dstImage->ImageOffsets)
-	    free(dstImage->ImageOffsets);
+	delete[] dstImage->ImageOffsets;
+	dstImage->ImageOffsets = nullptr;
 
 	/* Free old image data */
 	if (dstImage->Data)

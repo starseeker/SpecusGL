@@ -1345,7 +1345,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     if ((width & 7) | (height & 3)) {
 	GLint newWidth = (width + 7) & ~7;
 	GLint newHeight = (height + 3) & ~3;
-	newSource = malloc(comps * newWidth * newHeight * sizeof(GLchan));
+	newSource = new GLchan[comps * newWidth * newHeight];
 	if (!newSource) {
 	    GET_CURRENT_CONTEXT(ctx);
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "texture compression");
@@ -1364,7 +1364,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     if (CHAN_TYPE != GL_UNSIGNED_BYTE) {
 	const GLuint n = width * height * comps;
 	const GLchan *src = (const GLchan *) source;
-	GLubyte *dest = (GLubyte *) malloc(n * sizeof(GLubyte));
+	GLubyte *dest = new GLubyte[n];
 	GLuint i;
 	if (!dest) {
 	    GET_CURRENT_CONTEXT(ctx);
@@ -1375,9 +1375,9 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 	    dest[i] = CHAN_TO_UBYTE(src[i]);
 	}
 	if (newSource != nullptr) {
-	    free(newSource);
+	    delete[] static_cast<GLchan *>(newSource);
 	}
-	newSource = dest;  /* we'll free this buffer before returning */
+	newSource = dest;  /* we'll delete this buffer before returning */
 	source = dest;  /* the new, GLubyte incoming image */
     }
 
@@ -1400,9 +1400,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     }
 
 cleanUp:
-    if (newSource != nullptr) {
-	free(newSource);
-    }
+    delete[] static_cast<GLchan *>(newSource);
 }
 
 
