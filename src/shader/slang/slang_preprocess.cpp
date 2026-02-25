@@ -32,6 +32,8 @@
 #include "grammar_mesa.h"
 #include "slang_preprocess.h"
 
+#include <vector>
+
 LONGSTRING static const char *slang_pp_directives_syn =
 #include "library/slang_pp_directives_syn.h"
     ;
@@ -335,95 +337,63 @@ execute_expressions(slang_string *output, grammar eid, const byte *expr, GLint r
  * as well as macros in the source string.
  */
 
-typedef struct {
-    struct pp_symbol_ *symbols;
-    GLuint count;
-} pp_symbols;
+struct pp_symbol;
+using pp_symbols = std::vector<pp_symbol>;
+
+struct pp_symbol {
+    slang_string name;
+    slang_string replacement;
+    pp_symbols parameters;
+};
 
 static GLvoid
 pp_symbols_init(pp_symbols *self)
 {
-    self->symbols = nullptr;
-    self->count = 0;
+    self->clear();
 }
 
 static GLvoid
-pp_symbols_free(pp_symbols *);
-
-typedef struct pp_symbol_ {
-    slang_string name;
-    slang_string replacement;
-    pp_symbols parameters;
-} pp_symbol;
-
-static GLvoid
-pp_symbol_init(pp_symbol *self)
+pp_symbols_free(pp_symbols *self)
 {
-    slang_string_init(&self->name);
-    slang_string_init(&self->replacement);
-    pp_symbols_init(&self->parameters);
+    self->clear();
 }
 
-static GLvoid
-pp_symbol_free(pp_symbol *self)
-{
-    slang_string_free(&self->name);
-    slang_string_free(&self->replacement);
-    pp_symbols_free(&self->parameters);
-}
+/* pp_symbol and pp_symbols are backed by std::string and std::vector.
+ * The init/free/reset functions are now trivial wrappers; the constructor
+ * and destructor of the struct members handle memory automatically. */
+
+static void pp_symbol_init(pp_symbol *) {} /* no-op: std::string/vector self-init */
+static void pp_symbol_free(pp_symbol *) {} /* no-op: members self-destruct */
 
 static GLvoid
 pp_symbol_reset(pp_symbol *self)
 {
     /* Leave symbol name intact. */
     slang_string_reset(&self->replacement);
-    pp_symbols_free(&self->parameters);
-    pp_symbols_init(&self->parameters);
-}
-
-static GLvoid
-pp_symbols_free(pp_symbols *self)
-{
-    GLuint i;
-
-    for (i = 0; i < self->count; i++)
-	pp_symbol_free(&self->symbols[i]);
-    free(self->symbols);
+    self->parameters.clear();
 }
 
 static pp_symbol *
 pp_symbols_push(pp_symbols *self)
 {
-    self->symbols = (pp_symbol *)(_mesa_realloc(self->symbols, self->count * sizeof(pp_symbol),
-				  (self->count + 1) * sizeof(pp_symbol)));
-    if (self->symbols == nullptr)
-	return nullptr;
-    pp_symbol_init(&self->symbols[self->count]);
-    return &self->symbols[self->count++];
+    self->emplace_back();
+    return &self->back();
 }
 
 static GLboolean
 pp_symbols_erase(pp_symbols *self, pp_symbol *symbol)
 {
-    assert(symbol >= self->symbols && symbol < self->symbols + self->count);
-
-    self->count--;
-    pp_symbol_free(symbol);
-    if (symbol < self->symbols + self->count)
-	memcpy(symbol, symbol + 1, sizeof(pp_symbol) * (self->symbols + self->count - symbol));
-    self->symbols = (pp_symbol *)(_mesa_realloc(self->symbols, (self->count + 1) * sizeof(pp_symbol),
-				  self->count * sizeof(pp_symbol)));
-    return self->symbols != nullptr;
+    assert(symbol >= self->data() && symbol < self->data() + self->size());
+    self->erase(self->begin() + (symbol - self->data()));
+    return GL_TRUE;
 }
 
 static pp_symbol *
 pp_symbols_find(pp_symbols *self, const char *name)
 {
-    GLuint i;
-
-    for (i = 0; i < self->count; i++)
-	if (strcmp(name, slang_string_cstr(&self->symbols[i].name)) == 0)
-	    return &self->symbols[i];
+    for (auto &sym : *self)
+	if (sym.name == name)
+	    return &sym;
     return nullptr;
 }
 
@@ -617,7 +587,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
     expand_state es;
 
     /* If the macro has some parameters, we need to parse them. */
-    if (symbol->parameters.count != 0) {
+    if (symbol->parameters.size() != 0) {
 	GLuint i;
 
 	/* Parse the opening parenthesis. */
@@ -631,20 +601,20 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
 
 	/* Parse macro actual parameters. This can be anything, separated by a colon.
 	 * TODO: What about nested/grouped parameters by parenthesis? */
-	for (i = 0; i < symbol->parameters.count; i++) {
+	for (i = 0; i < symbol->parameters.size(); i++) {
 	    if (*e->input == ')') {
 		slang_info_log_error(e->state->elog, "preprocess error: unexpected ')'.");
 		return GL_FALSE;
 	    }
 
 	    /* Eat all characters up to the comma or closing parentheses. */
-	    pp_symbol_reset(&symbol->parameters.symbols[i]);
+	    pp_symbol_reset(&symbol->parameters[i]);
 	    while (!IS_NULL(*e->input) && *e->input != ',' && *e->input != ')')
-		slang_string_pushc(&symbol->parameters.symbols[i].replacement, *e->input++);
+		slang_string_pushc(&symbol->parameters[i].replacement, *e->input++);
 
 	    /* If it was not the last paremeter, skip the comma. Otherwise, skip the
 	     * closing parentheses. */
-	    if (i + 1 == symbol->parameters.count) {
+	    if (i + 1 == symbol->parameters.size()) {
 		/* This is the last paremeter - skip the closing parentheses. */
 		if (*e->input != ')') {
 		    slang_info_log_error(e->state->elog, "preprocess error: ')' expected.");
