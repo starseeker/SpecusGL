@@ -259,20 +259,25 @@ static inline int GET_FLOAT_BITS(float x)
  *** DIFFERENT_SIGNS: test if two floats have opposite signs
  ***/
 #if defined(USE_IEEE)
-#define DIFFERENT_SIGNS(x,y) ((GET_FLOAT_BITS(x) ^ GET_FLOAT_BITS(y)) & (1<<31))
+[[nodiscard]] inline bool different_signs(float x, float y) noexcept {
+    return (GET_FLOAT_BITS(x) ^ GET_FLOAT_BITS(y)) & (1U << 31);
+}
 #else
-/* Could just use (x*y<0) except for the flatshading requirements.
- * Maybe there's a better way?
- */
-#define DIFFERENT_SIGNS(x,y) ((x) * (y) <= 0.0F && (x) - (y) != 0.0F)
+[[nodiscard]] inline bool different_signs(float x, float y) noexcept {
+    return x * y <= 0.0F && x - y != 0.0F;
+}
 #endif
+#define DIFFERENT_SIGNS(x, y) different_signs(x, y)
 
 
 
 /***
  *** IROUND: return (as an integer) float rounded to nearest integer
  ***/
-#define IROUND(f)  ((int) (((f) >= 0.0F) ? ((f) + 0.5F) : ((f) - 0.5F)))
+[[nodiscard]] inline int iround(float f) noexcept {
+    return static_cast<int>(f >= 0.0F ? (f + 0.5F) : (f - 0.5F));
+}
+#define IROUND(f) iround(f)
 
 
 /***

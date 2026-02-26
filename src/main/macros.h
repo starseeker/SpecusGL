@@ -104,52 +104,156 @@ extern GLfloat _mesa_ubyte_to_float_color_tab[256];
 
 /*@}*/
 
+/**
+ * Helper for pointer stride stepping.
+ *
+ * Advances pointer \p p by \p stride bytes, preserving const-ness of the
+ * pointee.  This replaces the old C-style cast macros which silently stripped
+ * const when used with pointers-to-const data.
+ */
+template<typename T>
+[[nodiscard]] inline T* mesa_stride_ptr(T* p, std::ptrdiff_t stride) noexcept {
+    return reinterpret_cast<T*>(reinterpret_cast<char*>(p) + stride);
+}
+template<typename T>
+[[nodiscard]] inline const T* mesa_stride_ptr(const T* p, std::ptrdiff_t stride) noexcept {
+    return reinterpret_cast<const T*>(reinterpret_cast<const char*>(p) + stride);
+}
 
 /** Stepping a GLfloat pointer by a byte stride */
-#define STRIDE_F(p, i)  (p = (GLfloat *)((GLubyte *)p + i))
+#define STRIDE_F(p, i)      (p = mesa_stride_ptr(p, i))
 /** Stepping a GLuint pointer by a byte stride */
-#define STRIDE_UI(p, i)  (p = (GLuint *)((GLubyte *)p + i))
+#define STRIDE_UI(p, i)     (p = mesa_stride_ptr(p, i))
 /** Stepping a GLubyte[4] pointer by a byte stride */
-#define STRIDE_4UB(p, i)  (p = (GLubyte (*)[4])((GLubyte *)p + i))
+#define STRIDE_4UB(p, i)    (p = mesa_stride_ptr(p, i))
 /** Stepping a GLfloat[4] pointer by a byte stride */
-#define STRIDE_4F(p, i)  (p = (GLfloat (*)[4])((GLubyte *)p + i))
+#define STRIDE_4F(p, i)     (p = mesa_stride_ptr(p, i))
 /** Stepping a GLchan[4] pointer by a byte stride */
-#define STRIDE_4CHAN(p, i)  (p = (GLchan (*)[4])((GLubyte *)p + i))
+#define STRIDE_4CHAN(p, i)  (p = mesa_stride_ptr(p, i))
 /** Stepping a GLchan pointer by a byte stride */
-#define STRIDE_CHAN(p, i)  (p = (GLchan *)((GLubyte *)p + i))
+#define STRIDE_CHAN(p, i)   (p = mesa_stride_ptr(p, i))
 /** Stepping a \p t pointer by a byte stride */
-#define STRIDE_T(p, t, i)  (p = (t)((GLubyte *)p + i))
+#define STRIDE_T(p, t, i)  (p = reinterpret_cast<t>(reinterpret_cast<char *>(p) + (i)))
 
+
+/*
+ * C++17 inline function implementations for vector operations.
+ *
+ * These replace the old do-while macro bodies.  The macros below are kept
+ * as thin wrappers so that all existing call sites continue to compile
+ * without modification.  New code should call the mesa_* functions directly.
+ */
 
 /**********************************************************************/
 /** \name 4-element vector operations */
 /*@{*/
 
-/** Zero */
-#define ZERO_4V( DST )  (DST)[0] = (DST)[1] = (DST)[2] = (DST)[3] = 0
+/** Zero all four elements. */
+template<typename T>
+inline void mesa_zero4v(T* v) noexcept { v[0] = v[1] = v[2] = v[3] = T(0); }
 
-/** Test for equality */
-#define TEST_EQ_4V(a,b)  ((a)[0] == (b)[0] &&   \
-              (a)[1] == (b)[1] &&   \
-              (a)[2] == (b)[2] &&   \
-              (a)[3] == (b)[3])
+/** Test element-wise equality of two 4-element vectors. */
+template<typename T, typename U>
+[[nodiscard]] inline bool mesa_test_eq_4v(const T* a, const U* b) noexcept {
+    return a[0]==b[0] && a[1]==b[1] && a[2]==b[2] && a[3]==b[3];
+}
 
+/** Copy a 4-element vector (element-wise assignment). */
+template<typename Dst, typename Src>
+inline void mesa_copy4v(Dst* dst, const Src* src) noexcept {
+    dst[0]=src[0]; dst[1]=src[1]; dst[2]=src[2]; dst[3]=src[3];
+}
+
+/**
+ * Copy a 4-element float vector using memcpy (avoids FPU registers and
+ * the type-punning UB of the original uint-cast approach).
+ */
+inline void mesa_copy4fv(GLfloat* dst, const GLfloat* src) noexcept {
+    std::memcpy(dst, src, 4 * sizeof(GLfloat));
+}
+
+/** Copy \p sz elements (1-4) into a 4-element vector (higher unused). */
+template<typename Dst, typename Src>
+inline void mesa_copy_sz_4v(Dst* dst, int sz, const Src* src) noexcept {
+    switch (sz) {
+    case 4: dst[3] = src[3]; [[fallthrough]];
+    case 3: dst[2] = src[2]; [[fallthrough]];
+    case 2: dst[1] = src[1]; [[fallthrough]];
+    case 1: dst[0] = src[0];
+    }
+}
+
+/** Copy \p sz elements into a homogeneous 4-vector; remaining set to (0,0,0,1). */
+template<typename Dst, typename Src>
+inline void mesa_copy_clean_4v(Dst* dst, int sz, const Src* src) noexcept {
+    dst[0] = Dst(0); dst[1] = Dst(0); dst[2] = Dst(0); dst[3] = Dst(1);
+    mesa_copy_sz_4v(dst, sz, src);
+}
+
+/** Subtraction: dst = a - b */
+template<typename Dst, typename A, typename B>
+inline void mesa_sub4v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]-b[0]; dst[1]=a[1]-b[1]; dst[2]=a[2]-b[2]; dst[3]=a[3]-b[3];
+}
+
+/** Addition: dst = a + b */
+template<typename Dst, typename A, typename B>
+inline void mesa_add4v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]+b[0]; dst[1]=a[1]+b[1]; dst[2]=a[2]+b[2]; dst[3]=a[3]+b[3];
+}
+
+/** Element-wise multiplication: dst = a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_scale4v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]*b[0]; dst[1]=a[1]*b[1]; dst[2]=a[2]*b[2]; dst[3]=a[3]*b[3];
+}
+
+/** In-place addition: dst += src */
+template<typename Dst, typename Src>
+inline void mesa_acc4v(Dst* dst, const Src* src) noexcept {
+    dst[0]+=src[0]; dst[1]+=src[1]; dst[2]+=src[2]; dst[3]+=src[3];
+}
+
+/** Element-wise multiply-accumulate: dst += a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_acc_scale4v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]+=a[0]*b[0]; dst[1]+=a[1]*b[1]; dst[2]+=a[2]*b[2]; dst[3]+=a[3]*b[3];
+}
+
+/** Scalar multiply-accumulate: dst += s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_acc_scale_scalar4v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]+=s*src[0]; dst[1]+=s*src[1]; dst[2]+=s*src[2]; dst[3]+=s*src[3];
+}
+
+/** Scalar multiplication: dst = s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_scale_scalar4v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]=s*src[0]; dst[1]=s*src[1]; dst[2]=s*src[2]; dst[3]=s*src[3];
+}
+
+/** In-place scalar multiplication: dst *= s */
+template<typename Dst, typename S>
+inline void mesa_self_scale_scalar4v(Dst* dst, S s) noexcept {
+    dst[0]*=s; dst[1]*=s; dst[2]*=s; dst[3]*=s;
+}
+
+/** Assign four scalar values to a vector. */
+template<typename V, typename V0, typename V1, typename V2, typename V3>
+inline void mesa_assign4v(V* v, V0 v0, V1 v1, V2 v2, V3 v3) noexcept {
+    v[0]=v0; v[1]=v1; v[2]=v2; v[3]=v3;
+}
+
+/* --- Macro aliases --- */
+#define ZERO_4V(DST)              mesa_zero4v(DST)
+#define TEST_EQ_4V(a, b)          mesa_test_eq_4v(a, b)
 /** Test for equality (unsigned bytes) */
 #if defined(__i386__)
-#define TEST_EQ_4UBV(DST, SRC) *((GLuint*)(DST)) == *((GLuint*)(SRC))
+#define TEST_EQ_4UBV(DST, SRC) (*reinterpret_cast<const GLuint*>(DST) == *reinterpret_cast<const GLuint*>(SRC))
 #else
-#define TEST_EQ_4UBV(DST, SRC) TEST_EQ_4V(DST, SRC)
+#define TEST_EQ_4UBV(DST, SRC) mesa_test_eq_4v(DST, SRC)
 #endif
-
-/** Copy a 4-element vector */
-#define COPY_4V( DST, SRC )         \
-do {                                \
-   (DST)[0] = (SRC)[0];             \
-   (DST)[1] = (SRC)[1];             \
-   (DST)[2] = (SRC)[2];             \
-   (DST)[3] = (SRC)[3];             \
-} while (0)
-
+#define COPY_4V(DST, SRC)         mesa_copy4v(DST, SRC)
 /** Copy a 4-element vector with cast */
 #define COPY_4V_CAST( DST, SRC, CAST )  \
 do {                                    \
@@ -158,162 +262,124 @@ do {                                    \
    (DST)[2] = (CAST)(SRC)[2];           \
    (DST)[3] = (CAST)(SRC)[3];           \
 } while (0)
-
 /** Copy a 4-element unsigned byte vector */
 #if defined(__i386__)
-#define COPY_4UBV(DST, SRC)                 \
-do {                                        \
-   *((GLuint*)(DST)) = *((GLuint*)(SRC));   \
-} while (0)
+#define COPY_4UBV(DST, SRC) \
+   (*reinterpret_cast<GLuint*>(DST) = *reinterpret_cast<const GLuint*>(SRC))
 #else
-/* The GLuint cast might fail if DST or SRC are not dword-aligned (RISC) */
-#define COPY_4UBV(DST, SRC)         \
-do {                                \
-   (DST)[0] = (SRC)[0];             \
-   (DST)[1] = (SRC)[1];             \
-   (DST)[2] = (SRC)[2];             \
-   (DST)[3] = (SRC)[3];             \
-} while (0)
+#define COPY_4UBV(DST, SRC)  mesa_copy4v(DST, SRC)
 #endif
-
-/**
- * Copy a 4-element float vector (avoid using FPU registers)
- * XXX Could use two 64-bit moves on 64-bit systems
- */
-#define COPY_4FV( DST, SRC )                  \
-do {                                          \
-   const GLuint *_s = (const GLuint *) (SRC); \
-   GLuint *_d = (GLuint *) (DST);             \
-   _d[0] = _s[0];                             \
-   _d[1] = _s[1];                             \
-   _d[2] = _s[2];                             \
-   _d[3] = _s[3];                             \
-} while (0)
-
-/** Copy \p SZ elements into a 4-element vector */
-#define COPY_SZ_4V(DST, SZ, SRC)  \
-do {                              \
-   switch (SZ) {                  \
-   case 4: (DST)[3] = (SRC)[3];   \
-   case 3: (DST)[2] = (SRC)[2];   \
-   case 2: (DST)[1] = (SRC)[1];   \
-   case 1: (DST)[0] = (SRC)[0];   \
-   }                              \
-} while(0)
-
-/** Copy \p SZ elements into a homegeneous (4-element) vector, giving
- * default values to the remaining */
-#define COPY_CLEAN_4V(DST, SZ, SRC)  \
-do {                                 \
-      ASSIGN_4V( DST, 0, 0, 0, 1 );  \
-      COPY_SZ_4V( DST, SZ, SRC );    \
-} while (0)
-
-/** Subtraction */
-#define SUB_4V( DST, SRCA, SRCB )           \
-do {                                        \
-      (DST)[0] = (SRCA)[0] - (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] - (SRCB)[1];     \
-      (DST)[2] = (SRCA)[2] - (SRCB)[2];     \
-      (DST)[3] = (SRCA)[3] - (SRCB)[3];     \
-} while (0)
-
-/** Addition */
-#define ADD_4V( DST, SRCA, SRCB )           \
-do {                                        \
-      (DST)[0] = (SRCA)[0] + (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] + (SRCB)[1];     \
-      (DST)[2] = (SRCA)[2] + (SRCB)[2];     \
-      (DST)[3] = (SRCA)[3] + (SRCB)[3];     \
-} while (0)
-
-/** Element-wise multiplication */
-#define SCALE_4V( DST, SRCA, SRCB )         \
-do {                                        \
-      (DST)[0] = (SRCA)[0] * (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] * (SRCB)[1];     \
-      (DST)[2] = (SRCA)[2] * (SRCB)[2];     \
-      (DST)[3] = (SRCA)[3] * (SRCB)[3];     \
-} while (0)
-
-/** In-place addition */
-#define ACC_4V( DST, SRC )          \
-do {                                \
-      (DST)[0] += (SRC)[0];         \
-      (DST)[1] += (SRC)[1];         \
-      (DST)[2] += (SRC)[2];         \
-      (DST)[3] += (SRC)[3];         \
-} while (0)
-
-/** Element-wise multiplication and addition */
-#define ACC_SCALE_4V( DST, SRCA, SRCB )     \
-do {                                        \
-      (DST)[0] += (SRCA)[0] * (SRCB)[0];    \
-      (DST)[1] += (SRCA)[1] * (SRCB)[1];    \
-      (DST)[2] += (SRCA)[2] * (SRCB)[2];    \
-      (DST)[3] += (SRCA)[3] * (SRCB)[3];    \
-} while (0)
-
-/** In-place scalar multiplication and addition */
-#define ACC_SCALE_SCALAR_4V( DST, S, SRCB ) \
-do {                                        \
-      (DST)[0] += S * (SRCB)[0];            \
-      (DST)[1] += S * (SRCB)[1];            \
-      (DST)[2] += S * (SRCB)[2];            \
-      (DST)[3] += S * (SRCB)[3];            \
-} while (0)
-
-/** Scalar multiplication */
-#define SCALE_SCALAR_4V( DST, S, SRCB ) \
-do {                                    \
-      (DST)[0] = S * (SRCB)[0];         \
-      (DST)[1] = S * (SRCB)[1];         \
-      (DST)[2] = S * (SRCB)[2];         \
-      (DST)[3] = S * (SRCB)[3];         \
-} while (0)
-
-/** In-place scalar multiplication */
-#define SELF_SCALE_SCALAR_4V( DST, S ) \
-do {                                   \
-      (DST)[0] *= S;                   \
-      (DST)[1] *= S;                   \
-      (DST)[2] *= S;                   \
-      (DST)[3] *= S;                   \
-} while (0)
-
-/** Assignment */
-#define ASSIGN_4V( V, V0, V1, V2, V3 )  \
-do {                                    \
-    V[0] = V0;                          \
-    V[1] = V1;                          \
-    V[2] = V2;                          \
-    V[3] = V3;                          \
-} while(0)
+#define COPY_4FV(DST, SRC)        mesa_copy4fv(DST, SRC)
+#define COPY_SZ_4V(DST, SZ, SRC)  mesa_copy_sz_4v(DST, SZ, SRC)
+#define COPY_CLEAN_4V(DST, SZ, SRC) mesa_copy_clean_4v(DST, SZ, SRC)
+#define SUB_4V(DST, SRCA, SRCB)   mesa_sub4v(DST, SRCA, SRCB)
+#define ADD_4V(DST, SRCA, SRCB)   mesa_add4v(DST, SRCA, SRCB)
+#define SCALE_4V(DST, SRCA, SRCB) mesa_scale4v(DST, SRCA, SRCB)
+#define ACC_4V(DST, SRC)          mesa_acc4v(DST, SRC)
+#define ACC_SCALE_4V(DST, SRCA, SRCB)       mesa_acc_scale4v(DST, SRCA, SRCB)
+#define ACC_SCALE_SCALAR_4V(DST, S, SRCB)   mesa_acc_scale_scalar4v(DST, S, SRCB)
+#define SCALE_SCALAR_4V(DST, S, SRCB)       mesa_scale_scalar4v(DST, S, SRCB)
+#define SELF_SCALE_SCALAR_4V(DST, S)        mesa_self_scale_scalar4v(DST, S)
+#define ASSIGN_4V(V, V0, V1, V2, V3)        mesa_assign4v(V, V0, V1, V2, V3)
 
 /*@}*/
 
 
 /**********************************************************************/
-/** \name 3-element vector operations*/
+/** \name 3-element vector operations */
 /*@{*/
 
-/** Zero */
-#define ZERO_3V( DST )  (DST)[0] = (DST)[1] = (DST)[2] = 0
+/** Zero all three elements. */
+template<typename T>
+inline void mesa_zero3v(T* v) noexcept { v[0] = v[1] = v[2] = T(0); }
 
-/** Test for equality */
-#define TEST_EQ_3V(a,b)  \
-   ((a)[0] == (b)[0] &&  \
-    (a)[1] == (b)[1] &&  \
-    (a)[2] == (b)[2])
+/** Test element-wise equality of two 3-element vectors. */
+template<typename T, typename U>
+[[nodiscard]] inline bool mesa_test_eq_3v(const T* a, const U* b) noexcept {
+    return a[0]==b[0] && a[1]==b[1] && a[2]==b[2];
+}
 
-/** Copy a 3-element vector */
-#define COPY_3V( DST, SRC )         \
-do {                                \
-   (DST)[0] = (SRC)[0];             \
-   (DST)[1] = (SRC)[1];             \
-   (DST)[2] = (SRC)[2];             \
-} while (0)
+/** Copy a 3-element vector. */
+template<typename Dst, typename Src>
+inline void mesa_copy3v(Dst* dst, const Src* src) noexcept {
+    dst[0]=src[0]; dst[1]=src[1]; dst[2]=src[2];
+}
 
+/** Copy a 3-element float vector using memcpy. */
+inline void mesa_copy3fv(GLfloat* dst, const GLfloat* src) noexcept {
+    std::memcpy(dst, src, 3 * sizeof(GLfloat));
+}
+
+/** Subtraction: dst = a - b */
+template<typename Dst, typename A, typename B>
+inline void mesa_sub3v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]-b[0]; dst[1]=a[1]-b[1]; dst[2]=a[2]-b[2];
+}
+
+/** Addition: dst = a + b */
+template<typename Dst, typename A, typename B>
+inline void mesa_add3v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]+b[0]; dst[1]=a[1]+b[1]; dst[2]=a[2]+b[2];
+}
+
+/** Element-wise multiplication: dst = a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_scale3v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]*b[0]; dst[1]=a[1]*b[1]; dst[2]=a[2]*b[2];
+}
+
+/** In-place element-wise multiplication: dst *= src */
+template<typename Dst, typename Src>
+inline void mesa_self_scale3v(Dst* dst, const Src* src) noexcept {
+    dst[0]*=src[0]; dst[1]*=src[1]; dst[2]*=src[2];
+}
+
+/** In-place addition: dst += src */
+template<typename Dst, typename Src>
+inline void mesa_acc3v(Dst* dst, const Src* src) noexcept {
+    dst[0]+=src[0]; dst[1]+=src[1]; dst[2]+=src[2];
+}
+
+/** Element-wise multiply-accumulate: dst += a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_acc_scale3v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]+=a[0]*b[0]; dst[1]+=a[1]*b[1]; dst[2]+=a[2]*b[2];
+}
+
+/** Scalar multiplication: dst = s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_scale_scalar3v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]=s*src[0]; dst[1]=s*src[1]; dst[2]=s*src[2];
+}
+
+/** Scalar multiply-accumulate: dst += s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_acc_scale_scalar3v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]+=s*src[0]; dst[1]+=s*src[1]; dst[2]+=s*src[2];
+}
+
+/** In-place scalar multiplication: dst *= s */
+template<typename Dst, typename S>
+inline void mesa_self_scale_scalar3v(Dst* dst, S s) noexcept {
+    dst[0]*=s; dst[1]*=s; dst[2]*=s;
+}
+
+/** In-place scalar addition: dst += s */
+template<typename Dst, typename S>
+inline void mesa_acc_scalar3v(Dst* dst, S s) noexcept {
+    dst[0]+=s; dst[1]+=s; dst[2]+=s;
+}
+
+/** Assign three scalar values to a vector. */
+template<typename V, typename V0, typename V1, typename V2>
+inline void mesa_assign3v(V* v, V0 v0, V1 v1, V2 v2) noexcept {
+    v[0]=v0; v[1]=v1; v[2]=v2;
+}
+
+/* --- Macro aliases --- */
+#define ZERO_3V(DST)              mesa_zero3v(DST)
+#define TEST_EQ_3V(a, b)          mesa_test_eq_3v(a, b)
+#define COPY_3V(DST, SRC)         mesa_copy3v(DST, SRC)
 /** Copy a 3-element vector with cast */
 #define COPY_3V_CAST( DST, SRC, CAST )  \
 do {                                    \
@@ -321,222 +387,142 @@ do {                                    \
    (DST)[1] = (CAST)(SRC)[1];           \
    (DST)[2] = (CAST)(SRC)[2];           \
 } while (0)
-
-/** Copy a 3-element float vector */
-#define COPY_3FV( DST, SRC )        \
-do {                                \
-   const GLfloat *_tmp = (SRC);     \
-   (DST)[0] = _tmp[0];              \
-   (DST)[1] = _tmp[1];              \
-   (DST)[2] = _tmp[2];              \
-} while (0)
-
-/** Subtraction */
-#define SUB_3V( DST, SRCA, SRCB )        \
-do {                                     \
-      (DST)[0] = (SRCA)[0] - (SRCB)[0];  \
-      (DST)[1] = (SRCA)[1] - (SRCB)[1];  \
-      (DST)[2] = (SRCA)[2] - (SRCB)[2];  \
-} while (0)
-
-/** Addition */
-#define ADD_3V( DST, SRCA, SRCB )       \
-do {                                    \
-      (DST)[0] = (SRCA)[0] + (SRCB)[0]; \
-      (DST)[1] = (SRCA)[1] + (SRCB)[1]; \
-      (DST)[2] = (SRCA)[2] + (SRCB)[2]; \
-} while (0)
-
-/** In-place scalar multiplication */
-#define SCALE_3V( DST, SRCA, SRCB )     \
-do {                                    \
-      (DST)[0] = (SRCA)[0] * (SRCB)[0]; \
-      (DST)[1] = (SRCA)[1] * (SRCB)[1]; \
-      (DST)[2] = (SRCA)[2] * (SRCB)[2]; \
-} while (0)
-
-/** In-place element-wise multiplication */
-#define SELF_SCALE_3V( DST, SRC )   \
-do {                                \
-      (DST)[0] *= (SRC)[0];         \
-      (DST)[1] *= (SRC)[1];         \
-      (DST)[2] *= (SRC)[2];         \
-} while (0)
-
-/** In-place addition */
-#define ACC_3V( DST, SRC )          \
-do {                                \
-      (DST)[0] += (SRC)[0];         \
-      (DST)[1] += (SRC)[1];         \
-      (DST)[2] += (SRC)[2];         \
-} while (0)
-
-/** Element-wise multiplication and addition */
-#define ACC_SCALE_3V( DST, SRCA, SRCB )     \
-do {                                        \
-      (DST)[0] += (SRCA)[0] * (SRCB)[0];    \
-      (DST)[1] += (SRCA)[1] * (SRCB)[1];    \
-      (DST)[2] += (SRCA)[2] * (SRCB)[2];    \
-} while (0)
-
-/** Scalar multiplication */
-#define SCALE_SCALAR_3V( DST, S, SRCB ) \
-do {                                    \
-      (DST)[0] = S * (SRCB)[0];         \
-      (DST)[1] = S * (SRCB)[1];         \
-      (DST)[2] = S * (SRCB)[2];         \
-} while (0)
-
-/** In-place scalar multiplication and addition */
-#define ACC_SCALE_SCALAR_3V( DST, S, SRCB ) \
-do {                                        \
-      (DST)[0] += S * (SRCB)[0];            \
-      (DST)[1] += S * (SRCB)[1];            \
-      (DST)[2] += S * (SRCB)[2];            \
-} while (0)
-
-/** In-place scalar multiplication */
-#define SELF_SCALE_SCALAR_3V( DST, S ) \
-do {                                   \
-      (DST)[0] *= S;                   \
-      (DST)[1] *= S;                   \
-      (DST)[2] *= S;                   \
-} while (0)
-
-/** In-place scalar addition */
-#define ACC_SCALAR_3V( DST, S )     \
-do {                                \
-      (DST)[0] += S;                \
-      (DST)[1] += S;                \
-      (DST)[2] += S;                \
-} while (0)
-
-/** Assignment */
-#define ASSIGN_3V( V, V0, V1, V2 )  \
-do {                                \
-    V[0] = V0;                      \
-    V[1] = V1;                      \
-    V[2] = V2;                      \
-} while(0)
+#define COPY_3FV(DST, SRC)        mesa_copy3fv(DST, SRC)
+#define SUB_3V(DST, SRCA, SRCB)   mesa_sub3v(DST, SRCA, SRCB)
+#define ADD_3V(DST, SRCA, SRCB)   mesa_add3v(DST, SRCA, SRCB)
+#define SCALE_3V(DST, SRCA, SRCB) mesa_scale3v(DST, SRCA, SRCB)
+#define SELF_SCALE_3V(DST, SRC)   mesa_self_scale3v(DST, SRC)
+#define ACC_3V(DST, SRC)          mesa_acc3v(DST, SRC)
+#define ACC_SCALE_3V(DST, SRCA, SRCB)       mesa_acc_scale3v(DST, SRCA, SRCB)
+#define SCALE_SCALAR_3V(DST, S, SRCB)       mesa_scale_scalar3v(DST, S, SRCB)
+#define ACC_SCALE_SCALAR_3V(DST, S, SRCB)   mesa_acc_scale_scalar3v(DST, S, SRCB)
+#define SELF_SCALE_SCALAR_3V(DST, S)        mesa_self_scale_scalar3v(DST, S)
+#define ACC_SCALAR_3V(DST, S)               mesa_acc_scalar3v(DST, S)
+#define ASSIGN_3V(V, V0, V1, V2)            mesa_assign3v(V, V0, V1, V2)
 
 /*@}*/
 
 
 /**********************************************************************/
-/** \name 2-element vector operations*/
+/** \name 2-element vector operations */
 /*@{*/
 
-/** Zero */
-#define ZERO_2V( DST )  (DST)[0] = (DST)[1] = 0
+/** Zero both elements. */
+template<typename T>
+inline void mesa_zero2v(T* v) noexcept { v[0] = v[1] = T(0); }
 
-/** Copy a 2-element vector */
-#define COPY_2V( DST, SRC )         \
-do {                        \
-   (DST)[0] = (SRC)[0];             \
-   (DST)[1] = (SRC)[1];             \
-} while (0)
+/** Copy a 2-element vector. */
+template<typename Dst, typename Src>
+inline void mesa_copy2v(Dst* dst, const Src* src) noexcept {
+    dst[0]=src[0]; dst[1]=src[1];
+}
 
+/** Copy a 2-element float vector using memcpy. */
+inline void mesa_copy2fv(GLfloat* dst, const GLfloat* src) noexcept {
+    std::memcpy(dst, src, 2 * sizeof(GLfloat));
+}
+
+/** Subtraction: dst = a - b */
+template<typename Dst, typename A, typename B>
+inline void mesa_sub2v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]-b[0]; dst[1]=a[1]-b[1];
+}
+
+/** Addition: dst = a + b */
+template<typename Dst, typename A, typename B>
+inline void mesa_add2v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]+b[0]; dst[1]=a[1]+b[1];
+}
+
+/** Element-wise multiplication: dst = a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_scale2v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]=a[0]*b[0]; dst[1]=a[1]*b[1];
+}
+
+/** In-place addition: dst += src */
+template<typename Dst, typename Src>
+inline void mesa_acc2v(Dst* dst, const Src* src) noexcept {
+    dst[0]+=src[0]; dst[1]+=src[1];
+}
+
+/** Element-wise multiply-accumulate: dst += a * b */
+template<typename Dst, typename A, typename B>
+inline void mesa_acc_scale2v(Dst* dst, const A* a, const B* b) noexcept {
+    dst[0]+=a[0]*b[0]; dst[1]+=a[1]*b[1];
+}
+
+/** Scalar multiplication: dst = s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_scale_scalar2v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]=s*src[0]; dst[1]=s*src[1];
+}
+
+/** Scalar multiply-accumulate: dst += s * src */
+template<typename Dst, typename S, typename Src>
+inline void mesa_acc_scale_scalar2v(Dst* dst, S s, const Src* src) noexcept {
+    dst[0]+=s*src[0]; dst[1]+=s*src[1];
+}
+
+/** In-place scalar multiplication: dst *= s */
+template<typename Dst, typename S>
+inline void mesa_self_scale_scalar2v(Dst* dst, S s) noexcept {
+    dst[0]*=s; dst[1]*=s;
+}
+
+/** In-place scalar addition: dst += s */
+template<typename Dst, typename S>
+inline void mesa_acc_scalar2v(Dst* dst, S s) noexcept {
+    dst[0]+=s; dst[1]+=s;
+}
+
+/** Assign two scalar values to a vector. */
+template<typename V, typename V0, typename V1>
+inline void mesa_assign2v(V* v, V0 v0, V1 v1) noexcept {
+    v[0]=v0; v[1]=v1;
+}
+
+/* --- Macro aliases --- */
+#define ZERO_2V(DST)              mesa_zero2v(DST)
+#define COPY_2V(DST, SRC)         mesa_copy2v(DST, SRC)
 /** Copy a 2-element vector with cast */
 #define COPY_2V_CAST( DST, SRC, CAST )      \
 do {                        \
    (DST)[0] = (CAST)(SRC)[0];           \
    (DST)[1] = (CAST)(SRC)[1];           \
 } while (0)
-
-/** Copy a 2-element float vector */
-#define COPY_2FV( DST, SRC )            \
-do {                        \
-   const GLfloat *_tmp = (SRC);         \
-   (DST)[0] = _tmp[0];              \
-   (DST)[1] = _tmp[1];              \
-} while (0)
-
-/** Subtraction */
-#define SUB_2V( DST, SRCA, SRCB )       \
-do {                        \
-      (DST)[0] = (SRCA)[0] - (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] - (SRCB)[1];     \
-} while (0)
-
-/** Addition */
-#define ADD_2V( DST, SRCA, SRCB )       \
-do {                        \
-      (DST)[0] = (SRCA)[0] + (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] + (SRCB)[1];     \
-} while (0)
-
-/** In-place scalar multiplication */
-#define SCALE_2V( DST, SRCA, SRCB )     \
-do {                        \
-      (DST)[0] = (SRCA)[0] * (SRCB)[0];     \
-      (DST)[1] = (SRCA)[1] * (SRCB)[1];     \
-} while (0)
-
-/** In-place addition */
-#define ACC_2V( DST, SRC )          \
-do {                        \
-      (DST)[0] += (SRC)[0];         \
-      (DST)[1] += (SRC)[1];         \
-} while (0)
-
-/** Element-wise multiplication and addition */
-#define ACC_SCALE_2V( DST, SRCA, SRCB )     \
-do {                        \
-      (DST)[0] += (SRCA)[0] * (SRCB)[0];    \
-      (DST)[1] += (SRCA)[1] * (SRCB)[1];    \
-} while (0)
-
-/** Scalar multiplication */
-#define SCALE_SCALAR_2V( DST, S, SRCB )     \
-do {                        \
-      (DST)[0] = S * (SRCB)[0];         \
-      (DST)[1] = S * (SRCB)[1];         \
-} while (0)
-
-/** In-place scalar multiplication and addition */
-#define ACC_SCALE_SCALAR_2V( DST, S, SRCB ) \
-do {                        \
-      (DST)[0] += S * (SRCB)[0];        \
-      (DST)[1] += S * (SRCB)[1];        \
-} while (0)
-
-/** In-place scalar multiplication */
-#define SELF_SCALE_SCALAR_2V( DST, S )      \
-do {                        \
-      (DST)[0] *= S;                \
-      (DST)[1] *= S;                \
-} while (0)
-
-/** In-place scalar addition */
-#define ACC_SCALAR_2V( DST, S )         \
-do {                        \
-      (DST)[0] += S;                \
-      (DST)[1] += S;                \
-} while (0)
-
-/** Assign scalers to short vectors */
-#define ASSIGN_2V( V, V0, V1 )	\
-do {				\
-    V[0] = V0;			\
-    V[1] = V1;			\
-} while(0)
+#define COPY_2FV(DST, SRC)        mesa_copy2fv(DST, SRC)
+#define SUB_2V(DST, SRCA, SRCB)   mesa_sub2v(DST, SRCA, SRCB)
+#define ADD_2V(DST, SRCA, SRCB)   mesa_add2v(DST, SRCA, SRCB)
+#define SCALE_2V(DST, SRCA, SRCB) mesa_scale2v(DST, SRCA, SRCB)
+#define ACC_2V(DST, SRC)          mesa_acc2v(DST, SRC)
+#define ACC_SCALE_2V(DST, SRCA, SRCB)       mesa_acc_scale2v(DST, SRCA, SRCB)
+#define SCALE_SCALAR_2V(DST, S, SRCB)       mesa_scale_scalar2v(DST, S, SRCB)
+#define ACC_SCALE_SCALAR_2V(DST, S, SRCB)   mesa_acc_scale_scalar2v(DST, S, SRCB)
+#define SELF_SCALE_SCALAR_2V(DST, S)        mesa_self_scale_scalar2v(DST, S)
+#define ACC_SCALAR_2V(DST, S)               mesa_acc_scalar2v(DST, S)
+#define ASSIGN_2V(V, V0, V1)                mesa_assign2v(V, V0, V1)
 
 /*@}*/
 
 
-/** \name Linear interpolation macros */
+/** \name Linear interpolation */
 /*@{*/
 
 /**
- * Linear interpolation
- *
- * \note \p OUT argument is evaluated twice!
- * \note Be wary of using *coord++ as an argument to any of these macros!
+ * Linear interpolation: result = out + t*(in - out)
+ * Replaces the old macro form which evaluated OUT twice.
  */
-#define LINTERP(T, OUT, IN) ((OUT) + (T) * ((IN) - (OUT)))
+template<typename T, typename U>
+[[nodiscard]] constexpr auto mesa_linterp(T t, U out, U in) noexcept {
+    return out + t * (in - out);
+}
 
-/* Can do better with integer math
- */
+/* LINTERP kept as macro alias so dependent macros (INTERP_UB, INTERP_CHAN)
+ * pick up the inline function automatically. */
+#define LINTERP(T, OUT, IN)  mesa_linterp(T, OUT, IN)
+
+/* Can do better with integer math */
 #define INTERP_UB( t, dstub, outub, inub )  \
 do {                        \
    GLfloat inf = UBYTE_TO_FLOAT( inub );    \
@@ -553,26 +539,53 @@ do {                        \
    UNCLAMPED_FLOAT_TO_CHAN( dstc, dstf );   \
 } while (0)
 
-#define INTERP_UI( t, dstui, outui, inui )  \
-   dstui = (GLuint) (GLint) LINTERP( (t), (GLfloat) (outui), (GLfloat) (inui) )
+/** Float linear interpolation (assigns to dstui). */
+template<typename T>
+inline void mesa_interp_ui(T t, GLuint& dstui, GLuint outui, GLuint inui) noexcept {
+    dstui = static_cast<GLuint>(static_cast<GLint>(
+        mesa_linterp(t, static_cast<GLfloat>(outui), static_cast<GLfloat>(inui))));
+}
 
-#define INTERP_F( t, dstf, outf, inf )      \
-   dstf = LINTERP( t, outf, inf )
+/** Float linear interpolation (assigns to dstf). */
+template<typename T>
+inline void mesa_interp_f(T t, GLfloat& dstf, GLfloat outf, GLfloat inf) noexcept {
+    dstf = mesa_linterp(t, outf, inf);
+}
 
-#define INTERP_4F( t, dst, out, in )        \
-do {                        \
-   dst[0] = LINTERP( (t), (out)[0], (in)[0] );  \
-   dst[1] = LINTERP( (t), (out)[1], (in)[1] );  \
-   dst[2] = LINTERP( (t), (out)[2], (in)[2] );  \
-   dst[3] = LINTERP( (t), (out)[3], (in)[3] );  \
-} while (0)
+/** 4-component float linear interpolation. */
+template<typename T>
+inline void mesa_interp_4f(T t, GLfloat* dst, const GLfloat* out, const GLfloat* in) noexcept {
+    dst[0] = mesa_linterp(t, out[0], in[0]);
+    dst[1] = mesa_linterp(t, out[1], in[1]);
+    dst[2] = mesa_linterp(t, out[2], in[2]);
+    dst[3] = mesa_linterp(t, out[3], in[3]);
+}
 
-#define INTERP_3F( t, dst, out, in )        \
-do {                        \
-   dst[0] = LINTERP( (t), (out)[0], (in)[0] );  \
-   dst[1] = LINTERP( (t), (out)[1], (in)[1] );  \
-   dst[2] = LINTERP( (t), (out)[2], (in)[2] );  \
-} while (0)
+/** 3-component float linear interpolation. */
+template<typename T>
+inline void mesa_interp_3f(T t, GLfloat* dst, const GLfloat* out, const GLfloat* in) noexcept {
+    dst[0] = mesa_linterp(t, out[0], in[0]);
+    dst[1] = mesa_linterp(t, out[1], in[1]);
+    dst[2] = mesa_linterp(t, out[2], in[2]);
+}
+
+/** Interpolate sz (1-4) float components into a 4-element vector. */
+template<typename T>
+inline void mesa_interp_sz(T t, GLfloat (*vec)[4], int to, int out, int in, int sz) noexcept {
+    switch (sz) {
+    case 4: vec[to][3] = mesa_linterp(t, vec[out][3], vec[in][3]); [[fallthrough]];
+    case 3: vec[to][2] = mesa_linterp(t, vec[out][2], vec[in][2]); [[fallthrough]];
+    case 2: vec[to][1] = mesa_linterp(t, vec[out][1], vec[in][1]); [[fallthrough]];
+    case 1: vec[to][0] = mesa_linterp(t, vec[out][0], vec[in][0]);
+    }
+}
+
+/* --- Macro aliases --- */
+#define INTERP_UI(t, dstui, outui, inui)     mesa_interp_ui(t, dstui, outui, inui)
+#define INTERP_F(t, dstf, outf, inf)         mesa_interp_f(t, dstf, outf, inf)
+#define INTERP_4F(t, dst, out, in)           mesa_interp_4f(t, dst, out, in)
+#define INTERP_3F(t, dst, out, in)           mesa_interp_3f(t, dst, out, in)
+#define INTERP_SZ(t, vec, to, out, in, sz)   mesa_interp_sz(t, vec, to, out, in, sz)
 
 #define INTERP_4CHAN( t, dst, out, in )         \
 do {                            \
@@ -589,17 +602,8 @@ do {                            \
    INTERP_CHAN( (t), (dst)[2], (out)[2], (in)[2] ); \
 } while (0)
 
-#define INTERP_SZ( t, vec, to, out, in, sz )                \
-do {                                    \
-   switch (sz) {                            \
-   case 4: vec[to][3] = LINTERP( (t), (vec)[out][3], (vec)[in][3] );    \
-   case 3: vec[to][2] = LINTERP( (t), (vec)[out][2], (vec)[in][2] );    \
-   case 2: vec[to][1] = LINTERP( (t), (vec)[out][1], (vec)[in][1] );    \
-   case 1: vec[to][0] = LINTERP( (t), (vec)[out][0], (vec)[in][0] );    \
-   }                                    \
-} while(0)
-
 /*@}*/
+
 /**
  * Type-safe clamp/min/max helpers (C++17).
  *
@@ -643,46 +647,78 @@ template<typename T, typename U>
 /** Maximum of two values: */
 #define MAX2(A, B)   mesa_max2(A, B)
 
-/** Dot product of two 2-element vectors */
-#define DOT2( a, b )  ( (a)[0]*(b)[0] + (a)[1]*(b)[1] )
+/** \name Geometry / vector-math inline functions */
+/*@{*/
 
-/** Dot product of two 3-element vectors */
-#define DOT3( a, b )  ( (a)[0]*(b)[0] + (a)[1]*(b)[1] + (a)[2]*(b)[2] )
+/** Dot product of two 2-element vectors. */
+template<typename T, typename U>
+[[nodiscard]] inline auto mesa_dot2(const T* a, const U* b) noexcept {
+    return a[0]*b[0] + a[1]*b[1];
+}
 
-/** Dot product of two 4-element vectors */
-#define DOT4( a, b )  ( (a)[0]*(b)[0] + (a)[1]*(b)[1] + \
-            (a)[2]*(b)[2] + (a)[3]*(b)[3] )
+/** Dot product of two 3-element vectors. */
+template<typename T, typename U>
+[[nodiscard]] inline auto mesa_dot3(const T* a, const U* b) noexcept {
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
 
-/** Dot product of two 4-element vectors */
+/** Dot product of two 4-element vectors. */
+template<typename T, typename U>
+[[nodiscard]] inline auto mesa_dot4(const T* a, const U* b) noexcept {
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
+}
+
+/** Cross product: n = u × v */
+template<typename N, typename U, typename V>
+inline void mesa_cross3(N* n, const U* u, const V* v) noexcept {
+    n[0] = u[1]*v[2] - u[2]*v[1];
+    n[1] = u[2]*v[0] - u[0]*v[2];
+    n[2] = u[0]*v[1] - u[1]*v[0];
+}
+
+/** Squared length of a 3-element float vector. */
+[[nodiscard]] inline GLfloat mesa_len_sq3fv(const GLfloat* v) noexcept {
+    return v[0]*v[0] + v[1]*v[1] + v[2]*v[2];
+}
+
+/** Squared length of a 2-element float vector. */
+[[nodiscard]] inline GLfloat mesa_len_sq2fv(const GLfloat* v) noexcept {
+    return v[0]*v[0] + v[1]*v[1];
+}
+
+/** Length of a 3-element float vector. */
+[[nodiscard]] inline GLfloat mesa_len3fv(const GLfloat* v) noexcept {
+    return SQRTF(mesa_len_sq3fv(v));
+}
+
+/** Length of a 2-element float vector. */
+[[nodiscard]] inline GLfloat mesa_len2fv(const GLfloat* v) noexcept {
+    return SQRTF(mesa_len_sq2fv(v));
+}
+
+/** Normalise a 3-element float vector to unit length (no-op if zero). */
+inline void mesa_normalize3fv(GLfloat* v) noexcept {
+    GLfloat len = mesa_len_sq3fv(v);
+    if (len) {
+        len = INV_SQRTF(len);
+        v[0] *= len; v[1] *= len; v[2] *= len;
+    }
+}
+
+/* --- Macro aliases --- */
+#define DOT2(a, b)              mesa_dot2(a, b)
+#define DOT3(a, b)              mesa_dot3(a, b)
+#define DOT4(a, b)              mesa_dot4(a, b)
+/** Dot product of a 4-element vector against four scalars */
 #define DOT4V(v,a,b,c,d) (v[0]*(a) + v[1]*(b) + v[2]*(c) + v[3]*(d))
+#define CROSS3(n, u, v)         mesa_cross3(n, u, v)
+#define LEN_SQUARED_3FV(V)      mesa_len_sq3fv(V)
+#define LEN_SQUARED_2FV(V)      mesa_len_sq2fv(V)
+#define LEN_3FV(V)              mesa_len3fv(V)
+#define LEN_2FV(V)              mesa_len2fv(V)
+#define NORMALIZE_3FV(V)        mesa_normalize3fv(V)
 
-
-/** Cross product of two 3-element vectors */
-#define CROSS3(n, u, v)             \
-do {                        \
-   (n)[0] = (u)[1]*(v)[2] - (u)[2]*(v)[1];  \
-   (n)[1] = (u)[2]*(v)[0] - (u)[0]*(v)[2];  \
-   (n)[2] = (u)[0]*(v)[1] - (u)[1]*(v)[0];  \
-} while (0)
-
-
-/* Normalize a 3-element vector to unit length. */
-#define NORMALIZE_3FV( V )          \
-do {                        \
-   GLfloat len = (GLfloat) LEN_SQUARED_3FV(V);  \
-   if (len) {                   \
-      len = INV_SQRTF(len);         \
-      (V)[0] = (GLfloat) ((V)[0] * len);    \
-      (V)[1] = (GLfloat) ((V)[1] * len);    \
-      (V)[2] = (GLfloat) ((V)[2] * len);    \
-   }                        \
-} while(0)
-
-#define LEN_3FV( V ) (SQRTF((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2]))
-#define LEN_2FV( V ) (SQRTF((V)[0]*(V)[0]+(V)[1]*(V)[1]))
-
-#define LEN_SQUARED_3FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1]+(V)[2]*(V)[2])
-#define LEN_SQUARED_2FV( V ) ((V)[0]*(V)[0]+(V)[1]*(V)[1])
+/*@}*/
 
 
 

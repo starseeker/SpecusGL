@@ -48,9 +48,11 @@
 
 #include <assert.h>
 #include <cmath>
+#include <cstring>
 #include <ctype.h>
 #include <limits.h>
 #include <memory>
+#include <type_traits>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
