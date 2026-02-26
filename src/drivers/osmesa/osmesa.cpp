@@ -142,6 +142,43 @@ struct osmesa_context {
 
     /** glFinish callback: flushes the swrast pipeline and applies FXAA. */
     static void finish_cb(GLcontext *ctx);
+
+    /** Choose a fast line-drawing function if possible. */
+    static swrast_line_func choose_line_func(GLcontext *ctx);
+
+    /** Choose a fast triangle-drawing function if possible. */
+    static swrast_tri_func choose_triangle_func(GLcontext *ctx);
+
+    /** swrast choose_line hook: calls choose_line_func and installs result. */
+    static void choose_line(GLcontext *ctx);
+
+    /** swrast choose_triangle hook: calls choose_triangle_func and installs result. */
+    static void choose_triangle(GLcontext *ctx);
+
+    /* ------------------------------------------------------------------ */
+    /* Query methods                                                       */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Get the depth buffer for this context.
+     * Returns GL_TRUE on success.
+     */
+    [[nodiscard]] GLboolean get_depth_buffer(GLint *width, GLint *height,
+                                              GLint *bytesPerValue,
+                                              void **buf) const;
+
+    /**
+     * Get the color buffer for this context.
+     * Returns GL_TRUE on success.
+     */
+    [[nodiscard]] GLboolean get_color_buffer(GLint *width, GLint *height,
+                                              GLint *fmt, void **buf) const;
+
+    /** Enable or disable fragment colour clamping. */
+    void color_clamp(GLboolean enable);
+
+    /** Enable or disable FXAA post-processing. */
+    void set_fxaa_enable(GLboolean enable) { enable_fxaa = enable; }
 };
 
 
@@ -701,8 +738,8 @@ do {							\
  * Analyze context state to see if we can provide a fast line drawing
  * function.  Otherwise, return nullptr.
  */
-static swrast_line_func
-osmesa_choose_line_function(GLcontext *ctx)
+swrast_line_func
+osmesa_context::choose_line_func(GLcontext *ctx)
 {
     const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
@@ -816,8 +853,8 @@ osmesa_choose_line_function(GLcontext *ctx)
 /**
  * Return pointer to an optimized triangle function if possible.
  */
-static swrast_tri_func
-osmesa_choose_triangle_function(GLcontext *ctx)
+swrast_tri_func
+osmesa_context::choose_triangle_func(GLcontext *ctx)
 {
     const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
@@ -850,27 +887,25 @@ osmesa_choose_triangle_function(GLcontext *ctx)
 }
 
 
-
-/* Override for the swrast triangle-selection function.  Try to use one
- * of our internal triangle functions, otherwise fall back to the
- * standard swrast functions.
+/* swrast choose_triangle hook: try our optimized function first, then fall
+ * back to the standard swrast implementation.
  */
-static void
-osmesa_choose_triangle(GLcontext *ctx)
+void
+osmesa_context::choose_triangle(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    swrast->Triangle = osmesa_choose_triangle_function(ctx);
+    swrast->Triangle = osmesa_context::choose_triangle_func(ctx);
     if (!swrast->Triangle)
 	_swrast_choose_triangle(ctx);
 }
 
-static void
-osmesa_choose_line(GLcontext *ctx)
+void
+osmesa_context::choose_line(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    swrast->Line = osmesa_choose_line_function(ctx);
+    swrast->Line = osmesa_context::choose_line_func(ctx);
     if (!swrast->Line)
 	_swrast_choose_line(ctx);
 }
@@ -1331,8 +1366,8 @@ osmesa_context::create(GLenum fmt,
 	TNL_CONTEXT(ctx)->Driver.RunPipeline = _tnl_run_pipeline;
 
 	/* Hook in our optimised line and triangle drawing functions */
-	SWRAST_CONTEXT(ctx)->choose_line     = osmesa_choose_line;
-	SWRAST_CONTEXT(ctx)->choose_triangle = osmesa_choose_triangle;
+	SWRAST_CONTEXT(ctx)->choose_line     = osmesa_context::choose_line;
+	SWRAST_CONTEXT(ctx)->choose_triangle = osmesa_context::choose_triangle;
     }
 
     return osmesa;
@@ -1442,6 +1477,64 @@ osmesa_context::get_integer(GLint pname, GLint *value) const
 }
 
 
+/**
+ * Return the depth buffer associated with this context.
+ */
+GLboolean
+osmesa_context::get_depth_buffer(GLint *width, GLint *height,
+                                  GLint *bytesPerValue, void **buf) const
+{
+    const struct gl_renderbuffer *drb = nullptr;
+    if (gl_buffer)
+	drb = gl_buffer->Attachment[BUFFER_DEPTH].Renderbuffer;
+
+    if (!drb || !drb->Data) {
+	*width = *height = *bytesPerValue = 0;
+	*buf = nullptr;
+	return GL_FALSE;
+    }
+
+    *width  = (GLint)drb->Width;
+    *height = (GLint)drb->Height;
+    *bytesPerValue = (gl_visual->depthBits <= 16)
+                     ? (GLint)sizeof(GLushort)
+                     : (GLint)sizeof(GLuint);
+    *buf = drb->Data;
+    return GL_TRUE;
+}
+
+
+/**
+ * Return the color buffer associated with this context.
+ */
+GLboolean
+osmesa_context::get_color_buffer(GLint *width, GLint *height,
+                                  GLint *fmt, void **buf) const
+{
+    if (rb && rb->Data) {
+	*width  = (GLint)rb->Width;
+	*height = (GLint)rb->Height;
+	*fmt    = (GLint)format;
+	*buf    = rb->Data;
+	return GL_TRUE;
+    }
+    *width = *height = *fmt = 0;
+    *buf = nullptr;
+    return GL_FALSE;
+}
+
+
+/**
+ * Enable or disable fragment colour clamping.
+ */
+void
+osmesa_context::color_clamp(GLboolean enable)
+{
+    mesa.Color.ClampFragmentColor = enable ? GL_TRUE
+                                           : (GLboolean)GL_FIXED_ONLY_ARB;
+}
+
+
 /**********************************************************************/
 /*****                    Public Functions                        *****/
 /**********************************************************************/
@@ -1536,65 +1629,25 @@ OSMesaGetIntegerv(GLint pname, GLint *value)
 
 /**
  * Return the depth buffer associated with an OSMesa context.
- * Input:  c - the OSMesa context
- * Output:  width, height - size of buffer in pixels
- *          bytesPerValue - bytes per depth value (2 or 4)
- *          buffer - pointer to depth buffer values
- * Return:  GL_TRUE or GL_FALSE to indicate success or failure.
  */
 GLAPI GLboolean GLAPIENTRY
 OSMesaGetDepthBuffer(OSMesaContext c, GLint *width, GLint *height,
 		     GLint *bytesPerValue, void **buffer)
 {
-    struct gl_renderbuffer *rb = nullptr;
-
-    if (c->gl_buffer)
-	rb = c->gl_buffer->Attachment[BUFFER_DEPTH].Renderbuffer;
-
-    if (!rb || !rb->Data) {
-	*width = 0;
-	*height = 0;
-	*bytesPerValue = 0;
-	*buffer = 0;
-	return GL_FALSE;
-    } else {
-	*width = rb->Width;
-	*height = rb->Height;
-	if (c->gl_visual->depthBits <= 16)
-	    *bytesPerValue = sizeof(GLushort);
-	else
-	    *bytesPerValue = sizeof(GLuint);
-	*buffer = rb->Data;
-	return GL_TRUE;
-    }
+    return c ? c->get_depth_buffer(width, height, bytesPerValue, buffer)
+             : GL_FALSE;
 }
 
 
 /**
  * Return the color buffer associated with an OSMesa context.
- * Input:  c - the OSMesa context
- * Output:  width, height - size of buffer in pixels
- *          format - the pixel format (OSMESA_FORMAT)
- *          buffer - pointer to color buffer values
- * Return:  GL_TRUE or GL_FALSE to indicate success or failure.
  */
 GLAPI GLboolean GLAPIENTRY
 OSMesaGetColorBuffer(OSMesaContext osmesa, GLint *width,
 		     GLint *height, GLint *format, void **buffer)
 {
-    if (osmesa->rb && osmesa->rb->Data) {
-	*width = osmesa->rb->Width;
-	*height = osmesa->rb->Height;
-	*format = osmesa->format;
-	*buffer = osmesa->rb->Data;
-	return GL_TRUE;
-    } else {
-	*width = 0;
-	*height = 0;
-	*format = 0;
-	*buffer = 0;
-	return GL_FALSE;
-    }
+    return osmesa ? osmesa->get_color_buffer(width, height, format, buffer)
+                  : GL_FALSE;
 }
 
 
@@ -1636,12 +1689,8 @@ GLAPI void GLAPIENTRY
 OSMesaColorClamp(GLboolean enable)
 {
     OSMesaContext osmesa = OSMesaGetCurrentContext();
-
-    if (enable == GL_TRUE) {
-	osmesa->mesa.Color.ClampFragmentColor = GL_TRUE;
-    } else {
-	osmesa->mesa.Color.ClampFragmentColor = GL_FIXED_ONLY_ARB;
-    }
+    if (osmesa)
+	osmesa->color_clamp(enable);
 }
 
 
@@ -1649,12 +1698,8 @@ GLAPI void GLAPIENTRY
 OSMesaFXAAEnable(GLboolean enable)
 {
     OSMesaContext osmesa = OSMesaGetCurrentContext();
-    
-    if (!osmesa) {
-        return;
-    }
-    
-    osmesa->enable_fxaa = enable;
+    if (osmesa)
+	osmesa->set_fxaa_enable(enable);
 }
 
 
