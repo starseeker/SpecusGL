@@ -151,12 +151,10 @@ slang_struct_copy(slang_struct * x, const slang_struct * y)
 int
 slang_struct_equal(const slang_struct * x, const slang_struct * y)
 {
-    GLuint i;
-
-    if (x->fields->num_variables != y->fields->num_variables)
+    if (x->fields->variables.size() != y->fields->variables.size())
 	return 0;
 
-    for (i = 0; i < x->fields->num_variables; i++) {
+    for (GLuint i = 0; i < x->fields->variables.size(); i++) {
 	const slang_variable *varx = x->fields->variables[i];
 	const slang_variable *vary = y->fields->variables[i];
 

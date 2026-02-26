@@ -756,15 +756,15 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	     */
 	    oper->type = SLANG_OPER_BLOCK_NO_NEW_SCOPE;
 	    {
-		const unsigned int first_var = O->vars->num_variables;
+		const unsigned int first_var = static_cast<unsigned int>(O->vars->variables.size());
 
 		/* parse the declaration, note that there can be zero or more
 		 * than one declarators
 		 */
 		if (!parse_declaration(C, O))
 		    return 0;
-		if (first_var < O->vars->num_variables) {
-		    const unsigned int num_vars = O->vars->num_variables - first_var;
+		if (first_var < O->vars->variables.size()) {
+		    const unsigned int num_vars = static_cast<unsigned int>(O->vars->variables.size()) - first_var;
 		    unsigned int i;
 		    assert(oper->num_children == 0);
 		    oper->num_children = num_vars;
@@ -773,7 +773,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 			slang_info_log_memory(C->L);
 			return 0;
 		    }
-		    for (i = first_var; i < O->vars->num_variables; i++) {
+		    for (i = first_var; i < O->vars->variables.size(); i++) {
 			slang_operation *o = &oper->children[i - first_var];
 			o->type = SLANG_OPER_VARIABLE_DECL;
 			o->locals->outer_scope = O->vars;
@@ -1412,7 +1412,7 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
      * given identifier is not found here, the search process continues
      * in the global space
      */
-    func->param_count = func->parameters->num_variables;
+    func->param_count = static_cast<unsigned int>(func->parameters->variables.size());
     func->parameters->outer_scope = O->vars;
 
     return 1;
@@ -1470,18 +1470,11 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     op_id.a_id = var->a_name;
 
     /* put the variable into operation's scope */
-    op_id.locals->variables =
-	(slang_variable **) _slang_alloc(sizeof(slang_variable *));
-    if (op_id.locals->variables == nullptr) {
-	slang_operation_destruct(&op_id);
-	return GL_FALSE;
-    }
-    op_id.locals->num_variables = 1;
-    op_id.locals->variables[0] = var;
+    op_id.locals->variables.push_back(var);  /* non-owned reference */
 
     /* construct the assignment expression */
     if (!slang_operation_construct(&op_assign)) {
-	op_id.locals->num_variables = 0;
+	op_id.locals->variables.clear();  /* don't own var, don't delete it */
 	slang_operation_destruct(&op_id);
 	return GL_FALSE;
     }
@@ -1490,7 +1483,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 	(slang_operation *) _slang_alloc(2 * sizeof(slang_operation));
     if (op_assign.children == nullptr) {
 	slang_operation_destruct(&op_assign);
-	op_id.locals->num_variables = 0;
+	op_id.locals->variables.clear();  /* don't own var, don't delete it */
 	slang_operation_destruct(&op_id);
 	return GL_FALSE;
     }
@@ -1503,7 +1496,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     _slang_free(op_assign.children);
     op_assign.children = nullptr;
     slang_operation_destruct(&op_assign);
-    op_id.locals->num_variables = 0;
+    op_id.locals->variables.clear();  /* don't own var, don't delete it */
     slang_operation_destruct(&op_id);
 
     return GL_TRUE;

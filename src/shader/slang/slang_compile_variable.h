@@ -25,10 +25,11 @@
 #ifndef SLANG_COMPILE_VARIABLE_H
 #define SLANG_COMPILE_VARIABLE_H
 
+#include <vector>
 
 
 
-    typedef enum slang_type_qualifier_ {
+    enum slang_type_qualifier {
 	SLANG_QUAL_NONE,
 	SLANG_QUAL_CONST,
 	SLANG_QUAL_ATTRIBUTE,
@@ -38,7 +39,7 @@
 	SLANG_QUAL_INOUT,
 	SLANG_QUAL_FIXEDOUTPUT,      /* internal */
 	SLANG_QUAL_FIXEDINPUT        /* internal */
-    } slang_type_qualifier;
+    };
 
     extern slang_type_specifier_type
     slang_type_specifier_type_from_string(const char *);
@@ -81,11 +82,13 @@
 
     /**
      * Basically a list of variables, with a pointer to the parent scope.
+     *
+     * C++17 modernisation: replaced raw pointer array + count with
+     * std::vector<slang_variable *>.  Each element is heap-owned by this scope.
      */
     struct slang_variable_scope {
-	slang_variable **variables;  /**< Array [num_variables] of ptrs to vars */
-	GLuint num_variables;
-	slang_variable_scope *outer_scope;
+	std::vector<slang_variable *> variables; /**< Owned ptrs to variables */
+	slang_variable_scope *outer_scope{nullptr};
     };
 
 

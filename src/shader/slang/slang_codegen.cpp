@@ -88,8 +88,7 @@ static GLint
 _slang_field_offset(const slang_type_specifier *spec, slang_atom field)
 {
     GLint offset = 0;
-    GLuint i;
-    for (i = 0; i < spec->_struct->fields->num_variables; i++) {
+    for (GLuint i = 0; i < spec->_struct->fields->variables.size(); i++) {
 	const slang_variable *v = spec->_struct->fields->variables[i];
 	const GLuint sz = _slang_sizeof_type_specifier(&v->type.specifier);
 	if (sz > 1) {

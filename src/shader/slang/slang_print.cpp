@@ -203,9 +203,8 @@ print_generic(const slang_operation *op, const char *oper, int indent)
 static const slang_variable_scope *
 find_scope(const slang_variable_scope *s, slang_atom name)
 {
-    GLuint i;
-    for (i = 0; i < s->num_variables; i++) {
-	if (s->variables[i]->a_name == name)
+    for (const auto *v : s->variables) {
+	if (v->a_name == name)
 	    return s;
     }
     if (s->outer_scope)
@@ -217,10 +216,9 @@ find_scope(const slang_variable_scope *s, slang_atom name)
 static const slang_variable *
 find_var(const slang_variable_scope *s, slang_atom name)
 {
-    GLuint i;
-    for (i = 0; i < s->num_variables; i++) {
-	if (s->variables[i]->a_name == name)
-	    return s->variables[i];
+    for (const auto *v : s->variables) {
+	if (v->a_name == name)
+	    return v;
     }
     if (s->outer_scope)
 	return find_var(s->outer_scope, name);
@@ -778,10 +776,10 @@ _slang_print_var_scope(const slang_variable_scope *vars, int indent)
     GLuint i;
 
     spaces(indent);
-    printf("Var scope %p  %d vars:\n", (void *) vars, vars->num_variables);
-    for (i = 0; i < vars->num_variables; i++) {
+    printf("Var scope %p  %zu vars:\n", (void *) vars, vars->variables.size());
+    for (GLuint i = 0; i < vars->variables.size(); i++) {
 	spaces(indent + 3);
-	printf("%s (at %p)\n", (char *) vars->variables[i]->a_name, (void*)(vars->variables + i));
+	printf("%s (at %p)\n", (char *) vars->variables[i]->a_name, (void*)&vars->variables[i]);
     }
     spaces(indent + 3);
     printf("outer_scope = %p\n", (void*) vars->outer_scope);

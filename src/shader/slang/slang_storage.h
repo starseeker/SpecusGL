@@ -30,6 +30,8 @@
 #include "slang_compile.h"
 #include "slang_typeinfo.h"
 
+#include <vector>
+
 
 /*
  * Program variable data storage is kept completely transparent to the
@@ -46,7 +48,7 @@
  * If the vec4 module is enabled, 4-component vectors of floats are
  * used when possible. 4x4 matrices are constructed of 4 vec4 slots.
  */
-typedef enum slang_storage_type_ {
+enum slang_storage_type {
     /* core */
     SLANG_STORE_AGGREGATE,
     SLANG_STORE_BOOL,
@@ -54,29 +56,19 @@ typedef enum slang_storage_type_ {
     SLANG_STORE_FLOAT,
     /* vec4 */
     SLANG_STORE_VEC4
-} slang_storage_type;
+};
 
 
 struct slang_storage_aggregate;
 
 /**
  * The slang_storage_array structure groups data slots of the same
- * type into an array. This array has a fixed length. Arrays are
- * required to have a size equal to the sum of sizes of its
- * elements. They are also required to support indirect
- * addressing. That is, if B references first data slot in the array,
- * S is the size of the data slot and I is the integral index that is
- * not known at compile time, B+I*S references I-th data slot.
- *
- * This structure is also used to break down built-in data types that
- * are not supported directly.  Vectors, like vec3, are constructed
- * from arrays of their basic types. Matrices are formed of an array
- * of column vectors, which are in turn processed as other vectors.
+ * type into an array. This array has a fixed length.
  */
 struct slang_storage_array {
-    slang_storage_type type;
-    slang_storage_aggregate *aggregate;
-    GLuint length;
+    slang_storage_type type{SLANG_STORE_AGGREGATE};
+    slang_storage_aggregate *aggregate{nullptr}; /**< owned; deleted by destruct */
+    GLuint length{0};
 };
 
 GLboolean slang_storage_array_construct(slang_storage_array *);
@@ -85,15 +77,12 @@ GLvoid slang_storage_array_destruct(slang_storage_array *);
 
 /**
  * The slang_storage_aggregate structure relaxes the indirect
- * addressing requirement for slang_storage_array
- * structure. Aggregates are always accessed statically - its member
- * addresses are well-known at compile time. For example, user-defined
- * types are implemented as aggregates. Aggregates can collect data of
- * a different type.
+ * addressing requirement for slang_storage_array structure.
+ *
+ * C++17 modernisation: replaced raw arrays + count with std::vector<slang_storage_array>.
  */
 struct slang_storage_aggregate {
-    slang_storage_array *arrays;
-    GLuint count;
+    std::vector<slang_storage_array> arrays; /**< owned array elements */
 };
 
 GLboolean slang_storage_aggregate_construct(slang_storage_aggregate *);
