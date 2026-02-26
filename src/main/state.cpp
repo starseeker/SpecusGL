@@ -1253,9 +1253,9 @@ _mesa_update_state_locked(GLcontext *ctx)
 void
 __GLcontextRec::update_state()
 {
-    _mesa_lock_context_textures(this);
+    lock_textures();
     _mesa_update_state_locked(this);
-    _mesa_unlock_context_textures(this);
+    unlock_textures();
 }
 
 

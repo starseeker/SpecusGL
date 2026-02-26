@@ -1061,21 +1061,35 @@ _mesa_IsTexture(GLuint texture)
  *
  * See also _mesa_lock/unlock_texture in texobj.h
  */
+void
+__GLcontextRec::lock_textures()
+{
+    Shared->TexMutex.lock();
+
+    if (Shared->TextureStateStamp != TextureStateTimestamp) {
+	NewState |= _NEW_TEXTURE;
+	TextureStateTimestamp = Shared->TextureStateStamp;
+    }
+}
+
+
+void
+__GLcontextRec::unlock_textures()
+{
+    assert(Shared->TextureStateStamp == TextureStateTimestamp);
+    Shared->TexMutex.unlock();
+}
+
+
 void _mesa_lock_context_textures(GLcontext *ctx)
 {
-    ctx->Shared->TexMutex.lock();
-
-    if (ctx->Shared->TextureStateStamp != ctx->TextureStateTimestamp) {
-	ctx->NewState |= _NEW_TEXTURE;
-	ctx->TextureStateTimestamp = ctx->Shared->TextureStateStamp;
-    }
+    ctx->lock_textures();
 }
 
 
 void _mesa_unlock_context_textures(GLcontext *ctx)
 {
-    assert(ctx->Shared->TextureStateStamp == ctx->TextureStateTimestamp);
-    ctx->Shared->TexMutex.unlock();
+    ctx->unlock_textures();
 }
 
 /*@}*/

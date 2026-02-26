@@ -3595,6 +3595,18 @@ struct __GLcontextRec {
      */
     void update_state();
 
+    /**
+     * Lock the shared texture state and synchronise the per-context timestamp.
+     * Replaces _mesa_lock_context_textures().
+     */
+    void lock_textures();
+
+    /**
+     * Unlock the shared texture state.
+     * Replaces _mesa_unlock_context_textures().
+     */
+    void unlock_textures();
+
     /*@}*/
 };
 
