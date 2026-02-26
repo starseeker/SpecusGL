@@ -438,7 +438,7 @@ set_extension(GLcontext *ctx, const char *name, GLboolean state)
 	return;
     }
 
-    for (i = 0 ; i < Elements(default_extensions) ; i++) {
+    for (i = 0 ; i < std::size(default_extensions) ; i++) {
 	if (strcmp(default_extensions[i].name, name) == 0) {
 	    if (default_extensions[i].flag_offset) {
 		GLboolean *enabled = base + default_extensions[i].flag_offset;
@@ -482,7 +482,7 @@ _mesa_extension_is_enabled(GLcontext *ctx, const char *name)
     const GLboolean *base = (const GLboolean *) &ctx->Extensions;
     GLuint i;
 
-    for (i = 0 ; i < Elements(default_extensions) ; i++) {
+    for (i = 0 ; i < std::size(default_extensions) ; i++) {
 	if (strcmp(default_extensions[i].name, name) == 0) {
 	    if (!default_extensions[i].flag_offset)
 		return GL_TRUE;
@@ -504,7 +504,7 @@ _mesa_init_extensions(GLcontext *ctx)
     GLboolean *base = (GLboolean *) &ctx->Extensions;
     GLuint i;
 
-    for (i = 0 ; i < Elements(default_extensions) ; i++) {
+    for (i = 0 ; i < std::size(default_extensions) ; i++) {
 	if (default_extensions[i].enabled &&
 	    default_extensions[i].flag_offset) {
 	    *(base + default_extensions[i].flag_offset) = GL_TRUE;
@@ -523,7 +523,7 @@ _mesa_make_extension_string(GLcontext *ctx)
     const GLboolean *base = (const GLboolean *) &ctx->Extensions;
     std::string ext;
 
-    for (GLuint i = 0 ; i < Elements(default_extensions) ; i++) {
+    for (GLuint i = 0 ; i < std::size(default_extensions) ; i++) {
 	if (!default_extensions[i].flag_offset ||
 	    *(base + default_extensions[i].flag_offset)) {
 	    if (!ext.empty())

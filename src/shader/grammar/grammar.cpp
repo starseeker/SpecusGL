@@ -260,7 +260,7 @@
     first).
 */
 
-#include <stdio.h>
+#include <cstdio>
 
 static void mem_free(void **);
 

@@ -46,18 +46,18 @@
 #ifndef GLHEADER_H
 #define GLHEADER_H
 
-#include <assert.h>
+#include <cassert>
+#include <cctype>
+#include <cfloat>
+#include <climits>
 #include <cmath>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <ctype.h>
-#include <limits.h>
+#include <iterator>
 #include <memory>
 #include <type_traits>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <float.h>
-#include <stdarg.h>
 
 
 /* Get typedefs for uintptr_t and friends */

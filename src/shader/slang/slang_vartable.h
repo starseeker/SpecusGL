@@ -4,7 +4,7 @@
 
 
 
-struct _slang_ir_storage;
+struct slang_ir_storage;
 
 struct slang_var_table;
 
@@ -29,16 +29,16 @@ extern slang_variable *
 _slang_find_variable(const slang_var_table *t, slang_atom name);
 
 extern GLboolean
-_slang_alloc_var(slang_var_table *t, struct _slang_ir_storage *store);
+_slang_alloc_var(slang_var_table *t, slang_ir_storage *store);
 
 extern GLboolean
-_slang_alloc_temp(slang_var_table *t, struct _slang_ir_storage *store);
+_slang_alloc_temp(slang_var_table *t, slang_ir_storage *store);
 
 extern void
-_slang_free_temp(slang_var_table *t, struct _slang_ir_storage *store);
+_slang_free_temp(slang_var_table *t, slang_ir_storage *store);
 
 extern GLboolean
-_slang_is_temp(const slang_var_table *t, const struct _slang_ir_storage *store);
+_slang_is_temp(const slang_var_table *t, const slang_ir_storage *store);
 
 
 

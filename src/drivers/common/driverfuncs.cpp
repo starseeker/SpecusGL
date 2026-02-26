@@ -65,7 +65,7 @@
 void
 _mesa_init_driver_functions(struct dd_function_table *driver)
 {
-    _mesa_bzero(driver, sizeof(*driver));
+    std::memset(driver, 0, sizeof(*driver));
 
     driver->GetString = nullptr;  /* REQUIRED! */
     driver->UpdateState = nullptr;  /* REQUIRED! */

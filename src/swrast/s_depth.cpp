@@ -240,7 +240,7 @@ depth_test_span16(GLcontext *ctx, GLuint n,
 	    }
 	    break;
 	case GL_NEVER:
-	    _mesa_bzero(mask, n * sizeof(GLubyte));
+	    std::memset(mask, 0, n * sizeof(GLubyte));
 	    break;
 	default:
 	    _mesa_problem(ctx, "Bad depth func in depth_test_span16");
@@ -450,7 +450,7 @@ depth_test_span32(GLcontext *ctx, GLuint n,
 	    }
 	    break;
 	case GL_NEVER:
-	    _mesa_bzero(mask, n * sizeof(GLubyte));
+	    std::memset(mask, 0, n * sizeof(GLubyte));
 	    break;
 	default:
 	    _mesa_problem(ctx, "Bad depth func in depth_test_span32");
@@ -734,7 +734,7 @@ direct_depth_test_pixels16(GLcontext *ctx, GLushort *zStart, GLuint stride,
 	    break;
 	case GL_NEVER:
 	    /* depth test never passes */
-	    _mesa_bzero(mask, n * sizeof(GLubyte));
+	    std::memset(mask, 0, n * sizeof(GLubyte));
 	    break;
 	default:
 	    _mesa_problem(ctx, "Bad depth func in direct_depth_test_pixels");
@@ -961,7 +961,7 @@ direct_depth_test_pixels32(GLcontext *ctx, GLuint *zStart, GLuint stride,
 	    break;
 	case GL_NEVER:
 	    /* depth test never passes */
-	    _mesa_bzero(mask, n * sizeof(GLubyte));
+	    std::memset(mask, 0, n * sizeof(GLubyte));
 	    break;
 	default:
 	    _mesa_problem(ctx, "Bad depth func in direct_depth_test_pixels");
@@ -1125,7 +1125,7 @@ _swrast_read_depth_span_float(GLcontext *ctx, struct gl_renderbuffer *rb,
 
     if (!rb) {
 	/* really only doing this to prevent FP exceptions later */
-	_mesa_bzero(depth, n * sizeof(GLfloat));
+	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
     }
 
@@ -1134,7 +1134,7 @@ _swrast_read_depth_span_float(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (y < 0 || y >= (GLint) rb->Height ||
 	x + n <= 0 || x >= (GLint) rb->Width) {
 	/* span is completely outside framebuffer */
-	_mesa_bzero(depth, n * sizeof(GLfloat));
+	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
     }
 
@@ -1187,7 +1187,7 @@ _swrast_read_depth_span_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
     if (!rb) {
 	/* really only doing this to prevent FP exceptions later */
-	_mesa_bzero(depth, n * sizeof(GLfloat));
+	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
     }
 
@@ -1196,7 +1196,7 @@ _swrast_read_depth_span_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (y < 0 || y >= (GLint) rb->Height ||
 	x + n <= 0 || x >= (GLint) rb->Width) {
 	/* span is completely outside framebuffer */
-	_mesa_bzero(depth, n * sizeof(GLfloat));
+	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
     }
 

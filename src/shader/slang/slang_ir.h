@@ -140,7 +140,7 @@ typedef enum {
 /**
  * Describes where data storage is allocated.
  */
-struct _slang_ir_storage {
+struct slang_ir_storage {
     enum register_file File;  /**< PROGRAM_TEMPORARY, PROGRAM_INPUT, etc */
     GLint Index;  /**< -1 means unallocated */
     GLint Size;  /**< number of floats */
@@ -148,16 +148,14 @@ struct _slang_ir_storage {
     GLint RefCount; /**< Used during IR tree delete */
 };
 
-typedef struct _slang_ir_storage slang_ir_storage;
-
 
 /**
  * Intermediate Representation (IR) tree node
  * Basically a binary tree, but IR_LRP and IR_CLAMP have three children.
  */
-typedef struct slang_ir_node_ {
+struct slang_ir_node {
     slang_ir_opcode Opcode;
-    struct slang_ir_node_ *Children[3];
+    slang_ir_node *Children[3];
     slang_ir_storage *Store;  /**< location of result of this operation */
     GLint InstLocation;  /**< Location of instruction emitted for this node */
 
@@ -167,22 +165,22 @@ typedef struct slang_ir_node_ {
     GLuint Writemask;  /**< If Opcode == IR_MOVE */
     GLfloat Value[4];    /**< If Opcode == IR_FLOAT */
     slang_variable *Var;  /**< If Opcode == IR_VAR or IR_VAR_DECL */
-    struct slang_ir_node_ *List;  /**< For various linked lists */
-    struct slang_ir_node_ *Parent;  /**< Pointer to logical parent (ie. loop) */
+    slang_ir_node *List;  /**< For various linked lists */
+    slang_ir_node *Parent;  /**< Pointer to logical parent (ie. loop) */
     slang_label *Label;  /**< Used for branches */
-} slang_ir_node;
+};
 
 
 
 /**
  * Assembly and IR info
  */
-typedef struct {
+struct slang_ir_info {
     slang_ir_opcode IrOpcode;
     const char *IrName;
     gl_inst_opcode InstOpcode;
     GLuint ResultSize, NumParams;
-} slang_ir_info;
+};
 
 
 

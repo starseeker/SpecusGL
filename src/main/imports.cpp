@@ -159,30 +159,6 @@ _mesa_realloc(void *oldBuffer, size_t /*oldSize*/, size_t newSize)
     return std::realloc(oldBuffer, newSize);
 }
 
-/**
- * Fill memory with a constant 16bit word.
- * \param dst destination pointer.
- * \param val value.
- * \param n number of words.
- */
-void
-_mesa_memset16(unsigned short *dst, unsigned short val, size_t n)
-{
-    while (n-- > 0)
-	*dst++ = val;
-}
-
-/** Wrapper around either memcpy() or bzero() */
-void
-_mesa_bzero(void *dst, size_t n)
-{
-#if defined(__FreeBSD__) || defined(__DragonFly__)
-    bzero(dst, n);
-#else
-    memset(dst, 0, n);
-#endif
-}
-
 /*@}*/
 
 

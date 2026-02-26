@@ -29,11 +29,11 @@
 #include <string>
 
 
-typedef struct slang_info_log_ {
+struct slang_info_log {
     std::string text;
     bool dont_free_text{false};
     bool error_flag{false};
-} slang_info_log;
+};
 
 
 extern void

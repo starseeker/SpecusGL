@@ -885,7 +885,7 @@ clip_span(GLcontext *ctx, SWspan *span)
 	if (x < xmin) {
 	    ASSERT(x + n > xmin);
 	    span->writeAll = GL_FALSE;
-	    _mesa_bzero(span->array->mask, (xmin - x) * sizeof(GLubyte));
+	    std::memset(span->array->mask, 0, (xmin - x) * sizeof(GLubyte));
 	}
 
 	/* Clip to right */
@@ -1642,7 +1642,7 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (y < 0 || y >= bufHeight || x + (GLint) n < 0 || x >= bufWidth) {
 	/* completely above, below, or right */
 	/* XXX maybe leave rgba values undefined? */
-	_mesa_bzero(rgba, 4 * n * sizeof(GLchan));
+	std::memset(rgba, 0, 4 * n * sizeof(GLchan));
     } else {
 	GLint skip, length;
 	if (x < 0) {
@@ -1701,7 +1701,7 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 
     if (y < 0 || y >= bufHeight || x + (GLint) n < 0 || x >= bufWidth) {
 	/* completely above, below, or right */
-	_mesa_bzero(index, n * sizeof(GLuint));
+	std::memset(index, 0, n * sizeof(GLuint));
     } else {
 	GLint skip, length;
 	if (x < 0) {

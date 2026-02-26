@@ -27,24 +27,26 @@
 
 
 
-    typedef struct slang_struct_scope_ {
-	struct slang_struct_ *structs;
+    struct slang_struct;
+
+    struct slang_struct_scope {
+	slang_struct *structs;
 	GLuint num_structs;
-	struct slang_struct_scope_ *outer_scope;
-    } slang_struct_scope;
+	slang_struct_scope *outer_scope;
+    };
 
     extern GLvoid
     _slang_struct_scope_ctr(slang_struct_scope *);
 
     void slang_struct_scope_destruct(slang_struct_scope *);
     int slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
-    struct slang_struct_ *slang_struct_scope_find(slang_struct_scope *, slang_atom, int);
+    slang_struct *slang_struct_scope_find(slang_struct_scope *, slang_atom, int);
 
-    typedef struct slang_struct_ {
+    struct slang_struct {
 	slang_atom a_name;
 	slang_variable_scope *fields;
 	slang_struct_scope *structs;
-    } slang_struct;
+    };
 
     int slang_struct_construct(slang_struct *);
     void slang_struct_destruct(slang_struct *);

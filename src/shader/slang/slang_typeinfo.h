@@ -41,6 +41,9 @@ struct slang_function_scope;
 struct slang_function;
 struct slang_label;
 struct slang_variable_scope;
+struct slang_struct_scope;
+struct slang_struct;
+struct slang_ir_node;
 
 /**
  * Holds complete information about vector swizzle - the <swizzle>
@@ -55,7 +58,7 @@ struct slang_swizzle {
 
 struct slang_name_space {
     slang_function_scope *funcs;
-    struct slang_struct_scope_ *structs;
+    slang_struct_scope *structs;
     slang_variable_scope *vars;
 };
 
@@ -67,7 +70,7 @@ struct slang_assemble_ctx {
     slang_var_table *vartable;
     slang_info_log *log;
     slang_label *curFuncEndLabel;
-    struct slang_ir_node_ *CurLoop;
+    slang_ir_node *CurLoop;
     slang_function *CurFunction;
 };
 
@@ -135,7 +138,7 @@ typedef enum slang_type_specifier_type_ {
  */
 struct slang_type_specifier {
     slang_type_specifier_type type;
-    struct slang_struct_ *_struct;         /**< used if type == spec_struct */
+    slang_struct *_struct;         /**< used if type == spec_struct */
     slang_type_specifier *_array;  /**< used if type == spec_array */
 };
 

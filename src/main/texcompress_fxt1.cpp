@@ -310,9 +310,9 @@ typedef unsigned long long Fx64;
 
 #define FX64_NATIVE 0
 
-typedef struct {
+struct Fx64 {
     GLuint lo, hi;
-} Fx64;
+};
 
 #define FX64_MOV32(a, b) a.lo = b
 #define FX64_OR32(a, b)  a.lo |= b

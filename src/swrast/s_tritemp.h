@@ -150,7 +150,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 		 const SWvertex *v1,
 		 const SWvertex *v2)
 {
-    typedef struct {
+    struct EdgeT {
 	const SWvertex *v0, *v1;   /* Y(v0) < Y(v1) */
 #if TRIANGLE_WALK_DOUBLE
 	GLdouble dx;	/* X(v1) - X(v0) */
@@ -171,7 +171,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 	GLfixed fx0;	/* fixed pt X of lower endpoint */
 #endif
 	GLint lines;	/* number of lines to be sampled on this edge */
-    } EdgeT;
+    };
 #define EDGET_INIT_ZERO {nullptr, nullptr, 0, 0, 0, 0, 0, 0, 0, 0}
 
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);

@@ -3643,7 +3643,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 			     &parsed, &parsed_len);
 
 	/* 'parsed' is unused here */
-	free(parsed);
+	grammar_alloc_free(parsed);
 	parsed = nullptr;
 
 	/* NOTE: we can't destroy grammar_syn_id right here because
@@ -3726,7 +3726,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	} while (0)
 #endif
 
-		free(parsed);
+		grammar_alloc_free(parsed);
 
 	grammar_destroy(arbprogram_syn_id);
 	return GL_FALSE;
@@ -3781,7 +3781,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
     /* We're done with the parsed binary array */
     var_cache_destroy(&vc_head);
 
-    free(parsed);
+    grammar_alloc_free(parsed);
 
     return !err;
 }

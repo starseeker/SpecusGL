@@ -405,14 +405,14 @@ pp_symbols_find(pp_symbols *self, const char *name)
  * context handling.
  */
 
-typedef struct {
+struct pp_cond_ctx {
     GLboolean current;         /* The condition value of this level. */
     GLboolean effective;       /* The effective product of current condition, outer level conditions
                                * and position within #if-#else-#endif sections. */
     GLboolean else_allowed;    /* TRUE if in #if-#else section, FALSE if in #else-#endif section
                                * and for global context. */
     GLboolean endif_required;  /* FALSE for global context only. */
-} pp_cond_ctx;
+};
 
 /* Should be enuff. */
 #define CONDITION_STACK_SIZE 64
@@ -447,10 +447,10 @@ pp_cond_stack_reevaluate(pp_cond_stack *self)
  * NOTE: Currently, only enable/disable state is stored.
  */
 
-typedef struct {
+struct pp_ext {
     GLboolean MESA_shader_debug;        /* GL_MESA_shader_debug enable */
     GLboolean ARB_texture_rectangle; /* GL_ARB_texture_rectangle enable */
-} pp_ext;
+};
 
 /*
  * Disable all extensions. Called at startup and on #extension all: disable.
@@ -487,7 +487,7 @@ pp_ext_set(pp_ext *self, const char *name, GLboolean enable)
  * and the #if/#endif context.
  */
 
-typedef struct {
+struct pp_state {
     GLint line;
     GLint file;
     GLint version;
@@ -495,7 +495,7 @@ typedef struct {
     pp_ext ext;
     slang_info_log *elog;
     pp_cond_stack cond;
-} pp_state;
+};
 
 static GLvoid
 pp_state_init(pp_state *self, slang_info_log *elog)
@@ -528,11 +528,11 @@ pp_state_free(pp_state *self)
 
 #define SKIP_WHITE(x) do { while (IS_WHITE(*(x))) (x)++; } while (GL_FALSE)
 
-typedef struct {
+struct expand_state {
     slang_string *output;
     const char *input;
     pp_state *state;
-} expand_state;
+};
 
 static GLboolean
 expand_defined(expand_state *e, slang_string *buffer)

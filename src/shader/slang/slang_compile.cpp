@@ -119,25 +119,25 @@ _slang_code_object_dtr(slang_code_object * self)
 
 /* slang_parse_ctx */
 
-typedef struct slang_parse_ctx_ {
+struct slang_parse_ctx {
     const byte *I;
     slang_info_log *L;
     int parsing_builtin;
     GLboolean global_scope;   /**< Is object being declared a global? */
     slang_atom_pool *atoms;
     slang_unit_type type;     /**< Vertex vs. Fragment */
-} slang_parse_ctx;
+};
 
 /* slang_output_ctx */
 
-typedef struct slang_output_ctx_ {
+struct slang_output_ctx {
     slang_variable_scope *vars;
     slang_function_scope *funs;
     slang_struct_scope *structs;
     slang_var_pool *global_pool;
     struct gl_program *program;
     slang_var_table *vartable;
-} slang_output_ctx;
+};
 
 /* _slang_compile() */
 

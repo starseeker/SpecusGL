@@ -476,11 +476,13 @@ do {									\
 /**
  * Return 1 if this is a little endian machine, 0 if big endian.
  */
-static inline GLboolean
+[[nodiscard]] static inline GLboolean
 _mesa_little_endian(void)
 {
-    const GLuint ui = 1; /* intentionally not static */
-    return *((const GLubyte *) &ui);
+    const GLuint ui = 1;
+    GLubyte b;
+    std::memcpy(&b, &ui, sizeof(b));
+    return b;
 }
 
 
@@ -504,12 +506,6 @@ _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 
 extern void *
 _mesa_realloc(void *oldBuffer, size_t oldSize, size_t newSize);
-
-extern void
-_mesa_memset16(unsigned short *dst, unsigned short val, size_t n);
-
-extern void
-_mesa_bzero(void *dst, size_t n);
 
 extern float
 _mesa_sinf(float a);
