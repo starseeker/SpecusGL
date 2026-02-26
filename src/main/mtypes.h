@@ -3139,11 +3139,8 @@ struct gl_matrix_stack {
 
 
 
-/*
- * Forward declaration of display list data types:
- */
-union node;
-typedef union node Node;
+/* Display list opcode enum and Node union (complete type needed for vector). */
+#include "dlist_node.h"
 
 
 /* This has to be included here. */
@@ -3185,7 +3182,7 @@ struct gl_tnl_module {
  * etc. in the future.
  */
 struct mesa_display_list {
-    Node *node;
+    std::vector<Node> nodes; /**< Instruction node array */
     GLuint id;
     GLbitfield flags;
 };
@@ -3199,8 +3196,7 @@ struct gl_dlist_state {
 
     struct mesa_display_list *CurrentList = nullptr;
     GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
-    GLuint CurrentPos = 0;	/**< Write index into CurrentList->node */
-    GLuint CurrentCapacity = 0;	/**< Allocated nodes in CurrentList->node */
+    GLuint CurrentPos = 0;	/**< Write index into CurrentList->nodes */
 
     GLvertexformat ListVtxfmt;
 
