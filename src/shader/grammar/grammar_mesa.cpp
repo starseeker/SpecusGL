@@ -29,6 +29,7 @@
  */
 
 #include "grammar_mesa.h"
+#include <cstdlib>
 
 #define GRAMMAR_PORT_BUILD 1
 #include "grammar.cpp"
@@ -37,17 +38,17 @@
 
 void grammar_alloc_free(void *ptr)
 {
-    free(ptr);
+    std::free(ptr);
 }
 
 void *grammar_alloc_malloc(size_t size)
 {
-    return malloc(size);
+    return std::malloc(size);
 }
 
-void *grammar_alloc_realloc(void *ptr, size_t old_size, size_t size)
+void *grammar_alloc_realloc(void *ptr, size_t /*old_size*/, size_t size)
 {
-    return _mesa_realloc(ptr, old_size, size);
+    return std::realloc(ptr, size);
 }
 
 void *grammar_memory_copy(void *dst, const void * src, size_t size)

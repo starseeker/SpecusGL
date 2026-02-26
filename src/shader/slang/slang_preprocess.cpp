@@ -32,6 +32,7 @@
 #include "grammar_mesa.h"
 #include "slang_preprocess.h"
 
+#include <array>
 #include <vector>
 
 LONGSTRING static const char *slang_pp_directives_syn =
@@ -416,15 +417,15 @@ typedef struct {
 /* Should be enuff. */
 #define CONDITION_STACK_SIZE 64
 
-typedef struct {
-    pp_cond_ctx stack[CONDITION_STACK_SIZE];
+struct pp_cond_stack {
+    std::array<pp_cond_ctx, CONDITION_STACK_SIZE> stack;
     pp_cond_ctx *top;
-} pp_cond_stack;
+};
 
 static GLboolean
 pp_cond_stack_push(pp_cond_stack *self, slang_info_log *elog)
 {
-    if (self->top == self->stack) {
+    if (self->top == self->stack.data()) {
 	slang_info_log_error(elog, "internal compiler error: preprocessor condition stack overflow.");
 	return GL_FALSE;
     }

@@ -44,7 +44,8 @@
  * consists of mode and limit information.
  */
 
-typedef struct __GLcontextRec __GLcontext;
+struct __GLcontextRec;
+using __GLcontext = __GLcontextRec;
 
 struct __GLcontextModes {
     struct __GLcontextModes * next;
