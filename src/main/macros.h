@@ -596,15 +596,8 @@ inline void mesa_interp_ub(TScalar t, GLubyte& dstub, GLubyte outub, GLubyte inu
 }
 #define INTERP_UB(t, dstub, outub, inub) mesa_interp_ub(t, dstub, outub, inub)
 
-/* INTERP_CHAN uses CHAN_TO_FLOAT and UNCLAMPED_FLOAT_TO_CHAN from colormac.h,
- * which is included after macros.h, so these remain as do-while macros. */
-#define INTERP_CHAN( t, dstc, outc, inc )   \
-do {                        \
-   GLfloat inf = CHAN_TO_FLOAT( inc );      \
-   GLfloat outf = CHAN_TO_FLOAT( outc );    \
-   GLfloat dstf = LINTERP( t, outf, inf );  \
-   UNCLAMPED_FLOAT_TO_CHAN( dstc, dstf );   \
-} while (0)
+/* INTERP_CHAN, INTERP_4CHAN and INTERP_3CHAN are defined in colormac.h, after
+ * CHAN_TO_FLOAT and UNCLAMPED_FLOAT_TO_CHAN are available. */
 
 /** Float linear interpolation (assigns to dstui). */
 template<typename T>
@@ -654,22 +647,7 @@ inline void mesa_interp_sz(T t, GLfloat (*vec)[4], int to, int out, int in, int 
 #define INTERP_3F(t, dst, out, in)           mesa_interp_3f(t, dst, out, in)
 #define INTERP_SZ(t, vec, to, out, in, sz)   mesa_interp_sz(t, vec, to, out, in, sz)
 
-/** 4-channel linear interpolation. */
-#define INTERP_4CHAN( t, dst, out, in )         \
-do {                            \
-   INTERP_CHAN( (t), (dst)[0], (out)[0], (in)[0] ); \
-   INTERP_CHAN( (t), (dst)[1], (out)[1], (in)[1] ); \
-   INTERP_CHAN( (t), (dst)[2], (out)[2], (in)[2] ); \
-   INTERP_CHAN( (t), (dst)[3], (out)[3], (in)[3] ); \
-} while (0)
-
-/** 3-channel linear interpolation. */
-#define INTERP_3CHAN( t, dst, out, in )         \
-do {                            \
-   INTERP_CHAN( (t), (dst)[0], (out)[0], (in)[0] ); \
-   INTERP_CHAN( (t), (dst)[1], (out)[1], (in)[1] ); \
-   INTERP_CHAN( (t), (dst)[2], (out)[2], (in)[2] ); \
-} while (0)
+/* INTERP_CHAN, INTERP_4CHAN and INTERP_3CHAN are defined in colormac.h. */
 
 /*@}*/
 

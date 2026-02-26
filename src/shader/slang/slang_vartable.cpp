@@ -2,10 +2,11 @@
 #include "imports.h"
 #include "slang_compile.h"
 #include "slang_compile_variable.h"
-#include "slang_mem.h"
 #include "slang_vartable.h"
 #include "slang_ir.h"
 #include "prog_instruction.h"
+#include <new>
+#include <vector>
 
 
 static int dbg = 0;
@@ -22,14 +23,13 @@ typedef enum {
  * Variable/register info for one variable scope.
  */
 struct table {
-    int Level;
-    int NumVars;
-    slang_variable **Vars;  /* array [NumVars] */
+    int Level{0};
+    std::vector<slang_variable *> Vars;
 
-    TempState Temps[MAX_PROGRAM_TEMPS * 4];  /* per-component state */
-    int ValSize[MAX_PROGRAM_TEMPS];     /* For debug only */
+    TempState Temps[MAX_PROGRAM_TEMPS * 4]{};  /* per-component state */
+    int ValSize[MAX_PROGRAM_TEMPS]{};     /* For debug only */
 
-    struct table *Parent;  /** Parent scope table */
+    struct table *Parent{nullptr};  /** Parent scope table */
 };
 
 
@@ -37,9 +37,9 @@ struct table {
  * A variable table is a stack of tables, one per scope.
  */
 struct slang_var_table {
-    GLint CurLevel;
-    GLuint MaxRegisters;
-    struct table *Top;  /**< Table at top of stack */
+    GLint CurLevel{0};
+    GLuint MaxRegisters{0};
+    struct table *Top{nullptr};  /**< Table at top of stack */
 };
 
 
@@ -47,8 +47,7 @@ struct slang_var_table {
 slang_var_table *
 _slang_new_var_table(GLuint maxRegisters)
 {
-    slang_var_table *vt
-	= (slang_var_table *) _slang_alloc(sizeof(slang_var_table));
+    slang_var_table *vt = new (std::nothrow) slang_var_table{};
     if (vt) {
 	vt->MaxRegisters = maxRegisters;
     }
@@ -63,7 +62,7 @@ _slang_delete_var_table(slang_var_table *vt)
 	_mesa_problem(nullptr, "non-empty var table in _slang_delete_var_table()");
 	return;
     }
-    _slang_free(vt);
+    delete vt;
 }
 
 
@@ -76,7 +75,7 @@ _slang_delete_var_table(slang_var_table *vt)
 void
 _slang_push_var_table(slang_var_table *vt)
 {
-    struct table *t = (struct table *) _slang_alloc(sizeof(struct table));
+    struct table *t = new (std::nothrow) table{};
     if (t) {
 	t->Level = vt->CurLevel++;
 	t->Parent = vt->Top;
@@ -103,7 +102,7 @@ _slang_pop_var_table(slang_var_table *vt)
     if (dbg) printf("Popping level %d\n", t->Level);
 
     /* free the storage allocated for each variable */
-    for (i = 0; i < t->NumVars; i++) {
+    for (i = 0; i < (int)t->Vars.size(); i++) {
 	slang_ir_storage *store = (slang_ir_storage *) t->Vars[i]->aux;
 	GLint j;
 	GLuint comp;
@@ -127,7 +126,7 @@ _slang_pop_var_table(slang_var_table *vt)
 	/* just verify that any remaining allocations in this scope
 	 * were for temps
 	 */
-	for (i = 0; i < vt->MaxRegisters * 4; i++) {
+	for (i = 0; i < (int)vt->MaxRegisters * 4; i++) {
 	    if (t->Temps[i] != FREE && t->Parent->Temps[i] == FREE) {
 		if (dbg) printf("  Free reg %d\n", i/4);
 		assert(t->Temps[i] == TEMP);
@@ -135,13 +134,8 @@ _slang_pop_var_table(slang_var_table *vt)
 	}
     }
 
-    if (t->Vars) {
-	_slang_free(t->Vars);
-	t->Vars = nullptr;
-    }
-
     vt->Top = t->Parent;
-    _slang_free(t);
+    delete t;
     vt->CurLevel--;
 }
 
@@ -157,12 +151,7 @@ _slang_add_variable(slang_var_table *vt, slang_variable *v)
     t = vt->Top;
     assert(t);
     if (dbg) printf("Adding var %s\n", (char *) v->a_name);
-    t->Vars = (slang_variable **)
-	      _slang_realloc(t->Vars,
-			     t->NumVars * sizeof(slang_variable *),
-			     (t->NumVars + 1) * sizeof(slang_variable *));
-    t->Vars[t->NumVars] = v;
-    t->NumVars++;
+    t->Vars.push_back(v);
 }
 
 
@@ -176,7 +165,7 @@ _slang_find_variable(const slang_var_table *vt, slang_atom name)
     struct table *t = vt->Top;
     while (1) {
 	int i;
-	for (i = 0; i < t->NumVars; i++) {
+	for (i = 0; i < (int)t->Vars.size(); i++) {
 	    if (t->Vars[i]->a_name == name)
 		return t->Vars[i];
 	}

@@ -133,9 +133,11 @@ struct gl_pixelstore_attrib;
 struct gl_texture_format;
 struct gl_texture_image;
 struct gl_texture_object;
-typedef struct __GLcontextRec GLcontext;
+struct __GLcontextRec;
+using GLcontext = __GLcontextRec;
 typedef __GLcontextModes GLvisual;
-typedef struct gl_framebuffer GLframebuffer;
+struct gl_framebuffer;
+using GLframebuffer = gl_framebuffer;
 /*@}*/
 
 /**
