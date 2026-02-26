@@ -57,7 +57,7 @@ slang_mempool *
 _slang_new_mempool(GLuint initialSize)
 {
     try {
-        return new slang_mempool_(initialSize);
+        return new slang_mempool(initialSize);
     } catch (const std::bad_alloc &) {
         return nullptr;
     }
@@ -134,7 +134,7 @@ _slang_alloc(GLuint bytes)
 	    /* allocate a new overflow block */
 	    const GLuint sz = MAX2(bytes, static_cast<GLuint>(pool->data.size()));
 	    try {
-		pool->next.reset(new slang_mempool_(sz));
+		pool->next.reset(new slang_mempool(sz));
 	    } catch (const std::bad_alloc &) {
 		return nullptr;
 	    }

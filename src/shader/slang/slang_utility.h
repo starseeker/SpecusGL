@@ -78,10 +78,9 @@ typedef GLvoid *slang_atom;
  * pointers inside each node) are not invalidated by insertion, so
  * previously-returned slang_atom values remain valid.
  */
-struct slang_atom_pool_ {
+struct slang_atom_pool {
     std::unordered_set<std::string> strings;
 };
-typedef struct slang_atom_pool_ slang_atom_pool;
 
 GLvoid slang_atom_pool_construct(slang_atom_pool *);
 GLvoid slang_atom_pool_destruct(slang_atom_pool *);
