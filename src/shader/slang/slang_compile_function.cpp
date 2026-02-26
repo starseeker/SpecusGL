@@ -34,19 +34,7 @@
 
 /* slang_fixup_table */
 
-void
-slang_fixup_table_init(slang_fixup_table * fix)
-{
-    fix->table = nullptr;
-    fix->count = 0;
-}
-
-void
-slang_fixup_table_free(slang_fixup_table * fix)
-{
-    _slang_free(fix->table);
-    slang_fixup_table_init(fix);
-}
+/* slang_fixup_table_init and slang_fixup_table_free are now inline in the header. */
 
 /**
  * Add a new fixup address to the table.
@@ -54,14 +42,7 @@ slang_fixup_table_free(slang_fixup_table * fix)
 GLboolean
 slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 {
-    fixups->table = (GLuint *)
-		    _slang_realloc(fixups->table,
-				   fixups->count * sizeof(GLuint),
-				   (fixups->count + 1) * sizeof(GLuint));
-    if (fixups->table == nullptr)
-	return GL_FALSE;
-    fixups->table[fixups->count] = address;
-    fixups->count++;
+    fixups->table.push_back(address);
     return GL_TRUE;
 }
 
@@ -111,19 +92,15 @@ slang_function_destruct(slang_function * func)
 GLvoid
 _slang_function_scope_ctr(slang_function_scope * self)
 {
-    self->functions = nullptr;
-    self->num_functions = 0;
     self->outer_scope = nullptr;
 }
 
 void
 slang_function_scope_destruct(slang_function_scope * scope)
 {
-    unsigned int i;
-
-    for (i = 0; i < scope->num_functions; i++)
-	slang_function_destruct(scope->functions + i);
-    _slang_free(scope->functions);
+    for (auto &f : scope->functions)
+	slang_function_destruct(&f);
+    scope->functions.clear();
 }
 
 
@@ -148,10 +125,8 @@ int
 slang_function_scope_find_by_name(slang_function_scope * funcs,
 				  slang_atom a_name, int all_scopes)
 {
-    unsigned int i;
-
-    for (i = 0; i < funcs->num_functions; i++)
-	if (a_name == funcs->functions[i].header.a_name)
+    for (const auto &f : funcs->functions)
+	if (a_name == f.header.a_name)
 	    return 1;
     if (all_scopes && funcs->outer_scope != nullptr)
 	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, 1);
@@ -173,43 +148,27 @@ slang_function *
 slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
 			  int all_scopes)
 {
-    unsigned int i;
-
-    for (i = 0; i < funcs->num_functions; i++) {
-	slang_function *f = &funcs->functions[i];
+    for (auto &f : funcs->functions) {
 	const GLuint haveRetValue = 0;
 #if 0
-	    = (f->header.type.specifier.type != SLANG_SPEC_VOID);
+	    = (f.header.type.specifier.type != SLANG_SPEC_VOID);
 #endif
 	unsigned int j;
 
-	/*
-	printf("Compare name %s to %s  (ret %u, %d, %d)\n",
-	       (char *) fun->header.a_name, (char *) f->header.a_name,
-	       haveRetValue,
-	       fun->param_count, f->param_count);
-	*/
-
-	if (fun->header.a_name != f->header.a_name)
+	if (fun->header.a_name != f.header.a_name)
 	    continue;
-	if (fun->param_count != f->param_count)
+	if (fun->param_count != f.param_count)
 	    continue;
 	for (j = haveRetValue; j < fun->param_count; j++) {
 	    if (!slang_type_specifier_equal
 		(&fun->parameters->variables[j]->type.specifier,
-		 &f->parameters->variables[j]->type.specifier))
+		 &f.parameters->variables[j]->type.specifier))
 		break;
 	}
 	if (j == fun->param_count) {
-	    /*
-	    printf("Found match\n");
-	    */
-	    return f;
+	    return &f;
 	}
     }
-    /*
-    printf("Not found\n");
-    */
     if (all_scopes && funcs->outer_scope != nullptr)
 	return slang_function_scope_find(funcs->outer_scope, fun, 1);
     return nullptr;

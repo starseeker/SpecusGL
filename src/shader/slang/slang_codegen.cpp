@@ -1377,11 +1377,9 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
 static slang_function *
 _slang_first_function(slang_function_scope *scope, const char *name)
 {
-    GLuint i;
-    for (i = 0; i < scope->num_functions; i++) {
-	slang_function *f = &scope->functions[i];
-	if (strcmp(name, (char*) f->header.a_name) == 0)
-	    return f;
+    for (auto &f : scope->functions) {
+	if (strcmp(name, (char*) f.header.a_name) == 0)
+	    return &f;
     }
     if (scope->outer_scope)
 	return _slang_first_function(scope->outer_scope, name);

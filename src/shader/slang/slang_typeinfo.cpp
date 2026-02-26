@@ -747,10 +747,8 @@ _slang_locate_function(const slang_function_scope * funcs, slang_atom a_name,
 		       const slang_name_space * space, slang_atom_pool * atoms,
 		       slang_info_log *log)
 {
-    GLuint i;
-
-    for (i = 0; i < funcs->num_functions; i++) {
-	slang_function *f = &funcs->functions[i];
+    for (const auto &f_ref : funcs->functions) {
+	const slang_function *f = &f_ref;
 	const GLuint haveRetValue = _slang_function_has_return_value(f);
 	GLuint j;
 
@@ -785,7 +783,7 @@ _slang_locate_function(const slang_function_scope * funcs, slang_atom a_name,
 		break;
 	}
 	if (j == num_args)
-	    return f;
+	    return const_cast<slang_function *>(f);
     }
     if (funcs->outer_scope != nullptr)
 	return _slang_locate_function(funcs->outer_scope, a_name, args,

@@ -30,27 +30,30 @@
 
 struct slang_code_unit;
 
+#include <vector>
+
 /**
  * Types of functions.
  */
-typedef enum slang_function_kind_ {
+enum slang_function_kind {
     SLANG_FUNC_ORDINARY,
     SLANG_FUNC_CONSTRUCTOR,
     SLANG_FUNC_OPERATOR
-} slang_function_kind;
+};
 
 
 /**
  * When we need to fill in addresses which we won't know until the future,
  * we keep track of them with a fix-up table.
+ *
+ * C++17 modernisation: replaced GLuint* + count pair with std::vector<GLuint>.
  */
 struct slang_fixup_table {
-    GLuint *table;     /**< array[count] of addresses */
-    GLuint count;
+    std::vector<GLuint> table;  /**< addresses awaiting fixup */
 };
 
-extern void slang_fixup_table_init(slang_fixup_table *);
-extern void slang_fixup_table_free(slang_fixup_table *);
+inline void slang_fixup_table_init(slang_fixup_table *fix) { fix->table.clear(); }
+inline void slang_fixup_table_free(slang_fixup_table *fix) { fix->table.clear(); }
 extern GLboolean slang_fixup_save(slang_fixup_table *fixups, GLuint address);
 
 
@@ -73,10 +76,11 @@ extern void slang_function_destruct(slang_function *);
 
 /**
  * Basically, a list of compiled functions.
+ *
+ * C++17 modernisation: replaced raw array + count with std::vector<slang_function>.
  */
 struct slang_function_scope {
-    slang_function *functions;
-    GLuint num_functions;
+    std::vector<slang_function> functions;
     slang_function_scope *outer_scope;
 };
 

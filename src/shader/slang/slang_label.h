@@ -7,17 +7,28 @@
 #include "mtypes.h"
 #include "prog_instruction.h"
 
+#include <string>
+#include <vector>
 
+
+/**
+ * A branch-target label in a compiled GLSL shader.
+ *
+ * C++17 modernisation: Name is now a std::string, References is a
+ * std::vector<GLuint>, and the struct is allocated/deleted with new/delete
+ * instead of the slang memory pool.
+ */
 struct slang_label {
-    char *Name;
-    GLint Location;
+    std::string Name;
+    GLint Location{-1};
     /**
      * List of instruction references (numbered starting at zero) which need
      * their BranchTarget field filled in with the location eventually
      * assigned to the label.
      */
-    GLuint NumReferences;
-    GLuint *References;   /** Array [NumReferences] */
+    std::vector<GLuint> References;
+
+    explicit slang_label(const std::string &name) : Name(name) {}
 };
 
 

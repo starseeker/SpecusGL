@@ -1694,22 +1694,10 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
     found_func = slang_function_scope_find(O->funs, &parsed_func, 0);
     if (found_func == nullptr) {
 	/* New function, add it to the function list */
-	O->funs->functions =
-	    (slang_function *) _slang_realloc(O->funs->functions,
-					      O->funs->num_functions
-					      * sizeof(slang_function),
-					      (O->funs->num_functions + 1)
-					      * sizeof(slang_function));
-	if (O->funs->functions == nullptr) {
-	    slang_info_log_memory(C->L);
-	    slang_function_destruct(&parsed_func);
-	    return GL_FALSE;
-	}
-	O->funs->functions[O->funs->num_functions] = parsed_func;
-	O->funs->num_functions++;
+	O->funs->functions.push_back(parsed_func);
 
 	/* return the newly parsed function */
-	*parsed_func_ret = &O->funs->functions[O->funs->num_functions - 1];
+	*parsed_func_ret = &O->funs->functions.back();
     } else {
 	/* previously defined or declared */
 	/* TODO: check function return type qualifiers and specifiers */
