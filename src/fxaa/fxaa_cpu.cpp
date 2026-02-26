@@ -11,15 +11,12 @@
  */
 
 #include "fxaa_cpu.h"
+#include <algorithm>
+#include <cmath>
+#include <cstring>
 #include <vector>
-#include <string.h>
-#include <math.h>
 
-#ifndef FXAA_CLAMP
-#define FXAA_CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : ((v) > (hi) ? (hi) : (v)))
-#endif
-
-typedef struct { float x, y; } vec2;
+struct vec2 { float x, y; };
 
 static inline float luminosity(float r, float g, float b) {
     return 0.299f * r + 0.587f * g + 0.114f * b;
@@ -32,9 +29,9 @@ static inline void load_rgb_u8(const uint8_t* p, float* r, float* g, float* b) {
 }
 
 static inline void store_rgb_u8(uint8_t* p, float r, float g, float b) {
-    p[0] = (uint8_t)FXAA_CLAMP(lroundf(r * 255.0f), 0, 255);
-    p[1] = (uint8_t)FXAA_CLAMP(lroundf(g * 255.0f), 0, 255);
-    p[2] = (uint8_t)FXAA_CLAMP(lroundf(b * 255.0f), 0, 255);
+    p[0] = static_cast<uint8_t>(std::clamp(std::lround(r * 255.0f), 0L, 255L));
+    p[1] = static_cast<uint8_t>(std::clamp(std::lround(g * 255.0f), 0L, 255L));
+    p[2] = static_cast<uint8_t>(std::clamp(std::lround(b * 255.0f), 0L, 255L));
 }
 
 static inline uint8_t load_a_u8(const uint8_t* p) { return p[3]; }
@@ -42,14 +39,14 @@ static inline void store_a_u8(uint8_t* p, uint8_t a) { p[3] = a; }
 
 /* Bilinear sample: normalized coords [0,1] with clamp-to-edge */
 static void sample_bilinear_rgb(const ImageRGBA8* img, float u, float v, float* r, float* g, float* b) {
-    float x = FXAA_CLAMP(u, 0.0f, 1.0f) * (float)(img->width  - 1);
-    float y = FXAA_CLAMP(v, 0.0f, 1.0f) * (float)(img->height - 1);
-    int x0 = (int)floorf(x);
-    int y0 = (int)floorf(y);
-    int x1 = FXAA_CLAMP(x0 + 1, 0, img->width  - 1);
-    int y1 = FXAA_CLAMP(y0 + 1, 0, img->height - 1);
-    float tx = x - (float)x0;
-    float ty = y - (float)y0;
+    float x = std::clamp(u, 0.0f, 1.0f) * static_cast<float>(img->width  - 1);
+    float y = std::clamp(v, 0.0f, 1.0f) * static_cast<float>(img->height - 1);
+    int x0 = static_cast<int>(std::floor(x));
+    int y0 = static_cast<int>(std::floor(y));
+    int x1 = std::clamp(x0 + 1, 0, img->width  - 1);
+    int y1 = std::clamp(y0 + 1, 0, img->height - 1);
+    float tx = x - static_cast<float>(x0);
+    float ty = y - static_cast<float>(y0);
 
     const uint8_t* p00 = img->rgba + y0 * img->strideBytes + x0 * 4;
     const uint8_t* p10 = img->rgba + y0 * img->strideBytes + x1 * 4;
@@ -77,8 +74,8 @@ static void sample_bilinear_rgb(const ImageRGBA8* img, float u, float v, float* 
 
 /* Nearest sample at integer offsets for 3x3 neighborhood */
 static void sample_nearest_rgb(const ImageRGBA8* img, int ix, int iy, float* r, float* g, float* b) {
-    ix = FXAA_CLAMP(ix, 0, img->width  - 1);
-    iy = FXAA_CLAMP(iy, 0, img->height - 1);
+    ix = std::clamp(ix, 0, img->width  - 1);
+    iy = std::clamp(iy, 0, img->height - 1);
     const uint8_t* p = img->rgba + iy * img->strideBytes + ix * 4;
     load_rgb_u8(p, r, g, b);
 }
@@ -121,10 +118,10 @@ static int vtkEndpointSearchCPU(
 	    sample_bilinear_rgb(img, posCP.x, posCP.y, &r,&g,&b);
 	    lumCP = luminosity(r,g,b);
 	}
-	doneN = doneN || fabsf(lumHCN - lumHC) > fabsf(lumHCN - lumC)
-	    || fabsf(lumCN  - lumC)  > fabsf(lumCN  - lumHC);
-	doneP = doneP || fabsf(lumHCP - lumHC) > fabsf(lumHCP - lumC)
-	    || fabsf(lumCP  - lumC)  > fabsf(lumCP  - lumHC);
+	doneN = doneN || std::fabs(lumHCN - lumHC) > std::fabs(lumHCN - lumC)
+	    || std::fabs(lumCN  - lumC)  > std::fabs(lumCN  - lumHC);
+	doneP = doneP || std::fabs(lumHCP - lumHC) > std::fabs(lumHCP - lumC)
+	    || std::fabs(lumCP  - lumC)  > std::fabs(lumCP  - lumHC);
 	if (doneN && doneP) break;
 	if (!doneN) { posHCN.x -= edgeDir.x; posHCN.y -= edgeDir.y; posCN.x -= edgeDir.x; posCN.y -= edgeDir.y; }
 	if (!doneP) { posHCP.x += edgeDir.x; posHCP.y += edgeDir.y; posCP.x += edgeDir.x; posCP.y += edgeDir.y; }
@@ -135,10 +132,10 @@ static int vtkEndpointSearchCPU(
     else { dstN = posC.y - posCN.y; dstP = posCP.y - posC.y; }
 
     int nearestEndpointIsN = dstN < dstP;
-    float dst = fminf(dstN, dstP);
+    float dst = std::fmin(dstN, dstP);
     float lumCNear = nearestEndpointIsN ? lumCN : lumCP;
 
-    int needEdgeAA = fabsf(lumCNear - lumHC) < fabsf(lumCNear - lumC);
+    int needEdgeAA = std::fabs(lumCNear - lumHC) < std::fabs(lumCNear - lumC);
 
     float invNegSpanLength = -1.f / (dstN + dstP);
     float pixelOffset = dst * invNegSpanLength + 0.5f;
@@ -164,18 +161,18 @@ void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p
 	dst.strideBytes = in->strideBytes;
     }
 
-    const float tcPixelX = 1.0f / (float)in->width;
-    const float tcPixelY = 1.0f / (float)in->height;
+    const float tcPixelX = 1.0f / static_cast<float>(in->width);
+    const float tcPixelY = 1.0f / static_cast<float>(in->height);
     const vec2 tcPixel = { tcPixelX, tcPixelY };
 
     for (int y = 0; y < in->height; ++y) {
 	for (int x = 0; x < in->width; ++x) {
-	    vec2 tcC = { (float)x * tcPixelX, (float)y * tcPixelY };
+	    vec2 tcC = { static_cast<float>(x) * tcPixelX, static_cast<float>(y) * tcPixelY };
 
-	    int xW = FXAA_CLAMP(x - 1, 0, in->width - 1);
-	    int xE = FXAA_CLAMP(x + 1, 0, in->width - 1);
-	    int yN = FXAA_CLAMP(y - 1, 0, in->height - 1);
-	    int yS = FXAA_CLAMP(y + 1, 0, in->height - 1);
+	    int xW = std::clamp(x - 1, 0, in->width - 1);
+	    int xE = std::clamp(x + 1, 0, in->width - 1);
+	    int yN = std::clamp(y - 1, 0, in->height - 1);
+	    int yS = std::clamp(y + 1, 0, in->height - 1);
 
 	    const uint8_t* pC = in->rgba + y * in->strideBytes + x * 4;
 	    float rC,gC,bC; load_rgb_u8(pC, &rC,&gC,&bC);
@@ -203,10 +200,10 @@ void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p
 	    float lumNW = luminosity(rNW,gNW,bNW);
 	    float lumSW = luminosity(rSW,gSW,bSW);
 
-	    float lumMin = fminf(lumC, fminf(fminf(lumN, lumS), fminf(lumW, lumE)));
-	    float lumMax = fmaxf(lumC, fmaxf(fmaxf(lumN, lumS), fmaxf(lumW, lumE)));
+	    float lumMin = std::fmin(lumC, std::fmin(std::fmin(lumN, lumS), std::fmin(lumW, lumE)));
+	    float lumMax = std::fmax(lumC, std::fmax(std::fmax(lumN, lumS), std::fmax(lumW, lumE)));
 	    float lumRange = lumMax - lumMin;
-	    float lumThresh = fmaxf(p->HardContrastThreshold,
+	    float lumThresh = std::fmax(p->HardContrastThreshold,
 		    p->RelativeContrastThreshold * lumMax);
 
 	    float outR = rC, outG = gC, outB = bC;
@@ -221,19 +218,19 @@ void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p
 		float lumNESE = lumNE + lumSE;
 
 		float lumAveNSWE = 0.25f * lumNSWE;
-		float lumSubRange = fabsf(lumAveNSWE - lumC);
-		float blendSub = fmaxf(0.f, (lumSubRange / lumRange) - p->SubpixelContrastThreshold);
-		blendSub = fminf(p->SubpixelBlendLimit,
+		float lumSubRange = std::fabs(lumAveNSWE - lumC);
+		float blendSub = std::fmax(0.f, (lumSubRange / lumRange) - p->SubpixelContrastThreshold);
+		blendSub = std::fmin(p->SubpixelBlendLimit,
 			blendSub * (1.f / (1.f - p->SubpixelContrastThreshold)));
 
-		float edgeVertRow1 = fabsf(-2.f * lumN + lumNWNE);
-		float edgeVertRow2 = fabsf(-2.f * lumC + lumWE);
-		float edgeVertRow3 = fabsf(-2.f * lumS + lumSWSE);
+		float edgeVertRow1 = std::fabs(-2.f * lumN + lumNWNE);
+		float edgeVertRow2 = std::fabs(-2.f * lumC + lumWE);
+		float edgeVertRow3 = std::fabs(-2.f * lumS + lumSWSE);
 		float edgeVert = ((2.f * edgeVertRow2 + edgeVertRow1) + edgeVertRow3) / 12.f;
 
-		float edgeHorzCol1 = fabsf(-2.f * lumW + lumNWSW);
-		float edgeHorzCol2 = fabsf(-2.f * lumC + lumNS);
-		float edgeHorzCol3 = fabsf(-2.f * lumE + lumNESE);
+		float edgeHorzCol1 = std::fabs(-2.f * lumW + lumNWSW);
+		float edgeHorzCol2 = std::fabs(-2.f * lumC + lumNS);
+		float edgeHorzCol3 = std::fabs(-2.f * lumE + lumNESE);
 		float edgeHorz = ((2.f * edgeHorzCol2 + edgeHorzCol1) + edgeHorzCol3) / 12.f;
 
 		int horzSpan = edgeHorz >= edgeVert;
@@ -246,7 +243,7 @@ void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p
 		    lumHC1 = lumW; lumHC2 = lumE; lengthSign = -tcPixelX; // assume W
 		}
 		float lumHC = lumHC1;
-		if (fabsf(lumC - lumHC1) < fabsf(lumC - lumHC2)) {
+		if (std::fabs(lumC - lumHC1) < std::fabs(lumC - lumHC2)) {
 		    lumHC = lumHC2;
 		    lengthSign = -lengthSign;
 		}
@@ -326,9 +323,9 @@ void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAPara
 	    g = linear_to_srgb(g);
 	    b = linear_to_srgb(b);
 
-	    pSrgb[0] = (uint8_t)FXAA_CLAMP(lroundf(r * 255.0f), 0, 255);
-	    pSrgb[1] = (uint8_t)FXAA_CLAMP(lroundf(g * 255.0f), 0, 255);
-	    pSrgb[2] = (uint8_t)FXAA_CLAMP(lroundf(b * 255.0f), 0, 255);
+	    pSrgb[0] = static_cast<uint8_t>(std::clamp(std::lround(r * 255.0f), 0L, 255L));
+	    pSrgb[1] = static_cast<uint8_t>(std::clamp(std::lround(g * 255.0f), 0L, 255L));
+	    pSrgb[2] = static_cast<uint8_t>(std::clamp(std::lround(b * 255.0f), 0L, 255L));
 	    pSrgb[3] = pIn[3]; /* Preserve alpha */
 	}
     }
@@ -355,9 +352,9 @@ void fxaa_apply_rgba8_srgb(const ImageRGBA8* in, ImageRGBA8* out, const FXAAPara
 	    g = srgb_to_linear(g);
 	    b = srgb_to_linear(b);
 
-	    pOut[0] = (uint8_t)FXAA_CLAMP(lroundf(r * 255.0f), 0, 255);
-	    pOut[1] = (uint8_t)FXAA_CLAMP(lroundf(g * 255.0f), 0, 255);
-	    pOut[2] = (uint8_t)FXAA_CLAMP(lroundf(b * 255.0f), 0, 255);
+	    pOut[0] = static_cast<uint8_t>(std::clamp(std::lround(r * 255.0f), 0L, 255L));
+	    pOut[1] = static_cast<uint8_t>(std::clamp(std::lround(g * 255.0f), 0L, 255L));
+	    pOut[2] = static_cast<uint8_t>(std::clamp(std::lround(b * 255.0f), 0L, 255L));
 	    pOut[3] = pSrgb[3]; /* Preserve alpha */
 	}
     }

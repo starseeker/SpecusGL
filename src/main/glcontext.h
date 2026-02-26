@@ -48,8 +48,6 @@ struct __GLcontextRec;
 using __GLcontext = __GLcontextRec;
 
 struct __GLcontextModes {
-    struct __GLcontextModes * next;
-
     GLboolean rgbMode;
     GLboolean floatMode;
     GLboolean colorIndexMode;

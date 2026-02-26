@@ -3656,7 +3656,7 @@ enum _debug {
 
 
 
-#define Elements(x) sizeof(x)/sizeof(*(x))
+#define Elements(x) std::size(x)
 
 
 #endif /* TYPES_H */

@@ -8,24 +8,24 @@
 #ifndef FXAA_CPU_H
 #define FXAA_CPU_H
 
-#include <stdint.h>
+#include <cstdint>
 
 
 
-    typedef struct {
+    struct FXAAParams {
 	float RelativeContrastThreshold;   // e.g. 0.125f
 	float HardContrastThreshold;       // e.g. 0.0625f
 	float SubpixelBlendLimit;          // e.g. 0.75f
 	float SubpixelContrastThreshold;   // e.g. 0.25f
 	int   EndpointSearchIterations;    // e.g. 12
-    } FXAAParams;
+    };
 
-    typedef struct {
+    struct ImageRGBA8 {
 	uint8_t* rgba;     // pointer to RGBA8 pixels
 	int width;
 	int height;
 	int strideBytes;   // bytes per row (>= width * 4)
-    } ImageRGBA8;
+    };
 
     /* Apply FXAA to an RGBA8 buffer (can be in-place if out == in). */
     void fxaa_apply_rgba8(const ImageRGBA8* in, ImageRGBA8* out, const FXAAParams* p);
