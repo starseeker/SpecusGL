@@ -126,9 +126,8 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
 /**
  * Reinterpret the bit pattern of a GLfloat as a GLint.
  *
- * Replaces the fi_type union type-punning which is undefined behaviour in
- * ISO C++.  std::memcpy is the standard-compliant way to do this in C++17;
- * compilers generate identical code (a plain register move on x86).
+ * This uses std::memcpy which is the standard-compliant way to do this in
+ * C++17; compilers generate identical code (a plain register move on x86).
  */
 [[nodiscard]] inline GLint float_bits(float f) noexcept {
     GLint bits;
