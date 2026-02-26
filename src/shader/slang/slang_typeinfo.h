@@ -97,7 +97,7 @@ _slang_multiply_swizzles(slang_swizzle *, const slang_swizzle *,
 /**
  * The basic shading language types (float, vec4, mat3, etc)
  */
-typedef enum slang_type_specifier_type_ {
+enum slang_type_specifier_type {
     SLANG_SPEC_VOID,
     SLANG_SPEC_BOOL,
     SLANG_SPEC_BVEC2,
@@ -130,7 +130,7 @@ typedef enum slang_type_specifier_type_ {
     SLANG_SPEC_SAMPLER2DRECTSHADOW,
     SLANG_SPEC_STRUCT,
     SLANG_SPEC_ARRAY
-} slang_type_specifier_type;
+};
 
 
 /**

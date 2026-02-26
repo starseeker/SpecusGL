@@ -33,7 +33,7 @@
  * These are the types of the AST (abstract syntax tree) nodes.
  * [foo] indicates a sub-tree or reference to another type of node
  */
-typedef enum slang_operation_type_ {
+enum slang_operation_type {
     SLANG_OPER_NONE,
     SLANG_OPER_BLOCK_NO_NEW_SCOPE,       /* "{" sequence "}" */
     SLANG_OPER_BLOCK_NEW_SCOPE,  /* "{" sequence "}" */
@@ -98,7 +98,7 @@ typedef enum slang_operation_type_ {
     SLANG_OPER_FIELD,            /* i.e.: ".next" or ".xzy" or ".xxx" etc */
     SLANG_OPER_POSTINCREMENT,    /* [var] "++" */
     SLANG_OPER_POSTDECREMENT     /* [var] "--" */
-} slang_operation_type;
+};
 
 
 struct slang_function;

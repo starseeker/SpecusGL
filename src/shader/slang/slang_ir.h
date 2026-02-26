@@ -44,7 +44,7 @@
 /**
  * Intermediate Representation opcodes
  */
-typedef enum {
+enum slang_ir_opcode {
     IR_NOP = 0,
     IR_SEQ,     /* sequence (eval left, then right) */
     IR_SCOPE,   /* new variable scope (one child) */
@@ -134,7 +134,7 @@ typedef enum {
     IR_F_TO_I,  /* float[4] to int[4] conversion */
 
     IR_KILL     /* fragment kill/discard */
-} slang_ir_opcode;
+};
 
 
 /**

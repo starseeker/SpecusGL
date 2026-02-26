@@ -45,7 +45,6 @@
 #include "shader/prog_print.h"
 #include "slang_builtin.h"
 #include "slang_emit.h"
-#include "slang_mem.h"
 
 #include <vector>
 #include <algorithm>
@@ -125,14 +124,11 @@ swizzle_swizzle(GLuint swz1, GLuint swz2)
 slang_ir_storage *
 _slang_new_ir_storage(enum register_file file, GLint index, GLint size)
 {
-    slang_ir_storage *st;
-    st = (slang_ir_storage *) _slang_alloc(sizeof(slang_ir_storage));
-    if (st) {
-	st->File = file;
-	st->Index = index;
-	st->Size = size;
-	st->Swizzle = SWIZZLE_NOOP;
-    }
+    slang_ir_storage *st = new slang_ir_storage;
+    st->File = file;
+    st->Index = index;
+    st->Size = size;
+    st->Swizzle = SWIZZLE_NOOP;
     return st;
 }
 
@@ -151,7 +147,7 @@ alloc_temp_storage(slang_emit_info *emitInfo, slang_ir_node *n, GLint size)
     if (!_slang_alloc_temp(emitInfo->vt, n->Store)) {
 	slang_info_log_error(emitInfo->log,
 			     "Ran out of registers, too many temporaries");
-	_slang_free(n->Store);
+	delete n->Store;
 	n->Store = nullptr;
 	return GL_FALSE;
     }

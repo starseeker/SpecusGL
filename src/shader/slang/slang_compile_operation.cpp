@@ -30,7 +30,6 @@
 
 #include "imports.h"
 #include "slang_compile.h"
-#include "slang_mem.h"
 
 
 /**
@@ -61,9 +60,9 @@ slang_operation_destruct(slang_operation * oper)
 
     for (i = 0; i < oper->num_children; i++)
 	slang_operation_destruct(oper->children + i);
-    _slang_free(oper->children);
+    delete[] oper->children;
     slang_variable_scope_destruct(oper->locals);
-    _slang_free(oper->locals);
+    delete oper->locals;
     oper->children = nullptr;
     oper->num_children = 0;
     oper->locals = nullptr;
@@ -85,17 +84,14 @@ slang_operation_copy(slang_operation * x, const slang_operation * y)
     if (!slang_operation_construct(&z))
 	return GL_FALSE;
     z.type = y->type;
-    z.children = (slang_operation *)
-		 _slang_alloc(y->num_children * sizeof(slang_operation));
-    if (z.children == nullptr) {
-	slang_operation_destruct(&z);
-	return GL_FALSE;
-    }
-    for (z.num_children = 0; z.num_children < y->num_children;
-	 z.num_children++) {
-	if (!slang_operation_construct(&z.children[z.num_children])) {
-	    slang_operation_destruct(&z);
-	    return GL_FALSE;
+    if (y->num_children > 0) {
+	z.children = new slang_operation[y->num_children];
+	for (z.num_children = 0; z.num_children < y->num_children;
+	     z.num_children++) {
+	    if (!slang_operation_construct(&z.children[z.num_children])) {
+		slang_operation_destruct(&z);
+		return GL_FALSE;
+	    }
 	}
     }
     for (i = 0; i < z.num_children; i++) {
@@ -131,22 +127,12 @@ slang_operation_copy(slang_operation * x, const slang_operation * y)
 slang_operation *
 slang_operation_new(GLuint count)
 {
-    slang_operation *ops
-	= (slang_operation *) _slang_alloc(count * sizeof(slang_operation));
     assert(count > 0);
-    if (ops) {
-	GLuint i;
-	for (i = 0; i < count; i++) {
-	    if (!slang_operation_construct(ops + i)) {
-		// Previously the return value wasn't checked.  Finish the
-		// non-allocation initialization if slang_operation_construct
-		// fails, since that will have the least overall impact on
-		// existing logic flows.  TODO - find out what the behavior
-		// *should* be if slang_operation_construct fails here...
-		slang_operation * oper = (ops+i);
-		oper->fun = nullptr;
-		oper->var = nullptr;
-	    }
+    slang_operation *ops = new slang_operation[count];
+    for (GLuint i = 0; i < count; i++) {
+	if (!slang_operation_construct(ops + i)) {
+	    ops[i].fun = nullptr;
+	    ops[i].var = nullptr;
 	}
     }
     return ops;
@@ -160,31 +146,33 @@ void
 slang_operation_delete(slang_operation *oper)
 {
     slang_operation_destruct(oper);
-    _slang_free(oper);
+    delete oper;
 }
 
 
 slang_operation *
 slang_operation_grow(GLuint *numChildren, slang_operation **children)
 {
-    slang_operation *ops;
+    const GLuint newCount = *numChildren + 1;
+    slang_operation *ops = new slang_operation[newCount];
+    if (!ops)
+	return nullptr;
 
-    ops = (slang_operation *)
-	  _slang_realloc(*children,
-			 *numChildren * sizeof(slang_operation),
-			 (*numChildren + 1) * sizeof(slang_operation));
-    if (ops) {
-	slang_operation *newOp = ops + *numChildren;
-	if (!slang_operation_construct(newOp)) {
-	    _slang_free(ops);
-	    *children = nullptr;
-	    return nullptr;
-	}
-	*children = ops;
-	(*numChildren)++;
-	return newOp;
+    /* copy existing children (shallow) and default-construct the new one */
+    for (GLuint i = 0; i < *numChildren; i++)
+	ops[i] = (*children)[i];
+
+    slang_operation *newOp = ops + *numChildren;
+    if (!slang_operation_construct(newOp)) {
+	delete[] ops;
+	*children = nullptr;
+	return nullptr;
     }
-    return nullptr;
+    /* Release the old array (without destroying children - they were shallow-copied). */
+    delete[] *children;
+    *children = ops;
+    (*numChildren)++;
+    return newOp;
 }
 
 /**
@@ -198,34 +186,33 @@ slang_operation *
 slang_operation_insert(GLuint *numElements, slang_operation **array,
 		       GLuint pos)
 {
-    slang_operation *ops;
-
     assert(pos <= *numElements);
 
-    ops = (slang_operation *)
-	  _slang_alloc((*numElements + 1) * sizeof(slang_operation));
-    if (ops) {
-	slang_operation *newOp;
-	newOp = ops + pos;
-	if (pos > 0)
-	    memcpy(ops, *array, pos * sizeof(slang_operation));
-	if (pos < *numElements)
-	    memcpy(newOp + 1, (*array) + pos,
-			 (*numElements - pos) * sizeof(slang_operation));
+    slang_operation *ops = new slang_operation[*numElements + 1];
+    if (!ops)
+	return nullptr;
 
-	if (!slang_operation_construct(newOp)) {
-	    _slang_free(ops);
-	    *numElements = 0;
-	    *array = nullptr;
-	    return nullptr;
-	}
-	if (*array)
-	    _slang_free(*array);
-	*array = ops;
-	(*numElements)++;
-	return newOp;
+    slang_operation *newOp = ops + pos;
+
+    /* shallow-copy elements before insertion point */
+    for (GLuint i = 0; i < pos; i++)
+	ops[i] = (*array)[i];
+
+    /* shallow-copy elements after insertion point */
+    for (GLuint i = pos; i < *numElements; i++)
+	ops[i + 1] = (*array)[i];
+
+    if (!slang_operation_construct(newOp)) {
+	delete[] ops;
+	*numElements = 0;
+	*array = nullptr;
+	return nullptr;
     }
-    return nullptr;
+    /* Release old array without destroying children (shallow-copied). */
+    delete[] *array;
+    *array = ops;
+    (*numElements)++;
+    return newOp;
 }
 
 

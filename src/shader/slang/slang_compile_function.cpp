@@ -57,13 +57,7 @@ slang_function_construct(slang_function * func)
     if (!slang_variable_construct(&func->header))
 	return 0;
 
-    func->parameters = (slang_variable_scope *)
-		       _slang_alloc(sizeof(slang_variable_scope));
-    if (func->parameters == nullptr) {
-	slang_variable_destruct(&func->header);
-	return 0;
-    }
-
+    func->parameters = new slang_variable_scope;
     _slang_variable_scope_ctr(func->parameters);
     func->param_count = 0;
     func->body = nullptr;
@@ -77,10 +71,12 @@ slang_function_destruct(slang_function * func)
 {
     slang_variable_destruct(&func->header);
     slang_variable_scope_destruct(func->parameters);
-    _slang_free(func->parameters);
+    delete func->parameters;
+    func->parameters = nullptr;
     if (func->body != nullptr) {
 	slang_operation_destruct(func->body);
-	_slang_free(func->body);
+	delete func->body;
+	func->body = nullptr;
     }
     slang_fixup_table_free(&func->fixups);
 }

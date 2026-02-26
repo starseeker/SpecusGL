@@ -26,7 +26,6 @@
 #include "imports.h"
 #include "context.h"
 #include "slang_ir.h"
-#include "slang_mem.h"
 #include "shader/prog_print.h"
 
 
@@ -143,20 +142,10 @@ _slang_free_ir(slang_ir_node *n)
     if (!n)
 	return;
 
-#if 0
-    if (n->Store) {
-	n->Store->RefCount--;
-	if (n->Store->RefCount == 0) {
-	    _slang_free(n->Store);
-	    n->Store = nullptr;
-	}
-    }
-#endif
-
     for (i = 0; i < 3; i++)
 	_slang_free_ir(n->Children[i]);
     /* Do not free n->List since it's a child elsewhere */
-    _slang_free(n);
+    delete n;
 }
 
 
