@@ -3417,6 +3417,68 @@ struct __GLcontextRec {
     vbo_context *swtnl_im        = nullptr;  /**< vbo builder private context */
     AEcontext   *aelt_context    = nullptr;  /**< array-element helper context */
     /*@}*/
+
+    /** \name C++ class methods – context lifecycle and common operations */
+    /*@{*/
+
+    /**
+     * Initialize this context.  Replaces the body of _mesa_initialize_context().
+     * Returns true on success, false on failure (same semantics as the old
+     * GL_TRUE/GL_FALSE return).
+     */
+    bool initialize(const GLvisual *visual,
+                    struct __GLcontextRec *share_list,
+                    const struct dd_function_table *driverFunctions,
+                    void *driverContext);
+
+    /**
+     * Free all resources owned by this context (but does not free the
+     * __GLcontextRec object itself).  Replaces _mesa_free_context_data().
+     */
+    void free_data();
+
+    /**
+     * Record a GL error on this context.  Replaces _mesa_record_error().
+     */
+    void record_error(GLenum error)
+    {
+        if (ErrorValue == GL_NO_ERROR)
+            ErrorValue = error;
+        if (Driver.Error)
+            Driver.Error(this);
+    }
+
+    /**
+     * Bind draw and read framebuffers to this context.
+     * Called (for non-null contexts) by _mesa_make_current().
+     */
+    void bind(GLframebuffer *draw, GLframebuffer *read);
+
+    /**
+     * Share display-list / texture / program state with \p other.
+     * Replaces the body of _mesa_share_state().
+     * Returns true if sharing was established.
+     */
+    bool share_state_with(struct __GLcontextRec *other);
+
+    /**
+     * Check whether this context's visual is compatible with \p buffer.
+     * Replaces the static check_compatible() helper.
+     */
+    [[nodiscard]] bool is_visual_compatible(const GLframebuffer *buffer) const;
+
+    /**
+     * Return the current API dispatch table (Exec or Save).
+     */
+    [[nodiscard]] struct _glapi_table *get_dispatch() const { return CurrentDispatch; }
+
+    /**
+     * Called by the window system just before swapping buffers.
+     * Replaces _mesa_notifySwapBuffers().
+     */
+    void notify_swap_buffers();
+
+    /*@}*/
 };
 
 
