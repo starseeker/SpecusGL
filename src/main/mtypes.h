@@ -3576,6 +3576,25 @@ struct __GLcontextRec {
      */
     bool init_attrib_groups();
 
+    /**
+     * Invalidate the shine table cache entry for the given side (0=front, 1=back).
+     * Replaces _mesa_invalidate_shine_table().
+     */
+    void invalidate_shine_table(GLuint side);
+
+    /**
+     * Revalidate all lighting lookup tables (shine tables and spot exponent tables).
+     * Replaces _mesa_validate_all_lighting_tables().
+     */
+    void validate_all_lighting_tables();
+
+    /**
+     * Update all derived OpenGL state for this context.
+     * Called after any state changes; locks the texture state while running.
+     * Replaces _mesa_update_state().
+     */
+    void update_state();
+
     /*@}*/
 };
 

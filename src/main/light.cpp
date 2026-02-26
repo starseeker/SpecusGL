@@ -917,11 +917,16 @@ gl_light::validate_spot_exp_table()
  * lighting, and the cost of doing it early may be partially offset
  * by keeping a MRU cache of shine tables for various shine values.
  */
+
+/**
+ * Invalidate the shine table cache entry for the given side.
+ * Replaces the body of _mesa_invalidate_shine_table().
+ */
 void
-_mesa_invalidate_shine_table(GLcontext *ctx, GLuint side)
+__GLcontextRec::invalidate_shine_table(GLuint side)
 {
     ASSERT(side < 2);
-    ctx->_ShineTable[side] = ctx->_ShineTabList.end();
+    _ShineTable[side] = _ShineTabList.end();
 }
 
 
@@ -979,23 +984,41 @@ validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 }
 
 
+/**
+ * Revalidate all lighting lookup tables.
+ * Replaces the body of _mesa_validate_all_lighting_tables().
+ */
 void
-_mesa_validate_all_lighting_tables(GLcontext *ctx)
+__GLcontextRec::validate_all_lighting_tables()
 {
     GLuint i;
     GLfloat shininess;
 
-    shininess = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_SHININESS][0];
-    if (ctx->_ShineTable[0] == ctx->_ShineTabList.end() || ctx->_ShineTable[0]->shininess != shininess)
-	validate_shine_table(ctx, 0, shininess);
+    shininess = Light.Material.Attrib[MAT_ATTRIB_FRONT_SHININESS][0];
+    if (_ShineTable[0] == _ShineTabList.end() || _ShineTable[0]->shininess != shininess)
+	validate_shine_table(this, 0, shininess);
 
-    shininess = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_SHININESS][0];
-    if (ctx->_ShineTable[1] == ctx->_ShineTabList.end() || ctx->_ShineTable[1]->shininess != shininess)
-	validate_shine_table(ctx, 1, shininess);
+    shininess = Light.Material.Attrib[MAT_ATTRIB_BACK_SHININESS][0];
+    if (_ShineTable[1] == _ShineTabList.end() || _ShineTable[1]->shininess != shininess)
+	validate_shine_table(this, 1, shininess);
 
-    for (i = 0; i < ctx->Const.MaxLights; i++)
-	if (ctx->Light.Light[i]._SpotExpTable[0][0] == -1)
-	    ctx->Light.Light[i].validate_spot_exp_table();
+    for (i = 0; i < Const.MaxLights; i++)
+	if (Light.Light[i]._SpotExpTable[0][0] == -1)
+	    Light.Light[i].validate_spot_exp_table();
+}
+
+
+void
+_mesa_invalidate_shine_table(GLcontext *ctx, GLuint side)
+{
+    ctx->invalidate_shine_table(side);
+}
+
+
+void
+_mesa_validate_all_lighting_tables(GLcontext *ctx)
+{
+    ctx->validate_all_lighting_tables();
 }
 
 
