@@ -226,9 +226,10 @@ gl_framebuffer::replace(struct gl_framebuffer **ptr,
     if (*ptr)
 	gl_framebuffer::release(ptr);
     assert(!*ptr);
-    assert(fb);
-    fb->ref();
-    *ptr = fb;
+    if (fb) {
+	fb->ref();
+	*ptr = fb;
+    }
 }
 
 

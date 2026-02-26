@@ -122,7 +122,7 @@ struct osmesa_context {
      * Query an integer OSMesa parameter.
      * Replaces the body of OSMesaGetIntegerv().
      */
-    void get_integer(GLint pname, GLint *value) const;
+    void get_integer(GLint pname, GLint *value);
 
     /** Recompute the rowaddr array from the current buffer and format. */
     void compute_row_addresses();
@@ -1450,7 +1450,7 @@ osmesa_context::pixel_store(GLint pname, GLint value)
  * Query an integer OSMesa parameter.
  */
 void
-osmesa_context::get_integer(GLint pname, GLint *value) const
+osmesa_context::get_integer(GLint pname, GLint *value)
 {
     switch (pname) {
 	case OSMESA_WIDTH:
@@ -1470,7 +1470,7 @@ osmesa_context::get_integer(GLint pname, GLint *value) const
 	case OSMESA_MAX_HEIGHT:
 	    *value = MAX_HEIGHT;       return;
 	default:
-	    _mesa_error(const_cast<GLcontext *>(&mesa),
+	    _mesa_error(&mesa,
                        GL_INVALID_ENUM, "OSMesaGetIntergerv(pname)");
 	    return;
     }
