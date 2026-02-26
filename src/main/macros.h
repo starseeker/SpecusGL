@@ -704,9 +704,12 @@ template<typename T, typename U>
 /** Clamp X to [MIN,MAX] */
 #define CLAMP(X, MIN, MAX)  mesa_clamp(X, MIN, MAX)
 
-/** Assign X to CLAMP(X, MIN, MAX) */
-#define CLAMP_SELF(x, mn, mx)  \
-   ( (x)<(mn) ? ((x) = (mn)) : ((x)>(mx) ? ((x)=(mx)) : (x)) )
+/** Clamp x in-place to [mn, mx]. */
+template<typename T, typename Lo, typename Hi>
+inline void mesa_clamp_self(T& x, Lo mn, Hi hi) noexcept {
+    x = static_cast<T>(mesa_clamp(x, mn, hi));
+}
+#define CLAMP_SELF(x, mn, mx) mesa_clamp_self(x, mn, mx)
 
 
 
@@ -735,6 +738,12 @@ template<typename T, typename U>
 template<typename T, typename U>
 [[nodiscard]] inline auto mesa_dot4(const T* a, const U* b) noexcept {
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
+}
+
+/** Dot product of a 4-element vector against four scalars. */
+template<typename V, typename A, typename B, typename C, typename D>
+[[nodiscard]] inline auto mesa_dot4v(const V* v, A a, B b, C c, D d) noexcept {
+    return v[0]*a + v[1]*b + v[2]*c + v[3]*d;
 }
 
 /** Cross product: n = u × v */
@@ -779,7 +788,7 @@ inline void mesa_normalize3fv(GLfloat* v) noexcept {
 #define DOT3(a, b)              mesa_dot3(a, b)
 #define DOT4(a, b)              mesa_dot4(a, b)
 /** Dot product of a 4-element vector against four scalars */
-#define DOT4V(v,a,b,c,d) (v[0]*(a) + v[1]*(b) + v[2]*(c) + v[3]*(d))
+#define DOT4V(v,a,b,c,d) mesa_dot4v(v, a, b, c, d)
 #define CROSS3(n, u, v)         mesa_cross3(n, u, v)
 #define LEN_SQUARED_3FV(V)      mesa_len_sq3fv(V)
 #define LEN_SQUARED_2FV(V)      mesa_len_sq2fv(V)
