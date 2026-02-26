@@ -1216,7 +1216,7 @@ osmesa_context::~osmesa_context()
     _swrast_DestroyContext(&mesa);
 
     _mesa_destroy_visual(gl_visual);
-    _mesa_unreference_framebuffer(&gl_buffer);
+    gl_framebuffer::release(&gl_buffer);
 
     mesa.free_data();
 }

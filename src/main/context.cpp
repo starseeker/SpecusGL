@@ -1044,10 +1044,10 @@ __GLcontextRec::free_data()
     }
 
     /* unreference WinSysDraw/Read buffers */
-    _mesa_unreference_framebuffer(&WinSysDrawBuffer);
-    _mesa_unreference_framebuffer(&WinSysReadBuffer);
-    _mesa_unreference_framebuffer(&DrawBuffer);
-    _mesa_unreference_framebuffer(&ReadBuffer);
+    gl_framebuffer::release(&WinSysDrawBuffer);
+    gl_framebuffer::release(&WinSysReadBuffer);
+    gl_framebuffer::release(&DrawBuffer);
+    gl_framebuffer::release(&ReadBuffer);
 
     _mesa_free_attrib_data(this);         /* releases texture references on attrib stack */
     _mesa_free_texture_data(this);        /* frees texture objects */
@@ -1316,16 +1316,16 @@ __GLcontextRec::bind(GLframebuffer *drawBuffer, GLframebuffer *readBuffer)
     if (drawBuffer && readBuffer) {
 	ASSERT(drawBuffer->Name == 0);
 	ASSERT(readBuffer->Name == 0);
-	_mesa_reference_framebuffer(&WinSysDrawBuffer, drawBuffer);
-	_mesa_reference_framebuffer(&WinSysReadBuffer, readBuffer);
+	gl_framebuffer::replace(&WinSysDrawBuffer, drawBuffer);
+	gl_framebuffer::replace(&WinSysReadBuffer, readBuffer);
 
 	/* Only set Draw/ReadBuffer fields if they're nullptr or not bound to
 	 * a user-created FBO. */
 	if (!DrawBuffer || DrawBuffer->Name == 0) {
-	    _mesa_reference_framebuffer(&DrawBuffer, drawBuffer);
+	    gl_framebuffer::replace(&DrawBuffer, drawBuffer);
 	}
 	if (!ReadBuffer || ReadBuffer->Name == 0) {
-	    _mesa_reference_framebuffer(&ReadBuffer, readBuffer);
+	    gl_framebuffer::replace(&ReadBuffer, readBuffer);
 	}
 
 	NewState |= _NEW_BUFFERS;

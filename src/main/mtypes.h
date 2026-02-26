@@ -1503,6 +1503,14 @@ struct gl_texture_object {
      */
     void set_image(GLenum target, GLint level,
                    struct gl_texture_image *texImage);
+
+    /**
+     * Atomically replace *\p ptr with \p tex, adjusting reference counts.
+     * If *ptr already equals tex, nothing happens.
+     * Replaces _mesa_reference_texobj().
+     */
+    static void replace(struct gl_texture_object **ptr,
+                        struct gl_texture_object *tex);
 };
 
 
@@ -2730,6 +2738,21 @@ struct gl_framebuffer {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Atomically replace *\p ptr with \p fb, adjusting reference counts.
+     * If *ptr already equals fb, nothing happens.
+     * Replaces _mesa_reference_framebuffer().
+     */
+    static void replace(struct gl_framebuffer **ptr,
+                        struct gl_framebuffer *fb);
+
+    /**
+     * Decrement the reference count of *\p ptr and set it to nullptr.
+     * Deletes the framebuffer if the count reaches zero.
+     * Replaces _mesa_unreference_framebuffer().
+     */
+    static void release(struct gl_framebuffer **ptr);
 };
 
 

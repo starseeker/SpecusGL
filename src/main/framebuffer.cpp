@@ -213,20 +213,18 @@ _mesa_free_framebuffer_data(struct gl_framebuffer *fb)
 
 
 /**
- * Set *ptr to point to fb, with refcounting and locking.
+ * Atomically replace *ptr with fb, adjusting reference counts.
+ * Replaces the body of _mesa_reference_framebuffer().
  */
 void
-_mesa_reference_framebuffer(struct gl_framebuffer **ptr,
-			    struct gl_framebuffer *fb)
+gl_framebuffer::replace(struct gl_framebuffer **ptr,
+                        struct gl_framebuffer *fb)
 {
     assert(ptr);
-    if (*ptr == fb) {
-	/* no change */
+    if (*ptr == fb)
 	return;
-    }
-    if (*ptr) {
-	_mesa_unreference_framebuffer(ptr);
-    }
+    if (*ptr)
+	gl_framebuffer::release(ptr);
     assert(!*ptr);
     assert(fb);
     fb->ref();
@@ -235,21 +233,42 @@ _mesa_reference_framebuffer(struct gl_framebuffer **ptr,
 
 
 /**
+ * Decrement the reference count of *ptr and set it to nullptr.
+ * Deletes the framebuffer if the count reaches zero.
+ * Replaces the body of _mesa_unreference_framebuffer().
+ */
+void
+gl_framebuffer::release(struct gl_framebuffer **ptr)
+{
+    assert(ptr);
+    if (*ptr) {
+	if ((*ptr)->unref())
+	    delete *ptr;
+	*ptr = nullptr;
+    }
+}
+
+
+/**
+ * Set *ptr to point to fb, with refcounting and locking.
+ * Delegates to gl_framebuffer::replace().
+ */
+void
+_mesa_reference_framebuffer(struct gl_framebuffer **ptr,
+			    struct gl_framebuffer *fb)
+{
+    gl_framebuffer::replace(ptr, fb);
+}
+
+
+/**
  * Undo/remove a reference to a framebuffer object.
- * Decrement the framebuffer object's reference count and delete it when
- * the refcount hits zero.
- * Note: we pass the address of a pointer and set it to nullptr.
+ * Delegates to gl_framebuffer::release().
  */
 void
 _mesa_unreference_framebuffer(struct gl_framebuffer **fb)
 {
-    assert(fb);
-    if (*fb) {
-	if ((*fb)->unref())
-	    delete *fb;
-
-	*fb = nullptr;
-    }
+    gl_framebuffer::release(fb);
 }
 
 
