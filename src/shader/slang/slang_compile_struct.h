@@ -25,14 +25,19 @@
 #if !defined SLANG_COMPILE_STRUCT_H
 #define SLANG_COMPILE_STRUCT_H
 
+#include <vector>
 
 
     struct slang_struct;
 
+    /**
+     * A scope containing GLSL struct type definitions.
+     *
+     * C++17 modernisation: replaced raw array + count with std::vector<slang_struct>.
+     */
     struct slang_struct_scope {
-	slang_struct *structs;
-	GLuint num_structs;
-	slang_struct_scope *outer_scope;
+	std::vector<slang_struct> structs; /**< owned struct definitions */
+	slang_struct_scope *outer_scope{nullptr};
     };
 
     extern GLvoid

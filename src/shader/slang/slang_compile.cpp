@@ -356,13 +356,9 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
     }
 
     /* set-up a new struct */
-    *st = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-    if (*st == nullptr) {
-	slang_info_log_memory(C->L);
-	return 0;
-    }
+    *st = new slang_struct;
     if (!slang_struct_construct(*st)) {
-	_slang_free(*st);
+	delete *st;
 	*st = nullptr;
 	slang_info_log_memory(C->L);
 	return 0;
@@ -386,20 +382,12 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
     if (name[0] != '\0') {
 	slang_struct *s;
 
-	O->structs->structs =
-	    (slang_struct *) _slang_realloc(O->structs->structs,
-					    O->structs->num_structs
-					    * sizeof(slang_struct),
-					    (O->structs->num_structs + 1)
-					    * sizeof(slang_struct));
-	if (O->structs->structs == nullptr) {
-	    slang_info_log_memory(C->L);
+	O->structs->structs.emplace_back();
+	s = &O->structs->structs.back();
+	if (!slang_struct_construct(s)) {
+	    O->structs->structs.pop_back();
 	    return 0;
 	}
-	s = &O->structs->structs[O->structs->num_structs];
-	if (!slang_struct_construct(s))
-	    return 0;
-	O->structs->num_structs++;
 	if (!slang_struct_copy(s, *st))
 	    return 0;
     }
@@ -600,13 +588,9 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		    return 0;
 		}
 
-		spec->_struct = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-		if (spec->_struct == nullptr) {
-		    slang_info_log_memory(C->L);
-		    return 0;
-		}
+		spec->_struct = new slang_struct;
 		if (!slang_struct_construct(spec->_struct)) {
-		    _slang_free(spec->_struct);
+		    delete spec->_struct;
 		    spec->_struct = nullptr;
 		    return 0;
 		}

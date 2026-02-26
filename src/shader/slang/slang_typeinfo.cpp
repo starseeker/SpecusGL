@@ -179,11 +179,13 @@ slang_type_specifier_dtr(slang_type_specifier * self)
 {
     if (self->_struct != nullptr) {
 	slang_struct_destruct(self->_struct);
-	_slang_free(self->_struct);
+	delete self->_struct;
+	self->_struct = nullptr;
     }
     if (self->_array != nullptr) {
 	slang_type_specifier_dtr(self->_array);
-	_slang_free(self->_array);
+	delete self->_array;
+	self->_array = nullptr;
     }
 }
 
@@ -196,13 +198,9 @@ slang_type_specifier_copy(slang_type_specifier * x,
     slang_type_specifier_ctr(&z);
     z.type = y->type;
     if (z.type == SLANG_SPEC_STRUCT) {
-	z._struct = (slang_struct *) _slang_alloc(sizeof(slang_struct));
-	if (z._struct == nullptr) {
-	    slang_type_specifier_dtr(&z);
-	    return GL_FALSE;
-	}
+	z._struct = new slang_struct;
 	if (!slang_struct_construct(z._struct)) {
-	    _slang_free(z._struct);
+	    delete z._struct;
 	    slang_type_specifier_dtr(&z);
 	    return GL_FALSE;
 	}
@@ -211,12 +209,7 @@ slang_type_specifier_copy(slang_type_specifier * x,
 	    return GL_FALSE;
 	}
     } else if (z.type == SLANG_SPEC_ARRAY) {
-	z._array = (slang_type_specifier *)
-		   _slang_alloc(sizeof(slang_type_specifier));
-	if (z._array == nullptr) {
-	    slang_type_specifier_dtr(&z);
-	    return GL_FALSE;
-	}
+	z._array = new slang_type_specifier;
 	slang_type_specifier_ctr(z._array);
 	if (!slang_type_specifier_copy(z._array, y->_array)) {
 	    slang_type_specifier_dtr(&z);
@@ -588,12 +581,9 @@ _slang_typeof_operation_(slang_operation * op,
 		    if (s) {
 			/* struct initializer */
 			ti->spec.type = SLANG_SPEC_STRUCT;
-			ti->spec._struct =
-			    (slang_struct *) _slang_alloc(sizeof(slang_struct));
-			if (ti->spec._struct == nullptr)
-			    return GL_FALSE;
+			ti->spec._struct = new slang_struct;
 			if (!slang_struct_construct(ti->spec._struct)) {
-			    _slang_free(ti->spec._struct);
+			    delete ti->spec._struct;
 			    ti->spec._struct = nullptr;
 			    return GL_FALSE;
 			}
