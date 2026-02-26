@@ -30,7 +30,6 @@
 
 #include "imports.h"
 #include "slang_compile.h"
-#include "slang_mem.h"
 
 
 struct type_specifier_type_name {
@@ -253,13 +252,9 @@ slang_variable_destruct(slang_variable * var)
     slang_fully_specified_type_destruct(&var->type);
     if (var->initializer != nullptr) {
 	slang_operation_destruct(var->initializer);
-	_slang_free(var->initializer);
+	delete var->initializer;
+	var->initializer = nullptr;
     }
-#if 0
-    if (var->aux) {
-	free(var->aux);
-    }
-#endif
 }
 
 
@@ -277,14 +272,10 @@ slang_variable_copy(slang_variable * x, const slang_variable * y)
     z.a_name = y->a_name;
     z.array_len = y->array_len;
     if (y->initializer != nullptr) {
-	z.initializer
-	    = (slang_operation *) _slang_alloc(sizeof(slang_operation));
-	if (z.initializer == nullptr) {
-	    slang_variable_destruct(&z);
-	    return 0;
-	}
+	z.initializer = new slang_operation;
 	if (!slang_operation_construct(z.initializer)) {
-	    _slang_free(z.initializer);
+	    delete z.initializer;
+	    z.initializer = nullptr;
 	    slang_variable_destruct(&z);
 	    return 0;
 	}

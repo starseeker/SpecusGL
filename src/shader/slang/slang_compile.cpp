@@ -273,12 +273,7 @@ convert_to_array(slang_parse_ctx * C, slang_variable * var,
     /* sized array - mark it as array, copy the specifier to the array element and
      * parse the expression */
     var->type.specifier.type = SLANG_SPEC_ARRAY;
-    var->type.specifier._array = (slang_type_specifier *)
-				 _slang_alloc(sizeof(slang_type_specifier));
-    if (var->type.specifier._array == nullptr) {
-	slang_info_log_memory(C->L);
-	return GL_FALSE;
-    }
+    var->type.specifier._array = new slang_type_specifier;
     slang_type_specifier_ctr(var->type.specifier._array);
     return slang_type_specifier_copy(var->type.specifier._array, sp);
 }
@@ -869,13 +864,13 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
     (*ops)[*total_ops - (n + 1)] = (*ops)[*total_ops - 1];
     *total_ops -= n;
 
-    *ops = (slang_operation *)
-	   _slang_realloc(*ops,
-			  (*total_ops + n) * sizeof(slang_operation),
-			  *total_ops * sizeof(slang_operation));
-    if (*ops == nullptr) {
-	slang_info_log_memory(C->L);
-	return 0;
+    /* shrink ops array - shallow copy the first *total_ops elements */
+    {
+	slang_operation *new_ops = new slang_operation[*total_ops];
+	for (unsigned int k = 0; k < *total_ops; k++)
+	    new_ops[k] = (*ops)[k];
+	delete[] *ops;
+	*ops = new_ops;
     }
     return 1;
 }
@@ -902,13 +897,12 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	const unsigned int op_code = *C->I++;
 
 	/* allocate default operation, becomes a no-op if not used  */
-	ops = (slang_operation *)
-	      _slang_realloc(ops,
-			     num_ops * sizeof(slang_operation),
-			     (num_ops + 1) * sizeof(slang_operation));
-	if (ops == nullptr) {
-	    slang_info_log_memory(C->L);
-	    return 0;
+	{
+	    slang_operation *new_ops = new slang_operation[num_ops + 1];
+	    for (unsigned int k = 0; k < num_ops; k++)
+		new_ops[k] = ops[k];
+	    delete[] ops;
+	    ops = new_ops;
 	}
 	op = &ops[num_ops];
 	if (!slang_operation_construct(op)) {
@@ -1147,8 +1141,8 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 
     slang_operation_destruct(oper);
     if (ops) {
-	*oper = *ops; /* struct copy */
-	_slang_free(ops);
+	*oper = *ops; /* struct copy - transfers resources from ops[0] */
+	delete[] ops;
     }
 
     return 1;
@@ -1412,13 +1406,9 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 	return 0;
 
     /* create function's body operation */
-    func->body = (slang_operation *) _slang_alloc(sizeof(slang_operation));
-    if (func->body == nullptr) {
-	slang_info_log_memory(C->L);
-	return 0;
-    }
+    func->body = new slang_operation;
     if (!slang_operation_construct(func->body)) {
-	_slang_free(func->body);
+	delete func->body;
 	func->body = nullptr;
 	slang_info_log_memory(C->L);
 	return 0;
@@ -1463,21 +1453,14 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 	return GL_FALSE;
     }
     op_assign.type = SLANG_OPER_ASSIGN;
-    op_assign.children =
-	(slang_operation *) _slang_alloc(2 * sizeof(slang_operation));
-    if (op_assign.children == nullptr) {
-	slang_operation_destruct(&op_assign);
-	op_id.locals->variables.clear();  /* don't own var, don't delete it */
-	slang_operation_destruct(&op_id);
-	return GL_FALSE;
-    }
+    op_assign.children = new slang_operation[2];
     op_assign.num_children = 2;
     op_assign.children[0] = op_id;
     op_assign.children[1] = *var->initializer;
 
     /* carefully destroy the operations */
     op_assign.num_children = 0;
-    _slang_free(op_assign.children);
+    delete[] op_assign.children;
     op_assign.children = nullptr;
     slang_operation_destruct(&op_assign);
     op_id.locals->variables.clear();  /* don't own var, don't delete it */
@@ -1534,14 +1517,9 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 	    /* initialized variable - copy the specifier and parse the expression */
 	    if (!slang_type_specifier_copy(&var->type.specifier, &type->specifier))
 		return 0;
-	    var->initializer =
-		(slang_operation *) _slang_alloc(sizeof(slang_operation));
-	    if (var->initializer == nullptr) {
-		slang_info_log_memory(C->L);
-		return 0;
-	    }
+	    var->initializer = new slang_operation;
 	    if (!slang_operation_construct(var->initializer)) {
-		_slang_free(var->initializer);
+		delete var->initializer;
 		var->initializer = nullptr;
 		slang_info_log_memory(C->L);
 		return 0;
