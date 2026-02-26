@@ -275,33 +275,21 @@ float
 _mesa_sqrtf(float x)
 {
 #if defined(USE_IEEE) && !defined(DEBUG)
-    fi_type num;
-    /* to access the bits of a float in C
-     * we use a union from glheader.h     */
-
     short e;                     /* the exponent */
     if (x == 0.0F) return 0.0F;  /* check for square root of 0 */
-    num.f = x;
-    e = (num.i >> 23) - 127;     /* get the exponent - on a SPARC the */
-    /* exponent is stored with 127 added */
-    num.i &= 0x7fffff;           /* leave only the mantissa */
-    if (e & 0x01) num.i |= 0x800000;
-    /* the exponent is odd so we have to */
-    /* look it up in the second half of  */
-    /* the lookup table, so we set the   */
-    /* high bit                                */
+    GLint bits = float_bits(x);
+    e = static_cast<short>((bits >> 23) - 127);  /* get exponent (stored + 127) */
+    bits &= 0x7fffff;            /* leave only the mantissa */
+    if (e & 0x01) bits |= 0x800000;
+    /* the exponent is odd so we have to look it up in the second half of
+     * the lookup table, so we set the high bit */
     e >>= 1;                     /* divide the exponent by two */
-    /* note that in C the shift */
-    /* operators are sign preserving */
-    /* for signed operands */
     /* Do the table lookup, based on the quaternary mantissa,
-     * then reconstruct the result back into a float
-     */
-    num.i = ((sqrttab[num.i >> 16]) << 16) | ((e + 127) << 23);
-
-    return num.f;
+     * then reconstruct the result back into a float */
+    bits = (static_cast<GLint>(sqrttab[bits >> 16]) << 16) | ((e + 127) << 23);
+    return bits_float(bits);
 #else
-    return (float) sqrt((double) x);
+    return static_cast<float>(sqrt(static_cast<double>(x)));
 #endif
 }
 

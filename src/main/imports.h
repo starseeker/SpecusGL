@@ -130,11 +130,36 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
  * But with gcc's -fstrict-aliasing flag (which defaults to on in gcc 3.0)
  * these casts generate warnings.
  * The following union typedef is used to solve that.
+ *
+ * \deprecated  New code should use float_bits() / bits_float() instead.
+ *              Those helpers use std::memcpy which is well-defined in C++17.
  */
 typedef union {
     GLfloat f;
     GLint i;
 } fi_type;
+
+/**
+ * Reinterpret the bit pattern of a GLfloat as a GLint.
+ *
+ * Replaces the fi_type union type-punning which is undefined behaviour in
+ * ISO C++.  std::memcpy is the standard-compliant way to do this in C++17;
+ * compilers generate identical code (a plain register move on x86).
+ */
+[[nodiscard]] inline GLint float_bits(float f) noexcept {
+    GLint bits;
+    std::memcpy(&bits, &f, sizeof(bits));
+    return bits;
+}
+
+/**
+ * Reinterpret the bit pattern of a GLint as a GLfloat.
+ */
+[[nodiscard]] inline float bits_float(GLint bits) noexcept {
+    float f;
+    std::memcpy(&f, &bits, sizeof(f));
+    return f;
+}
 
 
 
@@ -198,16 +223,15 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 /* Pretty fast, and accurate.
  * Based on code from http://www.flipcode.com/totd/
  */
-static inline GLfloat LOG2(GLfloat val)
+[[nodiscard]] static inline GLfloat LOG2(GLfloat val)
 {
-    fi_type num;
-    GLint log_2;
-    num.f = val;
-    log_2 = ((num.i >> 23) & 255) - 128;
-    num.i &= ~(255 << 23);
-    num.i += 127 << 23;
-    num.f = ((-1.0f/3) * num.f + 2) * num.f - 2.0f/3;
-    return num.f + log_2;
+    GLint bits = float_bits(val);
+    const GLint log_2 = ((bits >> 23) & 255) - 128;
+    bits &= ~(255 << 23);
+    bits += 127 << 23;
+    const float f0 = bits_float(bits);
+    const float result = ((-1.0f/3) * f0 + 2) * f0 - 2.0f/3;
+    return result + static_cast<GLfloat>(log_2);
 }
 #else
 /*
@@ -222,11 +246,10 @@ static inline GLfloat LOG2(GLfloat val)
  *** IS_INF_OR_NAN: test if float is infinite or NaN
  ***/
 #ifdef USE_IEEE
-static inline int IS_INF_OR_NAN(float x)
+[[nodiscard]] static inline int IS_INF_OR_NAN(float x)
 {
-    fi_type tmp;
-    tmp.f = x;
-    return !(int)((unsigned int)((tmp.i & 0x7fffffff)-0x7f800000) >> 31);
+    const GLint bits = float_bits(x);
+    return !(static_cast<int>(static_cast<unsigned int>((bits & 0x7fffffff) - 0x7f800000) >> 31));
 }
 #elif defined(isfinite)
 #define IS_INF_OR_NAN(x)        (!isfinite(x))
@@ -243,11 +266,9 @@ static inline int IS_INF_OR_NAN(float x)
  *** IS_NEGATIVE: test if float is negative
  ***/
 #if defined(USE_IEEE)
-static inline int GET_FLOAT_BITS(float x)
+[[nodiscard]] static inline int GET_FLOAT_BITS(float x)
 {
-    fi_type fi;
-    fi.f = x;
-    return fi.i;
+    return float_bits(x);
 }
 #define IS_NEGATIVE(x) (GET_FLOAT_BITS(x) < 0)
 #else
@@ -296,16 +317,10 @@ static inline int GET_FLOAT_BITS(float x)
 #if   defined(USE_IEEE)
 static inline int ifloor(float f)
 {
-    int ai, bi;
-    double af, bf;
-    fi_type u;
-
-    af = (3 << 22) + 0.5 + (double)f;
-    bf = (3 << 22) + 0.5 - (double)f;
-    u.f = (float) af;
-    ai = u.i;
-    u.f = (float) bf;
-    bi = u.i;
+    const float af = static_cast<float>((3 << 22) + 0.5 + static_cast<double>(f));
+    const float bf = static_cast<float>((3 << 22) + 0.5 - static_cast<double>(f));
+    const int ai = float_bits(af);
+    const int bi = float_bits(bf);
     return (ai - bi) >> 1;
 }
 #define IFLOOR(x)  ifloor(x)
@@ -325,15 +340,10 @@ static inline int ifloor(float f)
 #if   defined(USE_IEEE)
 static inline int iceil(float f)
 {
-    int ai, bi;
-    double af, bf;
-    fi_type u;
-    af = (3 << 22) + 0.5 + (double)f;
-    bf = (3 << 22) + 0.5 - (double)f;
-    u.f = (float) af;
-    ai = u.i;
-    u.f = (float) bf;
-    bi = u.i;
+    const float af = static_cast<float>((3 << 22) + 0.5 + static_cast<double>(f));
+    const float bf = static_cast<float>((3 << 22) + 0.5 - static_cast<double>(f));
+    const int ai = float_bits(af);
+    const int bi = float_bits(bf);
     return (ai - bi + 1) >> 1;
 }
 #define ICEIL(x)  iceil(x)
@@ -353,34 +363,38 @@ static inline int iceil(float f)
  ***/
 #if defined(USE_IEEE) && !defined(DEBUG)
 #define IEEE_0996 0x3f7f0000	/* 0.996 or so */
-/* This function/macro is sensitive to precision.  Test very carefully
+/* This function is sensitive to precision.  Test very carefully
  * if you change it!
  */
-#define UNCLAMPED_FLOAT_TO_UBYTE(UB, F)					\
-        do {								\
-           fi_type __tmp;						\
-           __tmp.f = (F);						\
-           if (__tmp.i < 0)						\
-              UB = (GLubyte) 0;						\
-           else if (__tmp.i >= IEEE_0996)				\
-              UB = (GLubyte) 255;					\
-           else {							\
-              __tmp.f = __tmp.f * (255.0F/256.0F) + 32768.0F;		\
-              UB = (GLubyte) __tmp.i;					\
-           }								\
-        } while (0)
-#define CLAMPED_FLOAT_TO_UBYTE(UB, F)					\
-        do {								\
-           fi_type __tmp;						\
-           __tmp.f = (F) * (255.0F/256.0F) + 32768.0F;			\
-           UB = (GLubyte) __tmp.i;					\
-        } while (0)
+template<typename T>
+inline void unclamped_float_to_ubyte(T& ub, float f) noexcept {
+    const GLint bits = float_bits(f);
+    if (bits < 0)
+        ub = static_cast<T>(0);
+    else if (bits >= IEEE_0996)
+        ub = static_cast<T>(255);
+    else {
+        const float adjusted = f * (255.0F/256.0F) + 32768.0F;
+        ub = static_cast<T>(float_bits(adjusted));
+    }
+}
+template<typename T>
+inline void clamped_float_to_ubyte(T& ub, float f) noexcept {
+    const float adjusted = f * (255.0F/256.0F) + 32768.0F;
+    ub = static_cast<T>(float_bits(adjusted));
+}
 #else
-#define UNCLAMPED_FLOAT_TO_UBYTE(ub, f) \
-	ub = ((GLubyte) IROUND(CLAMP((f), 0.0F, 1.0F) * 255.0F))
-#define CLAMPED_FLOAT_TO_UBYTE(ub, f) \
-	ub = ((GLubyte) IROUND((f) * 255.0F))
+template<typename T>
+inline void unclamped_float_to_ubyte(T& ub, float f) noexcept {
+    ub = static_cast<T>(iround(mesa_clamp(f, 0.0F, 1.0F) * 255.0F));
+}
+template<typename T>
+inline void clamped_float_to_ubyte(T& ub, float f) noexcept {
+    ub = static_cast<T>(iround(f * 255.0F));
+}
 #endif
+#define UNCLAMPED_FLOAT_TO_UBYTE(UB, F) unclamped_float_to_ubyte(UB, F)
+#define CLAMPED_FLOAT_TO_UBYTE(UB, F)   clamped_float_to_ubyte(UB, F)
 
 
 /***
