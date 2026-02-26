@@ -735,13 +735,11 @@ slang_type_string(slang_type_specifier_type t)
 }
 
 
-static const char *
+static std::string
 slang_fq_type_string(const slang_fully_specified_type *t)
 {
-    static char str[1000];
-    sprintf(str, "%s %s", slang_type_qual_string(t->qualifier),
-	    slang_type_string(t->specifier.type));
-    return str;
+    return std::string(slang_type_qual_string(t->qualifier)) + " " +
+           slang_type_string(t->specifier.type);
 }
 
 
@@ -770,7 +768,7 @@ void
 slang_print_variable(const slang_variable *v)
 {
     printf("Name: %s\n", (char *) v->a_name);
-    printf("Type: %s\n", slang_fq_type_string(&v->type));
+    printf("Type: %s\n", slang_fq_type_string(&v->type).c_str());
 }
 
 

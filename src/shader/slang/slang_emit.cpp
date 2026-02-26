@@ -311,7 +311,6 @@ storage_annotation(const slang_ir_node *n, const struct gl_program *prog)
 {
 #if ANNOTATE
     const slang_ir_storage *st = n->Store;
-    static char s[100] = "";
 
     if (!st)
 	return {};
@@ -320,36 +319,32 @@ storage_annotation(const slang_ir_node *n, const struct gl_program *prog)
 	case PROGRAM_CONSTANT:
 	    if (st->Index >= 0) {
 		const GLfloat *val = prog->Parameters->ParameterValues[st->Index];
+		char buf[64];
 		if (st->Swizzle == SWIZZLE_NOOP)
-		    sprintf(s, "{%g, %g, %g, %g}", val[0], val[1], val[2], val[3]);
-		else {
-		    sprintf(s, "%g", val[GET_SWZ(st->Swizzle, 0)]);
-		}
+		    std::snprintf(buf, sizeof(buf), "{%g, %g, %g, %g}",
+				  val[0], val[1], val[2], val[3]);
+		else
+		    std::snprintf(buf, sizeof(buf), "%g",
+				  val[GET_SWZ(st->Swizzle, 0)]);
+		return buf;
 	    }
-	    break;
+	    return {};
 	case PROGRAM_TEMPORARY:
 	    if (n->Var)
-		sprintf(s, "%s", (char *) n->Var->a_name);
-	    else
-		sprintf(s, "t[%d]", st->Index);
-	    break;
+		return reinterpret_cast<const char *>(n->Var->a_name);
+	    return "t[" + std::to_string(st->Index) + "]";
 	case PROGRAM_STATE_VAR:
 	case PROGRAM_UNIFORM:
-	    sprintf(s, "%s", prog->Parameters->Parameters[st->Index].Name.c_str());
-	    break;
+	    return prog->Parameters->Parameters[st->Index].Name;
 	case PROGRAM_VARYING:
-	    sprintf(s, "%s", prog->Varying->Parameters[st->Index].Name.c_str());
-	    break;
+	    return prog->Varying->Parameters[st->Index].Name;
 	case PROGRAM_INPUT:
-	    sprintf(s, "input[%d]", st->Index);
-	    break;
+	    return "input[" + std::to_string(st->Index) + "]";
 	case PROGRAM_OUTPUT:
-	    sprintf(s, "output[%d]", st->Index);
-	    break;
+	    return "output[" + std::to_string(st->Index) + "]";
 	default:
-	    s[0] = 0;
+	    return {};
     }
-    return s;
 #else
     return {};
 #endif
@@ -365,52 +360,23 @@ instruction_annotation(gl_inst_opcode opcode, const std::string& dstAnnot,
 		       const std::string& srcAnnot2)
 {
 #if ANNOTATE
-    const char *operator;
-
-    int len = 50 + dstAnnot.size() + srcAnnot0.size() + srcAnnot1.size() + srcAnnot2.size();
+    const char *op;
 
     switch (opcode) {
-	case OPCODE_ADD:
-	    operator = "+";
-	    break;
-	case OPCODE_SUB:
-	    operator = "-";
-	    break;
-	case OPCODE_MUL:
-	    operator = "*";
-	    break;
-	case OPCODE_DP3:
-	    operator = "DP3";
-	    break;
-	case OPCODE_DP4:
-	    operator = "DP4";
-	    break;
-	case OPCODE_XPD:
-	    operator = "XPD";
-	    break;
-	case OPCODE_RSQ:
-	    operator = "RSQ";
-	    break;
-	case OPCODE_SGT:
-	    operator = ">";
-	    break;
-	default:
-	    operator = ",";
+	case OPCODE_ADD: op = "+";   break;
+	case OPCODE_SUB: op = "-";   break;
+	case OPCODE_MUL: op = "*";   break;
+	case OPCODE_DP3: op = "DP3"; break;
+	case OPCODE_DP4: op = "DP4"; break;
+	case OPCODE_XPD: op = "XPD"; break;
+	case OPCODE_RSQ: op = "RSQ"; break;
+	case OPCODE_SGT: op = ">";   break;
+	default:         op = ",";   break;
     }
 
-    s = (char *) malloc(len);
-    sprintf(s, "%s = %s %s %s %s", dstAnnot,
-	    srcAnnot0, operator, srcAnnot1, srcAnnot2);
-    assert(strlen(s) < len);
-
-    free(dstAnnot);
-    free(srcAnnot0);
-    free(srcAnnot1);
-    free(srcAnnot2);
-
-    return s;
+    return dstAnnot + " = " + srcAnnot0 + " " + op + " " + srcAnnot1 + " " + srcAnnot2;
 #else
-    return nullptr;
+    return {};
 #endif
 }
 

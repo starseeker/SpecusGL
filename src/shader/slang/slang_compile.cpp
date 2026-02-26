@@ -142,10 +142,10 @@ typedef struct slang_output_ctx_ {
 /* _slang_compile() */
 
 static void
-parse_identifier_str(slang_parse_ctx * C, char **id)
+parse_identifier_str(slang_parse_ctx * C, const char **id)
 {
-    *id = (char *) C->I;
-    C->I += strlen(*id) + 1;
+    *id = reinterpret_cast<const char *>(C->I);
+    C->I += std::strlen(*id) + 1;
 }
 
 static slang_atom
@@ -183,32 +183,18 @@ parse_number(slang_parse_ctx * C, int *number)
 static int
 parse_float(slang_parse_ctx * C, float *number)
 {
-    char *integral = nullptr;
-    char *fractional = nullptr;
-    char *exponent = nullptr;
-    char *whole = nullptr;
+    const char *integral   = nullptr;
+    const char *fractional = nullptr;
+    const char *exponent   = nullptr;
 
     parse_identifier_str(C, &integral);
     parse_identifier_str(C, &fractional);
     parse_identifier_str(C, &exponent);
 
-    whole = (char *) _slang_alloc((strlen(integral) +
-				   strlen(fractional) +
-				   strlen(exponent) + 3) * sizeof(char));
-    if (whole == nullptr) {
-	slang_info_log_memory(C->L);
-	return 0;
-    }
-
-    slang_string_copy(whole, integral);
-    slang_string_concat(whole, ".");
-    slang_string_concat(whole, fractional);
-    slang_string_concat(whole, "E");
-    slang_string_concat(whole, exponent);
-
-    *number = (float)(strtod(whole, (char **) nullptr));
-
-    _slang_free(whole);
+    /* Build the number string from its parts using std::string to avoid
+     * manual buffer sizing and pool allocation.  */
+    const std::string whole = std::string(integral) + "." + fractional + "E" + exponent;
+    *number = static_cast<float>(std::strtod(whole.c_str(), nullptr));
 
     return 1;
 }
