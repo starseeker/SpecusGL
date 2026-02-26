@@ -2938,8 +2938,8 @@ struct gl_extensions {
     GLboolean TDFX_texture_compression_FXT1;
     GLboolean S3_s3tc;
     /*@}*/
-    /* The extension string */
-    const GLubyte *String;
+    /* The extension string (cached; built lazily on first GL_EXTENSIONS query) */
+    std::string String;
 };
 
 

@@ -1057,8 +1057,7 @@ _mesa_free_context_data(GLcontext *ctx)
 	free_shared_state(ctx, ctx->Shared);
     }
 
-    if (ctx->Extensions.String)
-	delete[] ctx->Extensions.String;
+    /* Extensions.String is now std::string – destructs automatically */
 
     /* unbind the context if it's currently bound */
     if (ctx == _mesa_get_current_context()) {
