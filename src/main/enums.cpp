@@ -29,10 +29,10 @@
 #include "enums.h"
 #include "imports.h"
 
-typedef struct {
+struct enum_elt {
     size_t offset;
     int n;
-} enum_elt;
+};
 
 LONGSTRING static const char enum_string_table[] =
     "GL_2D\0"

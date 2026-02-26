@@ -387,11 +387,11 @@ _slang_output_index(const char *name, GLenum target)
 /**
  * Map "_asm foo" to IR_FOO, etc.
  */
-typedef struct {
+struct slang_asm_info {
     const char *Name;
     slang_ir_opcode Opcode;
     GLuint HaveRetValue, NumParams;
-} slang_asm_info;
+};
 
 
 static slang_asm_info AsmInfo[] = {

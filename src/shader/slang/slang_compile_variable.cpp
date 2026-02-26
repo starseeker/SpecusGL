@@ -33,10 +33,10 @@
 #include "slang_mem.h"
 
 
-typedef struct {
+struct type_specifier_type_name {
     const char *name;
     slang_type_specifier_type type;
-} type_specifier_type_name;
+};
 
 static const type_specifier_type_name type_specifier_type_names[] = {
     {"void", SLANG_SPEC_VOID},

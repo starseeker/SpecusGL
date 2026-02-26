@@ -55,7 +55,7 @@
 #define ANNOTATE 0
 
 
-typedef struct {
+struct slang_emit_info {
     slang_info_log *log;
     slang_var_table *vt;
     struct gl_program *prog;
@@ -67,7 +67,7 @@ typedef struct {
     GLboolean EmitCondCodes;
     GLboolean EmitComments;
     GLboolean EmitBeginEndSub; /* XXX TEMPORARY */
-} slang_emit_info;
+};
 
 
 
