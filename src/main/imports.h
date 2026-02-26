@@ -124,27 +124,10 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
 
 
 /**
- * Sometimes we treat GLfloats as GLints.  On x86 systems, moving a float
- * as a int (thereby using integer registers instead of FP registers) is
- * a performance win.  Typically, this can be done with ordinary casts.
- * But with gcc's -fstrict-aliasing flag (which defaults to on in gcc 3.0)
- * these casts generate warnings.
- * The following union typedef is used to solve that.
- *
- * \deprecated  New code should use float_bits() / bits_float() instead.
- *              Those helpers use std::memcpy which is well-defined in C++17.
- */
-typedef union {
-    GLfloat f;
-    GLint i;
-} fi_type;
-
-/**
  * Reinterpret the bit pattern of a GLfloat as a GLint.
  *
- * Replaces the fi_type union type-punning which is undefined behaviour in
- * ISO C++.  std::memcpy is the standard-compliant way to do this in C++17;
- * compilers generate identical code (a plain register move on x86).
+ * This uses std::memcpy which is the standard-compliant way to do this in
+ * C++17; compilers generate identical code (a plain register move on x86).
  */
 [[nodiscard]] inline GLint float_bits(float f) noexcept {
     GLint bits;

@@ -1226,7 +1226,7 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
     if (count > maxCount) count = maxCount;
 
     for (k = 0; k < count; k++) {
-	GLfloat *uniformVal = shProg->Uniforms->ParameterValues[location + k];
+	GLfloat *uniformVal = shProg->Uniforms->ParameterValues[location + k].data();
 	if (type == GL_INT ||
 	    type == GL_INT_VEC2 ||
 	    type == GL_INT_VEC3 ||
@@ -1307,7 +1307,7 @@ _mesa_uniform_matrix(GLcontext *ctx, GLint cols, GLint rows,
 	if (transpose) {
 	    GLuint row, col;
 	    for (col = 0; col < cols; col++) {
-		GLfloat *v = shProg->Uniforms->ParameterValues[location + col];
+		GLfloat *v = shProg->Uniforms->ParameterValues[location + col].data();
 		for (row = 0; row < rows; row++) {
 		    v[row] = values[row * cols + col];
 		}
@@ -1315,7 +1315,7 @@ _mesa_uniform_matrix(GLcontext *ctx, GLint cols, GLint rows,
 	} else {
 	    GLuint row, col;
 	    for (col = 0; col < cols; col++) {
-		GLfloat *v = shProg->Uniforms->ParameterValues[location + col];
+		GLfloat *v = shProg->Uniforms->ParameterValues[location + col].data();
 		for (row = 0; row < rows; row++) {
 		    v[row] = values[col * rows + row];
 		}

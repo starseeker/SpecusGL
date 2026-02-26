@@ -37,15 +37,6 @@
 #include "prog_statevars.h"
 
 
-/**
- * Destructor - frees aligned parameter values array.
- */
-gl_program_parameter_list::~gl_program_parameter_list()
-{
-    /* Parameters vector destructs itself (including std::string Names). */
-    if (ParameterValues)
-	_mesa_align_free(ParameterValues);
-}
 
 
 
@@ -74,22 +65,10 @@ gl_program_parameter_list::add_parameter(enum register_file type, const char *na
 
     assert(size > 0);
 
-    /* Grow the aligned ParameterValues array if needed */
+    /* Grow both parallel vectors by sz4 slots */
     const GLuint newNum = oldNum + sz4;
-    if (newNum > ParameterValueCapacity) {
-	const GLuint newCap = newNum + 4 * sz4; /* over-allocate a little */
-	ParameterValues = (GLfloat(*)[4])
-	    _mesa_align_realloc(ParameterValues,
-			       oldNum * 4 * sizeof(GLfloat),
-			       newCap * 4 * sizeof(GLfloat),
-			       16);
-	if (!ParameterValues)
-	    return -1;
-	ParameterValueCapacity = newCap;
-    }
-
-    /* Append sz4 parameter descriptors to the vector */
     Parameters.resize(newNum);
+    ParameterValues.resize(newNum);
 
     for (GLuint i = 0; i < sz4; i++) {
 	struct gl_program_parameter &p = Parameters[oldNum + i];
@@ -99,10 +78,10 @@ gl_program_parameter_list::add_parameter(enum register_file type, const char *na
 	p.Size = size;
 	p.DataType = datatype;
 	if (values) {
-	    COPY_4V(ParameterValues[oldNum + i], values);
+	    COPY_4V(ParameterValues[oldNum + i].data(), values);
 	    values += 4;
 	} else {
-	    ASSIGN_4V(ParameterValues[oldNum + i], 0, 0, 0, 0);
+	    ParameterValues[oldNum + i] = {};
 	}
 	size -= 4;
     }
@@ -189,7 +168,7 @@ gl_program_parameter_list::add_unnamed_constant(const GLfloat values[4], GLuint 
 	    struct gl_program_parameter *p = &Parameters[pos];
 	    if (p->Type == PROGRAM_CONSTANT && p->Size + size <= 4) {
 		/* ok, found room */
-		GLfloat *pVal = ParameterValues[pos];
+		GLfloat *pVal = ParameterValues[pos].data();
 		GLuint swz = p->Size; /* 1, 2 or 3 for Y, Z, W */
 		pVal[p->Size] = values[0];
 		p->Size++;
@@ -379,10 +358,10 @@ gl_program_parameter_list::add_state_reference(const gl_state_index stateTokens[
  * \return pointer to the float[4] values.
  */
 GLfloat *
-gl_program_parameter_list::lookup_parameter_value(GLsizei nameLen, const char *name) const
+gl_program_parameter_list::lookup_parameter_value(GLsizei nameLen, const char *name)
 {
     GLuint i = lookup_parameter_index(nameLen, name);
-    return ParameterValues[i];
+    return ParameterValues[i].data();
 }
 
 
@@ -514,7 +493,7 @@ gl_program_parameter_list::clone() const
 	const struct gl_program_parameter *p = &Parameters[i];
 	GLuint size = MIN2(p->Size, 4);
 	GLint j = clone->add_parameter(p->Type, p->Name.c_str(), size, p->DataType,
-				      ParameterValues[i], nullptr);
+				      ParameterValues[i].data(), nullptr);
 	ASSERT(j >= 0);
 	/* copy state indexes */
 	if (p->Type == PROGRAM_STATE_VAR) {

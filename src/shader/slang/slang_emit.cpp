@@ -318,7 +318,7 @@ storage_annotation(const slang_ir_node *n, const struct gl_program *prog)
     switch (st->File) {
 	case PROGRAM_CONSTANT:
 	    if (st->Index >= 0) {
-		const GLfloat *val = prog->Parameters->ParameterValues[st->Index];
+		const GLfloat *val = prog->Parameters->ParameterValues[st->Index].data();
 		char buf[64];
 		if (st->Swizzle == SWIZZLE_NOOP)
 		    std::snprintf(buf, sizeof(buf), "{%g, %g, %g, %g}",

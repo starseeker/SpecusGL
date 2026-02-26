@@ -1521,7 +1521,7 @@ PrintSrcReg(const struct gl_fragment_program *program,
 	if (program->Parameters->Parameters[src->Index].Type
 	    == PROGRAM_CONSTANT) {
 	    const GLfloat *v;
-	    v = program->Parameters->ParameterValues[src->Index];
+	    v = program->Parameters->ParameterValues[src->Index].data();
 	    _mesa_printf("{%g, %g, %g, %g}", v[0], v[1], v[2], v[3]);
 	} else {
 	    ASSERT(program->Parameters->Parameters[src->Index].Type
