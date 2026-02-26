@@ -6,9 +6,9 @@
 
 struct _slang_ir_storage;
 
-typedef struct slang_var_table_ slang_var_table;
+struct slang_var_table;
 
-struct slang_variable_;
+struct slang_variable;
 
 extern slang_var_table *
 _slang_new_var_table(GLuint maxRegisters);
@@ -23,9 +23,9 @@ extern void
 _slang_pop_var_table(slang_var_table *t);
 
 extern void
-_slang_add_variable(slang_var_table *t, struct slang_variable_ *v);
+_slang_add_variable(slang_var_table *t, slang_variable *v);
 
-extern struct slang_variable_ *
+extern slang_variable *
 _slang_find_variable(const slang_var_table *t, slang_atom name);
 
 extern GLboolean

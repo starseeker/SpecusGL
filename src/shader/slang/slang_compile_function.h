@@ -28,7 +28,7 @@
 
 
 
-struct slang_code_unit_;
+struct slang_code_unit;
 
 /**
  * Types of functions.
@@ -44,10 +44,10 @@ typedef enum slang_function_kind_ {
  * When we need to fill in addresses which we won't know until the future,
  * we keep track of them with a fix-up table.
  */
-typedef struct slang_fixup_table_ {
+struct slang_fixup_table {
     GLuint *table;     /**< array[count] of addresses */
     GLuint count;
-} slang_fixup_table;
+};
 
 extern void slang_fixup_table_init(slang_fixup_table *);
 extern void slang_fixup_table_free(slang_fixup_table *);
@@ -57,7 +57,7 @@ extern GLboolean slang_fixup_save(slang_fixup_table *fixups, GLuint address);
 /**
  * Description of a compiled shader function.
  */
-typedef struct slang_function_ {
+struct slang_function {
     slang_function_kind kind;
     slang_variable header;      /**< The function's name and return type */
     slang_variable_scope *parameters; /**< formal parameters AND local vars */
@@ -65,7 +65,7 @@ typedef struct slang_function_ {
     slang_operation *body;      /**< The instruction tree */
     unsigned int address;       /**< Address of this func in memory */
     slang_fixup_table fixups;   /**< Mem locations which need func's address */
-} slang_function;
+};
 
 extern int slang_function_construct(slang_function *);
 extern void slang_function_destruct(slang_function *);
@@ -74,11 +74,11 @@ extern void slang_function_destruct(slang_function *);
 /**
  * Basically, a list of compiled functions.
  */
-typedef struct slang_function_scope_ {
+struct slang_function_scope {
     slang_function *functions;
     GLuint num_functions;
-    struct slang_function_scope_ *outer_scope;
-} slang_function_scope;
+    slang_function_scope *outer_scope;
+};
 
 
 extern GLvoid

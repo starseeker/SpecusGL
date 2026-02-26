@@ -28,6 +28,7 @@
 #include <string>
 #include <cstring>
 #include <cstdio>
+#include <unordered_set>
 
 
 #define slang_string_compare(str1, str2) strcmp (str1, str2)
@@ -68,16 +69,19 @@ typedef GLvoid *slang_atom;
 
 #define SLANG_ATOM_NULL ((slang_atom) 0)
 
-typedef struct slang_atom_entry_ {
-    char *id;
-    struct slang_atom_entry_ *next;
-} slang_atom_entry;
-
-#define SLANG_ATOM_POOL_SIZE 1023
-
-typedef struct slang_atom_pool_ {
-    slang_atom_entry *entries[SLANG_ATOM_POOL_SIZE];
-} slang_atom_pool;
+/**
+ * Atom pool – a string-interning table for the GLSL compiler.
+ *
+ * C++17 modernisation: the old fixed-size array of C-style linked lists
+ * (backed by the slang mempool) has been replaced by
+ * std::unordered_set<std::string>.  Iterators (and therefore the .c_str()
+ * pointers inside each node) are not invalidated by insertion, so
+ * previously-returned slang_atom values remain valid.
+ */
+struct slang_atom_pool_ {
+    std::unordered_set<std::string> strings;
+};
+typedef struct slang_atom_pool_ slang_atom_pool;
 
 GLvoid slang_atom_pool_construct(slang_atom_pool *);
 GLvoid slang_atom_pool_destruct(slang_atom_pool *);

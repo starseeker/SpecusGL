@@ -203,7 +203,7 @@ writemask_string(GLuint writemask)
 }
 
 
-static const char *
+static std::string
 storage_string(const slang_ir_storage *st)
 {
     static const char *files[] = {
@@ -221,17 +221,8 @@ storage_string(const slang_ir_storage *st)
 	"SAMPLER",
 	"UNDEFINED"
     };
-    static char s[100];
-#if 0
-    if (st->Size == 1)
-	sprintf(s, "%s[%d]", files[st->File], st->Index);
-    else
-	sprintf(s, "%s[%d..%d]", files[st->File], st->Index,
-		st->Index + st->Size - 1);
-#endif
     assert(st->File < (GLint)(sizeof(files) / sizeof(files[0])));
-    sprintf(s, "%s[%d]", files[st->File], st->Index);
-    return s;
+    return std::string(files[st->File]) + "[" + std::to_string(st->Index) + "]";
 }
 
 
@@ -344,12 +335,12 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 	    printf("VAR %s%s at %s  store %p\n",
 		   (n->Var ? (char *) n->Var->a_name : "TEMP"),
 		   swizzle_string(n->Store->Swizzle),
-		   storage_string(n->Store), (void*) n->Store);
+		   storage_string(n->Store).c_str(), (void*) n->Store);
 	    break;
 	case IR_VAR_DECL:
 	    printf("VAR_DECL %s (%p) at %s  store %p\n",
 		   (n->Var ? (char *) n->Var->a_name : "TEMP"),
-		   (void*) n->Var, storage_string(n->Store),
+		   (void*) n->Var, storage_string(n->Store).c_str(),
 		   (void*) n->Store);
 	    break;
 	case IR_FIELD:

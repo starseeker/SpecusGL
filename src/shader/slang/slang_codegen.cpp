@@ -1375,7 +1375,7 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
  * all of them...
  */
 static slang_function *
-_slang_first_function(struct slang_function_scope_ *scope, const char *name)
+_slang_first_function(slang_function_scope *scope, const char *name)
 {
     GLuint i;
     for (i = 0; i < scope->num_functions; i++) {

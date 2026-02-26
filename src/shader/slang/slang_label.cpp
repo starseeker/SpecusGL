@@ -9,6 +9,7 @@
 
 #include "slang_label.h"
 #include "slang_mem.h"
+#include <string>
 
 
 
@@ -30,15 +31,14 @@ slang_label *
 _slang_label_new_unique(const char *name)
 {
     static int id = 1;
-    slang_label *l = (slang_label *) _slang_alloc(sizeof(slang_label));
+    slang_label *l = static_cast<slang_label *>(_slang_alloc(sizeof(slang_label)));
     if (l) {
-	l->Name = (char *) _slang_alloc(strlen(name) + 10);
+	const std::string unique = std::string(name) + "_" + std::to_string(id++);
+	l->Name = _slang_strdup(unique.c_str());
 	if (!l->Name) {
-	    free(l);
+	    _slang_free(l);
 	    return nullptr;
 	}
-	_mesa_sprintf(l->Name, "%s_%d", name, id);
-	id++;
 	l->Location = -1;
     }
     return l;

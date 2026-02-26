@@ -43,22 +43,23 @@
     } slang_unit_type;
 
 
-    typedef struct slang_var_pool_ {
+    struct slang_var_pool {
 	GLuint next_addr;
-    } slang_var_pool;
+    };
 
+    struct slang_code_object;
 
-    typedef struct slang_code_unit_ {
+    struct slang_code_unit {
 	slang_variable_scope vars;
 	slang_function_scope funs;
 	slang_struct_scope structs;
 	slang_unit_type type;
-	struct slang_code_object_ *object;
-    } slang_code_unit;
+	slang_code_object *object;
+    };
 
 
     extern GLvoid
-    _slang_code_unit_ctr(slang_code_unit *, struct slang_code_object_ *);
+    _slang_code_unit_ctr(slang_code_unit *, slang_code_object *);
 
     extern GLvoid
     _slang_code_unit_dtr(slang_code_unit *);
@@ -70,12 +71,12 @@
 
 #define SLANG_BUILTIN_TOTAL  4
 
-    typedef struct slang_code_object_ {
+    struct slang_code_object {
 	slang_code_unit builtin[SLANG_BUILTIN_TOTAL];
 	slang_code_unit unit;
 	slang_var_pool varpool;
 	slang_atom_pool atompool;
-    } slang_code_object;
+    };
 
     extern GLvoid
     _slang_code_object_ctr(slang_code_object *);

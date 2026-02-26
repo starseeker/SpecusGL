@@ -174,52 +174,110 @@ do {						\
 
 
 /**
- * \name Generic color packing macros.  All inputs should be GLubytes.
+ * \name Generic color packing inline functions.  All inputs should be GLubytes.
  *
- * \todo We may move these into texstore.h at some point.
+ * These replace the old macros with type-safe, constexpr functions that
+ * use static_cast to suppress narrowing-conversion warnings and eliminate
+ * the double-evaluation hazard of macro arguments.
  */
 /*@{*/
 
-#define PACK_COLOR_8888( R, G, B, A )					\
-   (((R) << 24) | ((G) << 16) | ((B) << 8) | (A))
+[[nodiscard]] constexpr GLuint mesa_pack_color_8888(GLubyte r, GLubyte g, GLubyte b, GLubyte a) noexcept {
+    return (static_cast<GLuint>(r) << 24) | (static_cast<GLuint>(g) << 16) |
+           (static_cast<GLuint>(b) << 8) | static_cast<GLuint>(a);
+}
+#define PACK_COLOR_8888(R, G, B, A) mesa_pack_color_8888(R, G, B, A)
 
-#define PACK_COLOR_8888_REV( R, G, B, A )				\
-   (((A) << 24) | ((B) << 16) | ((G) << 8) | (R))
+[[nodiscard]] constexpr GLuint mesa_pack_color_8888_rev(GLubyte r, GLubyte g, GLubyte b, GLubyte a) noexcept {
+    return (static_cast<GLuint>(a) << 24) | (static_cast<GLuint>(b) << 16) |
+           (static_cast<GLuint>(g) << 8) | static_cast<GLuint>(r);
+}
+#define PACK_COLOR_8888_REV(R, G, B, A) mesa_pack_color_8888_rev(R, G, B, A)
 
-#define PACK_COLOR_888( R, G, B )					\
-   (((R) << 16) | ((G) << 8) | (B))
+[[nodiscard]] constexpr GLuint mesa_pack_color_888(GLubyte r, GLubyte g, GLubyte b) noexcept {
+    return (static_cast<GLuint>(r) << 16) | (static_cast<GLuint>(g) << 8) | static_cast<GLuint>(b);
+}
+#define PACK_COLOR_888(R, G, B) mesa_pack_color_888(R, G, B)
 
-#define PACK_COLOR_565( R, G, B )					\
-   ((((R) & 0xf8) << 8) | (((G) & 0xfc) << 3) | (((B) & 0xf8) >> 3))
+[[nodiscard]] constexpr GLushort mesa_pack_color_565(GLubyte r, GLubyte g, GLubyte b) noexcept {
+    return static_cast<GLushort>(
+        ((static_cast<unsigned>(r) & 0xf8u) << 8) |
+        ((static_cast<unsigned>(g) & 0xfcu) << 3) |
+        ((static_cast<unsigned>(b) & 0xf8u) >> 3));
+}
+#define PACK_COLOR_565(R, G, B) mesa_pack_color_565(R, G, B)
 
-#define PACK_COLOR_565_REV( R, G, B )					\
-   (((R) & 0xf8) | ((G) & 0xe0) >> 5 | (((G) & 0x1c) << 11) | (((B) & 0xf8) << 5))
+[[nodiscard]] constexpr GLushort mesa_pack_color_565_rev(GLubyte r, GLubyte g, GLubyte b) noexcept {
+    return static_cast<GLushort>(
+        (static_cast<unsigned>(r) & 0xf8u) |
+        ((static_cast<unsigned>(g) & 0xe0u) >> 5) |
+        ((static_cast<unsigned>(g) & 0x1cu) << 11) |
+        ((static_cast<unsigned>(b) & 0xf8u) << 5));
+}
+#define PACK_COLOR_565_REV(R, G, B) mesa_pack_color_565_rev(R, G, B)
 
-#define PACK_COLOR_1555( A, B, G, R )					\
-   ((((B) & 0xf8) << 7) | (((G) & 0xf8) << 2) | (((R) & 0xf8) >> 3) |	\
-    ((A) ? 0x8000 : 0))
+[[nodiscard]] constexpr GLushort mesa_pack_color_1555(GLubyte a, GLubyte b, GLubyte g, GLubyte r) noexcept {
+    return static_cast<GLushort>(
+        ((static_cast<unsigned>(b) & 0xf8u) << 7) |
+        ((static_cast<unsigned>(g) & 0xf8u) << 2) |
+        ((static_cast<unsigned>(r) & 0xf8u) >> 3) |
+        (a ? 0x8000u : 0u));
+}
+#define PACK_COLOR_1555(A, B, G, R) mesa_pack_color_1555(A, B, G, R)
 
-#define PACK_COLOR_1555_REV( A, B, G, R )					\
-   ((((B) & 0xf8) >> 1) | (((G) & 0xc0) >> 6) | (((G) & 0x38) << 10) | (((R) & 0xf8) << 5) |	\
-    ((A) ? 0x80 : 0))
+[[nodiscard]] constexpr GLushort mesa_pack_color_1555_rev(GLubyte a, GLubyte b, GLubyte g, GLubyte r) noexcept {
+    return static_cast<GLushort>(
+        ((static_cast<unsigned>(b) & 0xf8u) >> 1) |
+        ((static_cast<unsigned>(g) & 0xc0u) >> 6) |
+        ((static_cast<unsigned>(g) & 0x38u) << 10) |
+        ((static_cast<unsigned>(r) & 0xf8u) << 5) |
+        (a ? 0x80u : 0u));
+}
+#define PACK_COLOR_1555_REV(A, B, G, R) mesa_pack_color_1555_rev(A, B, G, R)
 
-#define PACK_COLOR_4444( R, G, B, A )					\
-   ((((R) & 0xf0) << 8) | (((G) & 0xf0) << 4) | ((B) & 0xf0) | ((A) >> 4))
+[[nodiscard]] constexpr GLushort mesa_pack_color_4444(GLubyte r, GLubyte g, GLubyte b, GLubyte a) noexcept {
+    return static_cast<GLushort>(
+        ((static_cast<unsigned>(r) & 0xf0u) << 8) |
+        ((static_cast<unsigned>(g) & 0xf0u) << 4) |
+        (static_cast<unsigned>(b) & 0xf0u) |
+        (static_cast<unsigned>(a) >> 4));
+}
+#define PACK_COLOR_4444(R, G, B, A) mesa_pack_color_4444(R, G, B, A)
 
-#define PACK_COLOR_4444_REV( R, G, B, A )				\
-   ((((B) & 0xf0) << 8) | (((A) & 0xf0) << 4) | ((R) & 0xf0) | ((G) >> 4))
+[[nodiscard]] constexpr GLushort mesa_pack_color_4444_rev(GLubyte r, GLubyte g, GLubyte b, GLubyte a) noexcept {
+    return static_cast<GLushort>(
+        ((static_cast<unsigned>(b) & 0xf0u) << 8) |
+        ((static_cast<unsigned>(a) & 0xf0u) << 4) |
+        (static_cast<unsigned>(r) & 0xf0u) |
+        (static_cast<unsigned>(g) >> 4));
+}
+#define PACK_COLOR_4444_REV(R, G, B, A) mesa_pack_color_4444_rev(R, G, B, A)
 
-#define PACK_COLOR_88( L, A )						\
-   (((L) << 8) | (A))
+[[nodiscard]] constexpr GLushort mesa_pack_color_88(GLubyte l, GLubyte a) noexcept {
+    return static_cast<GLushort>((static_cast<unsigned>(l) << 8) | static_cast<unsigned>(a));
+}
+#define PACK_COLOR_88(L, A) mesa_pack_color_88(L, A)
 
-#define PACK_COLOR_88_REV( L, A )					\
-   (((A) << 8) | (L))
+[[nodiscard]] constexpr GLushort mesa_pack_color_88_rev(GLubyte l, GLubyte a) noexcept {
+    return static_cast<GLushort>((static_cast<unsigned>(a) << 8) | static_cast<unsigned>(l));
+}
+#define PACK_COLOR_88_REV(L, A) mesa_pack_color_88_rev(L, A)
 
-#define PACK_COLOR_332( R, G, B )					\
-   (((R) & 0xe0) | (((G) & 0xe0) >> 3) | (((B) & 0xc0) >> 6))
+[[nodiscard]] constexpr GLubyte mesa_pack_color_332(GLubyte r, GLubyte g, GLubyte b) noexcept {
+    return static_cast<GLubyte>(
+        (static_cast<unsigned>(r) & 0xe0u) |
+        ((static_cast<unsigned>(g) & 0xe0u) >> 3) |
+        ((static_cast<unsigned>(b) & 0xc0u) >> 6));
+}
+#define PACK_COLOR_332(R, G, B) mesa_pack_color_332(R, G, B)
 
-#define PACK_COLOR_233( B, G, R )					\
-   (((B) & 0xc0) | (((G) & 0xe0) >> 2) | (((R) & 0xe0) >> 5))
+[[nodiscard]] constexpr GLubyte mesa_pack_color_233(GLubyte b, GLubyte g, GLubyte r) noexcept {
+    return static_cast<GLubyte>(
+        (static_cast<unsigned>(b) & 0xc0u) |
+        ((static_cast<unsigned>(g) & 0xe0u) >> 2) |
+        ((static_cast<unsigned>(r) & 0xe0u) >> 5));
+}
+#define PACK_COLOR_233(B, G, R) mesa_pack_color_233(B, G, R)
 
 /*@}*/
 

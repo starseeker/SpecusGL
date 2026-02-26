@@ -186,98 +186,72 @@ arb_output_attrib_string(GLint index, GLenum progType)
  * \param mode  the output format/mode/style
  * \param prog  pointer to containing program
  */
-static const char *
+static std::string
 reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
 	   const struct gl_program *prog)
 {
-    static char str[100];
-
-    str[0] = 0;
-
     switch (mode) {
 	case PROG_PRINT_DEBUG:
-	    sprintf(str, "%s[%d]", file_string(f, mode), index);
-	    break;
+	    return std::string(file_string(f, mode)) + "[" + std::to_string(index) + "]";
 
 	case PROG_PRINT_ARB:
 	    switch (f) {
 		case PROGRAM_INPUT:
-		    sprintf(str, "%s", arb_input_attrib_string(index, prog->Target));
-		    break;
+		    return arb_input_attrib_string(index, prog->Target);
 		case PROGRAM_OUTPUT:
-		    sprintf(str, "%s", arb_output_attrib_string(index, prog->Target));
-		    break;
+		    return arb_output_attrib_string(index, prog->Target);
 		case PROGRAM_TEMPORARY:
-		    sprintf(str, "temp%d", index);
-		    break;
+		    return "temp" + std::to_string(index);
 		case PROGRAM_ENV_PARAM:
-		    sprintf(str, "program.env[%d]", index);
-		    break;
+		    return "program.env[" + std::to_string(index) + "]";
 		case PROGRAM_LOCAL_PARAM:
-		    sprintf(str, "program.local[%d]", index);
-		    break;
-		case PROGRAM_VARYING: /* extension */
-		    sprintf(str, "varying[%d]", index);
-		    break;
-		case PROGRAM_CONSTANT: /* extension */
-		    sprintf(str, "constant[%d]", index);
-		    break;
-		case PROGRAM_UNIFORM: /* extension */
-		    sprintf(str, "uniform[%d]", index);
-		    break;
+		    return "program.local[" + std::to_string(index) + "]";
+		case PROGRAM_VARYING:
+		    return "varying[" + std::to_string(index) + "]";
+		case PROGRAM_CONSTANT:
+		    return "constant[" + std::to_string(index) + "]";
+		case PROGRAM_UNIFORM:
+		    return "uniform[" + std::to_string(index) + "]";
 		case PROGRAM_STATE_VAR: {
 		    struct gl_program_parameter *param = &prog->Parameters->Parameters[index];
-		    std::string sstr = _mesa_program_state_string(param->StateIndexes);
-		    sprintf(str, "%s", sstr.c_str());
+		    return _mesa_program_state_string(param->StateIndexes);
 		}
-		break;
 		case PROGRAM_ADDRESS:
-		    sprintf(str, "A%d", index);
-		    break;
+		    return "A" + std::to_string(index);
 		default:
 		    _mesa_problem(nullptr, "bad file in reg_string()");
+		    return {};
 	    }
-	    break;
 
 	case PROG_PRINT_NV:
 	    switch (f) {
 		case PROGRAM_INPUT:
-		    if (prog->Target == GL_VERTEX_PROGRAM_ARB)
-			sprintf(str, "v[%d]", index);
-		    else
-			sprintf(str, "f[%d]", index);
-		    break;
+		    return prog->Target == GL_VERTEX_PROGRAM_ARB
+		        ? ("v[" + std::to_string(index) + "]")
+		        : ("f[" + std::to_string(index) + "]");
 		case PROGRAM_OUTPUT:
-		    sprintf(str, "o[%d]", index);
-		    break;
+		    return "o[" + std::to_string(index) + "]";
 		case PROGRAM_TEMPORARY:
-		    sprintf(str, "R%d", index);
-		    break;
+		    return "R" + std::to_string(index);
 		case PROGRAM_ENV_PARAM:
-		    sprintf(str, "c[%d]", index);
-		    break;
-		case PROGRAM_VARYING: /* extension */
-		    sprintf(str, "varying[%d]", index);
-		    break;
-		case PROGRAM_UNIFORM: /* extension */
-		    sprintf(str, "uniform[%d]", index);
-		    break;
-		case PROGRAM_CONSTANT: /* extension */
-		    sprintf(str, "constant[%d]", index);
-		    break;
-		case PROGRAM_STATE_VAR: /* extension */
-		    sprintf(str, "state[%d]", index);
-		    break;
+		    return "c[" + std::to_string(index) + "]";
+		case PROGRAM_VARYING:
+		    return "varying[" + std::to_string(index) + "]";
+		case PROGRAM_UNIFORM:
+		    return "uniform[" + std::to_string(index) + "]";
+		case PROGRAM_CONSTANT:
+		    return "constant[" + std::to_string(index) + "]";
+		case PROGRAM_STATE_VAR:
+		    return "state[" + std::to_string(index) + "]";
 		default:
 		    _mesa_problem(nullptr, "bad file in reg_string()");
+		    return {};
 	    }
-	    break;
 
 	default:
 	    _mesa_problem(nullptr, "bad mode in reg_string()");
+	    return {};
     }
-
-    return str;
 }
 
 
@@ -392,7 +366,7 @@ print_dst_reg(const struct prog_dst_register *dstReg, gl_prog_print_mode mode,
 {
     _mesa_printf("%s%s",
 		 reg_string((enum register_file) dstReg->File,
-			    dstReg->Index, mode, prog),
+			    dstReg->Index, mode, prog).c_str(),
 		 writemask_string(dstReg->WriteMask));
 
     if (dstReg->CondMask != COND_TR) {
@@ -415,7 +389,7 @@ print_src_reg(const struct prog_src_register *srcReg, gl_prog_print_mode mode,
 {
     _mesa_printf("%s%s",
 		 reg_string((enum register_file) srcReg->File,
-			    srcReg->Index, mode, prog),
+			    srcReg->Index, mode, prog).c_str(),
 		 _mesa_swizzle_string(srcReg->Swizzle,
 				      srcReg->NegateBase, GL_FALSE));
 #if 0

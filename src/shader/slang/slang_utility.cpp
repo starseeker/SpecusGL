@@ -41,88 +41,47 @@ slang_string_concat(char *dst, const char *src)
 
 /* slang_atom_pool */
 
+/**
+ * Initialise the atom pool.
+ *
+ * C++17: the std::unordered_set member is default-initialised; this
+ * function is retained to preserve the existing call-site API.
+ */
 void
 slang_atom_pool_construct(slang_atom_pool * pool)
 {
-    GLuint i;
-
-    for (i = 0; i < SLANG_ATOM_POOL_SIZE; i++)
-pool->entries[i] = nullptr;
+    pool->strings.clear();
 }
 
+/**
+ * Destroy the atom pool.
+ *
+ * C++17: clearing the std::unordered_set releases all stored strings.
+ */
 void
 slang_atom_pool_destruct(slang_atom_pool * pool)
 {
-    GLuint i;
-
-    for (i = 0; i < SLANG_ATOM_POOL_SIZE; i++) {
-slang_atom_entry * entry;
-
-entry = pool->entries[i];
-while (entry != nullptr) {
-    slang_atom_entry *next = entry->next;
-    _slang_free(entry->id);
-    _slang_free(entry);
-    entry = next;
-}
-    }
+    pool->strings.clear();
+    pool->strings.rehash(0); /* release bucket storage */
 }
 
-/*
- * Search the atom pool for an atom with a given name.
- * If atom is not found, create and add it to the pool.
- * Returns ATOM_NULL if the atom was not found and the function failed
- * to create a new atom.
+/**
+ * Search for or intern a string in the atom pool.
+ *
+ * Returns a stable pointer to the interned copy of \p id, which serves as
+ * the atom's unique identity (pointer equality test).
+ *
+ * C++17: std::unordered_set guarantees that iterators (and therefore the
+ * .c_str() pointers they expose) are not invalidated by further insertions,
+ * so the returned pointer remains valid for the lifetime of the pool.
  */
 slang_atom
 slang_atom_pool_atom(slang_atom_pool * pool, const char * id)
 {
-    GLuint hash;
-    const char * p = id;
-    slang_atom_entry ** entry;
-
-    /* Hash a given string to a number in the range [0, ATOM_POOL_SIZE). */
-    hash = 0;
-    while (*p != '\0') {
-GLuint g;
-
-hash = (hash << 4) + (GLuint)(*p++);
-g = hash & 0xf0000000;
-if (g != 0)
-    hash ^= g >> 24;
-hash &= ~g;
-    }
-    hash %= SLANG_ATOM_POOL_SIZE;
-
-    /* Now the hash points to a linked list of atoms with names that
-     * have the same hash value.  Search the linked list for a given
-     * name.
-     */
-    entry = &pool->entries[hash];
-    while (*entry != nullptr) {
-/* If the same, return the associated atom. */
-if (slang_string_compare((**entry).id, id) == 0)
-    return (slang_atom)(**entry).id;
-/* Grab the next atom in the linked list. */
-entry = &(**entry).next;
-    }
-
-    /* Okay, we have not found an atom. Create a new entry for it.
-     * Note that the <entry> points to the last entry's <next> field.
-     */
-    *entry = (slang_atom_entry *) _slang_alloc(sizeof(slang_atom_entry));
-    if (*entry == nullptr)
-return SLANG_ATOM_NULL;
-
-    /* Initialize a new entry. Because we'll need the actual name of
-     * the atom, we use the pointer to this string as an actual atom's
-     * value.
-     */
-    (**entry).next = nullptr;
-    (**entry).id = _slang_strdup(id);
-    if ((**entry).id == nullptr)
-return SLANG_ATOM_NULL;
-    return (slang_atom)(**entry).id;
+    auto [it, _] = pool->strings.emplace(id);
+    /* The pool's interface contracts that the atom is the string pointer.
+     * const_cast is safe here: callers only read through the atom. */
+    return static_cast<slang_atom>(const_cast<char *>(it->c_str()));
 }
 
 /**
@@ -131,5 +90,6 @@ return SLANG_ATOM_NULL;
 const char *
 slang_atom_pool_id(slang_atom_pool * pool, slang_atom atom)
 {
-    return (const char *)(atom);
+    (void) pool;
+    return static_cast<const char *>(atom);
 }
