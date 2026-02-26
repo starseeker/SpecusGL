@@ -2024,6 +2024,13 @@ struct gl_program {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Virtual destructor: frees owned parameter lists.
+     * Defined out-of-line in program.cpp where gl_program_parameter_list
+     * is fully defined.
+     */
+    virtual ~gl_program();
 };
 
 
@@ -2033,6 +2040,12 @@ struct gl_vertex_program : gl_program {
     GLboolean IsNVProgram;    /**< is this a GL_NV_vertex_program program? */
     GLboolean IsPositionInvariant;
     void *TnlData;		/**< should probably use DriverData */
+
+    /**
+     * Destructor: TnlData is always nullptr in practice but free it if set.
+     * Defined out-of-line in program.cpp.
+     */
+    ~gl_vertex_program() override;
 };
 
 

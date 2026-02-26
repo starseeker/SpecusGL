@@ -533,6 +533,25 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
  * \param n      Number of buffer objects to delete.
  * \param ids    Array of \c n buffer object IDs.
  */
+/**
+ * If *slot points to oldBuf, rebind it to nullBuf, adjusting reference
+ * counts.  Used during buffer deletion to unbind vertex array slots.
+ * We adjust refcounts directly rather than through unref() to defer deletion
+ * until _mesa_unbind_buffer_object() is called at the end of the loop.
+ */
+static inline void
+rebind_buf_slot(struct gl_buffer_object **slot,
+		struct gl_buffer_object *oldBuf,
+		struct gl_buffer_object *nullBuf)
+{
+    if (*slot == oldBuf) {
+	oldBuf->RefCount--;
+	*slot = nullBuf;
+	nullBuf->RefCount++;
+    }
+}
+
+
 void GLAPIENTRY
 _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 {
@@ -555,55 +574,18 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 
 	    ASSERT(bufObj->Name == ids[i]);
 
-	    if (ctx->Array.ArrayObj->Vertex.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->Vertex.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->Normal.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->Normal.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->Color.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->Color.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->SecondaryColor.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->SecondaryColor.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->FogCoord.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->FogCoord.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->Index.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->Index.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    if (ctx->Array.ArrayObj->EdgeFlag.BufferObj == bufObj) {
-		bufObj->RefCount--;
-		ctx->Array.ArrayObj->EdgeFlag.BufferObj = ctx->Array.NullBufferObj;
-		ctx->Array.NullBufferObj->RefCount++;
-	    }
-	    for (j = 0; j < MAX_TEXTURE_UNITS; j++) {
-		if (ctx->Array.ArrayObj->TexCoord[j].BufferObj == bufObj) {
-		    bufObj->RefCount--;
-		    ctx->Array.ArrayObj->TexCoord[j].BufferObj = ctx->Array.NullBufferObj;
-		    ctx->Array.NullBufferObj->RefCount++;
-		}
-	    }
-	    for (j = 0; j < VERT_ATTRIB_MAX; j++) {
-		if (ctx->Array.ArrayObj->VertexAttrib[j].BufferObj == bufObj) {
-		    bufObj->RefCount--;
-		    ctx->Array.ArrayObj->VertexAttrib[j].BufferObj = ctx->Array.NullBufferObj;
-		    ctx->Array.NullBufferObj->RefCount++;
-		}
-	    }
+	    /* Unbind this buffer from all vertex array slots */
+	    rebind_buf_slot(&ctx->Array.ArrayObj->Vertex.BufferObj,       bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->Normal.BufferObj,       bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->Color.BufferObj,        bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->SecondaryColor.BufferObj, bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->FogCoord.BufferObj,     bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->Index.BufferObj,        bufObj, ctx->Array.NullBufferObj);
+	    rebind_buf_slot(&ctx->Array.ArrayObj->EdgeFlag.BufferObj,     bufObj, ctx->Array.NullBufferObj);
+	    for (j = 0; j < MAX_TEXTURE_UNITS; j++)
+		rebind_buf_slot(&ctx->Array.ArrayObj->TexCoord[j].BufferObj, bufObj, ctx->Array.NullBufferObj);
+	    for (j = 0; j < VERT_ATTRIB_MAX; j++)
+		rebind_buf_slot(&ctx->Array.ArrayObj->VertexAttrib[j].BufferObj, bufObj, ctx->Array.NullBufferObj);
 
 	    if (ctx->Array.ArrayBufferObj == bufObj) {
 		_mesa_BindBufferARB(GL_ARRAY_BUFFER_ARB, 0);

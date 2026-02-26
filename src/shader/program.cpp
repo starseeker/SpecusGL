@@ -50,6 +50,26 @@ struct gl_program _mesa_DummyProgram;
 
 
 /**
+ * gl_program destructor: frees owned parameter lists.
+ */
+gl_program::~gl_program()
+{
+    delete Parameters;
+    delete Varying;
+    delete Attributes;
+}
+
+
+/**
+ * gl_vertex_program destructor: frees TnlData if set (should always be null).
+ */
+gl_vertex_program::~gl_vertex_program()
+{
+    delete static_cast<char *>(TnlData);
+}
+
+
+/**
  * C++17 note: gl_program_state, gl_vertex_program_state, gl_fragment_program_state,
  * and gl_ati_fragment_shader_state now carry default member initializers for
  * all static fields.  The remaining work here is wiring up the shared default
@@ -247,7 +267,7 @@ _mesa_new_program(GLcontext *ctx, GLenum target, GLuint id)
 /**
  * Delete a program and remove it from the hash table, ignoring the
  * reference count.
- * Called via ctx->Driver.DeleteProgram.  May be wrapped (OO deriviation)
+ * Called via ctx->Driver.DeleteProgram.  May be wrapped (OO derivation)
  * by a device driver function.
  */
 void
@@ -264,25 +284,9 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
 	    delete[] static_cast<GLubyte *>(inst.Data);
     }
 
-    if (prog->Parameters) {
-	_mesa_free_parameter_list(prog->Parameters);
-    }
-    if (prog->Varying) {
-	_mesa_free_parameter_list(prog->Varying);
-    }
-    if (prog->Attributes) {
-	_mesa_free_parameter_list(prog->Attributes);
-    }
-
-    /* XXX this is a little ugly */
-    if (prog->Target == GL_VERTEX_PROGRAM_ARB) {
-	struct gl_vertex_program *vprog = static_cast<gl_vertex_program *>(prog);
-	if (vprog->TnlData)
-	    delete static_cast<char *>(vprog->TnlData); /* should always be nullptr */
-	delete vprog;
-    } else {
-	delete static_cast<gl_fragment_program *>(prog);
-    }
+    /* Virtual destructor handles Parameters/Varying/Attributes cleanup
+     * and, for gl_vertex_program, TnlData cleanup. */
+    delete prog;
 }
 
 
