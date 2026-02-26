@@ -56,44 +56,110 @@
 
 
 /**
- * OSMesa rendering context, derived from core Mesa GLcontext.
+ * OSMesa rendering context – a proper C++ class layered on top of GLcontext.
+ *
+ * The public OSMesa C API (OSMesaCreateContext etc.) is a thin wrapper around
+ * this class.  All logic lives in the class methods so that the behaviour
+ * below the public API is expressed in idiomatic C++.
+ *
+ * \note \c mesa must remain the first data member so that the OSMESA_CONTEXT()
+ *       helper cast continues to work.
  */
 struct osmesa_context {
-    GLcontext mesa;		/*< Base class - this must be first */
-    GLvisual *gl_visual;		/*< Describes the buffers */
-    struct gl_renderbuffer *rb;  /*< The user's colorbuffer */
-    GLframebuffer *gl_buffer;	/*< The framebuffer, containing user's rb */
-    GLenum format;		/*< User-specified context format */
-    GLint userRowLength;		/*< user-specified number of pixels per row */
-    GLint rInd, gInd, bInd, aInd;/*< index offsets for RGBA formats */
-    std::vector<GLvoid *> rowaddr;  /*< address of first pixel in each image row */
-    GLboolean yup;		/*< TRUE  -> Y increases upward */
-    /*< FALSE -> Y increases downward */
-    GLboolean enable_fxaa;	/*< TRUE to enable FXAA post-processing */
+    GLcontext mesa;		        /**< Base Mesa context – must be first */
+    GLvisual *gl_visual = nullptr;  /**< Describes the buffers */
+    struct gl_renderbuffer *rb = nullptr; /**< The user's colorbuffer */
+    GLframebuffer *gl_buffer = nullptr;   /**< The framebuffer */
+    GLenum format = OSMESA_RGBA;    /**< User-specified context format */
+    GLint userRowLength = 0;        /**< user-specified pixels per row (0 = width) */
+    GLint rInd = 0, gInd = 0, bInd = 0, aInd = 0; /**< RGBA component offsets */
+    std::vector<GLvoid *> rowaddr;  /**< address of first pixel in each image row */
+    GLboolean yup = GL_TRUE;        /**< GL_TRUE  → Y increases upward */
+    GLboolean enable_fxaa = GL_FALSE; /**< GL_TRUE to enable FXAA */
+
+    /* ------------------------------------------------------------------ */
+    /* Destructor                                                          */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Destroy this context, releasing all Mesa resources.
+     * Called automatically when the object is deleted.
+     */
+    ~osmesa_context();
+
+    /* ------------------------------------------------------------------ */
+    /* Static factory                                                      */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Create and fully initialise a new OSMesa context.
+     * Returns a heap-allocated context on success, nullptr on failure.
+     * Replaces the body of OSMesaCreateContextExt().
+     */
+    static osmesa_context *create(GLenum format,
+                                  GLint depthBits, GLint stencilBits,
+                                  GLint accumBits,
+                                  osmesa_context *sharelist);
+
+    /* ------------------------------------------------------------------ */
+    /* Instance methods                                                    */
+    /* ------------------------------------------------------------------ */
+
+    /**
+     * Bind a pixel buffer to this context and make it current.
+     * Replaces the body of OSMesaMakeCurrent().
+     */
+    GLboolean make_current(void *buffer, GLenum type,
+                           GLsizei width, GLsizei height);
+
+    /**
+     * Set a pixel-store parameter (row length or Y-up direction).
+     * Replaces the body of OSMesaPixelStore().
+     */
+    void pixel_store(GLint pname, GLint value);
+
+    /**
+     * Query an integer OSMesa parameter.
+     * Replaces the body of OSMesaGetIntegerv().
+     */
+    void get_integer(GLint pname, GLint *value) const;
 
     /** Recompute the rowaddr array from the current buffer and format. */
     void compute_row_addresses();
 
     /** Apply FXAA post-processing if enabled. */
     void apply_fxaa();
+
+    /* ------------------------------------------------------------------ */
+    /* Static driver callbacks (registered in the dd_function_table)      */
+    /* ------------------------------------------------------------------ */
+
+    /** GL_RENDERER / GL_VERSION string callback. */
+    static const GLubyte *get_string_cb(GLcontext *ctx, GLenum name);
+
+    /** State-invalidation callback: propagates dirty bits to sub-systems. */
+    static void update_state_cb(GLcontext *ctx, GLuint new_state);
+
+    /** glFinish callback: flushes the swrast pipeline and applies FXAA. */
+    static void finish_cb(GLcontext *ctx);
 };
 
 
 static inline OSMesaContext
 OSMESA_CONTEXT(GLcontext *ctx)
 {
-    /* Just cast, since we're using structure containment */
+    /* Just cast, since mesa is the first member of osmesa_context */
     return static_cast<OSMesaContext>(static_cast<void *>(ctx));
 }
 
 
 /**********************************************************************/
-/*** Private Device Driver Functions                                ***/
+/*** Private Device Driver Functions (now static methods)           ***/
 /**********************************************************************/
 
 
-static const GLubyte *
-get_string(GLcontext *ctx, GLenum name)
+const GLubyte *
+osmesa_context::get_string_cb(GLcontext *ctx, GLenum name)
 {
     (void) ctx;
     switch (name) {
@@ -111,10 +177,10 @@ get_string(GLcontext *ctx, GLenum name)
 }
 
 
-static void
-osmesa_update_state(GLcontext *ctx, GLuint new_state)
+void
+osmesa_context::update_state_cb(GLcontext *ctx, GLuint new_state)
 {
-    /* easy - just propogate */
+    /* Propagate dirty state to all sub-systems. */
     _swrast_InvalidateState(ctx, new_state);
     _swsetup_InvalidateState(ctx, new_state);
     _tnl_InvalidateState(ctx, new_state);
@@ -123,8 +189,20 @@ osmesa_update_state(GLcontext *ctx, GLuint new_state)
 
 
 /**
+ * glFinish callback: flush the swrast pipeline and apply FXAA.
+ */
+void
+osmesa_context::finish_cb(GLcontext *ctx)
+{
+    OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
+    _swrast_flush(ctx);
+    osmesa->apply_fxaa();
+}
+
+
+/**
  * Apply FXAA post-processing if enabled.
- * Called from glFinish to process the final rendered image.
+ * Called from finish_cb() after rendering is complete.
  */
 void
 osmesa_context::apply_fxaa()
@@ -163,22 +241,6 @@ osmesa_context::apply_fxaa()
     /* Apply FXAA with sRGB color space conversion (matching VTK) */
     ImageRGBA8 img = { buffer, width, height, strideBytes };
     fxaa_apply_rgba8_srgb(&img, &img, &params);
-}
-
-
-/**
- * Called by glFinish to flush rendering and apply post-processing.
- */
-static void
-osmesa_finish(GLcontext *ctx)
-{
-    OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
-    
-    /* Finish all pending rendering operations first */
-    _swrast_flush(ctx);
-    
-    /* Apply FXAA if enabled */
-    osmesa->apply_fxaa();
 }
 
 
@@ -1100,6 +1162,287 @@ new_osmesa_renderbuffer(GLcontext *ctx, GLenum format, GLenum type)
 
 
 /**********************************************************************/
+/*****           osmesa_context C++ class implementations         *****/
+/**********************************************************************/
+
+
+/**
+ * Destructor: release all Mesa resources owned by this context.
+ * The object itself is freed by the caller (via \c delete osmesa).
+ */
+osmesa_context::~osmesa_context()
+{
+    if (rb)
+	_mesa_reference_renderbuffer(&rb, nullptr);
+
+    _swsetup_DestroyContext(&mesa);
+    _tnl_DestroyContext(&mesa);
+    _vbo_DestroyContext(&mesa);
+    _swrast_DestroyContext(&mesa);
+
+    _mesa_destroy_visual(gl_visual);
+    _mesa_unreference_framebuffer(&gl_buffer);
+
+    mesa.free_data();
+}
+
+
+/**
+ * Static factory: create and fully initialise a new OSMesa context.
+ * Returns a heap-allocated context on success, nullptr on failure.
+ * Replaces the body of OSMesaCreateContextExt().
+ */
+osmesa_context *
+osmesa_context::create(GLenum fmt,
+                       GLint depthBits, GLint stencilBits,
+                       GLint accumBits,
+                       osmesa_context *sharelist)
+{
+    struct dd_function_table functions;
+    GLint rind = 0, gind = 0, bind = 0, aind = 0;
+    GLint indexBits = 0, redBits = 0, greenBits = 0, blueBits = 0, alphaBits = 0;
+    GLboolean rgbmode;
+    GLenum type = CHAN_TYPE;
+
+    if (fmt == OSMESA_COLOR_INDEX) {
+	indexBits = 8;
+	rgbmode = GL_FALSE;
+    } else if (fmt == OSMESA_RGBA) {
+	indexBits = 0;
+	redBits = CHAN_BITS; greenBits = CHAN_BITS;
+	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
+	rind = 0; gind = 1; bind = 2; aind = 3;
+	rgbmode = GL_TRUE;
+    } else if (fmt == OSMESA_BGRA) {
+	indexBits = 0;
+	redBits = CHAN_BITS; greenBits = CHAN_BITS;
+	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
+	bind = 0; gind = 1; rind = 2; aind = 3;
+	rgbmode = GL_TRUE;
+    } else if (fmt == OSMESA_ARGB) {
+	indexBits = 0;
+	redBits = CHAN_BITS; greenBits = CHAN_BITS;
+	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
+	aind = 0; rind = 1; gind = 2; bind = 3;
+	rgbmode = GL_TRUE;
+    } else if (fmt == OSMESA_RGB) {
+	indexBits = 0;
+	redBits = CHAN_BITS; greenBits = CHAN_BITS;
+	blueBits = CHAN_BITS; alphaBits = 0;
+	rind = 0; gind = 1; bind = 2;
+	rgbmode = GL_TRUE;
+    } else if (fmt == OSMESA_BGR) {
+	indexBits = 0;
+	redBits = CHAN_BITS; greenBits = CHAN_BITS;
+	blueBits = CHAN_BITS; alphaBits = 0;
+	rind = 2; gind = 1; bind = 0;
+	rgbmode = GL_TRUE;
+    }
+#if CHAN_TYPE == GL_UNSIGNED_BYTE
+    else if (fmt == OSMESA_RGB_565) {
+	indexBits = 0;
+	redBits = 5; greenBits = 6; blueBits = 5; alphaBits = 0;
+	rgbmode = GL_TRUE;
+    }
+#endif
+    else {
+	return nullptr;
+    }
+
+    auto *osmesa = new osmesa_context{};
+
+    osmesa->gl_visual = _mesa_create_visual(rgbmode,
+					    GL_FALSE, GL_FALSE,
+					    redBits, greenBits, blueBits, alphaBits,
+					    indexBits,
+					    depthBits, stencilBits,
+					    accumBits, accumBits, accumBits,
+					    alphaBits ? accumBits : 0,
+					    1 /* num samples */);
+    if (!osmesa->gl_visual) {
+	delete osmesa;
+	return nullptr;
+    }
+
+    /* Set up device driver function table */
+    _mesa_init_driver_functions(&functions);
+    functions.GetString    = osmesa_context::get_string_cb;
+    functions.UpdateState  = osmesa_context::update_state_cb;
+    functions.GetBufferSize = nullptr;
+    functions.Finish       = osmesa_context::finish_cb;
+
+    if (!osmesa->mesa.initialize(osmesa->gl_visual,
+                                 sharelist ? &sharelist->mesa : nullptr,
+                                 &functions, osmesa)) {
+	_mesa_destroy_visual(osmesa->gl_visual);
+	delete osmesa;
+	return nullptr;
+    }
+
+    _mesa_enable_sw_extensions(&osmesa->mesa);
+    _mesa_enable_1_3_extensions(&osmesa->mesa);
+    _mesa_enable_1_4_extensions(&osmesa->mesa);
+    _mesa_enable_1_5_extensions(&osmesa->mesa);
+
+    osmesa->gl_buffer = _mesa_create_framebuffer(osmesa->gl_visual);
+    if (!osmesa->gl_buffer) {
+	_mesa_destroy_visual(osmesa->gl_visual);
+	osmesa->mesa.free_data();
+	delete osmesa;
+	return nullptr;
+    }
+
+    /* Create front color buffer in user-provided memory (no back buffer) */
+    osmesa->rb = new_osmesa_renderbuffer(&osmesa->mesa, fmt, type);
+    _mesa_add_renderbuffer(osmesa->gl_buffer, BUFFER_FRONT_LEFT, osmesa->rb);
+    assert(osmesa->rb->RefCount == 2);
+
+    _mesa_add_soft_renderbuffers(osmesa->gl_buffer,
+				 GL_FALSE,
+				 osmesa->gl_visual->haveDepthBuffer,
+				 osmesa->gl_visual->haveStencilBuffer,
+				 osmesa->gl_visual->haveAccumBuffer,
+				 GL_FALSE,
+				 GL_FALSE);
+
+    osmesa->format       = fmt;
+    osmesa->userRowLength = 0;
+    osmesa->yup          = GL_TRUE;
+    osmesa->rInd         = rind;
+    osmesa->gInd         = gind;
+    osmesa->bInd         = bind;
+    osmesa->aInd         = aind;
+    osmesa->enable_fxaa  = GL_FALSE;
+
+    /* Initialize software rasterizer and helper modules */
+    {
+	GLcontext *ctx = &osmesa->mesa;
+	if (!_swrast_CreateContext(ctx) ||
+	    !_vbo_CreateContext(ctx) ||
+	    !_tnl_CreateContext(ctx) ||
+	    !_swsetup_CreateContext(ctx)) {
+	    delete osmesa; /* destructor cleans up everything */
+	    return nullptr;
+	}
+
+	_swsetup_Wakeup(ctx);
+
+	/* Use default TCL pipeline */
+	TNL_CONTEXT(ctx)->Driver.RunPipeline = _tnl_run_pipeline;
+
+	/* Hook in our optimised line and triangle drawing functions */
+	SWRAST_CONTEXT(ctx)->choose_line     = osmesa_choose_line;
+	SWRAST_CONTEXT(ctx)->choose_triangle = osmesa_choose_triangle;
+    }
+
+    return osmesa;
+}
+
+
+/**
+ * Bind a pixel buffer to this context and make it the current context.
+ */
+GLboolean
+osmesa_context::make_current(void *buffer, GLenum type,
+                              GLsizei width, GLsizei height)
+{
+    if (!buffer ||
+	width < 1 || height < 1 ||
+	width > MAX_WIDTH || height > MAX_HEIGHT) {
+	return GL_FALSE;
+    }
+
+    if (format == OSMESA_RGB_565 && type != GL_UNSIGNED_SHORT_5_6_5)
+	return GL_FALSE;
+
+    update_state_cb(&mesa, 0);
+
+    /* Call this periodically to detect when the user has begun using
+     * GL rendering from multiple threads.
+     */
+    _glapi_check_multithread();
+
+    /* Set renderbuffer fields.  Set width/height = 0 to force
+     * AllocStorage being called by _mesa_resize_framebuffer().
+     */
+    rb->Data   = buffer;
+    rb->DataType = type;
+    rb->Width  = rb->Height = 0;
+
+    /* Resize (triggers renderbuffer storage allocation). */
+    _mesa_resize_framebuffer(&mesa, gl_buffer, width, height);
+    gl_buffer->Initialized = GL_TRUE;
+
+    _mesa_make_current(&mesa, gl_buffer, gl_buffer);
+
+    /* Re-attach the renderbuffer to install any bpp-conversion wrapper. */
+    _mesa_remove_renderbuffer(gl_buffer, BUFFER_FRONT_LEFT);
+    _mesa_add_renderbuffer(gl_buffer, BUFFER_FRONT_LEFT, rb);
+
+    _mesa_update_framebuffer_visual(gl_buffer);
+    _mesa_resize_framebuffer(&mesa, gl_buffer, width, height);
+
+    return GL_TRUE;
+}
+
+
+/**
+ * Set a pixel-store parameter on this context.
+ */
+void
+osmesa_context::pixel_store(GLint pname, GLint value)
+{
+    switch (pname) {
+	case OSMESA_ROW_LENGTH:
+	    if (value < 0) {
+		_mesa_error(&mesa, GL_INVALID_VALUE, "OSMesaPixelStore(value)");
+		return;
+	    }
+	    userRowLength = value;
+	    break;
+	case OSMESA_Y_UP:
+	    yup = value ? GL_TRUE : GL_FALSE;
+	    break;
+	default:
+	    _mesa_error(&mesa, GL_INVALID_ENUM, "OSMesaPixelStore(pname)");
+	    return;
+    }
+    compute_row_addresses();
+}
+
+
+/**
+ * Query an integer OSMesa parameter.
+ */
+void
+osmesa_context::get_integer(GLint pname, GLint *value) const
+{
+    switch (pname) {
+	case OSMESA_WIDTH:
+	    *value = gl_buffer ? (GLint)gl_buffer->Width  : 0; return;
+	case OSMESA_HEIGHT:
+	    *value = gl_buffer ? (GLint)gl_buffer->Height : 0; return;
+	case OSMESA_FORMAT:
+	    *value = (GLint)format;   return;
+	case OSMESA_TYPE:
+	    *value = rb ? (GLint)rb->DataType : 0; return;
+	case OSMESA_ROW_LENGTH:
+	    *value = userRowLength;    return;
+	case OSMESA_Y_UP:
+	    *value = (GLint)yup;       return;
+	case OSMESA_MAX_WIDTH:
+	    *value = MAX_WIDTH;        return;
+	case OSMESA_MAX_HEIGHT:
+	    *value = MAX_HEIGHT;       return;
+	default:
+	    _mesa_error(const_cast<GLcontext *>(&mesa),
+                       GL_INVALID_ENUM, "OSMesaGetIntergerv(pname)");
+	    return;
+    }
+}
+
+
+/**********************************************************************/
 /*****                    Public Functions                        *****/
 /**********************************************************************/
 
@@ -1132,309 +1475,31 @@ GLAPI OSMesaContext GLAPIENTRY
 OSMesaCreateContextExt(GLenum format, GLint depthBits, GLint stencilBits,
 		       GLint accumBits, OSMesaContext sharelist)
 {
-    OSMesaContext osmesa;
-    struct dd_function_table functions;
-    GLint rind, gind, bind, aind;
-    GLint indexBits = 0, redBits = 0, greenBits = 0, blueBits = 0, alphaBits =0;
-    GLboolean rgbmode;
-    GLenum type = CHAN_TYPE;
-
-    rind = gind = bind = aind = 0;
-    if (format==OSMESA_COLOR_INDEX) {
-	indexBits = 8;
-	rgbmode = GL_FALSE;
-    } else if (format==OSMESA_RGBA) {
-	indexBits = 0;
-	redBits = CHAN_BITS;
-	greenBits = CHAN_BITS;
-	blueBits = CHAN_BITS;
-	alphaBits = CHAN_BITS;
-	rind = 0;
-	gind = 1;
-	bind = 2;
-	aind = 3;
-	rgbmode = GL_TRUE;
-    } else if (format==OSMESA_BGRA) {
-	indexBits = 0;
-	redBits = CHAN_BITS;
-	greenBits = CHAN_BITS;
-	blueBits = CHAN_BITS;
-	alphaBits = CHAN_BITS;
-	bind = 0;
-	gind = 1;
-	rind = 2;
-	aind = 3;
-	rgbmode = GL_TRUE;
-    } else if (format==OSMESA_ARGB) {
-	indexBits = 0;
-	redBits = CHAN_BITS;
-	greenBits = CHAN_BITS;
-	blueBits = CHAN_BITS;
-	alphaBits = CHAN_BITS;
-	aind = 0;
-	rind = 1;
-	gind = 2;
-	bind = 3;
-	rgbmode = GL_TRUE;
-    } else if (format==OSMESA_RGB) {
-	indexBits = 0;
-	redBits = CHAN_BITS;
-	greenBits = CHAN_BITS;
-	blueBits = CHAN_BITS;
-	alphaBits = 0;
-	rind = 0;
-	gind = 1;
-	bind = 2;
-	rgbmode = GL_TRUE;
-    } else if (format==OSMESA_BGR) {
-	indexBits = 0;
-	redBits = CHAN_BITS;
-	greenBits = CHAN_BITS;
-	blueBits = CHAN_BITS;
-	alphaBits = 0;
-	rind = 2;
-	gind = 1;
-	bind = 0;
-	rgbmode = GL_TRUE;
-    }
-#if CHAN_TYPE == GL_UNSIGNED_BYTE
-    else if (format==OSMESA_RGB_565) {
-	indexBits = 0;
-	redBits = 5;
-	greenBits = 6;
-	blueBits = 5;
-	alphaBits = 0;
-	rind = 0; /* not used */
-	gind = 0;
-	bind = 0;
-	rgbmode = GL_TRUE;
-    }
-#endif
-    else {
-	return nullptr;
-    }
-
-    osmesa = new osmesa_context{};
-    if (osmesa) {
-	osmesa->gl_visual = _mesa_create_visual(rgbmode,
-						GL_FALSE,    /* double buffer */
-						GL_FALSE,    /* stereo */
-						redBits,
-						greenBits,
-						blueBits,
-						alphaBits,
-						indexBits,
-						depthBits,
-						stencilBits,
-						accumBits,
-						accumBits,
-						accumBits,
-						alphaBits ? accumBits : 0,
-						1            /* num samples */
-					       );
-	if (!osmesa->gl_visual) {
-	    delete osmesa;
-	    return nullptr;
-	}
-
-	/* Initialize device driver function table */
-	_mesa_init_driver_functions(&functions);
-	/* override with our functions */
-	functions.GetString = get_string;
-	functions.UpdateState = osmesa_update_state;
-	functions.GetBufferSize = nullptr;
-	functions.Finish = osmesa_finish;
-
-	if (!_mesa_initialize_context(&osmesa->mesa,
-				      osmesa->gl_visual,
-				      sharelist ? &sharelist->mesa
-				      : (GLcontext *) nullptr,
-				      &functions, (void *) osmesa)) {
-	    _mesa_destroy_visual(osmesa->gl_visual);
-	    delete osmesa;
-	    return nullptr;
-	}
-
-	_mesa_enable_sw_extensions(&(osmesa->mesa));
-	_mesa_enable_1_3_extensions(&(osmesa->mesa));
-	_mesa_enable_1_4_extensions(&(osmesa->mesa));
-	_mesa_enable_1_5_extensions(&(osmesa->mesa));
-
-	osmesa->gl_buffer = _mesa_create_framebuffer(osmesa->gl_visual);
-	if (!osmesa->gl_buffer) {
-	    _mesa_destroy_visual(osmesa->gl_visual);
-	    _mesa_free_context_data(&osmesa->mesa);
-	    delete osmesa;
-	    return nullptr;
-	}
-
-	/* create front color buffer in user-provided memory (no back buffer) */
-	osmesa->rb = new_osmesa_renderbuffer(&osmesa->mesa, format, type);
-	_mesa_add_renderbuffer(osmesa->gl_buffer, BUFFER_FRONT_LEFT, osmesa->rb);
-	assert(osmesa->rb->RefCount == 2);
-
-	_mesa_add_soft_renderbuffers(osmesa->gl_buffer,
-				     GL_FALSE, /* color */
-				     osmesa->gl_visual->haveDepthBuffer,
-				     osmesa->gl_visual->haveStencilBuffer,
-				     osmesa->gl_visual->haveAccumBuffer,
-				     GL_FALSE, /* alpha */
-				     GL_FALSE /* aux */);
-
-	osmesa->format = format;
-	osmesa->userRowLength = 0;
-	osmesa->yup = GL_TRUE;
-	osmesa->rInd = rind;
-	osmesa->gInd = gind;
-	osmesa->bInd = bind;
-	osmesa->aInd = aind;
-	osmesa->enable_fxaa = GL_FALSE;
-
-	/* Initialize the software rasterizer and helper modules. */
-	{
-	    GLcontext *ctx = &osmesa->mesa;
-	    SWcontext *swrast;
-	    TNLcontext *tnl;
-
-	    if (!_swrast_CreateContext(ctx) ||
-		!_vbo_CreateContext(ctx) ||
-		!_tnl_CreateContext(ctx) ||
-		!_swsetup_CreateContext(ctx)) {
-		_mesa_destroy_visual(osmesa->gl_visual);
-		_mesa_free_context_data(ctx);
-		delete osmesa;
-		return nullptr;
-	    }
-
-	    _swsetup_Wakeup(ctx);
-
-	    /* use default TCL pipeline */
-	    tnl = TNL_CONTEXT(ctx);
-	    tnl->Driver.RunPipeline = _tnl_run_pipeline;
-
-	    /* Extend the software rasterizer with our optimized line and triangle
-	     * drawing functions.
-	     */
-	    swrast = SWRAST_CONTEXT(ctx);
-	    swrast->choose_line = osmesa_choose_line;
-	    swrast->choose_triangle = osmesa_choose_triangle;
-	}
-    }
-    return osmesa;
+    return osmesa_context::create(format, depthBits, stencilBits,
+                                  accumBits, sharelist);
 }
 
 
 /**
  * Destroy an Off-Screen Mesa rendering context.
- *
- * \param osmesa  the context to destroy
  */
 GLAPI void GLAPIENTRY
 OSMesaDestroyContext(OSMesaContext osmesa)
 {
-    if (osmesa) {
-	if (osmesa->rb)
-	    _mesa_reference_renderbuffer(&osmesa->rb, nullptr);
-
-	_swsetup_DestroyContext(&osmesa->mesa);
-	_tnl_DestroyContext(&osmesa->mesa);
-	_vbo_DestroyContext(&osmesa->mesa);
-	_swrast_DestroyContext(&osmesa->mesa);
-
-	_mesa_destroy_visual(osmesa->gl_visual);
-	_mesa_unreference_framebuffer(&osmesa->gl_buffer);
-
-	_mesa_free_context_data(&osmesa->mesa);
-	delete osmesa;
-    }
+    delete osmesa;
 }
 
 
 /**
- * Bind an OSMesaContext to an image buffer.  The image buffer is just a
- * block of memory which the client provides.  Its size must be at least
- * as large as width*height*sizeof(type).  Its address should be a multiple
- * of 4 if using RGBA mode.
- *
- * Image data is stored in the order of glDrawPixels:  row-major order
- * with the lower-left image pixel stored in the first array position
- * (ie. bottom-to-top).
- *
- * If the context's viewport hasn't been initialized yet, it will now be
- * initialized to (0,0,width,height).
- *
- * Input:  osmesa - the rendering context
- *         buffer - the image buffer memory
- *         type - data type for pixel components
- *            Normally, only GL_UNSIGNED_BYTE and GL_UNSIGNED_SHORT_5_6_5
- *            are supported.  But if Mesa's been compiled with CHAN_BITS==16
- *            then type may be GL_UNSIGNED_SHORT or GL_UNSIGNED_BYTE.  And if
- *            Mesa's been build with CHAN_BITS==32 then type may be GL_FLOAT,
- *            GL_UNSIGNED_SHORT or GL_UNSIGNED_BYTE.
- *         width, height - size of image buffer in pixels, at least 1
- * Return:  GL_TRUE if success, GL_FALSE if error because of invalid osmesa,
- *          invalid buffer address, invalid type, width<1, height<1,
- *          width>internal limit or height>internal limit.
+ * Bind an OSMesaContext to an image buffer and make it current.
  */
 GLAPI GLboolean GLAPIENTRY
 OSMesaMakeCurrent(OSMesaContext osmesa, void *buffer, GLenum type,
 		  GLsizei width, GLsizei height)
 {
-    if (!osmesa || !buffer ||
-	width < 1 || height < 1 ||
-	width > MAX_WIDTH || height > MAX_HEIGHT) {
+    if (!osmesa)
 	return GL_FALSE;
-    }
-
-    if (osmesa->format == OSMESA_RGB_565 && type != GL_UNSIGNED_SHORT_5_6_5) {
-	return GL_FALSE;
-    }
-
-#if 0
-    if (!(type == GL_UNSIGNED_BYTE ||
-	  (type == GL_UNSIGNED_SHORT && CHAN_BITS >= 16) ||
-	  (type == GL_FLOAT && CHAN_BITS == 32))) {
-	/* i.e. is sizeof(type) * 8 > CHAN_BITS? */
-	return GL_FALSE;
-    }
-#endif
-
-    osmesa_update_state(&osmesa->mesa, 0);
-
-    /* Call this periodically to detect when the user has begun using
-     * GL rendering from multiple threads.
-     */
-    _glapi_check_multithread();
-
-    /* Set renderbuffer fields.  Set width/height = 0 to force
-     * osmesa_renderbuffer_storage() being called by _mesa_resize_framebuffer()
-     */
-    osmesa->rb->Data = buffer;
-    osmesa->rb->DataType = type;
-    osmesa->rb->Width = osmesa->rb->Height = 0;
-
-    /* Set the framebuffer's size.  This causes the
-     * osmesa_renderbuffer_storage() function to get called.
-     */
-    _mesa_resize_framebuffer(&osmesa->mesa, osmesa->gl_buffer, width, height);
-    osmesa->gl_buffer->Initialized = GL_TRUE; /* XXX TEMPORARY? */
-
-    _mesa_make_current(&osmesa->mesa, osmesa->gl_buffer, osmesa->gl_buffer);
-
-    /* Remove renderbuffer attachment, then re-add.  This installs the
-     * renderbuffer adaptor/wrapper if needed (for bpp conversion).
-     */
-    _mesa_remove_renderbuffer(osmesa->gl_buffer, BUFFER_FRONT_LEFT);
-    _mesa_add_renderbuffer(osmesa->gl_buffer, BUFFER_FRONT_LEFT, osmesa->rb);
-
-
-    /* this updates the visual's red/green/blue/alphaBits fields */
-    _mesa_update_framebuffer_visual(osmesa->gl_buffer);
-
-    /* update the framebuffer size */
-    _mesa_resize_framebuffer(&osmesa->mesa, osmesa->gl_buffer, width, height);
-
-    return GL_TRUE;
+    return osmesa->make_current(buffer, type, width, height);
 }
 
 
@@ -1455,73 +1520,17 @@ GLAPI void GLAPIENTRY
 OSMesaPixelStore(GLint pname, GLint value)
 {
     OSMesaContext osmesa = OSMesaGetCurrentContext();
-
-    switch (pname) {
-	case OSMESA_ROW_LENGTH:
-	    if (value<0) {
-		_mesa_error(&osmesa->mesa, GL_INVALID_VALUE,
-			    "OSMesaPixelStore(value)");
-		return;
-	    }
-	    osmesa->userRowLength = value;
-	    break;
-	case OSMESA_Y_UP:
-	    osmesa->yup = value ? GL_TRUE : GL_FALSE;
-	    break;
-	default:
-	    _mesa_error(&osmesa->mesa, GL_INVALID_ENUM, "OSMesaPixelStore(pname)");
-	    return;
-    }
-
-    osmesa->compute_row_addresses();
+    if (osmesa)
+	osmesa->pixel_store(pname, value);
 }
 
 
 GLAPI void GLAPIENTRY
 OSMesaGetIntegerv(GLint pname, GLint *value)
 {
-    OSMesaContext osmesa = OSMesaGetCurrentContext();
-
-    switch (pname) {
-	case OSMESA_WIDTH:
-	    if (osmesa->gl_buffer)
-		*value = osmesa->gl_buffer->Width;
-	    else
-		*value = 0;
-	    return;
-	case OSMESA_HEIGHT:
-	    if (osmesa->gl_buffer)
-		*value = osmesa->gl_buffer->Height;
-	    else
-		*value = 0;
-	    return;
-	case OSMESA_FORMAT:
-	    *value = osmesa->format;
-	    return;
-	case OSMESA_TYPE:
-	    /* current color buffer's data type */
-	    if (osmesa->rb) {
-		*value = osmesa->rb->DataType;
-	    } else {
-		*value = 0;
-	    }
-	    return;
-	case OSMESA_ROW_LENGTH:
-	    *value = osmesa->userRowLength;
-	    return;
-	case OSMESA_Y_UP:
-	    *value = osmesa->yup;
-	    return;
-	case OSMESA_MAX_WIDTH:
-	    *value = MAX_WIDTH;
-	    return;
-	case OSMESA_MAX_HEIGHT:
-	    *value = MAX_HEIGHT;
-	    return;
-	default:
-	    _mesa_error(&osmesa->mesa, GL_INVALID_ENUM, "OSMesaGetIntergerv(pname)");
-	    return;
-    }
+    const OSMesaContext osmesa = OSMesaGetCurrentContext();
+    if (osmesa)
+	osmesa->get_integer(pname, value);
 }
 
 
