@@ -432,7 +432,7 @@ set_extension(GLcontext *ctx, const char *name, GLboolean state)
     GLboolean *base = (GLboolean *) &ctx->Extensions;
     GLuint i;
 
-    if (ctx->Extensions.String) {
+    if (!ctx->Extensions.String.empty()) {
 	/* The string was already queried - can't change it now! */
 	_mesa_problem(ctx, "Trying to enable/disable extension after glGetString(GL_EXTENSIONS): %s", name);
 	return;
@@ -517,7 +517,7 @@ _mesa_init_extensions(GLcontext *ctx)
  * Construct the GL_EXTENSIONS string.  Called the first time that
  * glGetString(GL_EXTENSIONS) is called.
  */
-GLubyte *
+std::string
 _mesa_make_extension_string(GLcontext *ctx)
 {
     const GLboolean *base = (const GLboolean *) &ctx->Extensions;
@@ -534,10 +534,7 @@ _mesa_make_extension_string(GLcontext *ctx)
 
     ASSERT(!ext.empty());
 
-    /* Allocate a C string. The caller frees with delete[]. */
-    auto *s = new GLubyte[ext.size() + 1];
-    memcpy(s, ext.c_str(), ext.size() + 1);
-    return s;
+    return ext;
 }
 
 /*

@@ -2024,6 +2024,13 @@ struct gl_program {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Virtual destructor: frees owned parameter lists.
+     * Defined out-of-line in program.cpp where gl_program_parameter_list
+     * is fully defined.
+     */
+    virtual ~gl_program();
 };
 
 
@@ -2033,6 +2040,12 @@ struct gl_vertex_program : gl_program {
     GLboolean IsNVProgram;    /**< is this a GL_NV_vertex_program program? */
     GLboolean IsPositionInvariant;
     void *TnlData;		/**< should probably use DriverData */
+
+    /**
+     * Destructor: TnlData is always nullptr in practice but free it if set.
+     * Defined out-of-line in program.cpp.
+     */
+    ~gl_vertex_program() override;
 };
 
 
@@ -2647,9 +2660,9 @@ struct gl_renderbuffer_attachment {
  */
 struct gl_framebuffer {
     mutable std::mutex Mutex;		   /**< for thread safety */
-    GLuint Name;      /* if zero, this is a window system framebuffer */
-    GLint RefCount;
-    GLboolean DeletePending;
+    GLuint Name = 0;  /* if zero, this is a window system framebuffer */
+    GLint RefCount = 0; /**< reference count; set to 1 by allocating functions */
+    GLboolean DeletePending = GL_FALSE;
 
     GLvisual Visual;	/**< The framebuffer's visual.
                              Immutable if this is a window system buffer.
@@ -2925,8 +2938,8 @@ struct gl_extensions {
     GLboolean TDFX_texture_compression_FXT1;
     GLboolean S3_s3tc;
     /*@}*/
-    /* The extension string */
-    const GLubyte *String;
+    /* The extension string (cached; built lazily on first GL_EXTENSIONS query) */
+    std::string String;
 };
 
 
@@ -3139,11 +3152,8 @@ struct gl_matrix_stack {
 
 
 
-/*
- * Forward declaration of display list data types:
- */
-union node;
-typedef union node Node;
+/* Display list opcode enum and Node union (complete type needed for vector). */
+#include "dlist_node.h"
 
 
 /* This has to be included here. */
@@ -3185,7 +3195,7 @@ struct gl_tnl_module {
  * etc. in the future.
  */
 struct mesa_display_list {
-    Node *node;
+    std::vector<Node> nodes; /**< Instruction node array */
     GLuint id;
     GLbitfield flags;
 };
@@ -3199,8 +3209,7 @@ struct gl_dlist_state {
 
     struct mesa_display_list *CurrentList = nullptr;
     GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
-    GLuint CurrentPos = 0;	/**< Write index into CurrentList->node */
-    GLuint CurrentCapacity = 0;	/**< Allocated nodes in CurrentList->node */
+    GLuint CurrentPos = 0;	/**< Write index into CurrentList->nodes */
 
     GLvertexformat ListVtxfmt;
 

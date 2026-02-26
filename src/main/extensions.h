@@ -65,7 +65,7 @@ extern GLboolean _mesa_extension_is_enabled(GLcontext *ctx, const char *name);
 
 extern void _mesa_init_extensions(GLcontext *ctx);
 
-[[nodiscard]] extern GLubyte *_mesa_make_extension_string(GLcontext *ctx);
+[[nodiscard]] extern std::string _mesa_make_extension_string(GLcontext *ctx);
 
 #else
 
