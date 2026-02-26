@@ -42,7 +42,7 @@
 
     typedef struct slang_struct_ {
 	slang_atom a_name;
-	struct slang_variable_scope_ *fields;
+	slang_variable_scope *fields;
 	slang_struct_scope *structs;
     } slang_struct;
 

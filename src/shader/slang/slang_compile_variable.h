@@ -48,10 +48,10 @@
 
 
 
-    typedef struct slang_fully_specified_type_ {
+    struct slang_fully_specified_type {
 	slang_type_qualifier qualifier;
 	slang_type_specifier specifier;
-    } slang_fully_specified_type;
+    };
 
     extern int
     slang_fully_specified_type_construct(slang_fully_specified_type *);
@@ -67,26 +67,26 @@
     /**
      * A shading language program variable.
      */
-    typedef struct slang_variable_ {
+    struct slang_variable {
 	slang_fully_specified_type type; /**< Variable's data type */
 	slang_atom a_name;               /**< The variable's name (char *) */
 	GLuint array_len;                /**< only if type == SLANG_SPEC_ARRAy */
-	struct slang_operation_ *initializer; /**< Optional initializer code */
+	struct slang_operation *initializer; /**< Optional initializer code */
 	GLuint address;                  /**< Storage location */
 	GLuint size;                     /**< Variable's size in bytes */
 	GLboolean isTemp;                /**< a named temporary (__resultTmp) */
 	void *aux;                       /**< Used during code gen */
-    } slang_variable;
+    };
 
 
     /**
      * Basically a list of variables, with a pointer to the parent scope.
      */
-    typedef struct slang_variable_scope_ {
+    struct slang_variable_scope {
 	slang_variable **variables;  /**< Array [num_variables] of ptrs to vars */
 	GLuint num_variables;
-	struct slang_variable_scope_ *outer_scope;
-    } slang_variable_scope;
+	slang_variable_scope *outer_scope;
+    };
 
 
     extern slang_variable_scope *

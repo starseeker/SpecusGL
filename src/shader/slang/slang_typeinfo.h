@@ -34,8 +34,13 @@
 #include "slang_vartable.h"
 
 
-struct slang_operation_;
+struct slang_operation;
 
+
+struct slang_function_scope;
+struct slang_function;
+struct slang_label;
+struct slang_variable_scope;
 
 /**
  * Holds complete information about vector swizzle - the <swizzle>
@@ -43,33 +48,33 @@ struct slang_operation_;
  * is "y", 2 is "z" and 3 is "w".
  * Example: "xwz" --> { 3, { 0, 3, 2, not used } }.
  */
-typedef struct slang_swizzle_ {
+struct slang_swizzle {
     GLuint num_components;
     GLuint swizzle[4];
-} slang_swizzle;
+};
 
-typedef struct slang_name_space_ {
-    struct slang_function_scope_ *funcs;
+struct slang_name_space {
+    slang_function_scope *funcs;
     struct slang_struct_scope_ *structs;
-    struct slang_variable_scope_ *vars;
-} slang_name_space;
+    slang_variable_scope *vars;
+};
 
 
-typedef struct slang_assemble_ctx_ {
+struct slang_assemble_ctx {
     slang_atom_pool *atoms;
     slang_name_space space;
     struct gl_program *program;
     slang_var_table *vartable;
     slang_info_log *log;
-    struct slang_label_ *curFuncEndLabel;
+    slang_label *curFuncEndLabel;
     struct slang_ir_node_ *CurLoop;
-    struct slang_function_ *CurFunction;
-} slang_assemble_ctx;
+    slang_function *CurFunction;
+};
 
 
-extern struct slang_function_ *
-_slang_locate_function(const struct slang_function_scope_ *funcs,
-		       slang_atom name, struct slang_operation_ *params,
+extern slang_function *
+_slang_locate_function(const slang_function_scope *funcs,
+		       slang_atom name, slang_operation *params,
 		       GLuint num_params,
 		       const slang_name_space *space,
 		       slang_atom_pool *atoms, slang_info_log *log);
@@ -128,11 +133,11 @@ typedef enum slang_type_specifier_type_ {
 /**
  * Describes more sophisticated types, like structs and arrays.
  */
-typedef struct slang_type_specifier_ {
+struct slang_type_specifier {
     slang_type_specifier_type type;
     struct slang_struct_ *_struct;         /**< used if type == spec_struct */
-    struct slang_type_specifier_ *_array;  /**< used if type == spec_array */
-} slang_type_specifier;
+    slang_type_specifier *_array;  /**< used if type == spec_array */
+};
 
 
 extern GLvoid
@@ -149,13 +154,13 @@ slang_type_specifier_equal(const slang_type_specifier *,
 			   const slang_type_specifier *);
 
 
-typedef struct slang_typeinfo_ {
+struct slang_typeinfo {
     GLboolean can_be_referenced;
     GLboolean is_swizzled;
     slang_swizzle swz;
     slang_type_specifier spec;
     GLuint array_len;
-} slang_typeinfo;
+};
 
 extern GLboolean
 slang_typeinfo_construct(slang_typeinfo *);
@@ -171,11 +176,11 @@ slang_typeinfo_destruct(slang_typeinfo *);
  */
 extern GLboolean
 _slang_typeof_operation(const slang_assemble_ctx *,
-			struct slang_operation_ *,
+			slang_operation *,
 			slang_typeinfo *);
 
 extern GLboolean
-_slang_typeof_operation_(struct slang_operation_ *,
+_slang_typeof_operation_(slang_operation *,
 			 const slang_name_space *,
 			 slang_typeinfo *, slang_atom_pool *,
 			 slang_info_log *log);

@@ -57,6 +57,8 @@ typedef enum slang_storage_type_ {
 } slang_storage_type;
 
 
+struct slang_storage_aggregate;
+
 /**
  * The slang_storage_array structure groups data slots of the same
  * type into an array. This array has a fixed length. Arrays are
@@ -71,11 +73,11 @@ typedef enum slang_storage_type_ {
  * from arrays of their basic types. Matrices are formed of an array
  * of column vectors, which are in turn processed as other vectors.
  */
-typedef struct slang_storage_array_ {
+struct slang_storage_array {
     slang_storage_type type;
-    struct slang_storage_aggregate_ *aggregate;
+    slang_storage_aggregate *aggregate;
     GLuint length;
-} slang_storage_array;
+};
 
 GLboolean slang_storage_array_construct(slang_storage_array *);
 GLvoid slang_storage_array_destruct(slang_storage_array *);
@@ -89,10 +91,10 @@ GLvoid slang_storage_array_destruct(slang_storage_array *);
  * types are implemented as aggregates. Aggregates can collect data of
  * a different type.
  */
-typedef struct slang_storage_aggregate_ {
+struct slang_storage_aggregate {
     slang_storage_array *arrays;
     GLuint count;
-} slang_storage_aggregate;
+};
 
 GLboolean slang_storage_aggregate_construct(slang_storage_aggregate *);
 GLvoid slang_storage_aggregate_destruct(slang_storage_aggregate *);

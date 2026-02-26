@@ -8,7 +8,7 @@
 #include "prog_instruction.h"
 
 
-struct slang_label_ {
+struct slang_label {
     char *Name;
     GLint Location;
     /**
@@ -19,8 +19,6 @@ struct slang_label_ {
     GLuint NumReferences;
     GLuint *References;   /** Array [NumReferences] */
 };
-
-typedef struct slang_label_ slang_label;
 
 
 extern slang_label *

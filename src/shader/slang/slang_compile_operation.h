@@ -101,6 +101,10 @@ typedef enum slang_operation_type_ {
 } slang_operation_type;
 
 
+struct slang_function;
+struct slang_variable;
+struct slang_label;
+
 /**
  * A slang_operation is basically a compiled instruction (such as assignment,
  * a while-loop, a conditional, a multiply, a function call, etc).
@@ -108,18 +112,18 @@ typedef enum slang_operation_type_ {
  * NOTE: This structure could have been implemented as a union of simpler
  * structs which would correspond to the operation types above.
  */
-typedef struct slang_operation_ {
+struct slang_operation {
     slang_operation_type type;
-    struct slang_operation_ *children;
+    slang_operation *children;
     GLuint num_children;
     GLfloat literal[4];           /**< Used for float, int and bool values */
     GLuint literal_size;          /**< 1, 2, 3, or 4 */
     slang_atom a_id;              /**< type: asm, identifier, call, field */
     slang_variable_scope *locals; /**< local vars for scope */
-    struct slang_function_ *fun;  /**< If type == SLANG_OPER_CALL */
-    struct slang_variable_ *var;  /**< If type == slang_oper_identier */
-    struct slang_label_ *label;   /**< If type == SLANG_OPER_LABEL */
-} slang_operation;
+    slang_function *fun;  /**< If type == SLANG_OPER_CALL */
+    slang_variable *var;  /**< If type == slang_oper_identier */
+    slang_label *label;   /**< If type == SLANG_OPER_LABEL */
+};
 
 
 extern GLboolean

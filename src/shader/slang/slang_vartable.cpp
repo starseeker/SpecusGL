@@ -36,7 +36,7 @@ struct table {
 /**
  * A variable table is a stack of tables, one per scope.
  */
-struct slang_var_table_ {
+struct slang_var_table {
     GLint CurLevel;
     GLuint MaxRegisters;
     struct table *Top;  /**< Table at top of stack */

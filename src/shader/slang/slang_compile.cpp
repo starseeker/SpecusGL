@@ -73,7 +73,7 @@ slang_var_pool_alloc(slang_var_pool * pool, unsigned int size)
 
 GLvoid
 _slang_code_unit_ctr(slang_code_unit * self,
-		     struct slang_code_object_ * object)
+		     slang_code_object * object)
 {
     _slang_variable_scope_ctr(&self->vars);
     _slang_function_scope_ctr(&self->funs);
