@@ -47,56 +47,117 @@ extern GLfloat _mesa_ubyte_to_float_color_tab[256];
 #define UBYTE_TO_FLOAT(u) _mesa_ubyte_to_float_color_tab[(unsigned int)(u)]
 
 /** Convert GLfloat in [0.0,1.0] to GLubyte in [0,255] */
-#define FLOAT_TO_UBYTE(X)   ((GLubyte) (GLint) ((X) * 255.0F))
-
+[[nodiscard]] constexpr GLubyte mesa_float_to_ubyte(GLfloat x) noexcept {
+    return static_cast<GLubyte>(static_cast<GLint>(x * 255.0F));
+}
+#define FLOAT_TO_UBYTE(X) mesa_float_to_ubyte(X)
 
 /** Convert GLbyte in [-128,127] to GLfloat in [-1.0,1.0] */
-#define BYTE_TO_FLOAT(B)    ((2.0F * (B) + 1.0F) * (1.0F/255.0F))
+[[nodiscard]] constexpr GLfloat mesa_byte_to_float(GLbyte b) noexcept {
+    return (2.0F * static_cast<GLfloat>(b) + 1.0F) * (1.0F/255.0F);
+}
+#define BYTE_TO_FLOAT(B) mesa_byte_to_float(B)
 
 /** Convert GLfloat in [-1.0,1.0] to GLbyte in [-128,127] */
-#define FLOAT_TO_BYTE(X)    ( (((GLint) (255.0F * (X))) - 1) / 2 )
+[[nodiscard]] constexpr GLbyte mesa_float_to_byte(GLfloat x) noexcept {
+    return static_cast<GLbyte>((static_cast<GLint>(255.0F * x) - 1) / 2);
+}
+#define FLOAT_TO_BYTE(X) mesa_float_to_byte(X)
 
-
-/** Convert GLushort in [0,65536] to GLfloat in [0.0,1.0] */
-#define USHORT_TO_FLOAT(S)  ((GLfloat) (S) * (1.0F / 65535.0F))
+/** Convert GLushort in [0,65535] to GLfloat in [0.0,1.0] */
+[[nodiscard]] constexpr GLfloat mesa_ushort_to_float(GLushort s) noexcept {
+    return static_cast<GLfloat>(s) * (1.0F / 65535.0F);
+}
+#define USHORT_TO_FLOAT(S) mesa_ushort_to_float(S)
 
 /** Convert GLshort in [-32768,32767] to GLfloat in [-1.0,1.0] */
-#define SHORT_TO_FLOAT(S)   ((2.0F * (S) + 1.0F) * (1.0F/65535.0F))
+[[nodiscard]] constexpr GLfloat mesa_short_to_float(GLshort s) noexcept {
+    return (2.0F * static_cast<GLfloat>(s) + 1.0F) * (1.0F/65535.0F);
+}
+#define SHORT_TO_FLOAT(S) mesa_short_to_float(S)
 
 /** Convert GLfloat in [0.0,1.0] to GLshort in [-32768,32767] */
-#define FLOAT_TO_SHORT(X)   ( (((GLint) (65535.0F * (X))) - 1) / 2 )
-
+[[nodiscard]] constexpr GLshort mesa_float_to_short(GLfloat x) noexcept {
+    return static_cast<GLshort>((static_cast<GLint>(65535.0F * x) - 1) / 2);
+}
+#define FLOAT_TO_SHORT(X) mesa_float_to_short(X)
 
 /** Convert GLuint in [0,4294967295] to GLfloat in [0.0,1.0] */
-#define UINT_TO_FLOAT(U)    ((GLfloat) (U) * (1.0F / 4294967295.0F))
+[[nodiscard]] constexpr GLfloat mesa_uint_to_float(GLuint u) noexcept {
+    return static_cast<GLfloat>(u) * (1.0F / 4294967295.0F);
+}
+#define UINT_TO_FLOAT(U) mesa_uint_to_float(U)
 
 /** Convert GLfloat in [0.0,1.0] to GLuint in [0,4294967295] */
-#define FLOAT_TO_UINT(X)    ((GLuint) ((X) * 4294967295.0))
-
+[[nodiscard]] constexpr GLuint mesa_float_to_uint(GLfloat x) noexcept {
+    return static_cast<GLuint>(x * 4294967295.0);
+}
+#define FLOAT_TO_UINT(X) mesa_float_to_uint(X)
 
 /** Convert GLint in [-2147483648,2147483647] to GLfloat in [-1.0,1.0] */
-#define INT_TO_FLOAT(I)     ((2.0F * (I) + 1.0F) * (1.0F/4294967294.0F))
+[[nodiscard]] constexpr GLfloat mesa_int_to_float(GLint i) noexcept {
+    return (2.0F * static_cast<GLfloat>(i) + 1.0F) * (1.0F/4294967294.0F);
+}
+#define INT_TO_FLOAT(I) mesa_int_to_float(I)
 
 /** Convert GLfloat in [-1.0,1.0] to GLint in [-2147483648,2147483647] */
-/* causes overflow:
-#define FLOAT_TO_INT(X)     ( (((GLint) (4294967294.0F * (X))) - 1) / 2 )
-*/
-/* a close approximation: */
-#define FLOAT_TO_INT(X)     ( (GLint) (2147483647.0 * (X)) )
+[[nodiscard]] constexpr GLint mesa_float_to_int(GLfloat x) noexcept {
+    return static_cast<GLint>(2147483647.0 * x);
+}
+#define FLOAT_TO_INT(X) mesa_float_to_int(X)
 
 
-#define BYTE_TO_UBYTE(b)   ((GLubyte) ((b) < 0 ? 0 : (GLubyte) (b)))
-#define SHORT_TO_UBYTE(s)  ((GLubyte) ((s) < 0 ? 0 : (GLubyte) ((s) >> 7)))
-#define USHORT_TO_UBYTE(s) ((GLubyte) ((s) >> 8))
-#define INT_TO_UBYTE(i)    ((GLubyte) ((i) < 0 ? 0 : (GLubyte) ((i) >> 23)))
-#define UINT_TO_UBYTE(i)   ((GLubyte) ((i) >> 24))
+[[nodiscard]] constexpr GLubyte mesa_byte_to_ubyte(GLbyte b) noexcept {
+    return static_cast<GLubyte>(b < 0 ? 0 : b);
+}
+#define BYTE_TO_UBYTE(b)  mesa_byte_to_ubyte(b)
+
+[[nodiscard]] constexpr GLubyte mesa_short_to_ubyte(GLshort s) noexcept {
+    return static_cast<GLubyte>(s < 0 ? 0 : static_cast<GLubyte>(s >> 7));
+}
+#define SHORT_TO_UBYTE(s) mesa_short_to_ubyte(s)
+
+[[nodiscard]] constexpr GLubyte mesa_ushort_to_ubyte(GLushort s) noexcept {
+    return static_cast<GLubyte>(s >> 8);
+}
+#define USHORT_TO_UBYTE(s) mesa_ushort_to_ubyte(s)
+
+[[nodiscard]] constexpr GLubyte mesa_int_to_ubyte(GLint i) noexcept {
+    return static_cast<GLubyte>(i < 0 ? 0 : static_cast<GLubyte>(i >> 23));
+}
+#define INT_TO_UBYTE(i)   mesa_int_to_ubyte(i)
+
+[[nodiscard]] constexpr GLubyte mesa_uint_to_ubyte(GLuint i) noexcept {
+    return static_cast<GLubyte>(i >> 24);
+}
+#define UINT_TO_UBYTE(i)  mesa_uint_to_ubyte(i)
 
 
-#define BYTE_TO_USHORT(b)  ((b) < 0 ? 0 : ((GLushort) (((b) * 65535) / 255)))
-#define UBYTE_TO_USHORT(b) (((GLushort) (b) << 8) | (GLushort) (b))
-#define SHORT_TO_USHORT(s) ((s) < 0 ? 0 : ((GLushort) (((s) * 65535 / 32767))))
-#define INT_TO_USHORT(i)   ((i) < 0 ? 0 : ((GLushort) ((i) >> 15)))
-#define UINT_TO_USHORT(i)  ((i) < 0 ? 0 : ((GLushort) ((i) >> 16)))
+[[nodiscard]] constexpr GLushort mesa_byte_to_ushort(GLbyte b) noexcept {
+    return static_cast<GLushort>(b < 0 ? 0 : ((static_cast<GLint>(b) * 65535) / 255));
+}
+#define BYTE_TO_USHORT(b)  mesa_byte_to_ushort(b)
+
+[[nodiscard]] constexpr GLushort mesa_ubyte_to_ushort(GLubyte b) noexcept {
+    return static_cast<GLushort>((static_cast<GLushort>(b) << 8) | static_cast<GLushort>(b));
+}
+#define UBYTE_TO_USHORT(b) mesa_ubyte_to_ushort(b)
+
+[[nodiscard]] constexpr GLushort mesa_short_to_ushort(GLshort s) noexcept {
+    return static_cast<GLushort>(s < 0 ? 0 : ((static_cast<GLint>(s) * 65535) / 32767));
+}
+#define SHORT_TO_USHORT(s) mesa_short_to_ushort(s)
+
+[[nodiscard]] constexpr GLushort mesa_int_to_ushort(GLint i) noexcept {
+    return static_cast<GLushort>(i < 0 ? 0 : static_cast<GLushort>(i >> 15));
+}
+#define INT_TO_USHORT(i)   mesa_int_to_ushort(i)
+
+[[nodiscard]] constexpr GLushort mesa_uint_to_ushort(GLuint i) noexcept {
+    return static_cast<GLushort>(static_cast<GLint>(i) < 0 ? 0 : static_cast<GLushort>(i >> 16));
+}
+#define UINT_TO_USHORT(i)  mesa_uint_to_ushort(i)
+
 #define UNCLAMPED_FLOAT_TO_USHORT(us, f)  \
         us = ( (GLushort) IROUND( CLAMP((f), 0.0, 1.0) * 65535.0F) )
 #define CLAMPED_FLOAT_TO_USHORT(us, f)  \
