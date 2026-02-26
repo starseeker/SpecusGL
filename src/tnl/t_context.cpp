@@ -116,7 +116,7 @@ _tnl_InvalidateState(GLcontext *ctx, GLuint new_state)
 
 	RENDERINPUTS_ZERO(tnl->render_inputs_bitset);
 	RENDERINPUTS_SET(tnl->render_inputs_bitset, _TNL_ATTRIB_POS);
-	if (!fp || (fp->Base.InputsRead & FRAG_BIT_COL0)) {
+	if (!fp || (fp->InputsRead & FRAG_BIT_COL0)) {
 	    RENDERINPUTS_SET(tnl->render_inputs_bitset, _TNL_ATTRIB_COLOR0);
 	}
 	for (i = 0; i < ctx->Const.MaxTextureCoordUnits; i++) {
@@ -135,7 +135,7 @@ _tnl_InvalidateState(GLcontext *ctx, GLuint new_state)
     if (ctx->Fog.Enabled || ctx->FragmentProgram._Active ||
 	(ctx->FragmentProgram._Current &&
 	 (ctx->FragmentProgram._Current->FogOption != GL_NONE ||
-	  (ctx->FragmentProgram._Current->Base.InputsRead & FRAG_BIT_FOGC)))
+	  (ctx->FragmentProgram._Current->InputsRead & FRAG_BIT_FOGC)))
        )
 	RENDERINPUTS_SET(tnl->render_inputs_bitset, _TNL_ATTRIB_FOG);
 
@@ -154,7 +154,7 @@ _tnl_InvalidateState(GLcontext *ctx, GLuint new_state)
     if (vp) {
 	GLuint i;
 	for (i = 0; i < MAX_VARYING; i++) {
-	    if (vp->Base.OutputsWritten & (1 << (VERT_RESULT_VAR0 + i))) {
+	    if (vp->OutputsWritten & (1 << (VERT_RESULT_VAR0 + i))) {
 		RENDERINPUTS_SET(tnl->render_inputs_bitset,
 				 _TNL_ATTRIB_GENERIC(i));
 	    }

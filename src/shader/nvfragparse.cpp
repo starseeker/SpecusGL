@@ -1476,17 +1476,17 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 	}
 
 	/* install the program */
-	program->Base.Target = target;
-	program->Base.String = programString;
-	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	program->Base.Instructions.assign(instBuffer, instBuffer + parseState.numInst);
-	program->Base.InputsRead = parseState.inputsRead;
-	program->Base.OutputsWritten = parseState.outputsWritten;
+	program->Target = target;
+	program->String = programString;
+	program->Format = GL_PROGRAM_FORMAT_ASCII_ARB;
+	program->Instructions.assign(instBuffer, instBuffer + parseState.numInst);
+	program->InputsRead = parseState.inputsRead;
+	program->OutputsWritten = parseState.outputsWritten;
 	for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++)
-	    program->Base.TexturesUsed[u] = parseState.texturesUsed[u];
+	    program->TexturesUsed[u] = parseState.texturesUsed[u];
 
 	/* save program parameters */
-	program->Base.Parameters = parseState.parameters;
+	program->Parameters = parseState.parameters;
 
 	/* allocate registers for declared program parameters */
 #if 00
@@ -1494,7 +1494,7 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 #endif
 
 #ifdef DEBUG_foo
-	_mesa_printf("--- glLoadProgramNV(%d) result ---\n", program->Base.Id);
+	_mesa_printf("--- glLoadProgramNV(%d) result ---\n", program->Id);
 	_mesa_print_nv_fragment_program(program);
 	_mesa_printf("----------------------------------\n");
 #endif
@@ -1522,15 +1522,15 @@ PrintSrcReg(const struct gl_fragment_program *program,
 	_mesa_printf("-");
     }
     if (src->File == PROGRAM_NAMED_PARAM) {
-	if (program->Base.Parameters->Parameters[src->Index].Type
+	if (program->Parameters->Parameters[src->Index].Type
 	    == PROGRAM_CONSTANT) {
 	    const GLfloat *v;
-	    v = program->Base.Parameters->ParameterValues[src->Index];
+	    v = program->Parameters->ParameterValues[src->Index];
 	    _mesa_printf("{%g, %g, %g, %g}", v[0], v[1], v[2], v[3]);
 	} else {
-	    ASSERT(program->Base.Parameters->Parameters[src->Index].Type
+	    ASSERT(program->Parameters->Parameters[src->Index].Type
 		   == PROGRAM_NAMED_PARAM);
-	    _mesa_printf("%s", program->Base.Parameters->Parameters[src->Index].Name.c_str());
+	    _mesa_printf("%s", program->Parameters->Parameters[src->Index].Name.c_str());
 	}
     } else if (src->File == PROGRAM_OUTPUT) {
 	_mesa_printf("o[%s]", OutputRegisters[src->Index]);
@@ -1658,8 +1658,8 @@ PrintDstReg(const struct prog_dst_register *dst)
 void
 _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 {
-    for (GLuint _i = 0; _i < (GLuint)program->Base.Instructions.size(); _i++) {
-	const struct prog_instruction *inst = &program->Base.Instructions[_i];
+    for (GLuint _i = 0; _i < (GLuint)program->Instructions.size(); _i++) {
+	const struct prog_instruction *inst = &program->Instructions[_i];
 	if (inst->Opcode == OPCODE_END) break;
 	int i;
 	for (i = 0; Instructions[i].name; i++) {

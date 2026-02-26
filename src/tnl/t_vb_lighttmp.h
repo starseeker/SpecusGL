@@ -202,7 +202,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec_coef;
-		struct gl_shine_tab *tab = ctx->_ShineTable[side];
+		const gl_shine_tab *tab = &*ctx->_ShineTable[side];
 		GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec_coef);
 
 		if (spec_coef > 1.0e-10) {
@@ -381,7 +381,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 
 		if (n_dot_h > 0.0F) {
 		    GLfloat spec_coef;
-		    struct gl_shine_tab *tab = ctx->_ShineTable[side];
+		    const gl_shine_tab *tab = &*ctx->_ShineTable[side];
 
 		    GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec_coef);
 
@@ -589,7 +589,7 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 		ACC_SCALE_SCALAR_3V(sum[0], n_dot_VP, light->_MatDiffuse[0]);
 		n_dot_h = DOT3(normal, light->_h_inf_norm);
 		if (n_dot_h > 0.0F) {
-		    struct gl_shine_tab *tab = ctx->_ShineTable[0];
+		    const gl_shine_tab *tab = &*ctx->_ShineTable[0];
 		    GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec);
 		    ACC_SCALE_SCALAR_3V(sum[0], spec, light->_MatSpecular[0]);
 		}
@@ -599,7 +599,7 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 		ACC_SCALE_SCALAR_3V(sum[1], -n_dot_VP, light->_MatDiffuse[1]);
 		n_dot_h = -DOT3(normal, light->_h_inf_norm);
 		if (n_dot_h > 0.0F) {
-		    struct gl_shine_tab *tab = ctx->_ShineTable[1];
+		    const gl_shine_tab *tab = &*ctx->_ShineTable[1];
 		    GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec);
 		    ACC_SCALE_SCALAR_3V(sum[1], spec, light->_MatSpecular[1]);
 		}
@@ -756,7 +756,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 	    n_dot_h = correction * DOT3(normal, h);
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec_coef;
-		struct gl_shine_tab *tab = ctx->_ShineTable[side];
+		const gl_shine_tab *tab = &*ctx->_ShineTable[side];
 		GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec_coef);
 		specular[side] += spec_coef * light->_sli * attenuation;
 	    }

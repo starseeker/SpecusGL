@@ -55,13 +55,6 @@ _mesa_new_ati_fragment_shader(GLcontext *ctx, GLuint id)
 void
 _mesa_delete_ati_fragment_shader(GLcontext *ctx, struct ati_fragment_shader *s)
 {
-    GLuint i;
-    for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
-	if (s->Instructions[i])
-	    delete[] s->Instructions[i];
-	if (s->SetupInst[i])
-	    delete[] s->SetupInst[i];
-    }
     delete s;
 }
 
@@ -291,7 +284,6 @@ _mesa_DeleteFragmentShaderATI(GLuint id)
 void GLAPIENTRY
 _mesa_BeginFragmentShaderATI(void)
 {
-    GLint i;
     GET_CURRENT_CONTEXT(ctx);
 
     if (ctx->ATIFragmentShader.Compiling) {
@@ -301,23 +293,10 @@ _mesa_BeginFragmentShaderATI(void)
 
     FLUSH_VERTICES(ctx, _NEW_PROGRAM);
 
-    /* if the shader was already defined free instructions and get new ones
-       (or, could use the same mem but would need to reinitialize) */
-    /* no idea if it's allowed to redefine a shader */
-    for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
-	delete[] ctx->ATIFragmentShader.Current->Instructions[i];
-	ctx->ATIFragmentShader.Current->Instructions[i] = nullptr;
-	delete[] ctx->ATIFragmentShader.Current->SetupInst[i];
-	ctx->ATIFragmentShader.Current->SetupInst[i] = nullptr;
-    }
-
-    /* allocate the instructions here */
-    for (i = 0; i < MAX_NUM_PASSES_ATI; i++) {
-	ctx->ATIFragmentShader.Current->Instructions[i] =
-	    new atifs_instruction[MAX_NUM_INSTRUCTIONS_PER_PASS_ATI]{};
-	ctx->ATIFragmentShader.Current->SetupInst[i] =
-	    new atifs_setupinst[MAX_NUM_FRAGMENT_REGISTERS_ATI]{};
-    }
+    /* if the shader was already defined, reinitialize instructions
+       (no idea if it's allowed to redefine a shader, but we handle it) */
+    ctx->ATIFragmentShader.Current->Instructions = {};
+    ctx->ATIFragmentShader.Current->SetupInst = {};
 
     /* can't rely on calloc for initialization as it's possible to redefine a shader (?) */
     ctx->ATIFragmentShader.Current->LocalConstDef = 0;

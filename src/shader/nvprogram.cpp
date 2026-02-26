@@ -69,9 +69,9 @@ _mesa_ExecuteProgramNV(GLenum target, GLuint id, const GLfloat *params)
 
     FLUSH_VERTICES(ctx, _NEW_PROGRAM);
 
-    vprog = (struct gl_vertex_program *) _mesa_lookup_program(ctx, id);
+    vprog = static_cast<gl_vertex_program *>(_mesa_lookup_program(ctx, id));
 
-    if (!vprog || vprog->Base.Target != GL_VERTEX_STATE_PROGRAM_NV) {
+    if (!vprog || vprog->Target != GL_VERTEX_STATE_PROGRAM_NV) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glExecuteProgramNV");
 	return;
     }
@@ -533,28 +533,26 @@ _mesa_LoadProgramNV(GLenum target, GLuint id, GLsizei len,
     if ((target == GL_VERTEX_PROGRAM_NV ||
 	 target == GL_VERTEX_STATE_PROGRAM_NV)
 	&& ctx->Extensions.NV_vertex_program) {
-	struct gl_vertex_program *vprog = (struct gl_vertex_program *) prog;
+	struct gl_vertex_program *vprog = static_cast<gl_vertex_program *>(prog);
 	if (!vprog || prog == &_mesa_DummyProgram) {
-	    vprog = (struct gl_vertex_program *)
-		    ctx->Driver.NewProgram(ctx, target, id);
+	    vprog = static_cast<gl_vertex_program *>(ctx->Driver.NewProgram(ctx, target, id));
 	    if (!vprog) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
 		return;
 	    }
-	    ctx->Shared->insert_program(id, &vprog->Base);
+	    ctx->Shared->insert_program(id, vprog);
 	}
 	_mesa_parse_nv_vertex_program(ctx, target, program, len, vprog);
     } else if (target == GL_FRAGMENT_PROGRAM_NV
 	       && ctx->Extensions.NV_fragment_program) {
-	struct gl_fragment_program *fprog = (struct gl_fragment_program *) prog;
+	struct gl_fragment_program *fprog = static_cast<gl_fragment_program *>(prog);
 	if (!fprog || prog == &_mesa_DummyProgram) {
-	    fprog = (struct gl_fragment_program *)
-		    ctx->Driver.NewProgram(ctx, target, id);
+	    fprog = static_cast<gl_fragment_program *>(ctx->Driver.NewProgram(ctx, target, id));
 	    if (!fprog) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glLoadProgramNV");
 		return;
 	    }
-	    ctx->Shared->insert_program(id, &fprog->Base);
+	    ctx->Shared->insert_program(id, fprog);
 	}
 	_mesa_parse_nv_fragment_program(ctx, target, program, len, fprog);
     } else {
@@ -778,8 +776,8 @@ _mesa_ProgramNamedParameter4fNV(GLuint id, GLsizei len, const GLubyte *name,
 	return;
     }
 
-    fragProg = (struct gl_fragment_program *) prog;
-    v = _mesa_lookup_parameter_value(fragProg->Base.Parameters, len,
+    fragProg = static_cast<gl_fragment_program *>(prog);
+    v = _mesa_lookup_parameter_value(fragProg->Parameters, len,
 				     (char *) name);
     if (v) {
 	v[0] = x;
@@ -844,8 +842,8 @@ _mesa_GetProgramNamedParameterfvNV(GLuint id, GLsizei len, const GLubyte *name,
 	return;
     }
 
-    fragProg = (struct gl_fragment_program *) prog;
-    v = _mesa_lookup_parameter_value(fragProg->Base.Parameters,
+    fragProg = static_cast<gl_fragment_program *>(prog);
+    v = _mesa_lookup_parameter_value(fragProg->Parameters,
 				     len, (char *) name);
     if (v) {
 	params[0] = v[0];

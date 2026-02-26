@@ -1299,14 +1299,14 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 	}
 
 	/* install the program */
-	program->Base.Target = target;
-	program->Base.String = programString;
-	program->Base.Format = GL_PROGRAM_FORMAT_ASCII_ARB;
-	program->Base.Instructions.assign(instBuffer, instBuffer + parseState.numInst);
-	program->Base.InputsRead = parseState.inputsRead;
+	program->Target = target;
+	program->String = programString;
+	program->Format = GL_PROGRAM_FORMAT_ASCII_ARB;
+	program->Instructions.assign(instBuffer, instBuffer + parseState.numInst);
+	program->InputsRead = parseState.inputsRead;
 	if (parseState.isPositionInvariant)
-	    program->Base.InputsRead |= VERT_BIT_POS;
-	program->Base.OutputsWritten = parseState.outputsWritten;
+	    program->InputsRead |= VERT_BIT_POS;
+	program->OutputsWritten = parseState.outputsWritten;
 	program->IsPositionInvariant = parseState.isPositionInvariant;
 	program->IsNVProgram = GL_TRUE;
 
@@ -1463,8 +1463,8 @@ _mesa_print_nv_vertex_instruction(const struct prog_instruction *inst)
 void
 _mesa_print_nv_vertex_program(const struct gl_vertex_program *program)
 {
-    for (GLuint _i = 0; _i < (GLuint)program->Base.Instructions.size(); _i++) {
-	const struct prog_instruction *inst = &program->Base.Instructions[_i];
+    for (GLuint _i = 0; _i < (GLuint)program->Instructions.size(); _i++) {
+	const struct prog_instruction *inst = &program->Instructions[_i];
 	_mesa_print_nv_vertex_instruction(inst);
 	if (inst->Opcode == OPCODE_END)
 	    return;

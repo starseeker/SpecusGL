@@ -255,7 +255,7 @@ struct ati_fs_opcode_st ati_fs_opcodes[] = {
 
 
 static void
-handle_pass_op(struct atifs_machine *machine, struct atifs_setupinst *texinst,
+handle_pass_op(struct atifs_machine *machine, const struct atifs_setupinst *texinst,
 	       const SWspan *span, GLuint column, GLuint idx)
 {
     GLuint swizzle = texinst->swizzle;
@@ -275,7 +275,7 @@ handle_pass_op(struct atifs_machine *machine, struct atifs_setupinst *texinst,
 
 static void
 handle_sample_op(GLcontext * ctx, struct atifs_machine *machine,
-		 struct atifs_setupinst *texinst, const SWspan *span,
+		 const struct atifs_setupinst *texinst, const SWspan *span,
 		 GLuint column, GLuint idx)
 {
     /* sample from unit idx using texinst->src as coords */
@@ -317,8 +317,8 @@ execute_shader(GLcontext *ctx, const struct ati_fragment_shader *shader,
 	       GLuint column)
 {
     GLuint pc = 0;
-    struct atifs_instruction *inst = nullptr;
-    struct atifs_setupinst *texinst = nullptr;
+    const struct atifs_instruction *inst = nullptr;
+    const struct atifs_setupinst *texinst = nullptr;
     GLint optype = 0;
     GLuint i = 0;
     GLint j = 0, pass = 0;

@@ -404,8 +404,8 @@ static struct ureg get_temp(struct texenv_fragment_program *p)
 	_mesa_exit(1);
     }
 
-    if ((GLuint) bit > p->program->Base.NumTemporaries)
-	p->program->Base.NumTemporaries = bit;
+    if ((GLuint) bit > p->program->NumTemporaries)
+	p->program->NumTemporaries = bit;
 
     if (bit > 0)
 	p->temp_in_use |= 1<<(bit-1);
@@ -433,8 +433,8 @@ static struct ureg get_tex_temp(struct texenv_fragment_program *p)
 	_mesa_exit(1);
     }
 
-    if ((GLuint) bit > p->program->Base.NumTemporaries)
-	p->program->Base.NumTemporaries = bit;
+    if ((GLuint) bit > p->program->NumTemporaries)
+	p->program->NumTemporaries = bit;
 
     if (bit > 0)
 	p->temp_in_use |= 1<<(bit-1);
@@ -470,7 +470,7 @@ static struct ureg register_param5(struct texenv_fragment_program *p,
     tokens[2] = static_cast<gl_state_index>(s2);
     tokens[3] = static_cast<gl_state_index>(s3);
     tokens[4] = static_cast<gl_state_index>(s4);
-    idx = _mesa_add_state_reference(p->program->Base.Parameters, tokens);
+    idx = _mesa_add_state_reference(p->program->Parameters, tokens);
     return make_ureg(PROGRAM_STATE_VAR, idx);
 }
 
@@ -483,7 +483,7 @@ static struct ureg register_param5(struct texenv_fragment_program *p,
 
 static struct ureg register_input(struct texenv_fragment_program *p, GLuint input)
 {
-    p->program->Base.InputsRead |= (1 << input);
+    p->program->InputsRead |= (1 << input);
     return make_ureg(PROGRAM_INPUT, input);
 }
 
@@ -519,9 +519,9 @@ emit_op(struct texenv_fragment_program *p,
 	struct ureg src1,
 	struct ureg src2)
 {
-    assert(p->program->Base.Instructions.size() < MAX_INSTRUCTIONS);
-    p->program->Base.Instructions.emplace_back();
-    struct prog_instruction *inst = &p->program->Base.Instructions.back();
+    assert(p->program->Instructions.size() < MAX_INSTRUCTIONS);
+    p->program->Instructions.emplace_back();
+    struct prog_instruction *inst = &p->program->Instructions.back();
 
     _mesa_init_instructions(inst, 1);
     inst->Opcode = op;
@@ -576,7 +576,7 @@ static struct ureg emit_arith(struct texenv_fragment_program *p,
 #endif
 	p->alu_temps |= 1 << dest.idx;
 
-    p->program->Base.NumAluInstructions++;
+    p->program->NumAluInstructions++;
     return dest;
 }
 
@@ -598,7 +598,7 @@ static struct ureg emit_texld(struct texenv_fragment_program *p,
     inst->TexSrcTarget = tex_idx;
     inst->TexSrcUnit = tex_unit;
 
-    p->program->Base.NumTexInstructions++;
+    p->program->NumTexInstructions++;
 
     /* Is this a texture indirection?
     */
@@ -609,7 +609,7 @@ static struct ureg emit_texld(struct texenv_fragment_program *p,
 		(p->temps_output & (1<<coord.idx))) ||
 	    (dest.file == PROGRAM_TEMPORARY &&
 	     (p->alu_temps & (1<<dest.idx)))) {
-	p->program->Base.NumTexIndirections++;
+	p->program->NumTexIndirections++;
 	p->temps_output = 1<<coord.idx;
 	p->alu_temps = 0;
 	assert(0);		/* KW: texture env crossbar */
@@ -634,7 +634,7 @@ static struct ureg register_const4f(struct texenv_fragment_program *p,
     values[1] = s1;
     values[2] = s2;
     values[3] = s3;
-    idx = _mesa_add_unnamed_constant(p->program->Base.Parameters, values, 4,
+    idx = _mesa_add_unnamed_constant(p->program->Parameters, values, 4,
 				     &swizzle);
     ASSERT(swizzle == SWIZZLE_NOOP);
     return make_ureg(PROGRAM_STATE_VAR, idx);
@@ -1060,19 +1060,19 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     p.state = key;
     p.program = program;
 
-    p.program->Base.Target = GL_FRAGMENT_PROGRAM_ARB;
-    p.program->Base.NumTexIndirections = 1;	/* correct? */
-    p.program->Base.NumTexInstructions = 0;
-    p.program->Base.NumAluInstructions = 0;
-    p.program->Base.String.clear();
-    p.program->Base.Instructions.clear();
-    p.program->Base.NumTemporaries =
-	p.program->Base.NumParameters =
-	    p.program->Base.NumAttributes = p.program->Base.NumAddressRegs = 0;
-    p.program->Base.Parameters = _mesa_new_parameter_list();
+    p.program->Target = GL_FRAGMENT_PROGRAM_ARB;
+    p.program->NumTexIndirections = 1;	/* correct? */
+    p.program->NumTexInstructions = 0;
+    p.program->NumAluInstructions = 0;
+    p.program->String.clear();
+    p.program->Instructions.clear();
+    p.program->NumTemporaries =
+	p.program->NumParameters =
+	    p.program->NumAttributes = p.program->NumAddressRegs = 0;
+    p.program->Parameters = _mesa_new_parameter_list();
 
-    p.program->Base.InputsRead = 0;
-    p.program->Base.OutputsWritten = 1 << FRAG_RESULT_COLR;
+    p.program->InputsRead = 0;
+    p.program->OutputsWritten = 1 << FRAG_RESULT_COLR;
 
     for (unit = 0; unit < MAX_TEXTURE_UNITS; unit++)
 	p.src_texture[unit] = undef;
@@ -1133,16 +1133,16 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     } else
 	p.program->FogOption = GL_NONE;
 
-    if (p.program->Base.NumTexIndirections > ctx->Const.FragmentProgram.MaxTexIndirections)
+    if (p.program->NumTexIndirections > ctx->Const.FragmentProgram.MaxTexIndirections)
 	program_error(&p, "Exceeded max nr indirect texture lookups");
 
-    if (p.program->Base.NumTexInstructions > ctx->Const.FragmentProgram.MaxTexInstructions)
+    if (p.program->NumTexInstructions > ctx->Const.FragmentProgram.MaxTexInstructions)
 	program_error(&p, "Exceeded max TEX instructions");
 
-    if (p.program->Base.NumAluInstructions > ctx->Const.FragmentProgram.MaxAluInstructions)
+    if (p.program->NumAluInstructions > ctx->Const.FragmentProgram.MaxAluInstructions)
 	program_error(&p, "Exceeded max ALU instructions");
 
-    ASSERT(p.program->Base.Instructions.size() <= MAX_INSTRUCTIONS);
+    ASSERT(p.program->Instructions.size() <= MAX_INSTRUCTIONS);
 
     /* Instructions are already in the vector, no copy needed */
 
@@ -1150,11 +1150,11 @@ create_new_program(GLcontext *ctx, struct state_key *key,
      */
     if (ctx->Driver.ProgramStringNotify) {
 	ctx->Driver.ProgramStringNotify(ctx, GL_FRAGMENT_PROGRAM_ARB,
-					&p.program->Base);
+					p.program);
     }
 
     if (DISASSEM) {
-	_mesa_print_program(&p.program->Base);
+	_mesa_print_program(p.program);
 	_mesa_printf("\n");
     }
 }
@@ -1194,8 +1194,7 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
 
 	    /* create new tex env program */
 	    struct gl_fragment_program *prog =
-		(struct gl_fragment_program *)
-		ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
+		static_cast<gl_fragment_program *>(ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0));
 
 	    create_new_program(ctx, &key, prog);
 	    cache.map.emplace(map_key, prog);
@@ -1213,7 +1212,7 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
      */
     if (ctx->FragmentProgram._Current != prev && ctx->Driver.BindProgram) {
 	ctx->Driver.BindProgram(ctx, GL_FRAGMENT_PROGRAM_ARB,
-				(struct gl_program *) ctx->FragmentProgram._Current);
+				ctx->FragmentProgram._Current);
     }
 }
 
@@ -1228,7 +1227,7 @@ void _mesa_TexEnvProgramCacheDestroy(GLcontext *ctx)
 {
     auto &cache = ctx->Texture.env_fp_cache;
     for (auto &entry : cache.map)
-	ctx->Driver.DeleteProgram(ctx, (struct gl_program *) entry.second);
+	ctx->Driver.DeleteProgram(ctx, entry.second);
     cache.map.clear();
 }
 

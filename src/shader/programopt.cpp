@@ -49,7 +49,7 @@
 void
 _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
 {
-    const GLuint origLen = static_cast<GLuint>(vprog->Base.Instructions.size());
+    const GLuint origLen = static_cast<GLuint>(vprog->Instructions.size());
     const GLuint newLen = origLen + 4;
     GLuint i;
 
@@ -66,7 +66,7 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
     GLint mvpRef[4];
 
     for (i = 0; i < 4; i++) {
-	mvpRef[i] = _mesa_add_state_reference(vprog->Base.Parameters,
+	mvpRef[i] = _mesa_add_state_reference(vprog->Parameters,
 					      mvpState[i]);
     }
 
@@ -94,13 +94,13 @@ _mesa_insert_mvp_code(GLcontext *ctx, struct gl_vertex_program *vprog)
     }
 
     /* Append original instructions after new instructions */
-    std::copy(vprog->Base.Instructions.begin(), vprog->Base.Instructions.end(),
+    std::copy(vprog->Instructions.begin(), vprog->Instructions.end(),
 	      newInst.begin() + 4);
 
     /* install new instructions */
-    vprog->Base.Instructions = std::move(newInst);
-    vprog->Base.InputsRead |= VERT_BIT_POS;
-    vprog->Base.OutputsWritten |= (1 << VERT_RESULT_HPOS);
+    vprog->Instructions = std::move(newInst);
+    vprog->InputsRead |= VERT_BIT_POS;
+    vprog->OutputsWritten |= (1 << VERT_RESULT_HPOS);
 }
 
 
@@ -121,7 +121,7 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
     static const gl_state_index fogColorState[STATE_LENGTH]
 	= { STATE_FOG_COLOR, static_cast<gl_state_index>(0), static_cast<gl_state_index>(0), static_cast<gl_state_index>(0), static_cast<gl_state_index>(0)};
     struct prog_instruction *inst;
-    const GLuint origLen = static_cast<GLuint>(fprog->Base.Instructions.size());
+    const GLuint origLen = static_cast<GLuint>(fprog->Instructions.size());
     const GLuint newLen = origLen + 5;
     GLuint i;
     GLint fogPRefOpt, fogColorRef; /* state references */
@@ -137,20 +137,20 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
     std::vector<prog_instruction> newInst(newLen);
 
     /* Copy orig instructions into new instruction buffer */
-    std::copy(fprog->Base.Instructions.begin(), fprog->Base.Instructions.end(),
+    std::copy(fprog->Instructions.begin(), fprog->Instructions.end(),
 	      newInst.begin());
 
     /* PARAM fogParamsRefOpt = internal optimized fog params; */
     fogPRefOpt
-	= _mesa_add_state_reference(fprog->Base.Parameters, fogPStateOpt);
+	= _mesa_add_state_reference(fprog->Parameters, fogPStateOpt);
     /* PARAM fogColorRef = state.fog.color; */
     fogColorRef
-	= _mesa_add_state_reference(fprog->Base.Parameters, fogColorState);
+	= _mesa_add_state_reference(fprog->Parameters, fogColorState);
 
     /* TEMP colorTemp; */
-    colorTemp = fprog->Base.NumTemporaries++;
+    colorTemp = fprog->NumTemporaries++;
     /* TEMP fogFactorTemp; */
-    fogFactorTemp = fprog->Base.NumTemporaries++;
+    fogFactorTemp = fprog->NumTemporaries++;
 
     /* Scan program to find where result.color is written */
     inst = newInst.data();
@@ -263,9 +263,9 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
 
     /* install new instructions */
     GLuint finalCount = static_cast<GLuint>(inst - newInst.data());
-    fprog->Base.Instructions = std::move(newInst);
-    fprog->Base.Instructions.resize(finalCount);
-    fprog->Base.InputsRead |= FRAG_BIT_FOGC;
+    fprog->Instructions = std::move(newInst);
+    fprog->Instructions.resize(finalCount);
+    fprog->InputsRead |= FRAG_BIT_FOGC;
     /* XXX do this?  fprog->FogOption = GL_NONE; */
 }
 

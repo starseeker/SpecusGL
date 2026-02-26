@@ -344,7 +344,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		    COPY_4V(value, ctx->FragmentProgram.Parameters[idx]);
 		    break;
 		case STATE_LOCAL:
-		    COPY_4V(value, ctx->FragmentProgram.Current->Base.LocalParams[idx]);
+		    COPY_4V(value, ctx->FragmentProgram.Current->LocalParams[idx]);
 		    break;
 		default:
 		    _mesa_problem(ctx, "Bad state switch in _mesa_fetch_state()");
@@ -362,7 +362,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		    COPY_4V(value, ctx->VertexProgram.Parameters[idx]);
 		    break;
 		case STATE_LOCAL:
-		    COPY_4V(value, ctx->VertexProgram.Current->Base.LocalParams[idx]);
+		    COPY_4V(value, ctx->VertexProgram.Current->LocalParams[idx]);
 		    break;
 		default:
 		    _mesa_problem(ctx, "Bad state switch in _mesa_fetch_state()");

@@ -469,7 +469,7 @@ static struct gl_vertex_program *
 vertex_program(struct gl_program *prog)
 {
     assert(prog->Target == GL_VERTEX_PROGRAM_ARB);
-    return (struct gl_vertex_program *) prog;
+    return static_cast<gl_vertex_program *>(prog);
 }
 
 
@@ -478,7 +478,7 @@ static struct gl_fragment_program *
 fragment_program(struct gl_program *prog)
 {
     assert(prog->Target == GL_FRAGMENT_PROGRAM_ARB);
-    return (struct gl_fragment_program *) prog;
+    return static_cast<gl_fragment_program *>(prog);
 }
 
 
@@ -550,47 +550,47 @@ _slang_link(GLcontext *ctx,
      */
     if (vertProg) {
 	shProg->VertexProgram
-	    = vertex_program(_mesa_clone_program(ctx, &vertProg->Base));
+	    = vertex_program(_mesa_clone_program(ctx, vertProg));
     } else {
 	shProg->VertexProgram = nullptr;
     }
 
     if (fragProg) {
 	shProg->FragmentProgram
-	    = fragment_program(_mesa_clone_program(ctx, &fragProg->Base));
+	    = fragment_program(_mesa_clone_program(ctx, fragProg));
     } else {
 	shProg->FragmentProgram = nullptr;
     }
 
     if (shProg->VertexProgram)
-	link_varying_vars(shProg, &shProg->VertexProgram->Base);
+	link_varying_vars(shProg, shProg->VertexProgram);
     if (shProg->FragmentProgram)
-	link_varying_vars(shProg, &shProg->FragmentProgram->Base);
+	link_varying_vars(shProg, shProg->FragmentProgram);
 
     if (shProg->VertexProgram)
-	link_uniform_vars(shProg, &shProg->VertexProgram->Base);
+	link_uniform_vars(shProg, shProg->VertexProgram);
     if (shProg->FragmentProgram)
-	link_uniform_vars(shProg, &shProg->FragmentProgram->Base);
+	link_uniform_vars(shProg, shProg->FragmentProgram);
 
     /* The vertex and fragment programs share a common set of uniforms now */
     if (shProg->VertexProgram) {
-	_mesa_free_parameter_list(shProg->VertexProgram->Base.Parameters);
-	shProg->VertexProgram->Base.Parameters = shProg->Uniforms;
+	_mesa_free_parameter_list(shProg->VertexProgram->Parameters);
+	shProg->VertexProgram->Parameters = shProg->Uniforms;
     }
     if (shProg->FragmentProgram) {
-	_mesa_free_parameter_list(shProg->FragmentProgram->Base.Parameters);
-	shProg->FragmentProgram->Base.Parameters = shProg->Uniforms;
+	_mesa_free_parameter_list(shProg->FragmentProgram->Parameters);
+	shProg->FragmentProgram->Parameters = shProg->Uniforms;
     }
 
     if (shProg->VertexProgram) {
-	_slang_resolve_samplers(shProg, &shProg->VertexProgram->Base);
+	_slang_resolve_samplers(shProg, shProg->VertexProgram);
     }
     if (shProg->FragmentProgram) {
-	_slang_resolve_samplers(shProg, &shProg->FragmentProgram->Base);
+	_slang_resolve_samplers(shProg, shProg->FragmentProgram);
     }
 
     if (shProg->VertexProgram) {
-	if (!_slang_resolve_attributes(shProg, &shProg->VertexProgram->Base)) {
+	if (!_slang_resolve_attributes(shProg, shProg->VertexProgram)) {
 	    /*goto cleanup;*/
 	    _mesa_problem(ctx, "_slang_resolve_attributes() failed");
 	    return;
@@ -598,9 +598,9 @@ _slang_link(GLcontext *ctx,
     }
 
     if (shProg->VertexProgram) {
-	_slang_update_inputs_outputs(&shProg->VertexProgram->Base);
-	_slang_count_temporaries(&shProg->VertexProgram->Base);
-	if (!(shProg->VertexProgram->Base.OutputsWritten & (1 << VERT_RESULT_HPOS))) {
+	_slang_update_inputs_outputs(shProg->VertexProgram);
+	_slang_count_temporaries(shProg->VertexProgram);
+	if (!(shProg->VertexProgram->OutputsWritten & (1 << VERT_RESULT_HPOS))) {
 	    /* the vertex program did not compute a vertex position */
 	    link_error(shProg,
 		       "gl_Position was not written by vertex shader\n");
@@ -608,8 +608,8 @@ _slang_link(GLcontext *ctx,
 	}
     }
     if (shProg->FragmentProgram) {
-	_slang_update_inputs_outputs(&shProg->FragmentProgram->Base);
-	_slang_count_temporaries(&shProg->FragmentProgram->Base);
+	_slang_update_inputs_outputs(shProg->FragmentProgram);
+	_slang_count_temporaries(shProg->FragmentProgram);
     }
 
     /* Check that all the varying vars needed by the fragment shader are
@@ -617,9 +617,9 @@ _slang_link(GLcontext *ctx,
      */
     if (shProg->FragmentProgram) {
 	const GLbitfield varyingRead
-	    = shProg->FragmentProgram->Base.InputsRead >> FRAG_ATTRIB_VAR0;
+	    = shProg->FragmentProgram->InputsRead >> FRAG_ATTRIB_VAR0;
 	const GLbitfield varyingWritten = shProg->VertexProgram ?
-					  shProg->VertexProgram->Base.OutputsWritten >> VERT_RESULT_VAR0 : 0x0;
+					  shProg->VertexProgram->OutputsWritten >> VERT_RESULT_VAR0 : 0x0;
 	if ((varyingRead & varyingWritten) != varyingRead) {
 	    link_error(shProg,
 		       "Fragment program using varying vars not written by vertex shader\n");
@@ -631,32 +631,32 @@ _slang_link(GLcontext *ctx,
     if (fragProg && shProg->FragmentProgram) {
 	/* notify driver that a new fragment program has been compiled/linked */
 	ctx->Driver.ProgramStringNotify(ctx, GL_FRAGMENT_PROGRAM_ARB,
-					&shProg->FragmentProgram->Base);
+					shProg->FragmentProgram);
 #if 0
 	printf("************** original fragment program\n");
-	_mesa_print_program(&fragProg->Base);
-	_mesa_print_program_parameters(ctx, &fragProg->Base);
+	_mesa_print_program(fragProg);
+	_mesa_print_program_parameters(ctx, fragProg);
 #endif
 #if 0
 	printf("************** linked fragment prog\n");
-	_mesa_print_program(&shProg->FragmentProgram->Base);
-	_mesa_print_program_parameters(ctx, &shProg->FragmentProgram->Base);
+	_mesa_print_program(shProg->FragmentProgram);
+	_mesa_print_program_parameters(ctx, shProg->FragmentProgram);
 #endif
     }
 
     if (vertProg && shProg->VertexProgram) {
 	/* notify driver that a new vertex program has been compiled/linked */
 	ctx->Driver.ProgramStringNotify(ctx, GL_VERTEX_PROGRAM_ARB,
-					&shProg->VertexProgram->Base);
+					shProg->VertexProgram);
 #if 0
 	printf("************** original vertex program\n");
-	_mesa_print_program(&vertProg->Base);
-	_mesa_print_program_parameters(ctx, &vertProg->Base);
+	_mesa_print_program(vertProg);
+	_mesa_print_program_parameters(ctx, vertProg);
 #endif
 #if 0
 	printf("************** linked vertex prog\n");
-	_mesa_print_program(&shProg->VertexProgram->Base);
-	_mesa_print_program_parameters(ctx, &shProg->VertexProgram->Base);
+	_mesa_print_program(shProg->VertexProgram);
+	_mesa_print_program_parameters(ctx, shProg->VertexProgram);
 #endif
     }
 

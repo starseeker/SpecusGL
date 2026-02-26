@@ -213,7 +213,7 @@ do {								\
 #define SPAN_NEEDS_FOG(ctx)                                             \
    (SWRAST_CONTEXT(ctx)->_FogEnabled ||                                 \
     (ctx->FragmentProgram._Current &&                                   \
-     ctx->FragmentProgram._Current->Base.InputsRead & FRAG_BIT_FOGC))
+     ctx->FragmentProgram._Current->InputsRead & FRAG_BIT_FOGC))
 
 
 extern void

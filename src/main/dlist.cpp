@@ -383,9 +383,8 @@ typedef enum {
     OPCODE_EVAL_P1,
     OPCODE_EVAL_P2,
 
-    /* The following three are meta instructions */
+    /* The following two are meta instructions */
     OPCODE_ERROR,                /* raise compiled-in error */
-    OPCODE_CONTINUE,
     OPCODE_END_OF_LIST,
     OPCODE_EXT_0
 } OpCode;
@@ -395,10 +394,7 @@ typedef enum {
 /**
  * Display list node.
  *
- * Display list instructions are stored as sequences of "nodes".  Nodes
- * are allocated in blocks.  Each block has BLOCK_SIZE nodes.  Blocks
- * are linked together with a pointer.
- *
+ * Display list instructions are stored as a contiguous array of nodes.
  * Each instruction in the display list is stored as a sequence of
  * contiguous nodes in memory.
  * Each node is the union of a variety of data types.
@@ -415,16 +411,13 @@ union node {
     GLenum e;
     GLfloat f;
     GLvoid *data;
-    void *next;                  /* If prev node's opcode==OPCODE_CONTINUE */
 };
 
 
 /**
- * How many nodes to allocate at a time.
- *
- * \note Reduced now that we hold vertices etc. elsewhere.
+ * Growth increment when the node array needs to be expanded.
  */
-#define BLOCK_SIZE 256
+static constexpr GLuint BLOCK_SIZE = 256;
 
 
 
@@ -444,14 +437,15 @@ void mesa_print_display_list(GLuint list);
 
 /**
  * Make an empty display list.  This is used by glGenLists() to
- * reserve display list IDs.
+ * reserve display list IDs, and by _mesa_NewList() to start compilation.
+ * \param capacity  initial node array capacity; must be >= 1 (for OPCODE_END_OF_LIST)
  */
 static struct mesa_display_list *
-make_list(GLuint list, GLuint count)
+make_list(GLuint list, GLuint capacity = 1)
 {
     auto *dlist = new mesa_display_list{};
     dlist->id = list;
-    dlist->node = new Node[count];
+    dlist->node = new Node[capacity];
     dlist->node[0].opcode = OPCODE_END_OF_LIST;
     return dlist;
 }
@@ -476,16 +470,10 @@ lookup_list(GLcontext *ctx, GLuint list)
 void
 _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 {
-    Node *n, *block;
-    GLboolean done;
+    Node *n = dlist->node;
+    bool done = (n == nullptr);
 
-    n = block = dlist->node;
-
-    done = block ? GL_FALSE : GL_TRUE;
     while (!done) {
-
-	/* check for extension opcodes first */
-
 	GLint i = (GLint) n[0].opcode - (GLint) OPCODE_EXT_0;
 	if (i >= 0 && i < (GLint) ctx->ListExt.NumOpcodes) {
 	    ctx->ListExt.Opcode[i].Destroy(ctx, &n[1]);
@@ -599,14 +587,8 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 		    n += InstSize[n[0].opcode];
 		    break;
 #endif
-		case OPCODE_CONTINUE:
-		    n = (Node *) n[1].next;
-		    delete[] block;
-		    block = n;
-		    break;
 		case OPCODE_END_OF_LIST:
-		    delete[] block;
-		    done = GL_TRUE;
+		    done = true;
 		    break;
 		default:
 		    /* Most frequent case */
@@ -616,6 +598,7 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
 	}
     }
 
+    delete[] dlist->node;
     delete dlist;
 }
 
@@ -748,30 +731,25 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
 	}
     }
 
-    if (ctx->ListState.CurrentPos + numNodes + 2 > BLOCK_SIZE) {
-	/* This block is full.  Allocate a new block and chain to it */
-	Node *newblock = nullptr;
-	n = ctx->ListState.CurrentBlock + ctx->ListState.CurrentPos;
-#ifdef __clang_analyzer__
-	if (!n)
-	    return nullptr;
-#endif
-	n[0].opcode = OPCODE_CONTINUE;
-	newblock = new Node[BLOCK_SIZE];
-	if (!newblock) {
+    /* +1 to always leave room for OPCODE_END_OF_LIST */
+    if (ctx->ListState.CurrentPos + numNodes + 1 > ctx->ListState.CurrentCapacity) {
+	/* Grow the node array (single contiguous allocation, no block chaining) */
+	const GLuint newCap = ctx->ListState.CurrentPos + numNodes +
+	    std::max(numNodes + 1, BLOCK_SIZE);
+	Node *newNodes = new Node[newCap];
+	if (!newNodes) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Building display list");
 	    return nullptr;
 	}
-	n[1].next = (Node *) newblock;
-	ctx->ListState.CurrentBlock = newblock;
-	ctx->ListState.CurrentPos = 0;
+	std::copy(ctx->ListState.CurrentList->node,
+		  ctx->ListState.CurrentList->node + ctx->ListState.CurrentPos,
+		  newNodes);
+	delete[] ctx->ListState.CurrentList->node;
+	ctx->ListState.CurrentList->node = newNodes;
+	ctx->ListState.CurrentCapacity = newCap;
     }
 
-    n = ctx->ListState.CurrentBlock + ctx->ListState.CurrentPos;
-#ifdef __clang_analyzer__
-    if (!n)
-	return nullptr;
-#endif
+    n = ctx->ListState.CurrentList->node + ctx->ListState.CurrentPos;
     ctx->ListState.CurrentPos += numNodes;
     n[0].opcode = (OpCode) opcode;
     return (void *)(n + 1);      /* return ptr to node following opcode */
@@ -6521,9 +6499,6 @@ execute_list(GLcontext *ctx, GLuint list)
 
 
 
-		case OPCODE_CONTINUE:
-		    n = (Node *) n[1].next;
-		    break;
 		case OPCODE_END_OF_LIST:
 		    done = GL_TRUE;
 		    break;
@@ -6537,7 +6512,7 @@ execute_list(GLcontext *ctx, GLuint list)
 	    }
 
 	    /* increment n to point to next compiled command */
-	    if (opcode != OPCODE_CONTINUE) {
+	    if (!done) {
 		n += InstSize[opcode];
 	    }
 	}
@@ -6654,7 +6629,7 @@ _mesa_NewList(GLuint list, GLenum mode)
 	return;
     }
 
-    if (ctx->ListState.CurrentListPtr) {
+    if (ctx->ListState.CurrentList) {
 	/* already compiling a display list */
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glNewList");
 	return;
@@ -6666,8 +6641,7 @@ _mesa_NewList(GLuint list, GLenum mode)
     /* Allocate new display list */
     ctx->ListState.CurrentListNum = list;
     ctx->ListState.CurrentList = make_list(list, BLOCK_SIZE);
-    ctx->ListState.CurrentBlock = ctx->ListState.CurrentList->node;
-    ctx->ListState.CurrentListPtr = ctx->ListState.CurrentBlock;
+    ctx->ListState.CurrentCapacity = BLOCK_SIZE;
     ctx->ListState.CurrentPos = 0;
 
     /* Reset acumulated list state:
@@ -6700,7 +6674,7 @@ _mesa_EndList(void)
 	_mesa_debug(ctx, "glEndList\n");
 
     /* Check that a list is under construction */
-    if (!ctx->ListState.CurrentListPtr) {
+    if (!ctx->ListState.CurrentList) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glEndList");
 	return;
     }
@@ -6721,7 +6695,7 @@ _mesa_EndList(void)
 
     ctx->ListState.CurrentList = nullptr;
     ctx->ListState.CurrentListNum = 0;
-    ctx->ListState.CurrentListPtr = nullptr;
+    ctx->ListState.CurrentCapacity = 0;
     ctx->ExecuteFlag = GL_TRUE;
     ctx->CompileFlag = GL_FALSE;
 
@@ -8337,10 +8311,6 @@ print_list(GLcontext *ctx, GLuint list)
 		    _mesa_printf("Error: %s %s\n",
 				 enum_string(n[1].e), (const char *) n[2].data);
 		    break;
-		case OPCODE_CONTINUE:
-		    _mesa_printf("DISPLAY-LIST-CONTINUE\n");
-		    n = (Node *) n[1].next;
-		    break;
 		case OPCODE_END_OF_LIST:
 		    _mesa_printf("END-LIST %u\n", list);
 		    done = GL_TRUE;
@@ -8357,7 +8327,7 @@ print_list(GLcontext *ctx, GLuint list)
 		    }
 	    }
 	    /* increment n to point to next compiled command */
-	    if (opcode != OPCODE_CONTINUE) {
+	    if (!done) {
 		n += InstSize[opcode];
 	    }
 	}

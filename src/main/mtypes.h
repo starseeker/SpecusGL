@@ -34,6 +34,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <array>
 #include <mutex>
 #include <vector>
 #include <list>
@@ -506,7 +507,6 @@ struct gl_color_table {
 struct gl_shine_tab {
     GLfloat tab[SHINE_TABLE_SIZE+1];
     GLfloat shininess;
-    GLuint refcount;
 };
 
 
@@ -547,6 +547,12 @@ struct gl_light {
     GLfloat _dli;		/**< CI diffuse light intensity */
     GLfloat _sli;		/**< CI specular light intensity */
     /*@}*/
+
+    /** Mark the spot-exponent lookup table as needing recomputation. */
+    void invalidate_spot_exp_table() noexcept { _SpotExpTable[0][0] = -1.0f; }
+
+    /** Rebuild the spot-exponent lookup table from SpotExponent. */
+    void validate_spot_exp_table();
 };
 
 
@@ -2022,17 +2028,16 @@ struct gl_program {
 
 
 /** Vertex program object */
-struct gl_vertex_program {
-    struct gl_program Base;   /**< base class */
+/** Vertex program object */
+struct gl_vertex_program : gl_program {
     GLboolean IsNVProgram;    /**< is this a GL_NV_vertex_program program? */
     GLboolean IsPositionInvariant;
-    void *TnlData;		/**< should probably use Base.DriverData */
+    void *TnlData;		/**< should probably use DriverData */
 };
 
 
 /** Fragment program object */
-struct gl_fragment_program {
-    struct gl_program Base;   /**< base class */
+struct gl_fragment_program : gl_program {
     GLenum FogOption;
     GLboolean UsesKill;
 };
@@ -2121,8 +2126,41 @@ struct gl_fragment_program_state {
 #define ATI_FS_INPUT_PRIMARY 0
 #define ATI_FS_INPUT_SECONDARY 1
 
-struct atifs_instruction;
-struct atifs_setupinst;
+#define MAX_NUM_INSTRUCTIONS_PER_PASS_ATI 8
+#define MAX_NUM_PASSES_ATI                2
+#define MAX_NUM_FRAGMENT_REGISTERS_ATI    6
+
+struct atifragshader_src_register {
+    GLuint Index;
+    GLuint argRep;
+    GLuint argMod;
+};
+
+struct atifragshader_dst_register {
+    GLuint Index;
+    GLuint dstMod;
+    GLuint dstMask;
+};
+
+#define ATI_FRAGMENT_SHADER_COLOR_OP  0
+#define ATI_FRAGMENT_SHADER_ALPHA_OP  1
+#define ATI_FRAGMENT_SHADER_PASS_OP   2
+#define ATI_FRAGMENT_SHADER_SAMPLE_OP 3
+
+/** Two opcodes – one for color, one for alpha; up to three source registers. */
+struct atifs_instruction {
+    GLenum Opcode[2];
+    GLuint ArgCount[2];
+    struct atifragshader_src_register SrcReg[2][3];
+    struct atifragshader_dst_register DstReg[2];
+};
+
+/** Setup instruction (different from arithmetic shader instruction). */
+struct atifs_setupinst {
+    GLenum Opcode;
+    GLuint src;
+    GLenum swizzle;
+};
 
 /**
  * ATI fragment shader
@@ -2130,8 +2168,8 @@ struct atifs_setupinst;
 struct ati_fragment_shader {
     GLuint Id;
     GLint RefCount;
-    struct atifs_instruction *Instructions[2];
-    struct atifs_setupinst *SetupInst[2];
+    std::array<std::array<atifs_instruction,  MAX_NUM_INSTRUCTIONS_PER_PASS_ATI>, MAX_NUM_PASSES_ATI> Instructions;
+    std::array<std::array<atifs_setupinst, MAX_NUM_FRAGMENT_REGISTERS_ATI>,    MAX_NUM_PASSES_ATI> SetupInst;
     GLfloat Constants[8][4];
     GLbitfield LocalConstDef;  /** Indicates which constants have been set */
     GLubyte numArithInstr[2];
@@ -3160,10 +3198,9 @@ struct gl_dlist_state {
     GLuint CallDepth = 0;	/**< Current recursion calling depth */
 
     struct mesa_display_list *CurrentList = nullptr;
-    Node *CurrentListPtr = nullptr;	/**< Head of list being compiled */
     GLuint CurrentListNum = 0;	/**< Number of the list being compiled */
-    Node *CurrentBlock = nullptr;	/**< Pointer to current block of nodes */
-    GLuint CurrentPos = 0;	/**< Index into current block of nodes */
+    GLuint CurrentPos = 0;	/**< Write index into CurrentList->node */
+    GLuint CurrentCapacity = 0;	/**< Allocated nodes in CurrentList->node */
 
     GLvertexformat ListVtxfmt;
 
@@ -3338,7 +3375,7 @@ struct __GLcontextRec {
 
     GLuint TextureStateTimestamp; /* detect changes to shared state */
 
-    struct gl_shine_tab *_ShineTable[2]; /**< Active shine tables (point into _ShineTabList) */
+    std::list<gl_shine_tab>::iterator _ShineTable[2]; /**< Active shine tables (iterators into _ShineTabList; end() = none) */
     std::list<gl_shine_tab> _ShineTabList;  /**< MRU pool of shine tables */
     /**@}*/
 

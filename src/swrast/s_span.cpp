@@ -722,7 +722,7 @@ static inline void
 interpolate_varying(GLcontext *ctx, SWspan *span)
 {
     GLuint var;
-    const GLbitfield inputsUsed = ctx->FragmentProgram._Current->Base.InputsRead;
+    const GLbitfield inputsUsed = ctx->FragmentProgram._Current->InputsRead;
 
     ASSERT(span->interpMask & SPAN_VARYING);
     ASSERT(!(span->arrayMask & SPAN_VARYING));
@@ -1279,7 +1279,7 @@ shade_texture_span(GLcontext *ctx, SWspan *span)
 
     /* Determine which fragment attributes are actually needed */
     if (ctx->FragmentProgram._Current) {
-	inputsRead = ctx->FragmentProgram._Current->Base.InputsRead;
+	inputsRead = ctx->FragmentProgram._Current->InputsRead;
     } else {
 	/* XXX we could be a bit smarter about this */
 	inputsRead = ~0;
@@ -1387,7 +1387,7 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 	deferredTexture = GL_FALSE;
     } else if (shaderOrTexture) {
 	if (ctx->FragmentProgram._Current) {
-	    if (ctx->FragmentProgram._Current->Base.OutputsWritten
+	    if (ctx->FragmentProgram._Current->OutputsWritten
 		& (1 << FRAG_RESULT_DEPR)) {
 		/* Z comes from fragment program/shader */
 		deferredTexture = GL_FALSE;

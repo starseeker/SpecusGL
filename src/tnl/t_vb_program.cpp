@@ -262,7 +262,7 @@ map_textures(GLcontext *ctx, const struct gl_vertex_program *vp)
 	return;
 
     for (u = 0; u < ctx->Const.MaxVertexTextureImageUnits; u++) {
-	if (vp->Base.TexturesUsed[u]) {
+	if (vp->TexturesUsed[u]) {
 	    /* Note: _Current *should* correspond to the target indicated
 	     * in TexturesUsed[u].
 	     */
@@ -284,7 +284,7 @@ unmap_textures(GLcontext *ctx, const struct gl_vertex_program *vp)
 	return;
 
     for (u = 0; u < ctx->Const.MaxVertexTextureImageUnits; u++) {
-	if (vp->Base.TexturesUsed[u]) {
+	if (vp->TexturesUsed[u]) {
 	    /* Note: _Current *should* correspond to the target indicated
 	     * in TexturesUsed[u].
 	     */
@@ -315,13 +315,13 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	_mesa_load_tracked_matrices(ctx);
     } else {
 	/* ARB program or vertex shader */
-	_mesa_load_state_parameters(ctx, program->Base.Parameters);
+	_mesa_load_state_parameters(ctx, program->Parameters);
     }
 
     /* make list of outputs to save some time below */
     numOutputs = 0;
     for (i = 0; i < VERT_RESULT_MAX; i++) {
-	if (program->Base.OutputsWritten & (1 << i)) {
+	if (program->OutputsWritten & (1 << i)) {
 	    outputs[numOutputs++] = i;
 	}
     }
@@ -353,7 +353,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 
 	/* the vertex array case */
 	for (attr = 0; attr < VERT_ATTRIB_MAX; attr++) {
-	    if (program->Base.InputsRead & (1 << attr)) {
+	    if (program->InputsRead & (1 << attr)) {
 		const GLubyte *ptr = (const GLubyte*) VB->AttribPtr[attr]->data;
 		const GLuint size = VB->AttribPtr[attr]->size;
 		const GLuint stride = VB->AttribPtr[attr]->stride;
@@ -363,7 +363,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	}
 
 	/* execute the program */
-	_mesa_execute_program(ctx, &program->Base, &machine);
+	_mesa_execute_program(ctx, program, &machine);
 
 	/* copy the output registers into the VB->attribs arrays */
 	for (j = 0; j < numOutputs; j++) {
@@ -384,14 +384,14 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     /* Fixup fog and point size results if needed */
     if (program->IsNVProgram) {
 	if (ctx->Fog.Enabled &&
-	    (program->Base.OutputsWritten & (1 << VERT_RESULT_FOGC)) == 0) {
+	    (program->OutputsWritten & (1 << VERT_RESULT_FOGC)) == 0) {
 	    for (i = 0; i < VB->Count; i++) {
 		store->results[VERT_RESULT_FOGC].data[i][0] = 1.0;
 	    }
 	}
 
 	if (ctx->VertexProgram.PointSizeEnabled &&
-	    (program->Base.OutputsWritten & (1 << VERT_RESULT_PSIZ)) == 0) {
+	    (program->OutputsWritten & (1 << VERT_RESULT_PSIZ)) == 0) {
 	    for (i = 0; i < VB->Count; i++) {
 		store->results[VERT_RESULT_PSIZ].data[i][0] = ctx->Point.Size;
 	    }
@@ -448,7 +448,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     }
 
     for (i = 0; i < ctx->Const.MaxVarying; i++) {
-	if (program->Base.OutputsWritten & (1 << (VERT_RESULT_VAR0 + i))) {
+	if (program->OutputsWritten & (1 << (VERT_RESULT_VAR0 + i))) {
 	    /* Note: varying results get put into the generic attributes */
 	    VB->AttribPtr[VERT_ATTRIB_GENERIC0+i]
 		= &store->results[VERT_RESULT_VAR0 + i];

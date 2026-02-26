@@ -125,7 +125,7 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine,
 	     const struct gl_fragment_program *program,
 	     const SWspan *span, GLuint col)
 {
-    if (program->Base.Target == GL_FRAGMENT_PROGRAM_NV) {
+    if (program->Target == GL_FRAGMENT_PROGRAM_NV) {
 	/* Clear temporary registers (undefined for ARB_f_p) */
 	_mesa_bzero(machine->Temporaries,
 		    MAX_PROGRAM_TEMPS * 4 * sizeof(GLfloat));
@@ -167,7 +167,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     const struct gl_fragment_program *program = ctx->FragmentProgram._Current;
-    const GLbitfield outputsWritten = program->Base.OutputsWritten;
+    const GLbitfield outputsWritten = program->OutputsWritten;
     struct gl_program_machine *machine = &swrast->FragProgMachine;
     GLuint i;
 
@@ -175,7 +175,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 	if (span->array->mask[i]) {
 	    init_machine(ctx, machine, program, span, i);
 
-	    if (_mesa_execute_program(ctx, &program->Base, machine)) {
+	    if (_mesa_execute_program(ctx, program, machine)) {
 
 		/* Store result color */
 		if (outputsWritten & (1 << FRAG_RESULT_COLR)) {
@@ -225,7 +225,7 @@ _swrast_exec_fragment_program(GLcontext *ctx, SWspan *span)
     const struct gl_fragment_program *program = ctx->FragmentProgram._Current;
 
     /* incoming colors should be floats */
-    if (program->Base.InputsRead & FRAG_BIT_COL0) {
+    if (program->InputsRead & FRAG_BIT_COL0) {
 	ASSERT(span->array->ChanType == GL_FLOAT);
     }
 
@@ -233,12 +233,12 @@ _swrast_exec_fragment_program(GLcontext *ctx, SWspan *span)
 
     run_program(ctx, span, 0, span->end);
 
-    if (program->Base.OutputsWritten & (1 << FRAG_RESULT_COLR)) {
+    if (program->OutputsWritten & (1 << FRAG_RESULT_COLR)) {
 	span->interpMask &= ~SPAN_RGBA;
 	span->arrayMask |= SPAN_RGBA;
     }
 
-    if (program->Base.OutputsWritten & (1 << FRAG_RESULT_DEPR)) {
+    if (program->OutputsWritten & (1 << FRAG_RESULT_DEPR)) {
 	span->interpMask &= ~SPAN_Z;
 	span->arrayMask |= SPAN_Z;
     }
