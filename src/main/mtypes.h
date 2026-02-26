@@ -3479,6 +3479,55 @@ struct __GLcontextRec {
     void notify_swap_buffers();
 
     /**
+     * Flush any stored vertices and mark \p newstate as dirty.
+     * The actual work of FLUSH_VERTICES(); the macro adds optional debug output.
+     */
+    void flush_vertices(GLbitfield newstate)
+    {
+        if (Driver.NeedFlush & FLUSH_STORED_VERTICES)
+            Driver.FlushVertices(this, FLUSH_STORED_VERTICES);
+        NewState |= newstate;
+    }
+
+    /**
+     * Flush current vertex state and mark \p newstate as dirty.
+     * The actual work of FLUSH_CURRENT(); the macro adds optional debug output.
+     */
+    void flush_current(GLbitfield newstate)
+    {
+        if (Driver.NeedFlush & FLUSH_UPDATE_CURRENT)
+            Driver.FlushVertices(this, FLUSH_UPDATE_CURRENT);
+        NewState |= newstate;
+    }
+
+    /**
+     * Returns true if secondary color processing is required for this context.
+     * Replaces the NEED_SECONDARY_COLOR() macro.
+     */
+    [[nodiscard]] bool needs_secondary_color() const
+    {
+        return ((Light.Enabled &&
+                 Light.Model.ColorControl == GL_SEPARATE_SPECULAR_COLOR)
+                || Fog.ColorSumEnabled
+                || (VertexProgram._Current &&
+                    VertexProgram._Current != VertexProgram._TnlProgram &&
+                    (VertexProgram._Current->InputsRead & VERT_BIT_COLOR1))
+                || (FragmentProgram._Current &&
+                    FragmentProgram._Current != FragmentProgram._TexEnvProgram &&
+                    (FragmentProgram._Current->InputsRead & FRAG_BIT_COL1)));
+    }
+
+    /**
+     * Returns true if RGBA LogicOp is effectively enabled.
+     * Replaces the RGBA_LOGICOP_ENABLED() macro.
+     */
+    [[nodiscard]] bool rgba_logicop_enabled() const
+    {
+        return (Color.ColorLogicOpEnabled ||
+                (Color.BlendEnabled && Color.BlendEquationRGB == GL_LOGIC_OP));
+    }
+
+    /**
      * Initialize current vertex attribute defaults.  Replaces the
      * file-static _mesa_init_current() in context.cpp.
      */

@@ -185,9 +185,7 @@ _mesa_Flush(void);
 do {								\
    if (MESA_VERBOSE & VERBOSE_STATE)				\
       _mesa_debug(ctx, "FLUSH_VERTICES in %s\n", MESA_FUNCTION);\
-   if (ctx->Driver.NeedFlush & FLUSH_STORED_VERTICES)		\
-      ctx->Driver.FlushVertices(ctx, FLUSH_STORED_VERTICES);	\
-   ctx->NewState |= newstate;					\
+   (ctx)->flush_vertices(newstate);				\
 } while (0)
 
 /**
@@ -204,9 +202,7 @@ do {								\
 do {								\
    if (MESA_VERBOSE & VERBOSE_STATE)				\
       _mesa_debug(ctx, "FLUSH_CURRENT in %s\n", MESA_FUNCTION);	\
-   if (ctx->Driver.NeedFlush & FLUSH_UPDATE_CURRENT)		\
-      ctx->Driver.FlushVertices(ctx, FLUSH_UPDATE_CURRENT);	\
-   ctx->NewState |= newstate;					\
+   (ctx)->flush_current(newstate);				\
 } while (0)
 
 /**
@@ -269,26 +265,16 @@ do {									\
 
 /**
  * Is the secondary color needed?
+ * Delegates to the __GLcontextRec::needs_secondary_color() method.
  */
-#define NEED_SECONDARY_COLOR(CTX)					\
-   (((CTX)->Light.Enabled &&						\
-     (CTX)->Light.Model.ColorControl == GL_SEPARATE_SPECULAR_COLOR)	\
-    || (CTX)->Fog.ColorSumEnabled					\
-    || ((CTX)->VertexProgram._Current &&				\
-        ((CTX)->VertexProgram._Current != (CTX)->VertexProgram._TnlProgram) &&    \
-        ((CTX)->VertexProgram._Current->InputsRead & VERT_BIT_COLOR1)) \
-    || ((CTX)->FragmentProgram._Current &&				\
-        ((CTX)->FragmentProgram._Current != (CTX)->FragmentProgram._TexEnvProgram) &&  \
-        ((CTX)->FragmentProgram._Current->InputsRead & FRAG_BIT_COL1)) \
-   )
+#define NEED_SECONDARY_COLOR(CTX)  ((CTX)->needs_secondary_color())
 
 
 /**
  * Is RGBA LogicOp enabled?
+ * Delegates to the __GLcontextRec::rgba_logicop_enabled() method.
  */
-#define RGBA_LOGICOP_ENABLED(CTX) \
-  ((CTX)->Color.ColorLogicOpEnabled || \
-   ((CTX)->Color.BlendEnabled && (CTX)->Color.BlendEquationRGB == GL_LOGIC_OP))
+#define RGBA_LOGICOP_ENABLED(CTX)  ((CTX)->rgba_logicop_enabled())
 
 
 
