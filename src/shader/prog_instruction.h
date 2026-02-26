@@ -333,9 +333,10 @@ struct prog_instruction {
     GLshort StringPos;
 #endif
     /**
-     * Arbitrary data.  Used for the PRINT, CAL, and BRA instructions.
+     * Optional string data for PRINT instructions.
+     * Replaces the old void* that required manual new[]/delete[].
      */
-    void *Data;
+    std::string Data;
 
     struct prog_src_register SrcReg[3];
     struct prog_dst_register DstReg;

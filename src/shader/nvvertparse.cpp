@@ -1008,7 +1008,6 @@ static GLboolean
 Parse_PrintInstruction(struct parse_state *parseState, struct prog_instruction *inst)
 {
     const GLubyte *str;
-    GLubyte *msg;
     GLuint len;
     GLubyte token[100];
     struct prog_src_register *srcReg = &inst->SrcReg[0];
@@ -1025,10 +1024,7 @@ Parse_PrintInstruction(struct parse_state *parseState, struct prog_instruction *
     for (len = 0; str[len] != '\''; len++) /* find closing quote */
 	;
     parseState->pos += len + 1;
-    msg = new GLubyte[len + 1];
-    memcpy(msg, str, len);
-    msg[len] = 0;
-    inst->Data = msg;
+    inst->Data.assign(reinterpret_cast<const char *>(str), len);
 
     /* comma */
     if (Parse_String(parseState, ",")) {
@@ -1439,7 +1435,7 @@ _mesa_print_nv_vertex_instruction(const struct prog_instruction *inst)
 	    _mesa_printf(";\n");
 	    break;
 	case OPCODE_PRINT:
-	    _mesa_printf("PRINT '%p'", inst->Data);
+	    _mesa_printf("PRINT '%s'", inst->Data.c_str());
 	    if (inst->SrcReg[0].File != PROGRAM_UNDEFINED) {
 		_mesa_printf(", ");
 		PrintSrcReg(&inst->SrcReg[0]);

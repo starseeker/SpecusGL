@@ -1185,7 +1185,6 @@ Parse_PrintInstruction(struct parse_state *parseState,
 		       struct prog_instruction *inst)
 {
     const GLubyte *str;
-    GLubyte *msg;
     GLuint len;
     GLint idx;
 
@@ -1197,10 +1196,7 @@ Parse_PrintInstruction(struct parse_state *parseState,
     for (len = 0; str[len] != '\''; len++) /* find closing quote */
 	;
     parseState->pos += len + 1;
-    msg = new GLubyte[len + 1];
-    memcpy(msg, str, len);
-    msg[len] = 0;
-    inst->Data = msg;
+    inst->Data.assign(reinterpret_cast<const char *>(str), len);
 
     if (Parse_String(parseState, ",")) {
 	/* got an optional register to print */

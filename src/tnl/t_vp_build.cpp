@@ -516,7 +516,7 @@ static void emit_op3fn(struct tnl_program *p,
 
     inst->Opcode = (enum prog_opcode) op;
     inst->StringPos = 0;
-    inst->Data = 0;
+    /* Data is now std::string; default-constructed to empty. */
 
     emit_arg(&inst->SrcReg[0], src0);
     emit_arg(&inst->SrcReg[1], src1);

@@ -279,10 +279,8 @@ _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
     if (prog == &_mesa_DummyProgram)
 	return;
 
-    for (auto &inst : prog->Instructions) {
-	if (inst.Data)
-	    delete[] static_cast<GLubyte *>(inst.Data);
-    }
+    /* Instructions is a std::vector<prog_instruction>; each prog_instruction
+     * now holds std::string Data, so all instruction memory is automatic. */
 
     /* Virtual destructor handles Parameters/Varying/Attributes cleanup
      * and, for gl_vertex_program, TnlData cleanup. */

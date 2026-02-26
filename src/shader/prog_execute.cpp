@@ -1385,7 +1385,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_PRINT: {
 		 GLfloat a[4] = {0.0};
 		 fetch_vector4(&inst->SrcReg[0], machine, a);
-		 _mesa_printf("%s%g, %g, %g, %g\n", (const char *) inst->Data,
+		 _mesa_printf("%s%g, %g, %g, %g\n", inst->Data.c_str(),
 				 a[0], a[1], a[2], a[3]);
 	    }
 	    break;
