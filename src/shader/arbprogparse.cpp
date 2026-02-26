@@ -503,7 +503,7 @@ LONGSTRING static char arb_grammar_text[] =
 /**
  * Variable Table Handling functions
  */
-typedef enum {
+enum var_type {
     vt_none,
     vt_address,
     vt_attrib,
@@ -511,7 +511,7 @@ typedef enum {
     vt_temp,
     vt_output,
     vt_alias
-} var_type;
+};
 
 
 /**

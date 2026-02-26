@@ -143,7 +143,7 @@
  * Program instruction opcodes, for both vertex and fragment programs.
  * \note changes to this opcode list must be reflected in t_vb_arbprogram.c
  */
-typedef enum prog_opcode {
+enum prog_opcode {
     /* ARB_vp   ARB_fp   NV_vp   NV_fp     GLSL */
     /*------------------------------------------*/
     OPCODE_NOP = 0,   /*                                      X   */
@@ -232,7 +232,8 @@ typedef enum prog_opcode {
     OPCODE_X2D,       /*                            X             */
     OPCODE_XPD,       /*   X        X                         X   */
     MAX_OPCODE
-} gl_inst_opcode;
+};
+using gl_inst_opcode = prog_opcode;
 
 
 /**

@@ -46,7 +46,7 @@
  * For state that's an array, like STATE_CLIPPLANE, the 2nd token [1] should
  * always be the array index.
  */
-typedef enum gl_state_index_ {
+enum gl_state_index {
     STATE_MATERIAL = 0,
 
     STATE_LIGHT,
@@ -111,7 +111,7 @@ typedef enum gl_state_index_ {
     STATE_FOG_PARAMS_OPTIMIZED,  /* for faster fog calc */
     STATE_SPOT_DIR_NORMALIZED,   /* pre-normalized spot dir */
     STATE_INTERNAL_DRIVER	/* first available state index for drivers (must be last) */
-} gl_state_index;
+};
 
 
 
