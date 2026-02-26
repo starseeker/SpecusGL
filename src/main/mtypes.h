@@ -3478,6 +3478,32 @@ struct __GLcontextRec {
      */
     void notify_swap_buffers();
 
+    /**
+     * Initialize current vertex attribute defaults.  Replaces the
+     * file-static _mesa_init_current() in context.cpp.
+     */
+    void init_current();
+
+    /**
+     * Initialize hardware/driver limit constants.  Replaces the
+     * file-static _mesa_init_constants() in context.cpp.
+     */
+    void init_constants();
+
+    /**
+     * Verify that driver-reported limits don't exceed Mesa's static array
+     * sizes.  Replaces the file-static check_context_limits() in context.cpp.
+     * Called on the first MakeCurrent.
+     */
+    void check_limits() const;
+
+    /**
+     * Initialize all attribute groups.  Replaces the file-static
+     * init_attrib_groups() in context.cpp.
+     * Returns true on success.
+     */
+    bool init_attrib_groups();
+
     /*@}*/
 };
 

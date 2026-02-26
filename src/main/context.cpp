@@ -610,25 +610,26 @@ free_shared_state(GLcontext *ctx, struct gl_shared_state *ss)
 
 
 /**
- * Initialize fields of gl_current_attrib (aka ctx->Current.*)
+ * Initialize current vertex attribute defaults.
+ * Replaces the file-static _mesa_init_current().
  */
-static void
-_mesa_init_current(GLcontext *ctx)
+void
+__GLcontextRec::init_current()
 {
     GLuint i;
 
     /* Init all to (0,0,0,1) */
     for (i = 0; i < VERT_ATTRIB_MAX; i++) {
-	ASSIGN_4V(ctx->Current.Attrib[i], 0.0, 0.0, 0.0, 1.0);
+	ASSIGN_4V(Current.Attrib[i], 0.0, 0.0, 0.0, 1.0);
     }
 
     /* redo special cases: */
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_NORMAL], 0.0, 0.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_COLOR0], 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_COLOR1], 0.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX], 1.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(ctx->Current.Attrib[VERT_ATTRIB_EDGEFLAG], 1.0, 0.0, 0.0, 1.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 0.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_NORMAL], 0.0, 0.0, 1.0, 1.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR0], 1.0, 1.0, 1.0, 1.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR1], 0.0, 0.0, 0.0, 1.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR_INDEX], 1.0, 0.0, 0.0, 1.0);
+    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_EDGEFLAG], 1.0, 0.0, 0.0, 1.0);
 }
 
 
@@ -650,15 +651,14 @@ init_natives(struct gl_program_constants *prog)
 
 
 /**
- * Initialize fields of gl_constants (aka ctx->Const.*).
+ * Initialize fields of gl_constants (aka Const.*).
  * Use defaults from gllimits.h.  The device drivers will often override
  * some of these values (such as number of texture units).
+ * Replaces the file-static _mesa_init_constants().
  */
-static void
-_mesa_init_constants(GLcontext *ctx)
+void
+__GLcontextRec::init_constants()
 {
-    assert(ctx);
-
     assert(MAX_TEXTURE_LEVELS >= MAX_3D_TEXTURE_LEVELS);
     assert(MAX_TEXTURE_LEVELS >= MAX_CUBE_TEXTURE_LEVELS);
 
@@ -666,94 +666,94 @@ _mesa_init_constants(GLcontext *ctx)
     assert(MAX_TEXTURE_UNITS >= MAX_TEXTURE_IMAGE_UNITS);
 
     /* Constants, may be overriden (usually only reduced) by device drivers */
-    ctx->Const.MaxTextureLevels = MAX_TEXTURE_LEVELS;
-    ctx->Const.Max3DTextureLevels = MAX_3D_TEXTURE_LEVELS;
-    ctx->Const.MaxCubeTextureLevels = MAX_CUBE_TEXTURE_LEVELS;
-    ctx->Const.MaxTextureRectSize = MAX_TEXTURE_RECT_SIZE;
-    ctx->Const.MaxTextureCoordUnits = MAX_TEXTURE_COORD_UNITS;
-    ctx->Const.MaxTextureImageUnits = MAX_TEXTURE_IMAGE_UNITS;
-    ctx->Const.MaxTextureUnits = MIN2(ctx->Const.MaxTextureCoordUnits,
-				      ctx->Const.MaxTextureImageUnits);
-    ctx->Const.MaxTextureMaxAnisotropy = MAX_TEXTURE_MAX_ANISOTROPY;
-    ctx->Const.MaxTextureLodBias = MAX_TEXTURE_LOD_BIAS;
-    ctx->Const.MaxArrayLockSize = MAX_ARRAY_LOCK_SIZE;
-    ctx->Const.SubPixelBits = SUB_PIXEL_BITS;
-    ctx->Const.MinPointSize = MIN_POINT_SIZE;
-    ctx->Const.MaxPointSize = MAX_POINT_SIZE;
-    ctx->Const.MinPointSizeAA = MIN_POINT_SIZE;
-    ctx->Const.MaxPointSizeAA = MAX_POINT_SIZE;
-    ctx->Const.PointSizeGranularity = (GLfloat) POINT_SIZE_GRANULARITY;
-    ctx->Const.MinLineWidth = MIN_LINE_WIDTH;
-    ctx->Const.MaxLineWidth = MAX_LINE_WIDTH;
-    ctx->Const.MinLineWidthAA = MIN_LINE_WIDTH;
-    ctx->Const.MaxLineWidthAA = MAX_LINE_WIDTH;
-    ctx->Const.LineWidthGranularity = (GLfloat) LINE_WIDTH_GRANULARITY;
-    ctx->Const.MaxColorTableSize = MAX_COLOR_TABLE_SIZE;
-    ctx->Const.MaxConvolutionWidth = MAX_CONVOLUTION_WIDTH;
-    ctx->Const.MaxConvolutionHeight = MAX_CONVOLUTION_HEIGHT;
-    ctx->Const.MaxClipPlanes = MAX_CLIP_PLANES;
-    ctx->Const.MaxLights = MAX_LIGHTS;
-    ctx->Const.MaxShininess = 128.0;
-    ctx->Const.MaxSpotExponent = 128.0;
-    ctx->Const.MaxViewportWidth = MAX_WIDTH;
-    ctx->Const.MaxViewportHeight = MAX_HEIGHT;
+    Const.MaxTextureLevels = MAX_TEXTURE_LEVELS;
+    Const.Max3DTextureLevels = MAX_3D_TEXTURE_LEVELS;
+    Const.MaxCubeTextureLevels = MAX_CUBE_TEXTURE_LEVELS;
+    Const.MaxTextureRectSize = MAX_TEXTURE_RECT_SIZE;
+    Const.MaxTextureCoordUnits = MAX_TEXTURE_COORD_UNITS;
+    Const.MaxTextureImageUnits = MAX_TEXTURE_IMAGE_UNITS;
+    Const.MaxTextureUnits = MIN2(Const.MaxTextureCoordUnits,
+				 Const.MaxTextureImageUnits);
+    Const.MaxTextureMaxAnisotropy = MAX_TEXTURE_MAX_ANISOTROPY;
+    Const.MaxTextureLodBias = MAX_TEXTURE_LOD_BIAS;
+    Const.MaxArrayLockSize = MAX_ARRAY_LOCK_SIZE;
+    Const.SubPixelBits = SUB_PIXEL_BITS;
+    Const.MinPointSize = MIN_POINT_SIZE;
+    Const.MaxPointSize = MAX_POINT_SIZE;
+    Const.MinPointSizeAA = MIN_POINT_SIZE;
+    Const.MaxPointSizeAA = MAX_POINT_SIZE;
+    Const.PointSizeGranularity = (GLfloat) POINT_SIZE_GRANULARITY;
+    Const.MinLineWidth = MIN_LINE_WIDTH;
+    Const.MaxLineWidth = MAX_LINE_WIDTH;
+    Const.MinLineWidthAA = MIN_LINE_WIDTH;
+    Const.MaxLineWidthAA = MAX_LINE_WIDTH;
+    Const.LineWidthGranularity = (GLfloat) LINE_WIDTH_GRANULARITY;
+    Const.MaxColorTableSize = MAX_COLOR_TABLE_SIZE;
+    Const.MaxConvolutionWidth = MAX_CONVOLUTION_WIDTH;
+    Const.MaxConvolutionHeight = MAX_CONVOLUTION_HEIGHT;
+    Const.MaxClipPlanes = MAX_CLIP_PLANES;
+    Const.MaxLights = MAX_LIGHTS;
+    Const.MaxShininess = 128.0;
+    Const.MaxSpotExponent = 128.0;
+    Const.MaxViewportWidth = MAX_WIDTH;
+    Const.MaxViewportHeight = MAX_HEIGHT;
 #if FEATURE_ARB_vertex_program
-    ctx->Const.VertexProgram.MaxInstructions = MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS;
-    ctx->Const.VertexProgram.MaxAluInstructions = 0;
-    ctx->Const.VertexProgram.MaxTexInstructions = 0;
-    ctx->Const.VertexProgram.MaxTexIndirections = 0;
-    ctx->Const.VertexProgram.MaxAttribs = MAX_NV_VERTEX_PROGRAM_INPUTS;
-    ctx->Const.VertexProgram.MaxTemps = MAX_PROGRAM_TEMPS;
-    ctx->Const.VertexProgram.MaxParameters = MAX_NV_VERTEX_PROGRAM_PARAMS;
-    ctx->Const.VertexProgram.MaxLocalParams = MAX_PROGRAM_LOCAL_PARAMS;
-    ctx->Const.VertexProgram.MaxEnvParams = MAX_PROGRAM_ENV_PARAMS;
-    ctx->Const.VertexProgram.MaxAddressRegs = MAX_VERTEX_PROGRAM_ADDRESS_REGS;
-    ctx->Const.VertexProgram.MaxUniformComponents = 4 * MAX_UNIFORMS;
-    init_natives(&ctx->Const.VertexProgram);
+    Const.VertexProgram.MaxInstructions = MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS;
+    Const.VertexProgram.MaxAluInstructions = 0;
+    Const.VertexProgram.MaxTexInstructions = 0;
+    Const.VertexProgram.MaxTexIndirections = 0;
+    Const.VertexProgram.MaxAttribs = MAX_NV_VERTEX_PROGRAM_INPUTS;
+    Const.VertexProgram.MaxTemps = MAX_PROGRAM_TEMPS;
+    Const.VertexProgram.MaxParameters = MAX_NV_VERTEX_PROGRAM_PARAMS;
+    Const.VertexProgram.MaxLocalParams = MAX_PROGRAM_LOCAL_PARAMS;
+    Const.VertexProgram.MaxEnvParams = MAX_PROGRAM_ENV_PARAMS;
+    Const.VertexProgram.MaxAddressRegs = MAX_VERTEX_PROGRAM_ADDRESS_REGS;
+    Const.VertexProgram.MaxUniformComponents = 4 * MAX_UNIFORMS;
+    init_natives(&Const.VertexProgram);
 #endif
 
 #if FEATURE_ARB_fragment_program
-    ctx->Const.FragmentProgram.MaxInstructions = MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS;
-    ctx->Const.FragmentProgram.MaxAluInstructions = MAX_FRAGMENT_PROGRAM_ALU_INSTRUCTIONS;
-    ctx->Const.FragmentProgram.MaxTexInstructions = MAX_FRAGMENT_PROGRAM_TEX_INSTRUCTIONS;
-    ctx->Const.FragmentProgram.MaxTexIndirections = MAX_FRAGMENT_PROGRAM_TEX_INDIRECTIONS;
-    ctx->Const.FragmentProgram.MaxAttribs = MAX_NV_FRAGMENT_PROGRAM_INPUTS;
-    ctx->Const.FragmentProgram.MaxTemps = MAX_PROGRAM_TEMPS;
-    ctx->Const.FragmentProgram.MaxParameters = MAX_NV_FRAGMENT_PROGRAM_PARAMS;
-    ctx->Const.FragmentProgram.MaxLocalParams = MAX_PROGRAM_LOCAL_PARAMS;
-    ctx->Const.FragmentProgram.MaxEnvParams = MAX_PROGRAM_ENV_PARAMS;
-    ctx->Const.FragmentProgram.MaxAddressRegs = MAX_FRAGMENT_PROGRAM_ADDRESS_REGS;
-    ctx->Const.FragmentProgram.MaxUniformComponents = 4 * MAX_UNIFORMS;
-    init_natives(&ctx->Const.FragmentProgram);
+    Const.FragmentProgram.MaxInstructions = MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS;
+    Const.FragmentProgram.MaxAluInstructions = MAX_FRAGMENT_PROGRAM_ALU_INSTRUCTIONS;
+    Const.FragmentProgram.MaxTexInstructions = MAX_FRAGMENT_PROGRAM_TEX_INSTRUCTIONS;
+    Const.FragmentProgram.MaxTexIndirections = MAX_FRAGMENT_PROGRAM_TEX_INDIRECTIONS;
+    Const.FragmentProgram.MaxAttribs = MAX_NV_FRAGMENT_PROGRAM_INPUTS;
+    Const.FragmentProgram.MaxTemps = MAX_PROGRAM_TEMPS;
+    Const.FragmentProgram.MaxParameters = MAX_NV_FRAGMENT_PROGRAM_PARAMS;
+    Const.FragmentProgram.MaxLocalParams = MAX_PROGRAM_LOCAL_PARAMS;
+    Const.FragmentProgram.MaxEnvParams = MAX_PROGRAM_ENV_PARAMS;
+    Const.FragmentProgram.MaxAddressRegs = MAX_FRAGMENT_PROGRAM_ADDRESS_REGS;
+    Const.FragmentProgram.MaxUniformComponents = 4 * MAX_UNIFORMS;
+    init_natives(&Const.FragmentProgram);
 #endif
-    ctx->Const.MaxProgramMatrices = MAX_PROGRAM_MATRICES;
-    ctx->Const.MaxProgramMatrixStackDepth = MAX_PROGRAM_MATRIX_STACK_DEPTH;
+    Const.MaxProgramMatrices = MAX_PROGRAM_MATRICES;
+    Const.MaxProgramMatrixStackDepth = MAX_PROGRAM_MATRIX_STACK_DEPTH;
 
     /* CheckArrayBounds is overriden by drivers/x11 for X server */
-    ctx->Const.CheckArrayBounds = GL_FALSE;
+    Const.CheckArrayBounds = GL_FALSE;
 
     /* GL_ARB_draw_buffers */
-    ctx->Const.MaxDrawBuffers = MAX_DRAW_BUFFERS;
+    Const.MaxDrawBuffers = MAX_DRAW_BUFFERS;
 
     /* GL_OES_read_format */
-    ctx->Const.ColorReadFormat = GL_RGBA;
-    ctx->Const.ColorReadType = GL_UNSIGNED_BYTE;
+    Const.ColorReadFormat = GL_RGBA;
+    Const.ColorReadType = GL_UNSIGNED_BYTE;
 
 #if FEATURE_EXT_framebuffer_object
-    ctx->Const.MaxColorAttachments = MAX_COLOR_ATTACHMENTS;
-    ctx->Const.MaxRenderbufferSize = MAX_WIDTH;
+    Const.MaxColorAttachments = MAX_COLOR_ATTACHMENTS;
+    Const.MaxRenderbufferSize = MAX_WIDTH;
 #endif
 
 #if FEATURE_ARB_vertex_shader
-    ctx->Const.MaxVertexTextureImageUnits = MAX_VERTEX_TEXTURE_IMAGE_UNITS;
-    ctx->Const.MaxVarying = MAX_VARYING;
+    Const.MaxVertexTextureImageUnits = MAX_VERTEX_TEXTURE_IMAGE_UNITS;
+    Const.MaxVarying = MAX_VARYING;
 #endif
 
     /* sanity checks */
-    ASSERT(ctx->Const.MaxTextureUnits == MIN2(ctx->Const.MaxTextureImageUnits,
-	    ctx->Const.MaxTextureCoordUnits));
-    ASSERT(ctx->Const.FragmentProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
-    ASSERT(ctx->Const.VertexProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
+    ASSERT(Const.MaxTextureUnits == MIN2(Const.MaxTextureImageUnits,
+	    Const.MaxTextureCoordUnits));
+    ASSERT(Const.FragmentProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
+    ASSERT(Const.VertexProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
 
     ASSERT(MAX_NV_FRAGMENT_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
     ASSERT(MAX_NV_VERTEX_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
@@ -763,89 +763,81 @@ _mesa_init_constants(GLcontext *ctx)
 
 
 /**
- * Do some sanity checks on the limits/constants for the given context.
- * Only called the first time a context is bound.
+ * Verify driver-reported limits don't exceed Mesa's static array sizes.
+ * Called on the first MakeCurrent.
+ * Replaces the file-static check_context_limits().
  */
-static void
-check_context_limits(GLcontext *ctx)
+void
+__GLcontextRec::check_limits() const
 {
     /* Many context limits/constants are limited by the size of
      * internal arrays.
      */
-    assert(ctx->Const.MaxTextureImageUnits <= MAX_TEXTURE_IMAGE_UNITS);
-    assert(ctx->Const.MaxTextureCoordUnits <= MAX_TEXTURE_COORD_UNITS);
-    assert(ctx->Const.MaxTextureUnits <= MAX_TEXTURE_IMAGE_UNITS);
-    assert(ctx->Const.MaxTextureUnits <= MAX_TEXTURE_COORD_UNITS);
+    assert(Const.MaxTextureImageUnits <= MAX_TEXTURE_IMAGE_UNITS);
+    assert(Const.MaxTextureCoordUnits <= MAX_TEXTURE_COORD_UNITS);
+    assert(Const.MaxTextureUnits <= MAX_TEXTURE_IMAGE_UNITS);
+    assert(Const.MaxTextureUnits <= MAX_TEXTURE_COORD_UNITS);
 
-    assert(ctx->Const.MaxViewportWidth <= MAX_WIDTH);
-    assert(ctx->Const.MaxViewportHeight <= MAX_WIDTH);
+    assert(Const.MaxViewportWidth <= MAX_WIDTH);
+    assert(Const.MaxViewportHeight <= MAX_WIDTH);
 
     /* make sure largest texture image is <= MAX_WIDTH in size */
-    assert((1 << (ctx->Const.MaxTextureLevels -1)) <= MAX_WIDTH);
-    assert((1 << (ctx->Const.MaxCubeTextureLevels -1)) <= MAX_WIDTH);
-    assert((1 << (ctx->Const.Max3DTextureLevels -1)) <= MAX_WIDTH);
+    assert((1 << (Const.MaxTextureLevels -1)) <= MAX_WIDTH);
+    assert((1 << (Const.MaxCubeTextureLevels -1)) <= MAX_WIDTH);
+    assert((1 << (Const.Max3DTextureLevels -1)) <= MAX_WIDTH);
 
-    assert(ctx->Const.MaxDrawBuffers <= MAX_DRAW_BUFFERS);
+    assert(Const.MaxDrawBuffers <= MAX_DRAW_BUFFERS);
 
     /* XXX probably add more tests */
 }
 
 
 /**
- * Initialize the attribute groups in a GL context.
- *
- * \param ctx GL context.
- *
- * Initializes all the attributes, calling the respective <tt>init*</tt>
- * functions for the more complex data structures.
- */
-/**
  * Initialize all context attribute groups.
  *
+ * Replaces the file-static init_attrib_groups().
  * Functions that are pure no-ops (because the corresponding struct now uses
  * default member initializers) have been removed from this list.  Functions
  * that still need to perform work are retained.
  */
-static GLboolean
-init_attrib_groups(GLcontext *ctx)
+bool
+__GLcontextRec::init_attrib_groups()
 {
-    assert(ctx);
-
     /* Constants */
-    _mesa_init_constants(ctx);
+    init_constants();
 
     /* Extensions */
-    _mesa_init_extensions(ctx);
+    _mesa_init_extensions(this);
 
     /* Attribute Groups that still require active initialisation */
-    _mesa_init_buffer_objects(ctx);    /* allocates NullBufferObj */
-    _mesa_init_color(ctx);             /* sets DrawBuffer[0] from doubleBufferMode */
-    _mesa_init_current(ctx);           /* sets vertex attribute defaults (w=1 etc.) */
-    _mesa_init_debug(ctx);             /* reads MESA_NO_DITHER env var */
-    _mesa_init_display_list(ctx);      /* allocates display-list hash table */
-    _mesa_init_eval(ctx);              /* sets up evaluator control-point data */
-    _mesa_init_lighting(ctx);          /* initialises light sources & shine tables */
-    _mesa_init_matrix(ctx);            /* allocates matrix stacks */
-    _mesa_init_pixel(ctx);             /* sets Scale arrays, ReadBuffer, BufferObjs */
-    _mesa_init_point(ctx);             /* sets MaxSize from Const */
-    _mesa_init_polygon(ctx);           /* sets PolygonStipple to all-on */
-    _mesa_init_program(ctx);           /* initialises program state */
-    _mesa_init_query(ctx);             /* allocates query hash table */
-    _mesa_init_rastpos(ctx);           /* sets RasterTexCoords w=1 per unit */
-    _mesa_init_varray(ctx);            /* allocates default array object */
-    _mesa_init_viewport(ctx);          /* sets up initial viewport matrix */
+    _mesa_init_buffer_objects(this);    /* allocates NullBufferObj */
+    _mesa_init_color(this);             /* sets DrawBuffer[0] from doubleBufferMode */
+    init_current();                     /* sets vertex attribute defaults (w=1 etc.) */
+    _mesa_init_debug(this);             /* reads MESA_NO_DITHER env var */
+    _mesa_init_display_list(this);      /* allocates display-list hash table */
+    _mesa_init_eval(this);              /* sets up evaluator control-point data */
+    _mesa_init_lighting(this);          /* initialises light sources & shine tables */
+    _mesa_init_matrix(this);            /* allocates matrix stacks */
+    _mesa_init_pixel(this);             /* sets Scale arrays, ReadBuffer, BufferObjs */
+    _mesa_init_point(this);             /* sets MaxSize from Const */
+    _mesa_init_polygon(this);           /* sets PolygonStipple to all-on */
+    _mesa_init_program(this);           /* initialises program state */
+    _mesa_init_query(this);             /* allocates query hash table */
+    _mesa_init_rastpos(this);           /* sets RasterTexCoords w=1 per unit */
+    _mesa_init_varray(this);            /* allocates default array object */
+    _mesa_init_viewport(this);          /* sets up initial viewport matrix */
 
-    if (!_mesa_init_texture(ctx))
-	return GL_FALSE;
+    if (!_mesa_init_texture(this))
+	return false;
 
-    _mesa_init_texture_s3tc(ctx);
-    _mesa_init_texture_fxt1(ctx);
+    _mesa_init_texture_s3tc(this);
+    _mesa_init_texture_fxt1(this);
 
-    /* ctx->NewState and ctx->ErrorValue are already set by member initializers
+    /* NewState and ErrorValue are already set by member initializers
      * but NewState must be _NEW_ALL on first use to force full state update. */
-    ctx->NewState = _NEW_ALL;
+    NewState = _NEW_ALL;
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -942,7 +934,7 @@ __GLcontextRec::initialize(const GLvisual *visual,
     }
     Shared->ref();
 
-    if (!init_attrib_groups(this)) {
+    if (!init_attrib_groups()) {
 	free_shared_state(this, Shared);
 	return false;
     }
@@ -1365,7 +1357,7 @@ __GLcontextRec::bind(GLframebuffer *drawBuffer, GLframebuffer *readBuffer)
 	    /* set initial viewport and scissor size now */
 	    _mesa_set_viewport(this, 0, 0, drawBuffer->Width, drawBuffer->Height);
 	    _mesa_set_scissor(this, 0, 0,  drawBuffer->Width, drawBuffer->Height);
-	    check_context_limits(this);
+	    check_limits();
 	}
     }
 
