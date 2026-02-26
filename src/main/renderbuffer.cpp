@@ -1242,12 +1242,12 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
     }
 
     ASSERT(rb->DataType);
-    ASSERT(m_GetRow);
-    ASSERT(m_GetValues);
-    ASSERT(m_PutRow);
-    ASSERT(m_PutMonoRow);
-    ASSERT(m_PutValues);
-    ASSERT(m_PutMonoValues);
+    ASSERT(m_fmt.GetRow);
+    ASSERT(m_fmt.GetValues);
+    ASSERT(m_fmt.PutRow);
+    ASSERT(m_fmt.PutMonoRow);
+    ASSERT(m_fmt.PutValues);
+    ASSERT(m_fmt.PutMonoValues);
 
     /* free old buffer storage */
     delete[] static_cast<GLubyte *>(rb->Data);

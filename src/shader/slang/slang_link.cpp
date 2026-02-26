@@ -154,7 +154,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
     for (i = 0; i < prog->Parameters->NumParameters(); /* incr below*/) {
 	/* see if this uniform is in the linked uniform list */
 	const struct gl_program_parameter *p = &prog->Parameters->Parameters[i];
-	const GLfloat *pVals = prog->Parameters->ParameterValues[i];
+	const GLfloat *pVals = prog->Parameters->ParameterValues[i].data();
 	GLint j;
 	GLint size;
 

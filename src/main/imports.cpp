@@ -206,37 +206,20 @@ void
 _mesa_init_sqrt_table(void)
 {
 #if defined(USE_IEEE) && !defined(DEBUG)
-    unsigned short i;
-    fi_type fi;     /* to access the bits of a float in  C quickly  */
-    /* we use a union defined in glheader.h         */
-
-    for (i=0; i<= 0x7f; i++) {
-	fi.i = 0;
-
-	/*
-	 * Build a float with the bit pattern i as mantissa
-	 * and an exponent of 0, stored as 127
+    for (unsigned short i = 0; i <= 0x7f; i++) {
+	/* Build a float with the bit pattern i as mantissa
+	 * and an exponent of 0, stored as 127, then take its square root.
 	 */
+	GLint bits = (i << 16) | (127 << 23);
+	float f = bits_float(bits);
+	f = static_cast<float>(sqrt(f));
+	sqrttab[i] = (float_bits(f) & 0x7fffff) >> 16;
 
-	fi.i = (i << 16) | (127 << 23);
-	fi.f = sqrt(fi.f);
-
-	/*
-	 * Take the square root then strip the first 7 bits of
-	 * the mantissa into the table
-	 */
-
-	sqrttab[i] = (fi.i & 0x7fffff) >> 16;
-
-	/*
-	 * Repeat the process, this time with an exponent of
-	 * 1, stored as 128
-	 */
-
-	fi.i = 0;
-	fi.i = (i << 16) | (128 << 23);
-	fi.f = sqrt(fi.f);
-	sqrttab[i+0x80] = (fi.i & 0x7fffff) >> 16;
+	/* Repeat with an exponent of 1 (stored as 128). */
+	bits = (i << 16) | (128 << 23);
+	f = bits_float(bits);
+	f = static_cast<float>(sqrt(f));
+	sqrttab[i + 0x80] = (float_bits(f) & 0x7fffff) >> 16;
     }
 #else
     (void) sqrttab;  /* silence compiler warnings */

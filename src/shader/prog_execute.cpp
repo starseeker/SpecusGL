@@ -83,7 +83,7 @@ get_register_pointer(const struct prog_src_register *source,
 	    if (reg < 0 || reg >= params->NumParameters())
 		return ZeroVec;
 	    else
-		return params->ParameterValues[reg];
+		return params->ParameterValues[reg].data();
 	}
     }
 
@@ -122,7 +122,7 @@ get_register_pointer(const struct prog_src_register *source,
 	case PROGRAM_NAMED_PARAM:
 	    ASSERT(source->Index <
 		   (GLint) machine->CurProgram->Parameters->NumParameters());
-	    return machine->CurProgram->Parameters->ParameterValues[source->Index];
+	    return machine->CurProgram->Parameters->ParameterValues[source->Index].data();
 
 	default:
 	    _mesa_problem(nullptr,

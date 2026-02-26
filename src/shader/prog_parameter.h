@@ -65,13 +65,12 @@ struct gl_program_parameter {
  */
 struct gl_program_parameter_list {
     std::vector<gl_program_parameter> Parameters; /**< Parameter descriptors */
-    GLfloat(*ParameterValues)[4] = nullptr;   /**< Array [NumParameters] of GLfloat[4] */
-    GLuint ParameterValueCapacity = 0;         /**< allocated size of ParameterValues */
+    std::vector<std::array<GLfloat, 4>> ParameterValues; /**< Per-parameter float[4] values */
     GLbitfield StateFlags = 0; /**< _NEW_* flags indicating which state changes
                                    might invalidate ParameterValues[] */
 
     gl_program_parameter_list() = default;
-    ~gl_program_parameter_list();
+    ~gl_program_parameter_list() = default;
 
     /* Prevent accidental copies - use clone() explicitly */
     gl_program_parameter_list(const gl_program_parameter_list &) = delete;
@@ -91,7 +90,7 @@ struct gl_program_parameter_list {
     GLint add_attribute(const char *name, GLint size, GLint attrib);
     GLint add_state_reference(const gl_state_index stateTokens[STATE_LENGTH]);
 
-    GLfloat *lookup_parameter_value(GLsizei nameLen, const char *name) const;
+    GLfloat *lookup_parameter_value(GLsizei nameLen, const char *name);
     GLint lookup_parameter_index(GLsizei nameLen, const char *name) const;
     GLboolean lookup_parameter_constant(const GLfloat v[], GLuint vSize,
                                         GLint *posOut, GLuint *swizzleOut) const;
@@ -151,7 +150,7 @@ inline GLint _mesa_add_state_reference(gl_program_parameter_list *p,
 { return p->add_state_reference(stateTokens); }
 
 inline GLfloat *_mesa_lookup_parameter_value(
-    const gl_program_parameter_list *p, GLsizei nameLen, const char *name)
+    gl_program_parameter_list *p, GLsizei nameLen, const char *name)
 { return p ? p->lookup_parameter_value(nameLen, name) : nullptr; }
 
 inline GLint _mesa_lookup_parameter_index(

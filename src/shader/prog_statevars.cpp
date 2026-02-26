@@ -504,173 +504,59 @@ _mesa_program_state_flags(const gl_state_index state[STATE_LENGTH])
 }
 
 
-static void
-append(char *dst, const char *src)
-{
-    while (*dst)
-	dst++;
-    while (*src)
-	*dst++ = *src++;
-    *dst = 0;
-}
-
-
-static void
-append_token(char *dst, gl_state_index k)
+/** Return the literal string for a gl_state_index token, used in state names. */
+static std::string
+token_string(gl_state_index k)
 {
     switch (k) {
-	case STATE_MATERIAL:
-	    append(dst, "material");
-	    break;
-	case STATE_LIGHT:
-	    append(dst, "light");
-	    break;
-	case STATE_LIGHTMODEL_AMBIENT:
-	    append(dst, "lightmodel.ambient");
-	    break;
-	case STATE_LIGHTMODEL_SCENECOLOR:
-	    break;
-	case STATE_LIGHTPROD:
-	    append(dst, "lightprod");
-	    break;
-	case STATE_TEXGEN:
-	    append(dst, "texgen");
-	    break;
-	case STATE_FOG_COLOR:
-	    append(dst, "fog.color");
-	    break;
-	case STATE_FOG_PARAMS:
-	    append(dst, "fog.params");
-	    break;
-	case STATE_CLIPPLANE:
-	    append(dst, "clip");
-	    break;
-	case STATE_POINT_SIZE:
-	    append(dst, "point.size");
-	    break;
-	case STATE_POINT_ATTENUATION:
-	    append(dst, "point.attenuation");
-	    break;
-	case STATE_MODELVIEW_MATRIX:
-	    append(dst, "matrix.modelview");
-	    break;
-	case STATE_PROJECTION_MATRIX:
-	    append(dst, "matrix.projection");
-	    break;
-	case STATE_MVP_MATRIX:
-	    append(dst, "matrix.mvp");
-	    break;
-	case STATE_TEXTURE_MATRIX:
-	    append(dst, "matrix.texture");
-	    break;
-	case STATE_PROGRAM_MATRIX:
-	    append(dst, "matrix.program");
-	    break;
-	case STATE_MATRIX_INVERSE:
-	    append(dst, ".inverse");
-	    break;
-	case STATE_MATRIX_TRANSPOSE:
-	    append(dst, ".transpose");
-	    break;
-	case STATE_MATRIX_INVTRANS:
-	    append(dst, ".invtrans");
-	    break;
-	case STATE_AMBIENT:
-	    append(dst, ".ambient");
-	    break;
-	case STATE_DIFFUSE:
-	    append(dst, ".diffuse");
-	    break;
-	case STATE_SPECULAR:
-	    append(dst, ".specular");
-	    break;
-	case STATE_EMISSION:
-	    append(dst, ".emission");
-	    break;
-	case STATE_SHININESS:
-	    append(dst, "lshininess");
-	    break;
-	case STATE_HALF_VECTOR:
-	    append(dst, ".half");
-	    break;
-	case STATE_POSITION:
-	    append(dst, ".position");
-	    break;
-	case STATE_ATTENUATION:
-	    append(dst, ".attenuation");
-	    break;
-	case STATE_SPOT_DIRECTION:
-	    append(dst, ".spot.direction");
-	    break;
-	case STATE_SPOT_CUTOFF:
-	    append(dst, ".spot.cutoff");
-	    break;
-	case STATE_TEXGEN_EYE_S:
-	    append(dst, "eye.s");
-	    break;
-	case STATE_TEXGEN_EYE_T:
-	    append(dst, "eye.t");
-	    break;
-	case STATE_TEXGEN_EYE_R:
-	    append(dst, "eye.r");
-	    break;
-	case STATE_TEXGEN_EYE_Q:
-	    append(dst, "eye.q");
-	    break;
-	case STATE_TEXGEN_OBJECT_S:
-	    append(dst, "object.s");
-	    break;
-	case STATE_TEXGEN_OBJECT_T:
-	    append(dst, "object.t");
-	    break;
-	case STATE_TEXGEN_OBJECT_R:
-	    append(dst, "object.r");
-	    break;
-	case STATE_TEXGEN_OBJECT_Q:
-	    append(dst, "object.q");
-	    break;
-	case STATE_TEXENV_COLOR:
-	    append(dst, "texenv");
-	    break;
-	case STATE_DEPTH_RANGE:
-	    append(dst, "depth.range");
-	    break;
+	case STATE_MATERIAL:            return "material";
+	case STATE_LIGHT:               return "light";
+	case STATE_LIGHTMODEL_AMBIENT:  return "lightmodel.ambient";
+	case STATE_LIGHTMODEL_SCENECOLOR: return {};
+	case STATE_LIGHTPROD:           return "lightprod";
+	case STATE_TEXGEN:              return "texgen";
+	case STATE_FOG_COLOR:           return "fog.color";
+	case STATE_FOG_PARAMS:          return "fog.params";
+	case STATE_CLIPPLANE:           return "clip";
+	case STATE_POINT_SIZE:          return "point.size";
+	case STATE_POINT_ATTENUATION:   return "point.attenuation";
+	case STATE_MODELVIEW_MATRIX:    return "matrix.modelview";
+	case STATE_PROJECTION_MATRIX:   return "matrix.projection";
+	case STATE_MVP_MATRIX:          return "matrix.mvp";
+	case STATE_TEXTURE_MATRIX:      return "matrix.texture";
+	case STATE_PROGRAM_MATRIX:      return "matrix.program";
+	case STATE_MATRIX_INVERSE:      return ".inverse";
+	case STATE_MATRIX_TRANSPOSE:    return ".transpose";
+	case STATE_MATRIX_INVTRANS:     return ".invtrans";
+	case STATE_AMBIENT:             return ".ambient";
+	case STATE_DIFFUSE:             return ".diffuse";
+	case STATE_SPECULAR:            return ".specular";
+	case STATE_EMISSION:            return ".emission";
+	case STATE_SHININESS:           return "lshininess";
+	case STATE_HALF_VECTOR:         return ".half";
+	case STATE_POSITION:            return ".position";
+	case STATE_ATTENUATION:         return ".attenuation";
+	case STATE_SPOT_DIRECTION:      return ".spot.direction";
+	case STATE_SPOT_CUTOFF:         return ".spot.cutoff";
+	case STATE_TEXGEN_EYE_S:        return "eye.s";
+	case STATE_TEXGEN_EYE_T:        return "eye.t";
+	case STATE_TEXGEN_EYE_R:        return "eye.r";
+	case STATE_TEXGEN_EYE_Q:        return "eye.q";
+	case STATE_TEXGEN_OBJECT_S:     return "object.s";
+	case STATE_TEXGEN_OBJECT_T:     return "object.t";
+	case STATE_TEXGEN_OBJECT_R:     return "object.r";
+	case STATE_TEXGEN_OBJECT_Q:     return "object.q";
+	case STATE_TEXENV_COLOR:        return "texenv";
+	case STATE_DEPTH_RANGE:         return "depth.range";
 	case STATE_VERTEX_PROGRAM:
-	case STATE_FRAGMENT_PROGRAM:
-	    break;
-	case STATE_ENV:
-	    append(dst, "env");
-	    break;
-	case STATE_LOCAL:
-	    append(dst, "local");
-	    break;
-	case STATE_NORMAL_SCALE:
-	    append(dst, "normalScale");
-	    break;
+	case STATE_FRAGMENT_PROGRAM:    return {};
+	case STATE_ENV:                 return "env";
+	case STATE_LOCAL:               return "local";
+	case STATE_NORMAL_SCALE:        return "normalScale";
 	case STATE_INTERNAL:
-	case STATE_POSITION_NORMALIZED:
-	    append(dst, "(internal)");
-	    break;
-	default:
-	    ;
+	case STATE_POSITION_NORMALIZED: return "(internal)";
+	default:                        return {};
     }
-}
-
-static void
-append_face(char *dst, GLint face)
-{
-    if (face == 0)
-	append(dst, "front.");
-    else
-	append(dst, "back.");
-}
-
-static void
-append_index(char *dst, GLint index)
-{
-    char s[20];
-    _mesa_sprintf(s, "[%d]", index);
-    append(dst, s);
 }
 
 /**
@@ -680,47 +566,44 @@ append_index(char *dst, GLint index)
 std::string
 _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 {
-    char str[1000] = "";
-    char tmp[30];
+    std::string str = "state.";
+    str += token_string((gl_state_index) state[0]);
 
-    append(str, "state.");
-    append_token(str, (gl_state_index) state[0]);
+    auto face = [](GLint f) -> std::string { return f == 0 ? "front." : "back."; };
+    auto index = [](GLint i) { return '[' + std::to_string(i) + ']'; };
 
     switch (state[0]) {
 	case STATE_MATERIAL:
-	    append_face(str, state[1]);
-	    append_token(str, (gl_state_index) state[2]);
+	    str += face(state[1]);
+	    str += token_string((gl_state_index) state[2]);
 	    break;
 	case STATE_LIGHT:
-	    append_index(str, state[1]); /* light number [i]. */
-	    append_token(str, (gl_state_index) state[2]); /* coefficients */
+	    str += index(state[1]); /* light number [i]. */
+	    str += token_string((gl_state_index) state[2]); /* coefficients */
 	    break;
 	case STATE_LIGHTMODEL_AMBIENT:
-	    append(str, "lightmodel.ambient");
+	    str += "lightmodel.ambient";
 	    break;
 	case STATE_LIGHTMODEL_SCENECOLOR:
-	    if (state[1] == 0) {
-		append(str, "lightmodel.front.scenecolor");
-	    } else {
-		append(str, "lightmodel.back.scenecolor");
-	    }
+	    str += (state[1] == 0) ? "lightmodel.front.scenecolor"
+	                           : "lightmodel.back.scenecolor";
 	    break;
 	case STATE_LIGHTPROD:
-	    append_index(str, state[1]); /* light number [i]. */
-	    append_face(str, state[2]);
-	    append_token(str, (gl_state_index) state[3]);
+	    str += index(state[1]); /* light number [i]. */
+	    str += face(state[2]);
+	    str += token_string((gl_state_index) state[3]);
 	    break;
 	case STATE_TEXGEN:
-	    append_index(str, state[1]); /* tex unit [i] */
-	    append_token(str, (gl_state_index) state[2]); /* plane coef */
+	    str += index(state[1]); /* tex unit [i] */
+	    str += token_string((gl_state_index) state[2]); /* plane coef */
 	    break;
 	case STATE_TEXENV_COLOR:
-	    append_index(str, state[1]); /* tex unit [i] */
-	    append(str, "color");
+	    str += index(state[1]); /* tex unit [i] */
+	    str += "color";
 	    break;
 	case STATE_CLIPPLANE:
-	    append_index(str, state[1]); /* plane [i] */
-	    append(str, ".plane");
+	    str += index(state[1]); /* plane [i] */
+	    str += ".plane";
 	    break;
 	case STATE_MODELVIEW_MATRIX:
 	case STATE_PROJECTION_MATRIX:
@@ -733,39 +616,32 @@ _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 	    /* state[3] = last row to fetch */
 	    /* state[4] = transpose, inverse or invtrans */
 	    const gl_state_index mat = (gl_state_index) state[0];
-	    const GLuint index = (GLuint) state[1];
+	    const GLuint idx = (GLuint) state[1];
 	    const GLuint firstRow = (GLuint) state[2];
 	    const GLuint lastRow = (GLuint) state[3];
 	    const gl_state_index modifier = (gl_state_index) state[4];
-	    if (index ||
-		mat == STATE_TEXTURE_MATRIX ||
-		mat == STATE_PROGRAM_MATRIX)
-		append_index(str, index);
+	    if (idx || mat == STATE_TEXTURE_MATRIX || mat == STATE_PROGRAM_MATRIX)
+		str += index(idx);
 	    if (modifier)
-		append_token(str, modifier);
+		str += token_string(modifier);
 	    if (firstRow == lastRow)
-		_mesa_sprintf(tmp, ".row[%d]", firstRow);
+		str += ".row[" + std::to_string(firstRow) + ']';
 	    else
-		_mesa_sprintf(tmp, ".row[%d..%d]", firstRow, lastRow);
-	    append(str, tmp);
+		str += ".row[" + std::to_string(firstRow) + ".." + std::to_string(lastRow) + ']';
 	}
 	break;
 	case STATE_POINT_SIZE:
-	    break;
 	case STATE_POINT_ATTENUATION:
-	    break;
 	case STATE_FOG_PARAMS:
-	    break;
 	case STATE_FOG_COLOR:
-	    break;
 	case STATE_DEPTH_RANGE:
 	    break;
 	case STATE_FRAGMENT_PROGRAM:
 	case STATE_VERTEX_PROGRAM:
 	    /* state[1] = {STATE_ENV, STATE_LOCAL} */
 	    /* state[2] = parameter index          */
-	    append_token(str, (gl_state_index) state[1]);
-	    append_index(str, state[2]);
+	    str += token_string((gl_state_index) state[1]);
+	    str += index(state[2]);
 	    break;
 	case STATE_INTERNAL:
 	    break;
@@ -797,7 +673,7 @@ _mesa_load_state_parameters(GLcontext *ctx,
 	if (paramList->Parameters[i].Type == PROGRAM_STATE_VAR) {
 	    _mesa_fetch_state(ctx,
 			      (gl_state_index *) paramList->Parameters[i].StateIndexes,
-			      paramList->ParameterValues[i]);
+			      paramList->ParameterValues[i].data());
 	}
     }
 }

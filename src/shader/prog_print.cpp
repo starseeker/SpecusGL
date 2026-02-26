@@ -735,7 +735,7 @@ _mesa_print_parameter_list(const struct gl_program_parameter_list *list)
     _mesa_printf("param list %p\n", (void *) list);
     for (i = 0; i < list->NumParameters(); i++) {
 	const struct gl_program_parameter *param = &list->Parameters[i];
-	const GLfloat *v = list->ParameterValues[i];
+	const GLfloat *v = list->ParameterValues[i].data();
 	_mesa_printf("param[%d] sz=%d %s %s = {%.3g, %.3g, %.3g, %.3g};\n",
 		     i, param->Size,
 		     file_string(list->Parameters[i].Type, mode),
