@@ -1157,7 +1157,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 		    if (rb->DataType == GL_UNSIGNED_BYTE) {
 			memset(stencil, clearVal, width);
 		    } else {
-			_mesa_memset16((short unsigned int*) stencil, clearVal, width);
+			std::fill((short unsigned int*) stencil, (short unsigned int*) stencil + width, clearVal);
 		    }
 		}
 	    }

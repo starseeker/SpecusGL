@@ -507,12 +507,6 @@ _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 extern void *
 _mesa_realloc(void *oldBuffer, size_t oldSize, size_t newSize);
 
-extern void
-_mesa_memset16(unsigned short *dst, unsigned short val, size_t n);
-
-extern void
-_mesa_bzero(void *dst, size_t n);
-
 extern float
 _mesa_sinf(float a);
 

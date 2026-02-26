@@ -1425,7 +1425,7 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 
 
     /* Get ready to parse */
-    _mesa_bzero(&parseState, sizeof(struct parse_state));
+    std::memset(&parseState, 0, sizeof(struct parse_state));
     parseState.ctx = ctx;
     parseState.start = reinterpret_cast<const GLubyte *>(programString.c_str());
     parseState.program = program;

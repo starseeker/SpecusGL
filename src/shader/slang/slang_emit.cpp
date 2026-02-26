@@ -676,7 +676,7 @@ emit_clamp(slang_emit_info *emitInfo, slang_ir_node *n)
      * dest for this clamp() is an output reg, we can't use that reg for
      * the intermediate result.  Use a temp register instead.
      */
-    _mesa_bzero(&tmpNode, sizeof(tmpNode));
+    std::memset(&tmpNode, 0, sizeof(tmpNode));
     if (!alloc_temp_storage(emitInfo, &tmpNode, n->Store->Size)) {
 	return nullptr;
     }

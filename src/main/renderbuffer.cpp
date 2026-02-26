@@ -693,7 +693,7 @@ put_mono_row_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     if (!mask && val == 0) {
 	/* common case */
-	_mesa_bzero(dst, count * 4 * sizeof(GLubyte));
+	std::memset(dst, 0, count * 4 * sizeof(GLubyte));
     } else {
 	/* general case */
 	if (mask) {
@@ -851,7 +851,7 @@ put_mono_row_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     if (!mask && val0 == 0 && val1 == 0 && val2 == 0 && val3 == 0) {
 	/* common case for clearing accum buffer */
-	_mesa_bzero(dst, count * 4 * sizeof(GLushort));
+	std::memset(dst, 0, count * 4 * sizeof(GLushort));
     } else {
 	GLuint i;
 	for (i = 0; i < count; i++) {

@@ -454,7 +454,7 @@ _mesa_update_framebuffer_visual(struct gl_framebuffer *fb)
 {
     GLuint i;
 
-    _mesa_bzero(&fb->Visual, sizeof(fb->Visual));
+    std::memset(&fb->Visual, 0, sizeof(fb->Visual));
     fb->Visual.rgbMode = GL_TRUE; /* assume this */
 
 #if 0 /* this _might_ be needed */
