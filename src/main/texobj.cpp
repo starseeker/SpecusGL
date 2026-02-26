@@ -259,54 +259,55 @@ valid_texture_object(const struct gl_texture_object *tex)
 
 
 /**
- * Reference (or unreference) a texture object.
- * If '*ptr', decrement *ptr's refcount (and delete if it becomes zero).
- * If 'tex' is non-null, increment its refcount.
+ * Atomically replace *ptr with tex, adjusting reference counts.
+ * Replaces the body of _mesa_reference_texobj().
  */
 void
-_mesa_reference_texobj(struct gl_texture_object **ptr,
-		       struct gl_texture_object *tex)
+gl_texture_object::replace(struct gl_texture_object **ptr,
+                            struct gl_texture_object *tex)
 {
     assert(ptr);
-    if (*ptr == tex) {
-	/* no change */
+    if (*ptr == tex)
 	return;
-    }
 
     if (*ptr) {
-	/* Unreference the old texture using the new unref() method. */
 	struct gl_texture_object *oldTex = *ptr;
-
 	assert(valid_texture_object(oldTex));
 
 	if (oldTex->unref()) {
-	    /* Reference count reached zero – delete the object. */
 	    GET_CURRENT_CONTEXT(ctx);
 	    if (ctx)
 		ctx->Driver.DeleteTexture(ctx, oldTex);
 	    else
 		_mesa_problem(nullptr, "Unable to delete texture, no context");
 	}
-
 	*ptr = nullptr;
     }
     assert(!*ptr);
 
     if (tex) {
-	/* Reference the new texture using the new ref() method. */
 	assert(valid_texture_object(tex));
-	{
-	    std::lock_guard<std::mutex> lock(tex->Mutex);
-	    if (tex->RefCount == 0) {
-		/* This texture is being deleted (see above). */
-		_mesa_problem(nullptr, "referencing deleted texture object");
-		*ptr = nullptr;
-	    } else {
-		++tex->RefCount;
-		*ptr = tex;
-	    }
+	std::lock_guard<std::mutex> lock(tex->Mutex);
+	if (tex->RefCount == 0) {
+	    _mesa_problem(nullptr, "referencing deleted texture object");
+	    *ptr = nullptr;
+	} else {
+	    ++tex->RefCount;
+	    *ptr = tex;
 	}
     }
+}
+
+
+/**
+ * Reference (or unreference) a texture object.
+ * Delegates to gl_texture_object::replace().
+ */
+void
+_mesa_reference_texobj(struct gl_texture_object **ptr,
+		       struct gl_texture_object *tex)
+{
+    gl_texture_object::replace(ptr, tex);
 }
 
 
@@ -1060,21 +1061,35 @@ _mesa_IsTexture(GLuint texture)
  *
  * See also _mesa_lock/unlock_texture in texobj.h
  */
+void
+__GLcontextRec::lock_textures()
+{
+    Shared->TexMutex.lock();
+
+    if (Shared->TextureStateStamp != TextureStateTimestamp) {
+	NewState |= _NEW_TEXTURE;
+	TextureStateTimestamp = Shared->TextureStateStamp;
+    }
+}
+
+
+void
+__GLcontextRec::unlock_textures()
+{
+    assert(Shared->TextureStateStamp == TextureStateTimestamp);
+    Shared->TexMutex.unlock();
+}
+
+
 void _mesa_lock_context_textures(GLcontext *ctx)
 {
-    ctx->Shared->TexMutex.lock();
-
-    if (ctx->Shared->TextureStateStamp != ctx->TextureStateTimestamp) {
-	ctx->NewState |= _NEW_TEXTURE;
-	ctx->TextureStateTimestamp = ctx->Shared->TextureStateStamp;
-    }
+    ctx->lock_textures();
 }
 
 
 void _mesa_unlock_context_textures(GLcontext *ctx)
 {
-    assert(ctx->Shared->TextureStateStamp == ctx->TextureStateTimestamp);
-    ctx->Shared->TexMutex.unlock();
+    ctx->unlock_textures();
 }
 
 /*@}*/

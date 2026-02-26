@@ -1503,6 +1503,14 @@ struct gl_texture_object {
      */
     void set_image(GLenum target, GLint level,
                    struct gl_texture_image *texImage);
+
+    /**
+     * Atomically replace *\p ptr with \p tex, adjusting reference counts.
+     * If *ptr already equals tex, nothing happens.
+     * Replaces _mesa_reference_texobj().
+     */
+    static void replace(struct gl_texture_object **ptr,
+                        struct gl_texture_object *tex);
 };
 
 
@@ -2730,6 +2738,21 @@ struct gl_framebuffer {
         assert(RefCount > 0);
         return --RefCount == 0;
     }
+
+    /**
+     * Atomically replace *\p ptr with \p fb, adjusting reference counts.
+     * If *ptr already equals fb, nothing happens.
+     * Replaces _mesa_reference_framebuffer().
+     */
+    static void replace(struct gl_framebuffer **ptr,
+                        struct gl_framebuffer *fb);
+
+    /**
+     * Decrement the reference count of *\p ptr and set it to nullptr.
+     * Deletes the framebuffer if the count reaches zero.
+     * Replaces _mesa_unreference_framebuffer().
+     */
+    static void release(struct gl_framebuffer **ptr);
 };
 
 
@@ -3416,6 +3439,174 @@ struct __GLcontextRec {
     TNLcontext  *swtnl_context   = nullptr;  /**< tnl private context */
     vbo_context *swtnl_im        = nullptr;  /**< vbo builder private context */
     AEcontext   *aelt_context    = nullptr;  /**< array-element helper context */
+    /*@}*/
+
+    /** \name C++ class methods – context lifecycle and common operations */
+    /*@{*/
+
+    /**
+     * Initialize this context.  Replaces the body of _mesa_initialize_context().
+     * Returns true on success, false on failure (same semantics as the old
+     * GL_TRUE/GL_FALSE return).
+     */
+    bool initialize(const GLvisual *visual,
+                    struct __GLcontextRec *share_list,
+                    const struct dd_function_table *driverFunctions,
+                    void *driverContext);
+
+    /**
+     * Free all resources owned by this context (but does not free the
+     * __GLcontextRec object itself).  Replaces _mesa_free_context_data().
+     */
+    void free_data();
+
+    /**
+     * Record a GL error on this context.  Replaces _mesa_record_error().
+     */
+    void record_error(GLenum error)
+    {
+        if (ErrorValue == GL_NO_ERROR)
+            ErrorValue = error;
+        if (Driver.Error)
+            Driver.Error(this);
+    }
+
+    /**
+     * Bind draw and read framebuffers to this context.
+     * Called (for non-null contexts) by _mesa_make_current().
+     */
+    void bind(GLframebuffer *draw, GLframebuffer *read);
+
+    /**
+     * Share display-list / texture / program state with \p other.
+     * Replaces the body of _mesa_share_state().
+     * Returns true if sharing was established.
+     */
+    bool share_state_with(struct __GLcontextRec *other);
+
+    /**
+     * Check whether this context's visual is compatible with \p buffer.
+     * Replaces the static check_compatible() helper.
+     */
+    [[nodiscard]] bool is_visual_compatible(const GLframebuffer *buffer) const;
+
+    /**
+     * Return the current API dispatch table (Exec or Save).
+     */
+    [[nodiscard]] struct _glapi_table *get_dispatch() const { return CurrentDispatch; }
+
+    /**
+     * Called by the window system just before swapping buffers.
+     * Replaces _mesa_notifySwapBuffers().
+     */
+    void notify_swap_buffers();
+
+    /**
+     * Flush any stored vertices and mark \p newstate as dirty.
+     * The actual work of FLUSH_VERTICES(); the macro adds optional debug output.
+     */
+    void flush_vertices(GLbitfield newstate)
+    {
+        if (Driver.NeedFlush & FLUSH_STORED_VERTICES)
+            Driver.FlushVertices(this, FLUSH_STORED_VERTICES);
+        NewState |= newstate;
+    }
+
+    /**
+     * Flush current vertex state and mark \p newstate as dirty.
+     * The actual work of FLUSH_CURRENT(); the macro adds optional debug output.
+     */
+    void flush_current(GLbitfield newstate)
+    {
+        if (Driver.NeedFlush & FLUSH_UPDATE_CURRENT)
+            Driver.FlushVertices(this, FLUSH_UPDATE_CURRENT);
+        NewState |= newstate;
+    }
+
+    /**
+     * Returns true if secondary color processing is required for this context.
+     * Replaces the NEED_SECONDARY_COLOR() macro.
+     */
+    [[nodiscard]] bool needs_secondary_color() const
+    {
+        return ((Light.Enabled &&
+                 Light.Model.ColorControl == GL_SEPARATE_SPECULAR_COLOR)
+                || Fog.ColorSumEnabled
+                || (VertexProgram._Current &&
+                    VertexProgram._Current != VertexProgram._TnlProgram &&
+                    (VertexProgram._Current->InputsRead & VERT_BIT_COLOR1))
+                || (FragmentProgram._Current &&
+                    FragmentProgram._Current != FragmentProgram._TexEnvProgram &&
+                    (FragmentProgram._Current->InputsRead & FRAG_BIT_COL1)));
+    }
+
+    /**
+     * Returns true if RGBA LogicOp is effectively enabled.
+     * Replaces the RGBA_LOGICOP_ENABLED() macro.
+     */
+    [[nodiscard]] bool rgba_logicop_enabled() const
+    {
+        return (Color.ColorLogicOpEnabled ||
+                (Color.BlendEnabled && Color.BlendEquationRGB == GL_LOGIC_OP));
+    }
+
+    /**
+     * Initialize current vertex attribute defaults.  Replaces the
+     * file-static _mesa_init_current() in context.cpp.
+     */
+    void init_current();
+
+    /**
+     * Initialize hardware/driver limit constants.  Replaces the
+     * file-static _mesa_init_constants() in context.cpp.
+     */
+    void init_constants();
+
+    /**
+     * Verify that driver-reported limits don't exceed Mesa's static array
+     * sizes.  Replaces the file-static check_context_limits() in context.cpp.
+     * Called on the first MakeCurrent.
+     */
+    void check_limits() const;
+
+    /**
+     * Initialize all attribute groups.  Replaces the file-static
+     * init_attrib_groups() in context.cpp.
+     * Returns true on success.
+     */
+    bool init_attrib_groups();
+
+    /**
+     * Invalidate the shine table cache entry for the given side (0=front, 1=back).
+     * Replaces _mesa_invalidate_shine_table().
+     */
+    void invalidate_shine_table(GLuint side);
+
+    /**
+     * Revalidate all lighting lookup tables (shine tables and spot exponent tables).
+     * Replaces _mesa_validate_all_lighting_tables().
+     */
+    void validate_all_lighting_tables();
+
+    /**
+     * Update all derived OpenGL state for this context.
+     * Called after any state changes; locks the texture state while running.
+     * Replaces _mesa_update_state().
+     */
+    void update_state();
+
+    /**
+     * Lock the shared texture state and synchronise the per-context timestamp.
+     * Replaces _mesa_lock_context_textures().
+     */
+    void lock_textures();
+
+    /**
+     * Unlock the shared texture state.
+     * Replaces _mesa_unlock_context_textures().
+     */
+    void unlock_textures();
+
     /*@}*/
 };
 

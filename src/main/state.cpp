@@ -1242,14 +1242,27 @@ _mesa_update_state_locked(GLcontext *ctx)
 }
 
 
-/* This is the usual entrypoint for state updates:
+/* This is the usual entrypoint for state updates, now delegating to
+ * __GLcontextRec::update_state().
  */
+
+/**
+ * Update all derived OpenGL state.
+ * Called after any state changes.
+ */
+void
+__GLcontextRec::update_state()
+{
+    lock_textures();
+    _mesa_update_state_locked(this);
+    unlock_textures();
+}
+
+
 void
 _mesa_update_state(GLcontext *ctx)
 {
-    _mesa_lock_context_textures(ctx);
-    _mesa_update_state_locked(ctx);
-    _mesa_unlock_context_textures(ctx);
+    ctx->update_state();
 }
 
 
