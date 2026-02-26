@@ -315,14 +315,15 @@ inline void mesa_assign4v(V* v, V0 v0, V1 v1, V2 v2, V3 v3) noexcept {
 #define TEST_EQ_4UBV(DST, SRC) mesa_test_eq_4v(DST, SRC)
 #endif
 #define COPY_4V(DST, SRC)         mesa_copy4v(DST, SRC)
-/** Copy a 4-element vector with cast */
-#define COPY_4V_CAST( DST, SRC, CAST )  \
-do {                                    \
-   (DST)[0] = (CAST)(SRC)[0];           \
-   (DST)[1] = (CAST)(SRC)[1];           \
-   (DST)[2] = (CAST)(SRC)[2];           \
-   (DST)[3] = (CAST)(SRC)[3];           \
-} while (0)
+/** Copy a 4-element vector with explicit element cast to type CAST */
+template<typename Cast, typename Dst, typename Src>
+inline void mesa_copy4v_cast(Dst* dst, const Src* src) noexcept {
+    dst[0] = static_cast<Cast>(src[0]);
+    dst[1] = static_cast<Cast>(src[1]);
+    dst[2] = static_cast<Cast>(src[2]);
+    dst[3] = static_cast<Cast>(src[3]);
+}
+#define COPY_4V_CAST(DST, SRC, CAST) mesa_copy4v_cast<CAST>(DST, SRC)
 /** Copy a 4-element unsigned byte vector */
 #if defined(__i386__)
 #define COPY_4UBV(DST, SRC) \
@@ -441,13 +442,14 @@ inline void mesa_assign3v(V* v, V0 v0, V1 v1, V2 v2) noexcept {
 #define ZERO_3V(DST)              mesa_zero3v(DST)
 #define TEST_EQ_3V(a, b)          mesa_test_eq_3v(a, b)
 #define COPY_3V(DST, SRC)         mesa_copy3v(DST, SRC)
-/** Copy a 3-element vector with cast */
-#define COPY_3V_CAST( DST, SRC, CAST )  \
-do {                                    \
-   (DST)[0] = (CAST)(SRC)[0];           \
-   (DST)[1] = (CAST)(SRC)[1];           \
-   (DST)[2] = (CAST)(SRC)[2];           \
-} while (0)
+/** Copy a 3-element vector with explicit element cast to type CAST */
+template<typename Cast, typename Dst, typename Src>
+inline void mesa_copy3v_cast(Dst* dst, const Src* src) noexcept {
+    dst[0] = static_cast<Cast>(src[0]);
+    dst[1] = static_cast<Cast>(src[1]);
+    dst[2] = static_cast<Cast>(src[2]);
+}
+#define COPY_3V_CAST(DST, SRC, CAST) mesa_copy3v_cast<CAST>(DST, SRC)
 #define COPY_3FV(DST, SRC)        mesa_copy3fv(DST, SRC)
 #define SUB_3V(DST, SRCA, SRCB)   mesa_sub3v(DST, SRCA, SRCB)
 #define ADD_3V(DST, SRCA, SRCB)   mesa_add3v(DST, SRCA, SRCB)
@@ -546,12 +548,13 @@ inline void mesa_assign2v(V* v, V0 v0, V1 v1) noexcept {
 /* --- Macro aliases --- */
 #define ZERO_2V(DST)              mesa_zero2v(DST)
 #define COPY_2V(DST, SRC)         mesa_copy2v(DST, SRC)
-/** Copy a 2-element vector with cast */
-#define COPY_2V_CAST( DST, SRC, CAST )      \
-do {                        \
-   (DST)[0] = (CAST)(SRC)[0];           \
-   (DST)[1] = (CAST)(SRC)[1];           \
-} while (0)
+/** Copy a 2-element vector with explicit element cast to type CAST */
+template<typename Cast, typename Dst, typename Src>
+inline void mesa_copy2v_cast(Dst* dst, const Src* src) noexcept {
+    dst[0] = static_cast<Cast>(src[0]);
+    dst[1] = static_cast<Cast>(src[1]);
+}
+#define COPY_2V_CAST(DST, SRC, CAST) mesa_copy2v_cast<CAST>(DST, SRC)
 #define COPY_2FV(DST, SRC)        mesa_copy2fv(DST, SRC)
 #define SUB_2V(DST, SRCA, SRCB)   mesa_sub2v(DST, SRCA, SRCB)
 #define ADD_2V(DST, SRCA, SRCB)   mesa_add2v(DST, SRCA, SRCB)
@@ -583,15 +586,18 @@ template<typename T, typename U>
  * pick up the inline function automatically. */
 #define LINTERP(T, OUT, IN)  mesa_linterp(T, OUT, IN)
 
-/* Can do better with integer math */
-#define INTERP_UB( t, dstub, outub, inub )  \
-do {                        \
-   GLfloat inf = UBYTE_TO_FLOAT( inub );    \
-   GLfloat outf = UBYTE_TO_FLOAT( outub );  \
-   GLfloat dstf = LINTERP( t, outf, inf );  \
-   UNCLAMPED_FLOAT_TO_UBYTE( dstub, dstf ); \
-} while (0)
+/** Ubyte linear interpolation (int-via-float). */
+template<typename TScalar>
+inline void mesa_interp_ub(TScalar t, GLubyte& dstub, GLubyte outub, GLubyte inub) noexcept {
+    const GLfloat inf  = UBYTE_TO_FLOAT(inub);
+    const GLfloat outf = UBYTE_TO_FLOAT(outub);
+    const GLfloat dstf = mesa_linterp(t, outf, inf);
+    unclamped_float_to_ubyte(dstub, dstf);
+}
+#define INTERP_UB(t, dstub, outub, inub) mesa_interp_ub(t, dstub, outub, inub)
 
+/* INTERP_CHAN uses CHAN_TO_FLOAT and UNCLAMPED_FLOAT_TO_CHAN from colormac.h,
+ * which is included after macros.h, so these remain as do-while macros. */
 #define INTERP_CHAN( t, dstc, outc, inc )   \
 do {                        \
    GLfloat inf = CHAN_TO_FLOAT( inc );      \
@@ -648,6 +654,7 @@ inline void mesa_interp_sz(T t, GLfloat (*vec)[4], int to, int out, int in, int 
 #define INTERP_3F(t, dst, out, in)           mesa_interp_3f(t, dst, out, in)
 #define INTERP_SZ(t, vec, to, out, in, sz)   mesa_interp_sz(t, vec, to, out, in, sz)
 
+/** 4-channel linear interpolation. */
 #define INTERP_4CHAN( t, dst, out, in )         \
 do {                            \
    INTERP_CHAN( (t), (dst)[0], (out)[0], (in)[0] ); \
@@ -656,6 +663,7 @@ do {                            \
    INTERP_CHAN( (t), (dst)[3], (out)[3], (in)[3] ); \
 } while (0)
 
+/** 3-channel linear interpolation. */
 #define INTERP_3CHAN( t, dst, out, in )         \
 do {                            \
    INTERP_CHAN( (t), (dst)[0], (out)[0], (in)[0] ); \
