@@ -27,10 +27,33 @@
 #define SLANG_MEM_H
 
 
-
-
 #include "imports.h"
+#include <memory>
+#include <vector>
 
+
+/**
+ * Memory-pool block.
+ *
+ * C++17 modernisation: the raw char* + calloc/free pair has been replaced
+ * with a std::vector<char> (zero-initialised on construction) and the
+ * linked-list chain is managed via std::unique_ptr so that the whole
+ * chain is freed automatically when the head is deleted.
+ */
+struct slang_mempool_ {
+    std::vector<char>               data;    /**< zero-initialised storage block  */
+    GLuint                          used{0};    /**< bytes consumed from this block  */
+    GLuint                          count{0};   /**< allocation count (all blocks)   */
+    GLuint                          largest{0}; /**< largest single allocation       */
+    std::unique_ptr<slang_mempool_> next;    /**< overflow block (or nullptr)     */
+
+    explicit slang_mempool_(GLuint initial_size)
+        : data(initial_size, '\0') {}
+
+    /* non-copyable */
+    slang_mempool_(const slang_mempool_ &) = delete;
+    slang_mempool_ &operator=(const slang_mempool_ &) = delete;
+};
 
 typedef struct slang_mempool_ slang_mempool;
 

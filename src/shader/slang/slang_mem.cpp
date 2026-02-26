@@ -29,12 +29,20 @@
  * allocations out of a large pool then just free the pool when done
  * compiling to avoid intricate malloc/free tracking and memory leaks.
  *
+ * C++17 modernisation: the raw char* buffers (allocated with calloc/free) have
+ * been replaced by std::vector<char> which is zero-initialised on
+ * construction.  The linked chain of overflow blocks is now owned by
+ * std::unique_ptr so that _slang_delete_mempool only needs a single
+ * "delete pool" and the entire chain unwinds automatically.
+ *
  * \author Brian Paul
  */
 
 #include "context.h"
 #include "macros.h"
 #include "slang_mem.h"
+#include <cstring>
+#include <new>
 
 
 #define GRANULARITY 8
@@ -45,47 +53,23 @@
 #define USE_MALLOC_FREE 0
 
 
-struct slang_mempool_ {
-    GLuint Size, Used, Count, Largest;
-    char *Data;
-    struct slang_mempool_ *Next;
-};
-
-
 slang_mempool *
 _slang_new_mempool(GLuint initialSize)
 {
-    slang_mempool *pool = (slang_mempool *) calloc(1,sizeof(slang_mempool));
-    if (pool) {
-	pool->Data = (char *) calloc(1,initialSize);
-	/*printf("ALLOC MEMPOOL %d at %p\n", initialSize, pool->Data);*/
-	if (!pool->Data) {
-	    free(pool);
-	    return nullptr;
-	}
-	pool->Size = initialSize;
-	pool->Used = 0;
+    try {
+        return new slang_mempool_(initialSize);
+    } catch (const std::bad_alloc &) {
+        return nullptr;
     }
-    return pool;
 }
 
 
 void
 _slang_delete_mempool(slang_mempool *pool)
 {
-    GLuint total = 0;
-    while (pool) {
-	slang_mempool *next = pool->Next;
-	/*
-	printf("DELETE MEMPOOL %u / %u  count=%u largest=%u\n",
-	       pool->Used, pool->Size, pool->Count, pool->Largest);
-	*/
-	total += pool->Used;
-	free(pool->Data);
-	free(pool);
-	pool = next;
-    }
-    /*printf("TOTAL ALLOCATED: %u\n", total);*/
+    /* Deleting the head cascades through the unique_ptr chain,
+     * automatically releasing every overflow block. */
+    delete pool;
 }
 
 
@@ -95,7 +79,7 @@ check_zero(const char *addr, GLuint n)
 {
     GLuint i;
     for (i = 0; i < n; i++) {
-	assert(addr[i]==0);
+	assert(addr[i] == 0);
     }
 }
 #endif
@@ -106,11 +90,10 @@ static GLboolean
 is_valid_address(const slang_mempool *pool, void *addr)
 {
     while (pool) {
-	if ((char *) addr >= pool->Data &&
-	    (char *) addr < pool->Data + pool->Used)
+	if (static_cast<const char *>(addr) >= pool->data.data() &&
+	    static_cast<const char *>(addr) < pool->data.data() + pool->used)
 	    return GL_TRUE;
-
-	pool = pool->Next;
+	pool = pool->next.get();
     }
     return GL_FALSE;
 }
@@ -124,47 +107,45 @@ void *
 _slang_alloc(GLuint bytes)
 {
 #if USE_MALLOC_FREE
-    return calloc(1,bytes);
+    return calloc(1, bytes);
 #else
     slang_mempool *pool;
     GET_CURRENT_CONTEXT(ctx);
-    pool = (slang_mempool *) ctx->Shader.MemPool;
+    pool = static_cast<slang_mempool *>(ctx->Shader.MemPool);
 
     if (bytes == 0)
 	bytes = 1;
 
     while (pool) {
-	if (pool->Used + bytes <= pool->Size) {
-	    /* found room */
-	    void *addr = (void *)(pool->Data + pool->Used);
+	if (pool->used + bytes <= static_cast<GLuint>(pool->data.size())) {
+	    /* found room in this block */
+	    void *addr = static_cast<void *>(pool->data.data() + pool->used);
 #ifdef DEBUG
-	    check_zero((char*) addr, bytes);
+	    check_zero(static_cast<char *>(addr), bytes);
 #endif
-	    pool->Used += ROUND_UP(bytes);
-	    pool->Largest = MAX2(pool->Largest, bytes);
-	    pool->Count++;
-	    /*printf("alloc %u  Used %u\n", bytes, pool->Used);*/
+	    pool->used += ROUND_UP(bytes);
+	    pool->largest = MAX2(pool->largest, bytes);
+	    pool->count++;
 	    return addr;
-	} else if (pool->Next) {
+	} else if (pool->next) {
 	    /* try next block */
-	    pool = pool->Next;
+	    pool = pool->next.get();
 	} else {
-	    /* alloc new pool */
-	    const GLuint sz = MAX2(bytes, pool->Size);
-	    pool->Next = _slang_new_mempool(sz);
-	    if (!pool->Next) {
-		/* we're _really_ out of memory */
+	    /* allocate a new overflow block */
+	    const GLuint sz = MAX2(bytes, static_cast<GLuint>(pool->data.size()));
+	    try {
+		pool->next.reset(new slang_mempool_(sz));
+	    } catch (const std::bad_alloc &) {
 		return nullptr;
-	    } else {
-		pool = pool->Next;
-		pool->Largest = bytes;
-		pool->Count++;
-		pool->Used = ROUND_UP(bytes);
-#ifdef DEBUG
-		check_zero((char*) pool->Data, bytes);
-#endif
-		return (void *) pool->Data;
 	    }
+	    pool = pool->next.get();
+	    pool->largest = bytes;
+	    pool->count++;
+	    pool->used = ROUND_UP(bytes);
+#ifdef DEBUG
+	    check_zero(pool->data.data(), bytes);
+#endif
+	    return static_cast<void *>(pool->data.data());
 	}
     }
     return nullptr;
@@ -178,23 +159,14 @@ _slang_realloc(void *oldBuffer, GLuint oldSize, GLuint newSize)
 #if USE_MALLOC_FREE
     return _mesa_realloc(oldBuffer, oldSize, newSize);
 #else
-
     if (newSize < oldSize) {
 	return oldBuffer;
     } else {
 	const GLuint copySize = (oldSize < newSize) ? oldSize : newSize;
 	void *newBuffer = _slang_alloc(newSize);
 
-#if 0
-	if (oldBuffer) {
-	    GET_CURRENT_CONTEXT(ctx);
-	    slang_mempool *pool = (slang_mempool *) ctx->Shader.MemPool;
-	    ASSERT(is_valid_address(pool, oldBuffer));
-	}
-#endif
-
 	if (newBuffer && oldBuffer && copySize > 0)
-	    memcpy(newBuffer, oldBuffer, copySize);
+	    std::memcpy(newBuffer, oldBuffer, copySize);
 
 	return newBuffer;
     }
@@ -209,10 +181,10 @@ char *
 _slang_strdup(const char *s)
 {
     if (s) {
-	size_t l = strlen(s);
-	char *s2 = (char *) _slang_alloc(l + 1);
+	const std::size_t len = std::strlen(s);
+	char *s2 = static_cast<char *>(_slang_alloc(static_cast<GLuint>(len + 1)));
 	if (s2)
-	    strcpy(s2, s);
+	    std::memcpy(s2, s, len + 1);
 	return s2;
     } else {
 	return nullptr;
@@ -221,7 +193,8 @@ _slang_strdup(const char *s)
 
 
 /**
- * Don't actually free memory, but mark it (for debugging).
+ * Don't actually free memory (pool is freed all at once), but mark it
+ * as unused in debug builds.
  */
 void
 _slang_free(void *addr)
@@ -229,11 +202,7 @@ _slang_free(void *addr)
 #if USE_MALLOC_FREE
     free(addr);
 #else
-    if (addr) {
-	//GET_CURRENT_CONTEXT(ctx);
-	//slang_mempool *pool = (slang_mempool *) ctx->Shader.MemPool;
-	//ASSERT(is_valid_address(pool, addr));
-    }
+    (void) addr; /* intentional no-op: pool freed en-masse by _slang_delete_mempool */
 #endif
 }
 
