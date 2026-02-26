@@ -2660,9 +2660,9 @@ struct gl_renderbuffer_attachment {
  */
 struct gl_framebuffer {
     mutable std::mutex Mutex;		   /**< for thread safety */
-    GLuint Name;      /* if zero, this is a window system framebuffer */
-    GLint RefCount;
-    GLboolean DeletePending;
+    GLuint Name = 0;  /* if zero, this is a window system framebuffer */
+    GLint RefCount = 0; /**< reference count; set to 1 by allocating functions */
+    GLboolean DeletePending = GL_FALSE;
 
     GLvisual Visual;	/**< The framebuffer's visual.
                              Immutable if this is a window system buffer.

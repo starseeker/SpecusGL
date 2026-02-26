@@ -1587,7 +1587,7 @@ _mesa_init_renderbuffer(struct gl_renderbuffer *rb, GLuint name)
     rb->Magic    = RB_MAGIC;
     rb->ClassID  = 0;
     rb->Name     = name;
-    rb->RefCount = 0;
+    rb->RefCount = 0;  /* set by caller after construction */
     rb->Width    = 0;
     rb->Height   = 0;
     rb->InternalFormat = GL_NONE;
