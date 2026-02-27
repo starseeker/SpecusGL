@@ -75,15 +75,14 @@ void
 _slang_code_unit_ctr(slang_code_unit * self,
 		     slang_code_object * object)
 {
-    _slang_variable_scope_ctr(&self->vars);
-    _slang_function_scope_ctr(&self->funs);
-    _slang_struct_scope_ctr(&self->structs);
+    /* vars, funs, structs are default-constructed members; just set object */
     self->object = object;
 }
 
 void
 _slang_code_unit_dtr(slang_code_unit * self)
 {
+    /* RAII: vars, funs, structs destructors handle cleanup via their destructors */
     slang_variable_scope_destruct(&self->vars);
     slang_function_scope_destruct(&self->funs);
     slang_struct_scope_destruct(&self->structs);

@@ -107,13 +107,11 @@ slang_struct::slang_struct(const slang_struct &other)
 {
     if (other.fields) {
         fields = std::make_unique<slang_variable_scope>();
-        _slang_variable_scope_ctr(fields.get());
         if (!slang_variable_scope_copy(fields.get(), other.fields.get()))
             fields.reset();
     }
     if (other.structs) {
         structs = std::make_unique<slang_struct_scope>();
-        _slang_struct_scope_ctr(structs.get());
         if (!slang_struct_scope_copy(structs.get(), other.structs.get()))
             structs.reset();
     }
@@ -134,10 +132,7 @@ slang_struct_construct(slang_struct * stru)
 {
     stru->a_name = SLANG_ATOM_NULL;
     stru->fields = std::make_unique<slang_variable_scope>();
-    _slang_variable_scope_ctr(stru->fields.get());
-
     stru->structs = std::make_unique<slang_struct_scope>();
-    _slang_struct_scope_ctr(stru->structs.get());
     return 1;
 }
 

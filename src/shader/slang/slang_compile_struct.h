@@ -46,7 +46,7 @@
     };
 
     extern void
-    _slang_struct_scope_ctr(slang_struct_scope *);
+    _slang_struct_scope_ctr(slang_struct_scope *);  /* legacy no-op; members are default-constructed */
 
     void slang_struct_scope_destruct(slang_struct_scope *);
     int slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
