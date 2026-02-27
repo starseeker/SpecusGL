@@ -72,9 +72,9 @@ extern void *_glapi_Context;
 extern struct _glapi_table *_glapi_Dispatch;
 
 # ifdef THREADS
-#  define GET_CURRENT_CONTEXT(C)  GLcontext *C = (GLcontext *) (_glapi_Context ? _glapi_Context : _glapi_get_context())
+#  define GET_CURRENT_CONTEXT(C)  GLcontext *C = static_cast<GLcontext *>(_glapi_Context ? _glapi_Context : _glapi_get_context())
 # else
-#  define GET_CURRENT_CONTEXT(C)  GLcontext *C = (GLcontext *) _glapi_Context
+#  define GET_CURRENT_CONTEXT(C)  GLcontext *C = static_cast<GLcontext *>(_glapi_Context)
 # endif
 
 
