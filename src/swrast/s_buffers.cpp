@@ -51,7 +51,6 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
     GLint i;
 
     assert(ctx->Visual.rgbMode);
-    assert(rb->PutRow);
 
     /* Initialize color span with clear color */
     /* XXX optimize for clearcolor == black/zero (bzero) */
@@ -113,7 +112,6 @@ clear_ci_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
     GLint i;
 
     assert(!ctx->Visual.rgbMode);
-    assert(rb->PutRow);
     assert(rb->DataType == GL_UNSIGNED_INT);
 
     /* Initialize index span with clear index */
@@ -157,8 +155,6 @@ clear_rgba_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	   ctx->Color.ColorMask[1] &&
 	   ctx->Color.ColorMask[2] &&
 	   ctx->Color.ColorMask[3]);
-
-    assert(rb->PutMonoRow);
 
     switch (rb->DataType) {
 	case GL_UNSIGNED_BYTE:
@@ -209,8 +205,6 @@ clear_ci_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 
     assert((ctx->Color.IndexMask & ((1 << rb->IndexBits) - 1))
 	   == static_cast<GLuint>(((1 << rb->IndexBits) - 1)));
-
-    assert(rb->PutMonoRow);
 
     /* setup clear value */
     switch (rb->DataType) {

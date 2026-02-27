@@ -1609,13 +1609,11 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 
 		if (span->arrayMask & SPAN_XY) {
 		    /* array of pixel coords */
-		    assert(rb->PutValues);
 		    rb->PutValues(ctx, span->end,
 				  span->array->x, span->array->y,
 				  colorData, span->array->mask);
 		} else {
 		    /* horizontal run of pixels */
-		    assert(rb->PutRow);
 		    rb->PutRow(ctx, span->end, span->x, span->y,
 			       colorData,
 			       span->writeAll ? nullptr: span->array->mask);
@@ -1678,7 +1676,6 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	}
 
 	assert(rb);
-	assert(rb->GetRow);
 	assert(rb->_BaseFormat == GL_RGB || rb->_BaseFormat == GL_RGBA);
 
 	if (rb->DataType == dstType) {
@@ -1736,7 +1733,6 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    length = static_cast<GLint>(n);
 	}
 
-	assert(rb->GetRow);
 	assert(rb->_BaseFormat == GL_COLOR_INDEX);
 
 	if (rb->DataType == GL_UNSIGNED_BYTE) {
