@@ -169,7 +169,7 @@ print_variable(const slang_variable *v, int indent)
 static void
 print_binary(const slang_operation *op, const char *oper, int indent)
 {
-    assert(op->num_children == 2);
+    assert((int)op->children.size() == 2);
     slang_print_tree(&op->children[0], indent + 3);
     spaces(indent);
     printf("%s\n", oper);
@@ -184,9 +184,9 @@ print_generic2(const slang_operation *op, const char *oper,
     int i;
     if (oper) {
 	spaces(indent);
-	printf("[%p locals %p] %s %s\n", static_cast<const void *>(op), static_cast<const void *>(op->locals), oper, s);
+	printf("[%p locals %p] %s %s\n", static_cast<const void *>(op), static_cast<const void *>(op->locals.get()), oper, s);
     }
-    for (i = 0; i < op->num_children; i++) {
+    for (i = 0; i < (int)op->children.size(); i++) {
 	spaces(indent);
 	printf("//child %d:\n", i);
 	slang_print_tree(&op->children[i], indent);
@@ -241,7 +241,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_BLOCK_NO_NEW_SCOPE:
 	    spaces(indent);
-	    printf("{ locals %p  outer %p\n", static_cast<const void *>(op->locals), static_cast<const void *>(op->locals->outer_scope));
+	    printf("{ locals %p  outer %p\n", static_cast<const void *>(op->locals.get()), static_cast<const void *>(op->locals->outer_scope));
 	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}\n");
@@ -249,27 +249,27 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_BLOCK_NEW_SCOPE:
 	    spaces(indent);
-	    printf("{{ // new scope  locals %p\n", static_cast<const void *>(op->locals));
+	    printf("{{ // new scope  locals %p\n", static_cast<const void *>(op->locals.get()));
 	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}}\n");
 	    break;
 
 	case SLANG_OPER_VARIABLE_DECL:
-	    assert(op->num_children == 0 || op->num_children == 1);
+	    assert((int)op->children.size() == 0 || (int)op->children.size() == 1);
 	    {
 		slang_variable *v;
-		v = _slang_locate_variable(op->locals, op->a_id, GL_TRUE);
+		v = _slang_locate_variable(op->locals.get(), op->a_id, GL_TRUE);
 		if (v) {
 		    spaces(indent);
-		    printf("DECL (locals=%p outer=%p) ", static_cast<const void *>(op->locals), static_cast<const void *>(op->locals->outer_scope));
+		    printf("DECL (locals=%p outer=%p) ", static_cast<const void *>(op->locals.get()), static_cast<const void *>(op->locals->outer_scope));
 		    print_type(&v->type);
 		    printf(" %s (%p)", reinterpret_cast<char *>(op->a_id),
-			   static_cast<const void *>(find_var(op->locals, op->a_id)));
+			   static_cast<const void *>(find_var(op->locals.get(), op->a_id)));
 
 		    printf(" (in scope %p) ",
-			   static_cast<const void *>(find_scope(op->locals, op->a_id)));
-		    if (op->num_children == 1) {
+			   static_cast<const void *>(find_scope(op->locals.get(), op->a_id)));
+		    if ((int)op->children.size() == 1) {
 			printf(" :=\n");
 			slang_print_tree(&op->children[0], indent + 3);
 		    } else if (v->initializer) {
@@ -316,7 +316,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_RETURN:
 	    spaces(indent);
 	    printf("RETURN\n");
-	    if (op->num_children > 0)
+	    if ((int)op->children.size() > 0)
 		slang_print_tree(&op->children[0], indent + 3);
 	    break;
 
@@ -327,7 +327,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_EXPRESSION:
 	    spaces(indent);
-	    printf("EXPR:  locals %p\n", static_cast<const void *>(op->locals));
+	    printf("EXPR:  locals %p\n", static_cast<const void *>(op->locals.get()));
 	    /*print_generic(op, "SLANG_OPER_EXPRESSION", indent);*/
 	    slang_print_tree(&op->children[0], indent + 3);
 	    break;
@@ -347,7 +347,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	    break;
 
 	case SLANG_OPER_WHILE:
-	    assert(op->num_children == 2);
+	    assert((int)op->children.size() == 2);
 	    spaces(indent);
 	    printf("WHILE cond:\n");
 	    slang_print_tree(&op->children[0], indent + 3);
@@ -419,10 +419,10 @@ slang_print_tree(const slang_operation *op, int indent)
 	    spaces(indent);
 	    if (op->var && op->var->a_name)
 		printf("VAR %s  (in scope %p)\n", reinterpret_cast<char *>(op->var->a_name),
-		       static_cast<const void *>(find_scope(op->locals, op->a_id)));
+		       static_cast<const void *>(find_scope(op->locals.get(), op->a_id)));
 	    else
 		printf("VAR' %s  (in scope %p)\n", reinterpret_cast<char *>(op->a_id),
-		       static_cast<const void *>(find_scope(op->locals, op->a_id)));
+		       static_cast<const void *>(find_scope(op->locals.get(), op->a_id)));
 	    break;
 
 	case SLANG_OPER_SEQUENCE:
@@ -431,7 +431,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_ASSIGN:
 	    spaces(indent);
-	    printf("ASSIGNMENT  locals %p\n", static_cast<const void *>(op->locals));
+	    printf("ASSIGNMENT  locals %p\n", static_cast<const void *>(op->locals.get()));
 	    print_binary(op, ":=", indent);
 	    break;
 
@@ -467,8 +467,8 @@ slang_print_tree(const slang_operation *op, int indent)
 	/*SLANG_OPER_ANDASSIGN,*/
 	case SLANG_OPER_SELECT:
 	    spaces(indent);
-	    printf("SLANG_OPER_SELECT n=%d\n", op->num_children);
-	    assert(op->num_children == 3);
+	    printf("SLANG_OPER_SELECT n=%d\n", (int)op->children.size());
+	    assert((int)op->children.size() == 3);
 	    slang_print_tree(&op->children[0], indent+3);
 	    spaces(indent);
 	    printf("?\n");
@@ -575,14 +575,14 @@ slang_print_tree(const slang_operation *op, int indent)
 #if 0
 	    slang_function *fun
 		= _slang_locate_function(A->space.funcs, oper->a_id,
-					 oper->children,
-					 oper->num_children, &A->space, A->atoms);
+					 oper->children.data(),
+				 (GLuint)oper->children.size(), &A->space, A->atoms);
 #endif
 	    spaces(indent);
 	    printf("CALL %s(\n", reinterpret_cast<char *>(op->a_id));
-	    for (i = 0; i < op->num_children; i++) {
+	    for (i = 0; i < (int)op->children.size(); i++) {
 		slang_print_tree(&op->children[i], indent+3);
-		if (i + 1 < op->num_children) {
+		if (i + 1 < (int)op->children.size()) {
 		    spaces(indent + 3);
 		    printf(",\n");
 		}
@@ -795,10 +795,10 @@ _slang_print_var_scope(const slang_variable_scope *vars, int indent)
 int
 slang_checksum_tree(const slang_operation *op)
 {
-    int s = op->num_children;
+    int s = (int)op->children.size();
     int i;
 
-    for (i = 0; i < op->num_children; i++) {
+    for (i = 0; i < (int)op->children.size(); i++) {
 	s += slang_checksum_tree(&op->children[i]);
     }
     return s;

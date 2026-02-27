@@ -330,10 +330,10 @@ typeof_math_call(const char *name, slang_operation *call,
 	slang_function *fun;
 
 	/* number of params: */
-	assert(call->num_children == 1 || call->num_children == 2);
+	assert(call->children.size() == 1 || call->children.size() == 2);
 
 	atom = slang_atom_pool_atom(atoms, name);
-	if (!_slang_typeof_function(atom, call->children, call->num_children,
+	if (!_slang_typeof_function(atom, call->children.data(), (GLuint)call->children.size(),
 				    space, spec, &fun, atoms, log))
 	    return GL_FALSE;
 
@@ -397,7 +397,7 @@ _slang_typeof_operation_(slang_operation * op,
 	case SLANG_OPER_DIVASSIGN:
 	case SLANG_OPER_PREINCREMENT:
 	case SLANG_OPER_PREDECREMENT:
-	    if (!_slang_typeof_operation_(op->children, space, ti, atoms, log))
+	    if (!_slang_typeof_operation_(&op->children[0], space, ti, atoms, log))
 		return GL_FALSE;
 	    break;
 	case SLANG_OPER_LITERAL_BOOL:
@@ -462,7 +462,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    break;
 	case SLANG_OPER_IDENTIFIER: {
 	    slang_variable *var;
-	    var = _slang_locate_variable(op->locals, op->a_id, GL_TRUE);
+	    var = _slang_locate_variable(op->locals.get(), op->a_id, GL_TRUE);
 	    if (!var) {
 		slang_info_log_error(log, "undefined variable '%s'",
 				     reinterpret_cast<char *>(op->a_id));
@@ -504,34 +504,34 @@ _slang_typeof_operation_(slang_operation * op,
 	/*case SLANG_OPER_LSHIFT: */
 	/*case SLANG_OPER_RSHIFT: */
 	case SLANG_OPER_ADD:
-	    assert(op->num_children == 2);
+	    assert((GLuint)op->children.size() == 2);
 	    if (!typeof_math_call("+", op, space, &ti->spec, atoms, log))
 		return GL_FALSE;
 	    break;
 	case SLANG_OPER_SUBTRACT:
-	    assert(op->num_children == 2);
+	    assert((GLuint)op->children.size() == 2);
 	    if (!typeof_math_call("-", op, space, &ti->spec, atoms, log))
 		return GL_FALSE;
 	    break;
 	case SLANG_OPER_MULTIPLY:
-	    assert(op->num_children == 2);
+	    assert((GLuint)op->children.size() == 2);
 	    if (!typeof_math_call("*", op, space, &ti->spec, atoms, log))
 		return GL_FALSE;
 	    break;
 	case SLANG_OPER_DIVIDE:
-	    assert(op->num_children == 2);
+	    assert((GLuint)op->children.size() == 2);
 	    if (!typeof_math_call("/", op, space, &ti->spec, atoms, log))
 		return GL_FALSE;
 	    break;
 	/*case SLANG_OPER_MODULUS: */
 	case SLANG_OPER_PLUS:
-	    if (!_slang_typeof_operation_(op->children, space, ti, atoms, log))
+	    if (!_slang_typeof_operation_(&op->children[0], space, ti, atoms, log))
 		return GL_FALSE;
 	    ti->can_be_referenced = GL_FALSE;
 	    ti->is_swizzled = GL_FALSE;
 	    break;
 	case SLANG_OPER_MINUS:
-	    assert(op->num_children == 1);
+	    assert((GLuint)op->children.size() == 1);
 	    if (!typeof_math_call("-", op, space, &ti->spec, atoms, log))
 		return GL_FALSE;
 	    break;
@@ -541,7 +541,7 @@ _slang_typeof_operation_(slang_operation * op,
 
 	    if (!slang_typeinfo_construct(&_ti))
 		return GL_FALSE;
-	    if (!_slang_typeof_operation_(op->children, space, &_ti, atoms, log)) {
+	    if (!_slang_typeof_operation_(&op->children[0], space, &_ti, atoms, log)) {
 		slang_typeinfo_destruct(&_ti);
 		return GL_FALSE;
 	    }
@@ -569,7 +569,7 @@ _slang_typeof_operation_(slang_operation * op,
 		slang_type_specifier_copy(&ti->spec, &op->fun->header.type.specifier);
 	    } else {
 		slang_function *fun;
-		if (!_slang_typeof_function(op->a_id, op->children, op->num_children,
+		if (!_slang_typeof_function(op->a_id, op->children.data(), (GLuint)op->children.size(),
 					    space, &ti->spec, &fun, atoms, log))
 		    return GL_FALSE;
 		if (fun) {
@@ -610,7 +610,7 @@ _slang_typeof_operation_(slang_operation * op,
 
 	    if (!slang_typeinfo_construct(&_ti))
 		return GL_FALSE;
-	    if (!_slang_typeof_operation_(op->children, space, &_ti, atoms, log)) {
+	    if (!_slang_typeof_operation_(&op->children[0], space, &_ti, atoms, log)) {
 		slang_typeinfo_destruct(&_ti);
 		return GL_FALSE;
 	    }
@@ -715,7 +715,7 @@ _slang_typeof_operation_(slang_operation * op,
 	break;
 	case SLANG_OPER_POSTINCREMENT:
 	case SLANG_OPER_POSTDECREMENT:
-	    if (!_slang_typeof_operation_(op->children, space, ti, atoms, log))
+	    if (!_slang_typeof_operation_(&op->children[0], space, ti, atoms, log))
 		return GL_FALSE;
 	    ti->can_be_referenced = GL_FALSE;
 	    ti->is_swizzled = GL_FALSE;

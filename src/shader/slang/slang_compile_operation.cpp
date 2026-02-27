@@ -30,42 +30,42 @@
 
 #include "imports.h"
 #include "slang_compile.h"
+#include <memory>
 
 
 /**
  * Init a slang_operation object
  */
-GLboolean
-slang_operation_construct(slang_operation * oper)
+slang_operation::slang_operation()
+    : type(SLANG_OPER_NONE), literal{0.0f, 0.0f, 0.0f, 0.0f},
+      literal_size(1), a_id(SLANG_ATOM_NULL),
+      locals(std::unique_ptr<slang_variable_scope>(_slang_variable_scope_new(nullptr))),
+      fun(nullptr), var(nullptr), label(nullptr)
 {
-    oper->type = SLANG_OPER_NONE;
-    oper->children = nullptr;
-    oper->num_children = 0;
-    oper->literal[0] = 0.0;
-    oper->literal_size = 1;
-    oper->a_id = SLANG_ATOM_NULL;
-    oper->locals = _slang_variable_scope_new(nullptr);
-    if (oper->locals == nullptr)
-	return GL_FALSE;
-    _slang_variable_scope_ctr(oper->locals);
-    oper->fun = nullptr;
-    oper->var = nullptr;
-    return GL_TRUE;
+    if (locals)
+        _slang_variable_scope_ctr(locals.get());
+}
+
+slang_operation::~slang_operation()
+{
+    if (locals)
+        slang_variable_scope_destruct(locals.get());
+}
+
+GLboolean
+slang_operation_construct(slang_operation *oper)
+{
+    return oper->locals != nullptr ? GL_TRUE : GL_FALSE;
 }
 
 void
-slang_operation_destruct(slang_operation * oper)
+slang_operation_destruct(slang_operation *oper)
 {
-    GLuint i;
-
-    for (i = 0; i < oper->num_children; i++)
-	slang_operation_destruct(oper->children + i);
-    delete[] oper->children;
-    slang_variable_scope_destruct(oper->locals);
-    delete oper->locals;
-    oper->children = nullptr;
-    oper->num_children = 0;
-    oper->locals = nullptr;
+    oper->children.clear();
+    if (oper->locals) {
+        slang_variable_scope_destruct(oper->locals.get());
+        oper->locals.reset();
+    }
 }
 
 /**
@@ -73,32 +73,17 @@ slang_operation_destruct(slang_operation * oper)
  * \return GL_TRUE for success, GL_FALSE if failure
  */
 GLboolean
-slang_operation_copy(slang_operation * x, const slang_operation * y)
+slang_operation_copy(slang_operation *x, const slang_operation *y)
 {
     slang_operation z;
     GLuint i;
 
-    /* Initialize */
-    z.label = nullptr;
-
-    if (!slang_operation_construct(&z))
-	return GL_FALSE;
     z.type = y->type;
-    if (y->num_children > 0) {
-	z.children = new slang_operation[y->num_children];
-	for (z.num_children = 0; z.num_children < y->num_children;
-	     z.num_children++) {
-	    if (!slang_operation_construct(&z.children[z.num_children])) {
-		slang_operation_destruct(&z);
-		return GL_FALSE;
-	    }
-	}
-    }
-    for (i = 0; i < z.num_children; i++) {
-	if (!slang_operation_copy(&z.children[i], &y->children[i])) {
-	    slang_operation_destruct(&z);
-	    return GL_FALSE;
-	}
+    z.children.resize(y->children.size());
+    for (i = 0; i < (GLuint)y->children.size(); i++) {
+        if (!slang_operation_copy(&z.children[i], &y->children[i])) {
+            return GL_FALSE;
+        }
     }
     z.literal[0] = y->literal[0];
     z.literal[1] = y->literal[1];
@@ -109,33 +94,20 @@ slang_operation_copy(slang_operation * x, const slang_operation * y)
     assert(y->literal_size <= 4);
     z.a_id = y->a_id;
     if (y->locals) {
-	if (!slang_variable_scope_copy(z.locals, y->locals)) {
-	    slang_operation_destruct(&z);
-	    return GL_FALSE;
-	}
+        if (!slang_variable_scope_copy(z.locals.get(), y->locals.get())) {
+            return GL_FALSE;
+        }
     }
-#if 0
-    z.var = y->var;
-    z.fun = y->fun;
-#endif
     slang_operation_destruct(x);
-    *x = z;
+    *x = std::move(z);
     return GL_TRUE;
 }
 
 
 slang_operation *
-slang_operation_new(GLuint count)
+slang_operation_new()
 {
-    assert(count > 0);
-    slang_operation *ops = new slang_operation[count];
-    for (GLuint i = 0; i < count; i++) {
-	if (!slang_operation_construct(ops + i)) {
-	    ops[i].fun = nullptr;
-	    ops[i].var = nullptr;
-	}
-    }
-    return ops;
+    return new slang_operation;
 }
 
 
@@ -145,83 +117,36 @@ slang_operation_new(GLuint count)
 void
 slang_operation_delete(slang_operation *oper)
 {
-    slang_operation_destruct(oper);
     delete oper;
 }
 
 
 slang_operation *
-slang_operation_grow(GLuint *numChildren, slang_operation **children)
+slang_operation_grow(slang_operation *parent)
 {
-    const GLuint newCount = *numChildren + 1;
-    slang_operation *ops = new slang_operation[newCount];
-    if (!ops)
-	return nullptr;
-
-    /* copy existing children (shallow) and default-construct the new one */
-    for (GLuint i = 0; i < *numChildren; i++)
-	ops[i] = (*children)[i];
-
-    slang_operation *newOp = ops + *numChildren;
-    if (!slang_operation_construct(newOp)) {
-	delete[] ops;
-	*children = nullptr;
-	return nullptr;
-    }
-    /* Release the old array (without destroying children - they were shallow-copied). */
-    delete[] *children;
-    *children = ops;
-    (*numChildren)++;
-    return newOp;
+    parent->children.emplace_back();
+    return &parent->children.back();
 }
 
 /**
  * Insert a new slang_operation into an array.
- * \param numElements  pointer to current array size (in/out)
- * \param array  address of the array (in/out)
+ * \param parent  the parent operation
  * \param pos  position to insert new element
  * \return  pointer to the new operation/element
  */
 slang_operation *
-slang_operation_insert(GLuint *numElements, slang_operation **array,
-		       GLuint pos)
+slang_operation_insert(slang_operation *parent, GLuint pos)
 {
-    assert(pos <= *numElements);
-
-    slang_operation *ops = new slang_operation[*numElements + 1];
-    if (!ops)
-	return nullptr;
-
-    slang_operation *newOp = ops + pos;
-
-    /* shallow-copy elements before insertion point */
-    for (GLuint i = 0; i < pos; i++)
-	ops[i] = (*array)[i];
-
-    /* shallow-copy elements after insertion point */
-    for (GLuint i = pos; i < *numElements; i++)
-	ops[i + 1] = (*array)[i];
-
-    if (!slang_operation_construct(newOp)) {
-	delete[] ops;
-	*numElements = 0;
-	*array = nullptr;
-	return nullptr;
-    }
-    /* Release old array without destroying children (shallow-copied). */
-    delete[] *array;
-    *array = ops;
-    (*numElements)++;
-    return newOp;
+    assert(pos <= parent->children.size());
+    parent->children.emplace(parent->children.begin() + pos);
+    return &parent->children[pos];
 }
 
 
 void
 _slang_operation_swap(slang_operation *oper0, slang_operation *oper1)
 {
-    slang_operation tmp = *oper0;
-    *oper0 = *oper1;
-    *oper1 = tmp;
+    std::swap(*oper0, *oper1);
 }
 
 
