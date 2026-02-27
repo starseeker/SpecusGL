@@ -273,9 +273,8 @@ convert_to_array(slang_parse_ctx * C, slang_variable * var,
     /* sized array - mark it as array, copy the specifier to the array element and
      * parse the expression */
     var->type.specifier.type = SLANG_SPEC_ARRAY;
-    var->type.specifier._array = new slang_type_specifier;
-    slang_type_specifier_ctr(var->type.specifier._array);
-    return slang_type_specifier_copy(var->type.specifier._array, sp);
+    var->type.specifier._array = std::make_unique<slang_type_specifier>(*sp);
+    return GL_TRUE;
 }
 
 /* structure field */
@@ -563,8 +562,12 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 	    break;
 	case TYPE_SPECIFIER_STRUCT:
 	    spec->type = SLANG_SPEC_STRUCT;
-	    if (!parse_struct(C, O, &spec->_struct))
-		return 0;
+	    {
+		slang_struct *raw = nullptr;
+		if (!parse_struct(C, O, &raw))
+		    return 0;
+		spec->_struct.reset(raw);
+	    }
 	    break;
 	case TYPE_SPECIFIER_TYPENAME:
 	    spec->type = SLANG_SPEC_STRUCT;
@@ -583,14 +586,12 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		    return 0;
 		}
 
-		spec->_struct = new slang_struct;
-		if (!slang_struct_construct(spec->_struct)) {
-		    delete spec->_struct;
-		    spec->_struct = nullptr;
+		auto new_s = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct);
+		if (!slang_struct_construct(new_s.get()))
 		    return 0;
-		}
-		if (!slang_struct_copy(spec->_struct, stru))
+		if (!slang_struct_copy(new_s.get(), stru))
 		    return 0;
+		spec->_struct = std::move(new_s);
 	    }
 	    break;
 	default:
@@ -1348,7 +1349,7 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
 
     /* parse function parameters */
     while (*C->I++ == PARAMETER_NEXT) {
-	slang_variable *p = slang_variable_scope_grow(func->parameters);
+	slang_variable *p = slang_variable_scope_grow(func->parameters.get());
 	if (!p) {
 	    slang_info_log_memory(C->L);
 	    return 0;
@@ -1361,7 +1362,7 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
      * parameter that corresponds to the return value.
      */
     if (_slang_function_has_return_value(func)) {
-	slang_variable *p = slang_variable_scope_grow(func->parameters);
+	slang_variable *p = slang_variable_scope_grow(func->parameters.get());
 	slang_atom a_retVal = slang_atom_pool_atom(C->atoms, "__retVal");
 	assert(a_retVal);
 	p->a_name = a_retVal;
@@ -1391,14 +1392,14 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 	return 0;
 
     /* create function's body operation */
-    func->body = new slang_operation;
+    func->body = std::make_unique<slang_operation>();
 
     /* to parse the body the parse context is modified in order to
      * capture parsed variables into function's local variable scope
      */
     C->global_scope = GL_FALSE;
-    o.vars = func->parameters;
-    if (!parse_statement(C, &o, func->body))
+    o.vars = func->parameters.get();
+    if (!parse_statement(C, &o, func->body.get()))
 	return 0;
 
     C->global_scope = GL_TRUE;
@@ -1417,7 +1418,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     op_assign.type = SLANG_OPER_ASSIGN;
     op_assign.children.resize(2);
     slang_operation_copy(&op_assign.children[0], &op_id);
-    slang_operation_copy(&op_assign.children[1], var->initializer);
+    slang_operation_copy(&op_assign.children[1], var->initializer.get());
 
     op_id.locals->variables.clear();  /* don't own var, don't delete it */
     slang_operation_destruct(&op_id);
@@ -1473,14 +1474,13 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 	    /* initialized variable - copy the specifier and parse the expression */
 	    if (!slang_type_specifier_copy(&var->type.specifier, &type->specifier))
 		return 0;
-	    var->initializer = new slang_operation;
-	    if (!slang_operation_construct(var->initializer)) {
-		delete var->initializer;
-		var->initializer = nullptr;
+	    var->initializer = std::make_unique<slang_operation>();
+	    if (!slang_operation_construct(var->initializer.get())) {
+		var->initializer.reset();
 		slang_info_log_memory(C->L);
 		return 0;
 	    }
-	    if (!parse_expression(C, O, var->initializer))
+	    if (!parse_expression(C, O, var->initializer.get()))
 		return 0;
 	    break;
 	case VARIABLE_ARRAY_UNKNOWN:
@@ -1605,7 +1605,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
     found_func = slang_function_scope_find(O->funs, &parsed_func, 0);
     if (found_func == nullptr) {
 	/* New function, add it to the function list */
-	O->funs->functions.push_back(parsed_func);
+	O->funs->functions.push_back(std::move(parsed_func));
 
 	/* return the newly parsed function */
 	*parsed_func_ret = &O->funs->functions.back();
@@ -1625,10 +1625,9 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 	    /* destroy the existing function declaration and replace it
 	     * with the new one, remember to save the fixup table
 	     */
-	    parsed_func.fixups = found_func->fixups;
-	    slang_fixup_table_init(&found_func->fixups);
+	    parsed_func.fixups = std::move(found_func->fixups);
 	    slang_function_destruct(found_func);
-	    *found_func = parsed_func;
+	    *found_func = std::move(parsed_func);
 	} else {
 	    /* another declaration of the same function prototype - ignore it */
 	    slang_function_destruct(&parsed_func);

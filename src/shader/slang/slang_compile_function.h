@@ -31,6 +31,7 @@
 struct slang_code_unit;
 
 #include <vector>
+#include <memory>
 
 /**
  * Types of functions.
@@ -59,13 +60,18 @@ extern GLboolean slang_fixup_save(slang_fixup_table *fixups, GLuint address);
 
 /**
  * Description of a compiled shader function.
+ *
+ * C++17 modernisation: parameters and body are now std::unique_ptr so they
+ * are automatically freed when the function is destroyed without needing
+ * explicit slang_variable_scope_destruct + delete or slang_operation_destruct
+ * + delete calls.
  */
 struct slang_function {
     slang_function_kind kind;
     slang_variable header;      /**< The function's name and return type */
-    slang_variable_scope *parameters; /**< formal parameters AND local vars */
+    std::unique_ptr<slang_variable_scope> parameters; /**< formal parameters AND local vars */
     unsigned int param_count;   /**< number of formal params (no locals) */
-    slang_operation *body;      /**< The instruction tree */
+    std::unique_ptr<slang_operation> body;  /**< The instruction tree */
     unsigned int address;       /**< Address of this func in memory */
     slang_fixup_table fixups;   /**< Mem locations which need func's address */
 };

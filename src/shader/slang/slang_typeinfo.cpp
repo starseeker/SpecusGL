@@ -166,58 +166,75 @@ _slang_multiply_swizzles(slang_swizzle * dst, const slang_swizzle * left,
 }
 
 
-GLvoid
-slang_type_specifier_ctr(slang_type_specifier * self)
+/* ------------------------------------------------------------------ */
+/* slang_type_specifier RAII implementation                           */
+/* ------------------------------------------------------------------ */
+
+/** Custom deleter: call slang_struct_destruct before freeing. */
+void SlangStructDeleter::operator()(slang_struct *s) const noexcept
 {
-    self->type = SLANG_SPEC_VOID;
-    self->_struct = nullptr;
-    self->_array = nullptr;
+    if (s) {
+        slang_struct_destruct(s);
+        delete s;
+    }
 }
 
-GLvoid
-slang_type_specifier_dtr(slang_type_specifier * self)
+/** Destructor – unique_ptr members handle cleanup automatically. */
+slang_type_specifier::~slang_type_specifier() = default;
+
+/** Deep copy constructor. */
+slang_type_specifier::slang_type_specifier(const slang_type_specifier &other)
+    : type(other.type)
 {
-    if (self->_struct != nullptr) {
-	slang_struct_destruct(self->_struct);
-	delete self->_struct;
-	self->_struct = nullptr;
+    if (other._struct) {
+        slang_struct *s = new slang_struct;
+        if (slang_struct_construct(s) && slang_struct_copy(s, other._struct.get()))
+            _struct.reset(s);
+        else {
+            slang_struct_destruct(s);
+            delete s;
+        }
     }
-    if (self->_array != nullptr) {
-	slang_type_specifier_dtr(self->_array);
-	delete self->_array;
-	self->_array = nullptr;
-    }
+    if (other._array)
+        _array = std::make_unique<slang_type_specifier>(*other._array);
 }
+
+/** Deep copy assignment – safe for self-assignment. */
+slang_type_specifier &
+slang_type_specifier::operator=(const slang_type_specifier &other)
+{
+    if (this != &other)
+        *this = slang_type_specifier(other); /* copy-construct then move */
+    return *this;
+}
+
+/** Move constructor – transfers ownership; source is left in empty state. */
+slang_type_specifier::slang_type_specifier(slang_type_specifier &&other) noexcept
+    : type(other.type), _struct(std::move(other._struct)),
+      _array(std::move(other._array))
+{
+    other.type = SLANG_SPEC_VOID;
+}
+
+/** Move assignment – transfers ownership; source is left in empty state. */
+slang_type_specifier &
+slang_type_specifier::operator=(slang_type_specifier &&other) noexcept
+{
+    if (this != &other) {
+        type    = other.type;
+        _struct = std::move(other._struct);
+        _array  = std::move(other._array);
+        other.type = SLANG_SPEC_VOID;
+    }
+    return *this;
+}
+
 
 GLboolean
 slang_type_specifier_copy(slang_type_specifier * x,
 			  const slang_type_specifier * y)
 {
-    slang_type_specifier z;
-
-    slang_type_specifier_ctr(&z);
-    z.type = y->type;
-    if (z.type == SLANG_SPEC_STRUCT) {
-	z._struct = new slang_struct;
-	if (!slang_struct_construct(z._struct)) {
-	    delete z._struct;
-	    slang_type_specifier_dtr(&z);
-	    return GL_FALSE;
-	}
-	if (!slang_struct_copy(z._struct, y->_struct)) {
-	    slang_type_specifier_dtr(&z);
-	    return GL_FALSE;
-	}
-    } else if (z.type == SLANG_SPEC_ARRAY) {
-	z._array = new slang_type_specifier;
-	slang_type_specifier_ctr(z._array);
-	if (!slang_type_specifier_copy(z._array, y->_array)) {
-	    slang_type_specifier_dtr(&z);
-	    return GL_FALSE;
-	}
-    }
-    slang_type_specifier_dtr(x);
-    *x = z;
+    *x = *y;   /* invokes deep copy assignment */
     return GL_TRUE;
 }
 
@@ -232,9 +249,9 @@ slang_type_specifier_equal(const slang_type_specifier * x,
     if (x->type != y->type)
 	return GL_FALSE;
     if (x->type == SLANG_SPEC_STRUCT)
-	return slang_struct_equal(x->_struct, y->_struct);
+	return slang_struct_equal(x->_struct.get(), y->_struct.get());
     if (x->type == SLANG_SPEC_ARRAY)
-	return slang_type_specifier_equal(x->_array, y->_array);
+	return slang_type_specifier_equal(x->_array.get(), y->_array.get());
     return GL_TRUE;
 }
 
@@ -255,26 +272,16 @@ slang_type_specifier_compatible(const slang_type_specifier * x,
     if (x->type != y->type)
 	return GL_FALSE;
     if (x->type == SLANG_SPEC_STRUCT)
-	return slang_struct_equal(x->_struct, y->_struct);
+	return slang_struct_equal(x->_struct.get(), y->_struct.get());
     if (x->type == SLANG_SPEC_ARRAY)
-	return slang_type_specifier_compatible(x->_array, y->_array);
+	return slang_type_specifier_compatible(x->_array.get(), y->_array.get());
     return GL_TRUE;
 }
 
 
-GLboolean
-slang_typeinfo_construct(slang_typeinfo * ti)
-{
-    slang_type_specifier_ctr(&ti->spec);
-    ti->array_len = 0;
-    return GL_TRUE;
-}
 
-GLvoid
-slang_typeinfo_destruct(slang_typeinfo * ti)
-{
-    slang_type_specifier_dtr(&ti->spec);
-}
+
+/* slang_typeinfo_construct and slang_typeinfo_destruct are now inline in slang_typeinfo.h */
 
 
 
@@ -547,7 +554,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    }
 	    ti->can_be_referenced = _ti.can_be_referenced;
 	    if (_ti.spec.type == SLANG_SPEC_ARRAY) {
-		if (!slang_type_specifier_copy(&ti->spec, _ti.spec._array)) {
+		if (!slang_type_specifier_copy(&ti->spec, _ti.spec._array.get())) {
 		    slang_typeinfo_destruct(&_ti);
 		    return GL_FALSE;
 		}
@@ -581,14 +588,12 @@ _slang_typeof_operation_(slang_operation * op,
 		    if (s) {
 			/* struct initializer */
 			ti->spec.type = SLANG_SPEC_STRUCT;
-			ti->spec._struct = new slang_struct;
-			if (!slang_struct_construct(ti->spec._struct)) {
-			    delete ti->spec._struct;
-			    ti->spec._struct = nullptr;
+			auto new_s = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct);
+			if (!slang_struct_construct(new_s.get()))
 			    return GL_FALSE;
-			}
-			if (!slang_struct_copy(ti->spec._struct, s))
+			if (!slang_struct_copy(new_s.get(), s))
 			    return GL_FALSE;
+			ti->spec._struct = std::move(new_s);
 		    } else {
 			/* float, int, vec4, mat3, etc. constructor? */
 			const char *name;
@@ -990,7 +995,7 @@ _slang_gltype_from_specifier(const slang_type_specifier *type)
 	case SLANG_SPEC_SAMPLER2DRECTSHADOW:
 	    return GL_SAMPLER_2D_RECT_SHADOW_ARB;
 	case SLANG_SPEC_ARRAY:
-	    return _slang_gltype_from_specifier(type->_array);
+	    return _slang_gltype_from_specifier(type->_array.get());
 	case SLANG_SPEC_STRUCT:
 	/* fall-through */
 	default:

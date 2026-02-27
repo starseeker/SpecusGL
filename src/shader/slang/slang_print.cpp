@@ -159,7 +159,7 @@ print_variable(const slang_variable *v, int indent)
     printf(" %s", reinterpret_cast<char *>(v->a_name));
     if (v->initializer) {
 	printf(" :=\n");
-	slang_print_tree(v->initializer, indent + 3);
+	slang_print_tree(v->initializer.get(), indent + 3);
     } else {
 	printf(";\n");
     }
@@ -274,7 +274,7 @@ slang_print_tree(const slang_operation *op, int indent)
 			slang_print_tree(&op->children[0], indent + 3);
 		    } else if (v->initializer) {
 			printf(" := INITIALIZER\n");
-			slang_print_tree(v->initializer, indent + 3);
+			slang_print_tree(v->initializer.get(), indent + 3);
 		    } else {
 			printf(";\n");
 		    }
@@ -636,7 +636,7 @@ slang_print_function(const slang_function *f, GLboolean body)
 
     printf(")\n");
     if (body && f->body)
-	slang_print_tree(f->body, 0);
+	slang_print_tree(f->body.get(), 0);
 }
 
 

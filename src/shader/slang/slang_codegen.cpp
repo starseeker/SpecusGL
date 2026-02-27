@@ -201,7 +201,7 @@ _slang_sizeof_type_specifier(const slang_type_specifier *spec)
 	    }
 	    break;
 	case SLANG_SPEC_ARRAY:
-	    sz = _slang_sizeof_type_specifier(spec->_array);
+	    sz = _slang_sizeof_type_specifier(spec->_array.get());
 	    break;
 	default:
 	    _mesa_problem(nullptr, "Unexpected type in _slang_sizeof_type_specifier()");
@@ -719,7 +719,7 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 	    if (v->initializer && oper->children.empty()) {
 		/* set child of oper to copy of initializer */
 		oper->children.resize(1);
-		slang_operation_copy(&oper->children[0], v->initializer);
+		slang_operation_copy(&oper->children[0], v->initializer.get());
 	    }
 	    if (oper->children.size() == 1) {
 		/* the initializer */
@@ -1057,7 +1057,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     }
 
     /* actual code inlining: */
-    slang_operation_copy(inlined, fun->body);
+    slang_operation_copy(inlined, fun->body.get());
 
     /*** XXX review this */
     assert(inlined->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE);
@@ -2010,13 +2010,13 @@ _slang_gen_declaration(slang_assemble_ctx *A, slang_operation *oper)
 	{
 	    slang_operation dup;
 	    slang_operation_construct(&dup);
-	    slang_operation_copy(&dup, v->initializer);
+	    slang_operation_copy(&dup, v->initializer.get());
 	    _slang_simplify(&dup, &A->space, A->atoms);
 	    rhs = _slang_gen_operation(A, &dup);
 	}
 #else
-	_slang_simplify(v->initializer, &A->space, A->atoms);
-	rhs = _slang_gen_operation(A, v->initializer);
+	_slang_simplify(v->initializer.get(), &A->space, A->atoms);
+	rhs = _slang_gen_operation(A, v->initializer.get());
 #endif
 	if (!rhs)
 	    return nullptr;
@@ -2939,9 +2939,9 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
 	    lhs->Store = n->Store;
 
 	    /* constant folding, etc */
-	    _slang_simplify(var->initializer, &A->space, A->atoms);
+	    _slang_simplify(var->initializer.get(), &A->space, A->atoms);
 
-	    rhs = _slang_gen_operation(A, var->initializer);
+	    rhs = _slang_gen_operation(A, var->initializer.get());
 	    assert(rhs);
 	    init = new_node2(IR_MOVE, lhs, rhs);
 	    n = new_seq(n, init);
@@ -3011,7 +3011,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
     A->CurFunction = fun;
 
     /* fold constant expressions, etc. */
-    _slang_simplify(fun->body, &A->space, A->atoms);
+    _slang_simplify(fun->body.get(), &A->space, A->atoms);
 
 #if 0
     printf("\n*********** simplified %s\n", reinterpret_cast<char *>(fun->header.a_name));
@@ -3025,7 +3025,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
     _slang_push_var_table(A->vartable);
 
     /* Generate IR tree for the function body code */
-    n = _slang_gen_operation(A, fun->body);
+    n = _slang_gen_operation(A, fun->body.get());
     if (n)
 	n = new_node1(IR_SCOPE, n);
 

@@ -32,6 +32,7 @@
 #include "slang_log.h"
 #include "slang_utility.h"
 #include "slang_vartable.h"
+#include <memory>
 
 
 struct slang_operation;
@@ -135,19 +136,66 @@ enum slang_type_specifier_type {
 
 /**
  * Describes more sophisticated types, like structs and arrays.
+ *
+ * C++17 modernisation: _struct and _array are now RAII-managed via
+ * std::unique_ptr.  A custom deleter (SlangStructDeleter) is used for
+ * _struct so that slang_struct_destruct() is called before deallocation;
+ * the full definition of SlangStructDeleter::operator() lives in
+ * slang_typeinfo.cpp where slang_struct is complete.
+ *
+ * The legacy slang_type_specifier_ctr/dtr/copy free functions are kept
+ * as thin wrappers so that existing call sites do not need to change
+ * immediately; they now delegate to the C++ constructor/destructor/copy.
  */
+
+/**
+ * Custom deleter for slang_struct: calls slang_struct_destruct() before
+ * releasing the object.  Defined out-of-line in slang_typeinfo.cpp so that
+ * slang_struct is complete at the point of instantiation.
+ */
+struct SlangStructDeleter {
+    void operator()(slang_struct *s) const noexcept;
+};
+
 struct slang_type_specifier {
-    slang_type_specifier_type type;
-    slang_struct *_struct;         /**< used if type == spec_struct */
-    slang_type_specifier *_array;  /**< used if type == spec_array */
+    slang_type_specifier_type type = SLANG_SPEC_VOID;
+    /** Owned struct definition (only when type == SLANG_SPEC_STRUCT). */
+    std::unique_ptr<slang_struct, SlangStructDeleter> _struct;
+    /** Owned element-type specifier (only when type == SLANG_SPEC_ARRAY). */
+    std::unique_ptr<slang_type_specifier> _array;
+
+    /** Default constructor – leaves _struct/_array null, type=VOID. */
+    slang_type_specifier() noexcept = default;
+
+    /**
+     * Destructor.  Non-inline so that the full definition of slang_struct is
+     * available in the TU that instantiates ~unique_ptr<slang_struct>.
+     */
+    ~slang_type_specifier();
+
+    /** Deep copy constructor. */
+    slang_type_specifier(const slang_type_specifier &other);
+    /** Deep copy assignment. */
+    slang_type_specifier &operator=(const slang_type_specifier &other);
+
+    /** Move constructor – transfers ownership; source is left empty. */
+    slang_type_specifier(slang_type_specifier &&other) noexcept;
+    /** Move assignment – transfers ownership; source is left empty. */
+    slang_type_specifier &operator=(slang_type_specifier &&other) noexcept;
 };
 
 
-extern GLvoid
-slang_type_specifier_ctr(slang_type_specifier *);
+/** Legacy wrapper – equivalent to default-constructing the specifier. */
+inline void slang_type_specifier_ctr(slang_type_specifier *self) {
+    *self = slang_type_specifier{};
+}
 
-extern GLvoid
-slang_type_specifier_dtr(slang_type_specifier *);
+/** Legacy wrapper – equivalent to destroying + default-constructing. */
+inline void slang_type_specifier_dtr(slang_type_specifier *self) {
+    self->_struct.reset();
+    self->_array.reset();
+    self->type = SLANG_SPEC_VOID;
+}
 
 extern GLboolean
 slang_type_specifier_copy(slang_type_specifier *, const slang_type_specifier *);
@@ -158,18 +206,25 @@ slang_type_specifier_equal(const slang_type_specifier *,
 
 
 struct slang_typeinfo {
-    GLboolean can_be_referenced;
-    GLboolean is_swizzled;
-    slang_swizzle swz;
+    GLboolean can_be_referenced = GL_FALSE;
+    GLboolean is_swizzled = GL_FALSE;
+    slang_swizzle swz{};
     slang_type_specifier spec;
-    GLuint array_len;
+    GLuint array_len = 0;
 };
 
-extern GLboolean
-slang_typeinfo_construct(slang_typeinfo *);
+/** Legacy wrapper – spec is default-constructed; just initialise the plain fields. */
+inline GLboolean slang_typeinfo_construct(slang_typeinfo *ti) {
+    ti->can_be_referenced = GL_FALSE;
+    ti->is_swizzled = GL_FALSE;
+    ti->array_len = 0;
+    return GL_TRUE;
+}
 
-extern GLvoid
-slang_typeinfo_destruct(slang_typeinfo *);
+/** Legacy wrapper – spec destructor runs automatically; nothing else to free. */
+inline void slang_typeinfo_destruct(slang_typeinfo *ti) {
+    ti->spec = slang_type_specifier{};
+}
 
 
 /**

@@ -101,13 +101,14 @@ int
 slang_fully_specified_type_construct(slang_fully_specified_type * type)
 {
     type->qualifier = SLANG_QUAL_NONE;
-    slang_type_specifier_ctr(&type->specifier);
+    /* specifier is default-constructed (VOID, null ptrs) by the struct */
     return 1;
 }
 
 void
 slang_fully_specified_type_destruct(slang_fully_specified_type * type)
 {
+    /* specifier unique_ptrs handle their own cleanup */
     slang_type_specifier_dtr(&type->specifier);
 }
 
@@ -115,17 +116,8 @@ int
 slang_fully_specified_type_copy(slang_fully_specified_type * x,
 				const slang_fully_specified_type * y)
 {
-    slang_fully_specified_type z;
-
-    if (!slang_fully_specified_type_construct(&z))
-	return 0;
-    z.qualifier = y->qualifier;
-    if (!slang_type_specifier_copy(&z.specifier, &y->specifier)) {
-	slang_fully_specified_type_destruct(&z);
-	return 0;
-    }
-    slang_fully_specified_type_destruct(x);
-    *x = z;
+    x->qualifier = y->qualifier;
+    x->specifier = y->specifier;  /* deep copy via slang_type_specifier copy assignment */
     return 1;
 }
 
@@ -237,7 +229,7 @@ slang_variable_construct(slang_variable * var)
 	return 0;
     var->a_name = SLANG_ATOM_NULL;
     var->array_len = 0;
-    var->initializer = nullptr;
+    /* initializer is a unique_ptr, default-constructed to null */
     var->address = ~0;
     var->size = 0;
     var->isTemp = GL_FALSE;
@@ -250,11 +242,8 @@ void
 slang_variable_destruct(slang_variable * var)
 {
     slang_fully_specified_type_destruct(&var->type);
-    if (var->initializer != nullptr) {
-	slang_operation_destruct(var->initializer);
-	delete var->initializer;
-	var->initializer = nullptr;
-    }
+    /* initializer unique_ptr is destroyed automatically */
+    var->initializer.reset();
 }
 
 
@@ -271,15 +260,14 @@ slang_variable_copy(slang_variable * x, const slang_variable * y)
     }
     z.a_name = y->a_name;
     z.array_len = y->array_len;
-    if (y->initializer != nullptr) {
-	z.initializer = new slang_operation;
-	if (!slang_operation_construct(z.initializer)) {
-	    delete z.initializer;
-	    z.initializer = nullptr;
+    if (y->initializer) {
+	z.initializer = std::make_unique<slang_operation>();
+	if (!slang_operation_construct(z.initializer.get())) {
+	    z.initializer.reset();
 	    slang_variable_destruct(&z);
 	    return 0;
 	}
-	if (!slang_operation_copy(z.initializer, y->initializer)) {
+	if (!slang_operation_copy(z.initializer.get(), y->initializer.get())) {
 	    slang_variable_destruct(&z);
 	    return 0;
 	}
@@ -287,7 +275,7 @@ slang_variable_copy(slang_variable * x, const slang_variable * y)
     z.address = y->address;
     z.size = y->size;
     slang_variable_destruct(x);
-    *x = z;
+    *x = std::move(z);
     return 1;
 }
 

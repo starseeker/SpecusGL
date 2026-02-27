@@ -57,10 +57,10 @@ slang_function_construct(slang_function * func)
     if (!slang_variable_construct(&func->header))
 	return 0;
 
-    func->parameters = new slang_variable_scope;
-    _slang_variable_scope_ctr(func->parameters);
+    func->parameters = std::make_unique<slang_variable_scope>();
+    _slang_variable_scope_ctr(func->parameters.get());
     func->param_count = 0;
-    func->body = nullptr;
+    /* body is a unique_ptr, default-constructed to null */
     func->address = ~0;
     slang_fixup_table_init(&func->fixups);
     return 1;
@@ -70,14 +70,13 @@ void
 slang_function_destruct(slang_function * func)
 {
     slang_variable_destruct(&func->header);
-    slang_variable_scope_destruct(func->parameters);
-    delete func->parameters;
-    func->parameters = nullptr;
-    if (func->body != nullptr) {
-	slang_operation_destruct(func->body);
-	delete func->body;
-	func->body = nullptr;
-    }
+    /* parameters and body unique_ptrs handle their own cleanup */
+    if (func->parameters)
+	slang_variable_scope_destruct(func->parameters.get());
+    func->parameters.reset();
+    if (func->body)
+	slang_operation_destruct(func->body.get());
+    func->body.reset();
     slang_fixup_table_free(&func->fixups);
 }
 

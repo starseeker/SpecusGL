@@ -26,6 +26,7 @@
 #define SLANG_COMPILE_VARIABLE_H
 
 #include <vector>
+#include <memory>
 
 
 
@@ -67,12 +68,16 @@
 
     /**
      * A shading language program variable.
+     *
+     * C++17 modernisation: initializer is now a std::unique_ptr so it is
+     * automatically freed when the variable is destroyed without needing
+     * an explicit call to slang_operation_destruct + delete.
      */
     struct slang_variable {
 	slang_fully_specified_type type; /**< Variable's data type */
 	slang_atom a_name;               /**< The variable's name (char *) */
 	GLuint array_len;                /**< only if type == SLANG_SPEC_ARRAy */
-	struct slang_operation *initializer; /**< Optional initializer code */
+	std::unique_ptr<slang_operation> initializer; /**< Optional initializer code */
 	GLuint address;                  /**< Storage location */
 	GLuint size;                     /**< Variable's size in bytes */
 	GLboolean isTemp;                /**< a named temporary (__resultTmp) */

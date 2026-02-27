@@ -214,7 +214,7 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 		arr->aggregate = nullptr;
 		return GL_FALSE;
 	    }
-	    if (!_slang_aggregate_variable(arr->aggregate, spec->_array, 0,
+	    if (!_slang_aggregate_variable(arr->aggregate, spec->_array.get(), 0,
 					   funcs, structs, vars, atoms))
 		return GL_FALSE;
 	    arr->length = array_len;
