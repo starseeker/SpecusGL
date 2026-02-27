@@ -253,7 +253,7 @@ _slang_sizeof_aggregate(const slang_storage_aggregate * agg)
 
 
 #if 0
-GLboolean
+bool
 _slang_flatten_aggregate(slang_storage_aggregate * flat,
 			 const slang_storage_aggregate * agg)
 {
@@ -265,7 +265,7 @@ _slang_flatten_aggregate(slang_storage_aggregate * flat,
 	for (j = 0; j < agg->arrays[i].length; j++) {
 	    if (agg->arrays[i].type == SLANG_STORE_AGGREGATE) {
 		if (!_slang_flatten_aggregate(flat, agg->arrays[i].aggregate))
-		    return GL_FALSE;
+		    return false;
 	    } else {
 		GLuint k, count;
 		slang_storage_type type;
@@ -283,14 +283,14 @@ _slang_flatten_aggregate(slang_storage_aggregate * flat,
 
 		    arr = slang_storage_aggregate_push_new(flat);
 		    if (arr == nullptr)
-			return GL_FALSE;
+			return false;
 		    arr->type = type;
 		    arr->length = 1;
 		}
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 #endif
 
