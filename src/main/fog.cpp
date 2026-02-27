@@ -60,7 +60,7 @@ _mesa_Fogiv(GLenum pname, const GLint *params)
 	case GL_FOG_END:
 	case GL_FOG_INDEX:
 	case GL_FOG_COORDINATE_SOURCE_EXT:
-	    p[0] = (GLfloat) *params;
+	    p[0] = static_cast<GLfloat>(*params);
 	    break;
 	case GL_FOG_COLOR:
 	    p[0] = INT_TO_FLOAT(params[0]);
@@ -93,7 +93,7 @@ _mesa_Fogfv(GLenum pname, const GLfloat *params)
 
     switch (pname) {
 	case GL_FOG_MODE:
-	    m = (GLenum)(GLint) *params;
+	    m = static_cast<GLenum>(static_cast<GLint>(*params));
 	    switch (m) {
 		case GL_LINEAR:
 		case GL_EXP:
@@ -148,7 +148,7 @@ _mesa_Fogfv(GLenum pname, const GLfloat *params)
 	    ctx->Fog.Color[3] = CLAMP(params[3], 0.0F, 1.0F);
 	    break;
 	case GL_FOG_COORDINATE_SOURCE_EXT: {
-	    GLenum p = (GLenum)(GLint) *params;
+	    GLenum p = static_cast<GLenum>(static_cast<GLint>(*params));
 	    if (!ctx->Extensions.EXT_fog_coord ||
 		(p != GL_FOG_COORDINATE_EXT && p != GL_FRAGMENT_DEPTH_EXT)) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glFog");

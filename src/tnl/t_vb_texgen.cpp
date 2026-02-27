@@ -125,7 +125,7 @@ static void build_m3(GLfloat f[][3], GLfloat m[],
 	fz = f[i][2] = u[2] - norm[2] * two_nu;
 	m[i] = fx * fx + fy * fy + (fz + 1.0F) * (fz + 1.0F);
 	if (m[i] != 0.0F) {
-	    m[i] = 0.5F * _mesa_inv_sqrtf(m[i]);
+	    m[i] = 0.5F * (1.0f / std::sqrt(m[i]));
 	}
     }
 }
@@ -154,7 +154,7 @@ static void build_m2(GLfloat f[][3], GLfloat m[],
 	fz = f[i][2] = u[2] - norm[2] * two_nu;
 	m[i] = fx * fx + fy * fy + (fz + 1.0F) * (fz + 1.0F);
 	if (m[i] != 0.0F) {
-	    m[i] = 0.5F * _mesa_inv_sqrtf(m[i]);
+	    m[i] = 0.5F * (1.0f / std::sqrt(m[i]));
 	}
     }
 }

@@ -55,7 +55,7 @@ _swrast_Bitmap(GLcontext *ctx, GLint px, GLint py,
     GLuint count = 0;
     SWspan span;
 
-    ASSERT(ctx->RenderMode == GL_RENDER);
+    assert(ctx->RenderMode == GL_RENDER);
 
     if (unpack->BufferObj->Name) {
 	/* unpack from PBO */
@@ -177,8 +177,8 @@ _swrast_Bitmap(GLcontext *ctx, GLint px, GLint py,
     GLint row, col;
     SWspan span;
 
-    ASSERT(ctx->RenderMode == GL_RENDER);
-    ASSERT(bitmap);
+    assert(ctx->RenderMode == GL_RENDER);
+    assert(bitmap);
 
     RENDER_START(swrast,ctx);
 

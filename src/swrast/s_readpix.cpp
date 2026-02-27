@@ -58,13 +58,13 @@ read_index_pixels(GLcontext *ctx,
 	return;
 
     /* width should never be > MAX_WIDTH since we did clipping earlier */
-    ASSERT(width <= MAX_WIDTH);
+    assert(width <= MAX_WIDTH);
 
     /* process image row by row */
     for (i = 0; i < height; i++) {
 	GLuint index[MAX_WIDTH];
 	GLvoid *dest;
-	ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	assert(rb->DataType == GL_UNSIGNED_INT);
 	rb->GetRow(ctx, width, x, y + i, index);
 
 	dest = _mesa_image_address2d(packing, pixels, width, height,
@@ -96,19 +96,19 @@ read_depth_pixels(GLcontext *ctx,
 	return;
 
     /* clipping should have been done already */
-    ASSERT(x >= 0);
-    ASSERT(y >= 0);
-    ASSERT(x + width <= (GLint) rb->Width);
-    ASSERT(y + height <= (GLint) rb->Height);
+    assert(x >= 0);
+    assert(y >= 0);
+    assert(x + width <= static_cast<GLint>(rb->Width));
+    assert(y + height <= static_cast<GLint>(rb->Height));
     /* width should never be > MAX_WIDTH since we did clipping earlier */
-    ASSERT(width <= MAX_WIDTH);
+    assert(width <= MAX_WIDTH);
 
     if (type == GL_UNSIGNED_SHORT && fb->Visual.depthBits == 16
 	&& !biasOrScale && !packing->SwapBytes) {
 	/* Special case: directly read 16-bit unsigned depth values. */
 	GLint j;
-	ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT16);
-	ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
+	assert(rb->InternalFormat == GL_DEPTH_COMPONENT16);
+	assert(rb->DataType == GL_UNSIGNED_SHORT);
 	for (j = 0; j < height; j++, y++) {
 	    void *dest =_mesa_image_address2d(packing, pixels, width, height,
 					      GL_DEPTH_COMPONENT, type, j, 0);
@@ -118,8 +118,8 @@ read_depth_pixels(GLcontext *ctx,
 	       && !biasOrScale && !packing->SwapBytes) {
 	/* Special case: directly read 24-bit unsigned depth values. */
 	GLint j;
-	ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT24);
-	ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	assert(rb->InternalFormat == GL_DEPTH_COMPONENT24);
+	assert(rb->DataType == GL_UNSIGNED_INT);
 	for (j = 0; j < height; j++, y++) {
 	    GLuint *dest = static_cast<GLuint *>(
 			   _mesa_image_address2d(packing, pixels, width, height,
@@ -136,8 +136,8 @@ read_depth_pixels(GLcontext *ctx,
 	       && !biasOrScale && !packing->SwapBytes) {
 	/* Special case: directly read 32-bit unsigned depth values. */
 	GLint j;
-	ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT32);
-	ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	assert(rb->InternalFormat == GL_DEPTH_COMPONENT32);
+	assert(rb->DataType == GL_UNSIGNED_INT);
 	for (j = 0; j < height; j++, y++) {
 	    void *dest = _mesa_image_address2d(packing, pixels, width, height,
 					       GL_DEPTH_COMPONENT, type, j, 0);
@@ -175,7 +175,7 @@ read_stencil_pixels(GLcontext *ctx,
 	return;
 
     /* width should never be > MAX_WIDTH since we did clipping earlier */
-    ASSERT(width <= MAX_WIDTH);
+    assert(width <= MAX_WIDTH);
 
     /* process image row by row */
     for (j=0; j<height; j++,y++) {
@@ -212,11 +212,11 @@ fast_read_rgba_pixels(GLcontext *ctx,
     if (!rb)
 	return GL_FALSE;
 
-    ASSERT(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
+    assert(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
 
     /* clipping should have already been done */
-    ASSERT(x + width <= (GLint) rb->Width);
-    ASSERT(y + height <= (GLint) rb->Height);
+    assert(x + width <= static_cast<GLint>(rb->Width));
+    assert(y + height <= static_cast<GLint>(rb->Height));
 
     /* check for things we can't handle here */
     if (transferOps ||
@@ -232,7 +232,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
 						format, type, 0, 0));
 	GLint row;
-	ASSERT(rb->GetRow);
+	assert(rb->GetRow);
 	for (row = 0; row < height; row++) {
 	    rb->GetRow(ctx, width, x, y + row, dest);
 	    dest += dstStride;
@@ -249,7 +249,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
 						format, type, 0, 0));
 	GLint row;
-	ASSERT(rb->GetRow);
+	assert(rb->GetRow);
 	for (row = 0; row < height; row++) {
 	    GLubyte tempRow[MAX_WIDTH][4];
 	    GLint col;
@@ -285,9 +285,9 @@ adjust_colors(GLcontext *ctx, GLuint n, GLfloat rgba[][4])
     const GLuint rShift = 8 - ctx->Visual.redBits;
     const GLuint gShift = 8 - ctx->Visual.greenBits;
     const GLuint bShift = 8 - ctx->Visual.blueBits;
-    const GLfloat rScale = 1.0F / (GLfloat)((1 << ctx->Visual.redBits) - 1);
-    const GLfloat gScale = 1.0F / (GLfloat)((1 << ctx->Visual.greenBits) - 1);
-    const GLfloat bScale = 1.0F / (GLfloat)((1 << ctx->Visual.blueBits) - 1);
+    const GLfloat rScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.redBits) - 1));
+    const GLfloat gScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.greenBits) - 1));
+    const GLfloat bScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.blueBits) - 1));
     GLuint i;
     for (i = 0; i < n; i++) {
 	GLint r, g, b;
@@ -298,9 +298,9 @@ adjust_colors(GLcontext *ctx, GLuint n, GLfloat rgba[][4])
 	/* using only the N most significant bits of the ubyte value, convert to
 	 * float in [0,1].
 	 */
-	rgba[i][RCOMP] = (GLfloat)(r >> rShift) * rScale;
-	rgba[i][GCOMP] = (GLfloat)(g >> gShift) * gScale;
-	rgba[i][BCOMP] = (GLfloat)(b >> bShift) * bScale;
+	rgba[i][RCOMP] = static_cast<GLfloat>((r >> rShift)) * rScale;
+	rgba[i][GCOMP] = static_cast<GLfloat>((g >> gShift)) * gScale;
+	rgba[i][BCOMP] = static_cast<GLfloat>((b >> bShift)) * bScale;
     }
 }
 
@@ -336,7 +336,7 @@ read_rgba_pixels(GLcontext *ctx,
     }
 
     /* width should never be > MAX_WIDTH since we did clipping earlier */
-    ASSERT(width <= MAX_WIDTH);
+    assert(width <= MAX_WIDTH);
 
     if (ctx->Pixel.Convolution2DEnabled || ctx->Pixel.Separable2DEnabled) {
 	std::vector<GLfloat> tmpVec(static_cast<size_t>(width) * height * 4);
@@ -351,7 +351,7 @@ read_rgba_pixels(GLcontext *ctx,
 		_swrast_read_rgba_span(ctx, rb, width, x, y, GL_FLOAT, dest);
 	    } else {
 		GLuint index[MAX_WIDTH];
-		ASSERT(rb->DataType == GL_UNSIGNED_INT);
+		assert(rb->DataType == GL_UNSIGNED_INT);
 		rb->GetRow(ctx, width, x, y, index);
 		_mesa_apply_ci_transfer_ops(ctx,
 					    transferOps & IMAGE_SHIFT_OFFSET_BIT,
@@ -368,7 +368,7 @@ read_rgba_pixels(GLcontext *ctx,
 	if (ctx->Pixel.Convolution2DEnabled) {
 	    _mesa_convolve_2d_image(ctx, &width, &height, tmpVec.data(), convVec.data());
 	} else {
-	    ASSERT(ctx->Pixel.Separable2DEnabled);
+	    assert(ctx->Pixel.Separable2DEnabled);
 	    _mesa_convolve_sep_image(ctx, &width, &height, tmpVec.data(), convVec.data());
 	}
 	/* tmpVec is no longer needed */
@@ -407,7 +407,7 @@ read_rgba_pixels(GLcontext *ctx,
 	    } else {
 		/* read CI and convert to RGBA */
 		GLuint index[MAX_WIDTH];
-		ASSERT(rb->DataType == GL_UNSIGNED_INT);
+		assert(rb->DataType == GL_UNSIGNED_INT);
 		rb->GetRow(ctx, width, x, y, index);
 		_mesa_apply_ci_transfer_ops(ctx,
 					    transferOps & IMAGE_SHIFT_OFFSET_BIT,
@@ -502,7 +502,7 @@ read_depth_stencil_pixels(GLcontext *ctx,
 		/* ideal case */
 		GLuint zVals[MAX_WIDTH]; /* 24-bit values! */
 		GLint j;
-		ASSERT(depthRb->DataType == GL_UNSIGNED_INT);
+		assert(depthRb->DataType == GL_UNSIGNED_INT);
 		/* note, we've already been clipped */
 		depthRb->GetRow(ctx, width, x, y + i, zVals);
 		for (j = 0; j < width; j++) {

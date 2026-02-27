@@ -165,19 +165,19 @@ void
 _mesa_remove_attachment(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 {
     if (att->Type == GL_TEXTURE) {
-	ASSERT(att->Texture);
+	assert(att->Texture);
 	if (ctx->Driver.FinishRenderTexture) {
 	    /* tell driver we're done rendering to this texobj */
 	    ctx->Driver.FinishRenderTexture(ctx, att);
 	}
 	_mesa_reference_texobj(&att->Texture, nullptr); /* unbind */
-	ASSERT(!att->Texture);
+	assert(!att->Texture);
     }
     if (att->Type == GL_TEXTURE || att->Type == GL_RENDERBUFFER_EXT) {
-	ASSERT(att->Renderbuffer);
-	ASSERT(!att->Texture);
+	assert(att->Renderbuffer);
+	assert(!att->Texture);
 	_mesa_reference_renderbuffer(&att->Renderbuffer, nullptr); /* unbind */
-	ASSERT(!att->Renderbuffer);
+	assert(!att->Renderbuffer);
     }
     att->Type = GL_NONE;
     att->Complete = GL_TRUE;
@@ -197,7 +197,7 @@ _mesa_set_texture_attachment(GLcontext *ctx,
 {
     if (att->Texture == texObj) {
 	/* re-attaching same texture */
-	ASSERT(att->Type == GL_TEXTURE);
+	assert(att->Type == GL_TEXTURE);
     } else {
 	/* new attachment */
 	_mesa_remove_attachment(ctx, att);
@@ -325,7 +325,7 @@ test_attachment_completeness(const GLcontext *ctx, GLenum format,
 	    return;
 	}
     } else if (att->Type == GL_RENDERBUFFER_EXT) {
-	ASSERT(att->Renderbuffer);
+	assert(att->Renderbuffer);
 	if (!att->Renderbuffer->InternalFormat ||
 	    att->Renderbuffer->Width < 1 ||
 	    att->Renderbuffer->Height < 1) {
@@ -335,14 +335,14 @@ test_attachment_completeness(const GLcontext *ctx, GLenum format,
 	if (format == GL_COLOR) {
 	    if (att->Renderbuffer->_BaseFormat != GL_RGB &&
 		att->Renderbuffer->_BaseFormat != GL_RGBA) {
-		ASSERT(att->Renderbuffer->RedBits);
-		ASSERT(att->Renderbuffer->GreenBits);
-		ASSERT(att->Renderbuffer->BlueBits);
+		assert(att->Renderbuffer->RedBits);
+		assert(att->Renderbuffer->GreenBits);
+		assert(att->Renderbuffer->BlueBits);
 		att->Complete = GL_FALSE;
 		return;
 	    }
 	} else if (format == GL_DEPTH) {
-	    ASSERT(att->Renderbuffer->DepthBits);
+	    assert(att->Renderbuffer->DepthBits);
 	    if (att->Renderbuffer->_BaseFormat == GL_DEPTH_COMPONENT) {
 		/* OK */
 	    } else if (ctx->Extensions.EXT_packed_depth_stencil &&
@@ -354,7 +354,7 @@ test_attachment_completeness(const GLcontext *ctx, GLenum format,
 	    }
 	} else {
 	    assert(format == GL_STENCIL);
-	    ASSERT(att->Renderbuffer->StencilBits);
+	    assert(att->Renderbuffer->StencilBits);
 	    if (att->Renderbuffer->_BaseFormat == GL_STENCIL_INDEX) {
 		/* OK */
 	    } else if (ctx->Extensions.EXT_packed_depth_stencil &&
@@ -366,7 +366,7 @@ test_attachment_completeness(const GLcontext *ctx, GLenum format,
 	    }
 	}
     } else {
-	ASSERT(att->Type == GL_NONE);
+	assert(att->Type == GL_NONE);
 	/* complete */
 	return;
     }
@@ -573,7 +573,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindRenderbufferEXT");
 		return;
 	    }
-	    ASSERT(newRb);
+	    assert(newRb);
 	    ctx->Shared->RenderBuffers.insert(renderbuffer, newRb);
 	    newRb->RefCount = 1; /* referenced by hash table */
 	}
@@ -581,7 +581,7 @@ _mesa_BindRenderbufferEXT(GLenum target, GLuint renderbuffer)
 	newRb = nullptr;
     }
 
-    ASSERT(newRb != &DummyRenderbuffer);
+    assert(newRb != &DummyRenderbuffer);
 
     _mesa_reference_renderbuffer(&ctx->CurrentRenderbuffer, newRb);
 }
@@ -604,7 +604,7 @@ _mesa_DeleteRenderbuffersEXT(GLsizei n, const GLuint *renderbuffers)
 		/* check if deleting currently bound renderbuffer object */
 		if (rb == ctx->CurrentRenderbuffer) {
 		    /* bind default */
-		    ASSERT(rb->RefCount >= 2);
+		    assert(rb->RefCount >= 2);
 		    _mesa_BindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 		}
 
@@ -878,7 +878,7 @@ static void
 check_begin_texture_render(GLcontext *ctx, struct gl_framebuffer *fb)
 {
     GLuint i;
-    ASSERT(ctx->Driver.RenderTexture);
+    assert(ctx->Driver.RenderTexture);
     for (i = 0; i < BUFFER_COUNT; i++) {
 	struct gl_renderbuffer_attachment *att = fb->Attachment + i;
 	struct gl_texture_object *texObj = att->Texture;
@@ -973,7 +973,7 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 		return;
 	    }
 	    ctx->Shared->FrameBuffers.insert(framebuffer, newFb);
-	    ASSERT(newFb->RefCount == 1);
+	    assert(newFb->RefCount == 1);
 	}
     } else {
 	/* Binding the window system framebuffer (which was originally set
@@ -982,8 +982,8 @@ _mesa_BindFramebufferEXT(GLenum target, GLuint framebuffer)
 	newFb = ctx->WinSysDrawBuffer;
     }
 
-    ASSERT(newFb);
-    ASSERT(newFb != &DummyFramebuffer);
+    assert(newFb);
+    assert(newFb != &DummyFramebuffer);
 
     /*
      * XXX check if re-binding same buffer and skip some of this code.
@@ -1031,12 +1031,12 @@ _mesa_DeleteFramebuffersEXT(GLsizei n, const GLuint *framebuffers)
 	    struct gl_framebuffer *fb;
 	    fb = _mesa_lookup_framebuffer(ctx, framebuffers[i]);
 	    if (fb) {
-		ASSERT(fb == &DummyFramebuffer || fb->Name == framebuffers[i]);
+		assert(fb == &DummyFramebuffer || fb->Name == framebuffers[i]);
 
 		/* check if deleting currently bound framebuffer object */
 		if (fb == ctx->DrawBuffer) {
 		    /* bind default */
-		    ASSERT(fb->RefCount >= 2);
+		    assert(fb->RefCount >= 2);
 		    _mesa_BindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		}
 
@@ -1154,7 +1154,7 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
     }
 
     fb = ctx->DrawBuffer;
-    ASSERT(fb);
+    assert(fb);
 
     /* check framebuffer binding */
     if (fb->Name == 0) {
@@ -1589,7 +1589,7 @@ _mesa_BlitFramebufferEXT(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
 	return;
     }
 
-    ASSERT(ctx->Driver.BlitFramebuffer);
+    assert(ctx->Driver.BlitFramebuffer);
     ctx->Driver.BlitFramebuffer(ctx,
 				srcX0, srcY0, srcX1, srcY1,
 				dstX0, dstY0, dstX1, dstY1,

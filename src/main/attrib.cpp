@@ -377,8 +377,8 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
     for (i=0; i<MAX_CLIP_PLANES; i++) {
 	const GLuint mask = 1 << i;
 	if ((ctx->Transform.ClipPlanesEnabled & mask) != (enable->ClipPlanes & mask))
-	    _mesa_set_enable(ctx, (GLenum)(GL_CLIP_PLANE0 + i),
-			     (GLboolean)((enable->ClipPlanes & mask) ? GL_TRUE : GL_FALSE));
+	    _mesa_set_enable(ctx, static_cast<GLenum>((GL_CLIP_PLANE0 + i)),
+			     static_cast<GLboolean>(((enable->ClipPlanes & mask) ? GL_TRUE : GL_FALSE)));
     }
 
     TEST_AND_UPDATE(ctx->Light.ColorMaterialEnabled, enable->ColorMaterial,
@@ -515,17 +515,17 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
 		    (*ctx->Driver.ActiveTexture)(ctx, i);
 		}
 		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_1D,
-				      (GLboolean)(enable->Texture[i] & TEXTURE_1D_BIT));
+				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_1D_BIT)));
 		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_2D,
-				      (GLboolean)(enable->Texture[i] & TEXTURE_2D_BIT));
+				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_2D_BIT)));
 		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_3D,
-				      (GLboolean)(enable->Texture[i] & TEXTURE_3D_BIT));
+				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_3D_BIT)));
 		if (ctx->Extensions.ARB_texture_cube_map)
 		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_CUBE_MAP_ARB,
-					  (GLboolean)(enable->Texture[i] & TEXTURE_CUBE_BIT));
+					  static_cast<GLboolean>((enable->Texture[i] & TEXTURE_CUBE_BIT)));
 		if (ctx->Extensions.NV_texture_rectangle)
 		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_RECTANGLE_NV,
-					  (GLboolean)(enable->Texture[i] & TEXTURE_RECT_BIT));
+					  static_cast<GLboolean>((enable->Texture[i] & TEXTURE_RECT_BIT)));
 	    }
 	}
 
@@ -678,27 +678,27 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 	    switch (tgt) {
 		case TEXTURE_1D_INDEX:
 		    obj = &texstate->Saved1D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_1D);
+		    assert(obj->Target == GL_TEXTURE_1D);
 		    break;
 		case TEXTURE_2D_INDEX:
 		    obj = &texstate->Saved2D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_2D);
+		    assert(obj->Target == GL_TEXTURE_2D);
 		    break;
 		case TEXTURE_3D_INDEX:
 		    obj = &texstate->Saved3D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_3D);
+		    assert(obj->Target == GL_TEXTURE_3D);
 		    break;
 		case TEXTURE_CUBE_INDEX:
 		    if (!ctx->Extensions.ARB_texture_cube_map)
 			continue;
 		    obj = &texstate->SavedCube[u];
-		    ASSERT(obj->Target == GL_TEXTURE_CUBE_MAP_ARB);
+		    assert(obj->Target == GL_TEXTURE_CUBE_MAP_ARB);
 		    break;
 		case TEXTURE_RECT_INDEX:
 		    if (!ctx->Extensions.NV_texture_rectangle)
 			continue;
 		    obj = &texstate->SavedRect[u];
-		    ASSERT(obj->Target == GL_TEXTURE_RECTANGLE_NV);
+		    assert(obj->Target == GL_TEXTURE_RECTANGLE_NV);
 		    break;
 		default:
 		    _mesa_problem(ctx, "bad texture index in pop_texture_group");
@@ -800,16 +800,16 @@ _mesa_PopAttrib(void)
 	    case GL_COLOR_BUFFER_BIT: {
 		const struct gl_colorbuffer_attrib *color;
 		color = (const struct gl_colorbuffer_attrib *) data;
-		_mesa_ClearIndex((GLfloat) color->ClearIndex);
+		_mesa_ClearIndex(static_cast<GLfloat>(color->ClearIndex));
 		_mesa_ClearColor(color->ClearColor[0],
 				 color->ClearColor[1],
 				 color->ClearColor[2],
 				 color->ClearColor[3]);
 		_mesa_IndexMask(color->IndexMask);
-		_mesa_ColorMask((GLboolean)(color->ColorMask[0] != 0),
-				(GLboolean)(color->ColorMask[1] != 0),
-				(GLboolean)(color->ColorMask[2] != 0),
-				(GLboolean)(color->ColorMask[3] != 0));
+		_mesa_ColorMask(static_cast<GLboolean>((color->ColorMask[0] != 0)),
+				static_cast<GLboolean>((color->ColorMask[1] != 0)),
+				static_cast<GLboolean>((color->ColorMask[2] != 0)),
+				static_cast<GLboolean>((color->ColorMask[3] != 0)));
 		{
 		    /* Need to determine if more than one color output is
 		     * specified.  If so, call glDrawBuffersARB, else call
@@ -954,11 +954,11 @@ _mesa_PopAttrib(void)
 		_mesa_LightModelfv(GL_LIGHT_MODEL_AMBIENT,
 				   light->Model.Ambient);
 		_mesa_LightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER,
-				  (GLfloat) light->Model.LocalViewer);
+				  static_cast<GLfloat>(light->Model.LocalViewer));
 		_mesa_LightModelf(GL_LIGHT_MODEL_TWO_SIDE,
-				  (GLfloat) light->Model.TwoSide);
+				  static_cast<GLfloat>(light->Model.TwoSide));
 		_mesa_LightModelf(GL_LIGHT_MODEL_COLOR_CONTROL,
-				  (GLfloat) light->Model.ColorControl);
+				  static_cast<GLfloat>(light->Model.ColorControl));
 		/* shade model */
 		_mesa_ShadeModel(light->ShadeModel);
 		/* color material */
@@ -1008,14 +1008,14 @@ _mesa_PopAttrib(void)
 		    GLuint u;
 		    for (u = 0; u < ctx->Const.MaxTextureUnits; u++) {
 			_mesa_TexEnvi(GL_POINT_SPRITE_NV, GL_COORD_REPLACE_NV,
-				      (GLint) point->CoordReplace[u]);
+				      static_cast<GLint>(point->CoordReplace[u]));
 		    }
 		    _mesa_set_enable(ctx, GL_POINT_SPRITE_NV,point->PointSprite);
 		    if (ctx->Extensions.NV_point_sprite)
 			_mesa_PointParameteriNV(GL_POINT_SPRITE_R_MODE_NV,
 						ctx->Point.SpriteRMode);
 		    _mesa_PointParameterfEXT(GL_POINT_SPRITE_COORD_ORIGIN,
-					     (GLfloat)ctx->Point.SpriteOrigin);
+					     static_cast<GLfloat>(ctx->Point.SpriteOrigin));
 		}
 	    }
 	    break;

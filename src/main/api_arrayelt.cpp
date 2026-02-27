@@ -1114,7 +1114,7 @@ static void _ae_update_state(GLcontext *ctx)
 	     * If we ever remove GL_NV_vertex_program this will have to change.
 	     */
 	    at->array = attribArray;
-	    ASSERT(!at->array->Normalized);
+	    assert(!at->array->Normalized);
 	    at->func = AttribFuncsNV[at->array->Normalized]
 		       [at->array->Size-1]
 		       [TYPE_IDX(at->array->Type)];
@@ -1169,8 +1169,8 @@ static void _ae_update_state(GLcontext *ctx)
 
     check_vbo(actx, ctx->Array.ElementArrayBufferObj);
 
-    ASSERT(at - actx->attribs <= VERT_ATTRIB_MAX);
-    ASSERT(aa - actx->arrays < 32);
+    assert(at - actx->attribs <= VERT_ATTRIB_MAX);
+    assert(aa - actx->arrays < 32);
     at->func = nullptr;  /* terminate the list */
     aa->offset = -1;  /* terminate the list */
 

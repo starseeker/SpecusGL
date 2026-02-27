@@ -257,7 +257,7 @@ std::vector<GLfloat> _mesa_copy_map_points1d(GLenum target, GLint ustride, GLint
     GLfloat *p = buffer.data();
     for (i = 0; i < uorder; i++, points += ustride)
 	for (k = 0; k < size; k++)
-	    *p++ = (GLfloat) points[k];
+	    *p++ = static_cast<GLfloat>(points[k]);
     return buffer;
 }
 
@@ -332,7 +332,7 @@ std::vector<GLfloat> _mesa_copy_map_points2d(GLenum target,
     for (i=0; i<uorder; i++, points += uinc)
 	for (j=0; j<vorder; j++, points += vstride)
 	    for (k=0; k<size; k++)
-		*p++ = (GLfloat) points[k];
+		*p++ = static_cast<GLfloat>(points[k]);
 
     return buffer;
 }
@@ -357,7 +357,7 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     struct gl_1d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
-    ASSERT(type == GL_FLOAT || type == GL_DOUBLE);
+    assert(type == GL_FLOAT || type == GL_DOUBLE);
 
     if (u1 == u2) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glMap1(u1,u2)");
@@ -424,7 +424,7 @@ void GLAPIENTRY
 _mesa_Map1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride,
 	    GLint order, const GLdouble *points)
 {
-    map1(target, (GLfloat) u1, (GLfloat) u2, stride, order, points, GL_DOUBLE);
+    map1(target, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2), stride, order, points, GL_DOUBLE);
 }
 
 
@@ -438,7 +438,7 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     struct gl_2d_map *map = nullptr;
 
     ASSERT_OUTSIDE_BEGIN_END(ctx);
-    ASSERT(type == GL_FLOAT || type == GL_DOUBLE);
+    assert(type == GL_FLOAT || type == GL_DOUBLE);
 
     if (u1==u2) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glMap2(u1,u2)");
@@ -528,8 +528,8 @@ _mesa_Map2d(GLenum target,
 	    GLdouble v1, GLdouble v2, GLint vstride, GLint vorder,
 	    const GLdouble *points)
 {
-    map2(target, (GLfloat) u1, (GLfloat) u2, ustride, uorder,
-	 (GLfloat) v1, (GLfloat) v2, vstride, vorder, points, GL_DOUBLE);
+    map2(target, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2), ustride, uorder,
+	 static_cast<GLfloat>(v1), static_cast<GLfloat>(v2), vstride, vorder, points, GL_DOUBLE);
 }
 
 
@@ -554,7 +554,7 @@ _mesa_GetMapdv(GLenum target, GLenum query, GLdouble *v)
 
     map1d = get_1d_map(ctx, target);
     map2d = get_2d_map(ctx, target);
-    ASSERT(map1d || map2d);
+    assert(map1d || map2d);
 
     switch (query) {
 	case GL_COEFF:
@@ -573,21 +573,21 @@ _mesa_GetMapdv(GLenum target, GLenum query, GLdouble *v)
 	    break;
 	case GL_ORDER:
 	    if (map1d) {
-		v[0] = (GLdouble) map1d->Order;
+		v[0] = static_cast<GLdouble>(map1d->Order);
 	    } else {
-		v[0] = (GLdouble) map2d->Uorder;
-		v[1] = (GLdouble) map2d->Vorder;
+		v[0] = static_cast<GLdouble>(map2d->Uorder);
+		v[1] = static_cast<GLdouble>(map2d->Vorder);
 	    }
 	    break;
 	case GL_DOMAIN:
 	    if (map1d) {
-		v[0] = (GLdouble) map1d->u1;
-		v[1] = (GLdouble) map1d->u2;
+		v[0] = static_cast<GLdouble>(map1d->u1);
+		v[1] = static_cast<GLdouble>(map1d->u2);
 	    } else {
-		v[0] = (GLdouble) map2d->u1;
-		v[1] = (GLdouble) map2d->u2;
-		v[2] = (GLdouble) map2d->v1;
-		v[3] = (GLdouble) map2d->v2;
+		v[0] = static_cast<GLdouble>(map2d->u1);
+		v[1] = static_cast<GLdouble>(map2d->u2);
+		v[2] = static_cast<GLdouble>(map2d->v1);
+		v[3] = static_cast<GLdouble>(map2d->v2);
 	    }
 	    break;
 	default:
@@ -616,7 +616,7 @@ _mesa_GetMapfv(GLenum target, GLenum query, GLfloat *v)
 
     map1d = get_1d_map(ctx, target);
     map2d = get_2d_map(ctx, target);
-    ASSERT(map1d || map2d);
+    assert(map1d || map2d);
 
     switch (query) {
 	case GL_COEFF:
@@ -635,10 +635,10 @@ _mesa_GetMapfv(GLenum target, GLenum query, GLfloat *v)
 	    break;
 	case GL_ORDER:
 	    if (map1d) {
-		v[0] = (GLfloat) map1d->Order;
+		v[0] = static_cast<GLfloat>(map1d->Order);
 	    } else {
-		v[0] = (GLfloat) map2d->Uorder;
-		v[1] = (GLfloat) map2d->Vorder;
+		v[0] = static_cast<GLfloat>(map2d->Uorder);
+		v[1] = static_cast<GLfloat>(map2d->Vorder);
 	    }
 	    break;
 	case GL_DOMAIN:
@@ -678,7 +678,7 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v)
 
     map1d = get_1d_map(ctx, target);
     map2d = get_2d_map(ctx, target);
-    ASSERT(map1d || map2d);
+    assert(map1d || map2d);
 
     switch (query) {
 	case GL_COEFF:
@@ -735,14 +735,14 @@ _mesa_MapGrid1f(GLint un, GLfloat u1, GLfloat u2)
     ctx->Eval.MapGrid1un = un;
     ctx->Eval.MapGrid1u1 = u1;
     ctx->Eval.MapGrid1u2 = u2;
-    ctx->Eval.MapGrid1du = (u2 - u1) / (GLfloat) un;
+    ctx->Eval.MapGrid1du = (u2 - u1) / static_cast<GLfloat>(un);
 }
 
 
 void GLAPIENTRY
 _mesa_MapGrid1d(GLint un, GLdouble u1, GLdouble u2)
 {
-    _mesa_MapGrid1f(un, (GLfloat) u1, (GLfloat) u2);
+    _mesa_MapGrid1f(un, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2));
 }
 
 
@@ -766,11 +766,11 @@ _mesa_MapGrid2f(GLint un, GLfloat u1, GLfloat u2,
     ctx->Eval.MapGrid2un = un;
     ctx->Eval.MapGrid2u1 = u1;
     ctx->Eval.MapGrid2u2 = u2;
-    ctx->Eval.MapGrid2du = (u2 - u1) / (GLfloat) un;
+    ctx->Eval.MapGrid2du = (u2 - u1) / static_cast<GLfloat>(un);
     ctx->Eval.MapGrid2vn = vn;
     ctx->Eval.MapGrid2v1 = v1;
     ctx->Eval.MapGrid2v2 = v2;
-    ctx->Eval.MapGrid2dv = (v2 - v1) / (GLfloat) vn;
+    ctx->Eval.MapGrid2dv = (v2 - v1) / static_cast<GLfloat>(vn);
 }
 
 
@@ -778,8 +778,8 @@ void GLAPIENTRY
 _mesa_MapGrid2d(GLint un, GLdouble u1, GLdouble u2,
 		GLint vn, GLdouble v1, GLdouble v2)
 {
-    _mesa_MapGrid2f(un, (GLfloat) u1, (GLfloat) u2,
-		    vn, (GLfloat) v1, (GLfloat) v2);
+    _mesa_MapGrid2f(un, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2),
+		    vn, static_cast<GLfloat>(v1), static_cast<GLfloat>(v2));
 }
 
 

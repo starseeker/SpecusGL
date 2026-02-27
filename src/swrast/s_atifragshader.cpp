@@ -570,7 +570,7 @@ _swrast_exec_fragment_shader(GLcontext * ctx, SWspan *span)
     GLuint i;
 
     /* incoming colors should be floats */
-    ASSERT(span->array->ChanType == GL_FLOAT);
+    assert(span->array->ChanType == GL_FLOAT);
 
     ctx->_CurrentProgram = GL_FRAGMENT_SHADER_ATI;
 

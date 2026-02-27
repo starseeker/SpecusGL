@@ -99,7 +99,7 @@ rescale_accum(GLcontext *ctx)
 	    GLuint i;
 	    GLshort *acc = static_cast<GLshort *>(rb->GetPointer(ctx, 0, y));
 	    for (i = 0; i < 4 * rb->Width; i++) {
-		acc[i] = (GLshort)(acc[i] * s);
+		acc[i] = static_cast<GLshort>((acc[i] * s));
 	    }
 	}
     } else {
@@ -110,7 +110,7 @@ rescale_accum(GLcontext *ctx)
 	    GLuint i;
 	    rb->GetRow(ctx, rb->Width, 0, y, accRow);
 	    for (i = 0; i < 4 * rb->Width; i++) {
-		accRow[i] = (GLshort)(accRow[i] * s);
+		accRow[i] = static_cast<GLshort>((accRow[i] * s));
 	    }
 	    rb->PutRow(ctx, rb->Width, 0, y, accRow, nullptr);
 	}
@@ -153,10 +153,10 @@ _swrast_clear_accum_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	GLshort clearVal[4];
 	GLuint i;
 
-	clearVal[0] = (GLshort)(ctx->Accum.ClearColor[0] * accScale);
-	clearVal[1] = (GLshort)(ctx->Accum.ClearColor[1] * accScale);
-	clearVal[2] = (GLshort)(ctx->Accum.ClearColor[2] * accScale);
-	clearVal[3] = (GLshort)(ctx->Accum.ClearColor[3] * accScale);
+	clearVal[0] = static_cast<GLshort>((ctx->Accum.ClearColor[0] * accScale));
+	clearVal[1] = static_cast<GLshort>((ctx->Accum.ClearColor[1] * accScale));
+	clearVal[2] = static_cast<GLshort>((ctx->Accum.ClearColor[2] * accScale));
+	clearVal[3] = static_cast<GLshort>((ctx->Accum.ClearColor[3] * accScale));
 
 	for (i = 0; i < height; i++) {
 	    rb->PutMonoRow(ctx, width, x, y + i, clearVal, nullptr);
@@ -195,7 +195,7 @@ accum_add(GLcontext *ctx, GLfloat value,
 	rescale_accum(ctx);
 
     if (rb->DataType == GL_SHORT || rb->DataType == GL_UNSIGNED_SHORT) {
-	const GLshort incr = (GLshort)(value * ACCUM_SCALE16);
+	const GLshort incr = static_cast<GLshort>((value * ACCUM_SCALE16));
 	if (rb->GetPointer(ctx, 0, 0)) {
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
@@ -241,7 +241,7 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 	    for (i = 0; i < height; i++) {
 		GLshort *acc = static_cast<GLshort *>(rb->GetPointer(ctx, xpos, ypos + i));
 		for (j = 0; j < 4 * width; j++) {
-		    acc[j] = (GLshort)(acc[j] * mult);
+		    acc[j] = static_cast<GLshort>((acc[j] * mult));
 		}
 	    }
 	} else {
@@ -250,7 +250,7 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 		GLshort accRow[4 * MAX_WIDTH];
 		rb->GetRow(ctx, width, xpos, ypos + i, accRow);
 		for (j = 0; j < 4 * width; j++) {
-		    accRow[j] = (GLshort)(accRow[j] * mult);
+		    accRow[j] = static_cast<GLshort>((accRow[j] * mult));
 		}
 		rb->PutRow(ctx, width, xpos, ypos + i, accRow, nullptr);
 	    }
@@ -317,10 +317,10 @@ accum_accum(GLcontext *ctx, GLfloat value,
 		/* scaled integer (or float) accum buffer */
 		GLint j;
 		for (j = 0; j < width; j++) {
-		    acc[j * 4 + 0] += (GLshort)((GLfloat) rgba[j][RCOMP] * scale);
-		    acc[j * 4 + 1] += (GLshort)((GLfloat) rgba[j][GCOMP] * scale);
-		    acc[j * 4 + 2] += (GLshort)((GLfloat) rgba[j][BCOMP] * scale);
-		    acc[j * 4 + 3] += (GLshort)((GLfloat) rgba[j][ACOMP] * scale);
+		    acc[j * 4 + 0] += static_cast<GLshort>((static_cast<GLfloat>(rgba[j][RCOMP]) * scale));
+		    acc[j * 4 + 1] += static_cast<GLshort>((static_cast<GLfloat>(rgba[j][GCOMP]) * scale));
+		    acc[j * 4 + 2] += static_cast<GLshort>((static_cast<GLfloat>(rgba[j][BCOMP]) * scale));
+		    acc[j * 4 + 3] += static_cast<GLshort>((static_cast<GLfloat>(rgba[j][ACOMP]) * scale));
 		}
 	    }
 
@@ -399,10 +399,10 @@ accum_load(GLcontext *ctx, GLfloat value,
 		/* scaled integer (or float) accum buffer */
 		GLint j;
 		for (j = 0; j < width; j++) {
-		    acc[j * 4 + 0] = (GLshort)((GLfloat) rgba[j][RCOMP] * scale);
-		    acc[j * 4 + 1] = (GLshort)((GLfloat) rgba[j][GCOMP] * scale);
-		    acc[j * 4 + 2] = (GLshort)((GLfloat) rgba[j][BCOMP] * scale);
-		    acc[j * 4 + 3] = (GLshort)((GLfloat) rgba[j][ACOMP] * scale);
+		    acc[j * 4 + 0] = static_cast<GLshort>((static_cast<GLfloat>(rgba[j][RCOMP]) * scale));
+		    acc[j * 4 + 1] = static_cast<GLshort>((static_cast<GLfloat>(rgba[j][GCOMP]) * scale));
+		    acc[j * 4 + 2] = static_cast<GLshort>((static_cast<GLfloat>(rgba[j][BCOMP]) * scale));
+		    acc[j * 4 + 3] = static_cast<GLshort>((static_cast<GLfloat>(rgba[j][ACOMP]) * scale));
 		}
 	    }
 
@@ -431,7 +431,7 @@ accum_return(GLcontext *ctx, GLfloat value,
     static GLchan multTable[32768];
     static GLfloat prevMult = 0.0;
     const GLfloat mult = swrast->_IntegerAccumScaler;
-    const GLint max = MIN2((GLint)(256 / mult), 32767);
+    const GLint max = MIN2(static_cast<GLint>((256 / mult)), 32767);
 
     /* May have to leave optimized accum buffer mode */
     if (swrast->_IntegerAccumMode && value != 1.0)
@@ -443,7 +443,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 	assert(swrast->_IntegerAccumScaler <= 1.0);
 	if (mult != prevMult) {
 	    for (j = 0; j < max; j++)
-		multTable[j] = IROUND((GLfloat) j * mult);
+		multTable[j] = IROUND(static_cast<GLfloat>(j) * mult);
 	    prevMult = mult;
 	}
     }
@@ -476,10 +476,10 @@ accum_return(GLcontext *ctx, GLfloat value,
 	    if (swrast->_IntegerAccumMode) {
 		GLint j;
 		for (j = 0; j < width; j++) {
-		    ASSERT(acc[j * 4 + 0] < max);
-		    ASSERT(acc[j * 4 + 1] < max);
-		    ASSERT(acc[j * 4 + 2] < max);
-		    ASSERT(acc[j * 4 + 3] < max);
+		    assert(acc[j * 4 + 0] < max);
+		    assert(acc[j * 4 + 1] < max);
+		    assert(acc[j * 4 + 2] < max);
+		    assert(acc[j * 4 + 3] < max);
 		    span.array->rgba[j][RCOMP] = multTable[acc[j * 4 + 0]];
 		    span.array->rgba[j][GCOMP] = multTable[acc[j * 4 + 1]];
 		    span.array->rgba[j][BCOMP] = multTable[acc[j * 4 + 2]];
@@ -495,10 +495,10 @@ accum_return(GLcontext *ctx, GLfloat value,
 		    GLchan b = acc[j * 4 + 2] * scale;
 		    GLchan a = acc[j * 4 + 3] * scale;
 #else
-		    GLint r = IROUND((GLfloat)(acc[j * 4 + 0]) * scale);
-		    GLint g = IROUND((GLfloat)(acc[j * 4 + 1]) * scale);
-		    GLint b = IROUND((GLfloat)(acc[j * 4 + 2]) * scale);
-		    GLint a = IROUND((GLfloat)(acc[j * 4 + 3]) * scale);
+		    GLint r = IROUND(static_cast<GLfloat>((acc[j * 4 + 0])) * scale);
+		    GLint g = IROUND(static_cast<GLfloat>((acc[j * 4 + 1])) * scale);
+		    GLint b = IROUND(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
+		    GLint a = IROUND(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
 #endif
 		    span.array->rgba[j][RCOMP] = CLAMP(r, 0, CHAN_MAX);
 		    span.array->rgba[j][GCOMP] = CLAMP(g, 0, CHAN_MAX);

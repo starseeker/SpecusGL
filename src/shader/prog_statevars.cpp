@@ -54,11 +54,11 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
     switch (state[0]) {
 	case STATE_MATERIAL: {
 	    /* state[1] is either 0=front or 1=back side */
-	    const GLuint face = (GLuint) state[1];
+	    const GLuint face = static_cast<GLuint>(state[1]);
 	    const struct gl_material *mat = &ctx->Light.Material;
-	    ASSERT(face == 0 || face == 1);
+	    assert(face == 0 || face == 1);
 	    /* we rely on tokens numbered so that _BACK_ == _FRONT_+ 1 */
-	    ASSERT(MAT_ATTRIB_FRONT_AMBIENT + 1 == MAT_ATTRIB_BACK_AMBIENT);
+	    assert(MAT_ATTRIB_FRONT_AMBIENT + 1 == MAT_ATTRIB_BACK_AMBIENT);
 	    /* XXX we could get rid of this switch entirely with a little
 	     * work in arbprogparse.c's parse_state_single_item().
 	     */
@@ -89,7 +89,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	}
 	case STATE_LIGHT: {
 	    /* state[1] is the light number */
-	    const GLuint ln = (GLuint) state[1];
+	    const GLuint ln = static_cast<GLuint>(state[1]);
 	    /* state[2] is the light attribute */
 	    switch (state[2]) {
 		case STATE_AMBIENT:
@@ -165,10 +165,10 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    }
 	    return;
 	case STATE_LIGHTPROD: {
-	    const GLuint ln = (GLuint) state[1];
-	    const GLuint face = (GLuint) state[2];
+	    const GLuint ln = static_cast<GLuint>(state[1]);
+	    const GLuint face = static_cast<GLuint>(state[2]);
 	    GLint i;
-	    ASSERT(face == 0 || face == 1);
+	    assert(face == 0 || face == 1);
 	    switch (state[3]) {
 		case STATE_AMBIENT:
 		    for (i = 0; i < 3; i++) {
@@ -201,7 +201,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	}
 	case STATE_TEXGEN: {
 	    /* state[1] is the texture unit */
-	    const GLuint unit = (GLuint) state[1];
+	    const GLuint unit = static_cast<GLuint>(state[1]);
 	    /* state[2] is the texgen attribute */
 	    switch (state[2]) {
 		case STATE_TEXGEN_EYE_S:
@@ -235,7 +235,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	}
 	case STATE_TEXENV_COLOR: {
 	    /* state[1] is the texture unit */
-	    const GLuint unit = (GLuint) state[1];
+	    const GLuint unit = static_cast<GLuint>(state[1]);
 	    COPY_4V(value, ctx->Texture.Unit[unit].EnvColor);
 	}
 	return;
@@ -249,7 +249,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    value[3] = 1.0F / (ctx->Fog.End - ctx->Fog.Start);
 	    return;
 	case STATE_CLIPPLANE: {
-	    const GLuint plane = (GLuint) state[1];
+	    const GLuint plane = static_cast<GLuint>(state[1]);
 	    COPY_4V(value, ctx->Transform.EyeUserPlane[plane]);
 	}
 	return;
@@ -277,16 +277,16 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    /* state[4] = transpose, inverse or invtrans */
 	    const GLmatrix *matrix;
 	    const gl_state_index mat = state[0];
-	    const GLuint index = (GLuint) state[1];
-	    const GLuint firstRow = (GLuint) state[2];
-	    const GLuint lastRow = (GLuint) state[3];
+	    const GLuint index = static_cast<GLuint>(state[1]);
+	    const GLuint firstRow = static_cast<GLuint>(state[2]);
+	    const GLuint lastRow = static_cast<GLuint>(state[3]);
 	    const gl_state_index modifier = state[4];
 	    const GLfloat *m;
 	    GLuint row, i;
-	    ASSERT(firstRow >= 0);
-	    ASSERT(firstRow < 4);
-	    ASSERT(lastRow >= 0);
-	    ASSERT(lastRow < 4);
+	    assert(firstRow >= 0);
+	    assert(firstRow < 4);
+	    assert(lastRow >= 0);
+	    assert(lastRow < 4);
 	    if (mat == STATE_MODELVIEW_MATRIX) {
 		matrix = ctx->ModelviewMatrixStack.Top;
 	    } else if (mat == STATE_PROJECTION_MATRIX) {
@@ -409,7 +409,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		case STATE_SPOT_DIR_NORMALIZED: {
 		    /* here, state[2] is the light number */
 		    /* pre-normalize spot dir */
-		    const GLuint ln = (GLuint) state[2];
+		    const GLuint ln = static_cast<GLuint>(state[2]);
 		    COPY_3V(value, ctx->Light.Light[ln].EyeDirection);
 		    NORMALIZE_3FV(value);
 		    value[3] = ctx->Light.Light[ln]._CosCutoff;
@@ -616,9 +616,9 @@ _mesa_program_state_string(const gl_state_index state[STATE_LENGTH])
 	    /* state[3] = last row to fetch */
 	    /* state[4] = transpose, inverse or invtrans */
 	    const gl_state_index mat = (gl_state_index) state[0];
-	    const GLuint idx = (GLuint) state[1];
-	    const GLuint firstRow = (GLuint) state[2];
-	    const GLuint lastRow = (GLuint) state[3];
+	    const GLuint idx = static_cast<GLuint>(state[1]);
+	    const GLuint firstRow = static_cast<GLuint>(state[2]);
+	    const GLuint lastRow = static_cast<GLuint>(state[3]);
 	    const gl_state_index modifier = (gl_state_index) state[4];
 	    if (idx || mat == STATE_TEXTURE_MATRIX || mat == STATE_PROGRAM_MATRIX)
 		str += index(idx);
@@ -734,7 +734,7 @@ _mesa_load_tracked_matrices(GLcontext *ctx)
 	} else if (ctx->VertexProgram.TrackMatrix[i] >= GL_MATRIX0_NV &&
 		   ctx->VertexProgram.TrackMatrix[i] <= GL_MATRIX7_NV) {
 	    GLuint n = ctx->VertexProgram.TrackMatrix[i] - GL_MATRIX0_NV;
-	    ASSERT(n < MAX_PROGRAM_MATRICES);
+	    assert(n < MAX_PROGRAM_MATRICES);
 	    mat = ctx->ProgramMatrixStack[n].Top;
 	} else {
 	    /* no matrix is tracked, but we leave the register values as-is */
@@ -747,7 +747,7 @@ _mesa_load_tracked_matrices(GLcontext *ctx)
 	    load_matrix(ctx->VertexProgram.Parameters, i*4, mat->m);
 	} else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_INVERSE_NV) {
 	    mat->analyse(); /* update the inverse */
-	    ASSERT(!mat->is_dirty());
+	    assert(!mat->is_dirty());
 	    load_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
 	} else if (ctx->VertexProgram.TrackMatrixTransform[i] == GL_TRANSPOSE_NV) {
 	    load_transpose_matrix(ctx->VertexProgram.Parameters, i*4, mat->m);
@@ -755,7 +755,7 @@ _mesa_load_tracked_matrices(GLcontext *ctx)
 	    assert(ctx->VertexProgram.TrackMatrixTransform[i]
 		   == GL_INVERSE_TRANSPOSE_NV);
 	    mat->analyse(); /* update the inverse */
-	    ASSERT(!mat->is_dirty());
+	    assert(!mat->is_dirty());
 	    load_transpose_matrix(ctx->VertexProgram.Parameters, i*4, mat->inv);
 	}
     }

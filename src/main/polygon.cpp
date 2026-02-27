@@ -106,7 +106,7 @@ _mesa_FrontFace(GLenum mode)
     FLUSH_VERTICES(ctx, _NEW_POLYGON);
     ctx->Polygon.FrontFace = mode;
 
-    ctx->Polygon._FrontBit = (GLboolean)(mode == GL_CW);
+    ctx->Polygon._FrontBit = static_cast<GLboolean>((mode == GL_CW));
 
     if (ctx->Driver.FrontFace)
 	ctx->Driver.FrontFace(ctx, mode);

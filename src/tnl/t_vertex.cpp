@@ -280,7 +280,7 @@ GLuint _tnl_install_attrs(GLcontext *ctx, const struct tnl_attr_map *map,
 	const GLuint format = map[i].format;
 	if (format == EMIT_PAD) {
 	    if (DBG)
-		_mesa_printf("%d: pad %d, offset %d\n", i,
+		std::printf("%d: pad %d, offset %d\n", i,
 			     map[i].offset, offset);
 
 	    offset += map[i].offset;
@@ -310,7 +310,7 @@ GLuint _tnl_install_attrs(GLcontext *ctx, const struct tnl_attr_map *map,
 
 
 	    if (DBG)
-		_mesa_printf("%d: %s, vp %p, offset %d\n", i,
+		std::printf("%d: %s, vp %p, offset %d\n", i,
 			     _tnl_format_info[format].name, static_cast<const void *>(vp),
 			     vtx->attr[j].vertoffset);
 
@@ -457,7 +457,7 @@ void _tnl_init_vertices(GLcontext *ctx,
     vtx->codegen_emit = nullptr;
 
 #ifdef USE_SSE_ASM
-    if (!_mesa_getenv("MESA_NO_CODEGEN"))
+    if (!std::getenv("MESA_NO_CODEGEN"))
 	vtx->codegen_emit = _tnl_generate_sse_emit;
 #endif
 }

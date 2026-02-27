@@ -48,16 +48,16 @@ _mesa_ClipPlane(GLenum plane, const GLdouble *eq)
     GLfloat equation[4];
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    p = (GLint) plane - (GLint) GL_CLIP_PLANE0;
-    if (p < 0 || p >= (GLint) ctx->Const.MaxClipPlanes) {
+    p = static_cast<GLint>(plane) - static_cast<GLint>(GL_CLIP_PLANE0);
+    if (p < 0 || p >= static_cast<GLint>(ctx->Const.MaxClipPlanes)) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glClipPlane");
 	return;
     }
 
-    equation[0] = (GLfloat) eq[0];
-    equation[1] = (GLfloat) eq[1];
-    equation[2] = (GLfloat) eq[2];
-    equation[3] = (GLfloat) eq[3];
+    equation[0] = static_cast<GLfloat>(eq[0]);
+    equation[1] = static_cast<GLfloat>(eq[1]);
+    equation[2] = static_cast<GLfloat>(eq[2]);
+    equation[3] = static_cast<GLfloat>(eq[3]);
 
     /*
      * The equation is transformed by the transpose of the inverse of the
@@ -104,16 +104,16 @@ _mesa_GetClipPlane(GLenum plane, GLdouble *equation)
     GLint p;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    p = (GLint)(plane - GL_CLIP_PLANE0);
-    if (p < 0 || p >= (GLint) ctx->Const.MaxClipPlanes) {
+    p = static_cast<GLint>((plane - GL_CLIP_PLANE0));
+    if (p < 0 || p >= static_cast<GLint>(ctx->Const.MaxClipPlanes)) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetClipPlane");
 	return;
     }
 
-    equation[0] = (GLdouble) ctx->Transform.EyeUserPlane[p][0];
-    equation[1] = (GLdouble) ctx->Transform.EyeUserPlane[p][1];
-    equation[2] = (GLdouble) ctx->Transform.EyeUserPlane[p][2];
-    equation[3] = (GLdouble) ctx->Transform.EyeUserPlane[p][3];
+    equation[0] = static_cast<GLdouble>(ctx->Transform.EyeUserPlane[p][0]);
+    equation[1] = static_cast<GLdouble>(ctx->Transform.EyeUserPlane[p][1]);
+    equation[2] = static_cast<GLdouble>(ctx->Transform.EyeUserPlane[p][2]);
+    equation[3] = static_cast<GLdouble>(ctx->Transform.EyeUserPlane[p][3]);
 }
 
 void GLAPIENTRY
@@ -150,10 +150,10 @@ _mesa_CullParameterdvEXT(GLenum cap, GLdouble *v)
 {
     GLfloat f[4];
 
-    f[0] = (GLfloat)v[0];
-    f[1] = (GLfloat)v[1];
-    f[2] = (GLfloat)v[2];
-    f[3] = (GLfloat)v[3];
+    f[0] = static_cast<GLfloat>(v[0]);
+    f[1] = static_cast<GLfloat>(v[1]);
+    f[2] = static_cast<GLfloat>(v[2]);
+    f[3] = static_cast<GLfloat>(v[3]);
 
     _mesa_CullParameterfvEXT(cap, f);
 }

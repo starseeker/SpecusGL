@@ -32,8 +32,8 @@ return GL_FALSE;
 GLint x, GLint y, void *values) override {
 const GLint z = Zoffset;
 GLuint i;
-ASSERT(TexImage->Width == Width);
-ASSERT(TexImage->Height == Height);
+assert(TexImage->Width == Width);
+assert(TexImage->Height == Height);
 if (DataType == CHAN_TYPE) {
     GLchan *rgbaOut = (GLchan *) values;
     for (i = 0; i < count; i++) {
@@ -49,14 +49,14 @@ TexImage->FetchTexelf(TexImage, x + i, y, z, rgbaOut + 4 * i);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
     GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else {
     _mesa_problem(ctx, "invalid DataType in TextureRenderbuffer::GetRow");
@@ -82,14 +82,14 @@ TexImage->FetchTexelf(TexImage, x[i], y[i], z, rgbaOut + 4 * i);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
     GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else {
     _mesa_problem(ctx, "invalid DataType in TextureRenderbuffer::GetValues");
@@ -264,8 +264,8 @@ if (!mask || mask[i]) {
 static int
 wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 {
-    ASSERT(att->Type == GL_TEXTURE);
-    ASSERT(att->Renderbuffer == nullptr);
+    assert(att->Type == GL_TEXTURE);
+    assert(att->Renderbuffer == nullptr);
 
     auto *trb = new TextureRenderbuffer{};
     if (!trb) {
@@ -289,13 +289,13 @@ return;
 
     TextureRenderbuffer *trb = static_cast<TextureRenderbuffer *>(att->Renderbuffer);
     (void) ctx;
-    ASSERT(trb);
+    assert(trb);
 
     trb->TexImage = att->Texture->Image[att->CubeMapFace][att->TextureLevel];
-    ASSERT(trb->TexImage);
+    assert(trb->TexImage);
 
     trb->Store = trb->TexImage->TexFormat->StoreTexel;
-    ASSERT(trb->Store);
+    assert(trb->Store);
 
     trb->Zoffset = att->Zoffset;
 

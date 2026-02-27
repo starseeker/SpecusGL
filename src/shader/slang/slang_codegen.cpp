@@ -2375,7 +2375,7 @@ _slang_gen_subscript(slang_assemble_ctx * A, slang_operation *oper)
 	GLint index;
 	slang_ir_node *n;
 
-	index = (GLint) oper->children[1].literal[0];
+	index = static_cast<GLint>(oper->children[1].literal[0]);
 	if (oper->children[1].type != SLANG_OPER_LITERAL_INT ||
 	    index >= max) {
 	    slang_info_log_error(A->log, "Invalid array index for vector type");
@@ -2482,7 +2482,7 @@ _slang_check_matmul_optimization(slang_assemble_ctx *A, slang_operation *oper)
 	    if (matOp->a_id
 		== slang_atom_pool_atom(A->atoms, matrices[i].orig)) {
 		/*
-		_mesa_printf("Replace %s with %s\n",
+		std::printf("Replace %s with %s\n",
 		             matrices[i].orig, matrices[i].tranpose);
 		*/
 		assert(matOp->type == SLANG_OPER_IDENTIFIER);

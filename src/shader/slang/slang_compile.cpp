@@ -242,7 +242,7 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
     _slang_simplify(&array_size, &space, C->atoms);
     result = (array_size.type == SLANG_OPER_LITERAL_INT);
 
-    *len = (GLint) array_size.literal[0];
+    *len = static_cast<GLint>(array_size.literal[0]);
 
     slang_operation_destruct(&array_size);
     return result;
@@ -923,7 +923,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		op->literal[0] =
 		    op->literal[1] =
 			op->literal[2] =
-			    op->literal[3] = (GLfloat) number;
+			    op->literal[3] = static_cast<GLfloat>(number);
 		op->literal_size = 1;
 		break;
 	    case OP_PUSH_INT:
@@ -933,7 +933,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		op->literal[0] =
 		    op->literal[1] =
 			op->literal[2] =
-			    op->literal[3] = (GLfloat) number;
+			    op->literal[3] = static_cast<GLfloat>(number);
 		op->literal_size = 1;
 		break;
 	    case OP_PUSH_FLOAT:

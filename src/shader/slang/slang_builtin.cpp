@@ -364,7 +364,7 @@ _slang_alloc_statevar(slang_ir_node *n,
     if (n->Opcode == IR_ELEMENT) {
 	/* XXX can only handle constant indexes for now */
 	if (n->Children[1]->Opcode == IR_FLOAT) {
-	    index1 = (GLint) n->Children[1]->Value[0];
+	    index1 = static_cast<GLint>(n->Children[1]->Value[0]);
 	    n = n->Children[0];
 	} else {
 	    return -1;
@@ -374,7 +374,7 @@ _slang_alloc_statevar(slang_ir_node *n,
     if (n->Opcode == IR_ELEMENT) {
 	/* XXX can only handle constant indexes for now */
 	assert(n->Children[1]->Opcode == IR_FLOAT);
-	index2 = (GLint) n->Children[1]->Value[0];
+	index2 = static_cast<GLint>(n->Children[1]->Value[0]);
 	n = n->Children[0];
     }
 

@@ -78,7 +78,7 @@ _math_horner_bezier_curve(const GLfloat * cp, GLfloat * out, GLfloat t,
     GLuint i, k;
 
     if (order >= 2) {
-	bincoeff = (GLfloat)(order - 1);
+	bincoeff = static_cast<GLfloat>((order - 1));
 	s = 1.0F - t;
 
 	for (k = 0; k < dim; k++)
@@ -86,7 +86,7 @@ _math_horner_bezier_curve(const GLfloat * cp, GLfloat * out, GLfloat t,
 
 	for (i = 2, cp += 2 * dim, powert = t * t; i < order;
 	     i++, powert *= t, cp += dim) {
-	    bincoeff *= (GLfloat)(order - i);
+	    bincoeff *= static_cast<GLfloat>((order - i));
 	    bincoeff *= inv_tab[i];
 
 	    for (k = 0; k < dim; k++)
@@ -131,7 +131,7 @@ _math_horner_bezier_surf(GLfloat * cn, GLfloat * out, GLfloat u, GLfloat v,
 
 		/* Each control point is the point for parameter u on a */
 		/* curve defined by the control polygons in u-direction */
-		bincoeff = (GLfloat)(uorder - 1);
+		bincoeff = static_cast<GLfloat>((uorder - 1));
 		s = 1.0F - u;
 
 		for (k = 0; k < dim; k++)
@@ -139,7 +139,7 @@ _math_horner_bezier_surf(GLfloat * cn, GLfloat * out, GLfloat u, GLfloat v,
 
 		for (i = 2, ucp += 2 * uinc, poweru = u * u; i < uorder;
 		     i++, poweru *= u, ucp += uinc) {
-		    bincoeff *= (GLfloat)(uorder - i);
+		    bincoeff *= static_cast<GLfloat>((uorder - i));
 		    bincoeff *= inv_tab[i];
 
 		    for (k = 0; k < dim; k++)

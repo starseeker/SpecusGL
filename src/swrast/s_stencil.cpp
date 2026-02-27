@@ -227,7 +227,7 @@ do_stencil_test(GLcontext *ctx, GLuint face, GLuint n, GLstencil stencil[],
     GLstencil r, s;
     const GLuint valueMask = ctx->Stencil.ValueMask[face];
 
-    ASSERT(n <= MAX_WIDTH);
+    assert(n <= MAX_WIDTH);
 
     /*
      * Perform stencil test.  The results of this operation are stored
@@ -397,12 +397,12 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
     const GLint y = span->y;
     GLubyte *mask = span->array->mask;
 
-    ASSERT((span->arrayMask & SPAN_XY) == 0);
-    ASSERT(ctx->Stencil.Enabled);
-    ASSERT(n <= MAX_WIDTH);
+    assert((span->arrayMask & SPAN_XY) == 0);
+    assert(ctx->Stencil.Enabled);
+    assert(n <= MAX_WIDTH);
 #ifdef DEBUG
     if (ctx->Depth.Test) {
-	ASSERT(span->arrayMask & SPAN_Z);
+	assert(span->arrayMask & SPAN_Z);
     }
 #endif
 
@@ -459,7 +459,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
 	 * endif
 	 */
 	for (i=0; i<n; i++) {
-	    ASSERT(mask[i] == 0 || mask[i] == 1);
+	    assert(mask[i] == 0 || mask[i] == 1);
 	    passmask[i] = oldmask[i] & mask[i];
 	    failmask[i] = oldmask[i] & (mask[i] ^ 1);
 	}
@@ -520,8 +520,8 @@ apply_stencil_op_to_pixels(GLcontext *ctx,
     GLstencil *stencilStart = static_cast<GLubyte *>(rb->Data);
     const GLuint stride = rb->Width;
 
-    ASSERT(rb->GetPointer(ctx, 0, 0));
-    ASSERT(sizeof(GLstencil) == 1);
+    assert(rb->GetPointer(ctx, 0, 0));
+    assert(sizeof(GLstencil) == 1);
 
     switch (oper) {
 	case GL_KEEP:
@@ -686,8 +686,8 @@ stencil_test_pixels(GLcontext *ctx, GLuint face, GLuint n,
     const GLstencil *stencilStart = (GLstencil *) rb->Data;
     const GLuint stride = rb->Width;
 
-    ASSERT(rb->GetPointer(ctx, 0, 0));
-    ASSERT(sizeof(GLstencil) == 1);
+    assert(rb->GetPointer(ctx, 0, 0));
+    assert(sizeof(GLstencil) == 1);
 
     /*
      * Perform stencil test.  The results of this operation are stored
@@ -868,16 +868,16 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
     const GLint *y = span->array->y;
     GLubyte *mask = span->array->mask;
 
-    ASSERT(span->arrayMask & SPAN_XY);
-    ASSERT(ctx->Stencil.Enabled);
-    ASSERT(n <= MAX_WIDTH);
+    assert(span->arrayMask & SPAN_XY);
+    assert(ctx->Stencil.Enabled);
+    assert(n <= MAX_WIDTH);
 
     if (!rb->GetPointer(ctx, 0, 0)) {
 	/* No direct access */
 	GLstencil stencil[MAX_WIDTH];
 	GLubyte origMask[MAX_WIDTH];
 
-	ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
+	assert(rb->DataType == GL_UNSIGNED_BYTE);
 	_swrast_get_values(ctx, rb, n, x, y, stencil, sizeof(GLubyte));
 
 	memcpy(origMask, mask, n * sizeof(GLubyte));
@@ -894,7 +894,7 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 		GLubyte failmask[MAX_WIDTH];
 		GLuint i;
 		for (i = 0; i < n; i++) {
-		    ASSERT(mask[i] == 0 || mask[i] == 1);
+		    assert(mask[i] == 0 || mask[i] == 1);
 		    failmask[i] = origMask[i] & (mask[i] ^ 1);
 		}
 		apply_stencil_op(ctx, ctx->Stencil.ZFailFunc[face], face,
@@ -904,7 +904,7 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 		GLubyte passmask[MAX_WIDTH];
 		GLuint i;
 		for (i = 0; i < n; i++) {
-		    ASSERT(mask[i] == 0 || mask[i] == 1);
+		    assert(mask[i] == 0 || mask[i] == 1);
 		    passmask[i] = origMask[i] & mask[i];
 		}
 		apply_stencil_op(ctx, ctx->Stencil.ZPassFunc[face], face,
@@ -936,7 +936,7 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 	    _swrast_depth_test_span(ctx, span);
 
 	    for (i=0; i<n; i++) {
-		ASSERT(mask[i] == 0 || mask[i] == 1);
+		assert(mask[i] == 0 || mask[i] == 1);
 		passmask[i] = oldmask[i] & mask[i];
 		failmask[i] = oldmask[i] & (mask[i] ^ 1);
 	    }
@@ -1015,8 +1015,8 @@ void
 _swrast_read_stencil_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 			  GLint n, GLint x, GLint y, GLstencil stencil[])
 {
-    if (y < 0 || y >= (GLint) rb->Height ||
-	x + n <= 0 || x >= (GLint) rb->Width) {
+    if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
+	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
 	/* span is completely outside framebuffer */
 	return; /* undefined values OK */
     }
@@ -1027,7 +1027,7 @@ _swrast_read_stencil_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	n -= dx;
 	stencil += dx;
     }
-    if (x + n > (GLint) rb->Width) {
+    if (x + n > static_cast<GLint>(rb->Width)) {
 	GLint dx = x + n - rb->Width;
 	n -= dx;
     }
@@ -1057,8 +1057,8 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
     const GLuint stencilMax = (1 << fb->Visual.stencilBits) - 1;
     const GLuint stencilMask = ctx->Stencil.WriteMask[0];
 
-    if (y < 0 || y >= (GLint) rb->Height ||
-	x + n <= 0 || x >= (GLint) rb->Width) {
+    if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
+	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
 	/* span is completely outside framebuffer */
 	return; /* undefined values OK */
     }
@@ -1068,7 +1068,7 @@ _swrast_write_stencil_span(GLcontext *ctx, GLint n, GLint x, GLint y,
 	n -= dx;
 	stencil += dx;
     }
-    if (x + n > (GLint) rb->Width) {
+    if (x + n > static_cast<GLint>(rb->Width)) {
 	GLint dx = x + n - rb->Width;
 	n -= dx;
     }
@@ -1109,10 +1109,10 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     if (!rb || mask == 0)
 	return;
 
-    ASSERT(rb->DataType == GL_UNSIGNED_BYTE ||
+    assert(rb->DataType == GL_UNSIGNED_BYTE ||
 	   rb->DataType == GL_UNSIGNED_SHORT);
 
-    ASSERT(rb->_BaseFormat == GL_STENCIL_INDEX);
+    assert(rb->_BaseFormat == GL_STENCIL_INDEX);
 
     /* compute region to clear */
     x = ctx->DrawBuffer->_Xmin;
@@ -1143,7 +1143,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    }
 	} else {
 	    /* no bit masking */
-	    if (width == (GLint) rb->Width && rb->DataType == GL_UNSIGNED_BYTE) {
+	    if (width == static_cast<GLint>(rb->Width) && rb->DataType == GL_UNSIGNED_BYTE) {
 		/* optimized case */
 		/* Note: bottom-to-top raster assumed! */
 		GLubyte *stencil = static_cast<GLubyte *>(rb->GetPointer(ctx, x, y));
@@ -1189,8 +1189,8 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    }
 	} else {
 	    /* no bit masking */
-	    const GLubyte clear8 = (GLubyte) clearVal;
-	    const GLushort clear16 = (GLushort) clearVal;
+	    const GLubyte clear8 = static_cast<GLubyte>(clearVal);
+	    const GLushort clear16 = static_cast<GLushort>(clearVal);
 	    const void *clear;
 	    GLint i;
 	    if (rb->DataType == GL_UNSIGNED_BYTE) {

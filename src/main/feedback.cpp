@@ -110,7 +110,7 @@ _mesa_PassThrough(GLfloat token)
 
     if (ctx->RenderMode==GL_FEEDBACK) {
 	FLUSH_VERTICES(ctx, 0);
-	FEEDBACK_TOKEN(ctx, (GLfloat)(GLint) GL_PASS_THROUGH_TOKEN);
+	FEEDBACK_TOKEN(ctx, static_cast<GLfloat>(static_cast<GLint>(GL_PASS_THROUGH_TOKEN)));
 	FEEDBACK_TOKEN(ctx, token);
     }
 }
@@ -147,7 +147,7 @@ void _mesa_feedback_vertex(GLcontext *ctx,
 	FEEDBACK_TOKEN(ctx, win[3]);
     }
     if (ctx->Feedback._Mask & FB_INDEX) {
-	FEEDBACK_TOKEN(ctx, (GLfloat) index);
+	FEEDBACK_TOKEN(ctx, static_cast<GLfloat>(index));
     }
     if (ctx->Feedback._Mask & FB_COLOR) {
 	FEEDBACK_TOKEN(ctx, color[0]);
@@ -261,8 +261,8 @@ static void write_hit_record(GLcontext *ctx)
     /* 2^32-1 and round to nearest unsigned integer. */
 
     assert(ctx != nullptr);   /* this line magically fixes a SunOS 5.x/gcc bug */
-    zmin = (GLuint)((GLfloat) zscale * ctx->Select.HitMinZ);
-    zmax = (GLuint)((GLfloat) zscale * ctx->Select.HitMaxZ);
+    zmin = static_cast<GLuint>((static_cast<GLfloat>(zscale) * ctx->Select.HitMinZ));
+    zmax = static_cast<GLuint>((static_cast<GLfloat>(zscale) * ctx->Select.HitMaxZ));
 
     WRITE_RECORD(ctx, ctx->Select.NameStackDepth);
     WRITE_RECORD(ctx, zmin);

@@ -102,7 +102,7 @@ do {					\
 static inline GLfloat
 solve_plane(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
-    ASSERT(plane[2] != 0.0F);
+    assert(plane[2] != 0.0F);
     return (plane[3] + plane[0] * x + plane[1] * y) / -plane[2];
 }
 
@@ -139,7 +139,7 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 	return 0;
     else if (z > CHAN_MAX)
 	return CHAN_MAX;
-    return (GLchan) IROUND_POS(z);
+    return static_cast<GLchan>(IROUND_POS(z));
 #endif
 }
 
@@ -191,8 +191,8 @@ compute_coveragef(const GLfloat v0[3], const GLfloat v1[3],
 	{ POS(2, 2), POS(3, 2) }
     };
 
-    const GLfloat x = (GLfloat) winx;
-    const GLfloat y = (GLfloat) winy;
+    const GLfloat x = static_cast<GLfloat>(winx);
+    const GLfloat y = static_cast<GLfloat>(winy);
     const GLfloat dx0 = v1[0] - v0[0];
     const GLfloat dy0 = v1[1] - v0[1];
     const GLfloat dx1 = v2[0] - v1[0];
@@ -205,7 +205,7 @@ compute_coveragef(const GLfloat v0[3], const GLfloat v1[3],
 #ifdef DEBUG
     {
 	const GLfloat area = dx0 * dy1 - dx1 * dy0;
-	ASSERT(area >= 0.0);
+	assert(area >= 0.0);
     }
 #endif
 
@@ -282,8 +282,8 @@ compute_coveragei(const GLfloat v0[3], const GLfloat v1[3],
 	{ POS(3, 0), POS(2, 0) },
 	{ POS(1, 3), POS(3, 0) }
     };
-    const GLfloat x = (GLfloat) winx;
-    const GLfloat y = (GLfloat) winy;
+    const GLfloat x = static_cast<GLfloat>(winx);
+    const GLfloat y = static_cast<GLfloat>(winy);
     const GLfloat dx0 = v1[0] - v0[0];
     const GLfloat dy0 = v1[1] - v0[1];
     const GLfloat dx1 = v2[0] - v1[0];
@@ -296,7 +296,7 @@ compute_coveragei(const GLfloat v0[3], const GLfloat v1[3],
 #ifdef DEBUG
     {
 	const GLfloat area = dx0 * dy1 - dx1 * dy0;
-	ASSERT(area >= 0.0);
+	assert(area >= 0.0);
     }
 #endif
 
@@ -393,8 +393,8 @@ compute_lambda(GLcontext *ctx,
     if (obj) {
 	const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];
 	if (texImage) {
-	    texWidth = (GLfloat) texImage->Width;
-	    texHeight = (GLfloat) texImage->Height;
+	    texWidth = static_cast<GLfloat>(texImage->Width);
+	    texHeight = static_cast<GLfloat>(texImage->Height);
 	}
     }
     dsdx = FABSF(dsdx);
@@ -446,7 +446,7 @@ spec_tex_aa_tri(GLcontext *ctx,
 void
 _swrast_set_aa_triangle_function(GLcontext *ctx)
 {
-    ASSERT(ctx->Polygon.SmoothFlag);
+    assert(ctx->Polygon.SmoothFlag);
 
     if (ctx->Texture._EnabledCoordUnits != 0
 	|| ctx->FragmentProgram._Current) {
@@ -461,7 +461,7 @@ _swrast_set_aa_triangle_function(GLcontext *ctx)
 	SWRAST_CONTEXT(ctx)->Triangle = index_aa_tri;
     }
 
-    ASSERT(SWRAST_CONTEXT(ctx)->Triangle);
+    assert(SWRAST_CONTEXT(ctx)->Triangle);
 }
 
 /*

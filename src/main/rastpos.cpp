@@ -153,7 +153,7 @@ shade_rastpos(GLcontext *ctx,
 	    /* VP = vector from vertex pos to light[i].pos */
 	    SUB_3V(VP, light->_Position, vertex);
 	    /* d = length(VP) */
-	    d = (GLfloat) LEN_3FV(VP);
+	    d = static_cast<GLfloat>(LEN_3FV(VP));
 	    if (d > 1.0e-6) {
 		/* normalize VP */
 		GLfloat invd = 1.0F / d;
@@ -173,8 +173,8 @@ shade_rastpos(GLcontext *ctx,
 		} else {
 		    double x = PV_dot_dir * (EXP_TABLE_SIZE-1);
 		    int k = (int) x;
-		    GLfloat spot = (GLfloat)(light->_SpotExpTable[k][0]
-					     + (x-k)*light->_SpotExpTable[k][1]);
+		    GLfloat spot = static_cast<GLfloat>((light->_SpotExpTable[k][0]
+					     + (x-k)*light->_SpotExpTable[k][1]));
 		    attenuation *= spot;
 		}
 	    }
@@ -290,7 +290,7 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     rz = u[2] - normal[2] * two_nu;
     m = rx * rx + ry * ry + (rz + 1.0F) * (rz + 1.0F);
     if (m > 0.0F)
-	mInv = 0.5F * _mesa_inv_sqrtf(m);
+	mInv = 0.5F * (1.0f / std::sqrt(m));
     else
 	mInv = 0.0F;
 
@@ -517,7 +517,7 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 void GLAPIENTRY
 _mesa_RasterPos2d(GLdouble x, GLdouble y)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -531,7 +531,7 @@ _mesa_RasterPos2f(GLfloat x, GLfloat y)
 void GLAPIENTRY
 _mesa_RasterPos2i(GLint x, GLint y)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -545,7 +545,7 @@ _mesa_RasterPos2s(GLshort x, GLshort y)
 void GLAPIENTRY
 _mesa_RasterPos3d(GLdouble x, GLdouble y, GLdouble z)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -559,7 +559,7 @@ _mesa_RasterPos3f(GLfloat x, GLfloat y, GLfloat z)
 void GLAPIENTRY
 _mesa_RasterPos3i(GLint x, GLint y, GLint z)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -573,7 +573,7 @@ _mesa_RasterPos3s(GLshort x, GLshort y, GLshort z)
 void GLAPIENTRY
 _mesa_RasterPos4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 /** Calls raster_pos4f() */
@@ -588,7 +588,7 @@ _mesa_RasterPos4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 void GLAPIENTRY
 _mesa_RasterPos4i(GLint x, GLint y, GLint z, GLint w)
 {
-    _mesa_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    _mesa_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -602,7 +602,7 @@ _mesa_RasterPos4s(GLshort x, GLshort y, GLshort z, GLshort w)
 void GLAPIENTRY
 _mesa_RasterPos2dv(const GLdouble *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -616,7 +616,7 @@ _mesa_RasterPos2fv(const GLfloat *v)
 void GLAPIENTRY
 _mesa_RasterPos2iv(const GLint *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -630,7 +630,7 @@ _mesa_RasterPos2sv(const GLshort *v)
 void GLAPIENTRY
 _mesa_RasterPos3dv(const GLdouble *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -644,7 +644,7 @@ _mesa_RasterPos3fv(const GLfloat *v)
 void GLAPIENTRY
 _mesa_RasterPos3iv(const GLint *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -658,8 +658,8 @@ _mesa_RasterPos3sv(const GLshort *v)
 void GLAPIENTRY
 _mesa_RasterPos4dv(const GLdouble *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1],
-		      (GLfloat) v[2], (GLfloat) v[3]);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		      static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -673,8 +673,8 @@ _mesa_RasterPos4fv(const GLfloat *v)
 void GLAPIENTRY
 _mesa_RasterPos4iv(const GLint *v)
 {
-    _mesa_RasterPos4f((GLfloat) v[0], (GLfloat) v[1],
-		      (GLfloat) v[2], (GLfloat) v[3]);
+    _mesa_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		      static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 /** Calls _mesa_RasterPos4f() */
@@ -770,7 +770,7 @@ window_pos4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 void GLAPIENTRY
 _mesa_WindowPos2dMESA(GLdouble x, GLdouble y)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 void GLAPIENTRY
@@ -782,7 +782,7 @@ _mesa_WindowPos2fMESA(GLfloat x, GLfloat y)
 void GLAPIENTRY
 _mesa_WindowPos2iMESA(GLint x, GLint y)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 void GLAPIENTRY
@@ -794,7 +794,7 @@ _mesa_WindowPos2sMESA(GLshort x, GLshort y)
 void GLAPIENTRY
 _mesa_WindowPos3dMESA(GLdouble x, GLdouble y, GLdouble z)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 void GLAPIENTRY
@@ -806,7 +806,7 @@ _mesa_WindowPos3fMESA(GLfloat x, GLfloat y, GLfloat z)
 void GLAPIENTRY
 _mesa_WindowPos3iMESA(GLint x, GLint y, GLint z)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 void GLAPIENTRY
@@ -818,7 +818,7 @@ _mesa_WindowPos3sMESA(GLshort x, GLshort y, GLshort z)
 void GLAPIENTRY
 _mesa_WindowPos4dMESA(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 void GLAPIENTRY
@@ -830,7 +830,7 @@ _mesa_WindowPos4fMESA(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 void GLAPIENTRY
 _mesa_WindowPos4iMESA(GLint x, GLint y, GLint z, GLint w)
 {
-    window_pos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    window_pos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 void GLAPIENTRY
@@ -842,7 +842,7 @@ _mesa_WindowPos4sMESA(GLshort x, GLshort y, GLshort z, GLshort w)
 void GLAPIENTRY
 _mesa_WindowPos2dvMESA(const GLdouble *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 void GLAPIENTRY
@@ -854,7 +854,7 @@ _mesa_WindowPos2fvMESA(const GLfloat *v)
 void GLAPIENTRY
 _mesa_WindowPos2ivMESA(const GLint *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 void GLAPIENTRY
@@ -866,7 +866,7 @@ _mesa_WindowPos2svMESA(const GLshort *v)
 void GLAPIENTRY
 _mesa_WindowPos3dvMESA(const GLdouble *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 void GLAPIENTRY
@@ -878,7 +878,7 @@ _mesa_WindowPos3fvMESA(const GLfloat *v)
 void GLAPIENTRY
 _mesa_WindowPos3ivMESA(const GLint *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 void GLAPIENTRY
@@ -890,8 +890,8 @@ _mesa_WindowPos3svMESA(const GLshort *v)
 void GLAPIENTRY
 _mesa_WindowPos4dvMESA(const GLdouble *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1],
-		 (GLfloat) v[2], (GLfloat) v[3]);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		 static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 void GLAPIENTRY
@@ -903,8 +903,8 @@ _mesa_WindowPos4fvMESA(const GLfloat *v)
 void GLAPIENTRY
 _mesa_WindowPos4ivMESA(const GLint *v)
 {
-    window_pos4f((GLfloat) v[0], (GLfloat) v[1],
-		 (GLfloat) v[2], (GLfloat) v[3]);
+    window_pos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		 static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 void GLAPIENTRY

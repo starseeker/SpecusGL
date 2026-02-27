@@ -189,7 +189,7 @@ NAME(put_values)(GLcontext *ctx, struct gl_renderbuffer *rb,
 #endif
     const RB_TYPE(*src)[RB_COMPONENTS] = (const RB_TYPE(*)[RB_COMPONENTS]) values;
     GLuint i;
-    ASSERT(mask);
+    assert(mask);
     for (i = 0; i < count; i++) {
 	if (mask[i]) {
 	    INIT_PIXEL_PTR(pixel, x[i], y[i]);
@@ -210,7 +210,7 @@ NAME(put_mono_values)(GLcontext *ctx, struct gl_renderbuffer *rb,
 #endif
     const RB_TYPE *src = (const RB_TYPE *) value;
     GLuint i;
-    ASSERT(mask);
+    assert(mask);
     for (i = 0; i < count; i++) {
 	if (mask[i]) {
 	    INIT_PIXEL_PTR(pixel, x[i], y[i]);

@@ -72,9 +72,9 @@ _swrast_update_rasterflags(GLcontext *ctx)
     }
 
     if (ctx->Viewport.X < 0
-	|| ctx->Viewport.X + ctx->Viewport.Width > (GLint) ctx->DrawBuffer->Width
+	|| ctx->Viewport.X + ctx->Viewport.Width > static_cast<GLint>(ctx->DrawBuffer->Width)
 	|| ctx->Viewport.Y < 0
-	|| ctx->Viewport.Y + ctx->Viewport.Height > (GLint) ctx->DrawBuffer->Height) {
+	|| ctx->Viewport.Y + ctx->Viewport.Height > static_cast<GLint>(ctx->DrawBuffer->Height)) {
 	rasterMask |= CLIP_BIT;
     }
 
@@ -287,7 +287,7 @@ _swrast_validate_triangle(GLcontext *ctx,
 
     _swrast_validate_derived(ctx);
     swrast->choose_triangle(ctx);
-    ASSERT(swrast->Triangle);
+    assert(swrast->Triangle);
 
     if (ctx->Texture._EnabledUnits == 0
 	&& NEED_SECONDARY_COLOR(ctx)
@@ -311,7 +311,7 @@ _swrast_validate_line(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
 
     _swrast_validate_derived(ctx);
     swrast->choose_line(ctx);
-    ASSERT(swrast->Line);
+    assert(swrast->Line);
 
     if (ctx->Texture._EnabledUnits == 0
 	&& NEED_SECONDARY_COLOR(ctx)
@@ -383,7 +383,7 @@ _swrast_validate_texture_images(GLcontext *ctx)
     for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++) {
 	if (ctx->Texture.Unit[u]._ReallyEnabled) {
 	    struct gl_texture_object *texObj = ctx->Texture.Unit[u]._Current;
-	    ASSERT(texObj);
+	    assert(texObj);
 	    if (texObj) {
 		GLuint numFaces = (texObj->Target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
 		GLuint face;
@@ -393,7 +393,7 @@ _swrast_validate_texture_images(GLcontext *ctx)
 			struct gl_texture_image *texImg = texObj->Image[face][lvl];
 			if (texImg && !texImg->Data) {
 			    swrast->ValidateTextureImage(ctx, texObj, face, lvl);
-			    ASSERT(texObj->Image[face][lvl]->Data);
+			    assert(texObj->Image[face][lvl]->Data);
 			}
 		    }
 		}
@@ -421,7 +421,7 @@ _swrast_eject_texture_images(GLcontext *ctx)
     for (u = 0; u < ctx->Const.MaxTextureImageUnits; u++) {
 	if (ctx->Texture.Unit[u]._ReallyEnabled) {
 	    struct gl_texture_object *texObj = ctx->Texture.Unit[u]._Current;
-	    ASSERT(texObj);
+	    assert(texObj);
 	    if (texObj) {
 		GLuint numFaces = (texObj->Target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
 		GLuint face;

@@ -97,7 +97,7 @@ do {									\
    int k = (int) f;							\
    if (k < 0 /* gcc may cast an overflow float value to negative int value*/ \
 	|| k > SHINE_TABLE_SIZE-2)					\
-      result = (GLfloat) pow( dp, _tab->shininess );		\
+      result = static_cast<GLfloat>(pow( dp, _tab->shininess ));		\
    else									\
       result = _tab->tab[k] + (f-k)*(_tab->tab[k+1]-_tab->tab[k]);	\
 } while (0)

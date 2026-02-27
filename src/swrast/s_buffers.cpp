@@ -50,8 +50,8 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
     SWspan span;
     GLint i;
 
-    ASSERT(ctx->Visual.rgbMode);
-    ASSERT(rb->PutRow);
+    assert(ctx->Visual.rgbMode);
+    assert(rb->PutRow);
 
     /* Initialize color span with clear color */
     /* XXX optimize for clearcolor == black/zero (bzero) */
@@ -76,7 +76,7 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    COPY_4V(span.array->rgba[i], clearColor);
 	}
     } else {
-	ASSERT(span.array->ChanType == GL_FLOAT);
+	assert(span.array->ChanType == GL_FLOAT);
 	for (i = 0; i < width; i++) {
 	    CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][0], ctx->Color.ClearColor[0]);
 	    CLAMPED_FLOAT_TO_CHAN(span.array->rgba[i][1], ctx->Color.ClearColor[1]);
@@ -112,9 +112,9 @@ clear_ci_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
     SWspan span;
     GLint i;
 
-    ASSERT(!ctx->Visual.rgbMode);
-    ASSERT(rb->PutRow);
-    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+    assert(!ctx->Visual.rgbMode);
+    assert(rb->PutRow);
+    assert(rb->DataType == GL_UNSIGNED_INT);
 
     /* Initialize index span with clear index */
     INIT_SPAN(span, GL_BITMAP, width, 0, SPAN_RGBA);
@@ -151,14 +151,14 @@ clear_rgba_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     GLvoid *clearVal;
     GLint i;
 
-    ASSERT(ctx->Visual.rgbMode);
+    assert(ctx->Visual.rgbMode);
 
-    ASSERT(ctx->Color.ColorMask[0] &&
+    assert(ctx->Color.ColorMask[0] &&
 	   ctx->Color.ColorMask[1] &&
 	   ctx->Color.ColorMask[2] &&
 	   ctx->Color.ColorMask[3]);
 
-    ASSERT(rb->PutMonoRow);
+    assert(rb->PutMonoRow);
 
     switch (rb->DataType) {
 	case GL_UNSIGNED_BYTE:
@@ -205,21 +205,21 @@ clear_ci_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     GLvoid *clearVal;
     GLint i;
 
-    ASSERT(!ctx->Visual.rgbMode);
+    assert(!ctx->Visual.rgbMode);
 
-    ASSERT((ctx->Color.IndexMask & ((1 << rb->IndexBits) - 1))
-	   == (GLuint)((1 << rb->IndexBits) - 1));
+    assert((ctx->Color.IndexMask & ((1 << rb->IndexBits) - 1))
+	   == static_cast<GLuint>(((1 << rb->IndexBits) - 1)));
 
-    ASSERT(rb->PutMonoRow);
+    assert(rb->PutMonoRow);
 
     /* setup clear value */
     switch (rb->DataType) {
 	case GL_UNSIGNED_BYTE:
-	    clear8 = (GLubyte) ctx->Color.ClearIndex;
+	    clear8 = static_cast<GLubyte>(ctx->Color.ClearIndex);
 	    clearVal = &clear8;
 	    break;
 	case GL_UNSIGNED_SHORT:
-	    clear16 = (GLushort) ctx->Color.ClearIndex;
+	    clear16 = static_cast<GLushort>(ctx->Color.ClearIndex);
 	    clearVal = &clear16;
 	    break;
 	case GL_UNSIGNED_INT:

@@ -185,7 +185,7 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 	return 0;
     else if (z > CHAN_MAX)
 	return CHAN_MAX;
-    return (GLchan) IROUND_POS(z);
+    return static_cast<GLchan>(IROUND_POS(z));
 #endif
 }
 
@@ -208,7 +208,7 @@ compute_lambda(const GLfloat sPlane[4], const GLfloat tPlane[4],
     if (rho2 == 0.0F)
 	return 0.0;
     else
-	return (GLfloat)(LOGF(rho2) * 1.442695 * 0.5); /* 1.442695 = 1/log(2) */
+	return static_cast<GLfloat>((LOGF(rho2) * 1.442695 * 0.5)); /* 1.442695 = 1/log(2) */
 }
 
 
@@ -224,8 +224,8 @@ compute_lambda(const GLfloat sPlane[4], const GLfloat tPlane[4],
 static void
 make_sample_table(GLint xSamples, GLint ySamples, GLfloat samples[][2])
 {
-    const GLfloat dx = 1.0F / (GLfloat) xSamples;
-    const GLfloat dy = 1.0F / (GLfloat) ySamples;
+    const GLfloat dx = 1.0F / static_cast<GLfloat>(xSamples);
+    const GLfloat dy = 1.0F / static_cast<GLfloat>(ySamples);
     GLint x, y;
     GLint i;
 
@@ -268,8 +268,8 @@ compute_coveragef(const struct LineInfo *info,
 {
     static GLfloat samples[SUB_PIXEL * SUB_PIXEL][2];
     static GLboolean haveSamples = GL_FALSE;
-    const GLfloat x = (GLfloat) winx;
-    const GLfloat y = (GLfloat) winy;
+    const GLfloat x = static_cast<GLfloat>(winx);
+    const GLfloat y = static_cast<GLfloat>(winy);
     GLint stop = 4, i;
     GLfloat insideCount = SUB_PIXEL * SUB_PIXEL;
 
@@ -408,12 +408,12 @@ segment(GLcontext *ctx,
 	}
 
 	/* scan along the line, left-to-right */
-	ixRight = (GLint)(xRight + 1.0F);
+	ixRight = static_cast<GLint>((xRight + 1.0F));
 
 	/*printf("avg span height: %g\n", yTop - yBot);*/
-	for (ix = (GLint) xLeft; ix < ixRight; ix++) {
-	    const GLint iyBot = (GLint) yBot;
-	    const GLint iyTop = (GLint)(yTop + 1.0F);
+	for (ix = static_cast<GLint>(xLeft); ix < ixRight; ix++) {
+	    const GLint iyBot = static_cast<GLint>(yBot);
+	    const GLint iyTop = static_cast<GLint>((yTop + 1.0F));
 	    GLint iy;
 	    /* scan across the line, bottom-to-top */
 	    for (iy = iyBot; iy < iyTop; iy++) {
@@ -450,12 +450,12 @@ segment(GLcontext *ctx,
 	}
 
 	/* scan along the line, bottom-to-top */
-	iyTop = (GLint)(yTop + 1.0F);
+	iyTop = static_cast<GLint>((yTop + 1.0F));
 
 	/*printf("avg span width: %g\n", xRight - xLeft);*/
-	for (iy = (GLint) yBot; iy < iyTop; iy++) {
-	    const GLint ixLeft = (GLint) xLeft;
-	    const GLint ixRight = (GLint)(xRight + 1.0F);
+	for (iy = static_cast<GLint>(yBot); iy < iyTop; iy++) {
+	    const GLint ixLeft = static_cast<GLint>(xLeft);
+	    const GLint ixRight = static_cast<GLint>((xRight + 1.0F));
 	    GLint ix;
 	    /* scan across the line, left-to-right */
 	    for (ix = ixLeft; ix < ixRight; ix++) {
@@ -505,7 +505,7 @@ _swrast_choose_aa_line_function(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    ASSERT(ctx->Line.SmoothFlag);
+    assert(ctx->Line.SmoothFlag);
 
     if (ctx->Visual.rgbMode) {
 	/* RGBA */

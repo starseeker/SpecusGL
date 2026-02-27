@@ -253,7 +253,7 @@ _mesa_GetProgramivNV(GLuint id, GLenum pname, GLint *params)
 	    *params = prog->Target;
 	    return;
 	case GL_PROGRAM_LENGTH_NV:
-	    *params = (GLint) prog->String.size();
+	    *params = static_cast<GLint>(prog->String.size());
 	    return;
 	case GL_PROGRAM_RESIDENT_NV:
 	    *params = prog->Resident;
@@ -323,10 +323,10 @@ _mesa_GetTrackMatrixivNV(GLenum target, GLuint address,
 
 	switch (pname) {
 	    case GL_TRACK_MATRIX_NV:
-		params[0] = (GLint) ctx->VertexProgram.TrackMatrix[i];
+		params[0] = static_cast<GLint>(ctx->VertexProgram.TrackMatrix[i]);
 		return;
 	    case GL_TRACK_MATRIX_TRANSFORM_NV:
-		params[0] = (GLint) ctx->VertexProgram.TrackMatrixTransform[i];
+		params[0] = static_cast<GLint>(ctx->VertexProgram.TrackMatrixTransform[i]);
 		return;
 	    default:
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTrackMatrixivNV");
@@ -398,13 +398,13 @@ _mesa_GetVertexAttribfvNV(GLuint index, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_ATTRIB_ARRAY_SIZE_NV:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Size;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Size);
 	    break;
 	case GL_ATTRIB_ARRAY_STRIDE_NV:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Stride;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Stride);
 	    break;
 	case GL_ATTRIB_ARRAY_TYPE_NV:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Type;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Type);
 	    break;
 	case GL_CURRENT_ATTRIB_NV:
 	    if (index == 0) {
@@ -454,10 +454,10 @@ _mesa_GetVertexAttribivNV(GLuint index, GLenum pname, GLint *params)
 		return;
 	    }
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = (GLint) ctx->Current.Attrib[index][0];
-	    params[1] = (GLint) ctx->Current.Attrib[index][1];
-	    params[2] = (GLint) ctx->Current.Attrib[index][2];
-	    params[3] = (GLint) ctx->Current.Attrib[index][3];
+	    params[0] = static_cast<GLint>(ctx->Current.Attrib[index][0]);
+	    params[1] = static_cast<GLint>(ctx->Current.Attrib[index][1]);
+	    params[2] = static_cast<GLint>(ctx->Current.Attrib[index][2]);
+	    params[3] = static_cast<GLint>(ctx->Current.Attrib[index][3]);
 	    break;
 	case GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING_ARB:
 	    if (!ctx->Extensions.ARB_vertex_buffer_object) {
@@ -571,7 +571,7 @@ _mesa_ProgramParameter4dNV(GLenum target, GLuint index,
 			   GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
     _mesa_ProgramParameter4fNV(target, index,
-			       (GLfloat)x, (GLfloat)y, (GLfloat)z, (GLfloat)w);
+			       static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -584,8 +584,8 @@ _mesa_ProgramParameter4dvNV(GLenum target, GLuint index,
 			    const GLdouble *params)
 {
     _mesa_ProgramParameter4fNV(target, index,
-			       (GLfloat)params[0], (GLfloat)params[1],
-			       (GLfloat)params[2], (GLfloat)params[3]);
+			       static_cast<GLfloat>(params[0]), static_cast<GLfloat>(params[1]),
+			       static_cast<GLfloat>(params[2]), static_cast<GLfloat>(params[3]));
 }
 
 
@@ -647,10 +647,10 @@ _mesa_ProgramParameters4dvNV(GLenum target, GLuint index,
 	    return;
 	}
 	for (i = 0; i < num; i++) {
-	    ctx->VertexProgram.Parameters[index + i][0] = (GLfloat) params[0];
-	    ctx->VertexProgram.Parameters[index + i][1] = (GLfloat) params[1];
-	    ctx->VertexProgram.Parameters[index + i][2] = (GLfloat) params[2];
-	    ctx->VertexProgram.Parameters[index + i][3] = (GLfloat) params[3];
+	    ctx->VertexProgram.Parameters[index + i][0] = static_cast<GLfloat>(params[0]);
+	    ctx->VertexProgram.Parameters[index + i][1] = static_cast<GLfloat>(params[1]);
+	    ctx->VertexProgram.Parameters[index + i][2] = static_cast<GLfloat>(params[2]);
+	    ctx->VertexProgram.Parameters[index + i][3] = static_cast<GLfloat>(params[3]);
 	    params += 4;
 	};
     } else {
@@ -803,8 +803,8 @@ void GLAPIENTRY
 _mesa_ProgramNamedParameter4dNV(GLuint id, GLsizei len, const GLubyte *name,
 				GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    _mesa_ProgramNamedParameter4fNV(id, len, name, (GLfloat)x, (GLfloat)y,
-				    (GLfloat)z, (GLfloat)w);
+    _mesa_ProgramNamedParameter4fNV(id, len, name, static_cast<GLfloat>(x), static_cast<GLfloat>(y),
+				    static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -813,8 +813,8 @@ _mesa_ProgramNamedParameter4dvNV(GLuint id, GLsizei len, const GLubyte *name,
 				 const double v[])
 {
     _mesa_ProgramNamedParameter4fNV(id, len, name,
-				    (GLfloat)v[0], (GLfloat)v[1],
-				    (GLfloat)v[2], (GLfloat)v[3]);
+				    static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+				    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 

@@ -414,23 +414,23 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	return;
     }
 
-    if (width < 0 || (width != 0 && _mesa_bitcount(width) != 1)) {
+    if (width < 0 || (width != 0 && static_cast<GLuint>(__builtin_popcount(width)) != 1)) {
 	/* error */
 	if (proxy) {
 	    table->Size = 0;
-	    table->InternalFormat = (GLenum) 0;
-	    table->_BaseFormat = (GLenum) 0;
+	    table->InternalFormat = static_cast<GLenum>(0);
+	    table->_BaseFormat = static_cast<GLenum>(0);
 	} else {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glColorTable(width=%d)", width);
 	}
 	return;
     }
 
-    if (width > (GLsizei) ctx->Const.MaxColorTableSize) {
+    if (width > static_cast<GLsizei>(ctx->Const.MaxColorTableSize)) {
 	if (proxy) {
 	    table->Size = 0;
-	    table->InternalFormat = (GLenum) 0;
-	    table->_BaseFormat = (GLenum) 0;
+	    table->InternalFormat = static_cast<GLenum>(0);
+	    table->_BaseFormat = static_cast<GLenum>(0);
 	} else {
 	    _mesa_error(ctx, GL_TABLE_TOO_LARGE, "glColorTable(width)");
 	}
@@ -439,7 +439,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 
     table->Size = width;
     table->InternalFormat = internalFormat;
-    table->_BaseFormat = (GLenum) baseFormat;
+    table->_BaseFormat = static_cast<GLenum>(baseFormat);
 
     comps = _mesa_components_in_format(table->_BaseFormat);
     assert(comps > 0);  /* error should have been caught sooner */
@@ -565,7 +565,7 @@ _mesa_ColorSubTable(GLenum target, GLsizei start,
     /* error should have been caught sooner */
     assert(_mesa_components_in_format(table->_BaseFormat) > 0);
 
-    if (start + count > (GLint) table->Size) {
+    if (start + count > static_cast<GLint>(table->Size)) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glColorSubTable(count)");
 	return;
     }
@@ -674,7 +674,7 @@ _mesa_GetColorTable(GLenum target, GLenum format,
 	    return;
     }
 
-    ASSERT(table);
+    assert(table);
 
     if (table->Size <= 0) {
 	return;
@@ -841,13 +841,13 @@ _mesa_ColorTableParameteriv(GLenum target, GLenum pname, const GLint *params)
 	pname == GL_POST_CONVOLUTION_COLOR_TABLE_SGI ||
 	pname == GL_POST_COLOR_MATRIX_COLOR_TABLE_SGI) {
 	/* four values */
-	fparams[0] = (GLfloat) params[0];
-	fparams[1] = (GLfloat) params[1];
-	fparams[2] = (GLfloat) params[2];
-	fparams[3] = (GLfloat) params[3];
+	fparams[0] = static_cast<GLfloat>(params[0]);
+	fparams[1] = static_cast<GLfloat>(params[1]);
+	fparams[2] = static_cast<GLfloat>(params[2]);
+	fparams[3] = static_cast<GLfloat>(params[3]);
     } else {
 	/* one values */
-	fparams[0] = (GLfloat) params[0];
+	fparams[0] = static_cast<GLfloat>(params[0]);
     }
     _mesa_ColorTableParameterfv(target, pname, fparams);
 }
@@ -969,28 +969,28 @@ _mesa_GetColorTableParameterfv(GLenum target, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_COLOR_TABLE_FORMAT:
-	    *params = (GLfloat) table->InternalFormat;
+	    *params = static_cast<GLfloat>(table->InternalFormat);
 	    break;
 	case GL_COLOR_TABLE_WIDTH:
-	    *params = (GLfloat) table->Size;
+	    *params = static_cast<GLfloat>(table->Size);
 	    break;
 	case GL_COLOR_TABLE_RED_SIZE:
-	    *params = (GLfloat) table->RedSize;
+	    *params = static_cast<GLfloat>(table->RedSize);
 	    break;
 	case GL_COLOR_TABLE_GREEN_SIZE:
-	    *params = (GLfloat) table->GreenSize;
+	    *params = static_cast<GLfloat>(table->GreenSize);
 	    break;
 	case GL_COLOR_TABLE_BLUE_SIZE:
-	    *params = (GLfloat) table->BlueSize;
+	    *params = static_cast<GLfloat>(table->BlueSize);
 	    break;
 	case GL_COLOR_TABLE_ALPHA_SIZE:
-	    *params = (GLfloat) table->AlphaSize;
+	    *params = static_cast<GLfloat>(table->AlphaSize);
 	    break;
 	case GL_COLOR_TABLE_LUMINANCE_SIZE:
-	    *params = (GLfloat) table->LuminanceSize;
+	    *params = static_cast<GLfloat>(table->LuminanceSize);
 	    break;
 	case GL_COLOR_TABLE_INTENSITY_SIZE:
-	    *params = (GLfloat) table->IntensitySize;
+	    *params = static_cast<GLfloat>(table->IntensitySize);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetColorTableParameterfv(pname)");
@@ -1050,17 +1050,17 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 	    table = &ctx->ColorTable[COLORTABLE_PRECONVOLUTION];
 	    if (pname == GL_COLOR_TABLE_SCALE_SGI) {
 		GLfloat *scale = ctx->Pixel.ColorTableScale[COLORTABLE_PRECONVOLUTION];
-		params[0] = (GLint) scale[0];
-		params[1] = (GLint) scale[1];
-		params[2] = (GLint) scale[2];
-		params[3] = (GLint) scale[3];
+		params[0] = static_cast<GLint>(scale[0]);
+		params[1] = static_cast<GLint>(scale[1]);
+		params[2] = static_cast<GLint>(scale[2]);
+		params[3] = static_cast<GLint>(scale[3]);
 		return;
 	    } else if (pname == GL_COLOR_TABLE_BIAS_SGI) {
 		GLfloat *bias = ctx->Pixel.ColorTableBias[COLORTABLE_PRECONVOLUTION];
-		params[0] = (GLint) bias[0];
-		params[1] = (GLint) bias[1];
-		params[2] = (GLint) bias[2];
-		params[3] = (GLint) bias[3];
+		params[0] = static_cast<GLint>(bias[0]);
+		params[1] = static_cast<GLint>(bias[1]);
+		params[2] = static_cast<GLint>(bias[2]);
+		params[3] = static_cast<GLint>(bias[3]);
 		return;
 	    }
 	    break;
@@ -1074,16 +1074,16 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 	    }
 	    table = &(texUnit->ColorTable);
 	    if (pname == GL_COLOR_TABLE_SCALE_SGI) {
-		params[0] = (GLint) ctx->Pixel.TextureColorTableScale[0];
-		params[1] = (GLint) ctx->Pixel.TextureColorTableScale[1];
-		params[2] = (GLint) ctx->Pixel.TextureColorTableScale[2];
-		params[3] = (GLint) ctx->Pixel.TextureColorTableScale[3];
+		params[0] = static_cast<GLint>(ctx->Pixel.TextureColorTableScale[0]);
+		params[1] = static_cast<GLint>(ctx->Pixel.TextureColorTableScale[1]);
+		params[2] = static_cast<GLint>(ctx->Pixel.TextureColorTableScale[2]);
+		params[3] = static_cast<GLint>(ctx->Pixel.TextureColorTableScale[3]);
 		return;
 	    } else if (pname == GL_COLOR_TABLE_BIAS_SGI) {
-		params[0] = (GLint) ctx->Pixel.TextureColorTableBias[0];
-		params[1] = (GLint) ctx->Pixel.TextureColorTableBias[1];
-		params[2] = (GLint) ctx->Pixel.TextureColorTableBias[2];
-		params[3] = (GLint) ctx->Pixel.TextureColorTableBias[3];
+		params[0] = static_cast<GLint>(ctx->Pixel.TextureColorTableBias[0]);
+		params[1] = static_cast<GLint>(ctx->Pixel.TextureColorTableBias[1]);
+		params[2] = static_cast<GLint>(ctx->Pixel.TextureColorTableBias[2]);
+		params[3] = static_cast<GLint>(ctx->Pixel.TextureColorTableBias[3]);
 		return;
 	    }
 	    break;
@@ -1098,17 +1098,17 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 	    table = &ctx->ColorTable[COLORTABLE_POSTCONVOLUTION];
 	    if (pname == GL_COLOR_TABLE_SCALE_SGI) {
 		GLfloat *scale = ctx->Pixel.ColorTableScale[COLORTABLE_POSTCONVOLUTION];
-		params[0] = (GLint) scale[0];
-		params[1] = (GLint) scale[1];
-		params[2] = (GLint) scale[2];
-		params[3] = (GLint) scale[3];
+		params[0] = static_cast<GLint>(scale[0]);
+		params[1] = static_cast<GLint>(scale[1]);
+		params[2] = static_cast<GLint>(scale[2]);
+		params[3] = static_cast<GLint>(scale[3]);
 		return;
 	    } else if (pname == GL_COLOR_TABLE_BIAS_SGI) {
 		GLfloat *bias = ctx->Pixel.ColorTableBias[COLORTABLE_POSTCONVOLUTION];
-		params[0] = (GLint) bias[0];
-		params[1] = (GLint) bias[1];
-		params[2] = (GLint) bias[2];
-		params[3] = (GLint) bias[3];
+		params[0] = static_cast<GLint>(bias[0]);
+		params[1] = static_cast<GLint>(bias[1]);
+		params[2] = static_cast<GLint>(bias[2]);
+		params[3] = static_cast<GLint>(bias[3]);
 		return;
 	    }
 	    break;
@@ -1119,17 +1119,17 @@ _mesa_GetColorTableParameteriv(GLenum target, GLenum pname, GLint *params)
 	    table = &ctx->ColorTable[COLORTABLE_POSTCOLORMATRIX];
 	    if (pname == GL_COLOR_TABLE_SCALE_SGI) {
 		GLfloat *scale = ctx->Pixel.ColorTableScale[COLORTABLE_POSTCOLORMATRIX];
-		params[0] = (GLint) scale[0];
-		params[1] = (GLint) scale[1];
-		params[2] = (GLint) scale[2];
-		params[3] = (GLint) scale[3];
+		params[0] = static_cast<GLint>(scale[0]);
+		params[1] = static_cast<GLint>(scale[1]);
+		params[2] = static_cast<GLint>(scale[2]);
+		params[3] = static_cast<GLint>(scale[3]);
 		return;
 	    } else if (pname == GL_COLOR_TABLE_BIAS_SGI) {
 		GLfloat *bias = ctx->Pixel.ColorTableScale[COLORTABLE_POSTCOLORMATRIX];
-		params[0] = (GLint) bias[0];
-		params[1] = (GLint) bias[1];
-		params[2] = (GLint) bias[2];
-		params[3] = (GLint) bias[3];
+		params[0] = static_cast<GLint>(bias[0]);
+		params[1] = static_cast<GLint>(bias[1]);
+		params[2] = static_cast<GLint>(bias[2]);
+		params[3] = static_cast<GLint>(bias[3]);
 		return;
 	    }
 	    break;

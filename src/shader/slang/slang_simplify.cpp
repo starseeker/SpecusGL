@@ -195,7 +195,7 @@ _slang_simplify(slang_operation *oper,
 		for (i = 0; i < 4; i++) {
 		    const GLint a = oper->children[0].literal[i] ? 1 : 0;
 		    const GLint b = oper->children[1].literal[i] ? 1 : 0;
-		    oper->literal[i] = (GLfloat)(a && b);
+		    oper->literal[i] = static_cast<GLfloat>((a && b));
 		}
 		oper->literal_size = oper->children[0].literal_size;
 		slang_operation_destruct(oper);
@@ -205,7 +205,7 @@ _slang_simplify(slang_operation *oper,
 		for (i = 0; i < 4; i++) {
 		    const GLint a = oper->children[0].literal[i] ? 1 : 0;
 		    const GLint b = oper->children[1].literal[i] ? 1 : 0;
-		    oper->literal[i] = (GLfloat)(a || b);
+		    oper->literal[i] = static_cast<GLfloat>((a || b));
 		}
 		oper->literal_size = oper->children[0].literal_size;
 		slang_operation_destruct(oper);
@@ -215,7 +215,7 @@ _slang_simplify(slang_operation *oper,
 		for (i = 0; i < 4; i++) {
 		    const GLint a = oper->children[0].literal[i] ? 1 : 0;
 		    const GLint b = oper->children[1].literal[i] ? 1 : 0;
-		    oper->literal[i] = (GLfloat)(a ^ b);
+		    oper->literal[i] = static_cast<GLfloat>((a ^ b));
 		}
 		oper->literal_size = oper->children[0].literal_size;
 		slang_operation_destruct(oper);

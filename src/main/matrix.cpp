@@ -78,9 +78,9 @@ _mesa_Frustum(GLdouble left, GLdouble right,
 	return;
     }
 
-    ctx->CurrentStack->Top->frustum((GLfloat) left, (GLfloat) right,
-				    (GLfloat) bottom, (GLfloat) top,
-				    (GLfloat) nearval, (GLfloat) farval);
+    ctx->CurrentStack->Top->frustum(static_cast<GLfloat>(left), static_cast<GLfloat>(right),
+				    static_cast<GLfloat>(bottom), static_cast<GLfloat>(top),
+				    static_cast<GLfloat>(nearval), static_cast<GLfloat>(farval));
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -120,9 +120,9 @@ _mesa_Ortho(GLdouble left, GLdouble right,
 	return;
     }
 
-    ctx->CurrentStack->Top->ortho((GLfloat) left, (GLfloat) right,
-				  (GLfloat) bottom, (GLfloat) top,
-				  (GLfloat) nearval, (GLfloat) farval);
+    ctx->CurrentStack->Top->ortho(static_cast<GLfloat>(left), static_cast<GLfloat>(right),
+				  static_cast<GLfloat>(bottom), static_cast<GLfloat>(top),
+				  static_cast<GLfloat>(nearval), static_cast<GLfloat>(farval));
     ctx->NewState |= ctx->CurrentStack->DirtyFlag;
 }
 
@@ -443,7 +443,7 @@ _mesa_LoadMatrixd(const GLdouble *m)
     GLfloat f[16];
     if (!m) return;
     for (i = 0; i < 16; i++)
-	f[i] = (GLfloat) m[i];
+	f[i] = static_cast<GLfloat>(m[i]);
     _mesa_LoadMatrixf(f);
 }
 
@@ -454,7 +454,7 @@ _mesa_MultMatrixd(const GLdouble *m)
     GLfloat f[16];
     if (!m) return;
     for (i = 0; i < 16; i++)
-	f[i] = (GLfloat) m[i];
+	f[i] = static_cast<GLfloat>(m[i]);
     _mesa_MultMatrixf(f);
 }
 
@@ -462,21 +462,21 @@ _mesa_MultMatrixd(const GLdouble *m)
 void GLAPIENTRY
 _mesa_Rotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z)
 {
-    _mesa_Rotatef((GLfloat) angle, (GLfloat) x, (GLfloat) y, (GLfloat) z);
+    _mesa_Rotatef(static_cast<GLfloat>(angle), static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 
 void GLAPIENTRY
 _mesa_Scaled(GLdouble x, GLdouble y, GLdouble z)
 {
-    _mesa_Scalef((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    _mesa_Scalef(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 
 void GLAPIENTRY
 _mesa_Translated(GLdouble x, GLdouble y, GLdouble z)
 {
-    _mesa_Translatef((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    _mesa_Translatef(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 #endif
 
@@ -566,8 +566,8 @@ _mesa_set_viewport(GLcontext *ctx, GLint x, GLint y,
     }
 
     /* clamp width and height to the implementation dependent range */
-    width  = CLAMP(width,  1, (GLsizei) ctx->Const.MaxViewportWidth);
-    height = CLAMP(height, 1, (GLsizei) ctx->Const.MaxViewportHeight);
+    width  = CLAMP(width,  1, static_cast<GLsizei>(ctx->Const.MaxViewportWidth));
+    height = CLAMP(height, 1, static_cast<GLsizei>(ctx->Const.MaxViewportHeight));
 
     ctx->Viewport.X = x;
     ctx->Viewport.Width = width;
@@ -613,8 +613,8 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
     if (MESA_VERBOSE&VERBOSE_API)
 	_mesa_debug(ctx, "glDepthRange %f %f\n", nearval, farval);
 
-    ctx->Viewport.Near = (GLfloat) CLAMP(nearval, 0.0, 1.0);
-    ctx->Viewport.Far = (GLfloat) CLAMP(farval, 0.0, 1.0);
+    ctx->Viewport.Near = static_cast<GLfloat>(CLAMP(nearval, 0.0, 1.0));
+    ctx->Viewport.Far = static_cast<GLfloat>(CLAMP(farval, 0.0, 1.0));
     ctx->NewState |= _NEW_VIEWPORT;
 
 #if 1

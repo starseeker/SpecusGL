@@ -379,8 +379,6 @@ one_time_init(GLcontext *ctx)
 	assert(sizeof(GLint) == 4);
 	assert(sizeof(GLuint) == 4);
 
-	_mesa_init_sqrt_table();
-
 #if _HAVE_FULL_GL
 	_math_init();
 
@@ -389,7 +387,7 @@ one_time_init(GLcontext *ctx)
 	}
 #endif
 
-	if (_mesa_getenv("MESA_DEBUG")) {
+	if (std::getenv("MESA_DEBUG")) {
 	    _glapi_noop_enable_warnings(GL_TRUE);
 	    _glapi_set_warning_func((_glapi_warning_func) _mesa_warning);
 	} else {
@@ -558,7 +556,7 @@ gl_shared_state::cleanup(GLcontext *ctx)
 	    _mesa_free_shader(ctx, sh);
 	} else {
 	    auto *shProg = static_cast<gl_shader_program *>(data);
-	    ASSERT(shProg->Type == GL_SHADER_PROGRAM_MESA);
+	    assert(shProg->Type == GL_SHADER_PROGRAM_MESA);
 	    _mesa_free_shader_program(ctx, shProg);
 	}
     });
@@ -581,7 +579,7 @@ gl_shared_state::cleanup(GLcontext *ctx)
      * Free texture objects (after FBOs since some textures might have
      * been bound to FBOs).
      */
-    ASSERT(ctx->Driver.DeleteTexture);
+    assert(ctx->Driver.DeleteTexture);
     ctx->Driver.DeleteTexture(ctx, Default1D);
     ctx->Driver.DeleteTexture(ctx, Default2D);
     ctx->Driver.DeleteTexture(ctx, Default3D);
@@ -741,15 +739,15 @@ __GLcontextRec::init_constants()
 #endif
 
     /* sanity checks */
-    ASSERT(Const.MaxTextureUnits == MIN2(Const.MaxTextureImageUnits,
+    assert(Const.MaxTextureUnits == MIN2(Const.MaxTextureImageUnits,
 	    Const.MaxTextureCoordUnits));
-    ASSERT(Const.FragmentProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
-    ASSERT(Const.VertexProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
+    assert(Const.FragmentProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
+    assert(Const.VertexProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
 
-    ASSERT(MAX_NV_FRAGMENT_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
-    ASSERT(MAX_NV_VERTEX_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
-    ASSERT(MAX_NV_VERTEX_PROGRAM_INPUTS <= VERT_ATTRIB_MAX);
-    ASSERT(MAX_NV_VERTEX_PROGRAM_OUTPUTS <= VERT_RESULT_MAX);
+    assert(MAX_NV_FRAGMENT_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
+    assert(MAX_NV_VERTEX_PROGRAM_TEMPS <= MAX_PROGRAM_TEMPS);
+    assert(MAX_NV_VERTEX_PROGRAM_INPUTS <= VERT_ATTRIB_MAX);
+    assert(MAX_NV_VERTEX_PROGRAM_OUTPUTS <= VERT_RESULT_MAX);
 }
 
 
@@ -893,7 +891,7 @@ __GLcontextRec::initialize(const GLvisual *visual,
                            const struct dd_function_table *driverFunctions,
                            void *driverContext)
 {
-    ASSERT(driverContext);
+    assert(driverContext);
     assert(driverFunctions->NewTextureObject);
     assert(driverFunctions->FreeTexImageData);
 
@@ -951,11 +949,11 @@ __GLcontextRec::initialize(const GLvisual *visual,
 #endif
 
     FragmentProgram._MaintainTexEnvProgram
-	= (_mesa_getenv("MESA_TEX_PROG") != nullptr);
+	= (std::getenv("MESA_TEX_PROG") != nullptr);
     FragmentProgram._UseTexEnvProgram = FragmentProgram._MaintainTexEnvProgram;
 
     VertexProgram._MaintainTnlProgram
-	= (_mesa_getenv("MESA_TNL_PROG") != nullptr);
+	= (std::getenv("MESA_TNL_PROG") != nullptr);
     if (VertexProgram._MaintainTnlProgram) {
 	/* this is required... */
 	FragmentProgram._MaintainTexEnvProgram = GL_TRUE;
@@ -1005,8 +1003,8 @@ _mesa_create_context(const GLvisual *visual,
 {
     GLcontext *ctx;
 
-    ASSERT(visual);
-    ASSERT(driverContext);
+    assert(visual);
+    assert(driverContext);
 
     ctx = new GLcontext{};
 
@@ -1305,8 +1303,8 @@ __GLcontextRec::bind(GLframebuffer *drawBuffer, GLframebuffer *readBuffer)
     _glapi_set_dispatch(CurrentDispatch);
 
     if (drawBuffer && readBuffer) {
-	ASSERT(drawBuffer->Name == 0);
-	ASSERT(readBuffer->Name == 0);
+	assert(drawBuffer->Name == 0);
+	assert(readBuffer->Name == 0);
 	gl_framebuffer::replace(&WinSysDrawBuffer, drawBuffer);
 	gl_framebuffer::replace(&WinSysReadBuffer, readBuffer);
 
@@ -1354,7 +1352,7 @@ __GLcontextRec::bind(GLframebuffer *drawBuffer, GLframebuffer *readBuffer)
 
     /* First time this context is made current: optionally print info. */
     if (FirstTimeCurrent) {
-	if (_mesa_getenv("MESA_INFO")) {
+	if (std::getenv("MESA_INFO")) {
 	    _mesa_print_info();
 	}
 	FirstTimeCurrent = GL_FALSE;
@@ -1385,7 +1383,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
 
     /* We used to call _glapi_check_multithread() here.  Now do it in drivers */
     _glapi_set_context(static_cast<void *>(newCtx));
-    ASSERT(_mesa_get_current_context() == newCtx);
+    assert(_mesa_get_current_context() == newCtx);
 
     if (!newCtx) {
 	_glapi_set_dispatch(nullptr);  /* none current */

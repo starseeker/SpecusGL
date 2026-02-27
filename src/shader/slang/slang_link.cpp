@@ -373,7 +373,7 @@ _slang_count_temporaries(struct gl_program *prog)
 	}
     }
 
-    prog->NumTemporaries = (GLuint)(maxIndex + 1);
+    prog->NumTemporaries = static_cast<GLuint>((maxIndex + 1));
 }
 
 
@@ -453,7 +453,7 @@ _slang_resolve_samplers(struct gl_shader_program *shProg,
 	if (inst->Opcode == OPCODE_TEX ||
 	    inst->Opcode == OPCODE_TXB ||
 	    inst->Opcode == OPCODE_TXP) {
-	    GLint sampleUnit = (GLint) shProg->Uniforms->ParameterValues[inst->Sampler][0];
+	    GLint sampleUnit = static_cast<GLint>(shProg->Uniforms->ParameterValues[inst->Sampler][0]);
 	    assert(sampleUnit < MAX_TEXTURE_IMAGE_UNITS);
 	    inst->TexSrcUnit = sampleUnit;
 

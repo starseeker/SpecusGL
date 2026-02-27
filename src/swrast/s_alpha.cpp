@@ -126,7 +126,7 @@ _swrast_alpha_test(const GLcontext *ctx, SWspan *span)
 	}
     } else {
 	/* Interpolate alpha values */
-	ASSERT(span->interpMask & SPAN_RGBA);
+	assert(span->interpMask & SPAN_RGBA);
 	if (span->array->ChanType == GL_UNSIGNED_BYTE) {
 	    const GLfixed alphaStep = span->alphaStep;
 	    GLfixed alpha = span->alpha;

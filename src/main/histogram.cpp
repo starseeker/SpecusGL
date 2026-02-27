@@ -74,7 +74,7 @@ void
 _mesa_update_histogram(GLcontext *ctx, GLuint n, const GLfloat rgba[][4])
 {
     const GLint max = ctx->Histogram.Width - 1;
-    GLfloat w = (GLfloat) max;
+    GLfloat w = static_cast<GLfloat>(max);
     GLuint i;
 
     if (ctx->Histogram.Width == 0)
@@ -249,7 +249,7 @@ pack_histogram(GLcontext *ctx,
 	    PACK_MACRO(GLuint);
 	    /* convert to GLhalf */
 	    for (i = 0; i < n * comps; i++) {
-		dst[i] = _mesa_float_to_half((GLfloat) temp[i]);
+		dst[i] = _mesa_float_to_half(static_cast<GLfloat>(temp[i]));
 	    }
 	    if (packing->SwapBytes) {
 		_mesa_swap2(reinterpret_cast<GLushort *>(dst), n * comps);
@@ -268,7 +268,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x7) << 5)
 			     | ((rgba[i][GCOMP] & 0x7) << 2)
@@ -288,7 +288,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x3) << 6)
 			     | ((rgba[i][GCOMP] & 0x7) << 3)
@@ -308,7 +308,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x3f) <<  5)
@@ -328,7 +328,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x3f) <<  5)
@@ -358,7 +358,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xf) << 12)
 			     | ((rgba[i][BCOMP] & 0xf) <<  8)
@@ -389,7 +389,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xf) << 12)
 			     | ((rgba[i][GCOMP] & 0xf) <<  8)
@@ -420,7 +420,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x1f) << 11)
 			     | ((rgba[i][BCOMP] & 0x1f) <<  6)
@@ -451,7 +451,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x1f) <<  6)
@@ -482,7 +482,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xff) << 24)
 			     | ((rgba[i][BCOMP] & 0xff) << 16)
@@ -513,7 +513,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xff) << 24)
 			     | ((rgba[i][GCOMP] & 0xff) << 16)
@@ -544,7 +544,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x3ff) << 22)
 			     | ((rgba[i][BCOMP] & 0x3ff) << 12)
@@ -575,7 +575,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x3ff) << 22)
 			     | ((rgba[i][GCOMP] & 0x3ff) << 12)
@@ -831,28 +831,28 @@ _mesa_GetHistogramParameterfv(GLenum target, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_HISTOGRAM_WIDTH:
-	    *params = (GLfloat) ctx->Histogram.Width;
+	    *params = static_cast<GLfloat>(ctx->Histogram.Width);
 	    break;
 	case GL_HISTOGRAM_FORMAT:
-	    *params = (GLfloat) ctx->Histogram.Format;
+	    *params = static_cast<GLfloat>(ctx->Histogram.Format);
 	    break;
 	case GL_HISTOGRAM_RED_SIZE:
-	    *params = (GLfloat) ctx->Histogram.RedSize;
+	    *params = static_cast<GLfloat>(ctx->Histogram.RedSize);
 	    break;
 	case GL_HISTOGRAM_GREEN_SIZE:
-	    *params = (GLfloat) ctx->Histogram.GreenSize;
+	    *params = static_cast<GLfloat>(ctx->Histogram.GreenSize);
 	    break;
 	case GL_HISTOGRAM_BLUE_SIZE:
-	    *params = (GLfloat) ctx->Histogram.BlueSize;
+	    *params = static_cast<GLfloat>(ctx->Histogram.BlueSize);
 	    break;
 	case GL_HISTOGRAM_ALPHA_SIZE:
-	    *params = (GLfloat) ctx->Histogram.AlphaSize;
+	    *params = static_cast<GLfloat>(ctx->Histogram.AlphaSize);
 	    break;
 	case GL_HISTOGRAM_LUMINANCE_SIZE:
-	    *params = (GLfloat) ctx->Histogram.LuminanceSize;
+	    *params = static_cast<GLfloat>(ctx->Histogram.LuminanceSize);
 	    break;
 	case GL_HISTOGRAM_SINK:
-	    *params = (GLfloat) ctx->Histogram.Sink;
+	    *params = static_cast<GLfloat>(ctx->Histogram.Sink);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetHistogramParameterfv(pname)");
@@ -878,28 +878,28 @@ _mesa_GetHistogramParameteriv(GLenum target, GLenum pname, GLint *params)
 
     switch (pname) {
 	case GL_HISTOGRAM_WIDTH:
-	    *params = (GLint) ctx->Histogram.Width;
+	    *params = static_cast<GLint>(ctx->Histogram.Width);
 	    break;
 	case GL_HISTOGRAM_FORMAT:
-	    *params = (GLint) ctx->Histogram.Format;
+	    *params = static_cast<GLint>(ctx->Histogram.Format);
 	    break;
 	case GL_HISTOGRAM_RED_SIZE:
-	    *params = (GLint) ctx->Histogram.RedSize;
+	    *params = static_cast<GLint>(ctx->Histogram.RedSize);
 	    break;
 	case GL_HISTOGRAM_GREEN_SIZE:
-	    *params = (GLint) ctx->Histogram.GreenSize;
+	    *params = static_cast<GLint>(ctx->Histogram.GreenSize);
 	    break;
 	case GL_HISTOGRAM_BLUE_SIZE:
-	    *params = (GLint) ctx->Histogram.BlueSize;
+	    *params = static_cast<GLint>(ctx->Histogram.BlueSize);
 	    break;
 	case GL_HISTOGRAM_ALPHA_SIZE:
-	    *params = (GLint) ctx->Histogram.AlphaSize;
+	    *params = static_cast<GLint>(ctx->Histogram.AlphaSize);
 	    break;
 	case GL_HISTOGRAM_LUMINANCE_SIZE:
-	    *params = (GLint) ctx->Histogram.LuminanceSize;
+	    *params = static_cast<GLint>(ctx->Histogram.LuminanceSize);
 	    break;
 	case GL_HISTOGRAM_SINK:
-	    *params = (GLint) ctx->Histogram.Sink;
+	    *params = static_cast<GLint>(ctx->Histogram.Sink);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetHistogramParameteriv(pname)");
@@ -922,9 +922,9 @@ _mesa_GetMinmaxParameterfv(GLenum target, GLenum pname, GLfloat *params)
 	return;
     }
     if (pname == GL_MINMAX_FORMAT) {
-	*params = (GLfloat) ctx->MinMax.Format;
+	*params = static_cast<GLfloat>(ctx->MinMax.Format);
     } else if (pname == GL_MINMAX_SINK) {
-	*params = (GLfloat) ctx->MinMax.Sink;
+	*params = static_cast<GLfloat>(ctx->MinMax.Sink);
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetMinMaxParameterfv(pname)");
     }
@@ -946,9 +946,9 @@ _mesa_GetMinmaxParameteriv(GLenum target, GLenum pname, GLint *params)
 	return;
     }
     if (pname == GL_MINMAX_FORMAT) {
-	*params = (GLint) ctx->MinMax.Format;
+	*params = static_cast<GLint>(ctx->MinMax.Format);
     } else if (pname == GL_MINMAX_SINK) {
-	*params = (GLint) ctx->MinMax.Sink;
+	*params = static_cast<GLint>(ctx->MinMax.Sink);
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetMinMaxParameteriv(pname)");
     }
@@ -985,7 +985,7 @@ _mesa_Histogram(GLenum target, GLsizei width, GLenum internalFormat, GLboolean s
 	}
     }
 
-    if (width != 0 && _mesa_bitcount(width) != 1) {
+    if (width != 0 && static_cast<GLuint>(__builtin_popcount(width)) != 1) {
 	if (target == GL_PROXY_HISTOGRAM) {
 	    error = GL_TRUE;
 	} else {

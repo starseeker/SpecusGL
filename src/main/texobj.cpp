@@ -111,7 +111,7 @@ _mesa_initialize_texture_object(struct gl_texture_object *obj,
 void
 gl_texture_object::init(GLuint name, GLenum target)
 {
-    ASSERT(target == 0 ||
+    assert(target == 0 ||
 	   target == GL_TEXTURE_1D ||
 	   target == GL_TEXTURE_2D ||
 	   target == GL_TEXTURE_3D ||
@@ -324,7 +324,7 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
 static void
 incomplete(const struct gl_texture_object *t, const char *why)
 {
-    _mesa_printf("Texture Obj %d incomplete because: %s\n", t->Name, why);
+    std::printf("Texture Obj %d incomplete because: %s\n", t->Name, why);
 }
 #else
 #define incomplete(t, why)
@@ -355,7 +355,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     /* Always need the base level image */
     if (!t->Image[0][baseLevel]) {
 	char s[100];
-	_mesa_sprintf(s, "obj %p (%d) Image[baseLevel=%d] == nullptr",
+	std::snprintf(s, sizeof(s), "obj %p (%d) Image[baseLevel=%d] == nullptr",
 		      static_cast<void *>(t), t->Name, baseLevel);
 	incomplete(t, s);
 	t->Complete = GL_FALSE;
@@ -382,7 +382,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     } else if (t->Target == GL_TEXTURE_3D) {
 	GLint max = MAX2(t->Image[0][baseLevel]->WidthLog2,
 			 t->Image[0][baseLevel]->HeightLog2);
-	maxLog2 = MAX2(max, (GLint)(t->Image[0][baseLevel]->DepthLog2));
+	maxLog2 = MAX2(max, static_cast<GLint>((t->Image[0][baseLevel]->DepthLog2)));
 	maxLevels = ctx->Const.Max3DTextureLevels;
     } else if (t->Target == GL_TEXTURE_CUBE_MAP_ARB) {
 	maxLog2 = MAX2(t->Image[0][baseLevel]->WidthLog2,
@@ -396,14 +396,14 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 	return;
     }
 
-    ASSERT(maxLevels > 0);
+    assert(maxLevels > 0);
 
     t->_MaxLevel = baseLevel + maxLog2;
     t->_MaxLevel = MIN2(t->_MaxLevel, t->MaxLevel);
     t->_MaxLevel = MIN2(t->_MaxLevel, maxLevels - 1);
 
     /* Compute _MaxLambda = q - b (see the 1.2 spec) used during mipmapping */
-    t->_MaxLambda = (GLfloat)(t->_MaxLevel - t->BaseLevel);
+    t->_MaxLambda = static_cast<GLfloat>((t->_MaxLevel - t->BaseLevel));
 
     if (t->Target == GL_TEXTURE_CUBE_MAP_ARB) {
 	/* make sure that all six cube map level 0 images are the same size */
@@ -816,7 +816,7 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 
     if (MESA_VERBOSE & (VERBOSE_API|VERBOSE_TEXTURE))
 	_mesa_debug(ctx, "glBindTexture %s %d\n",
-		    _mesa_lookup_enum_by_nr(target), (GLint) texName);
+		    _mesa_lookup_enum_by_nr(target), static_cast<GLint>(texName));
 
     /*
      * Get pointer to new texture object (newTexObj)
@@ -861,8 +861,8 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 		newTexObj->WrapR = GL_CLAMP_TO_EDGE;
 		newTexObj->MinFilter = GL_LINEAR;
 		if (ctx->Driver.TexParameter) {
-		    static const GLfloat fparam_wrap[1] = {(GLfloat) GL_CLAMP_TO_EDGE};
-		    static const GLfloat fparam_filter[1] = {(GLfloat) GL_LINEAR};
+		    static const GLfloat fparam_wrap[1] = {static_cast<GLfloat>(GL_CLAMP_TO_EDGE)};
+		    static const GLfloat fparam_filter[1] = {static_cast<GLfloat>(GL_LINEAR)};
 		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_S, fparam_wrap);
 		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_T, fparam_wrap);
 		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_R, fparam_wrap);
@@ -1106,7 +1106,7 @@ void
 gl_texture_object::set_image(GLenum target, GLint level,
                               struct gl_texture_image *texImage)
 {
-    ASSERT(texImage);
+    assert(texImage);
     switch (target) {
 	case GL_TEXTURE_1D:
 	case GL_TEXTURE_2D:
@@ -1119,13 +1119,13 @@ gl_texture_object::set_image(GLenum target, GLint level,
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y_ARB:
 	case GL_TEXTURE_CUBE_MAP_POSITIVE_Z_ARB:
 	case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB: {
-	    GLuint face = ((GLuint) target -
-			   (GLuint) GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+	    GLuint face = (static_cast<GLuint>(target) -
+			   static_cast<GLuint>(GL_TEXTURE_CUBE_MAP_POSITIVE_X));
 	    Image[face][level] = texImage;
 	}
 	break;
 	case GL_TEXTURE_RECTANGLE_NV:
-	    ASSERT(level == 0);
+	    assert(level == 0);
 	    Image[0][level] = texImage;
 	    break;
 	default:

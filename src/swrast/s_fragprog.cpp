@@ -80,8 +80,8 @@ fetch_texel_deriv(GLcontext *ctx, const GLfloat texcoord[4],
 
     if (texObj) {
 	const struct gl_texture_image *texImg = texObj->Image[0][texObj->BaseLevel];
-	const GLfloat texW = (GLfloat) texImg->WidthScale;
-	const GLfloat texH = (GLfloat) texImg->HeightScale;
+	const GLfloat texW = static_cast<GLfloat>(texImg->WidthScale);
+	const GLfloat texH = static_cast<GLfloat>(texImg->HeightScale);
 
 	lambda = _swrast_compute_lambda(texdx[0], texdy[0], /* ds/dx, ds/dy */
 					texdx[1], texdy[1], /* dt/dx, dt/dy */
@@ -225,7 +225,7 @@ _swrast_exec_fragment_program(GLcontext *ctx, SWspan *span)
 
     /* incoming colors should be floats */
     if (program->InputsRead & FRAG_BIT_COL0) {
-	ASSERT(span->array->ChanType == GL_FLOAT);
+	assert(span->array->ChanType == GL_FLOAT);
     }
 
     ctx->_CurrentProgram = GL_FRAGMENT_PROGRAM_ARB; /* or NV, doesn't matter */

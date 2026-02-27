@@ -210,7 +210,7 @@ storage_string(const slang_ir_storage *st)
 	"SAMPLER",
 	"UNDEFINED"
     };
-    assert(st->File < (GLint)(sizeof(files) / sizeof(files[0])));
+    assert(st->File < static_cast<GLint>((sizeof(files) / sizeof(files[0]))));
     return std::string(files[st->File]) + "[" + std::to_string(st->Index) + "]";
 }
 

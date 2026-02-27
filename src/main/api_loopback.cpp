@@ -90,7 +90,7 @@ loopback_Color3b_f(GLbyte red, GLbyte green, GLbyte blue)
 static void GLAPIENTRY
 loopback_Color3d_f(GLdouble red, GLdouble green, GLdouble blue)
 {
-    COLORF((GLfloat) red, (GLfloat) green, (GLfloat) blue, 1.0);
+    COLORF(static_cast<GLfloat>(red), static_cast<GLfloat>(green), static_cast<GLfloat>(blue), 1.0);
 }
 
 static void GLAPIENTRY
@@ -139,7 +139,7 @@ loopback_Color3bv_f(const GLbyte *v)
 static void GLAPIENTRY
 loopback_Color3dv_f(const GLdouble *v)
 {
-    COLORF((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0);
+    COLORF(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
@@ -190,7 +190,7 @@ static void GLAPIENTRY
 loopback_Color4d_f(GLdouble red, GLdouble green, GLdouble blue,
 		   GLdouble alpha)
 {
-    COLORF((GLfloat) red, (GLfloat) green, (GLfloat) blue, (GLfloat) alpha);
+    COLORF(static_cast<GLfloat>(red), static_cast<GLfloat>(green), static_cast<GLfloat>(blue), static_cast<GLfloat>(alpha));
 }
 
 static void GLAPIENTRY
@@ -248,7 +248,7 @@ loopback_Color4bv_f(const GLbyte *v)
 static void GLAPIENTRY
 loopback_Color4dv_f(const GLdouble *v)
 {
-    COLORF((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    COLORF(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 
@@ -285,62 +285,62 @@ loopback_Color4ubv_f(const GLubyte *v)
 static void GLAPIENTRY
 loopback_FogCoorddEXT(GLdouble d)
 {
-    FOGCOORDF((GLfloat) d);
+    FOGCOORDF(static_cast<GLfloat>(d));
 }
 
 static void GLAPIENTRY
 loopback_FogCoorddvEXT(const GLdouble *v)
 {
-    FOGCOORDF((GLfloat) *v);
+    FOGCOORDF(static_cast<GLfloat>(*v));
 }
 
 
 static void GLAPIENTRY
 loopback_Indexd(GLdouble c)
 {
-    INDEX((GLfloat) c);
+    INDEX(static_cast<GLfloat>(c));
 }
 
 static void GLAPIENTRY
 loopback_Indexi(GLint c)
 {
-    INDEX((GLfloat) c);
+    INDEX(static_cast<GLfloat>(c));
 }
 
 static void GLAPIENTRY
 loopback_Indexs(GLshort c)
 {
-    INDEX((GLfloat) c);
+    INDEX(static_cast<GLfloat>(c));
 }
 
 static void GLAPIENTRY
 loopback_Indexub(GLubyte c)
 {
-    INDEX((GLfloat) c);
+    INDEX(static_cast<GLfloat>(c));
 }
 
 static void GLAPIENTRY
 loopback_Indexdv(const GLdouble *c)
 {
-    INDEX((GLfloat) *c);
+    INDEX(static_cast<GLfloat>(*c));
 }
 
 static void GLAPIENTRY
 loopback_Indexiv(const GLint *c)
 {
-    INDEX((GLfloat) *c);
+    INDEX(static_cast<GLfloat>(*c));
 }
 
 static void GLAPIENTRY
 loopback_Indexsv(const GLshort *c)
 {
-    INDEX((GLfloat) *c);
+    INDEX(static_cast<GLfloat>(*c));
 }
 
 static void GLAPIENTRY
 loopback_Indexubv(const GLubyte *c)
 {
-    INDEX((GLfloat) *c);
+    INDEX(static_cast<GLfloat>(*c));
 }
 
 
@@ -360,7 +360,7 @@ loopback_Normal3b(GLbyte nx, GLbyte ny, GLbyte nz)
 static void GLAPIENTRY
 loopback_Normal3d(GLdouble nx, GLdouble ny, GLdouble nz)
 {
-    NORMAL((GLfloat) nx, (GLfloat) ny, (GLfloat) nz);
+    NORMAL(static_cast<GLfloat>(nx), static_cast<GLfloat>(ny), static_cast<GLfloat>(nz));
 }
 
 static void GLAPIENTRY
@@ -384,7 +384,7 @@ loopback_Normal3bv(const GLbyte *v)
 static void GLAPIENTRY
 loopback_Normal3dv(const GLdouble *v)
 {
-    NORMAL((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    NORMAL(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
@@ -402,412 +402,412 @@ loopback_Normal3sv(const GLshort *v)
 static void GLAPIENTRY
 loopback_TexCoord1d(GLdouble s)
 {
-    TEXCOORD1((GLfloat) s);
+    TEXCOORD1(static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord1i(GLint s)
 {
-    TEXCOORD1((GLfloat) s);
+    TEXCOORD1(static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord1s(GLshort s)
 {
-    TEXCOORD1((GLfloat) s);
+    TEXCOORD1(static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2d(GLdouble s, GLdouble t)
 {
-    TEXCOORD2((GLfloat) s,(GLfloat) t);
+    TEXCOORD2(static_cast<GLfloat>(s),static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2s(GLshort s, GLshort t)
 {
-    TEXCOORD2((GLfloat) s,(GLfloat) t);
+    TEXCOORD2(static_cast<GLfloat>(s),static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2i(GLint s, GLint t)
 {
-    TEXCOORD2((GLfloat) s,(GLfloat) t);
+    TEXCOORD2(static_cast<GLfloat>(s),static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3d(GLdouble s, GLdouble t, GLdouble r)
 {
-    TEXCOORD3((GLfloat) s,(GLfloat) t,(GLfloat) r);
+    TEXCOORD3(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3i(GLint s, GLint t, GLint r)
 {
-    TEXCOORD3((GLfloat) s,(GLfloat) t,(GLfloat) r);
+    TEXCOORD3(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3s(GLshort s, GLshort t, GLshort r)
 {
-    TEXCOORD3((GLfloat) s,(GLfloat) t,(GLfloat) r);
+    TEXCOORD3(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4d(GLdouble s, GLdouble t, GLdouble r, GLdouble q)
 {
-    TEXCOORD4((GLfloat) s,(GLfloat) t,(GLfloat) r,(GLfloat) q);
+    TEXCOORD4(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r),static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4i(GLint s, GLint t, GLint r, GLint q)
 {
-    TEXCOORD4((GLfloat) s,(GLfloat) t,(GLfloat) r,(GLfloat) q);
+    TEXCOORD4(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r),static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4s(GLshort s, GLshort t, GLshort r, GLshort q)
 {
-    TEXCOORD4((GLfloat) s,(GLfloat) t,(GLfloat) r,(GLfloat) q);
+    TEXCOORD4(static_cast<GLfloat>(s),static_cast<GLfloat>(t),static_cast<GLfloat>(r),static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord1dv(const GLdouble *v)
 {
-    TEXCOORD1((GLfloat) v[0]);
+    TEXCOORD1(static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord1iv(const GLint *v)
 {
-    TEXCOORD1((GLfloat) v[0]);
+    TEXCOORD1(static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord1sv(const GLshort *v)
 {
-    TEXCOORD1((GLfloat) v[0]);
+    TEXCOORD1(static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2dv(const GLdouble *v)
 {
-    TEXCOORD2((GLfloat) v[0],(GLfloat) v[1]);
+    TEXCOORD2(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2iv(const GLint *v)
 {
-    TEXCOORD2((GLfloat) v[0],(GLfloat) v[1]);
+    TEXCOORD2(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord2sv(const GLshort *v)
 {
-    TEXCOORD2((GLfloat) v[0],(GLfloat) v[1]);
+    TEXCOORD2(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3dv(const GLdouble *v)
 {
-    TEXCOORD3((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2]);
+    TEXCOORD3(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3iv(const GLint *v)
 {
-    TEXCOORD3((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2]);
+    TEXCOORD3(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord3sv(const GLshort *v)
 {
-    TEXCOORD3((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2]);
+    TEXCOORD3(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4dv(const GLdouble *v)
 {
-    TEXCOORD4((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2],(GLfloat) v[3]);
+    TEXCOORD4(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]),static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4iv(const GLint *v)
 {
-    TEXCOORD4((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2],(GLfloat) v[3]);
+    TEXCOORD4(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]),static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_TexCoord4sv(const GLshort *v)
 {
-    TEXCOORD4((GLfloat) v[0],(GLfloat) v[1],(GLfloat) v[2],(GLfloat) v[3]);
+    TEXCOORD4(static_cast<GLfloat>(v[0]),static_cast<GLfloat>(v[1]),static_cast<GLfloat>(v[2]),static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2d(GLdouble x, GLdouble y)
 {
-    VERTEX2((GLfloat) x, (GLfloat) y);
+    VERTEX2(static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2i(GLint x, GLint y)
 {
-    VERTEX2((GLfloat) x, (GLfloat) y);
+    VERTEX2(static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2s(GLshort x, GLshort y)
 {
-    VERTEX2((GLfloat) x, (GLfloat) y);
+    VERTEX2(static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3d(GLdouble x, GLdouble y, GLdouble z)
 {
-    VERTEX3((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    VERTEX3(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3i(GLint x, GLint y, GLint z)
 {
-    VERTEX3((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    VERTEX3(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3s(GLshort x, GLshort y, GLshort z)
 {
-    VERTEX3((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    VERTEX3(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    VERTEX4((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    VERTEX4(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4i(GLint x, GLint y, GLint z, GLint w)
 {
-    VERTEX4((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    VERTEX4(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4s(GLshort x, GLshort y, GLshort z, GLshort w)
 {
-    VERTEX4((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    VERTEX4(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2dv(const GLdouble *v)
 {
-    VERTEX2((GLfloat) v[0], (GLfloat) v[1]);
+    VERTEX2(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2iv(const GLint *v)
 {
-    VERTEX2((GLfloat) v[0], (GLfloat) v[1]);
+    VERTEX2(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex2sv(const GLshort *v)
 {
-    VERTEX2((GLfloat) v[0], (GLfloat) v[1]);
+    VERTEX2(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3dv(const GLdouble *v)
 {
-    VERTEX3((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    VERTEX3(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3iv(const GLint *v)
 {
-    VERTEX3((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    VERTEX3(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex3sv(const GLshort *v)
 {
-    VERTEX3((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    VERTEX3(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4dv(const GLdouble *v)
 {
-    VERTEX4((GLfloat) v[0], (GLfloat) v[1],
-	    (GLfloat) v[2], (GLfloat) v[3]);
+    VERTEX4(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+	    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4iv(const GLint *v)
 {
-    VERTEX4((GLfloat) v[0], (GLfloat) v[1],
-	    (GLfloat) v[2], (GLfloat) v[3]);
+    VERTEX4(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+	    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_Vertex4sv(const GLshort *v)
 {
-    VERTEX4((GLfloat) v[0], (GLfloat) v[1],
-	    (GLfloat) v[2], (GLfloat) v[3]);
+    VERTEX4(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+	    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1dARB(GLenum target, GLdouble s)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) s);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1dvARB(GLenum target, const GLdouble *v)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) v[0]);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1iARB(GLenum target, GLint s)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) s);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1ivARB(GLenum target, const GLint *v)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) v[0]);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1sARB(GLenum target, GLshort s)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) s);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(s));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord1svARB(GLenum target, const GLshort *v)
 {
-    MULTI_TEXCOORD1(target, (GLfloat) v[0]);
+    MULTI_TEXCOORD1(target, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2dARB(GLenum target, GLdouble s, GLdouble t)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) s, (GLfloat) t);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2dvARB(GLenum target, const GLdouble *v)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) v[0], (GLfloat) v[1]);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2iARB(GLenum target, GLint s, GLint t)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) s, (GLfloat) t);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2ivARB(GLenum target, const GLint *v)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) v[0], (GLfloat) v[1]);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2sARB(GLenum target, GLshort s, GLshort t)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) s, (GLfloat) t);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord2svARB(GLenum target, const GLshort *v)
 {
-    MULTI_TEXCOORD2(target, (GLfloat) v[0], (GLfloat) v[1]);
+    MULTI_TEXCOORD2(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3dARB(GLenum target, GLdouble s, GLdouble t, GLdouble r)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) s, (GLfloat) t, (GLfloat) r);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t), static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3dvARB(GLenum target, const GLdouble *v)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3iARB(GLenum target, GLint s, GLint t, GLint r)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) s, (GLfloat) t, (GLfloat) r);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t), static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3ivARB(GLenum target, const GLint *v)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3sARB(GLenum target, GLshort s, GLshort t, GLshort r)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) s, (GLfloat) t, (GLfloat) r);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t), static_cast<GLfloat>(r));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord3svARB(GLenum target, const GLshort *v)
 {
-    MULTI_TEXCOORD3(target, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    MULTI_TEXCOORD3(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4dARB(GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) s, (GLfloat) t,
-		    (GLfloat) r, (GLfloat) q);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t),
+		    static_cast<GLfloat>(r), static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4dvARB(GLenum target, const GLdouble *v)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) v[0], (GLfloat) v[1],
-		    (GLfloat) v[2], (GLfloat) v[3]);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4iARB(GLenum target, GLint s, GLint t, GLint r, GLint q)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) s, (GLfloat) t,
-		    (GLfloat) r, (GLfloat) q);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t),
+		    static_cast<GLfloat>(r), static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4ivARB(GLenum target, const GLint *v)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) v[0], (GLfloat) v[1],
-		    (GLfloat) v[2], (GLfloat) v[3]);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4sARB(GLenum target, GLshort s, GLshort t, GLshort r, GLshort q)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) s, (GLfloat) t,
-		    (GLfloat) r, (GLfloat) q);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(s), static_cast<GLfloat>(t),
+		    static_cast<GLfloat>(r), static_cast<GLfloat>(q));
 }
 
 static void GLAPIENTRY
 loopback_MultiTexCoord4svARB(GLenum target, const GLshort *v)
 {
-    MULTI_TEXCOORD4(target, (GLfloat) v[0], (GLfloat) v[1],
-		    (GLfloat) v[2], (GLfloat) v[3]);
+    MULTI_TEXCOORD4(target, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		    static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_EvalCoord2dv(const GLdouble *u)
 {
-    EVALCOORD2((GLfloat) u[0], (GLfloat) u[1]);
+    EVALCOORD2(static_cast<GLfloat>(u[0]), static_cast<GLfloat>(u[1]));
 }
 
 static void GLAPIENTRY
@@ -819,25 +819,25 @@ loopback_EvalCoord2fv(const GLfloat *u)
 static void GLAPIENTRY
 loopback_EvalCoord2d(GLdouble u, GLdouble v)
 {
-    EVALCOORD2((GLfloat) u, (GLfloat) v);
+    EVALCOORD2(static_cast<GLfloat>(u), static_cast<GLfloat>(v));
 }
 
 static void GLAPIENTRY
 loopback_EvalCoord1dv(const GLdouble *u)
 {
-    EVALCOORD1((GLfloat) *u);
+    EVALCOORD1(static_cast<GLfloat>(*u));
 }
 
 static void GLAPIENTRY
 loopback_EvalCoord1fv(const GLfloat *u)
 {
-    EVALCOORD1((GLfloat) *u);
+    EVALCOORD1(static_cast<GLfloat>(*u));
 }
 
 static void GLAPIENTRY
 loopback_EvalCoord1d(GLdouble u)
 {
-    EVALCOORD1((GLfloat) u);
+    EVALCOORD1(static_cast<GLfloat>(u));
 }
 
 static void GLAPIENTRY
@@ -851,7 +851,7 @@ loopback_Materialf(GLenum face, GLenum pname, GLfloat param)
 static void GLAPIENTRY
 loopback_Materiali(GLenum face, GLenum pname, GLint param)
 {
-    GLfloat p = (GLfloat) param;
+    GLfloat p = static_cast<GLfloat>(param);
     MATERIALFV(face, pname, &p);
 }
 
@@ -871,12 +871,12 @@ loopback_Materialiv(GLenum face, GLenum pname, const GLint *params)
 	    fparam[3] = INT_TO_FLOAT(params[3]);
 	    break;
 	case GL_SHININESS:
-	    fparam[0] = (GLfloat) params[0];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
 	    break;
 	case GL_COLOR_INDEXES:
-	    fparam[0] = (GLfloat) params[0];
-	    fparam[1] = (GLfloat) params[1];
-	    fparam[2] = (GLfloat) params[2];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
+	    fparam[1] = static_cast<GLfloat>(params[1]);
+	    fparam[2] = static_cast<GLfloat>(params[2]);
 	    break;
 	default:
 	    ;
@@ -888,13 +888,13 @@ loopback_Materialiv(GLenum face, GLenum pname, const GLint *params)
 static void GLAPIENTRY
 loopback_Rectd(GLdouble x1, GLdouble y1, GLdouble x2, GLdouble y2)
 {
-    RECTF((GLfloat) x1, (GLfloat) y1, (GLfloat) x2, (GLfloat) y2);
+    RECTF(static_cast<GLfloat>(x1), static_cast<GLfloat>(y1), static_cast<GLfloat>(x2), static_cast<GLfloat>(y2));
 }
 
 static void GLAPIENTRY
 loopback_Rectdv(const GLdouble *v1, const GLdouble *v2)
 {
-    RECTF((GLfloat) v1[0], (GLfloat) v1[1], (GLfloat) v2[0], (GLfloat) v2[1]);
+    RECTF(static_cast<GLfloat>(v1[0]), static_cast<GLfloat>(v1[1]), static_cast<GLfloat>(v2[0]), static_cast<GLfloat>(v2[1]));
 }
 
 static void GLAPIENTRY
@@ -906,25 +906,25 @@ loopback_Rectfv(const GLfloat *v1, const GLfloat *v2)
 static void GLAPIENTRY
 loopback_Recti(GLint x1, GLint y1, GLint x2, GLint y2)
 {
-    RECTF((GLfloat) x1, (GLfloat) y1, (GLfloat) x2, (GLfloat) y2);
+    RECTF(static_cast<GLfloat>(x1), static_cast<GLfloat>(y1), static_cast<GLfloat>(x2), static_cast<GLfloat>(y2));
 }
 
 static void GLAPIENTRY
 loopback_Rectiv(const GLint *v1, const GLint *v2)
 {
-    RECTF((GLfloat) v1[0], (GLfloat) v1[1], (GLfloat) v2[0], (GLfloat) v2[1]);
+    RECTF(static_cast<GLfloat>(v1[0]), static_cast<GLfloat>(v1[1]), static_cast<GLfloat>(v2[0]), static_cast<GLfloat>(v2[1]));
 }
 
 static void GLAPIENTRY
 loopback_Rects(GLshort x1, GLshort y1, GLshort x2, GLshort y2)
 {
-    RECTF((GLfloat) x1, (GLfloat) y1, (GLfloat) x2, (GLfloat) y2);
+    RECTF(static_cast<GLfloat>(x1), static_cast<GLfloat>(y1), static_cast<GLfloat>(x2), static_cast<GLfloat>(y2));
 }
 
 static void GLAPIENTRY
 loopback_Rectsv(const GLshort *v1, const GLshort *v2)
 {
-    RECTF((GLfloat) v1[0], (GLfloat) v1[1], (GLfloat) v2[0], (GLfloat) v2[1]);
+    RECTF(static_cast<GLfloat>(v1[0]), static_cast<GLfloat>(v1[1]), static_cast<GLfloat>(v2[0]), static_cast<GLfloat>(v2[1]));
 }
 
 static void GLAPIENTRY
@@ -938,7 +938,7 @@ loopback_SecondaryColor3bEXT_f(GLbyte red, GLbyte green, GLbyte blue)
 static void GLAPIENTRY
 loopback_SecondaryColor3dEXT_f(GLdouble red, GLdouble green, GLdouble blue)
 {
-    SECONDARYCOLORF((GLfloat) red, (GLfloat) green, (GLfloat) blue);
+    SECONDARYCOLORF(static_cast<GLfloat>(red), static_cast<GLfloat>(green), static_cast<GLfloat>(blue));
 }
 
 static void GLAPIENTRY
@@ -992,7 +992,7 @@ loopback_SecondaryColor3bvEXT_f(const GLbyte *v)
 static void GLAPIENTRY
 loopback_SecondaryColor3dvEXT_f(const GLdouble *v)
 {
-    SECONDARYCOLORF((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    SECONDARYCOLORF(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 static void GLAPIENTRY
 loopback_SecondaryColor3ivEXT_f(const GLint *v)
@@ -1043,49 +1043,49 @@ loopback_SecondaryColor3ubvEXT_f(const GLubyte *v)
 static void GLAPIENTRY
 loopback_VertexAttrib1sNV(GLuint index, GLshort x)
 {
-    ATTRIB1NV(index, (GLfloat) x);
+    ATTRIB1NV(index, static_cast<GLfloat>(x));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib1dNV(GLuint index, GLdouble x)
 {
-    ATTRIB1NV(index, (GLfloat) x);
+    ATTRIB1NV(index, static_cast<GLfloat>(x));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2sNV(GLuint index, GLshort x, GLshort y)
 {
-    ATTRIB2NV(index, (GLfloat) x, y);
+    ATTRIB2NV(index, static_cast<GLfloat>(x), y);
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2dNV(GLuint index, GLdouble x, GLdouble y)
 {
-    ATTRIB2NV(index, (GLfloat) x, (GLfloat) y);
+    ATTRIB2NV(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3sNV(GLuint index, GLshort x, GLshort y, GLshort z)
 {
-    ATTRIB3NV(index, (GLfloat) x, (GLfloat) y, (GLfloat) z);
+    ATTRIB3NV(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3dNV(GLuint index, GLdouble x, GLdouble y, GLdouble z)
 {
-    ATTRIB4NV(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    ATTRIB4NV(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4sNV(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w)
 {
-    ATTRIB4NV(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    ATTRIB4NV(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4dNV(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    ATTRIB4NV(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    ATTRIB4NV(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
@@ -1098,50 +1098,50 @@ loopback_VertexAttrib4ubNV(GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyt
 static void GLAPIENTRY
 loopback_VertexAttrib1svNV(GLuint index, const GLshort *v)
 {
-    ATTRIB1NV(index, (GLfloat) v[0]);
+    ATTRIB1NV(index, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib1dvNV(GLuint index, const GLdouble *v)
 {
-    ATTRIB1NV(index, (GLfloat) v[0]);
+    ATTRIB1NV(index, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2svNV(GLuint index, const GLshort *v)
 {
-    ATTRIB2NV(index, (GLfloat) v[0], (GLfloat) v[1]);
+    ATTRIB2NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2dvNV(GLuint index, const GLdouble *v)
 {
-    ATTRIB2NV(index, (GLfloat) v[0], (GLfloat) v[1]);
+    ATTRIB2NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3svNV(GLuint index, const GLshort *v)
 {
-    ATTRIB3NV(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    ATTRIB3NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3dvNV(GLuint index, const GLdouble *v)
 {
-    ATTRIB3NV(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    ATTRIB3NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4svNV(GLuint index, const GLshort *v)
 {
-    ATTRIB4NV(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2],
-	      (GLfloat)v[3]);
+    ATTRIB4NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]),
+	      static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4dvNV(GLuint index, const GLdouble *v)
 {
-    ATTRIB4NV(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4NV(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
@@ -1265,128 +1265,128 @@ loopback_VertexAttribs4ubvNV(GLuint index, GLsizei n, const GLubyte *v)
 static void GLAPIENTRY
 loopback_VertexAttrib1sARB(GLuint index, GLshort x)
 {
-    ATTRIB1ARB(index, (GLfloat) x);
+    ATTRIB1ARB(index, static_cast<GLfloat>(x));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib1dARB(GLuint index, GLdouble x)
 {
-    ATTRIB1ARB(index, (GLfloat) x);
+    ATTRIB1ARB(index, static_cast<GLfloat>(x));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2sARB(GLuint index, GLshort x, GLshort y)
 {
-    ATTRIB2ARB(index, (GLfloat) x, y);
+    ATTRIB2ARB(index, static_cast<GLfloat>(x), y);
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2dARB(GLuint index, GLdouble x, GLdouble y)
 {
-    ATTRIB2ARB(index, (GLfloat) x, (GLfloat) y);
+    ATTRIB2ARB(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3sARB(GLuint index, GLshort x, GLshort y, GLshort z)
 {
-    ATTRIB3ARB(index, (GLfloat) x, (GLfloat) y, (GLfloat) z);
+    ATTRIB3ARB(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3dARB(GLuint index, GLdouble x, GLdouble y, GLdouble z)
 {
-    ATTRIB4ARB(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    ATTRIB4ARB(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4sARB(GLuint index, GLshort x, GLshort y, GLshort z, GLshort w)
 {
-    ATTRIB4ARB(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    ATTRIB4ARB(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4dARB(GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    ATTRIB4ARB(index, (GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    ATTRIB4ARB(index, static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib1svARB(GLuint index, const GLshort *v)
 {
-    ATTRIB1ARB(index, (GLfloat) v[0]);
+    ATTRIB1ARB(index, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib1dvARB(GLuint index, const GLdouble *v)
 {
-    ATTRIB1ARB(index, (GLfloat) v[0]);
+    ATTRIB1ARB(index, static_cast<GLfloat>(v[0]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2svARB(GLuint index, const GLshort *v)
 {
-    ATTRIB2ARB(index, (GLfloat) v[0], (GLfloat) v[1]);
+    ATTRIB2ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib2dvARB(GLuint index, const GLdouble *v)
 {
-    ATTRIB2ARB(index, (GLfloat) v[0], (GLfloat) v[1]);
+    ATTRIB2ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3svARB(GLuint index, const GLshort *v)
 {
-    ATTRIB3ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    ATTRIB3ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib3dvARB(GLuint index, const GLdouble *v)
 {
-    ATTRIB3ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2]);
+    ATTRIB3ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4svARB(GLuint index, const GLshort *v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2],
-	       (GLfloat)v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]),
+	       static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4dvARB(GLuint index, const GLdouble *v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4bvARB(GLuint index, const GLbyte * v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4ivARB(GLuint index, const GLint * v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4ubvARB(GLuint index, const GLubyte * v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4usvARB(GLuint index, const GLushort * v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4uivARB(GLuint index, const GLuint * v)
 {
-    ATTRIB4ARB(index, (GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], (GLfloat) v[3]);
+    ATTRIB4ARB(index, static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY

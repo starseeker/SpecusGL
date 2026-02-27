@@ -61,7 +61,7 @@ max_buffer_index(GLcontext *ctx, GLuint count, GLenum type,
 	    if ((static_cast<const GLushort *>(indices))[i] > max)
 		max = (static_cast<const GLushort *>(indices))[i];
     } else {
-	ASSERT(type == GL_UNSIGNED_BYTE);
+	assert(type == GL_UNSIGNED_BYTE);
 	for (i = 0; i < count; i++)
 	    if ((static_cast<const GLubyte *>(indices))[i] > max)
 		max = (static_cast<const GLubyte *>(indices))[i];
@@ -121,7 +121,7 @@ _mesa_validate_DrawElements(GLcontext *ctx,
 	} else if (type == GL_UNSIGNED_BYTE) {
 	    indexBytes = count * sizeof(GLubyte);
 	} else {
-	    ASSERT(type == GL_UNSIGNED_SHORT);
+	    assert(type == GL_UNSIGNED_SHORT);
 	    indexBytes = count * sizeof(GLushort);
 	}
 
@@ -200,7 +200,7 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
 	} else if (type == GL_UNSIGNED_BYTE) {
 	    indexBytes = count * sizeof(GLubyte);
 	} else {
-	    ASSERT(type == GL_UNSIGNED_SHORT);
+	    assert(type == GL_UNSIGNED_SHORT);
 	    indexBytes = count * sizeof(GLushort);
 	}
 

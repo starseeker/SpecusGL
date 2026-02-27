@@ -190,7 +190,7 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
 	inst->SaturateMode = SATURATE_ZERO_ONE;
 	inst++;
     } else {
-	ASSERT(fprog->FogOption == GL_EXP || fprog->FogOption == GL_EXP2);
+	assert(fprog->FogOption == GL_EXP || fprog->FogOption == GL_EXP2);
 	/* fogPRefOpt.z = d/ln(2), fogPRefOpt.w = d/sqrt(ln(2) */
 	/* EXP: MUL fogFactorTemp.x, fogPRefOpt.z, fragment.fogcoord.x; */
 	/* EXP2: MUL fogFactorTemp.x, fogPRefOpt.w, fragment.fogcoord.x; */

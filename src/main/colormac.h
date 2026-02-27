@@ -76,12 +76,12 @@
 
 #if CHAN_BITS == 8
 
-#define BYTE_TO_CHAN(b)   ((b) < 0 ? 0 : (GLchan) (b))
+#define BYTE_TO_CHAN(b)   ((b) < 0 ? 0 : static_cast<GLchan>((b)))
 #define UBYTE_TO_CHAN(b)  (b)
-#define SHORT_TO_CHAN(s)  ((s) < 0 ? 0 : (GLchan) ((s) >> 7))
-#define USHORT_TO_CHAN(s) ((GLchan) ((s) >> 8))
-#define INT_TO_CHAN(i)    ((i) < 0 ? 0 : (GLchan) ((i) >> 23))
-#define UINT_TO_CHAN(i)   ((GLchan) ((i) >> 24))
+#define SHORT_TO_CHAN(s)  ((s) < 0 ? 0 : static_cast<GLchan>(((s) >> 7)))
+#define USHORT_TO_CHAN(s) (static_cast<GLchan>(((s) >> 8)))
+#define INT_TO_CHAN(i)    ((i) < 0 ? 0 : static_cast<GLchan>(((i) >> 23)))
+#define UINT_TO_CHAN(i)   (static_cast<GLchan>(((i) >> 24)))
 
 #define CHAN_TO_UBYTE(c)  (c)
 #define CHAN_TO_FLOAT(c)  UBYTE_TO_FLOAT(c)
@@ -91,36 +91,36 @@
 
 #define COPY_CHAN4(DST, SRC)  COPY_4UBV(DST, SRC)
 
-#define CHAN_PRODUCT(a, b)  ((GLubyte) (((GLint)(a) * ((GLint)(b) + 1)) >> 8))
+#define CHAN_PRODUCT(a, b)  (static_cast<GLubyte>(((static_cast<GLint>((a)) * (static_cast<GLint>((b)) + 1)) >> 8)))
 
 #elif CHAN_BITS == 16
 
-#define BYTE_TO_CHAN(b)   ((b) < 0 ? 0 : (((GLchan) (b)) * 516))
-#define UBYTE_TO_CHAN(b)  ((((GLchan) (b)) << 8) | ((GLchan) (b)))
-#define SHORT_TO_CHAN(s)  ((s) < 0 ? 0 : (GLchan) (s))
+#define BYTE_TO_CHAN(b)   ((b) < 0 ? 0 : ((static_cast<GLchan>((b))) * 516))
+#define UBYTE_TO_CHAN(b)  (((static_cast<GLchan>((b))) << 8) | (static_cast<GLchan>((b))))
+#define SHORT_TO_CHAN(s)  ((s) < 0 ? 0 : static_cast<GLchan>((s)))
 #define USHORT_TO_CHAN(s) (s)
-#define INT_TO_CHAN(i)    ((i) < 0 ? 0 : (GLchan) ((i) >> 15))
-#define UINT_TO_CHAN(i)   ((GLchan) ((i) >> 16))
+#define INT_TO_CHAN(i)    ((i) < 0 ? 0 : static_cast<GLchan>(((i) >> 15)))
+#define UINT_TO_CHAN(i)   (static_cast<GLchan>(((i) >> 16)))
 
 #define CHAN_TO_UBYTE(c)  ((c) >> 8)
-#define CHAN_TO_FLOAT(c)  ((GLfloat) ((c) * (1.0 / CHAN_MAXF)))
+#define CHAN_TO_FLOAT(c)  (static_cast<GLfloat>(((c) * (1.0 / CHAN_MAXF))))
 
 #define CLAMPED_FLOAT_TO_CHAN(c, f)    CLAMPED_FLOAT_TO_USHORT(c, f)
 #define UNCLAMPED_FLOAT_TO_CHAN(c, f)  UNCLAMPED_FLOAT_TO_USHORT(c, f)
 
 #define COPY_CHAN4(DST, SRC)  COPY_4V(DST, SRC)
 
-#define CHAN_PRODUCT(a, b) ((GLchan) ((((GLuint) (a)) * ((GLuint) (b))) / 65535))
+#define CHAN_PRODUCT(a, b) (static_cast<GLchan>((((static_cast<GLuint>((a))) * (static_cast<GLuint>((b)))) / 65535)))
 
 #elif CHAN_BITS == 32
 
 /* XXX floating-point color channels not fully thought-out */
-#define BYTE_TO_CHAN(b)   ((GLfloat) ((b) * (1.0F / 127.0F)))
-#define UBYTE_TO_CHAN(b)  ((GLfloat) ((b) * (1.0F / 255.0F)))
-#define SHORT_TO_CHAN(s)  ((GLfloat) ((s) * (1.0F / 32767.0F)))
-#define USHORT_TO_CHAN(s) ((GLfloat) ((s) * (1.0F / 65535.0F)))
-#define INT_TO_CHAN(i)    ((GLfloat) ((i) * (1.0F / 2147483647.0F)))
-#define UINT_TO_CHAN(i)   ((GLfloat) ((i) * (1.0F / 4294967295.0F)))
+#define BYTE_TO_CHAN(b)   (static_cast<GLfloat>(((b) * (1.0F / 127.0F))))
+#define UBYTE_TO_CHAN(b)  (static_cast<GLfloat>(((b) * (1.0F / 255.0F))))
+#define SHORT_TO_CHAN(s)  (static_cast<GLfloat>(((s) * (1.0F / 32767.0F))))
+#define USHORT_TO_CHAN(s) (static_cast<GLfloat>(((s) * (1.0F / 65535.0F))))
+#define INT_TO_CHAN(i)    (static_cast<GLfloat>(((i) * (1.0F / 2147483647.0F))))
+#define UINT_TO_CHAN(i)   (static_cast<GLfloat>(((i) * (1.0F / 4294967295.0F))))
 
 #define CHAN_TO_UBYTE(c)  FLOAT_TO_UBYTE(c)
 #define CHAN_TO_FLOAT(c)  (c)

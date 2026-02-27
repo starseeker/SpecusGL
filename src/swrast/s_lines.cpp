@@ -64,9 +64,9 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
 {
     GLint width, start;
 
-    ASSERT(span->end < MAX_WIDTH);
+    assert(span->end < MAX_WIDTH);
 
-    width = (GLint) CLAMP(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH);
+    width = static_cast<GLint>(CLAMP(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH));
 
     if (width & 1)
 	start = width / 2;
@@ -140,7 +140,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);    \
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_index_span(ctx, &span);			\
@@ -159,7 +159,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\
@@ -180,7 +180,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\
@@ -215,19 +215,19 @@ _mesa_print_line_function(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    _mesa_printf("Line Func == ");
+    std::printf("Line Func == ");
     if (swrast->Line == simple_ci_line)
-	_mesa_printf("simple_ci_line\n");
+	std::printf("simple_ci_line\n");
     else if (swrast->Line == simple_rgba_line)
-	_mesa_printf("simple_rgba_line\n");
+	std::printf("simple_rgba_line\n");
     else if (swrast->Line == general_ci_line)
-	_mesa_printf("general_ci_line\n");
+	std::printf("general_ci_line\n");
     else if (swrast->Line == general_rgba_line)
-	_mesa_printf("general_rgba_line\n");
+	std::printf("general_rgba_line\n");
     else if (swrast->Line == textured_line)
-	_mesa_printf("textured_line\n");
+	std::printf("textured_line\n");
     else
-	_mesa_printf("Driver func %p\n", (void *(*)()) swrast->Line);
+	std::printf("Driver func %p\n", (void *(*)()) swrast->Line);
 }
 #endif
 
@@ -241,7 +241,7 @@ static const char *lineFuncName = nullptr;
 #define USE(lineFunc)                   \
 do {                                    \
     lineFuncName = #lineFunc;           \
-    /*_mesa_printf("%s\n", lineFuncName);*/   \
+    /*std::printf("%s\n", lineFuncName);*/   \
     swrast->Line = lineFunc;            \
 } while (0)
 
@@ -270,7 +270,7 @@ _swrast_choose_line(GLcontext *ctx)
 	if (ctx->Line.SmoothFlag) {
 	    /* antialiased lines */
 	    _swrast_choose_aa_line_function(ctx);
-	    ASSERT(swrast->Line);
+	    assert(swrast->Line);
 	} else if (ctx->Texture._EnabledCoordUnits
 		   || ctx->FragmentProgram._Current) {
 	    /* textured lines */
@@ -292,7 +292,7 @@ _swrast_choose_line(GLcontext *ctx)
     } else if (ctx->RenderMode == GL_FEEDBACK) {
 	USE(_swrast_feedback_line);
     } else {
-	ASSERT(ctx->RenderMode == GL_SELECT);
+	assert(ctx->RenderMode == GL_SELECT);
 	USE(_swrast_select_line);
     }
 

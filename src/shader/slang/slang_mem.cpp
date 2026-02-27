@@ -157,7 +157,7 @@ void *
 _slang_realloc(void *oldBuffer, GLuint oldSize, GLuint newSize)
 {
 #if USE_MALLOC_FREE
-    return _mesa_realloc(oldBuffer, oldSize, newSize);
+    return std::realloc(oldBuffer, newSize);
 #else
     if (newSize < oldSize) {
 	return oldBuffer;

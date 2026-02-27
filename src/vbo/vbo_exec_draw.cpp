@@ -39,7 +39,7 @@ static void vbo_exec_debug_verts(struct vbo_exec_context *exec)
     GLuint count = exec->vtx.vert_count;
     GLuint i;
 
-    _mesa_printf("%s: %u vertices %d primitives, %d vertsize\n",
+    std::printf("%s: %u vertices %d primitives, %d vertsize\n",
 		 __func__,
 		 count,
 		 exec->vtx.prim_count,
@@ -47,7 +47,7 @@ static void vbo_exec_debug_verts(struct vbo_exec_context *exec)
 
     for (i = 0 ; i < exec->vtx.prim_count ; i++) {
 	struct _mesa_prim *prim = &exec->vtx.prim[i];
-	_mesa_printf("   prim %d: %s%s %d..%d %s %s\n",
+	std::printf("   prim %d: %s%s %d..%d %s %s\n",
 		     i,
 		     _mesa_lookup_enum_by_nr(prim->mode),
 		     prim->weak ? " (weak)" : "",

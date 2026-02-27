@@ -74,10 +74,10 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
     const GLint texWidth = dstRowStride * 4 / 8; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgb_dxt1);
-    ASSERT(dstXoffset % 4 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset % 4 == 0);
+    assert(dstFormat == &_mesa_texformat_rgb_dxt1);
+    assert(dstXoffset % 4 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset % 4 == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 
@@ -130,10 +130,10 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
     const GLint texWidth = dstRowStride * 4 / 8; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_dxt1);
-    ASSERT(dstXoffset % 4 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset % 4 == 0);
+    assert(dstFormat == &_mesa_texformat_rgba_dxt1);
+    assert(dstXoffset % 4 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset % 4 == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 
@@ -185,10 +185,10 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
     const GLint texWidth = dstRowStride * 4 / 16; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_dxt3);
-    ASSERT(dstXoffset % 4 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset % 4 == 0);
+    assert(dstFormat == &_mesa_texformat_rgba_dxt3);
+    assert(dstXoffset % 4 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset % 4 == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 
@@ -240,10 +240,10 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
     const GLint texWidth = dstRowStride * 4 / 16; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_dxt5);
-    ASSERT(dstXoffset % 4 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset % 4 == 0);
+    assert(dstFormat == &_mesa_texformat_rgba_dxt5);
+    assert(dstXoffset % 4 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset % 4 == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 
@@ -290,7 +290,7 @@ fetch_texel_2d_rgb_dxt1_chk(const struct gl_texture_image *texImage,
 {
     (void) k;
     if (fetch_ext_rgb_dxt1) {
-	ASSERT(sizeof(GLchan) == sizeof(GLubyte));
+	assert(sizeof(GLchan) == sizeof(GLubyte));
 	fetch_ext_rgb_dxt1(texImage->RowStride, static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
@@ -363,7 +363,7 @@ fetch_texel_2d_rgba_dxt3_chk(const struct gl_texture_image *texImage,
 {
     (void) k;
     if (fetch_ext_rgba_dxt3) {
-	ASSERT(sizeof(GLchan) == sizeof(GLubyte));
+	assert(sizeof(GLchan) == sizeof(GLubyte));
 	fetch_ext_rgba_dxt3(texImage->RowStride, static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
