@@ -211,8 +211,8 @@ slang_type_specifier_equal(const slang_type_specifier *,
 
 
 struct slang_typeinfo {
-    GLboolean can_be_referenced = GL_FALSE;
-    GLboolean is_swizzled = GL_FALSE;
+    bool can_be_referenced = false;
+    bool is_swizzled = false;
     slang_swizzle swz{};
     slang_type_specifier spec;
     GLuint array_len = 0;
@@ -220,8 +220,8 @@ struct slang_typeinfo {
 
 /** Legacy wrapper – spec is default-constructed; just initialise the plain fields. */
 inline GLboolean slang_typeinfo_construct(slang_typeinfo *ti) {
-    ti->can_be_referenced = GL_FALSE;
-    ti->is_swizzled = GL_FALSE;
+    ti->can_be_referenced = false;
+    ti->is_swizzled = false;
     ti->array_len = 0;
     return GL_TRUE;
 }

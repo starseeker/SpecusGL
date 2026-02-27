@@ -74,25 +74,10 @@ slang_struct_scope_destruct(slang_struct_scope * scope)
 int
 slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
 {
+    /* Use slang_struct copy constructor for each element */
     slang_struct_scope z;
-    const GLuint n = static_cast<GLuint>(y->structs.size());
-    GLuint i;
-
-    z.structs.resize(n);
-    for (i = 0; i < n; i++) {
-	if (!slang_struct_construct(&z.structs[i])) {
-	    slang_struct_scope_destruct(&z);
-	    return 0;
-	}
-    }
-    for (i = 0; i < n; i++) {
-	if (!slang_struct_copy(&z.structs[i], &y->structs[i])) {
-	    slang_struct_scope_destruct(&z);
-	    return 0;
-	}
-    }
+    z.structs = y->structs;  /* copies each slang_struct via copy assignment */
     z.outer_scope = y->outer_scope;
-    slang_struct_scope_destruct(x);
     *x = std::move(z);
     return 1;
 }

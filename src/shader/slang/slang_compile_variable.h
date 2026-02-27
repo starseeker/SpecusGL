@@ -99,7 +99,7 @@
 	std::unique_ptr<slang_operation> initializer; /**< Optional initializer code */
 	GLuint address{~0u};                      /**< Storage location */
 	GLuint size{0};                           /**< Variable's size in bytes */
-	GLboolean isTemp{GL_FALSE};               /**< a named temporary (__resultTmp) */
+	GLboolean isTemp{false};                  /**< a named temporary (__resultTmp) */
 	void *aux{nullptr};                       /**< Used during code gen */
     };
 
