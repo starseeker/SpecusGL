@@ -84,19 +84,23 @@
     /**
      * A shading language program variable.
      *
-     * C++17 modernisation: initializer is now a std::unique_ptr so it is
-     * automatically freed when the variable is destroyed without needing
-     * an explicit call to slang_operation_destruct + delete.
+     * C++17 modernisation:
+     * - All POD fields have default member initialisers so that a
+     *   default-constructed slang_variable is already in a valid state.
+     * - initializer is a std::unique_ptr that automatically frees the
+     *   associated expression tree.
+     * - slang_variable_construct() is now an inline no-op kept only for
+     *   backward compatibility.
      */
     struct slang_variable {
-	slang_fully_specified_type type; /**< Variable's data type */
-	slang_atom a_name;               /**< The variable's name (char *) */
-	GLuint array_len;                /**< only if type == SLANG_SPEC_ARRAy */
+	slang_fully_specified_type type;          /**< Variable's data type */
+	slang_atom a_name{SLANG_ATOM_NULL};       /**< The variable's name (char *) */
+	GLuint array_len{0};                      /**< only if type == SLANG_SPEC_ARRAy */
 	std::unique_ptr<slang_operation> initializer; /**< Optional initializer code */
-	GLuint address;                  /**< Storage location */
-	GLuint size;                     /**< Variable's size in bytes */
-	GLboolean isTemp;                /**< a named temporary (__resultTmp) */
-	void *aux;                       /**< Used during code gen */
+	GLuint address{~0u};                      /**< Storage location */
+	GLuint size{0};                           /**< Variable's size in bytes */
+	GLboolean isTemp{GL_FALSE};               /**< a named temporary (__resultTmp) */
+	void *aux{nullptr};                       /**< Used during code gen */
     };
 
 
@@ -134,11 +138,20 @@
     extern slang_variable *
     slang_variable_scope_grow(slang_variable_scope *);
 
-    extern int
-    slang_variable_construct(slang_variable *);
+    /**
+     * Legacy no-op: slang_variable is fully default-constructible.
+     * Kept for backward compatibility only.
+     */
+    inline int slang_variable_construct(slang_variable *) { return 1; }
 
-    extern void
-    slang_variable_destruct(slang_variable *);
+    /**
+     * Legacy cleanup: resets RAII members; kept for backward compatibility.
+     * Actual memory is freed by the members' own destructors.
+     */
+    inline void slang_variable_destruct(slang_variable *var) {
+        var->type.specifier = slang_type_specifier{};
+        var->initializer.reset();
+    }
 
     extern int
     slang_variable_copy(slang_variable *, const slang_variable *);

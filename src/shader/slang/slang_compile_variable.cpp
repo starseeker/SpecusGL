@@ -228,29 +228,7 @@ slang_variable_scope_grow(slang_variable_scope *scope)
 
 /* slang_variable */
 
-int
-slang_variable_construct(slang_variable * var)
-{
-    if (!slang_fully_specified_type_construct(&var->type))
-	return 0;
-    var->a_name = SLANG_ATOM_NULL;
-    var->array_len = 0;
-    /* initializer is a unique_ptr, default-constructed to null */
-    var->address = ~0;
-    var->size = 0;
-    var->isTemp = GL_FALSE;
-    var->aux = nullptr;
-    return 1;
-}
-
-
-void
-slang_variable_destruct(slang_variable * var)
-{
-    slang_fully_specified_type_destruct(&var->type);
-    /* initializer unique_ptr is destroyed automatically */
-    var->initializer.reset();
-}
+/* slang_variable_construct and slang_variable_destruct are now inline in the header. */
 
 
 int
@@ -258,30 +236,20 @@ slang_variable_copy(slang_variable * x, const slang_variable * y)
 {
     slang_variable z;
 
-    if (!slang_variable_construct(&z))
+    if (!slang_fully_specified_type_copy(&z.type, &y->type))
 	return 0;
-    if (!slang_fully_specified_type_copy(&z.type, &y->type)) {
-	slang_variable_destruct(&z);
-	return 0;
-    }
     z.a_name = y->a_name;
     z.array_len = y->array_len;
     if (y->initializer) {
 	z.initializer = std::make_unique<slang_operation>();
-	if (!slang_operation_construct(z.initializer.get())) {
-	    z.initializer.reset();
-	    slang_variable_destruct(&z);
+	if (!slang_operation_construct(z.initializer.get()))
 	    return 0;
-	}
-	if (!slang_operation_copy(z.initializer.get(), y->initializer.get())) {
-	    slang_variable_destruct(&z);
+	if (!slang_operation_copy(z.initializer.get(), y->initializer.get()))
 	    return 0;
-	}
     }
     z.address = y->address;
     z.size = y->size;
-    slang_variable_destruct(x);
-    *x = std::move(z);
+    *x = std::move(z);   /* move assignment: destroys x's old state, transfers z */
     return 1;
 }
 
