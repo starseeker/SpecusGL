@@ -248,14 +248,14 @@ _swrast_update_texture_samplers(GLcontext *ctx);
 #define RENDER_START(SWctx, GLctx)			\
    do {							\
       if ((SWctx)->Driver.SpanRenderStart) {		\
-         (*(SWctx)->Driver.SpanRenderStart)(GLctx);	\
+         (SWctx)->Driver.SpanRenderStart(GLctx);	\
       }							\
    } while (0)
 
 #define RENDER_FINISH(SWctx, GLctx)			\
    do {							\
       if ((SWctx)->Driver.SpanRenderFinish) {		\
-         (*(SWctx)->Driver.SpanRenderFinish)(GLctx);	\
+         (SWctx)->Driver.SpanRenderFinish(GLctx);	\
       }							\
    } while (0)
 
