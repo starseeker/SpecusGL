@@ -57,10 +57,10 @@
     };
 
 
-    extern GLvoid
+    extern void
     _slang_code_unit_ctr(slang_code_unit *, slang_code_object *);
 
-    extern GLvoid
+    extern void
     _slang_code_unit_dtr(slang_code_unit *);
 
 #define SLANG_BUILTIN_CORE   0
@@ -77,10 +77,10 @@
 	slang_atom_pool atompool;
     };
 
-    extern GLvoid
+    extern void
     _slang_code_object_ctr(slang_code_object *);
 
-    extern GLvoid
+    extern void
     _slang_code_object_dtr(slang_code_object *);
 
     extern bool

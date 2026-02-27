@@ -125,7 +125,7 @@
     extern slang_variable_scope *
     _slang_variable_scope_new(slang_variable_scope *parent);
 
-    extern GLvoid
+    extern void
     _slang_variable_scope_ctr(slang_variable_scope *);
 
     extern void

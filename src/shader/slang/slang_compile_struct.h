@@ -45,7 +45,7 @@
 	~slang_struct_scope();  /**< Defined in slang_compile_struct.cpp */
     };
 
-    extern GLvoid
+    extern void
     _slang_struct_scope_ctr(slang_struct_scope *);
 
     void slang_struct_scope_destruct(slang_struct_scope *);

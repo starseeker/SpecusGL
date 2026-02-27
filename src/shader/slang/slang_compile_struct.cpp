@@ -36,7 +36,7 @@
 #include "slang_compile.h"
 
 
-GLvoid
+void
 _slang_struct_scope_ctr(slang_struct_scope * self)
 {
     self->structs.clear();

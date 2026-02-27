@@ -73,7 +73,7 @@ slang_function_destruct(slang_function * func)
  * slang_function_scope
  */
 
-GLvoid
+void
 _slang_function_scope_ctr(slang_function_scope * self)
 {
     self->outer_scope = nullptr;

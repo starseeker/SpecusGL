@@ -92,7 +92,7 @@ struct slang_function_scope {
 };
 
 
-extern GLvoid
+extern void
 _slang_function_scope_ctr(slang_function_scope *);
 
 extern void

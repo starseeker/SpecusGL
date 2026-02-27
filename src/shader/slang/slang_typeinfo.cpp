@@ -154,7 +154,7 @@ _slang_is_swizzle_mask(const slang_swizzle * swz, GLuint rows)
  * Combines (multiplies) two swizzles to form single swizzle.
  * Example: "vec.wzyx.yx" --> "vec.zw".
  */
-GLvoid
+void
 _slang_multiply_swizzles(slang_swizzle * dst, const slang_swizzle * left,
 			 const slang_swizzle * right)
 {

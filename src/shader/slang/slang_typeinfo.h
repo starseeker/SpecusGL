@@ -90,7 +90,7 @@ _slang_is_swizzle(const char *field, GLuint rows, slang_swizzle *swz);
 extern bool
 _slang_is_swizzle_mask(const slang_swizzle *swz, GLuint rows);
 
-extern GLvoid
+extern void
 _slang_multiply_swizzles(slang_swizzle *, const slang_swizzle *,
 			 const slang_swizzle *);
 

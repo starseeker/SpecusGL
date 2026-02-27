@@ -161,7 +161,7 @@ slang_variable_scope::~slang_variable_scope()
     /* do not free outer_scope - not owned */
 }
 
-GLvoid
+void
 _slang_variable_scope_ctr(slang_variable_scope * self)
 {
     self->variables.clear();

@@ -80,8 +80,8 @@ struct slang_atom_pool {
     std::unordered_set<std::string> strings;
 };
 
-GLvoid slang_atom_pool_construct(slang_atom_pool *);
-GLvoid slang_atom_pool_destruct(slang_atom_pool *);
+void slang_atom_pool_construct(slang_atom_pool *);
+void slang_atom_pool_destruct(slang_atom_pool *);
 slang_atom slang_atom_pool_atom(slang_atom_pool *, const char *);
 const char *slang_atom_pool_id(slang_atom_pool *, slang_atom);
 

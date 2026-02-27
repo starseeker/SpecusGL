@@ -47,7 +47,7 @@ LONGSTRING static const char *slang_pp_version_syn =
 #include "library/slang_pp_version_syn.h"
     ;
 
-static GLvoid
+static void
 grammar_error_to_log(slang_info_log *log)
 {
     char buf[1024];
@@ -101,7 +101,7 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
 
 #define PP_ANNOTATE 0
 
-static GLvoid
+static void
 pp_annotate(slang_string *output, const char *fmt, ...)
 {
 #if PP_ANNOTATE
@@ -113,8 +113,8 @@ pp_annotate(slang_string *output, const char *fmt, ...)
     va_end(va);
     slang_string_pushs(output, buffer, strlen(buffer));
 #else
-    (GLvoid)(output);
-    (GLvoid)(fmt);
+    (void)(output);
+    (void)(fmt);
 #endif
 }
 
@@ -347,13 +347,13 @@ struct pp_symbol {
     pp_symbols parameters;
 };
 
-static GLvoid
+static void
 pp_symbols_init(pp_symbols *self)
 {
     self->clear();
 }
 
-static GLvoid
+static void
 pp_symbols_free(pp_symbols *self)
 {
     self->clear();
@@ -366,7 +366,7 @@ pp_symbols_free(pp_symbols *self)
 static void pp_symbol_init(pp_symbol *) {} /* no-op: std::string/vector self-init */
 static void pp_symbol_free(pp_symbol *) {} /* no-op: members self-destruct */
 
-static GLvoid
+static void
 pp_symbol_reset(pp_symbol *self)
 {
     /* Leave symbol name intact. */
@@ -433,7 +433,7 @@ pp_cond_stack_push(pp_cond_stack *self, slang_info_log *elog)
     return true;
 }
 
-static GLvoid
+static void
 pp_cond_stack_reevaluate(pp_cond_stack *self)
 {
     /* There must be at least 2 conditions on the stack - one global and one being evaluated. */
@@ -455,13 +455,13 @@ struct pp_ext {
 /*
  * Disable all extensions. Called at startup and on #extension all: disable.
  */
-static GLvoid
+static void
 pp_ext_disable_all(pp_ext *self)
 {
     self->MESA_shader_debug = false;
 }
 
-static GLvoid
+static void
 pp_ext_init(pp_ext *self)
 {
     pp_ext_disable_all(self);
@@ -497,7 +497,7 @@ struct pp_state {
     pp_cond_stack cond;
 };
 
-static GLvoid
+static void
 pp_state_init(pp_state *self, slang_info_log *elog)
 {
     self->line = 0;
@@ -515,7 +515,7 @@ pp_state_init(pp_state *self, slang_info_log *elog)
     self->cond.top->endif_required = false;
 }
 
-static GLvoid
+static void
 pp_state_free(pp_state *self)
 {
     pp_symbols_free(&self->symbols);

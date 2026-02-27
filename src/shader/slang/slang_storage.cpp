@@ -47,7 +47,7 @@ slang_storage_array_construct(slang_storage_array * arr)
     return true;
 }
 
-GLvoid
+void
 slang_storage_array_destruct(slang_storage_array * arr)
 {
     /* unique_ptr member 'aggregate' frees itself automatically */
@@ -63,7 +63,7 @@ slang_storage_aggregate_construct(slang_storage_aggregate * agg)
     return true;
 }
 
-GLvoid
+void
 slang_storage_aggregate_destruct(slang_storage_aggregate * agg)
 {
     for (auto &arr : agg->arrays)

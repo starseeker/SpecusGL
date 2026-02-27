@@ -73,7 +73,7 @@ struct slang_storage_array {
 };
 
 bool slang_storage_array_construct(slang_storage_array *);
-GLvoid slang_storage_array_destruct(slang_storage_array *);
+void slang_storage_array_destruct(slang_storage_array *);
 
 
 /**
@@ -87,7 +87,7 @@ struct slang_storage_aggregate {
 };
 
 bool slang_storage_aggregate_construct(slang_storage_aggregate *);
-GLvoid slang_storage_aggregate_destruct(slang_storage_aggregate *);
+void slang_storage_aggregate_destruct(slang_storage_aggregate *);
 
 
 extern bool

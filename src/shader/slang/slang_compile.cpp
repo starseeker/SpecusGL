@@ -71,7 +71,7 @@ slang_var_pool_alloc(slang_var_pool * pool, unsigned int size)
  * slang_code_unit
  */
 
-GLvoid
+void
 _slang_code_unit_ctr(slang_code_unit * self,
 		     slang_code_object * object)
 {
@@ -81,7 +81,7 @@ _slang_code_unit_ctr(slang_code_unit * self,
     self->object = object;
 }
 
-GLvoid
+void
 _slang_code_unit_dtr(slang_code_unit * self)
 {
     slang_variable_scope_destruct(&self->vars);
@@ -93,7 +93,7 @@ _slang_code_unit_dtr(slang_code_unit * self)
  * slang_code_object
  */
 
-GLvoid
+void
 _slang_code_object_ctr(slang_code_object * self)
 {
     GLuint i;
@@ -105,7 +105,7 @@ _slang_code_object_ctr(slang_code_object * self)
     slang_atom_pool_construct(&self->atompool);
 }
 
-GLvoid
+void
 _slang_code_object_dtr(slang_code_object * self)
 {
     GLuint i;
