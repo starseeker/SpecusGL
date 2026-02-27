@@ -162,7 +162,7 @@ struct SWcontext {
     GLuint StateChanges;
     GLenum Primitive;    /* current primitive being drawn (ala glBegin) */
 
-    void (*InvalidateState)(GLcontext *ctx, GLbitfield new_state);
+    std::function<void(GLcontext *ctx, GLbitfield new_state)> InvalidateState;
 
     /**
      * When the NewState mask intersects these masks, we invalidate the
@@ -179,9 +179,9 @@ struct SWcontext {
      * Will be called when the GL state change mask intersects the above masks.
      */
     /*@{*/
-    void (*choose_point)(GLcontext *);
-    void (*choose_line)(GLcontext *);
-    void (*choose_triangle)(GLcontext *);
+    std::function<void(GLcontext *)> choose_point;
+    std::function<void(GLcontext *)> choose_line;
+    std::function<void(GLcontext *)> choose_triangle;
     /*@}*/
 
     /**

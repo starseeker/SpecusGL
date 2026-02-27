@@ -954,9 +954,9 @@ struct gl_list_attrib {
  */
 struct gl_list_instruction {
     GLuint Size;
-    void (*Execute)(GLcontext *ctx, void *data);
-    void (*Destroy)(GLcontext *ctx, void *data);
-    void (*Print)(GLcontext *ctx, void *data);
+    std::function<void(GLcontext *ctx, void *data)> Execute;
+    std::function<void(GLcontext *ctx, void *data)> Destroy;
+    std::function<void(GLcontext *ctx, void *data)> Print;
 };
 
 constexpr GLint MAX_DLIST_EXT_OPCODES = 16;

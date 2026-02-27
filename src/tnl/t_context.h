@@ -392,17 +392,17 @@ struct tnl_device_driver {
      *** TNL Pipeline
      ***/
 
-    void (*RunPipeline)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> RunPipeline;
     /* Replaces PipelineStart/PipelineFinish -- intended to allow
      * drivers to wrap _tnl_run_pipeline() with code to validate state
      * and grab/release hardware locks.
      */
 
-    void (*NotifyMaterialChange)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> NotifyMaterialChange;
     /* Alert tnl-aware drivers of changes to material.
      */
 
-    void (*NotifyInputChanges)(GLcontext *ctx, GLuint bitmask);
+    std::function<void(GLcontext *ctx, GLuint bitmask)> NotifyInputChanges;
     /* Alert tnl-aware drivers of changes to size and stride of input
      * arrays.
      */
@@ -411,14 +411,14 @@ struct tnl_device_driver {
      *** Rendering -- These functions called only from t_vb_render.c
      ***/
     struct {
-	void (*Start)(GLcontext *ctx);
-	void (*Finish)(GLcontext *ctx);
+	std::function<void(GLcontext *ctx)> Start;
+	std::function<void(GLcontext *ctx)> Finish;
 	/* Called before and after all rendering operations, including DrawPixels,
 	 * ReadPixels, Bitmap, span functions, and CopyTexImage, etc commands.
 	 * These are a suitable place for grabbing/releasing hardware locks.
 	 */
 
-	void (*PrimitiveNotify)(GLcontext *ctx, GLenum mode);
+	std::function<void(GLcontext *ctx, GLenum mode)> PrimitiveNotify;
 	/* Called between RenderStart() and RenderFinish() to indicate the
 	 * type of primitive we're about to draw.  Mode will be one of the
 	 * modes accepted by glBegin().
@@ -436,12 +436,12 @@ struct tnl_device_driver {
 	 * vertex attributes should be copied.
 	 */
 
-	void (*ClippedPolygon)(GLcontext *ctx, const GLuint *elts, GLuint n);
+	std::function<void(GLcontext *ctx, const GLuint *elts, GLuint n)> ClippedPolygon;
 	/* Render a polygon with <n> vertices whose indexes are in the <elts>
 	 * array.
 	 */
 
-	void (*ClippedLine)(GLcontext *ctx, GLuint v0, GLuint v1);
+	std::function<void(GLcontext *ctx, GLuint v0, GLuint v1)> ClippedLine;
 	/* Render a line between the two vertices given by indexes v0 and v1. */
 
 	tnl_points_func           Points; /* must now respect vb->elts */
@@ -461,7 +461,7 @@ struct tnl_device_driver {
 	 * vertices.
 	 */
 
-	void (*ResetLineStipple)(GLcontext *ctx);
+	std::function<void(GLcontext *ctx)> ResetLineStipple;
 	/* Reset the hardware's line stipple counter.
 	 */
 
@@ -476,7 +476,7 @@ struct tnl_device_driver {
 	 */
 
 
-	GLboolean(*Multipass)(GLcontext *ctx, GLuint passno);
+	std::function<GLboolean(GLcontext *ctx, GLuint passno)> Multipass;
 	/* Driver may request additional render passes by returning GL_TRUE
 	 * when this function is called.  This function will be called
 	 * after the first pass, and passes will be made until the function
