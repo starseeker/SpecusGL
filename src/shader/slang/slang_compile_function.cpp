@@ -82,8 +82,8 @@ _slang_function_scope_ctr(slang_function_scope * self)
 void
 slang_function_scope_destruct(slang_function_scope * scope)
 {
-    for (auto &f : scope->functions)
-	slang_function_destruct(&f);
+    /* ~slang_function() handles cleanup of parameters, body, and fixups
+     * via their RAII unique_ptr and vector members. */
     scope->functions.clear();
 }
 

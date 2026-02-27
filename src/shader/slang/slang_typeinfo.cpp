@@ -223,14 +223,7 @@ slang_type_specifier::operator=(slang_type_specifier &&other) noexcept
     return *this;
 }
 
-
-GLboolean
-slang_type_specifier_copy(slang_type_specifier * x,
-			  const slang_type_specifier * y)
-{
-    *x = *y;   /* invokes deep copy assignment */
-    return GL_TRUE;
-}
+/* slang_type_specifier_copy is now inline in slang_typeinfo.h */
 
 
 /**

@@ -197,8 +197,13 @@ inline void slang_type_specifier_dtr(slang_type_specifier *self) {
     self->type = SLANG_SPEC_VOID;
 }
 
-extern GLboolean
-slang_type_specifier_copy(slang_type_specifier *, const slang_type_specifier *);
+/** Deep-copy a type specifier; always succeeds (returns GL_TRUE). */
+inline GLboolean
+slang_type_specifier_copy(slang_type_specifier *x, const slang_type_specifier *y)
+{
+    *x = *y;   /* invokes deep-copy assignment */
+    return GL_TRUE;
+}
 
 extern GLboolean
 slang_type_specifier_equal(const slang_type_specifier *,
