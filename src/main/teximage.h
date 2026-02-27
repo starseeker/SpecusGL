@@ -126,6 +126,36 @@ static inline void _mesa_unlock_texture(GLcontext *ctx,
     ctx->Shared->TexMutex.unlock();
 }
 
+/**
+ * RAII guard that locks a texture on construction and unlocks it on
+ * destruction.  Use this instead of manual \c _mesa_lock_texture /
+ * \c goto-out / \c _mesa_unlock_texture sequences.
+ *
+ * Example:
+ * \code
+ *   TexLockGuard lock(ctx, texObj);
+ *   if (error_condition) return;   // unlock happens automatically
+ * \endcode
+ */
+struct TexLockGuard {
+    GLcontext               *ctx;
+    struct gl_texture_object *texObj;
+
+    TexLockGuard(GLcontext *c, struct gl_texture_object *t) noexcept
+        : ctx(c), texObj(t)
+    {
+        _mesa_lock_texture(ctx, texObj);
+    }
+
+    ~TexLockGuard() noexcept
+    {
+        _mesa_unlock_texture(ctx, texObj);
+    }
+
+    TexLockGuard(const TexLockGuard &) = delete;
+    TexLockGuard &operator=(const TexLockGuard &) = delete;
+};
+
 /*@}*/
 
 

@@ -61,17 +61,17 @@
  * Color channel data type.
  */
 #if CHAN_BITS == 8
-typedef GLubyte GLchan;
+using GLchan = GLubyte;
 #define CHAN_MAX 255
 #define CHAN_MAXF 255.0F
 #define CHAN_TYPE GL_UNSIGNED_BYTE
 #elif CHAN_BITS == 16
-typedef GLushort GLchan;
+using GLchan = GLushort;
 #define CHAN_MAX 65535
 #define CHAN_MAXF 65535.0F
 #define CHAN_TYPE GL_UNSIGNED_SHORT
 #elif CHAN_BITS == 32
-typedef GLfloat GLchan;
+using GLchan = GLfloat;
 #define CHAN_MAX 1.0
 #define CHAN_MAXF 1.0F
 #define CHAN_TYPE GL_FLOAT
@@ -84,9 +84,9 @@ typedef GLfloat GLchan;
  * Stencil buffer data type.
  */
 #if STENCIL_BITS==8
-typedef GLubyte GLstencil;
+using GLstencil = GLubyte;
 #elif STENCIL_BITS==16
-typedef GLushort GLstencil;
+using GLstencil = GLushort;
 #else
 #  error "illegal number of stencil bits"
 #endif
@@ -95,7 +95,7 @@ typedef GLushort GLstencil;
 /**
  * Fixed point data type.
  */
-typedef int GLfixed;
+using GLfixed = int;
 /*
  * Fixed point arithmetic macros
  */
@@ -1662,6 +1662,28 @@ struct gl_viewport_attrib {
     GLsizei Width = 0, Height = 0; /**< size */
     GLfloat Near = 0.0f, Far = 1.0f; /**< Depth buffer range */
     GLmatrix _WindowMap;     /**< Mapping transformation as a matrix. */
+
+    gl_viewport_attrib() = default;
+
+    /** Deep-copy constructor: copies POD fields and clones _WindowMap. */
+    gl_viewport_attrib(const gl_viewport_attrib &o)
+        : X(o.X), Y(o.Y), Width(o.Width), Height(o.Height)
+        , Near(o.Near), Far(o.Far)
+    {
+        _WindowMap.copy_from(&o._WindowMap);
+    }
+
+    /** Deep-copy assignment: copies POD fields and clones _WindowMap. */
+    gl_viewport_attrib &operator=(const gl_viewport_attrib &o)
+    {
+        if (this != &o) {
+            X = o.X; Y = o.Y;
+            Width = o.Width; Height = o.Height;
+            Near = o.Near; Far = o.Far;
+            _WindowMap.copy_from(&o._WindowMap);
+        }
+        return *this;
+    }
 };
 
 

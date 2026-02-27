@@ -792,7 +792,7 @@ static GLboolean invert_matrix_perspective(GLmatrix *mat)
 /**
  * Matrix inversion function pointer type.
  */
-typedef GLboolean(*inv_mat_func)(GLmatrix *mat);
+using inv_mat_func = GLboolean(*)(GLmatrix *mat);
 
 /**
  * Table of the matrix inversion functions according to the matrix type.
@@ -1540,6 +1540,47 @@ GLmatrix::~GLmatrix()
 	::operator delete[](inv, std::align_val_t{16});
 	inv = nullptr;
     }
+}
+
+/**
+ * GLmatrix move constructor.
+ *
+ * Transfers ownership of the aligned m and inv arrays from \p other to this
+ * matrix.  The source \p other is left in a safe, destructible state with
+ * nullptr m/inv pointers and identity-like flags.
+ */
+GLmatrix::GLmatrix(GLmatrix &&other) noexcept
+    : m(other.m)
+    , inv(other.inv)
+    , flags(other.flags)
+    , type(other.type)
+{
+    other.m   = nullptr;
+    other.inv = nullptr;
+}
+
+/**
+ * GLmatrix move assignment.
+ *
+ * Releases any existing m/inv storage in this matrix, then transfers
+ * ownership from \p other.
+ */
+GLmatrix &
+GLmatrix::operator=(GLmatrix &&other) noexcept
+{
+    if (this != &other) {
+        if (m)
+            ::operator delete[](m, std::align_val_t{16});
+        if (inv)
+            ::operator delete[](inv, std::align_val_t{16});
+        m      = other.m;
+        inv    = other.inv;
+        flags  = other.flags;
+        type   = other.type;
+        other.m   = nullptr;
+        other.inv = nullptr;
+    }
+    return *this;
 }
 
 /**

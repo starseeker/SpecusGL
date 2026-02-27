@@ -23,263 +23,117 @@
  */
 
 
-/*
- * Thread support for gl dispatch.
+/**
+ * \file glthread.h
+ * Thread support for gl dispatch – C++17 implementation.
  *
- * Initial version by John Stone (j.stone@acm.org) (johns@cs.umr.edu)
- *                and Christoph Poliwoda (poliwoda@volumegraphics.com)
- * Revised by Keith Whitwell
- * Adapted for new gl dispatcher by Brian Paul
+ * Replaces the old platform-specific \#ifdef maze (PTHREADS, SOLARIS_THREADS,
+ * WIN32_THREADS, USE_XTHREADS) with the C++17 standard library:
  *
+ *  - \c _glthread_TSD   is now \c void* ; callers declare the storage
+ *                       \c thread_local so each thread owns its own copy.
+ *  - \c _glthread_Mutex is an alias for \c std::mutex.
+ *  - \c _glthread_Thread is \c unsigned long (a numeric thread ID).
  *
- *
- * DOCUMENTATION
- *
- * This thread module exports the following types:
- *   _glthread_TSD     Thread-specific data area
- *   _glthread_Thread  Thread datatype
- *   _glthread_Mutex   Mutual exclusion lock
- *
- * Macros:
- *   _glthread_DECLARE_STATIC_MUTEX(name)   Declare a non-local mutex
- *   _glthread_INIT_MUTEX(name)             Initialize a mutex
- *   _glthread_LOCK_MUTEX(name)             Lock a mutex
- *   _glthread_UNLOCK_MUTEX(name)           Unlock a mutex
+ * Mutex convenience macros are kept as thin inline wrappers for backward
+ * compatibility, but new code should prefer RAII (\c std::lock_guard) directly.
  *
  * Functions:
- *   _glthread_GetID(v)      Get integer thread ID
- *   _glthread_InitTSD()     Initialize thread-specific data
- *   _glthread_GetTSD()      Get thread-specific data
- *   _glthread_SetTSD()      Set thread-specific data
- *
- */
-
-/*
- * If this file is accidentally included by a non-threaded build,
- * it should not cause the build to fail, or otherwise cause problems.
- * In general, it should only be included when needed however.
+ *   _glthread_GetID()      Returns a numeric identifier for the calling thread.
+ *   _glthread_InitTSD()    Initialises a TSD slot (no-op – thread_local zeroes itself).
+ *   _glthread_GetTSD()     Returns the per-thread pointer stored in the slot.
+ *   _glthread_SetTSD()     Writes a per-thread pointer into the slot.
  */
 
 #ifndef GLTHREAD_H
 #define GLTHREAD_H
 
-
-
+#include <mutex>
+#include <thread>
 
 #if defined(USE_MGL_NAMESPACE)
 #define _glapi_Dispatch _mglapi_Dispatch
 #endif
 
-
-
-#if (defined(PTHREADS) || defined(SOLARIS_THREADS) ||\
-     defined(WIN32_THREADS) || defined(USE_XTHREADS)) \
-    && !defined(THREADS)
-# define THREADS
-#endif
-
-/*
- * POSIX threads. This should be your choice in the Unix world
- * whenever possible.  When building with POSIX threads, be sure
- * to enable any compiler flags which will cause the MT-safe
- * libc (if one exists) to be used when linking, as well as any
- * header macros for MT-safe errno, etc.  For Solaris, this is the -mt
- * compiler flag.  On Solaris with gcc, use -D_REENTRANT to enable
- * proper compiling for MT-safe libc etc.
- */
-#if defined(PTHREADS)
-#include <pthread.h> /* POSIX threads headers */
-
-typedef struct {
-    pthread_key_t  key;
-    int initMagic;
-} _glthread_TSD;
-
-typedef pthread_t _glthread_Thread;
-
-typedef pthread_mutex_t _glthread_Mutex;
-
-#define _glthread_DECLARE_STATIC_MUTEX(name) \
-   static _glthread_Mutex name = PTHREAD_MUTEX_INITIALIZER
-
-#define _glthread_INIT_MUTEX(name) \
-   pthread_mutex_init(&(name), nullptr)
-
-#define _glthread_DESTROY_MUTEX(name) \
-   pthread_mutex_destroy(&(name))
-
-#define _glthread_LOCK_MUTEX(name) \
-   (void) pthread_mutex_lock(&(name))
-
-#define _glthread_UNLOCK_MUTEX(name) \
-   (void) pthread_mutex_unlock(&(name))
-
-#endif /* PTHREADS */
-
-
-
-
-/*
- * Solaris threads. Use only up to Solaris 2.4.
- * Solaris 2.5 and higher provide POSIX threads.
- * Be sure to compile with -mt on the Solaris compilers, or
- * use -D_REENTRANT if using gcc.
- */
-#ifdef SOLARIS_THREADS
-#include <thread.h>
-
-typedef struct {
-    thread_key_t key;
-    mutex_t      keylock;
-    int          initMagic;
-} _glthread_TSD;
-
-typedef thread_t _glthread_Thread;
-
-typedef mutex_t _glthread_Mutex;
-
-/* XXX need to really implement mutex-related macros */
-#define _glthread_DECLARE_STATIC_MUTEX(name)  static _glthread_Mutex name = 0
-#define _glthread_INIT_MUTEX(name)  (void) name
-#define _glthread_DESTROY_MUTEX(name) (void) name
-#define _glthread_LOCK_MUTEX(name)  (void) name
-#define _glthread_UNLOCK_MUTEX(name)  (void) name
-
-#endif /* SOLARIS_THREADS */
-
-
-
-
-/*
- * Windows threads. Should work with Windows NT and 95.
- * IMPORTANT: Link with multithreaded runtime library when THREADS are
- * used!
- */
-#ifdef WIN32_THREADS
-#include <windows.h>
-
-typedef struct {
-    DWORD key;
-    int   initMagic;
-} _glthread_TSD;
-
-typedef HANDLE _glthread_Thread;
-
-typedef CRITICAL_SECTION _glthread_Mutex;
-
-#define _glthread_DECLARE_STATIC_MUTEX(name)  /*static*/ _glthread_Mutex name = {0,0,0,0,0,0}
-#define _glthread_INIT_MUTEX(name)  InitializeCriticalSection(&name)
-#define _glthread_DESTROY_MUTEX(name)  DeleteCriticalSection(&name)
-#define _glthread_LOCK_MUTEX(name)  EnterCriticalSection(&name)
-#define _glthread_UNLOCK_MUTEX(name)  LeaveCriticalSection(&name)
-
-#endif /* WIN32_THREADS */
-
-
-
-
-/*
- * XFree86 has its own thread wrapper, Xthreads.h
- * We wrap it again for GL.
- */
-#ifdef USE_XTHREADS
-#include <X11/Xthreads.h>
-
-typedef struct {
-    xthread_key_t key;
-    int initMagic;
-} _glthread_TSD;
-
-typedef xthread_t _glthread_Thread;
-
-typedef xmutex_rec _glthread_Mutex;
-
-#ifdef XMUTEX_INITIALIZER
-#define _glthread_DECLARE_STATIC_MUTEX(name) \
-   static _glthread_Mutex name = XMUTEX_INITIALIZER
-#else
-#define _glthread_DECLARE_STATIC_MUTEX(name) \
-   static _glthread_Mutex name
-#endif
-
-#define _glthread_INIT_MUTEX(name) \
-   xmutex_init(&(name))
-
-#define _glthread_DESTROY_MUTEX(name) \
-   xmutex_clear(&(name))
-
-#define _glthread_LOCK_MUTEX(name) \
-   (void) xmutex_lock(&(name))
-
-#define _glthread_UNLOCK_MUTEX(name) \
-   (void) xmutex_unlock(&(name))
-
-#endif /* USE_XTHREADS */
-
-
+/* Always treat this build as thread-capable (C++17 guarantees thread support). */
 #ifndef THREADS
-
-/*
- * THREADS not defined
- */
-
-typedef GLuint _glthread_TSD;
-
-typedef GLuint _glthread_Thread;
-
-typedef GLuint _glthread_Mutex;
-
-#define _glthread_DECLARE_STATIC_MUTEX(name)  static _glthread_Mutex name = 0
-
-#define _glthread_INIT_MUTEX(name)  (void) name
-
-#define _glthread_DESTROY_MUTEX(name)  (void) name
-
-#define _glthread_LOCK_MUTEX(name)  (void) name
-
-#define _glthread_UNLOCK_MUTEX(name)  (void) name
-
-#endif /* THREADS */
+#  define THREADS
+#endif
 
 
+/* -----------------------------------------------------------------------
+ * Thread-specific data (TSD).
+ *
+ * _glthread_TSD is a plain void*.  Callers must declare the variable as
+ * thread_local so that each thread gets its own copy of the pointer.
+ * The get/set helpers below simply dereference the supplied address, which
+ * is always the address of the calling thread's thread_local storage.
+ * ----------------------------------------------------------------------- */
 
-/*
- * Platform independent thread specific data API.
- */
+/** Type of a TSD slot.  Declare as \c thread_local at each use site. */
+using _glthread_TSD = void *;
 
-extern unsigned long
-_glthread_GetID(void);
+/** Initialise a TSD slot (no-op: thread_local variables default to nullptr). */
+inline void _glthread_InitTSD(_glthread_TSD *tsd) noexcept { *tsd = nullptr; }
 
+/** Return the per-thread value stored in \p tsd. */
+inline void *_glthread_GetTSD(_glthread_TSD *tsd) noexcept { return *tsd; }
 
-extern void
-_glthread_InitTSD(_glthread_TSD *);
-
-
-extern void *
-_glthread_GetTSD(_glthread_TSD *);
+/** Store \p ptr as the per-thread value in \p tsd. */
+inline void _glthread_SetTSD(_glthread_TSD *tsd, void *ptr) noexcept { *tsd = ptr; }
 
 
-extern void
-_glthread_SetTSD(_glthread_TSD *, void *);
+/* -----------------------------------------------------------------------
+ * Mutex.
+ * ----------------------------------------------------------------------- */
 
-#if   !defined(GL_CALL)
-# if defined(THREADS)
+/** Mutex type – backed by std::mutex. */
+using _glthread_Mutex = std::mutex;
+
+/** Declare a static mutex.  std::mutex is default-constructible. */
+#define _glthread_DECLARE_STATIC_MUTEX(name)  static std::mutex name
+
+/** Initialise a mutex (no-op: std::mutex default-constructs itself). */
+#define _glthread_INIT_MUTEX(name)    ((void)0)
+
+/** Destroy a mutex (no-op: std::mutex destructor handles cleanup). */
+#define _glthread_DESTROY_MUTEX(name) ((void)0)
+
+/** Lock a mutex. */
+#define _glthread_LOCK_MUTEX(name)    (name).lock()
+
+/** Unlock a mutex. */
+#define _glthread_UNLOCK_MUTEX(name)  (name).unlock()
+
+
+/* -----------------------------------------------------------------------
+ * Thread identifier.
+ * ----------------------------------------------------------------------- */
+
+/** Numeric thread identifier type. */
+using _glthread_Thread = unsigned long;
+
+/** Return a numeric identifier for the calling thread. */
+extern unsigned long _glthread_GetID(void);
+
+
+/* -----------------------------------------------------------------------
+ * Dispatch helper.
+ * ----------------------------------------------------------------------- */
+
+#if !defined(GL_CALL)
 #  define GET_DISPATCH() \
-   ((__builtin_expect( _glapi_Dispatch != nullptr, 1 )) \
-       ? _glapi_Dispatch : _glapi_get_dispatch())
-# else
-#  define GET_DISPATCH() _glapi_Dispatch
-# endif /* defined(THREADS) */
-#endif  /* ndef GL_CALL */
+    ((__builtin_expect(_glapi_Dispatch != nullptr, 1)) \
+        ? _glapi_Dispatch : _glapi_get_dispatch())
+#endif /* ndef GL_CALL */
 
 
-
-#endif /* THREADS_H */
+#endif /* GLTHREAD_H */
 
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:

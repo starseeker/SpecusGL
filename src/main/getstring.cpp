@@ -143,7 +143,8 @@ _mesa_GetString(GLenum name)
 	case GL_SHADING_LANGUAGE_VERSION_ARB:
 	    if (ctx->Extensions.ARB_shading_language_100)
 		return reinterpret_cast<const GLubyte *>(sl_version_110);
-	    goto error;
+	    /* extension not supported – fall through to the error path */
+	    [[fallthrough]];
 #endif
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program || \
     FEATURE_NV_vertex_program || FEATURE_ARB_vertex_program
@@ -154,14 +155,11 @@ _mesa_GetString(GLenum name)
 		ctx->Extensions.ARB_vertex_program) {
 		return reinterpret_cast<const GLubyte *>(ctx->Program.ErrorString.c_str());
 	    }
-	    /* FALL-THROUGH */
-#endif
-#if FEATURE_ARB_shading_language_100
-	error:
+	    [[fallthrough]];
 #endif
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetString");
-	    return (const GLubyte *) 0;
+	    return nullptr;
     }
 }
 

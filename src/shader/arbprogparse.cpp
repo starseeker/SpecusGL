@@ -165,7 +165,7 @@ struct arb_program {
   to syntax part
 */
 
-typedef GLubyte *production;
+using production = GLubyte *;
 
 
 /**

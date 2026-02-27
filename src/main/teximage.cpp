@@ -2136,12 +2136,12 @@ _mesa_GetTexImage(GLenum target, GLint level, GLenum format,
 	return;
     }
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 	if (!texImage) {
 	    /* invalid mipmap level, not an error */
-	    goto out;
+	    return;
 	}
 
 
@@ -2153,24 +2153,24 @@ _mesa_GetTexImage(GLenum target, GLint level, GLenum format,
 	    && !is_color_format(texImage->TexFormat->BaseFormat)
 	    && !is_index_format(texImage->TexFormat->BaseFormat)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetTexImage(format mismatch)");
-	    goto out;
+	    return;
 	} else if (is_index_format(format)
 		   && !is_index_format(texImage->TexFormat->BaseFormat)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetTexImage(format mismatch)");
-	    goto out;
+	    return;
 	} else if (is_depth_format(format)
 		   && !is_depth_format(texImage->TexFormat->BaseFormat)
 		   && !is_depthstencil_format(texImage->TexFormat->BaseFormat)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetTexImage(format mismatch)");
-	    goto out;
+	    return;
 	} else if (is_ycbcr_format(format)
 		   && !is_ycbcr_format(texImage->TexFormat->BaseFormat)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetTexImage(format mismatch)");
-	    goto out;
+	    return;
 	} else if (is_depthstencil_format(format)
 		   && !is_depthstencil_format(texImage->TexFormat->BaseFormat)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetTexImage(format mismatch)");
-	    goto out;
+	    return;
 	}
 
 	if (ctx->Pack.BufferObj->Name) {
@@ -2181,7 +2181,7 @@ _mesa_GetTexImage(GLenum target, GLint level, GLenum format,
 					   format, type, pixels)) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glGetTexImage(invalid PBO access)");
-		goto out;
+		return;
 	    }
 	}
 
@@ -2190,8 +2190,6 @@ _mesa_GetTexImage(GLenum target, GLint level, GLenum format,
 				texObj, texImage);
 
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2259,12 +2257,12 @@ _mesa_TexImage1D(GLenum target, GLint level, GLint internalFormat,
 
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glTexImage1D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -2293,8 +2291,6 @@ _mesa_TexImage1D(GLenum target, GLint level, GLint internalFormat,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_1D) {
 	/* Proxy texture: check for errors and update proxy state */
 	struct gl_texture_image *texImage;
@@ -2358,12 +2354,12 @@ _mesa_TexImage2D(GLenum target, GLint level, GLint internalFormat,
 
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glTexImage2D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -2391,8 +2387,6 @@ _mesa_TexImage2D(GLenum target, GLint level, GLint internalFormat,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_2D ||
 	       (target == GL_PROXY_TEXTURE_CUBE_MAP_ARB &&
 		ctx->Extensions.ARB_texture_cube_map) ||
@@ -2452,12 +2446,12 @@ _mesa_TexImage3D(GLenum target, GLint level, GLint internalFormat,
 
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glTexImage3D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -2485,8 +2479,6 @@ _mesa_TexImage3D(GLenum target, GLint level, GLint internalFormat,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_3D) {
 	/* Proxy texture: check for errors and update proxy state */
 	struct gl_texture_image *texImage;
@@ -2553,17 +2545,17 @@ _mesa_TexSubImage1D(GLenum target, GLint level,
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
     assert(texObj);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (subtexture_error_check2(ctx, 1, target, level, xoffset, 0, 0,
 				    postConvWidth, 1, 1, format, type, texImage)) {
-	    goto out;   /* error was detected */
+	    return;   /* error was detected */
 	}
 
 	if (width == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
 	xoffset += texImage->Border;
@@ -2574,8 +2566,6 @@ _mesa_TexSubImage1D(GLenum target, GLint level,
 				     texObj, texImage);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2609,18 +2599,18 @@ _mesa_TexSubImage2D(GLenum target, GLint level,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (subtexture_error_check2(ctx, 2, target, level, xoffset, yoffset, 0,
 				    postConvWidth, postConvHeight, 1, format, type,
 				    texImage)) {
-	    goto out;   /* error was detected */
+	    return;   /* error was detected */
 	}
 
 	if (width == 0 || height == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
 	xoffset += texImage->Border;
@@ -2632,8 +2622,6 @@ _mesa_TexSubImage2D(GLenum target, GLint level,
 				     &ctx->Unpack, texObj, texImage);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2662,17 +2650,17 @@ _mesa_TexSubImage3D(GLenum target, GLint level,
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (subtexture_error_check2(ctx, 3, target, level, xoffset, yoffset, zoffset,
 				    width, height, depth, format, type, texImage)) {
-	    goto out;   /* error was detected */
+	    return;   /* error was detected */
 	}
 
 	if (width == 0 || height == 0 || height == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
 	xoffset += texImage->Border;
@@ -2687,8 +2675,6 @@ _mesa_TexSubImage3D(GLenum target, GLint level,
 				     &ctx->Unpack, texObj, texImage);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2720,12 +2706,12 @@ _mesa_CopyTexImage1D(GLenum target, GLint level,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	if (!texImage) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyTexImage1D");
-	    goto out;
+	    return;
 	}
 
 	if (texImage->Data) {
@@ -2751,8 +2737,6 @@ _mesa_CopyTexImage1D(GLenum target, GLint level,
 	texObj->Complete = GL_FALSE;
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2785,13 +2769,13 @@ _mesa_CopyTexImage2D(GLenum target, GLint level, GLenum internalFormat,
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 
 	if (!texImage) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glCopyTexImage2D");
-	    goto out;
+	    return;
 	}
 
 	if (texImage->Data) {
@@ -2817,8 +2801,6 @@ _mesa_CopyTexImage2D(GLenum target, GLint level, GLenum internalFormat,
 	texObj->Complete = GL_FALSE;
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2846,14 +2828,14 @@ _mesa_CopyTexSubImage1D(GLenum target, GLint level,
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (copytexsubimage_error_check2(ctx, 1, target, level,
 					 xoffset, 0, 0, postConvWidth, 1,
 					 texImage))
-	    goto out;
+	    return;
 
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
@@ -2863,8 +2845,6 @@ _mesa_CopyTexSubImage1D(GLenum target, GLint level,
 	(*ctx->Driver.CopyTexSubImage1D)(ctx, target, level, xoffset, x, y, width);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2894,13 +2874,13 @@ _mesa_CopyTexSubImage2D(GLenum target, GLint level,
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (copytexsubimage_error_check2(ctx, 2, target, level, xoffset, yoffset, 0,
 					 postConvWidth, postConvHeight, texImage))
-	    goto out;
+	    return;
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
 	xoffset += texImage->Border;
@@ -2911,8 +2891,6 @@ _mesa_CopyTexSubImage2D(GLenum target, GLint level,
 					 xoffset, yoffset, x, y, width, height);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -2942,14 +2920,14 @@ _mesa_CopyTexSubImage3D(GLenum target, GLint level,
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 
 	if (copytexsubimage_error_check2(ctx, 3, target, level, xoffset, yoffset,
 					 zoffset, postConvWidth, postConvHeight,
 					 texImage))
-	    goto out;
+	    return;
 
 	/* If we have a border, xoffset=-1 is legal.  Bias by border width */
 	xoffset += texImage->Border;
@@ -2962,8 +2940,6 @@ _mesa_CopyTexSubImage3D(GLenum target, GLint level,
 					 x, y, width, height);
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -3164,12 +3140,12 @@ _mesa_CompressedTexImage1DARB(GLenum target, GLint level,
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage1D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -3190,8 +3166,6 @@ _mesa_CompressedTexImage1DARB(GLenum target, GLint level,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_1D) {
 	/* Proxy texture: check for errors and update proxy state */
 	GLenum error = compressed_texture_error_check(ctx, 1, target, level,
@@ -3216,13 +3190,12 @@ _mesa_CompressedTexImage1DARB(GLenum target, GLint level,
 	    texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	    texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-	    _mesa_lock_texture(ctx, texObj);
+	    TexLockGuard lock(ctx, texObj);
 	    {
 		texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 		_mesa_init_teximage_fields(ctx, target, texImage, width, 1, 1,
 					   border, internalFormat);
 	    }
-	    _mesa_unlock_texture(ctx, texObj);
 	}
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glCompressedTexImage1D(target)");
@@ -3258,12 +3231,12 @@ _mesa_CompressedTexImage2DARB(GLenum target, GLint level,
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage2D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -3284,8 +3257,6 @@ _mesa_CompressedTexImage2DARB(GLenum target, GLint level,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_2D ||
 	       (target == GL_PROXY_TEXTURE_CUBE_MAP_ARB &&
 		ctx->Extensions.ARB_texture_cube_map)) {
@@ -3312,13 +3283,12 @@ _mesa_CompressedTexImage2DARB(GLenum target, GLint level,
 	    texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	    texObj = _mesa_select_tex_object(ctx, texUnit, target);
 
-	    _mesa_lock_texture(ctx, texObj);
+	    TexLockGuard lock(ctx, texObj);
 	    {
 		texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 		_mesa_init_teximage_fields(ctx, target, texImage, width, height, 1,
 					   border, internalFormat);
 	    }
-	    _mesa_unlock_texture(ctx, texObj);
 	}
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glCompressedTexImage2D(target)");
@@ -3350,12 +3320,12 @@ _mesa_CompressedTexImage3DARB(GLenum target, GLint level,
 
 	texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	texObj = _mesa_select_tex_object(ctx, texUnit, target);
-	_mesa_lock_texture(ctx, texObj);
+	TexLockGuard lock(ctx, texObj);
 	{
 	    texImage = _mesa_get_tex_image(ctx, texObj, target, level);
 	    if (!texImage) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glCompressedTexImage3D");
-		goto out;
+		return;
 	    }
 
 	    if (texImage->Data) {
@@ -3377,8 +3347,6 @@ _mesa_CompressedTexImage3DARB(GLenum target, GLint level,
 	    texObj->Complete = GL_FALSE;
 	    ctx->NewState |= _NEW_TEXTURE;
 	}
-    out:
-	_mesa_unlock_texture(ctx, texObj);
     } else if (target == GL_PROXY_TEXTURE_3D) {
 	/* Proxy texture: check for errors and update proxy state */
 	GLenum error = compressed_texture_error_check(ctx, 3, target, level,
@@ -3402,13 +3370,12 @@ _mesa_CompressedTexImage3DARB(GLenum target, GLint level,
 	    struct gl_texture_image *texImage;
 	    texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
 	    texObj = _mesa_select_tex_object(ctx, texUnit, target);
-	    _mesa_lock_texture(ctx, texObj);
+	    TexLockGuard lock(ctx, texObj);
 	    {
 		texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 		_mesa_init_teximage_fields(ctx, target, texImage, width, height,
 					   depth, border, internalFormat);
 	    }
-	    _mesa_unlock_texture(ctx, texObj);
 	}
     } else {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glCompressedTexImage3D(target)");
@@ -3440,7 +3407,7 @@ _mesa_CompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 	assert(texImage);
@@ -3448,16 +3415,16 @@ _mesa_CompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset,
 	if ((GLint) format != texImage->InternalFormat) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCompressedTexSubImage1D(format)");
-	    goto out;
+	    return;
 	}
 
 	if ((width == 1 || width == 2) && (GLuint) width != texImage->Width) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glCompressedTexSubImage1D(width)");
-	    goto out;
+	    return;
 	}
 
 	if (width == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	if (ctx->Driver.CompressedTexSubImage1D) {
 	    (*ctx->Driver.CompressedTexSubImage1D)(ctx, target, level,
@@ -3467,8 +3434,6 @@ _mesa_CompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset,
 	}
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -3497,7 +3462,7 @@ _mesa_CompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 	assert(texImage);
@@ -3505,17 +3470,17 @@ _mesa_CompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset,
 	if ((GLint) format != texImage->InternalFormat) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCompressedTexSubImage2D(format)");
-	    goto out;
+	    return;
 	}
 
 	if (((width == 1 || width == 2) && (GLuint) width != texImage->Width) ||
 	    ((height == 1 || height == 2) && (GLuint) height != texImage->Height)) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glCompressedTexSubImage2D(size)");
-	    goto out;
+	    return;
 	}
 
 	if (width == 0 || height == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	if (ctx->Driver.CompressedTexSubImage2D) {
 	    (*ctx->Driver.CompressedTexSubImage2D)(ctx, target, level,
@@ -3525,8 +3490,6 @@ _mesa_CompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset,
 	}
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -3554,7 +3517,7 @@ _mesa_CompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 	assert(texImage);
@@ -3562,18 +3525,18 @@ _mesa_CompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset,
 	if ((GLint) format != texImage->InternalFormat) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCompressedTexSubImage3D(format)");
-	    goto out;
+	    return;
 	}
 
 	if (((width == 1 || width == 2) && (GLuint) width != texImage->Width) ||
 	    ((height == 1 || height == 2) && (GLuint) height != texImage->Height) ||
 	    ((depth == 1 || depth == 2) && (GLuint) depth != texImage->Depth)) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glCompressedTexSubImage3D(size)");
-	    goto out;
+	    return;
 	}
 
 	if (width == 0 || height == 0 || depth == 0)
-	    goto out;  /* no-op, not an error */
+	    return;  /* no-op, not an error */
 
 	if (ctx->Driver.CompressedTexSubImage3D) {
 	    (*ctx->Driver.CompressedTexSubImage3D)(ctx, target, level,
@@ -3584,8 +3547,6 @@ _mesa_CompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset,
 	}
 	ctx->NewState |= _NEW_TEXTURE;
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 
@@ -3621,25 +3582,23 @@ _mesa_GetCompressedTexImageARB(GLenum target, GLint level, GLvoid *img)
     }
 
 
-    _mesa_lock_texture(ctx, texObj);
+    TexLockGuard lock(ctx, texObj);
     {
 	texImage = _mesa_select_tex_image(ctx, texObj, target, level);
 	if (!texImage) {
 	    /* probably invalid mipmap level */
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glGetCompressedTexImageARB(level)");
-	    goto out;
+	    return;
 	}
 
 	if (!texImage->IsCompressed) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glGetCompressedTexImageARB");
-	    goto out;
+	    return;
 	}
 
 	/* this typically calls _mesa_get_compressed_teximage() */
 	ctx->Driver.GetCompressedTexImage(ctx, target, level, img, texObj,texImage);
     }
-out:
-    _mesa_unlock_texture(ctx, texObj);
 }
 
 /*
