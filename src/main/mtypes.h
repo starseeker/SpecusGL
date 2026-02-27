@@ -103,14 +103,14 @@ typedef int GLfixed;
 constexpr GLuint FIXED_FRAC_BITS = 11;
 #endif
 
-#define FIXED_SHIFT     FIXED_FRAC_BITS
+constexpr GLuint FIXED_SHIFT = FIXED_FRAC_BITS;
+constexpr GLuint FIXED_HALF  = 1U << (FIXED_SHIFT - 1U);
 constexpr GLuint FIXED_ONE = 1 << FIXED_SHIFT;
-#define FIXED_HALF      (1 << (FIXED_SHIFT-1))
 constexpr GLuint FIXED_FRAC_MASK = FIXED_ONE - 1;
 constexpr GLuint FIXED_INT_MASK = ~FIXED_FRAC_MASK;
 constexpr GLint FIXED_EPSILON = 1;
-#define FIXED_SCALE     ((float) FIXED_ONE)
-#define FIXED_DBL_SCALE ((double) FIXED_ONE)
+constexpr float  FIXED_SCALE     = static_cast<float>(FIXED_ONE);
+constexpr double FIXED_DBL_SCALE = static_cast<double>(FIXED_ONE);
 #define FloatToFixed(X) (IROUND((X) * FIXED_SCALE))
 #define FixedToDouble(X) ((X) * (1.0 / FIXED_DBL_SCALE))
 #define IntToFixed(I)   ((I) << FIXED_SHIFT)
@@ -1321,7 +1321,7 @@ struct gl_texture_format {
 };
 
 
-#define MAX_3D_TEXTURE_SIZE (1 << (MAX_3D_TEXTURE_LEVELS - 1))
+constexpr int MAX_3D_TEXTURE_SIZE = 1 << (MAX_3D_TEXTURE_LEVELS - 1);
 
 /**
  * Texture image state.  Describes the dimensions of a texture image,

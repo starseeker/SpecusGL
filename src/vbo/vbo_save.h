@@ -89,11 +89,10 @@ struct vbo_save_vertex_list {
  * likelyhood as it occurs.  No reason we couldn't change usage
  * internally even though this probably isn't allowed for client VBOs?
  */
-#define VBO_SAVE_BUFFER_SIZE (8*1024) /* dwords */
-#define VBO_SAVE_PRIM_SIZE   128
-#define VBO_SAVE_PRIM_WEAK 0x40
-
-#define VBO_SAVE_FALLBACK    0x10000000
+constexpr int  VBO_SAVE_BUFFER_SIZE = 8 * 1024; /* dwords */
+constexpr int  VBO_SAVE_PRIM_SIZE   = 128;
+constexpr GLuint VBO_SAVE_PRIM_WEAK   = 0x40U;
+constexpr GLuint VBO_SAVE_FALLBACK    = 0x10000000U;
 
 /* Storage to be shared among several vertex_lists.
  */

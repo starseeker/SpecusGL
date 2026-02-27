@@ -34,7 +34,7 @@
  * Number of STATE_* values we need to address any GL state.
  * Used to dimension arrays.
  */
-#define STATE_LENGTH 5
+constexpr int STATE_LENGTH = 5;
 
 
 /**
