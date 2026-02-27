@@ -83,7 +83,7 @@
     extern GLvoid
     _slang_code_object_dtr(slang_code_object *);
 
-    extern GLboolean
+    extern bool
     _slang_compile(GLcontext *ctx, struct gl_shader *shader);
 
 

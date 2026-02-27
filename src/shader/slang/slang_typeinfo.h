@@ -84,10 +84,10 @@ _slang_locate_function(const slang_function_scope *funcs,
 		       slang_atom_pool *atoms, slang_info_log *log);
 
 
-extern GLboolean
+extern bool
 _slang_is_swizzle(const char *field, GLuint rows, slang_swizzle *swz);
 
-extern GLboolean
+extern bool
 _slang_is_swizzle_mask(const slang_swizzle *swz, GLuint rows);
 
 extern GLvoid
@@ -197,15 +197,15 @@ inline void slang_type_specifier_dtr(slang_type_specifier *self) {
     self->type = SLANG_SPEC_VOID;
 }
 
-/** Deep-copy a type specifier; always succeeds (returns GL_TRUE). */
-inline GLboolean
+/** Deep-copy a type specifier; always succeeds. */
+inline bool
 slang_type_specifier_copy(slang_type_specifier *x, const slang_type_specifier *y)
 {
     *x = *y;   /* invokes deep-copy assignment */
-    return GL_TRUE;
+    return true;
 }
 
-extern GLboolean
+extern bool
 slang_type_specifier_equal(const slang_type_specifier *,
 			   const slang_type_specifier *);
 
@@ -219,11 +219,11 @@ struct slang_typeinfo {
 };
 
 /** Legacy wrapper – spec is default-constructed; just initialise the plain fields. */
-inline GLboolean slang_typeinfo_construct(slang_typeinfo *ti) {
+inline bool slang_typeinfo_construct(slang_typeinfo *ti) {
     ti->can_be_referenced = false;
     ti->is_swizzled = false;
     ti->array_len = 0;
-    return GL_TRUE;
+    return true;
 }
 
 /** Legacy wrapper – spec destructor runs automatically; nothing else to free. */
@@ -237,21 +237,21 @@ inline void slang_typeinfo_destruct(slang_typeinfo *ti) {
  * Returns GL_TRUE on success.
  * Returns GL_FALSE otherwise.
  */
-extern GLboolean
+extern bool
 _slang_typeof_operation(const slang_assemble_ctx *,
 			slang_operation *,
 			slang_typeinfo *);
 
-extern GLboolean
+extern bool
 _slang_typeof_operation_(slang_operation *,
 			 const slang_name_space *,
 			 slang_typeinfo *, slang_atom_pool *,
 			 slang_info_log *log);
 
-extern GLboolean
+extern bool
 _slang_type_is_matrix(slang_type_specifier_type);
 
-extern GLboolean
+extern bool
 _slang_type_is_vector(slang_type_specifier_type);
 
 extern slang_type_specifier_type

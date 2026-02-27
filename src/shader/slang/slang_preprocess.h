@@ -31,10 +31,10 @@
 #include "slang_log.h"
 
 
-extern GLboolean
+extern bool
 _slang_preprocess_version(const char *, GLuint *, GLuint *, slang_info_log *);
 
-extern GLboolean
+extern bool
 _slang_preprocess_directives(slang_string *output, const char *input,
 			     slang_info_log *);
 

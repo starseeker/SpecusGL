@@ -62,10 +62,10 @@ struct slang_emit_info {
     GLuint NumSubroutines;
 
     /* code-gen options */
-    GLboolean EmitHighLevelInstructions;
-    GLboolean EmitCondCodes;
-    GLboolean EmitComments;
-    GLboolean EmitBeginEndSub; /* XXX TEMPORARY */
+    bool EmitHighLevelInstructions;
+    bool EmitCondCodes;
+    bool EmitComments;
+    bool EmitBeginEndSub; /* XXX TEMPORARY */
 };
 
 
@@ -137,7 +137,7 @@ _slang_new_ir_storage(enum register_file file, GLint index, GLint size)
  * Allocate temporary storage for an intermediate result (such as for
  * a multiply or add, etc.
  */
-static GLboolean
+static bool
 alloc_temp_storage(slang_emit_info *emitInfo, slang_ir_node *n, GLint size)
 {
     assert(!n->Var);
@@ -149,9 +149,9 @@ alloc_temp_storage(slang_emit_info *emitInfo, slang_ir_node *n, GLint size)
 			     "Ran out of registers, too many temporaries");
 	delete n->Store;
 	n->Store = nullptr;
-	return GL_FALSE;
+	return false;
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1741,13 +1741,13 @@ _slang_resolve_subroutines(slang_emit_info *emitInfo)
 
 
 
-GLboolean
+bool
 _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
-		 struct gl_program *prog, GLboolean withEnd,
+		 struct gl_program *prog, bool withEnd,
 		 slang_info_log *log)
 {
     GET_CURRENT_CONTEXT(ctx);
-    GLboolean success;
+    bool success;
     slang_emit_info emitInfo;
 
     emitInfo.log = log;
@@ -1758,10 +1758,10 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
     emitInfo.EmitHighLevelInstructions = ctx->Shader.EmitHighLevelInstructions;
     emitInfo.EmitCondCodes = ctx->Shader.EmitCondCodes;
     emitInfo.EmitComments = ctx->Shader.EmitComments;
-    emitInfo.EmitBeginEndSub = GL_TRUE;
+    emitInfo.EmitBeginEndSub = true;
 
     if (!emitInfo.EmitCondCodes) {
-	emitInfo.EmitHighLevelInstructions = GL_TRUE;
+	emitInfo.EmitHighLevelInstructions = true;
     }
 
     (void) emit(&emitInfo, n);
@@ -1775,7 +1775,7 @@ _slang_emit_code(slang_ir_node *n, slang_var_table *vt,
 
     _slang_resolve_subroutines(&emitInfo);
 
-    success = GL_TRUE;
+    success = true;
 
 #if 0
     printf("*********** End emit code (%u inst):\n", static_cast<GLuint>(prog->Instructions.size()));
