@@ -88,41 +88,41 @@ _math_init_transformation(void);
 #define CLIP_NEAR_SHIFT  	4
 #define CLIP_FAR_SHIFT  	5
 
-#define CLIP_RIGHT_BIT   0x01
-#define CLIP_LEFT_BIT    0x02
-#define CLIP_TOP_BIT     0x04
-#define CLIP_BOTTOM_BIT  0x08
-#define CLIP_NEAR_BIT    0x10
-#define CLIP_FAR_BIT     0x20
-#define CLIP_USER_BIT    0x40
-#define CLIP_CULL_BIT    0x80
-#define CLIP_FRUSTUM_BITS    0x3f
+constexpr GLubyte CLIP_RIGHT_BIT     = 0x01U;
+constexpr GLubyte CLIP_LEFT_BIT      = 0x02U;
+constexpr GLubyte CLIP_TOP_BIT       = 0x04U;
+constexpr GLubyte CLIP_BOTTOM_BIT    = 0x08U;
+constexpr GLubyte CLIP_NEAR_BIT      = 0x10U;
+constexpr GLubyte CLIP_FAR_BIT       = 0x20U;
+constexpr GLubyte CLIP_USER_BIT      = 0x40U;
+constexpr GLubyte CLIP_CULL_BIT      = 0x80U;
+constexpr GLubyte CLIP_FRUSTUM_BITS  = 0x3fU;
 
 
-typedef GLvector4f * (_XFORMAPIP clip_func)(GLvector4f *vClip,
+using clip_func = GLvector4f *(*)(GLvector4f *vClip,
 	GLvector4f *vProj,
 	GLubyte clipMask[],
 	GLubyte *orMask,
 	GLubyte *andMask);
 
-typedef void (*dotprod_func)(GLfloat *out,
-			     GLuint out_stride,
-			     CONST GLvector4f *coord_vec,
-			     CONST GLfloat plane[4]);
+using dotprod_func = void (*)(GLfloat *out,
+			      GLuint out_stride,
+			      CONST GLvector4f *coord_vec,
+			      CONST GLfloat plane[4]);
 
-typedef void (*vec_copy_func)(GLvector4f *to,
-			      CONST GLvector4f *from);
+using vec_copy_func = void (*)(GLvector4f *to,
+			       CONST GLvector4f *from);
 
 
 
 /*
  * Functions for transformation of normals in the VB.
  */
-typedef void (_NORMAPIP normal_func)(CONST GLmatrix *mat,
-				     GLfloat scale,
-				     CONST GLvector4f *in,
-				     CONST GLfloat lengths[],
-				     GLvector4f *dest);
+using normal_func = void (*)(CONST GLmatrix *mat,
+			     GLfloat scale,
+			     CONST GLvector4f *in,
+			     CONST GLfloat lengths[],
+			     GLvector4f *dest);
 
 
 /* Flags for selecting a normal transformation function.
@@ -140,7 +140,7 @@ constexpr GLuint NORM_TRANSFORM_NO_ROT = 0x8;   /* apply the transformation matr
  *     when the mask byte is zero.  This is always present as a
  *     parameter, to allow a unified interface.
  */
-typedef void (_XFORMAPIP transform_func)(GLvector4f *to_vec,
+using transform_func = void (*)(GLvector4f *to_vec,
 	CONST GLfloat m[16],
 	CONST GLvector4f *from_vec);
 

@@ -844,7 +844,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 
 #ifdef PIXEL_ADDRESS
 		    {
-			pRow = (PIXEL_TYPE *) PIXEL_ADDRESS(InterpToInt(fxLeftEdge), span.y);
+			pRow = static_cast<PIXEL_TYPE *>(PIXEL_ADDRESS(InterpToInt(fxLeftEdge), span.y));
 			dPRowOuter = -((int)BYTES_PER_ROW) + idxOuter * sizeof(PIXEL_TYPE);
 			/* negative because Y=0 at bottom and increases upward */
 		    }
@@ -880,8 +880,8 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 			    fdzOuter = (GLint)(span.attrStepY[FRAG_ATTRIB_WPOS][2] + dxOuter * span.attrStepX[FRAG_ATTRIB_WPOS][2]);
 			}
 #  ifdef DEPTH_TYPE
-			zRow = (DEPTH_TYPE *)
-			       zrb->GetPointer(ctx, InterpToInt(fxLeftEdge), span.y);
+			zRow = static_cast<DEPTH_TYPE *>(
+			       zrb->GetPointer(ctx, InterpToInt(fxLeftEdge), span.y));
 			dZRowOuter = (ctx->DrawBuffer->Width + idxOuter) * sizeof(DEPTH_TYPE);
 #  endif
 		    }
@@ -1182,11 +1182,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 			fError -= INTERP_ONE;
 
 #ifdef PIXEL_ADDRESS
-			pRow = (PIXEL_TYPE *)((GLubyte *) pRow + dPRowOuter);
+			pRow = reinterpret_cast<PIXEL_TYPE *>(reinterpret_cast<GLubyte *>(pRow) + dPRowOuter);
 #endif
 #ifdef INTERP_Z
 #  ifdef DEPTH_TYPE
-			zRow = (DEPTH_TYPE *)((GLubyte *) zRow + dZRowOuter);
+			zRow = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zRow) + dZRowOuter);
 #  endif
 			zLeft += fdzOuter;
 #endif
@@ -1226,11 +1226,11 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #endif
 		    } else {
 #ifdef PIXEL_ADDRESS
-			pRow = (PIXEL_TYPE *)((GLubyte *) pRow + dPRowInner);
+			pRow = reinterpret_cast<PIXEL_TYPE *>(reinterpret_cast<GLubyte *>(pRow) + dPRowInner);
 #endif
 #ifdef INTERP_Z
 #  ifdef DEPTH_TYPE
-			zRow = (DEPTH_TYPE *)((GLubyte *) zRow + dZRowInner);
+			zRow = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zRow) + dZRowInner);
 #  endif
 			zLeft += fdzInner;
 #endif

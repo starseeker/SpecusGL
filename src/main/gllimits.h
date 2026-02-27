@@ -37,79 +37,79 @@
 /*@{*/
 
 /** Maximum modelview matrix stack depth */
-#define MAX_MODELVIEW_STACK_DEPTH 32
+constexpr int MAX_MODELVIEW_STACK_DEPTH = 32;
 
 /** Maximum projection matrix stack depth */
-#define MAX_PROJECTION_STACK_DEPTH 32
+constexpr int MAX_PROJECTION_STACK_DEPTH = 32;
 
 /** Maximum texture matrix stack depth */
-#define MAX_TEXTURE_STACK_DEPTH 10
+constexpr int MAX_TEXTURE_STACK_DEPTH = 10;
 
 /** Maximum color matrix stack depth */
-#define MAX_COLOR_STACK_DEPTH 4
+constexpr int MAX_COLOR_STACK_DEPTH = 4;
 
 /** Maximum attribute stack depth */
-#define MAX_ATTRIB_STACK_DEPTH 16
+constexpr int MAX_ATTRIB_STACK_DEPTH = 16;
 
 /** Maximum client attribute stack depth */
-#define MAX_CLIENT_ATTRIB_STACK_DEPTH 16
+constexpr int MAX_CLIENT_ATTRIB_STACK_DEPTH = 16;
 
 /** Maximum recursion depth of display list calls */
-#define MAX_LIST_NESTING 64
+constexpr int MAX_LIST_NESTING = 64;
 
 /** Maximum number of lights */
-#define MAX_LIGHTS 8
+constexpr int MAX_LIGHTS = 8;
 
 /** Maximum user-defined clipping planes */
-#define MAX_CLIP_PLANES 6
+constexpr int MAX_CLIP_PLANES = 6;
 
 /** Maximum pixel map lookup table size */
-#define MAX_PIXEL_MAP_TABLE 256
+constexpr int MAX_PIXEL_MAP_TABLE = 256;
 
 /** Maximum number of auxillary color buffers */
-#define MAX_AUX_BUFFERS 4
+constexpr int MAX_AUX_BUFFERS = 4;
 
 /** Maximum order (degree) of curves */
-#   define MAX_EVAL_ORDER 30
+constexpr int MAX_EVAL_ORDER = 30;
 
 /** Maximum Name stack depth */
-#define MAX_NAME_STACK_DEPTH 64
+constexpr int MAX_NAME_STACK_DEPTH = 64;
 
 /** Minimum point size */
-#define MIN_POINT_SIZE 1.0
+constexpr float MIN_POINT_SIZE = 1.0F;
 /** Maximum point size */
-#define MAX_POINT_SIZE 20.0
+constexpr float MAX_POINT_SIZE = 20.0F;
 /** Point size granularity */
-#define POINT_SIZE_GRANULARITY 0.1
+constexpr float POINT_SIZE_GRANULARITY = 0.1F;
 
 /** Minimum line width */
-#define MIN_LINE_WIDTH 1.0
+constexpr float MIN_LINE_WIDTH = 1.0F;
 /** Maximum line width */
-#define MAX_LINE_WIDTH 10.0
+constexpr float MAX_LINE_WIDTH = 10.0F;
 /** Line width granularity */
-#define LINE_WIDTH_GRANULARITY 0.1
+constexpr float LINE_WIDTH_GRANULARITY = 0.1F;
 
 /** Max texture palette / color table size */
-#define MAX_COLOR_TABLE_SIZE 256
+constexpr int MAX_COLOR_TABLE_SIZE = 256;
 
 /** Number of 1D/2D texture mipmap levels */
-#define MAX_TEXTURE_LEVELS 12
+constexpr int MAX_TEXTURE_LEVELS = 12;
 
 /** Number of 3D texture mipmap levels */
-#define MAX_3D_TEXTURE_LEVELS 9
+constexpr int MAX_3D_TEXTURE_LEVELS = 9;
 
 /** Number of cube texture mipmap levels - GL_ARB_texture_cube_map */
-#define MAX_CUBE_TEXTURE_LEVELS 12
+constexpr int MAX_CUBE_TEXTURE_LEVELS = 12;
 
 /** Maximum rectangular texture size - GL_NV_texture_rectangle */
-#define MAX_TEXTURE_RECT_SIZE 2048
+constexpr int MAX_TEXTURE_RECT_SIZE = 2048;
 
 /** Number of texture units - GL_ARB_multitexture
  * This needs to be the larger of MAX_TEXTURE_COORD_UNITS and
  * MAX_TEXTURE_IMAGE_UNITS seen below, since MAX_TEXTURE_UNITS is used
  * to dimension some arrays that store both coord and image data.
 */
-#define MAX_TEXTURE_UNITS 8
+constexpr int MAX_TEXTURE_UNITS = 8;
 
 /*@}*/
 
@@ -122,103 +122,103 @@
  * And, GL_MAX_TEXTURE_UNITS <= MAX_TEXTURE_COORD_UNITS.
  */
 /*@{*/
-#define MAX_TEXTURE_COORD_UNITS 8
-#define MAX_TEXTURE_IMAGE_UNITS 8
+constexpr int MAX_TEXTURE_COORD_UNITS = 8;
+constexpr int MAX_TEXTURE_IMAGE_UNITS = 8;
 /*@}*/
 
 /**
  * Maximum viewport/image width. Must accomodate all texture sizes too.
  */
-#define MAX_WIDTH 4096
+constexpr int MAX_WIDTH = 4096;
 /** Maximum viewport/image height */
-#define MAX_HEIGHT 4096
+constexpr int MAX_HEIGHT = 4096;
 
 /** Maxmimum size for CVA.  May be overridden by the drivers.  */
-#define MAX_ARRAY_LOCK_SIZE 3000
+constexpr int MAX_ARRAY_LOCK_SIZE = 3000;
 
 /** Subpixel precision for antialiasing, window coordinate snapping */
-#define SUB_PIXEL_BITS 4
+constexpr int SUB_PIXEL_BITS = 4;
 
 /** Size of histogram tables */
-#define HISTOGRAM_TABLE_SIZE 256
+constexpr int HISTOGRAM_TABLE_SIZE = 256;
 
 /** Max convolution filter width */
-#define MAX_CONVOLUTION_WIDTH 9
+constexpr int MAX_CONVOLUTION_WIDTH = 9;
 /** Max convolution filter height */
-#define MAX_CONVOLUTION_HEIGHT 9
+constexpr int MAX_CONVOLUTION_HEIGHT = 9;
 
 /** For GL_ARB_texture_compression */
-#define MAX_COMPRESSED_TEXTURE_FORMATS 25
+constexpr int MAX_COMPRESSED_TEXTURE_FORMATS = 25;
 
 /** For GL_EXT_texture_filter_anisotropic */
-#define MAX_TEXTURE_MAX_ANISOTROPY 16.0
+constexpr float MAX_TEXTURE_MAX_ANISOTROPY = 16.0F;
 
 /** For GL_EXT_texture_lod_bias (typically MAX_TEXTURE_LEVELS - 1) */
-#define MAX_TEXTURE_LOD_BIAS 11.0
+constexpr float MAX_TEXTURE_LOD_BIAS = 11.0F;
 
 /** For GL_NV_vertex_program */
 /*@{*/
-#define MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS 128
-#define MAX_NV_VERTEX_PROGRAM_TEMPS         12
-#define MAX_NV_VERTEX_PROGRAM_PARAMS        128	/* KW: power of two */
-#define MAX_NV_VERTEX_PROGRAM_INPUTS        16
-#define MAX_NV_VERTEX_PROGRAM_OUTPUTS       15
+constexpr int MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS = 128;
+constexpr int MAX_NV_VERTEX_PROGRAM_TEMPS = 12;
+constexpr int MAX_NV_VERTEX_PROGRAM_PARAMS = 128; /* KW: power of two */
+constexpr int MAX_NV_VERTEX_PROGRAM_INPUTS = 16;
+constexpr int MAX_NV_VERTEX_PROGRAM_OUTPUTS = 15;
 /*@}*/
 
 /** For GL_NV_fragment_program */
 /*@{*/
-#define MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS 1024 /* 72 for GL_ARB_f_p */
-#define MAX_NV_FRAGMENT_PROGRAM_TEMPS         96
-#define MAX_NV_FRAGMENT_PROGRAM_PARAMS        64
-#define MAX_NV_FRAGMENT_PROGRAM_INPUTS        12
-#define MAX_NV_FRAGMENT_PROGRAM_OUTPUTS        3
-#define MAX_NV_FRAGMENT_PROGRAM_WRITE_ONLYS    2
+constexpr int MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS = 1024; /* 72 for GL_ARB_f_p */
+constexpr int MAX_NV_FRAGMENT_PROGRAM_TEMPS = 96;
+constexpr int MAX_NV_FRAGMENT_PROGRAM_PARAMS = 64;
+constexpr int MAX_NV_FRAGMENT_PROGRAM_INPUTS = 12;
+constexpr int MAX_NV_FRAGMENT_PROGRAM_OUTPUTS = 3;
+constexpr int MAX_NV_FRAGMENT_PROGRAM_WRITE_ONLYS = 2;
 /*@}*/
 
 /** For GL_ARB_vertex_program */
 /*@{*/
-#define MAX_VERTEX_PROGRAM_ADDRESS_REGS 1
-#define MAX_VERTEX_PROGRAM_ATTRIBS     16
+constexpr int MAX_VERTEX_PROGRAM_ADDRESS_REGS = 1;
+constexpr int MAX_VERTEX_PROGRAM_ATTRIBS = 16;
 /*@}*/
 
 /** For GL_ARB_fragment_program */
 /*@{*/
-#define MAX_FRAGMENT_PROGRAM_ADDRESS_REGS 0
-#define MAX_FRAGMENT_PROGRAM_ALU_INSTRUCTIONS 48
-#define MAX_FRAGMENT_PROGRAM_TEX_INSTRUCTIONS 24
-#define MAX_FRAGMENT_PROGRAM_TEX_INDIRECTIONS  4
+constexpr int MAX_FRAGMENT_PROGRAM_ADDRESS_REGS = 0;
+constexpr int MAX_FRAGMENT_PROGRAM_ALU_INSTRUCTIONS = 48;
+constexpr int MAX_FRAGMENT_PROGRAM_TEX_INSTRUCTIONS = 24;
+constexpr int MAX_FRAGMENT_PROGRAM_TEX_INDIRECTIONS = 4;
 /*@}*/
 
 /** For any program target/extension */
 /*@{*/
-#define MAX_PROGRAM_LOCAL_PARAMS 128 /* KW: power of two */
-#define MAX_PROGRAM_ENV_PARAMS 128
-#define MAX_PROGRAM_MATRICES 8
-#define MAX_PROGRAM_MATRIX_STACK_DEPTH 4
-#define MAX_PROGRAM_CALL_DEPTH 8
-#define MAX_PROGRAM_TEMPS 128
-#define MAX_PROGRAM_ADDRESS_REGS 2
-#define MAX_UNIFORMS 128
-#define MAX_VARYING 8
+constexpr int MAX_PROGRAM_LOCAL_PARAMS = 128; /* KW: power of two */
+constexpr int MAX_PROGRAM_ENV_PARAMS = 128;
+constexpr int MAX_PROGRAM_MATRICES = 8;
+constexpr int MAX_PROGRAM_MATRIX_STACK_DEPTH = 4;
+constexpr int MAX_PROGRAM_CALL_DEPTH = 8;
+constexpr int MAX_PROGRAM_TEMPS = 128;
+constexpr int MAX_PROGRAM_ADDRESS_REGS = 2;
+constexpr int MAX_UNIFORMS = 128;
+constexpr int MAX_VARYING = 8;
 /*@}*/
 
 /** For GL_ARB_vertex_shader */
 /*@{*/
-#define MAX_VERTEX_ATTRIBS 16
-#define MAX_VERTEX_TEXTURE_IMAGE_UNITS MAX_TEXTURE_UNITS
-#define MAX_COMBINED_TEXTURE_IMAGE_UNITS (MAX_TEXTURE_IMAGE_UNITS + MAX_VERTEX_TEXTURE_IMAGE_UNITS)
+constexpr int MAX_VERTEX_ATTRIBS = 16;
+constexpr int MAX_VERTEX_TEXTURE_IMAGE_UNITS = MAX_TEXTURE_UNITS;
+constexpr int MAX_COMBINED_TEXTURE_IMAGE_UNITS = MAX_TEXTURE_IMAGE_UNITS + MAX_VERTEX_TEXTURE_IMAGE_UNITS;
 /*@}*/
 
 
 /** For GL_ARB_draw_buffers */
 /*@{*/
-#define MAX_DRAW_BUFFERS 4
+constexpr int MAX_DRAW_BUFFERS = 4;
 /*@}*/
 
 
 /** For GL_EXT_framebuffer_object */
 /*@{*/
-#define MAX_COLOR_ATTACHMENTS 8
+constexpr int MAX_COLOR_ATTACHMENTS = 8;
 /*@}*/
 
 
@@ -268,10 +268,10 @@
  *
  * \note Changes will almost certainly cause problems at this time.
  */
-#define RCOMP 0
-#define GCOMP 1
-#define BCOMP 2
-#define ACOMP 3
+constexpr int RCOMP = 0;
+constexpr int GCOMP = 1;
+constexpr int BCOMP = 2;
+constexpr int ACOMP = 3;
 
 
 /*
@@ -313,7 +313,7 @@
  *
  * Used in array_cache and tnl modules.
  */
-#define MAX_CLIPPED_VERTICES ((2 * (6 + MAX_CLIP_PLANES))+1)
+constexpr int MAX_CLIPPED_VERTICES = (2 * (6 + MAX_CLIP_PLANES)) + 1;
 
 
 #endif /* MESA_GLLIMITS_H_INCLUDED */

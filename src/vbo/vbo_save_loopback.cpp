@@ -41,7 +41,7 @@
 #include "dispatch.h"
 
 
-typedef void (*attr_func)(GLcontext *ctx, GLint target, const GLfloat *);
+using attr_func = void (*)(GLcontext *ctx, GLint target, const GLfloat *);
 
 
 /* This file makes heavy use of the aliasing of NV vertex attributes

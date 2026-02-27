@@ -109,7 +109,7 @@ pp_annotate(slang_string *output, const char *fmt, ...)
     char buffer[1024];
 
     va_start(va, fmt);
-    vsprintf(buffer, fmt, va);
+    vsnprintf(buffer, sizeof(buffer), fmt, va);
     va_end(va);
     slang_string_pushs(output, buffer, strlen(buffer));
 #else

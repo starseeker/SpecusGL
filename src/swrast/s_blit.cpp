@@ -127,9 +127,9 @@ blit_nearest(GLcontext *ctx,
     GLint comps, pixelSize;
     GLint prevY = -1;
 
-    typedef void (*resample_func)(GLint srcWidth, GLint dstWidth,
-				  const GLvoid *srcBuffer, GLvoid *dstBuffer,
-				  GLboolean flip);
+    using resample_func = void (*)(GLint srcWidth, GLint dstWidth,
+				   const GLvoid *srcBuffer, GLvoid *dstBuffer,
+				   GLboolean flip);
     resample_func resampleRow;
 
     switch (buffer) {

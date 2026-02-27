@@ -121,9 +121,9 @@ read_depth_pixels(GLcontext *ctx,
 	ASSERT(rb->InternalFormat == GL_DEPTH_COMPONENT24);
 	ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	for (j = 0; j < height; j++, y++) {
-	    GLuint *dest = (GLuint *)
+	    GLuint *dest = static_cast<GLuint *>(
 			   _mesa_image_address2d(packing, pixels, width, height,
-						 GL_DEPTH_COMPONENT, type, j, 0);
+						 GL_DEPTH_COMPONENT, type, j, 0));
 	    GLint k;
 	    rb->GetRow(ctx, width, x, y, dest);
 	    /* convert range from 24-bit to 32-bit */
@@ -490,9 +490,9 @@ read_depth_stencil_pixels(GLcontext *ctx,
 	for (i = 0; i < height; i++) {
 	    GLstencil stencilVals[MAX_WIDTH];
 
-	    GLuint *depthStencilDst = (GLuint *)
+	    GLuint *depthStencilDst = static_cast<GLuint *>(
 				      _mesa_image_address2d(packing, pixels, width, height,
-					      GL_DEPTH_STENCIL_EXT, type, i, 0);
+					      GL_DEPTH_STENCIL_EXT, type, i, 0));
 
 	    _swrast_read_stencil_span(ctx, stencilRb, width,
 				      x, y + i, stencilVals);

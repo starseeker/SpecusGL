@@ -51,7 +51,7 @@
 #include <cstdlib>
 
 
-#define MAXSTRING 4000  /* for vsnprintf() */
+constexpr int MAXSTRING = 4000; /* for vsnprintf() */
 
 #ifdef WIN32
 #define vsnprintf _vsnprintf
@@ -370,7 +370,7 @@ int
 _mesa_ffs(int i)
 {
 #if (defined(_WIN32) && !defined(__MINGW32__) ) || defined(__IBMC__) || defined(__IBMCPP__)
-    register int bit = 0;
+    int bit = 0;
     if (i != 0) {
 	if ((i & 0xffff) == 0) {
 	    bit += 16;
@@ -636,14 +636,14 @@ _mesa_strdup(const char *s)
 /** \name I/O */
 /*@{*/
 
-/** Wrapper around vsprintf() */
+/** Wrapper around vsnprintf() */
 int
 _mesa_sprintf(char *str, const char *fmt, ...)
 {
     int r;
     va_list args;
     va_start(args, fmt);
-    r = vsprintf(str, fmt, args);
+    r = vsnprintf(str, MAXSTRING, fmt, args);
     va_end(args);
     return r;
 }

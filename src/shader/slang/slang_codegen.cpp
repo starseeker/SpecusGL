@@ -1171,7 +1171,7 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
     char name[200];
 
     prevFuncEndLabel = A->curFuncEndLabel;
-    sprintf(name, "__endOfFunc_%s_", reinterpret_cast<char *>(fun->header.a_name));
+    snprintf(name, sizeof(name), "__endOfFunc_%s_", reinterpret_cast<char *>(fun->header.a_name));
     A->curFuncEndLabel = _slang_label_new(name);
     assert(A->curFuncEndLabel);
 

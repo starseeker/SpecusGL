@@ -37,19 +37,19 @@
 
 
 
-#define VEC_DIRTY_0        0x1
-#define VEC_DIRTY_1        0x2
-#define VEC_DIRTY_2        0x4
-#define VEC_DIRTY_3        0x8
-#define VEC_MALLOC         0x10 /* storage field points to self-allocated mem*/
-#define VEC_NOT_WRITEABLE  0x40	/* writable elements to hold clipped data */
-#define VEC_BAD_STRIDE     0x100 /* matches tnl's prefered stride */
+constexpr GLuint VEC_DIRTY_0       = 0x001U;
+constexpr GLuint VEC_DIRTY_1       = 0x002U;
+constexpr GLuint VEC_DIRTY_2       = 0x004U;
+constexpr GLuint VEC_DIRTY_3       = 0x008U;
+constexpr GLuint VEC_MALLOC        = 0x010U; /* storage field points to self-allocated mem*/
+constexpr GLuint VEC_NOT_WRITEABLE = 0x040U; /* writable elements to hold clipped data */
+constexpr GLuint VEC_BAD_STRIDE    = 0x100U; /* matches tnl's prefered stride */
 
 
-#define VEC_SIZE_1   VEC_DIRTY_0
-#define VEC_SIZE_2   (VEC_DIRTY_0|VEC_DIRTY_1)
-#define VEC_SIZE_3   (VEC_DIRTY_0|VEC_DIRTY_1|VEC_DIRTY_2)
-#define VEC_SIZE_4   (VEC_DIRTY_0|VEC_DIRTY_1|VEC_DIRTY_2|VEC_DIRTY_3)
+constexpr GLuint VEC_SIZE_1 = VEC_DIRTY_0;
+constexpr GLuint VEC_SIZE_2 = VEC_DIRTY_0 | VEC_DIRTY_1;
+constexpr GLuint VEC_SIZE_3 = VEC_DIRTY_0 | VEC_DIRTY_1 | VEC_DIRTY_2;
+constexpr GLuint VEC_SIZE_4 = VEC_DIRTY_0 | VEC_DIRTY_1 | VEC_DIRTY_2 | VEC_DIRTY_3;
 
 
 

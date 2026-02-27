@@ -40,10 +40,10 @@
 #define LIGHT_MATERIAL      0x2
 #define MAX_LIGHT_FUNC      0x4
 
-typedef void (*light_func)(GLcontext *ctx,
-			   struct vertex_buffer *VB,
-			   struct tnl_pipeline_stage *stage,
-			   GLvector4f *input);
+using light_func = void (*)(GLcontext *ctx,
+			    struct vertex_buffer *VB,
+			    struct tnl_pipeline_stage *stage,
+			    GLvector4f *input);
 
 /**
  * Information for updating current material attributes from vertex color,

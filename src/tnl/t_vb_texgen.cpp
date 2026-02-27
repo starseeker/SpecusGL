@@ -55,9 +55,9 @@
 
 struct texgen_stage_data;
 
-typedef void (*texgen_func)(GLcontext *ctx,
-			    struct texgen_stage_data *store,
-			    GLuint unit);
+using texgen_func = void (*)(GLcontext *ctx,
+			     struct texgen_stage_data *store,
+			     GLuint unit);
 
 
 struct texgen_stage_data {
@@ -161,10 +161,10 @@ static void build_m2(GLfloat f[][3], GLfloat m[],
 
 
 
-typedef void (*build_m_func)(GLfloat f[][3],
-			     GLfloat m[],
-			     const GLvector4f *normal,
-			     const GLvector4f *eye);
+using build_m_func = void (*)(GLfloat f[][3],
+			      GLfloat m[],
+			      const GLvector4f *normal,
+			      const GLvector4f *eye);
 
 
 static build_m_func build_m_tab[5] = {
@@ -235,10 +235,10 @@ static void build_f2(GLfloat *f,
     }
 }
 
-typedef void (*build_f_func)(GLfloat *f,
-			     GLuint fstride,
-			     const GLvector4f *normal_vec,
-			     const GLvector4f *eye);
+using build_f_func = void (*)(GLfloat *f,
+			      GLuint fstride,
+			      const GLvector4f *normal_vec,
+			      const GLvector4f *eye);
 
 
 

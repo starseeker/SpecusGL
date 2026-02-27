@@ -103,22 +103,22 @@ typedef int GLfixed;
 constexpr GLuint FIXED_FRAC_BITS = 11;
 #endif
 
-#define FIXED_SHIFT     FIXED_FRAC_BITS
+constexpr GLuint FIXED_SHIFT = FIXED_FRAC_BITS;
+constexpr GLuint FIXED_HALF  = 1U << (FIXED_SHIFT - 1U);
 constexpr GLuint FIXED_ONE = 1 << FIXED_SHIFT;
-#define FIXED_HALF      (1 << (FIXED_SHIFT-1))
 constexpr GLuint FIXED_FRAC_MASK = FIXED_ONE - 1;
 constexpr GLuint FIXED_INT_MASK = ~FIXED_FRAC_MASK;
 constexpr GLint FIXED_EPSILON = 1;
-#define FIXED_SCALE     ((float) FIXED_ONE)
-#define FIXED_DBL_SCALE ((double) FIXED_ONE)
+constexpr float  FIXED_SCALE     = static_cast<float>(FIXED_ONE);
+constexpr double FIXED_DBL_SCALE = static_cast<double>(FIXED_ONE);
 #define FloatToFixed(X) (IROUND((X) * FIXED_SCALE))
 #define FixedToDouble(X) ((X) * (1.0 / FIXED_DBL_SCALE))
 #define IntToFixed(I)   ((I) << FIXED_SHIFT)
 #define FixedToInt(X)   ((X) >> FIXED_SHIFT)
-#define FixedToUns(X)   (((unsigned int)(X)) >> FIXED_SHIFT)
-#define FixedCeil(X)    (((X) + FIXED_ONE - FIXED_EPSILON) & FIXED_INT_MASK)
-#define FixedFloor(X)   ((X) & FIXED_INT_MASK)
-#define FixedToFloat(X) ((X) * (1.0F / FIXED_SCALE))
+#define FixedToUns(X)   (static_cast<GLuint>(X) >> FIXED_SHIFT)
+#define FixedCeil(X)    (((X) + static_cast<GLfixed>(FIXED_ONE) - FIXED_EPSILON) & static_cast<GLfixed>(FIXED_INT_MASK))
+#define FixedFloor(X)   ((X) & static_cast<GLfixed>(FIXED_INT_MASK))
+#define FixedToFloat(X) (static_cast<GLfloat>(X) * (1.0F / FIXED_SCALE))
 #define PosFloatToFixed(X)      FloatToFixed(X)
 #define SignedFloatToFixed(X)   FloatToFixed(X)
 
@@ -135,7 +135,7 @@ struct gl_texture_image;
 struct gl_texture_object;
 struct __GLcontextRec;
 using GLcontext = __GLcontextRec;
-typedef __GLcontextModes GLvisual;
+using GLvisual = __GLcontextModes;
 struct gl_framebuffer;
 using GLframebuffer = gl_framebuffer;
 /*@}*/
@@ -1191,23 +1191,23 @@ constexpr GLuint TEXGEN_NEED_EYE_COORD = (TEXGEN_SPHERE_MAP | TEXGEN_REFLECTION_
 
 
 /* A selection of state flags to make driver and module's lives easier. */
-#define ENABLE_TEXGEN0        0x1
-#define ENABLE_TEXGEN1        0x2
-#define ENABLE_TEXGEN2        0x4
-#define ENABLE_TEXGEN3        0x8
-#define ENABLE_TEXGEN4        0x10
-#define ENABLE_TEXGEN5        0x20
-#define ENABLE_TEXGEN6        0x40
-#define ENABLE_TEXGEN7        0x80
+constexpr GLuint ENABLE_TEXGEN0 = 0x01U;
+constexpr GLuint ENABLE_TEXGEN1 = 0x02U;
+constexpr GLuint ENABLE_TEXGEN2 = 0x04U;
+constexpr GLuint ENABLE_TEXGEN3 = 0x08U;
+constexpr GLuint ENABLE_TEXGEN4 = 0x10U;
+constexpr GLuint ENABLE_TEXGEN5 = 0x20U;
+constexpr GLuint ENABLE_TEXGEN6 = 0x40U;
+constexpr GLuint ENABLE_TEXGEN7 = 0x80U;
 
-#define ENABLE_TEXMAT0        0x1	/* Ie. not the identity matrix */
-#define ENABLE_TEXMAT1        0x2
-#define ENABLE_TEXMAT2        0x4
-#define ENABLE_TEXMAT3        0x8
-#define ENABLE_TEXMAT4        0x10
-#define ENABLE_TEXMAT5        0x20
-#define ENABLE_TEXMAT6        0x40
-#define ENABLE_TEXMAT7        0x80
+constexpr GLuint ENABLE_TEXMAT0 = 0x01U; /* Ie. not the identity matrix */
+constexpr GLuint ENABLE_TEXMAT1 = 0x02U;
+constexpr GLuint ENABLE_TEXMAT2 = 0x04U;
+constexpr GLuint ENABLE_TEXMAT3 = 0x08U;
+constexpr GLuint ENABLE_TEXMAT4 = 0x10U;
+constexpr GLuint ENABLE_TEXMAT5 = 0x20U;
+constexpr GLuint ENABLE_TEXMAT6 = 0x40U;
+constexpr GLuint ENABLE_TEXMAT7 = 0x80U;
 
 #define ENABLE_TEXGEN(i) (ENABLE_TEXGEN0 << (i))
 #define ENABLE_TEXMAT(i) (ENABLE_TEXMAT0 << (i))
@@ -1321,7 +1321,7 @@ struct gl_texture_format {
 };
 
 
-#define MAX_3D_TEXTURE_SIZE (1 << (MAX_3D_TEXTURE_LEVELS - 1))
+constexpr int MAX_3D_TEXTURE_SIZE = 1 << (MAX_3D_TEXTURE_LEVELS - 1);
 
 /**
  * Texture image state.  Describes the dimensions of a texture image,

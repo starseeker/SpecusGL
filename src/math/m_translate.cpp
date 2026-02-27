@@ -36,47 +36,47 @@
 
 
 
-typedef void (*trans_1f_func)(GLfloat *to,
-			      CONST void *ptr,
-			      GLuint stride,
-			      GLuint start,
-			      GLuint n);
-
-typedef void (*trans_1ui_func)(GLuint *to,
+using trans_1f_func = void (*)(GLfloat *to,
 			       CONST void *ptr,
 			       GLuint stride,
 			       GLuint start,
 			       GLuint n);
 
-typedef void (*trans_1ub_func)(GLubyte *to,
+using trans_1ui_func = void (*)(GLuint *to,
+				CONST void *ptr,
+				GLuint stride,
+				GLuint start,
+				GLuint n);
+
+using trans_1ub_func = void (*)(GLubyte *to,
+				CONST void *ptr,
+				GLuint stride,
+				GLuint start,
+				GLuint n);
+
+using trans_4ub_func = void (*)(GLubyte(*to)[4],
+				CONST void *ptr,
+				GLuint stride,
+				GLuint start,
+				GLuint n);
+
+using trans_4us_func = void (*)(GLushort(*to)[4],
+				CONST void *ptr,
+				GLuint stride,
+				GLuint start,
+				GLuint n);
+
+using trans_4f_func = void (*)(GLfloat(*to)[4],
 			       CONST void *ptr,
 			       GLuint stride,
 			       GLuint start,
 			       GLuint n);
 
-typedef void (*trans_4ub_func)(GLubyte(*to)[4],
-			       CONST void *ptr,
-			       GLuint stride,
-			       GLuint start,
-			       GLuint n);
-
-typedef void (*trans_4us_func)(GLushort(*to)[4],
-			       CONST void *ptr,
-			       GLuint stride,
-			       GLuint start,
-			       GLuint n);
-
-typedef void (*trans_4f_func)(GLfloat(*to)[4],
-			      CONST void *ptr,
-			      GLuint stride,
-			      GLuint start,
-			      GLuint n);
-
-typedef void (*trans_3fn_func)(GLfloat(*to)[3],
-			       CONST void *ptr,
-			       GLuint stride,
-			       GLuint start,
-			       GLuint n);
+using trans_3fn_func = void (*)(GLfloat(*to)[3],
+				CONST void *ptr,
+				GLuint stride,
+				GLuint start,
+				GLuint n);
 
 
 

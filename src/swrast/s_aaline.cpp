@@ -339,8 +339,8 @@ compute_coveragei(const struct LineInfo *info,
 
 
 
-typedef void (*plot_func)(GLcontext *ctx, struct LineInfo *line,
-			  int ix, int iy);
+using plot_func = void (*)(GLcontext *ctx, struct LineInfo *line,
+			   int ix, int iy);
 
 
 

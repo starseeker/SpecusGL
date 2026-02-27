@@ -311,7 +311,7 @@ static void FETCH(rgba_f32)(const struct gl_texture_image *texImage,
 static void store_texel_rgba_f32(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 4);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -351,7 +351,7 @@ static void FETCH(rgba_f16)(const struct gl_texture_image *texImage,
 static void store_texel_rgba_f16(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 4);
     dst[0] = _mesa_float_to_half(rgba[RCOMP]);
     dst[1] = _mesa_float_to_half(rgba[GCOMP]);
@@ -390,7 +390,7 @@ static void FETCH(rgb_f32)(const struct gl_texture_image *texImage,
 static void store_texel_rgb_f32(struct gl_texture_image *texImage,
 				GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 3);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -429,7 +429,7 @@ static void FETCH(rgb_f16)(const struct gl_texture_image *texImage,
 static void store_texel_rgb_f16(struct gl_texture_image *texImage,
 				GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 3);
     dst[0] = _mesa_float_to_half(rgba[RCOMP]);
     dst[1] = _mesa_float_to_half(rgba[GCOMP]);
@@ -466,7 +466,7 @@ static void FETCH(alpha_f32)(const struct gl_texture_image *texImage,
 static void store_texel_alpha_f32(struct gl_texture_image *texImage,
 				  GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 1);
     dst[0] = rgba[ACOMP];
 }
@@ -501,7 +501,7 @@ static void FETCH(alpha_f16)(const struct gl_texture_image *texImage,
 static void store_texel_alpha_f16(struct gl_texture_image *texImage,
 				  GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 1);
     dst[0] = _mesa_float_to_half(rgba[ACOMP]);
 }
@@ -538,7 +538,7 @@ static void FETCH(luminance_f32)(const struct gl_texture_image *texImage,
 static void store_texel_luminance_f32(struct gl_texture_image *texImage,
 				      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 1);
     dst[0] = rgba[RCOMP];
 }
@@ -575,7 +575,7 @@ static void FETCH(luminance_f16)(const struct gl_texture_image *texImage,
 static void store_texel_luminance_f16(struct gl_texture_image *texImage,
 				      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 1);
     dst[0] = _mesa_float_to_half(rgba[RCOMP]);
 }
@@ -612,7 +612,7 @@ static void FETCH(luminance_alpha_f32)(const struct gl_texture_image *texImage,
 static void store_texel_luminance_alpha_f32(struct gl_texture_image *texImage,
 	GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 2);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[ACOMP];
@@ -650,7 +650,7 @@ static void FETCH(luminance_alpha_f16)(const struct gl_texture_image *texImage,
 static void store_texel_luminance_alpha_f16(struct gl_texture_image *texImage,
 	GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 2);
     dst[0] = _mesa_float_to_half(rgba[RCOMP]);
     dst[1] = _mesa_float_to_half(rgba[ACOMP]);
@@ -687,7 +687,7 @@ static void FETCH(intensity_f32)(const struct gl_texture_image *texImage,
 static void store_texel_intensity_f32(struct gl_texture_image *texImage,
 				      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLfloat *dst = TEXEL_ADDR(GLfloat, texImage, i, j, k, 1);
     dst[0] = rgba[RCOMP];
 }
@@ -723,7 +723,7 @@ static void FETCH(intensity_f16)(const struct gl_texture_image *texImage,
 static void store_texel_intensity_f16(struct gl_texture_image *texImage,
 				      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLfloat *rgba = (const GLfloat *) texel;
+    const GLfloat *rgba = static_cast<const GLfloat *>(texel);
     GLhalfARB *dst = TEXEL_ADDR(GLhalfARB, texImage, i, j, k, 1);
     dst[0] = _mesa_float_to_half(rgba[RCOMP]);
 }
@@ -1486,7 +1486,7 @@ static void store_texel_z24_s8(struct gl_texture_image *texImage,
 {
     /* only store Z, not stencil */
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
-    GLfloat depth = *((GLfloat *) texel);
+    GLfloat depth = *static_cast<const GLfloat *>(texel);
     GLuint zi = ((GLuint)(depth * 0xffffff)) << 8;
     *dst = zi | (*dst & 0xff);
 }

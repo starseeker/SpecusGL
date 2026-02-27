@@ -42,13 +42,13 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "imports.h"
 
 
-#define VBO_MAX_PRIM 64
+constexpr int VBO_MAX_PRIM = 64;
 
 /* Wierd implementation stuff:
  */
-#define VBO_VERT_BUFFER_SIZE (1024*16)	/* dwords == 64k */
-#define VBO_MAX_ATTR_CODEGEN 16
-#define ERROR_ATTRIB 16
+constexpr int VBO_VERT_BUFFER_SIZE = 1024 * 16; /* dwords == 64k */
+constexpr int VBO_MAX_ATTR_CODEGEN = 16;
+constexpr int ERROR_ATTRIB         = 16;
 
 
 
@@ -71,7 +71,7 @@ struct vbo_exec_copied_vtx {
 };
 
 
-typedef void (*vbo_attrfv_func)(const GLfloat *);
+using vbo_attrfv_func = void (*)(const GLfloat *);
 
 
 struct vbo_exec_context {

@@ -31,13 +31,14 @@
 #include <unordered_set>
 
 
-#define slang_string_compare(str1, str2) strcmp (str1, str2)
-#define slang_string_copy(dst, src) strcpy (dst, src)
-#define slang_string_length(str) strlen (str)
+inline int slang_string_compare(const char *str1, const char *str2) { return strcmp(str1, str2); }
+inline char *slang_string_copy(char *dst, const char *src) { return strcpy(dst, src); }
+inline size_t slang_string_length(const char *str) { return strlen(str); }
 
 char *slang_string_concat(char *, const char *);
 
-/* slang_string – backed by std::string */
+using slang_atom = GLvoid *;
+constexpr slang_atom SLANG_ATOM_NULL = nullptr;
 
 using slang_string = std::string;
 
@@ -65,9 +66,6 @@ inline const char *slang_string_cstr(slang_string *s) { return s->c_str(); }
 
 /* slang_atom */
 
-typedef GLvoid *slang_atom;
-
-#define SLANG_ATOM_NULL ((slang_atom) 0)
 
 /**
  * Atom pool – a string-interning table for the GLSL compiler.

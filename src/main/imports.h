@@ -120,7 +120,13 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
  * this macro.
  * Both pointers/offsets are expressed in bytes.
  */
-#define ADD_POINTERS(A, B)  ( (GLubyte *) (A) + (uintptr_t) (B) )
+/** Add two pointers/byte offsets, returning a GLubyte *. */
+inline const GLubyte *ADD_POINTERS(const void *a, const void *b) noexcept {
+    return static_cast<const GLubyte *>(a) + reinterpret_cast<uintptr_t>(b);
+}
+inline GLubyte *ADD_POINTERS(void *a, const void *b) noexcept {
+    return static_cast<GLubyte *>(a) + reinterpret_cast<uintptr_t>(b);
+}
 
 
 /**
@@ -150,8 +156,8 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
  * Math macros
  */
 
-#define MAX_GLUSHORT	0xffff
-#define MAX_GLUINT	0xffffffff
+constexpr GLushort MAX_GLUSHORT = 0xffffU;
+constexpr GLuint   MAX_GLUINT   = 0xffffffffU;
 
 #ifndef M_PI
 #define M_PI (3.1415926536)

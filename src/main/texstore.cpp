@@ -1005,16 +1005,16 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 	/* extract RGB from RGBA */
 	GLint img, row, col;
 	for (img = 0; img < srcDepth; img++) {
-	    GLchan *dstImage = (GLchan *)
-			       (static_cast<GLubyte *>(dstAddr)
+	    GLchan *dstImage = static_cast<GLchan *>(
+			       static_cast<GLubyte *>(dstAddr)
 				+ dstImageOffsets[dstZoffset + img] * dstFormat->TexelBytes
 				+ dstYoffset * dstRowStride
 				+ dstXoffset * dstFormat->TexelBytes);
 
 	    const GLint srcRowStride = _mesa_image_row_stride(srcPacking,
 				       srcWidth, srcFormat, srcType);
-	    GLchan *srcRow = (GLchan *) _mesa_image_address(dims, srcPacking,
-			     srcAddr, srcWidth, srcHeight, srcFormat, srcType, img, 0, 0);
+	    GLchan *srcRow = static_cast<GLchan *>(_mesa_image_address(dims, srcPacking,
+			     srcAddr, srcWidth, srcHeight, srcFormat, srcType, img, 0, 0));
 	    GLchan *dstRow = dstImage;
 	    for (row = 0; row < srcHeight; row++) {
 		for (col = 0; col < srcWidth; col++) {
@@ -1023,7 +1023,7 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 		    dstRow[col * 3 + BCOMP] = srcRow[col * 4 + BCOMP];
 		}
 		dstRow += dstRowStride / sizeof(GLchan);
-		srcRow = (GLchan *)(static_cast<GLubyte *>(srcRow) + srcRowStride);
+		srcRow = static_cast<GLchan *>(static_cast<GLubyte *>(srcRow) + srcRowStride);
 	    }
 	}
     } else if (!ctx->_ImageTransferState &&
@@ -1507,7 +1507,7 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 
 	    for (row = 0; row < srcHeight; row++) {
 		for (col = 0; col < srcWidth; col++) {
-		    *(GLuint *)(dstRow + col * 4)  = (srcRow[col * 4 + RCOMP] << 16 |
+		    *reinterpret_cast<GLuint *>(dstRow + col * 4)  = (srcRow[col * 4 + RCOMP] << 16 |
 						      srcRow[col * 4 + GCOMP] << 8 |
 						      srcRow[col * 4 + BCOMP] << 0 |
 						      srcRow[col * 4 + ACOMP] << 24);
@@ -2485,7 +2485,7 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 			      + dstYoffset * dstRowStride
 			      + dstXoffset * dstFormat->TexelBytes;
 	    for (row = 0; row < srcHeight; row++) {
-		GLhalfARB *dstTexel = (GLhalfARB *) dstRow;
+		GLhalfARB *dstTexel = reinterpret_cast<GLhalfARB *>(dstRow);
 		GLint i;
 		for (i = 0; i < srcWidth * components; i++) {
 		    dstTexel[i] = _mesa_float_to_half(src[i]);
@@ -3483,9 +3483,9 @@ _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
 	 * A hardware driver might use a sophisticated blit to move the
 	 * texture data to the PBO if the PBO is in VRAM along with the texture.
 	 */
-	GLubyte *buf = (GLubyte *)
+	GLubyte *buf = static_cast<GLubyte *>(
 		       ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
-					     GL_WRITE_ONLY_ARB, ctx->Pack.BufferObj);
+					     GL_WRITE_ONLY_ARB, ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,"glGetTexImage(PBO is mapped)");

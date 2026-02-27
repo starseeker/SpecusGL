@@ -248,6 +248,6 @@ union node {
     GLvoid *data;
 };
 
-typedef union node Node;
+using Node = node;
 
 #endif /* DLIST_NODE_H */

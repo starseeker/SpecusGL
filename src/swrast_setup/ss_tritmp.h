@@ -102,7 +102,7 @@ static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2)
 			}
 		    } else {
 			struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-			GLfloat *vbindex = (GLfloat *)VB->IndexPtr[1]->data;
+			GLfloat *vbindex = reinterpret_cast<GLfloat *>(VB->IndexPtr[1]->data);
 			saved_index[0] = v[0]->index;
 			saved_index[1] = v[1]->index;
 			saved_index[2] = v[2]->index;

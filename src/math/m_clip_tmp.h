@@ -47,7 +47,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_points4)(GLvector4f *clip_vec,
 	GLubyte *andMask)
 {
     const GLuint stride = clip_vec->stride;
-    const GLfloat *from = (GLfloat *)clip_vec->start;
+    const GLfloat *from = static_cast<const GLfloat *>(clip_vec->start);
     const GLuint count = clip_vec->count;
     GLuint c = 0;
     GLfloat(*vProj)[4] = (GLfloat(*)[4])proj_vec->start;
@@ -125,7 +125,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_np_points4)(GLvector4f *clip_vec,
 {
     const GLuint stride = clip_vec->stride;
     const GLuint count = clip_vec->count;
-    const GLfloat *from = (GLfloat *)clip_vec->start;
+    const GLfloat *from = static_cast<const GLfloat *>(clip_vec->start);
     GLuint c = 0;
     GLubyte tmpAndMask = *andMask;
     GLubyte tmpOrMask = *orMask;
@@ -178,7 +178,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_points3)(GLvector4f *clip_vec,
 {
     const GLuint stride = clip_vec->stride;
     const GLuint count = clip_vec->count;
-    const GLfloat *from = (GLfloat *)clip_vec->start;
+    const GLfloat *from = static_cast<const GLfloat *>(clip_vec->start);
     GLubyte tmpOrMask = *orMask;
     GLubyte tmpAndMask = *andMask;
     GLuint i;
@@ -211,7 +211,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_points2)(GLvector4f *clip_vec,
 {
     const GLuint stride = clip_vec->stride;
     const GLuint count = clip_vec->count;
-    const GLfloat *from = (GLfloat *)clip_vec->start;
+    const GLfloat *from = static_cast<const GLfloat *>(clip_vec->start);
     GLubyte tmpOrMask = *orMask;
     GLubyte tmpAndMask = *andMask;
     GLuint i;
