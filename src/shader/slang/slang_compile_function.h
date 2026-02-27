@@ -105,7 +105,7 @@ extern bool
 slang_function_scope_find_by_name(slang_function_scope *, slang_atom, bool);
 
 extern slang_function *
-slang_function_scope_find(slang_function_scope *, slang_function *, int);
+slang_function_scope_find(slang_function_scope *, slang_function *, bool);
 
 
 

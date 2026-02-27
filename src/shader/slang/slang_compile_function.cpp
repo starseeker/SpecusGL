@@ -154,7 +154,7 @@ slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
 	}
     }
     if (all_scopes && funcs->outer_scope != nullptr)
-	return slang_function_scope_find(funcs->outer_scope, fun, 1);
+	return slang_function_scope_find(funcs->outer_scope, fun, true);
     return nullptr;
 }
 

@@ -1577,7 +1577,7 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
      * the current scope is being searched to allow built-in function
      * overriding
      */
-    found_func = slang_function_scope_find(O->funs, &parsed_func, 0);
+    found_func = slang_function_scope_find(O->funs, &parsed_func, false);
     if (found_func == nullptr) {
 	/* New function, add it to the function list */
 	O->funs->functions.push_back(std::move(parsed_func));
