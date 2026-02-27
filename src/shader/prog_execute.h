@@ -28,14 +28,14 @@
 
 
 
-typedef void (*FetchTexelLodFunc)(GLcontext *ctx, const GLfloat texcoord[4],
-				  GLfloat lambda, GLuint unit, GLfloat color[4]);
+using FetchTexelLodFunc = void (*)(GLcontext *ctx, const GLfloat texcoord[4],
+				   GLfloat lambda, GLuint unit, GLfloat color[4]);
 
-typedef void (*FetchTexelDerivFunc)(GLcontext *ctx, const GLfloat texcoord[4],
-				    const GLfloat texdx[4],
-				    const GLfloat texdy[4],
-				    GLfloat lodBias,
-				    GLuint unit, GLfloat color[4]);
+using FetchTexelDerivFunc = void (*)(GLcontext *ctx, const GLfloat texcoord[4],
+				     const GLfloat texdx[4],
+				     const GLfloat texdy[4],
+				     GLfloat lodBias,
+				     GLuint unit, GLfloat color[4]);
 
 
 /** The larger of VERT_RESULT_MAX, FRAG_RESULT_MAX */

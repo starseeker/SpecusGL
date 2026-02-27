@@ -387,11 +387,11 @@ str_length(const byte *str)
 /*
     string to byte map typedef
 */
-typedef struct map_byte_ {
+struct map_byte {
     byte *key;
     byte data;
-    struct map_byte_ *next;
-} map_byte;
+    map_byte *next;
+};
 
 static void map_byte_create(map_byte **ma)
 {
@@ -464,11 +464,11 @@ static int map_byte_find(map_byte **ma, const byte *key, byte *data)
     entry that references the regbyte. The first matching entry is used to return the current
     value it holds. If no entry is found, the default value is returned.
 */
-typedef struct regbyte_ctx_ {
+struct regbyte_ctx {
     map_byte *m_regbyte;
     byte m_current_value;
-    struct regbyte_ctx_ *m_prev;
-} regbyte_ctx;
+    regbyte_ctx *m_prev;
+};
 
 static void regbyte_ctx_create(regbyte_ctx **re)
 {
@@ -520,14 +520,14 @@ enum emit_dest {
 /*
     emit typedef
 */
-typedef struct emit_ {
+struct emit {
     emit_dest m_emit_dest;
     emit_type m_emit_type;      /* ed_output */
     byte m_byte;                /* et_byte */
     map_byte *m_regbyte;        /* ed_regbyte */
     byte *m_regname;            /* ed_regbyte - temporary */
-    struct emit_ *m_next;
-} emit;
+    emit *m_next;
+};
 
 static void emit_create(emit **em)
 {
@@ -607,11 +607,12 @@ static int emit_push(emit *_E, byte *_P, byte c, unsigned int _Pos, regbyte_ctx 
 /*
     error typedef
 */
-typedef struct error_ {
+struct rule;  /* forward declaration for rule *m_token pointer below */
+struct error {
     byte *m_text;
     byte *m_token_name;
-    struct rule_ *m_token;
-} error;
+    rule *m_token;
+};
 
 static void error_create(error **er)
 {
@@ -632,10 +633,10 @@ static void error_destroy(error **er)
     }
 }
 
-struct dict_;
+struct dict;
 
 static byte *
-error_get_token(error *, struct dict_ *, const byte *, int);
+error_get_token(error *, dict *, const byte *, int);
 
 /*
     condition operand type typedef
@@ -648,12 +649,12 @@ enum cond_oper_type {
 /*
     condition operand typedef
 */
-typedef struct cond_oper_ {
+struct cond_oper {
     cond_oper_type m_type;
     byte m_byte;            /* cot_byte */
     map_byte *m_regbyte;    /* cot_regbyte */
     byte *m_regname;        /* cot_regbyte - temporary */
-} cond_oper;
+};
 
 /*
     condition type typedef
@@ -666,10 +667,10 @@ enum cond_type {
 /*
     condition typedef
 */
-typedef struct cond_ {
+struct cond {
     cond_type m_type;
     cond_oper m_operands[2];
-} cond;
+};
 
 static void cond_create(cond **co)
 {
@@ -706,16 +707,16 @@ enum spec_type {
 /*
     specifier typedef
 */
-typedef struct spec_ {
+struct spec {
     spec_type m_spec_type;
     byte m_byte[2];                 /* st_byte, st_byte_range */
     byte *m_string;                 /* st_string */
-    struct rule_ *m_rule;           /* st_identifier, st_identifier_loop */
+    rule *m_rule;           /* st_identifier, st_identifier_loop */
     emit *m_emits;
     error *m_errtext;
     cond *m_cond;
-    struct spec_ *next;
-} spec;
+    spec *next;
+};
 
 static void spec_create(spec **sp)
 {
@@ -759,12 +760,12 @@ enum oper {
 /*
     rule typedef
 */
-typedef struct rule_ {
+struct rule {
     oper m_oper;
     spec *m_specs;
-    struct rule_ *next;
+    rule *next;
     int m_referenced;
-} rule;
+};
 
 static void rule_create(rule **ru)
 {
@@ -801,14 +802,14 @@ static grammar next_valid_grammar_id(void)
 /*
     dictionary typedef
 */
-typedef struct dict_ {
+struct dict {
     rule *m_rulez;
     rule *m_syntax;
     rule *m_string;
     map_byte *m_regbytes;
     grammar m_id;
-    struct dict_ *next;
-} dict;
+    dict *next;
+};
 
 static void dict_create(dict **di)
 {
@@ -853,10 +854,10 @@ static dict *g_dicts = nullptr;
 /*
     byte array typedef
 */
-typedef struct barray_ {
+struct barray {
     byte *data;
     unsigned int len;
-} barray;
+};
 
 static void barray_create(barray **ba)
 {
@@ -939,10 +940,10 @@ static int barray_push(barray **ba, emit *em, byte c, unsigned int pos, regbyte_
 /*
     byte pool typedef
 */
-typedef struct bytepool_ {
+struct bytepool {
     byte *_F;
     unsigned int _Siz;
-} bytepool;
+};
 
 static void bytepool_destroy(bytepool **by)
 {
@@ -988,11 +989,11 @@ static int bytepool_reserve(bytepool *by, unsigned int n)
 /*
     string to string map typedef
 */
-typedef struct map_str_ {
+struct map_str {
     byte *key;
     byte *data;
-    struct map_str_ *next;
-} map_str;
+    map_str *next;
+};
 
 static void map_str_create(map_str **ma)
 {
@@ -1043,11 +1044,11 @@ static int map_str_find(map_str **ma, const byte *key, byte **data)
 /*
     string to rule map typedef
 */
-typedef struct map_rule_ {
+struct map_rule {
     byte *key;
     rule *data;
-    struct map_rule_ *next;
-} map_rule;
+    map_rule *next;
+};
 
 static void map_rule_create(map_rule **ma)
 {
@@ -2523,14 +2524,14 @@ error_get_token(error *er, dict *di, const byte *text, int ind)
     return str;
 }
 
-typedef struct grammar_load_state_ {
+struct grammar_load_state {
     dict *di;
     byte *syntax_symbol;
     byte *string_symbol;
     map_str *maps;
     map_byte *mapb;
     map_rule *mapr;
-} grammar_load_state;
+};
 
 static void grammar_load_state_create(grammar_load_state **gr)
 {

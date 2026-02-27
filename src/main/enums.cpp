@@ -4802,7 +4802,7 @@ static const unsigned reduced_enums[1277] = {
     30, /* GL_ALL_CLIENT_ATTRIB_BITS */
 };
 
-typedef int (*cfunc)(const void *, const void *);
+    using cfunc = int (*)(const void *, const void *);
 
 /**
  * Compare a key name to an element in the \c all_enums array.

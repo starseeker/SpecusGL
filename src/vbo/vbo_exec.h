@@ -71,7 +71,7 @@ struct vbo_exec_copied_vtx {
 };
 
 
-typedef void (*vbo_attrfv_func)(const GLfloat *);
+using vbo_attrfv_func = void (*)(const GLfloat *);
 
 
 struct vbo_exec_context {

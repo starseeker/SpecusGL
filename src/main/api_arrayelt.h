@@ -38,7 +38,7 @@
  * so that the AEcontext pointer in GLcontext can be typed correctly.
  */
 
-typedef void (GLAPIENTRY *attrib_func)(GLuint indx, const void *data);
+using attrib_func = void (GLAPIENTRY *)(GLuint indx, const void *data);
 
 struct AEarray {
     const struct gl_client_array *array;

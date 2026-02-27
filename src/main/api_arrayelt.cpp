@@ -34,7 +34,7 @@
 #include "glapioffsets.h"
 #include "dispatch.h"
 
-typedef void (GLAPIENTRY *array_func)(const void *);
+using array_func = void (GLAPIENTRY *)(const void *);
 
 #define AE_CONTEXT(ctx) ((ctx)->aelt_context)
 

@@ -39,21 +39,21 @@
 #include "texstore.h"
 #include <vector>
 
-typedef void (*dxtFetchTexelFuncExt)(GLint srcRowstride, GLubyte *pixdata, GLint col, GLint row, GLvoid *texelOut);
+using dxtFetchTexelFuncExt = void (*)(GLint srcRowstride, GLubyte *pixdata, GLint col, GLint row, GLvoid *texelOut);
 
 dxtFetchTexelFuncExt fetch_ext_rgb_dxt1 = nullptr;
 dxtFetchTexelFuncExt fetch_ext_rgba_dxt1 = nullptr;
 dxtFetchTexelFuncExt fetch_ext_rgba_dxt3 = nullptr;
 dxtFetchTexelFuncExt fetch_ext_rgba_dxt5 = nullptr;
 
-typedef void (*dxtCompressTexFuncExt)(GLint srccomps, GLint width,
-				      GLint height, const GLchan *srcPixData,
-				      GLenum destformat, GLubyte *dest,
-				      GLint dstRowStride);
+using dxtCompressTexFuncExt = void (*)(GLint srccomps, GLint width,
+				       GLint height, const GLchan *srcPixData,
+				       GLenum destformat, GLubyte *dest,
+				       GLint dstRowStride);
 
 static dxtCompressTexFuncExt ext_tx_compress_dxtn = nullptr;
 
-typedef void (*GenericFunc)(void);
+using GenericFunc = void (*)();
 
 void
 _mesa_init_texture_s3tc(GLcontext *ctx)
