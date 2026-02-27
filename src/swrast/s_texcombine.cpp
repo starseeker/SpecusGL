@@ -82,9 +82,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
     GLchan ccolor[3][MAX_WIDTH][4];
     GLuint i, j;
 
-    ASSERT(ctx->Extensions.EXT_texture_env_combine ||
+    assert(ctx->Extensions.EXT_texture_env_combine ||
 	   ctx->Extensions.ARB_texture_env_combine);
-    ASSERT(SWRAST_CONTEXT(ctx)->_AnyTextureCombine);
+    assert(SWRAST_CONTEXT(ctx)->_AnyTextureCombine);
 
 #ifdef __clang_analyzer__
     // Validate the arrays up front for clang - Coverity doesn't seem
@@ -152,7 +152,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		/* ARB_texture_env_crossbar source */
 	    {
 		const GLuint srcUnit = srcRGB - GL_TEXTURE0;
-		ASSERT(srcUnit < ctx->Const.MaxTextureUnits);
+		assert(srcUnit < ctx->Const.MaxTextureUnits);
 		if (!ctx->Texture.Unit[srcUnit]._ReallyEnabled)
 		    return;
 		argRGB[j] = (const GLchan(*)[4])
@@ -180,7 +180,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		    dst[i][BCOMP] = src[i][ACOMP];
 		}
 	    } else {
-		ASSERT(textureUnit->_CurrentCombine->OperandRGB[j] ==GL_ONE_MINUS_SRC_ALPHA);
+		assert(textureUnit->_CurrentCombine->OperandRGB[j] ==GL_ONE_MINUS_SRC_ALPHA);
 		for (i = 0; i < n; i++) {
 		    dst[i][RCOMP] = CHAN_MAX - src[i][ACOMP];
 		    dst[i][GCOMP] = CHAN_MAX - src[i][ACOMP];
@@ -227,7 +227,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		/* ARB_texture_env_crossbar source */
 	    {
 		const GLuint srcUnit = srcA - GL_TEXTURE0;
-		ASSERT(srcUnit < ctx->Const.MaxTextureUnits);
+		assert(srcUnit < ctx->Const.MaxTextureUnits);
 		if (!ctx->Texture.Unit[srcUnit]._ReallyEnabled)
 		    return;
 		argA[j] = (const GLchan(*)[4])
@@ -815,11 +815,11 @@ texture_apply(const GLcontext *ctx,
     GLenum format;
     (void) primary_rgba;
 
-    ASSERT(texUnit);
-    ASSERT(texUnit->_Current);
+    assert(texUnit);
+    assert(texUnit->_Current);
 
     baseLevel = texUnit->_Current->BaseLevel;
-    ASSERT(texUnit->_Current->Image[0][baseLevel]);
+    assert(texUnit->_Current->Image[0][baseLevel]);
 
     format = texUnit->_Current->Image[0][baseLevel]->_BaseFormat;
 
@@ -1154,8 +1154,8 @@ _swrast_texture_span(GLcontext *ctx, SWspan *span)
     GLchan primary_rgba[MAX_WIDTH][4];
     GLuint unit;
 
-    ASSERT(span->end < MAX_WIDTH);
-    ASSERT(span->arrayMask & SPAN_TEXTURE);
+    assert(span->end < MAX_WIDTH);
+    assert(span->arrayMask & SPAN_TEXTURE);
 
     /*
      * Save copy of the incoming fragment colors (the GL_PRIMARY_COLOR)

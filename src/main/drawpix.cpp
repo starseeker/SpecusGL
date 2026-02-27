@@ -195,7 +195,7 @@ _mesa_DrawPixels(GLsizei width, GLsizei height,
 			      ctx->Current.RasterIndex,
 			      ctx->Current.RasterTexCoords[0]);
     } else {
-	ASSERT(ctx->RenderMode == GL_SELECT);
+	assert(ctx->RenderMode == GL_SELECT);
 	/* Do nothing.  See OpenGL Spec, Appendix B, Corollary 6. */
     }
 }
@@ -256,7 +256,7 @@ _mesa_CopyPixels(GLint srcx, GLint srcy, GLsizei width, GLsizei height,
 			      ctx->Current.RasterIndex,
 			      ctx->Current.RasterTexCoords[0]);
     } else {
-	ASSERT(ctx->RenderMode == GL_SELECT);
+	assert(ctx->RenderMode == GL_SELECT);
 	/* Do nothing.  See OpenGL Spec, Appendix B, Corollary 6. */
     }
 }
@@ -353,7 +353,7 @@ _mesa_Bitmap(GLsizei width, GLsizei height,
 			      ctx->Current.RasterIndex,
 			      ctx->Current.RasterTexCoords[0]);
     } else {
-	ASSERT(ctx->RenderMode == GL_SELECT);
+	assert(ctx->RenderMode == GL_SELECT);
 	/* Do nothing.  See OpenGL Spec, Appendix B, Corollary 6. */
     }
 #endif
@@ -419,7 +419,7 @@ _mesa_DrawDepthPixelsMESA(GLsizei width, GLsizei height,
 			      ctx->Current.RasterIndex,
 			      ctx->Current.RasterTexCoords[0]);
     } else {
-	ASSERT(ctx->RenderMode == GL_SELECT);
+	assert(ctx->RenderMode == GL_SELECT);
 	/* Do nothing.  See OpenGL Spec, Appendix B, Corollary 6. */
     }
 }

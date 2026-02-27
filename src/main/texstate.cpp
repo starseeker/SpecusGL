@@ -72,8 +72,8 @@ _mesa_copy_texture_state(const GLcontext *src, GLcontext *dst)
 {
     GLuint i;
 
-    ASSERT(src);
-    ASSERT(dst);
+    assert(src);
+    assert(dst);
 
     dst->Texture.CurrentUnit = src->Texture.CurrentUnit;
     dst->Texture._GenFlags = src->Texture._GenFlags;

@@ -73,7 +73,7 @@ get_buffer(GLcontext *ctx, GLenum target)
     }
 
     /* bufObj should point to NullBufferObj or a user-created buffer object */
-    ASSERT(bufObj);
+    assert(bufObj);
 
     return bufObj;
 }
@@ -170,10 +170,10 @@ _mesa_unbind_buffer_object(GLcontext *ctx, struct gl_buffer_object *bufObj)
 {
     if (bufObj != ctx->Array.NullBufferObj) {
 	if (bufObj->unref()) {
-	    ASSERT(ctx->Array.ArrayBufferObj != bufObj);
-	    ASSERT(ctx->Array.ElementArrayBufferObj != bufObj);
-	    ASSERT(ctx->Array.ArrayObj->Vertex.BufferObj != bufObj);
-	    ASSERT(ctx->Driver.DeleteBuffer);
+	    assert(ctx->Array.ArrayBufferObj != bufObj);
+	    assert(ctx->Array.ElementArrayBufferObj != bufObj);
+	    assert(ctx->Array.ArrayObj->Vertex.BufferObj != bufObj);
+	    assert(ctx->Driver.DeleteBuffer);
 	    ctx->Driver.DeleteBuffer(ctx, bufObj);
 	}
     }
@@ -268,7 +268,7 @@ _mesa_buffer_subdata(GLcontext *ctx, GLenum target, GLintptrARB offset,
     (void) target;
 
     /* this should have been caught in _mesa_BufferSubData() */
-    ASSERT(size + offset <= (GLsizeiptrARB)bufObj->Data.size());
+    assert(size + offset <= (GLsizeiptrARB)bufObj->Data.size());
 
     if (!bufObj->Data.empty()) {
 	memcpy(bufObj->Data.data() + offset, data, size);
@@ -331,7 +331,7 @@ _mesa_buffer_map(GLcontext *ctx, GLenum target, GLenum access,
     (void) ctx;
     (void) target;
     (void) access;
-    ASSERT(!bufObj->OnCard);
+    assert(!bufObj->OnCard);
     /* Just return a direct pointer to the data */
     if (bufObj->Pointer) {
 	/* already mapped! */
@@ -357,7 +357,7 @@ _mesa_buffer_unmap(GLcontext *ctx, GLenum target,
 {
     (void) ctx;
     (void) target;
-    ASSERT(!bufObj->OnCard);
+    assert(!bufObj->OnCard);
     /* XXX we might assert here that bufObj->Pointer is non-null */
     bufObj->Pointer = nullptr;
     return GL_TRUE;
@@ -406,7 +406,7 @@ _mesa_validate_pbo_access(GLuint dimensions,
 			  GLsizei width, GLsizei height, GLsizei depth,
 			  GLenum format, GLenum type, const GLvoid *ptr)
 {
-    ASSERT(pack->BufferObj->Name != 0);
+    assert(pack->BufferObj->Name != 0);
 
     if (pack->BufferObj->Data.empty())
 	/* no buffer! */
@@ -498,7 +498,7 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
 	newBufObj = _mesa_lookup_bufferobj(ctx, buffer);
 	if (!newBufObj) {
 	    /* if this is a new buffer object id, allocate a buffer object now */
-	    ASSERT(ctx->Driver.NewBufferObject);
+	    assert(ctx->Driver.NewBufferObject);
 	    newBufObj = ctx->Driver.NewBufferObject(ctx, buffer, target);
 	    if (!newBufObj) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindBufferARB");
@@ -520,7 +520,7 @@ _mesa_BindBufferARB(GLenum target, GLuint buffer)
     if (oldBufObj) {
 	if (oldBufObj->unref()) {
 	    assert(oldBufObj->Name != 0);
-	    ASSERT(ctx->Driver.DeleteBuffer);
+	    assert(ctx->Driver.DeleteBuffer);
 	    ctx->Driver.DeleteBuffer(ctx, oldBufObj);
 	}
     }
@@ -572,7 +572,7 @@ _mesa_DeleteBuffersARB(GLsizei n, const GLuint *ids)
 	    /* unbind any vertex pointers bound to this buffer */
 	    GLuint j;
 
-	    ASSERT(bufObj->Name == ids[i]);
+	    assert(bufObj->Name == ids[i]);
 
 	    /* Unbind this buffer from all vertex array slots */
 	    rebind_buf_slot(&ctx->Array.ArrayObj->Vertex.BufferObj,       bufObj, ctx->Array.NullBufferObj);
@@ -723,7 +723,7 @@ _mesa_BufferDataARB(GLenum target, GLsizeiptrARB size,
 	return;
     }
 
-    ASSERT(ctx->Driver.BufferData);
+    assert(ctx->Driver.BufferData);
 
     /* Give the buffer object to the driver!  <data> may be null! */
     ctx->Driver.BufferData(ctx, target, size, data, usage, bufObj);
@@ -745,7 +745,7 @@ _mesa_BufferSubDataARB(GLenum target, GLintptrARB offset,
 	return;
     }
 
-    ASSERT(ctx->Driver.BufferSubData);
+    assert(ctx->Driver.BufferSubData);
     ctx->Driver.BufferSubData(ctx, target, offset, size, data, bufObj);
 }
 
@@ -765,7 +765,7 @@ _mesa_GetBufferSubDataARB(GLenum target, GLintptrARB offset,
 	return;
     }
 
-    ASSERT(ctx->Driver.GetBufferSubData);
+    assert(ctx->Driver.GetBufferSubData);
     ctx->Driver.GetBufferSubData(ctx, target, offset, size, data, bufObj);
 }
 
@@ -802,7 +802,7 @@ _mesa_MapBufferARB(GLenum target, GLenum access)
 	return nullptr;
     }
 
-    ASSERT(ctx->Driver.MapBuffer);
+    assert(ctx->Driver.MapBuffer);
     bufObj->Pointer = ctx->Driver.MapBuffer(ctx, target, access, bufObj);
     if (!bufObj->Pointer) {
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "glMapBufferARB(access)");

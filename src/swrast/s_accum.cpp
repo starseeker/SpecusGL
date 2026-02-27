@@ -476,10 +476,10 @@ accum_return(GLcontext *ctx, GLfloat value,
 	    if (swrast->_IntegerAccumMode) {
 		GLint j;
 		for (j = 0; j < width; j++) {
-		    ASSERT(acc[j * 4 + 0] < max);
-		    ASSERT(acc[j * 4 + 1] < max);
-		    ASSERT(acc[j * 4 + 2] < max);
-		    ASSERT(acc[j * 4 + 3] < max);
+		    assert(acc[j * 4 + 0] < max);
+		    assert(acc[j * 4 + 1] < max);
+		    assert(acc[j * 4 + 2] < max);
+		    assert(acc[j * 4 + 3] < max);
 		    span.array->rgba[j][RCOMP] = multTable[acc[j * 4 + 0]];
 		    span.array->rgba[j][GCOMP] = multTable[acc[j * 4 + 1]];
 		    span.array->rgba[j][BCOMP] = multTable[acc[j * 4 + 2]];

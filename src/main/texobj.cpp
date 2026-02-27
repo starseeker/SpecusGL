@@ -111,7 +111,7 @@ _mesa_initialize_texture_object(struct gl_texture_object *obj,
 void
 gl_texture_object::init(GLuint name, GLenum target)
 {
-    ASSERT(target == 0 ||
+    assert(target == 0 ||
 	   target == GL_TEXTURE_1D ||
 	   target == GL_TEXTURE_2D ||
 	   target == GL_TEXTURE_3D ||
@@ -396,7 +396,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 	return;
     }
 
-    ASSERT(maxLevels > 0);
+    assert(maxLevels > 0);
 
     t->_MaxLevel = baseLevel + maxLog2;
     t->_MaxLevel = MIN2(t->_MaxLevel, t->MaxLevel);
@@ -1106,7 +1106,7 @@ void
 gl_texture_object::set_image(GLenum target, GLint level,
                               struct gl_texture_image *texImage)
 {
-    ASSERT(texImage);
+    assert(texImage);
     switch (target) {
 	case GL_TEXTURE_1D:
 	case GL_TEXTURE_2D:
@@ -1125,7 +1125,7 @@ gl_texture_object::set_image(GLenum target, GLint level,
 	}
 	break;
 	case GL_TEXTURE_RECTANGLE_NV:
-	    ASSERT(level == 0);
+	    assert(level == 0);
 	    Image[0][level] = texImage;
 	    break;
 	default:

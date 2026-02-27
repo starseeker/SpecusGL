@@ -48,8 +48,8 @@ NAME(GLint srcWidth, GLint dstWidth,			\
    if (flip) {						\
       for (dstCol = 0; dstCol < dstWidth; dstCol++) {	\
          GLint srcCol = (dstCol * srcWidth) / dstWidth;	\
-         ASSERT(srcCol >= 0);				\
-         ASSERT(srcCol < srcWidth);			\
+         assert(srcCol >= 0);				\
+         assert(srcCol < srcWidth);			\
          srcCol = srcWidth - 1 - srcCol; /* flip */	\
          if (SIZE == 1) {				\
             dst[dstCol] = src[srcCol];			\
@@ -69,8 +69,8 @@ NAME(GLint srcWidth, GLint dstWidth,			\
    else {						\
       for (dstCol = 0; dstCol < dstWidth; dstCol++) {	\
          GLint srcCol = (dstCol * srcWidth) / dstWidth;	\
-         ASSERT(srcCol >= 0);				\
-         ASSERT(srcCol < srcWidth);			\
+         assert(srcCol >= 0);				\
+         assert(srcCol < srcWidth);			\
          if (SIZE == 1) {				\
             dst[dstCol] = src[srcCol];			\
          }						\
@@ -206,8 +206,8 @@ blit_nearest(GLcontext *ctx,
 	GLint srcRow = (dstRow * srcHeight) / dstHeight;
 	GLint srcY;
 
-	ASSERT(srcRow >= 0);
-	ASSERT(srcRow < srcHeight);
+	assert(srcRow >= 0);
+	assert(srcRow < srcHeight);
 
 	if (invertY) {
 	    srcRow = srcHeight - 1 - srcRow;
@@ -264,9 +264,9 @@ resample_linear_row_ub(GLint srcWidth, GLint dstWidth,
 	GLfloat colWeight = srcCol - srcCol0; /* fractional part of srcCol */
 	GLfloat red, green, blue, alpha;
 
-	ASSERT(srcCol0 >= 0);
-	ASSERT(srcCol0 < srcWidth);
-	ASSERT(srcCol1 <= srcWidth);
+	assert(srcCol0 >= 0);
+	assert(srcCol0 < srcWidth);
+	assert(srcCol1 <= srcWidth);
 
 	if (srcCol1 == srcWidth) {
 	    /* last column fudge */
@@ -367,8 +367,8 @@ blit_linear(GLcontext *ctx,
 	GLint srcRow1 = srcRow0 + 1;
 	GLfloat rowWeight = srcRow - srcRow0; /* fractional part of srcRow */
 
-	ASSERT(srcRow >= 0);
-	ASSERT(srcRow < srcHeight);
+	assert(srcRow >= 0);
+	assert(srcRow < srcHeight);
 
 	if (srcRow1 == srcHeight) {
 	    /* last row fudge */
@@ -436,15 +436,15 @@ simple_blit(GLcontext *ctx,
     GLint comps, bytesPerRow;
 
     /* only one buffer */
-    ASSERT(static_cast<GLuint>(__builtin_popcount(buffer)) == 1);
+    assert(static_cast<GLuint>(__builtin_popcount(buffer)) == 1);
     /* no flipping checks */
-    ASSERT(srcX0 < srcX1);
-    ASSERT(srcY0 < srcY1);
-    ASSERT(dstX0 < dstX1);
-    ASSERT(dstY0 < dstY1);
+    assert(srcX0 < srcX1);
+    assert(srcY0 < srcY1);
+    assert(dstX0 < dstX1);
+    assert(dstY0 < dstY1);
     /* size checks */
-    ASSERT(srcX1 - srcX0 == dstX1 - dstX0);
-    ASSERT(srcY1 - srcY0 == dstY1 - dstY0);
+    assert(srcX1 - srcX0 == dstX1 - dstX0);
+    assert(srcY1 - srcY0 == dstY1 - dstY0);
 
     /* determine if copy should be bottom-to-top or top-to-bottom */
     if (srcY0 > dstY0) {
@@ -480,7 +480,7 @@ simple_blit(GLcontext *ctx,
 	    return;
     }
 
-    ASSERT(readRb->DataType == drawRb->DataType);
+    assert(readRb->DataType == drawRb->DataType);
 
     /* compute bytes per row */
     switch (readRb->DataType) {
@@ -526,19 +526,19 @@ clip_right_or_top(GLint *srcX0, GLint *srcX1,
 
     if (*dstX1 > maxValue) {
 	/* X1 outside right edge */
-	ASSERT(*dstX0 < maxValue); /* X0 should be inside right edge */
+	assert(*dstX0 < maxValue); /* X0 should be inside right edge */
 	t = static_cast<GLfloat>((maxValue - *dstX0)) / static_cast<GLfloat>((*dstX1 - *dstX0));
 	/* chop off [t, 1] part */
-	ASSERT(t >= 0.0 && t <= 1.0);
+	assert(t >= 0.0 && t <= 1.0);
 	*dstX1 = maxValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5;
 	*srcX1 = *srcX0 + static_cast<GLint>((t * (*srcX1 - *srcX0) + bias));
     } else if (*dstX0 > maxValue) {
 	/* X0 outside right edge */
-	ASSERT(*dstX1 < maxValue); /* X1 should be inside right edge */
+	assert(*dstX1 < maxValue); /* X1 should be inside right edge */
 	t = static_cast<GLfloat>((maxValue - *dstX1)) / static_cast<GLfloat>((*dstX0 - *dstX1));
 	/* chop off [t, 1] part */
-	ASSERT(t >= 0.0 && t <= 1.0);
+	assert(t >= 0.0 && t <= 1.0);
 	*dstX0 = maxValue;
 	bias = (*srcX0 < *srcX1) ? -0.5 : 0.5;
 	*srcX0 = *srcX1 + static_cast<GLint>((t * (*srcX0 - *srcX1) + bias));
@@ -558,19 +558,19 @@ clip_left_or_bottom(GLint *srcX0, GLint *srcX1,
 
     if (*dstX0 < minValue) {
 	/* X0 outside left edge */
-	ASSERT(*dstX1 > minValue); /* X1 should be inside left edge */
+	assert(*dstX1 > minValue); /* X1 should be inside left edge */
 	t = static_cast<GLfloat>((minValue - *dstX0)) / static_cast<GLfloat>((*dstX1 - *dstX0));
 	/* chop off [0, t] part */
-	ASSERT(t >= 0.0 && t <= 1.0);
+	assert(t >= 0.0 && t <= 1.0);
 	*dstX0 = minValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5; /* flipped??? */
 	*srcX0 = *srcX0 + static_cast<GLint>((t * (*srcX1 - *srcX0) + bias));
     } else if (*dstX1 < minValue) {
 	/* X1 outside left edge */
-	ASSERT(*dstX0 > minValue); /* X0 should be inside left edge */
+	assert(*dstX0 > minValue); /* X0 should be inside left edge */
 	t = static_cast<GLfloat>((minValue - *dstX1)) / static_cast<GLfloat>((*dstX0 - *dstX1));
 	/* chop off [0, t] part */
-	ASSERT(t >= 0.0 && t <= 1.0);
+	assert(t >= 0.0 && t <= 1.0);
 	*dstX1 = minValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5;
 	*srcX1 = *srcX1 + static_cast<GLint>((t * (*srcX0 - *srcX1) + bias));
@@ -666,25 +666,25 @@ clip_blit(GLcontext *ctx,
            *srcY0, *srcY1, *dstY0, *dstY1);
     */
 
-    ASSERT(*dstX0 >= dstXmin);
-    ASSERT(*dstX0 <= dstXmax);
-    ASSERT(*dstX1 >= dstXmin);
-    ASSERT(*dstX1 <= dstXmax);
+    assert(*dstX0 >= dstXmin);
+    assert(*dstX0 <= dstXmax);
+    assert(*dstX1 >= dstXmin);
+    assert(*dstX1 <= dstXmax);
 
-    ASSERT(*dstY0 >= dstYmin);
-    ASSERT(*dstY0 <= dstYmax);
-    ASSERT(*dstY1 >= dstYmin);
-    ASSERT(*dstY1 <= dstYmax);
+    assert(*dstY0 >= dstYmin);
+    assert(*dstY0 <= dstYmax);
+    assert(*dstY1 >= dstYmin);
+    assert(*dstY1 <= dstYmax);
 
-    ASSERT(*srcX0 >= srcXmin);
-    ASSERT(*srcX0 <= srcXmax);
-    ASSERT(*srcX1 >= srcXmin);
-    ASSERT(*srcX1 <= srcXmax);
+    assert(*srcX0 >= srcXmin);
+    assert(*srcX0 <= srcXmax);
+    assert(*srcX1 >= srcXmin);
+    assert(*srcX1 <= srcXmax);
 
-    ASSERT(*srcY0 >= srcYmin);
-    ASSERT(*srcY0 <= srcYmax);
-    ASSERT(*srcY1 >= srcYmin);
-    ASSERT(*srcY1 <= srcYmax);
+    assert(*srcY0 >= srcYmin);
+    assert(*srcY0 <= srcYmax);
+    assert(*srcY1 >= srcYmin);
+    assert(*srcY1 <= srcYmax);
 
     return GL_TRUE;
 }
@@ -738,7 +738,7 @@ _swrast_BlitFramebuffer(GLcontext *ctx,
 		}
 	    }
 	} else {
-	    ASSERT(filter == GL_LINEAR);
+	    assert(filter == GL_LINEAR);
 	    if (mask & GL_COLOR_BUFFER_BIT) {  /* depth/stencil not allowed */
 		blit_linear(ctx,  srcX0, srcY0, srcX1, srcY1,
 			    dstX0, dstY0, dstX1, dstY1);

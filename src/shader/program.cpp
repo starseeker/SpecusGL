@@ -274,7 +274,7 @@ void
 _mesa_delete_program(GLcontext *ctx, struct gl_program *prog)
 {
     (void) ctx;
-    ASSERT(prog);
+    assert(prog);
 
     if (prog == &_mesa_DummyProgram)
 	return;
@@ -486,8 +486,8 @@ _mesa_BindProgram(GLenum target, GLuint id)
     newProg->ref();
 
     /* Never null pointers */
-    ASSERT(ctx->VertexProgram.Current);
-    ASSERT(ctx->FragmentProgram.Current);
+    assert(ctx->VertexProgram.Current);
+    assert(ctx->FragmentProgram.Current);
 
     if (ctx->Driver.BindProgram)
 	ctx->Driver.BindProgram(ctx, target, newProg);
@@ -571,12 +571,12 @@ _mesa_GenPrograms(GLsizei n, GLuint *ids)
     first = ctx->Shared->Programs.findFreeKeyBlock(n);
 
     /* Insert pointer to dummy program as placeholder */
-    for (i = 0; i < (GLuint) n; i++) {
+    for (i = 0; i < static_cast<GLuint>(n); i++) {
 	ctx->Shared->insert_program(first + i, &_mesa_DummyProgram);
     }
 
     /* Return the program names */
-    for (i = 0; i < (GLuint) n; i++) {
+    for (i = 0; i < static_cast<GLuint>(n); i++) {
 	ids[i] = first + i;
     }
 }

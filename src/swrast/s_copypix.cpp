@@ -134,7 +134,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     if (ctx->Pixel.Convolution2DEnabled) {
 	_mesa_convolve_2d_image(ctx, &width, &height, tmpVec.data(), convVec.data());
     } else {
-	ASSERT(ctx->Pixel.Separable2DEnabled);
+	assert(ctx->Pixel.Separable2DEnabled);
 	_mesa_convolve_sep_image(ctx, &width, &height, tmpVec.data(), convVec.data());
     }
     /* tmpVec is no longer needed */
@@ -256,7 +256,7 @@ copy_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
     } else {
     }
 
-    ASSERT(width < MAX_WIDTH);
+    assert(width < MAX_WIDTH);
 
     for (row = 0; row < height; row++, sy += stepy, dy += stepy) {
 	GLvoid *rgba = span.array->attribs[FRAG_ATTRIB_COL0];
@@ -623,9 +623,9 @@ copy_depth_stencil_pixels(GLcontext *ctx,
     depthReadRb = ctx->ReadBuffer->_DepthBuffer;
     stencilReadRb = ctx->ReadBuffer->_StencilBuffer;
 
-    ASSERT(depthDrawRb);
-    ASSERT(depthReadRb);
-    ASSERT(stencilReadRb);
+    assert(depthDrawRb);
+    assert(depthReadRb);
+    assert(stencilReadRb);
 
     if (ctx->DrawBuffer == ctx->ReadBuffer) {
 	overlapping = regions_overlap(srcX, srcY, destX, destY, width, height,
@@ -784,7 +784,7 @@ fast_copy_pixels(GLcontext *ctx,
 	srcRb = srcFb->_DepthBuffer;
 	dstRb = dstFb->_DepthBuffer;
     } else {
-	ASSERT(type == GL_DEPTH_STENCIL_EXT);
+	assert(type == GL_DEPTH_STENCIL_EXT);
 	/* XXX correct? */
 	srcRb = srcFb->Attachment[BUFFER_DEPTH].Renderbuffer;
 	dstRb = dstFb->Attachment[BUFFER_DEPTH].Renderbuffer;

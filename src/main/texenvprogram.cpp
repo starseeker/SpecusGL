@@ -636,7 +636,7 @@ static struct ureg register_const4f(struct texenv_fragment_program *p,
     values[3] = s3;
     idx = _mesa_add_unnamed_constant(p->program->Parameters, values, 4,
 				     &swizzle);
-    ASSERT(swizzle == SWIZZLE_NOOP);
+    assert(swizzle == SWIZZLE_NOOP);
     return make_ureg(PROGRAM_STATE_VAR, idx);
 }
 
@@ -1142,7 +1142,7 @@ create_new_program(GLcontext *ctx, struct state_key *key,
     if (p.program->NumAluInstructions > ctx->Const.FragmentProgram.MaxAluInstructions)
 	program_error(&p, "Exceeded max ALU instructions");
 
-    ASSERT(p.program->Instructions.size() <= MAX_INSTRUCTIONS);
+    assert(p.program->Instructions.size() <= MAX_INSTRUCTIONS);
 
     /* Instructions are already in the vector, no copy needed */
 
@@ -1170,7 +1170,7 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
 {
     const struct gl_fragment_program *prev = ctx->FragmentProgram._Current;
 
-    ASSERT(ctx->FragmentProgram._MaintainTexEnvProgram);
+    assert(ctx->FragmentProgram._MaintainTexEnvProgram);
 
     /* If a conventional fragment program/shader isn't in effect... */
     if (!ctx->FragmentProgram._Enabled &&

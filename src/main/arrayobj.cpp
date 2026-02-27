@@ -226,7 +226,7 @@ _mesa_BindVertexArrayAPPLE(GLuint id)
     struct gl_array_object *newObj = nullptr;
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    ASSERT(oldObj != nullptr);
+    assert(oldObj != nullptr);
 
     if (oldObj->Name == id)
 	return;   /* rebinding the same array object- no change */
@@ -291,7 +291,7 @@ _mesa_DeleteVertexArraysAPPLE(GLsizei n, const GLuint *ids)
 	struct gl_array_object *obj = lookup_arrayobj(ctx, ids[i]);
 
 	if (obj != nullptr) {
-	    ASSERT(obj->Name == ids[i]);
+	    assert(obj->Name == ids[i]);
 
 
 	    /* If the array object is currently bound, the spec says "the binding

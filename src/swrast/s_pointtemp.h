@@ -84,7 +84,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
     const GLchan specBlue  = vert->specular[2];
 #endif
 #if FLAGS & INDEX
-    const GLuint colorIndex = (GLuint) vert->index; /* XXX round? */
+    const GLuint colorIndex = static_cast<GLuint>(vert->index); /* XXX round? */
 #endif
 #if FLAGS & ATTRIBS
     GLfloat attrib[FRAG_ATTRIB_MAX][4]; /* texture & varying */
@@ -186,7 +186,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
     {{
 	    GLint x, y;
 	    const GLfloat radius = 0.5F * size;
-	    const GLuint z = (GLuint)(vert->win[2] + 0.5F);
+	    const GLuint z = static_cast<GLuint>((vert->win[2] + 0.5F));
 	    GLuint count;
 #if FLAGS & SMOOTH
 	    const GLfloat rmin = radius - 0.7071F;  /* 0.7071 = sqrt(2)/2 */
@@ -194,28 +194,28 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 	    const GLfloat rmin2 = MAX2(0.0F, rmin * rmin);
 	    const GLfloat rmax2 = rmax * rmax;
 	    const GLfloat cscale = 1.0F / (rmax2 - rmin2);
-	    const GLint xmin = (GLint)(vert->win[0] - radius);
-	    const GLint xmax = (GLint)(vert->win[0] + radius);
-	    const GLint ymin = (GLint)(vert->win[1] - radius);
-	    const GLint ymax = (GLint)(vert->win[1] + radius);
+	    const GLint xmin = static_cast<GLint>((vert->win[0] - radius));
+	    const GLint xmax = static_cast<GLint>((vert->win[0] + radius));
+	    const GLint ymin = static_cast<GLint>((vert->win[1] - radius));
+	    const GLint ymax = static_cast<GLint>((vert->win[1] + radius));
 #else
 	    /* non-smooth */
 	    GLint xmin, xmax, ymin, ymax;
-	    GLint iSize = (GLint)(size + 0.5F);
+	    GLint iSize = static_cast<GLint>((size + 0.5F));
 	    GLint iRadius;
 	    iSize = MAX2(1, iSize);
 	    iRadius = iSize / 2;
 	    if (iSize & 1) {
 		/* odd size */
-		xmin = (GLint)(vert->win[0] - iRadius);
-		xmax = (GLint)(vert->win[0] + iRadius);
-		ymin = (GLint)(vert->win[1] - iRadius);
-		ymax = (GLint)(vert->win[1] + iRadius);
+		xmin = static_cast<GLint>((vert->win[0] - iRadius));
+		xmax = static_cast<GLint>((vert->win[0] + iRadius));
+		ymin = static_cast<GLint>((vert->win[1] - iRadius));
+		ymax = static_cast<GLint>((vert->win[1] + iRadius));
 	    } else {
 		/* even size */
-		xmin = (GLint)(vert->win[0] + 0.5) - iRadius;
+		xmin = static_cast<GLint>((vert->win[0] + 0.5)) - iRadius;
 		xmax = xmin + iSize - 1;
-		ymin = (GLint)(vert->win[1] + 0.5) - iRadius;
+		ymin = static_cast<GLint>((vert->win[1] + 0.5)) - iRadius;
 		ymax = ymin + iSize - 1;
 	    }
 #endif /*SMOOTH*/
@@ -303,7 +303,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 			    span->array->z[count] = z;
 
 #if (FLAGS & ATTENUATE) && (FLAGS & RGBA)
-			    span->array->rgba[count][ACOMP] = (GLchan)(alpha * alphaAtten);
+			    span->array->rgba[count][ACOMP] = static_cast<GLchan>((alpha * alphaAtten));
 #elif FLAGS & RGBA
 			    span->array->rgba[count][ACOMP] = alpha;
 #endif /*ATTENUATE*/
@@ -399,16 +399,16 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 	    ATTRIB_LOOP_END
 #endif
 
-	    span->array->x[count] = (GLint) vert->win[0];
-	    span->array->y[count] = (GLint) vert->win[1];
-	    span->array->z[count] = (GLint)(vert->win[2] + 0.5F);
+	    span->array->x[count] = static_cast<GLint>(vert->win[0]);
+	    span->array->y[count] = static_cast<GLint>(vert->win[1]);
+	    span->array->z[count] = static_cast<GLint>((vert->win[2] + 0.5F));
 	    span->end = count + 1;
 	}
     }
 
 #endif /* LARGE || ATTENUATE || SMOOTH */
 
-    ASSERT(span->end <= MAX_WIDTH);
+    assert(span->end <= MAX_WIDTH);
 }
 
 

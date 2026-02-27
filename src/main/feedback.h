@@ -40,7 +40,7 @@
 
 #define FEEDBACK_TOKEN( CTX, T )				\
 	if (CTX->Feedback.Count < CTX->Feedback.BufferSize) {	\
-	   CTX->Feedback.Buffer[CTX->Feedback.Count] = (GLfloat) (T); \
+	   CTX->Feedback.Buffer[CTX->Feedback.Count] = static_cast<GLfloat>((T)); \
 	}							\
 	CTX->Feedback.Count++;
 

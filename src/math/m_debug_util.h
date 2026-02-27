@@ -261,10 +261,10 @@ x -= counter_overhead;
 
 static GLfloat rnd(void)
 {
-    GLfloat f = (GLfloat)rand() / (GLfloat)RAND_MAX;
-    GLfloat gran = (GLfloat)(1 << 13);
+    GLfloat f = static_cast<GLfloat>(rand()) / static_cast<GLfloat>(RAND_MAX);
+    GLfloat gran = static_cast<GLfloat>((1 << 13));
 
-    f = (GLfloat)(GLint)(f * gran) / gran;
+    f = static_cast<GLfloat>(static_cast<GLint>((f * gran))) / gran;
 
     return f * 2.0 - 1.0;
 }

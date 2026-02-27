@@ -91,7 +91,7 @@ gl_program_parameter_list::add_parameter(enum register_file type, const char *na
 	    Parameters[oldNum].StateIndexes[i] = state[i];
     }
 
-    return (GLint) oldNum;
+    return static_cast<GLint>(oldNum);
 }
 
 
@@ -122,7 +122,7 @@ gl_program_parameter_list::add_named_constant(const char *name, const GLfloat va
 #if 0 /* disable this for now -- we need to save the name! */
     GLint pos;
     GLuint swizzle;
-    ASSERT(size == 4); /* XXX future feature */
+    assert(size == 4); /* XXX future feature */
     /* check if we already have this constant */
     if (lookup_parameter_constant(values, 4, &pos, &swizzle)) {
 	return pos;
@@ -151,8 +151,8 @@ GLint
 gl_program_parameter_list::add_unnamed_constant(const GLfloat values[4], GLuint size, GLuint *swizzleOut)
 {
     GLint pos = -1;
-    ASSERT(size >= 1);
-    ASSERT(size <= 4);
+    assert(size >= 1);
+    assert(size <= 4);
 
     if (lookup_parameter_constant(values,
 					size, &pos, swizzleOut)) {
@@ -164,7 +164,7 @@ gl_program_parameter_list::add_unnamed_constant(const GLfloat values[4], GLuint 
      * constants because we rely on smearing (i.e. .yyyy or .zzzz).
      */
     if (size == 1 && swizzleOut) {
-	for (pos = 0; pos < (GLint) NumParameters(); pos++) {
+	for (pos = 0; pos < static_cast<GLint>(NumParameters()); pos++) {
 	    struct gl_program_parameter *p = &Parameters[pos];
 	    if (p->Type == PROGRAM_CONSTANT && p->Size + size <= 4) {
 		/* ok, found room */
@@ -203,10 +203,10 @@ GLint
 gl_program_parameter_list::add_uniform(const char *name, GLuint size, GLenum datatype)
 {
     GLint i = lookup_parameter_index(-1, name);
-    ASSERT(datatype != GL_NONE);
+    assert(datatype != GL_NONE);
     if (i >= 0 && Parameters[i].Type == PROGRAM_UNIFORM) {
-	ASSERT(Parameters[i].Size == size);
-	ASSERT(Parameters[i].DataType == datatype);
+	assert(Parameters[i].Size == size);
+	assert(Parameters[i].DataType == datatype);
 	/* already in list */
 	return i;
     } else {
@@ -227,8 +227,8 @@ gl_program_parameter_list::add_sampler(const char *name, GLenum datatype)
 {
     GLint i = lookup_parameter_index(-1, name);
     if (i >= 0 && Parameters[i].Type == PROGRAM_SAMPLER) {
-	ASSERT(Parameters[i].Size == 1);
-	ASSERT(Parameters[i].DataType == datatype);
+	assert(Parameters[i].Size == 1);
+	assert(Parameters[i].DataType == datatype);
 	/* already in list */
 	return i;
     } else {
@@ -326,7 +326,7 @@ gl_program_parameter_list::add_state_reference(const gl_state_index stateTokens[
     GLint index;
 
     /* Check if the state reference is already in the list */
-    for (index = 0; index < (GLint) NumParameters(); index++) {
+    for (index = 0; index < static_cast<GLint>(NumParameters()); index++) {
 	GLuint i, match = 0;
 	for (i = 0; i < STATE_LENGTH; i++) {
 	    if (Parameters[index].StateIndexes[i] == stateTokens[i]) {
@@ -380,13 +380,13 @@ gl_program_parameter_list::lookup_parameter_index(GLsizei nameLen, const char *n
 
     if (nameLen == -1) {
 	/* name is null-terminated */
-	for (i = 0; i < (GLint) NumParameters(); i++) {
+	for (i = 0; i < static_cast<GLint>(NumParameters()); i++) {
 	    if (Parameters[i].Name == name)
 		return i;
 	}
     } else {
 	/* name is not null-terminated, use nameLen */
-	for (i = 0; i < (GLint) NumParameters(); i++) {
+	for (i = 0; i < static_cast<GLint>(NumParameters()); i++) {
 	    if (static_cast<GLint>(Parameters[i].Name.size()) == nameLen &&
 		Parameters[i].Name.compare(0, nameLen, name, nameLen) == 0)
 		return i;
@@ -494,7 +494,7 @@ gl_program_parameter_list::clone() const
 	GLuint size = MIN2(p->Size, 4);
 	GLint j = clone->add_parameter(p->Type, p->Name.c_str(), size, p->DataType,
 				      ParameterValues[i].data(), nullptr);
-	ASSERT(j >= 0);
+	assert(j >= 0);
 	/* copy state indexes */
 	if (p->Type == PROGRAM_STATE_VAR) {
 	    struct gl_program_parameter *q = &clone->Parameters[j];

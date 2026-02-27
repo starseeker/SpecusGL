@@ -228,7 +228,7 @@ Peek_Token(struct parse_state *parseState, GLubyte *token)
 	parseState->pos += (-i);
 	return GL_FALSE;
     }
-    len = (GLint)strlen(reinterpret_cast<const char *>(token));
+    len = static_cast<GLint>(strlen(reinterpret_cast<const char *>(token)));
     parseState->pos += (i - len);
     return GL_TRUE;
 }
@@ -264,7 +264,7 @@ Parse_String(struct parse_state *parseState, const char *pattern)
     /* Try to match the pattern */
     m = parseState->pos;
     for (i = 0; pattern[i]; i++) {
-	if (*m != (GLubyte) pattern[i])
+	if (*m != static_cast<GLubyte>(pattern[i]))
 	    return GL_FALSE;
 	m += 1;
     }
@@ -1343,7 +1343,7 @@ PrintSrcReg(const struct prog_src_register *src)
     } else if (src->File == PROGRAM_ENV_PARAM) {
 	std::printf("c[%d]", src->Index);
     } else {
-	ASSERT(src->File == PROGRAM_TEMPORARY);
+	assert(src->File == PROGRAM_TEMPORARY);
 	std::printf("R%d", src->Index);
     }
 
@@ -1371,7 +1371,7 @@ PrintDstReg(const struct prog_dst_register *dst)
     } else if (dst->File == PROGRAM_ENV_PARAM) {
 	std::printf("c[%d]", dst->Index);
     } else {
-	ASSERT(dst->File == PROGRAM_TEMPORARY);
+	assert(dst->File == PROGRAM_TEMPORARY);
 	std::printf("R%d", dst->Index);
     }
 
@@ -1459,7 +1459,7 @@ _mesa_print_nv_vertex_instruction(const struct prog_instruction *inst)
 void
 _mesa_print_nv_vertex_program(const struct gl_vertex_program *program)
 {
-    for (GLuint _i = 0; _i < (GLuint)program->Instructions.size(); _i++) {
+    for (GLuint _i = 0; _i < static_cast<GLuint>(program->Instructions.size()); _i++) {
 	const struct prog_instruction *inst = &program->Instructions[_i];
 	_mesa_print_nv_vertex_instruction(inst);
 	if (inst->Opcode == OPCODE_END)
@@ -1471,7 +1471,7 @@ _mesa_print_nv_vertex_program(const struct gl_vertex_program *program)
 const char *
 _mesa_nv_vertex_input_register_name(GLuint i)
 {
-    ASSERT(i < MAX_NV_VERTEX_PROGRAM_INPUTS);
+    assert(i < MAX_NV_VERTEX_PROGRAM_INPUTS);
     return InputRegisters[i];
 }
 
@@ -1479,7 +1479,7 @@ _mesa_nv_vertex_input_register_name(GLuint i)
 const char *
 _mesa_nv_vertex_output_register_name(GLuint i)
 {
-    ASSERT(i < MAX_NV_VERTEX_PROGRAM_OUTPUTS);
+    assert(i < MAX_NV_VERTEX_PROGRAM_OUTPUTS);
     return OutputRegisters[i];
 }
 

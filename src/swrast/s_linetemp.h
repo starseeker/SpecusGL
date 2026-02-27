@@ -75,10 +75,10 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
     span.y = 0;
     span.z = 0;
     GLuint interpFlags = 0;
-    GLint x0 = (GLint) vert0->win[0];
-    GLint x1 = (GLint) vert1->win[0];
-    GLint y0 = (GLint) vert0->win[1];
-    GLint y1 = (GLint) vert1->win[1];
+    GLint x0 = static_cast<GLint>(vert0->win[0]);
+    GLint x1 = static_cast<GLint>(vert1->win[0]);
+    GLint y0 = static_cast<GLint>(vert0->win[1]);
+    GLint y1 = static_cast<GLint>(vert1->win[1]);
     GLint dx, dy;
     GLint numPixels;
     GLint xstep, ystep;
@@ -168,18 +168,18 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 	dx = -dx;   /* make positive */
 	xstep = -1;
 #ifdef DEPTH_TYPE
-	zPtrXstep = -((GLint)sizeof(DEPTH_TYPE));
+	zPtrXstep = -(static_cast<GLint>(sizeof(DEPTH_TYPE)));
 #endif
 #ifdef PIXEL_ADDRESS
-	pixelXstep = -((GLint)sizeof(PIXEL_TYPE));
+	pixelXstep = -(static_cast<GLint>(sizeof(PIXEL_TYPE)));
 #endif
     } else {
 	xstep = 1;
 #ifdef DEPTH_TYPE
-	zPtrXstep = ((GLint)sizeof(DEPTH_TYPE));
+	zPtrXstep = (static_cast<GLint>(sizeof(DEPTH_TYPE)));
 #endif
 #ifdef PIXEL_ADDRESS
-	pixelXstep = ((GLint)sizeof(PIXEL_TYPE));
+	pixelXstep = (static_cast<GLint>(sizeof(PIXEL_TYPE)));
 #endif
     }
 
@@ -187,7 +187,7 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 	dy = -dy;   /* make positive */
 	ystep = -1;
 #ifdef DEPTH_TYPE
-	zPtrYstep = -((GLint)(ctx->DrawBuffer->Width * sizeof(DEPTH_TYPE)));
+	zPtrYstep = -(static_cast<GLint>((ctx->DrawBuffer->Width * sizeof(DEPTH_TYPE))));
 #endif
 #ifdef PIXEL_ADDRESS
 	pixelYstep = BYTES_PER_ROW;
@@ -195,15 +195,15 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
     } else {
 	ystep = 1;
 #ifdef DEPTH_TYPE
-	zPtrYstep = (GLint)(ctx->DrawBuffer->Width * sizeof(DEPTH_TYPE));
+	zPtrYstep = static_cast<GLint>((ctx->DrawBuffer->Width * sizeof(DEPTH_TYPE)));
 #endif
 #ifdef PIXEL_ADDRESS
 	pixelYstep = -(BYTES_PER_ROW);
 #endif
     }
 
-    ASSERT(dx >= 0);
-    ASSERT(dy >= 0);
+    assert(dx >= 0);
+    assert(dy >= 0);
 
     numPixels = MAX2(dx, dy);
 
@@ -268,8 +268,8 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 	    span.zStep = FloatToFixed(vert1->win[2] - vert0->win[2]) / numPixels;
 	} else {
 	    /* don't use fixed point */
-	    span.z = (GLuint) vert0->win[2];
-	    span.zStep = (GLint)((vert1->win[2] - vert0->win[2]) / numPixels);
+	    span.z = static_cast<GLuint>(vert0->win[2]);
+	    span.zStep = static_cast<GLint>(((vert1->win[2] - vert0->win[2]) / numPixels));
 	}
     }
 #endif

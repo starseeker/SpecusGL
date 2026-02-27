@@ -108,16 +108,16 @@ _mesa_GetVertexAttribfvARB(GLuint index, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Enabled;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Enabled);
 	    break;
 	case GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Size;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Size);
 	    break;
 	case GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Stride;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Stride);
 	    break;
 	case GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB:
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].Type;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].Type);
 	    break;
 	case GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB:
 	    params[0] = ctx->Array.ArrayObj->VertexAttrib[index].Normalized;
@@ -136,7 +136,7 @@ _mesa_GetVertexAttribfvARB(GLuint index, GLenum pname, GLfloat *params)
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetVertexAttribfvARB(pname)");
 		return;
 	    }
-	    params[0] = (GLfloat) ctx->Array.ArrayObj->VertexAttrib[index].BufferObj->Name;
+	    params[0] = static_cast<GLfloat>(ctx->Array.ArrayObj->VertexAttrib[index].BufferObj->Name);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetVertexAttribfvARB(pname)");
@@ -157,7 +157,7 @@ _mesa_GetVertexAttribivARB(GLuint index, GLenum pname, GLint *params)
 	if (pname == GL_CURRENT_VERTEX_ATTRIB_ARB) {
 	    COPY_4V_CAST(params, fparams, GLint);  /* float to int */
 	} else {
-	    params[0] = (GLint) fparams[0];
+	    params[0] = static_cast<GLint>(fparams[0]);
 	}
     }
 }
@@ -247,8 +247,8 @@ void GLAPIENTRY
 _mesa_ProgramEnvParameter4dARB(GLenum target, GLuint index,
 			       GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    _mesa_ProgramEnvParameter4fARB(target, index, (GLfloat) x, (GLfloat) y,
-				   (GLfloat) z, (GLfloat) w);
+    _mesa_ProgramEnvParameter4fARB(target, index, static_cast<GLfloat>(x), static_cast<GLfloat>(y),
+				   static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -256,9 +256,9 @@ void GLAPIENTRY
 _mesa_ProgramEnvParameter4dvARB(GLenum target, GLuint index,
 				const GLdouble *params)
 {
-    _mesa_ProgramEnvParameter4fARB(target, index, (GLfloat) params[0],
-				   (GLfloat) params[1], (GLfloat) params[2],
-				   (GLfloat) params[3]);
+    _mesa_ProgramEnvParameter4fARB(target, index, static_cast<GLfloat>(params[0]),
+				   static_cast<GLfloat>(params[1]), static_cast<GLfloat>(params[2]),
+				   static_cast<GLfloat>(params[3]));
 }
 
 
@@ -426,7 +426,7 @@ _mesa_ProgramLocalParameter4fARB(GLenum target, GLuint index,
 	return;
     }
 
-    ASSERT(index < MAX_PROGRAM_LOCAL_PARAMS);
+    assert(index < MAX_PROGRAM_LOCAL_PARAMS);
     prog->LocalParams[index][0] = x;
     prog->LocalParams[index][1] = y;
     prog->LocalParams[index][2] = z;
@@ -481,7 +481,7 @@ _mesa_ProgramLocalParameters4fvEXT(GLenum target, GLuint index, GLsizei count,
     }
 
     for (i = 0; i < count; i++) {
-	ASSERT((index + i) < MAX_PROGRAM_LOCAL_PARAMS);
+	assert((index + i) < MAX_PROGRAM_LOCAL_PARAMS);
 	COPY_4V(prog->LocalParams[index + i], params);
 	params += 4;
     }
@@ -496,8 +496,8 @@ _mesa_ProgramLocalParameter4dARB(GLenum target, GLuint index,
 				 GLdouble x, GLdouble y,
 				 GLdouble z, GLdouble w)
 {
-    _mesa_ProgramLocalParameter4fARB(target, index, (GLfloat) x, (GLfloat) y,
-				     (GLfloat) z, (GLfloat) w);
+    _mesa_ProgramLocalParameter4fARB(target, index, static_cast<GLfloat>(x), static_cast<GLfloat>(y),
+				     static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -509,8 +509,8 @@ _mesa_ProgramLocalParameter4dvARB(GLenum target, GLuint index,
 				  const GLdouble *params)
 {
     _mesa_ProgramLocalParameter4fARB(target, index,
-				     (GLfloat) params[0], (GLfloat) params[1],
-				     (GLfloat) params[2], (GLfloat) params[3]);
+				     static_cast<GLfloat>(params[0]), static_cast<GLfloat>(params[1]),
+				     static_cast<GLfloat>(params[2]), static_cast<GLfloat>(params[3]));
 }
 
 
@@ -550,8 +550,8 @@ _mesa_GetProgramLocalParameterfvARB(GLenum target, GLuint index,
 	return;
     }
 
-    ASSERT(prog);
-    ASSERT(index < MAX_PROGRAM_LOCAL_PARAMS);
+    assert(prog);
+    assert(index < MAX_PROGRAM_LOCAL_PARAMS);
     COPY_4V(params, prog->LocalParams[index]);
 }
 
@@ -595,14 +595,14 @@ _mesa_GetProgramivARB(GLenum target, GLenum pname, GLint *params)
 	return;
     }
 
-    ASSERT(prog);
-    ASSERT(limits);
+    assert(prog);
+    assert(limits);
 
     /* Queries supported for both vertex and fragment programs */
     switch (pname) {
 	case GL_PROGRAM_LENGTH_ARB:
 	    *params
-		= (GLint) prog->String.size();
+		= static_cast<GLint>(prog->String.size());
 	    return;
 	case GL_PROGRAM_FORMAT_ARB:
 	    *params = prog->Format;
@@ -769,7 +769,7 @@ _mesa_GetProgramStringARB(GLenum target, GLenum pname, GLvoid *string)
 	return;
     }
 
-    ASSERT(prog);
+    assert(prog);
 
     if (pname != GL_PROGRAM_STRING_ARB) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetProgramStringARB(pname)");

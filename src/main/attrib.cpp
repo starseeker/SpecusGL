@@ -678,27 +678,27 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 	    switch (tgt) {
 		case TEXTURE_1D_INDEX:
 		    obj = &texstate->Saved1D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_1D);
+		    assert(obj->Target == GL_TEXTURE_1D);
 		    break;
 		case TEXTURE_2D_INDEX:
 		    obj = &texstate->Saved2D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_2D);
+		    assert(obj->Target == GL_TEXTURE_2D);
 		    break;
 		case TEXTURE_3D_INDEX:
 		    obj = &texstate->Saved3D[u];
-		    ASSERT(obj->Target == GL_TEXTURE_3D);
+		    assert(obj->Target == GL_TEXTURE_3D);
 		    break;
 		case TEXTURE_CUBE_INDEX:
 		    if (!ctx->Extensions.ARB_texture_cube_map)
 			continue;
 		    obj = &texstate->SavedCube[u];
-		    ASSERT(obj->Target == GL_TEXTURE_CUBE_MAP_ARB);
+		    assert(obj->Target == GL_TEXTURE_CUBE_MAP_ARB);
 		    break;
 		case TEXTURE_RECT_INDEX:
 		    if (!ctx->Extensions.NV_texture_rectangle)
 			continue;
 		    obj = &texstate->SavedRect[u];
-		    ASSERT(obj->Target == GL_TEXTURE_RECTANGLE_NV);
+		    assert(obj->Target == GL_TEXTURE_RECTANGLE_NV);
 		    break;
 		default:
 		    _mesa_problem(ctx, "bad texture index in pop_texture_group");

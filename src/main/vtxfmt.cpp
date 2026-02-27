@@ -51,9 +51,9 @@
    struct gl_tnl_module * const tnl = &(ctx->TnlModule);		\
    const int tmp_offset = _gloffset_ ## FUNC ;				\
 									\
-   ASSERT( tnl->Current );						\
-   ASSERT( tnl->SwapCount < NUM_VERTEX_FORMAT_ENTRIES );		\
-   ASSERT( tmp_offset >= 0 );						\
+   assert( tnl->Current );						\
+   assert( tnl->SwapCount < NUM_VERTEX_FORMAT_ENTRIES );		\
+   assert( tmp_offset >= 0 );						\
 									\
    /* Save the swapped function's dispatch entry so it can be */	\
    /* restored later. */						\
@@ -132,7 +132,7 @@ install_vtxfmt(struct _glapi_table *tab, const GLvertexformat *vfmt)
     SET_DrawRangeElements(tab, vfmt->DrawRangeElements);
     SET_EvalMesh1(tab, vfmt->EvalMesh1);
     SET_EvalMesh2(tab, vfmt->EvalMesh2);
-    ASSERT(tab->EvalMesh2);
+    assert(tab->EvalMesh2);
 
     /* GL_NV_vertex_program */
     SET_VertexAttrib1fNV(tab, vfmt->VertexAttrib1fNV);

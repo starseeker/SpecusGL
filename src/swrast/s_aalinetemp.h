@@ -37,8 +37,8 @@ static void
 NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
 {
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
-    const GLfloat fx = (GLfloat) ix;
-    const GLfloat fy = (GLfloat) iy;
+    const GLfloat fx = static_cast<GLfloat>(ix);
+    const GLfloat fy = static_cast<GLfloat>(iy);
 #ifdef DO_INDEX
     const GLfloat coverage = compute_coveragei(line, ix, iy);
 #else
@@ -61,7 +61,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
      * solving the plane equations at (ix,iy).
      */
 #ifdef DO_Z
-    line->span.array->z[i] = (GLuint) solve_plane(fx, fy, line->zPlane);
+    line->span.array->z[i] = static_cast<GLuint>(solve_plane(fx, fy, line->zPlane));
 #endif
 #ifdef DO_FOG
     line->span.array->attribs[FRAG_ATTRIB_FOGC][i][0] = solve_plane(fx, fy, line->fPlane);
@@ -73,7 +73,7 @@ NAME(plot)(GLcontext *ctx, struct LineInfo *line, int ix, int iy)
     line->span.array->rgba[i][ACOMP] = solve_plane_chan(fx, fy, line->aPlane);
 #endif
 #ifdef DO_INDEX
-    line->span.array->index[i] = (GLint) solve_plane(fx, fy, line->iPlane);
+    line->span.array->index[i] = static_cast<GLint>(solve_plane(fx, fy, line->iPlane));
 #endif
 #ifdef DO_SPEC
     line->span.array->spec[i][RCOMP] = solve_plane_chan(fx, fy, line->srPlane);
@@ -221,8 +221,8 @@ NAME(line)(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
 	    const GLuint u = attr - FRAG_ATTRIB_TEX0;
 	    const struct gl_texture_object *obj = ctx->Texture.Unit[u]._Current;
 	    const struct gl_texture_image *texImage = obj->Image[0][obj->BaseLevel];
-	    line.texWidth[attr]  = (GLfloat) texImage->Width;
-	    line.texHeight[attr] = (GLfloat) texImage->Height;
+	    line.texWidth[attr]  = static_cast<GLfloat>(texImage->Width);
+	    line.texHeight[attr] = static_cast<GLfloat>(texImage->Height);
 	}
 	ATTRIB_LOOP_END
     }
@@ -230,14 +230,14 @@ NAME(line)(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
 
     tStart = tEnd = 0.0;
     inSegment = GL_FALSE;
-    iLen = (GLint) line.len;
+    iLen = static_cast<GLint>(line.len);
 
     if (ctx->Line.StippleFlag) {
 	for (i = 0; i < iLen; i++) {
 	    const GLuint bit = (swrast->StippleCounter / ctx->Line.StippleFactor) & 0xf;
 	    if ((1 << bit) & ctx->Line.StipplePattern) {
 		/* stipple bit is on */
-		const GLfloat t = (GLfloat) i / (GLfloat) line.len;
+		const GLfloat t = static_cast<GLfloat>(i) / static_cast<GLfloat>(line.len);
 		if (!inSegment) {
 		    /* start new segment */
 		    inSegment = GL_TRUE;

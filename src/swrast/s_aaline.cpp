@@ -505,7 +505,7 @@ _swrast_choose_aa_line_function(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    ASSERT(ctx->Line.SmoothFlag);
+    assert(ctx->Line.SmoothFlag);
 
     if (ctx->Visual.rgbMode) {
 	/* RGBA */

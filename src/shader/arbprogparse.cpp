@@ -637,10 +637,10 @@ parse_position(const GLubyte ** inst)
 {
     GLuint value;
 
-    value = (GLuint)(*(*inst)++);
-    value += (GLuint)(*(*inst)++) * 0x100;
-    value += (GLuint)(*(*inst)++) * 0x10000;
-    value += (GLuint)(*(*inst)++) * 0x1000000;
+    value = static_cast<GLuint>((*(*inst)++));
+    value += static_cast<GLuint>((*(*inst)++)) * 0x100;
+    value += static_cast<GLuint>((*(*inst)++)) * 0x10000;
+    value += static_cast<GLuint>((*(*inst)++)) * 0x1000000;
 
     return value;
 }
@@ -759,7 +759,7 @@ parse_float_string(const GLubyte ** inst, struct arb_program *Program, GLdouble 
     } else { /* nonempty string-- parse out the digits */
 	while (**inst >= '0' && **inst <= '9') {
 	    GLubyte digit = *((*inst)++);
-	    value = value * 10.0 + (GLint)(digit - '0');
+	    value = value * 10.0 + static_cast<GLint>((digit - '0'));
 	    oscale *= 10.0;
 	}
 	assert(**inst == 0); /* integer string should end with 0 */
@@ -793,8 +793,8 @@ parse_float(const GLubyte ** inst, struct arb_program *Program)
     exponent = parse_integer(inst, Program);   /* This is the exponent */
 
     /* Assemble parts of floating-point number: */
-    return (GLfloat)((whole + fraction / fracScale) *
-		     pow(10.0, (GLfloat) exponent));
+    return static_cast<GLfloat>(((whole + fraction / fracScale) *
+		     pow(10.0, static_cast<GLfloat>(exponent))));
 }
 
 
@@ -891,7 +891,7 @@ parse_generic_attrib_num(GLcontext *ctx, const GLubyte ** inst,
 	return 1;
     }
 
-    *attrib = (GLuint) i;
+    *attrib = static_cast<GLuint>(i);
 
     return 0;
 }
@@ -912,7 +912,7 @@ parse_output_color_num(GLcontext * ctx, const GLubyte ** inst,
 	return 1;
     }
 
-    *color = (GLuint) i;
+    *color = static_cast<GLuint>(i);
     return 0;
 }
 
@@ -932,7 +932,7 @@ parse_texcoord_num(GLcontext * ctx, const GLubyte ** inst,
 	return 1;
     }
 
-    *coord = (GLuint) i;
+    *coord = static_cast<GLuint>(i);
     return 0;
 }
 
@@ -964,7 +964,7 @@ parse_clipplane_num(GLcontext * ctx, const GLubyte ** inst,
 {
     *coord = parse_integer(inst, Program);
 
-    if ((*coord < 0) || (*coord >= (GLint) ctx->Const.MaxClipPlanes)) {
+    if ((*coord < 0) || (*coord >= static_cast<GLint>(ctx->Const.MaxClipPlanes))) {
 	program_error(ctx, Program->Position, "Invalid clip plane index");
 	return 1;
     }
@@ -1029,7 +1029,7 @@ parse_matrix(GLcontext * ctx, const GLubyte ** inst, struct arb_program *Program
 	case MATRIX_TEXTURE:
 	    *matrix = STATE_TEXTURE_MATRIX;
 	    *matrix_idx = parse_integer(inst, Program);
-	    if (*matrix_idx >= (GLint) ctx->Const.MaxTextureUnits) {
+	    if (*matrix_idx >= static_cast<GLint>(ctx->Const.MaxTextureUnits)) {
 		program_error(ctx, Program->Position, "Invalid Texture Unit");
 		/* bad *matrix_id */
 		return 1;
@@ -1047,7 +1047,7 @@ parse_matrix(GLcontext * ctx, const GLubyte ** inst, struct arb_program *Program
 	case MATRIX_PROGRAM:
 	    *matrix = STATE_PROGRAM_MATRIX;
 	    *matrix_idx = parse_integer(inst, Program);
-	    if (*matrix_idx >= (GLint) ctx->Const.MaxProgramMatrices) {
+	    if (*matrix_idx >= static_cast<GLint>(ctx->Const.MaxProgramMatrices)) {
 		program_error(ctx, Program->Position, "Invalid Program Matrix");
 		/* bad *matrix_idx */
 		return 1;
@@ -1117,7 +1117,7 @@ parse_state_single_item(GLcontext * ctx, const GLubyte ** inst,
 	    state_tokens[1] = static_cast<gl_state_index>(parse_integer(inst, Program));
 
 	    /* Check the value of state_tokens[1] against the # of lights */
-	    if (state_tokens[1] >= (GLint) ctx->Const.MaxLights) {
+	    if (state_tokens[1] >= static_cast<GLint>(ctx->Const.MaxLights)) {
 		program_error(ctx, Program->Position, "Invalid Light Number");
 		/* bad state_tokens[1] */
 		return 1;
@@ -1165,7 +1165,7 @@ parse_state_single_item(GLcontext * ctx, const GLubyte ** inst,
 	    state_tokens[1] = static_cast<gl_state_index>(parse_integer(inst, Program));
 
 	    /* Check the value of state_tokens[1] against the # of lights */
-	    if (state_tokens[1] >= (GLint) ctx->Const.MaxLights) {
+	    if (state_tokens[1] >= static_cast<GLint>(ctx->Const.MaxLights)) {
 		program_error(ctx, Program->Position, "Invalid Light Number");
 		/* bad state_tokens[1] */
 		return 1;
@@ -1365,10 +1365,10 @@ parse_program_single_item(GLcontext * ctx, const GLubyte ** inst,
 
 	    /* Check state_tokens[2] against the number of ENV parameters available */
 	    if (((Program->Base.Target == GL_FRAGMENT_PROGRAM_ARB) &&
-		 (state_tokens[2] >= (GLint) ctx->Const.FragmentProgram.MaxEnvParams))
+		 (state_tokens[2] >= static_cast<GLint>(ctx->Const.FragmentProgram.MaxEnvParams)))
 		||
 		((Program->Base.Target == GL_VERTEX_PROGRAM_ARB) &&
-		 (state_tokens[2] >= (GLint) ctx->Const.VertexProgram.MaxEnvParams))) {
+		 (state_tokens[2] >= static_cast<GLint>(ctx->Const.VertexProgram.MaxEnvParams)))) {
 		program_error(ctx, Program->Position,
 			      "Invalid Program Env Parameter");
 		/* bad state_tokens[2] */
@@ -1383,10 +1383,10 @@ parse_program_single_item(GLcontext * ctx, const GLubyte ** inst,
 
 	    /* Check state_tokens[2] against the number of LOCAL parameters available */
 	    if (((Program->Base.Target == GL_FRAGMENT_PROGRAM_ARB) &&
-		 (state_tokens[2] >= (GLint) ctx->Const.FragmentProgram.MaxLocalParams))
+		 (state_tokens[2] >= static_cast<GLint>(ctx->Const.FragmentProgram.MaxLocalParams)))
 		||
 		((Program->Base.Target == GL_VERTEX_PROGRAM_ARB) &&
-		 (state_tokens[2] >= (GLint) ctx->Const.VertexProgram.MaxLocalParams))) {
+		 (state_tokens[2] >= static_cast<GLint>(ctx->Const.VertexProgram.MaxLocalParams)))) {
 		program_error(ctx, Program->Position,
 			      "Invalid Program Local Parameter");
 		/* bad state_tokens[2] */
@@ -1597,7 +1597,7 @@ parse_result_binding(GLcontext *ctx, const GLubyte **inst,
 		 * draw into.  This pertains to GL_ARB_draw_buffers.
 		 */
 		parse_output_color_num(ctx, inst, Program, &out_color);
-		ASSERT(out_color < MAX_DRAW_BUFFERS);
+		assert(out_color < MAX_DRAW_BUFFERS);
 		*outputReg = FRAG_RESULT_COLR;
 	    } else {
 		/* for vtx programs, this is VERTEX_RESULT_POSITION */
@@ -2211,7 +2211,7 @@ parse_masked_dst_reg(GLcontext * ctx, const GLubyte ** inst,
      *
      * ==> Need to reverse the order of bits for this!
      */
-    tmp = (GLint) *(*inst)++;
+    tmp = static_cast<GLint>(*(*inst)++);
     *WriteMask = (((tmp>>3) & 0x1) |
 		  ((tmp>>1) & 0x2) |
 		  ((tmp<<1) & 0x4) |
@@ -3395,7 +3395,7 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
     GLint err = 0;
     GLuint numInst = 0;
 
-    ASSERT(MAX_INSTRUCTIONS >= maxInst);
+    assert(MAX_INSTRUCTIONS >= maxInst);
 
     Program->MajorVersion = (GLuint) * inst++;
     Program->MinorVersion = (GLuint) * inst++;
@@ -3794,7 +3794,7 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     struct arb_program ap;
     GLuint i;
 
-    ASSERT(target == GL_FRAGMENT_PROGRAM_ARB);
+    assert(target == GL_FRAGMENT_PROGRAM_ARB);
     if (!_mesa_parse_arb_program(ctx, target, static_cast<const GLubyte*>(str), len, &ap)) {
 	/* Error in the program. Just return. */
 	return;
@@ -3852,7 +3852,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
 {
     struct arb_program ap;
 
-    ASSERT(target == GL_VERTEX_PROGRAM_ARB);
+    assert(target == GL_VERTEX_PROGRAM_ARB);
 
     if (!_mesa_parse_arb_program(ctx, target, static_cast<const GLubyte*>(str), len, &ap)) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glProgramString(bad program)");

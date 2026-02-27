@@ -74,7 +74,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 {
     struct gl_light *light;
 
-    ASSERT(lnum < MAX_LIGHTS);
+    assert(lnum < MAX_LIGHTS);
     light = &ctx->Light.Light[lnum];
 
     switch (pname) {
@@ -115,8 +115,8 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 	    COPY_3V(light->EyeDirection, params);
 	    break;
 	case GL_SPOT_EXPONENT:
-	    ASSERT(params[0] >= 0.0);
-	    ASSERT(params[0] <= ctx->Const.MaxSpotExponent);
+	    assert(params[0] >= 0.0);
+	    assert(params[0] <= ctx->Const.MaxSpotExponent);
 	    if (light->SpotExponent == params[0])
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
@@ -124,7 +124,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 	    light->invalidate_spot_exp_table();
 	    break;
 	case GL_SPOT_CUTOFF:
-	    ASSERT(params[0] == 180.0 || (params[0] >= 0.0 && params[0] <= 90.0));
+	    assert(params[0] == 180.0 || (params[0] >= 0.0 && params[0] <= 90.0));
 	    if (light->SpotCutoff == params[0])
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
@@ -140,21 +140,21 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 		light->_Flags &= ~LIGHT_SPOT;
 	    break;
 	case GL_CONSTANT_ATTENUATION:
-	    ASSERT(params[0] >= 0.0);
+	    assert(params[0] >= 0.0);
 	    if (light->ConstantAttenuation == params[0])
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
 	    light->ConstantAttenuation = params[0];
 	    break;
 	case GL_LINEAR_ATTENUATION:
-	    ASSERT(params[0] >= 0.0);
+	    assert(params[0] >= 0.0);
 	    if (light->LinearAttenuation == params[0])
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
 	    light->LinearAttenuation = params[0];
 	    break;
 	case GL_QUADRATIC_ATTENUATION:
-	    ASSERT(params[0] >= 0.0);
+	    assert(params[0] >= 0.0);
 	    if (light->QuadraticAttenuation == params[0])
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
@@ -925,7 +925,7 @@ gl_light::validate_spot_exp_table()
 void
 __GLcontextRec::invalidate_shine_table(GLuint side)
 {
-    ASSERT(side < 2);
+    assert(side < 2);
     _ShineTable[side] = _ShineTabList.end();
 }
 
@@ -933,7 +933,7 @@ __GLcontextRec::invalidate_shine_table(GLuint side)
 static void
 validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 {
-    ASSERT(side < 2);
+    assert(side < 2);
     const auto end = ctx->_ShineTabList.end();
 
     /* Search the MRU pool for an existing entry with matching shininess */

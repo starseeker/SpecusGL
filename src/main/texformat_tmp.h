@@ -1391,14 +1391,14 @@ static void FETCH(ycbcr)(const struct gl_texture_image *texImage,
     GLint r, g, b;
     if (i & 1) {
 	/* odd pixel: use y1,cr,cb */
-	r = (GLint)(1.164 * (y1-16) + 1.596 * (cr-128));
-	g = (GLint)(1.164 * (y1-16) - 0.813 * (cr-128) - 0.391 * (cb-128));
-	b = (GLint)(1.164 * (y1-16) + 2.018 * (cb-128));
+	r = static_cast<GLint>((1.164 * (y1-16) + 1.596 * (cr-128)));
+	g = static_cast<GLint>((1.164 * (y1-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
+	b = static_cast<GLint>((1.164 * (y1-16) + 2.018 * (cb-128)));
     } else {
 	/* even pixel: use y0,cr,cb */
-	r = (GLint)(1.164 * (y0-16) + 1.596 * (cr-128));
-	g = (GLint)(1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128));
-	b = (GLint)(1.164 * (y0-16) + 2.018 * (cb-128));
+	r = static_cast<GLint>((1.164 * (y0-16) + 1.596 * (cr-128)));
+	g = static_cast<GLint>((1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
+	b = static_cast<GLint>((1.164 * (y0-16) + 2.018 * (cb-128)));
     }
     texel[RCOMP] = CLAMP(r, 0, CHAN_MAX);
     texel[GCOMP] = CLAMP(g, 0, CHAN_MAX);
@@ -1437,14 +1437,14 @@ static void FETCH(ycbcr_rev)(const struct gl_texture_image *texImage,
     GLint r, g, b;
     if (i & 1) {
 	/* odd pixel: use y1,cr,cb */
-	r = (GLint)(1.164 * (y1-16) + 1.596 * (cr-128));
-	g = (GLint)(1.164 * (y1-16) - 0.813 * (cr-128) - 0.391 * (cb-128));
-	b = (GLint)(1.164 * (y1-16) + 2.018 * (cb-128));
+	r = static_cast<GLint>((1.164 * (y1-16) + 1.596 * (cr-128)));
+	g = static_cast<GLint>((1.164 * (y1-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
+	b = static_cast<GLint>((1.164 * (y1-16) + 2.018 * (cb-128)));
     } else {
 	/* even pixel: use y0,cr,cb */
-	r = (GLint)(1.164 * (y0-16) + 1.596 * (cr-128));
-	g = (GLint)(1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128));
-	b = (GLint)(1.164 * (y0-16) + 2.018 * (cb-128));
+	r = static_cast<GLint>((1.164 * (y0-16) + 1.596 * (cr-128)));
+	g = static_cast<GLint>((1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
+	b = static_cast<GLint>((1.164 * (y0-16) + 2.018 * (cb-128)));
     }
     texel[RCOMP] = CLAMP(r, 0, CHAN_MAX);
     texel[GCOMP] = CLAMP(g, 0, CHAN_MAX);
@@ -1473,11 +1473,11 @@ static void FETCH(f_z24_s8)(const struct gl_texture_image *texImage,
 {
     /* only return Z, not stencil data */
     const GLuint *src = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
-    const GLfloat scale = 1.0F / (GLfloat) 0xffffff;
+    const GLfloat scale = 1.0F / static_cast<GLfloat>(0xffffff);
     texel[0] = ((*src) >> 8) * scale;
-    ASSERT(texImage->TexFormat->MesaFormat == MESA_FORMAT_Z24_S8);
-    ASSERT(texel[0] >= 0.0F);
-    ASSERT(texel[0] <= 1.0F);
+    assert(texImage->TexFormat->MesaFormat == MESA_FORMAT_Z24_S8);
+    assert(texel[0] >= 0.0F);
+    assert(texel[0] <= 1.0F);
 }
 
 #if DIM == 3
@@ -1487,7 +1487,7 @@ static void store_texel_z24_s8(struct gl_texture_image *texImage,
     /* only store Z, not stencil */
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     GLfloat depth = *static_cast<const GLfloat *>(texel);
-    GLuint zi = ((GLuint)(depth * 0xffffff)) << 8;
+    GLuint zi = (static_cast<GLuint>((depth * 0xffffff))) << 8;
     *dst = zi | (*dst & 0xff);
 }
 #endif

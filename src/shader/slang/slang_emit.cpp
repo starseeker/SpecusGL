@@ -1411,7 +1411,7 @@ emit_array_element(slang_emit_info *emitInfo, slang_ir_node *n)
     if (n->Children[1]->Opcode == IR_FLOAT) {
 	/* Constant index */
 	const GLint arrayAddr = n->Children[0]->Store->Index;
-	const GLint index = (GLint) n->Children[1]->Value[0];
+	const GLint index = static_cast<GLint>(n->Children[1]->Value[0]);
 	n->Store->Index = arrayAddr + index;
     } else {
 	/* Variable index - PROBLEM */

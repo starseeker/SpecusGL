@@ -547,7 +547,7 @@ _mesa_image_address(GLuint dimensions,
     GLint skipimages;       /* for 3-D volume images */
     const GLubyte *pixel_addr;
 
-    ASSERT(dimensions >= 1 && dimensions <= 3);
+    assert(dimensions >= 1 && dimensions <= 3);
 
     alignment = packing->Alignment;
     if (packing->RowLength > 0) {
@@ -610,7 +610,7 @@ _mesa_image_address(GLuint dimensions,
 	if (remainder > 0)
 	    bytes_per_row += (alignment - remainder);
 
-	ASSERT(bytes_per_row % alignment == 0);
+	assert(bytes_per_row % alignment == 0);
 
 	bytes_per_image = bytes_per_row * rows_per_image;
 
@@ -687,7 +687,7 @@ _mesa_image_row_stride(const struct gl_pixelstore_attrib *packing,
 {
     GLint bytesPerRow, remainder;
 
-    ASSERT(packing);
+    assert(packing);
 
     if (type == GL_BITMAP) {
 	if (packing->RowLength == 0) {
@@ -732,8 +732,8 @@ _mesa_image_image_stride(const struct gl_pixelstore_attrib *packing,
 			 GLint width, GLint height,
 			 GLenum format, GLenum type)
 {
-    ASSERT(packing);
-    ASSERT(type != GL_BITMAP);
+    assert(packing);
+    assert(type != GL_BITMAP);
 
     {
 	const GLint bytesPerPixel = _mesa_bytes_per_pixel(format, type);
@@ -2075,9 +2075,9 @@ extract_uint_indexes(GLuint n, GLuint indexes[],
 		     GLenum srcFormat, GLenum srcType, const GLvoid *src,
 		     const struct gl_pixelstore_attrib *unpack)
 {
-    ASSERT(srcFormat == GL_COLOR_INDEX || srcFormat == GL_STENCIL_INDEX);
+    assert(srcFormat == GL_COLOR_INDEX || srcFormat == GL_STENCIL_INDEX);
 
-    ASSERT(srcType == GL_BITMAP ||
+    assert(srcType == GL_BITMAP ||
 	   srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
@@ -2270,7 +2270,7 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
     GLint stride;
     GLint rComp, bComp, gComp, aComp;
 
-    ASSERT(srcFormat == GL_RED ||
+    assert(srcFormat == GL_RED ||
 	   srcFormat == GL_GREEN ||
 	   srcFormat == GL_BLUE ||
 	   srcFormat == GL_ALPHA ||
@@ -2283,7 +2283,7 @@ extract_float_rgba(GLuint n, GLfloat rgba[][4],
 	   srcFormat == GL_BGRA ||
 	   srcFormat == GL_ABGR_EXT);
 
-    ASSERT(srcType == GL_UNSIGNED_BYTE ||
+    assert(srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
 	   srcType == GL_SHORT ||
@@ -2864,7 +2864,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 			     const struct gl_pixelstore_attrib *srcPacking,
 			     GLbitfield transferOps)
 {
-    ASSERT(dstFormat == GL_ALPHA ||
+    assert(dstFormat == GL_ALPHA ||
 	   dstFormat == GL_LUMINANCE ||
 	   dstFormat == GL_LUMINANCE_ALPHA ||
 	   dstFormat == GL_INTENSITY ||
@@ -2872,7 +2872,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 	   dstFormat == GL_RGBA ||
 	   dstFormat == GL_COLOR_INDEX);
 
-    ASSERT(srcFormat == GL_RED ||
+    assert(srcFormat == GL_RED ||
 	   srcFormat == GL_GREEN ||
 	   srcFormat == GL_BLUE ||
 	   srcFormat == GL_ALPHA ||
@@ -2886,7 +2886,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 	   srcFormat == GL_ABGR_EXT ||
 	   srcFormat == GL_COLOR_INDEX);
 
-    ASSERT(srcType == GL_BITMAP ||
+    assert(srcType == GL_BITMAP ||
 	   srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
@@ -3193,7 +3193,7 @@ _mesa_unpack_color_span_float(GLcontext *ctx,
 			      const struct gl_pixelstore_attrib *srcPacking,
 			      GLbitfield transferOps)
 {
-    ASSERT(dstFormat == GL_ALPHA ||
+    assert(dstFormat == GL_ALPHA ||
 	   dstFormat == GL_LUMINANCE ||
 	   dstFormat == GL_LUMINANCE_ALPHA ||
 	   dstFormat == GL_INTENSITY ||
@@ -3201,7 +3201,7 @@ _mesa_unpack_color_span_float(GLcontext *ctx,
 	   dstFormat == GL_RGBA ||
 	   dstFormat == GL_COLOR_INDEX);
 
-    ASSERT(srcFormat == GL_RED ||
+    assert(srcFormat == GL_RED ||
 	   srcFormat == GL_GREEN ||
 	   srcFormat == GL_BLUE ||
 	   srcFormat == GL_ALPHA ||
@@ -3215,7 +3215,7 @@ _mesa_unpack_color_span_float(GLcontext *ctx,
 	   srcFormat == GL_ABGR_EXT ||
 	   srcFormat == GL_COLOR_INDEX);
 
-    ASSERT(srcType == GL_BITMAP ||
+    assert(srcType == GL_BITMAP ||
 	   srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
@@ -3413,7 +3413,7 @@ _mesa_unpack_index_span(const GLcontext *ctx, GLuint n,
 			const struct gl_pixelstore_attrib *srcPacking,
 			GLbitfield transferOps)
 {
-    ASSERT(srcType == GL_BITMAP ||
+    assert(srcType == GL_BITMAP ||
 	   srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
@@ -3423,7 +3423,7 @@ _mesa_unpack_index_span(const GLcontext *ctx, GLuint n,
 	   srcType == GL_HALF_FLOAT_ARB ||
 	   srcType == GL_FLOAT);
 
-    ASSERT(dstType == GL_UNSIGNED_BYTE ||
+    assert(dstType == GL_UNSIGNED_BYTE ||
 	   dstType == GL_UNSIGNED_SHORT ||
 	   dstType == GL_UNSIGNED_INT);
 
@@ -3488,7 +3488,7 @@ _mesa_pack_index_span(const GLcontext *ctx, GLuint n,
 {
     GLuint indexes[MAX_WIDTH];
 
-    ASSERT(n <= MAX_WIDTH);
+    assert(n <= MAX_WIDTH);
 
     transferOps &= (IMAGE_MAP_COLOR_BIT | IMAGE_SHIFT_OFFSET_BIT);
 
@@ -3609,7 +3609,7 @@ _mesa_unpack_stencil_span(const GLcontext *ctx, GLuint n,
 			  const struct gl_pixelstore_attrib *srcPacking,
 			  GLbitfield transferOps)
 {
-    ASSERT(srcType == GL_BITMAP ||
+    assert(srcType == GL_BITMAP ||
 	   srcType == GL_UNSIGNED_BYTE ||
 	   srcType == GL_BYTE ||
 	   srcType == GL_UNSIGNED_SHORT ||
@@ -3620,7 +3620,7 @@ _mesa_unpack_stencil_span(const GLcontext *ctx, GLuint n,
 	   srcType == GL_HALF_FLOAT_ARB ||
 	   srcType == GL_FLOAT);
 
-    ASSERT(dstType == GL_UNSIGNED_BYTE ||
+    assert(dstType == GL_UNSIGNED_BYTE ||
 	   dstType == GL_UNSIGNED_SHORT ||
 	   dstType == GL_UNSIGNED_INT);
 
@@ -3700,7 +3700,7 @@ _mesa_pack_stencil_span(const GLcontext *ctx, GLuint n,
 {
     GLstencil stencil[MAX_WIDTH];
 
-    ASSERT(n <= MAX_WIDTH);
+    assert(n <= MAX_WIDTH);
 
     if (ctx->Pixel.IndexShift || ctx->Pixel.IndexOffset ||
 	ctx->Pixel.MapStencilFlag) {
@@ -4027,13 +4027,13 @@ _mesa_unpack_depth_span(const GLcontext *ctx, GLuint n,
     } else if (dstType == GL_UNSIGNED_SHORT) {
 	GLushort *zValues = reinterpret_cast<GLushort *>(dest);
 	GLuint i;
-	ASSERT(depthScale <= 65535.0);
+	assert(depthScale <= 65535.0);
 	for (i = 0; i < n; i++) {
 	    zValues[i] = static_cast<GLushort>((depthValues[i] * depthScale));
 	}
     } else {
-	ASSERT(dstType == GL_FLOAT);
-	ASSERT(depthScale == 1.0F);
+	assert(dstType == GL_FLOAT);
+	assert(depthScale == 1.0F);
     }
 }
 
@@ -4048,7 +4048,7 @@ _mesa_pack_depth_span(const GLcontext *ctx, GLuint n, GLvoid *dest,
 {
     GLfloat depthCopy[MAX_WIDTH];
 
-    ASSERT(n <= MAX_WIDTH);
+    assert(n <= MAX_WIDTH);
 
     if (ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0) {
 	memcpy(depthCopy, depthSpan, n * sizeof(GLfloat));
@@ -4159,7 +4159,7 @@ _mesa_pack_depth_stencil_span(const GLcontext *ctx, GLuint n, GLuint *dest,
     GLstencil stencilCopy[MAX_WIDTH];
     GLuint i;
 
-    ASSERT(n <= MAX_WIDTH);
+    assert(n <= MAX_WIDTH);
 
     if (ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0) {
 	memcpy(depthCopy, depthVals, n * sizeof(GLfloat));
@@ -4331,7 +4331,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
     GLuint tempBuffer[MAX_WIDTH][4];
     const GLboolean useTemp = (src == dst);
 
-    ASSERT(srcType != dstType);
+    assert(srcType != dstType);
 
     switch (srcType) {
 	case GL_UNSIGNED_BYTE:
@@ -4353,7 +4353,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		const GLubyte(*src1)[4] = (const GLubyte(*)[4]) src;
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
-		ASSERT(dstType == GL_FLOAT);
+		assert(dstType == GL_FLOAT);
 		for (i = 0; i < count; i++) {
 		    if (!mask || mask[i]) {
 			dst4[i][RCOMP] = UBYTE_TO_FLOAT(src1[i][RCOMP]);
@@ -4385,7 +4385,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		const GLushort(*src2)[4] = (const GLushort(*)[4]) src;
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
-		ASSERT(dstType == GL_FLOAT);
+		assert(dstType == GL_FLOAT);
 		for (i = 0; i < count; i++) {
 		    if (!mask || mask[i]) {
 			dst4[i][RCOMP] = USHORT_TO_FLOAT(src2[i][RCOMP]);
@@ -4417,7 +4417,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		const GLfloat(*src4)[4] = (const GLfloat(*)[4]) src;
 		GLushort(*dst2)[4] = (GLushort(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
-		ASSERT(dstType == GL_UNSIGNED_SHORT);
+		assert(dstType == GL_UNSIGNED_SHORT);
 		for (i = 0; i < count; i++) {
 		    if (!mask || mask[i]) {
 			UNCLAMPED_FLOAT_TO_USHORT(dst2[i][RCOMP], src4[i][RCOMP]);
@@ -4461,8 +4461,8 @@ _mesa_clip_drawpixels(const GLcontext *ctx,
 	unpack->RowLength = *width;
     }
 
-    ASSERT(ctx->Pixel.ZoomX == 1.0F);
-    ASSERT(ctx->Pixel.ZoomY == 1.0F || ctx->Pixel.ZoomY == -1.0F);
+    assert(ctx->Pixel.ZoomX == 1.0F);
+    assert(ctx->Pixel.ZoomY == 1.0F || ctx->Pixel.ZoomY == -1.0F);
 
     /* left clipping */
     if (*destX < buffer->_Xmin) {

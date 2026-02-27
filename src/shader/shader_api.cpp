@@ -164,7 +164,7 @@ _mesa_reference_shader_program(GLcontext *ctx,
 	/* Unreference the old shader program */
 	struct gl_shader_program *old = *ptr;
 
-	ASSERT(old->RefCount > 0);
+	assert(old->RefCount > 0);
 	if (old->unref()) {
 	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader_program(ctx, old);
@@ -252,7 +252,7 @@ _mesa_reference_shader(GLcontext *ctx, struct gl_shader **ptr,
 	/* Unreference the old shader */
 	struct gl_shader *old = *ptr;
 
-	ASSERT(old->RefCount > 0);
+	assert(old->RefCount > 0);
 	if (old->unref()) {
 	    ctx->Shared->remove_shader_object(old->Name);
 	    _mesa_free_shader(ctx, old);
@@ -579,7 +579,7 @@ _mesa_detach_shader(GLcontext *ctx, GLuint program, GLuint shader)
 	    /* dereference */
 	    _mesa_reference_shader(ctx, &(*it), nullptr);
 	    shProg->Shaders.erase(it);
-	    n = (GLuint) shProg->Shaders.size();
+	    n = static_cast<GLuint>(shProg->Shaders.size());
 
 #ifdef DEBUG
 	    /* sanity check */
@@ -694,7 +694,7 @@ _mesa_get_attached_shaders(GLcontext *ctx, GLuint program, GLsizei maxCount,
 	= _mesa_lookup_shader_program(ctx, program);
     if (shProg) {
 	GLint i;
-	for (i = 0; i < maxCount && i < (GLsizei) shProg->Shaders.size(); i++) {
+	for (i = 0; i < maxCount && i < static_cast<GLsizei>(shProg->Shaders.size()); i++) {
 	    obj[i] = shProg->Shaders[i]->Name;
 	}
 	if (count)
@@ -782,7 +782,7 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 	    *params = shProg->Validated;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = (GLsizei) shProg->InfoLog.size() + 1;
+	    *params = static_cast<GLsizei>(shProg->InfoLog.size()) + 1;
 	    break;
 	case GL_ATTACHED_SHADERS:
 	    *params = static_cast<GLuint>(shProg->Shaders.size());
@@ -834,10 +834,10 @@ _mesa_get_shaderiv(GLcontext *ctx, GLuint name, GLenum pname, GLint *params)
 	    *params = shader->CompileStatus;
 	    break;
 	case GL_INFO_LOG_LENGTH:
-	    *params = (GLsizei) shader->InfoLog.size() + 1;
+	    *params = static_cast<GLsizei>(shader->InfoLog.size()) + 1;
 	    break;
 	case GL_SHADER_SOURCE_LENGTH:
-	    *params = (GLsizei) shader->Source.size() + 1;
+	    *params = static_cast<GLsizei>(shader->Source.size()) + 1;
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetShaderiv(pname)");
@@ -978,7 +978,7 @@ _mesa_get_uniformiv(GLcontext *ctx, GLuint program, GLint location,
     GLuint i;
     assert(n <= MAX_UNIFORM_ELEMENTS);
     for (i = 0; i < n; i++) {
-	params[i] = (GLint) fparams[i];
+	params[i] = static_cast<GLint>(fparams[i]);
     }
 }
 
@@ -1140,7 +1140,7 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
     /* The spec says this is GL_INVALID_OPERATION, although it seems like it
      * ought to be GL_INVALID_VALUE
      */
-    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters()) {
+    if (location < 0 || location >= static_cast<GLint>(shProg->Uniforms->NumParameters())) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUniform(location)");
 	return;
     }
@@ -1233,7 +1233,7 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
 	    type == GL_INT_VEC4) {
 	    const GLint *iValues = (static_cast<const GLint *>(values)) + k * elems;
 	    for (i = 0; i < elems; i++) {
-		uniformVal[i] = (GLfloat) iValues[i];
+		uniformVal[i] = static_cast<GLfloat>(iValues[i]);
 	    }
 	} else {
 	    const GLfloat *fValues = (static_cast<const GLfloat *>(values)) + k * elems;
@@ -1280,7 +1280,7 @@ _mesa_uniform_matrix(GLcontext *ctx, GLint cols, GLint rows,
     /* The spec says this is GL_INVALID_OPERATION, although it seems like it
      * ought to be GL_INVALID_VALUE
      */
-    if (location < 0 || location >= (GLint) shProg->Uniforms->NumParameters()) {
+    if (location < 0 || location >= static_cast<GLint>(shProg->Uniforms->NumParameters())) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUniformMatrix(location)");
 	return;
     }

@@ -316,9 +316,9 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 {
     GLuint transferOps = ctx->_ImageTransferState;
 
-    ASSERT(dims >= 1 && dims <= 3);
+    assert(dims >= 1 && dims <= 3);
 
-    ASSERT(logicalBaseFormat == GL_RGBA ||
+    assert(logicalBaseFormat == GL_RGBA ||
 	   logicalBaseFormat == GL_RGB ||
 	   logicalBaseFormat == GL_LUMINANCE_ALPHA ||
 	   logicalBaseFormat == GL_LUMINANCE ||
@@ -327,7 +327,7 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	   logicalBaseFormat == GL_COLOR_INDEX ||
 	   logicalBaseFormat == GL_DEPTH_COMPONENT);
 
-    ASSERT(textureBaseFormat == GL_RGBA ||
+    assert(textureBaseFormat == GL_RGBA ||
 	   textureBaseFormat == GL_RGB ||
 	   textureBaseFormat == GL_LUMINANCE_ALPHA ||
 	   textureBaseFormat == GL_LUMINANCE ||
@@ -383,14 +383,14 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 		convWidth = srcWidth;
 		convHeight = srcHeight;
 		if (dims == 1) {
-		    ASSERT(ctx->Pixel.Convolution1DEnabled);
+		    assert(ctx->Pixel.Convolution1DEnabled);
 		    _mesa_convolve_1d_image(ctx, &convWidth, src, convImage);
 		} else {
 		    if (ctx->Pixel.Convolution2DEnabled) {
 			_mesa_convolve_2d_image(ctx, &convWidth, &convHeight,
 						src, convImage);
 		    } else {
-			ASSERT(ctx->Pixel.Separable2DEnabled);
+			assert(ctx->Pixel.Separable2DEnabled);
 			_mesa_convolve_sep_image(ctx, &convWidth, &convHeight,
 						 src, convImage);
 		    }
@@ -454,13 +454,13 @@ make_temp_float_image(GLcontext *ctx, GLuint dims,
 	GLubyte map[6];
 
 	/* we only promote up to RGB, RGBA and LUMINANCE_ALPHA formats for now */
-	ASSERT(textureBaseFormat == GL_RGB || textureBaseFormat == GL_RGBA ||
+	assert(textureBaseFormat == GL_RGB || textureBaseFormat == GL_RGBA ||
 	       textureBaseFormat == GL_LUMINANCE_ALPHA);
 
 	/* The actual texture format should have at least as many components
 	 * as the logical texture format.
 	 */
-	ASSERT(texComponents >= logComponents);
+	assert(texComponents >= logComponents);
 
 	std::vector<GLfloat> newVec(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * texComponents);
 	const GLfloat *tempImage = tempVec.data();
@@ -524,16 +524,16 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
     const GLint components = _mesa_components_in_format(logicalBaseFormat);
     GLint img, row;
 
-    ASSERT(dims >= 1 && dims <= 3);
+    assert(dims >= 1 && dims <= 3);
 
-    ASSERT(logicalBaseFormat == GL_RGBA ||
+    assert(logicalBaseFormat == GL_RGBA ||
 	   logicalBaseFormat == GL_RGB ||
 	   logicalBaseFormat == GL_LUMINANCE_ALPHA ||
 	   logicalBaseFormat == GL_LUMINANCE ||
 	   logicalBaseFormat == GL_ALPHA ||
 	   logicalBaseFormat == GL_INTENSITY);
 
-    ASSERT(textureBaseFormat == GL_RGBA ||
+    assert(textureBaseFormat == GL_RGBA ||
 	   textureBaseFormat == GL_RGB ||
 	   textureBaseFormat == GL_LUMINANCE_ALPHA ||
 	   textureBaseFormat == GL_LUMINANCE ||
@@ -596,13 +596,13 @@ _mesa_make_temp_chan_image(GLcontext *ctx, GLuint dims,
 	GLubyte map[6];
 
 	/* we only promote up to RGB, RGBA and LUMINANCE_ALPHA formats for now */
-	ASSERT(textureBaseFormat == GL_RGB || textureBaseFormat == GL_RGBA ||
+	assert(textureBaseFormat == GL_RGB || textureBaseFormat == GL_RGBA ||
 	       textureBaseFormat == GL_LUMINANCE_ALPHA);
 
 	/* The actual texture format should have at least as many components
 	 * as the logical texture format.
 	 */
-	ASSERT(texComponents >= logComponents);
+	assert(texComponents >= logComponents);
 
 	std::vector<GLchan> newVec(static_cast<size_t>(srcWidth) * srcHeight * srcDepth * texComponents);
 	const GLchan *tempImage = tempVec.data();
@@ -671,8 +671,8 @@ swizzle_copy(GLubyte *dst, GLuint dstComponents, const GLubyte *src,
     tmp[ZERO] = 0x0;
     tmp[ONE] = 0xff;
 
-    ASSERT(srcComponents <= 4);
-    ASSERT(dstComponents <= 4);
+    assert(srcComponents <= 4);
+    assert(dstComponents <= 4);
 
     switch (dstComponents) {
 	case 4:
@@ -972,19 +972,19 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(baseInternalFormat);
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba ||
+    assert(dstFormat == &_mesa_texformat_rgba ||
 	   dstFormat == &_mesa_texformat_rgb ||
 	   dstFormat == &_mesa_texformat_alpha ||
 	   dstFormat == &_mesa_texformat_luminance ||
 	   dstFormat == &_mesa_texformat_luminance_alpha ||
 	   dstFormat == &_mesa_texformat_intensity);
-    ASSERT(baseInternalFormat == GL_RGBA ||
+    assert(baseInternalFormat == GL_RGBA ||
 	   baseInternalFormat == GL_RGB ||
 	   baseInternalFormat == GL_ALPHA ||
 	   baseInternalFormat == GL_LUMINANCE ||
 	   baseInternalFormat == GL_LUMINANCE_ALPHA ||
 	   baseInternalFormat == GL_INTENSITY);
-    ASSERT(dstFormat->TexelBytes == components * sizeof(GLchan));
+    assert(dstFormat->TexelBytes == components * sizeof(GLchan));
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1111,8 +1111,8 @@ _mesa_texstore_z32(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = static_cast<GLfloat>(0xffffffff);
     (void) dims;
-    ASSERT(dstFormat == &_mesa_texformat_z32);
-    ASSERT(dstFormat->TexelBytes == sizeof(GLuint));
+    assert(dstFormat == &_mesa_texformat_z32);
+    assert(dstFormat->TexelBytes == sizeof(GLuint));
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1157,8 +1157,8 @@ _mesa_texstore_z16(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = 65535.0f;
     (void) dims;
-    ASSERT(dstFormat == &_mesa_texformat_z16);
-    ASSERT(dstFormat->TexelBytes == sizeof(GLushort));
+    assert(dstFormat == &_mesa_texformat_z16);
+    assert(dstFormat->TexelBytes == sizeof(GLushort));
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1201,9 +1201,9 @@ _mesa_texstore_z16(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 {
-    ASSERT(dstFormat == &_mesa_texformat_rgb565 ||
+    assert(dstFormat == &_mesa_texformat_rgb565 ||
 	   dstFormat == &_mesa_texformat_rgb565_rev);
-    ASSERT(dstFormat->TexelBytes == 2);
+    assert(dstFormat->TexelBytes == 2);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1304,9 +1304,9 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 {
     const GLboolean littleEndian = _mesa_little_endian();
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba8888 ||
+    assert(dstFormat == &_mesa_texformat_rgba8888 ||
 	   dstFormat == &_mesa_texformat_rgba8888_rev);
-    ASSERT(dstFormat->TexelBytes == 4);
+    assert(dstFormat->TexelBytes == 4);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1421,9 +1421,9 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 {
     const GLboolean littleEndian = _mesa_little_endian();
 
-    ASSERT(dstFormat == &_mesa_texformat_argb8888 ||
+    assert(dstFormat == &_mesa_texformat_argb8888 ||
 	   dstFormat == &_mesa_texformat_argb8888_rev);
-    ASSERT(dstFormat->TexelBytes == 4);
+    assert(dstFormat->TexelBytes == 4);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1631,8 +1631,8 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 {
     const GLboolean littleEndian = _mesa_little_endian();
 
-    ASSERT(dstFormat == &_mesa_texformat_rgb888);
-    ASSERT(dstFormat->TexelBytes == 3);
+    assert(dstFormat == &_mesa_texformat_rgb888);
+    assert(dstFormat->TexelBytes == 3);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1751,8 +1751,8 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 {
     const GLboolean littleEndian = _mesa_little_endian();
 
-    ASSERT(dstFormat == &_mesa_texformat_bgr888);
-    ASSERT(dstFormat->TexelBytes == 3);
+    assert(dstFormat == &_mesa_texformat_bgr888);
+    assert(dstFormat->TexelBytes == 3);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1851,9 +1851,9 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 {
-    ASSERT(dstFormat == &_mesa_texformat_argb4444 ||
+    assert(dstFormat == &_mesa_texformat_argb4444 ||
 	   dstFormat == &_mesa_texformat_argb4444_rev);
-    ASSERT(dstFormat->TexelBytes == 2);
+    assert(dstFormat->TexelBytes == 2);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1917,9 +1917,9 @@ _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 {
-    ASSERT(dstFormat == &_mesa_texformat_argb1555 ||
+    assert(dstFormat == &_mesa_texformat_argb1555 ||
 	   dstFormat == &_mesa_texformat_argb1555_rev);
-    ASSERT(dstFormat->TexelBytes == 2);
+    assert(dstFormat->TexelBytes == 2);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -1984,9 +1984,9 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 {
     const GLboolean littleEndian = _mesa_little_endian();
 
-    ASSERT(dstFormat == &_mesa_texformat_al88 ||
+    assert(dstFormat == &_mesa_texformat_al88 ||
 	   dstFormat == &_mesa_texformat_al88_rev);
-    ASSERT(dstFormat->TexelBytes == 2);
+    assert(dstFormat->TexelBytes == 2);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2078,8 +2078,8 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 {
-    ASSERT(dstFormat == &_mesa_texformat_rgb332);
-    ASSERT(dstFormat->TexelBytes == 1);
+    assert(dstFormat == &_mesa_texformat_rgb332);
+    assert(dstFormat->TexelBytes == 1);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2131,10 +2131,10 @@ _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_a8(TEXSTORE_PARAMS)
 {
-    ASSERT(dstFormat == &_mesa_texformat_a8 ||
+    assert(dstFormat == &_mesa_texformat_a8 ||
 	   dstFormat == &_mesa_texformat_l8 ||
 	   dstFormat == &_mesa_texformat_i8);
-    ASSERT(dstFormat->TexelBytes == 1);
+    assert(dstFormat->TexelBytes == 1);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2211,9 +2211,9 @@ _mesa_texstore_ci8(TEXSTORE_PARAMS)
 {
     (void) dims;
     (void) baseInternalFormat;
-    ASSERT(dstFormat == &_mesa_texformat_ci8);
-    ASSERT(dstFormat->TexelBytes == 1);
-    ASSERT(baseInternalFormat == GL_COLOR_INDEX);
+    assert(dstFormat == &_mesa_texformat_ci8);
+    assert(dstFormat->TexelBytes == 1);
+    assert(baseInternalFormat == GL_COLOR_INDEX);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2259,14 +2259,14 @@ _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
     (void) dims;
     (void) baseInternalFormat;
 
-    ASSERT((dstFormat == &_mesa_texformat_ycbcr) ||
+    assert((dstFormat == &_mesa_texformat_ycbcr) ||
 	   (dstFormat == &_mesa_texformat_ycbcr_rev));
-    ASSERT(dstFormat->TexelBytes == 2);
-    ASSERT(ctx->Extensions.MESA_ycbcr_texture);
-    ASSERT(srcFormat == GL_YCBCR_MESA);
-    ASSERT((srcType == GL_UNSIGNED_SHORT_8_8_MESA) ||
+    assert(dstFormat->TexelBytes == 2);
+    assert(ctx->Extensions.MESA_ycbcr_texture);
+    assert(srcFormat == GL_YCBCR_MESA);
+    assert((srcType == GL_UNSIGNED_SHORT_8_8_MESA) ||
 	   (srcType == GL_UNSIGNED_SHORT_8_8_REV_MESA));
-    ASSERT(baseInternalFormat == GL_YCBCR_MESA);
+    assert(baseInternalFormat == GL_YCBCR_MESA);
 
     /* always just memcpy since no pixel transfer ops apply */
     memcpy_texture(ctx, dims,
@@ -2307,9 +2307,9 @@ _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = static_cast<GLfloat>(0xffffff);
 
-    ASSERT(dstFormat == &_mesa_texformat_z24_s8);
-    ASSERT(srcFormat == GL_DEPTH_STENCIL_EXT);
-    ASSERT(srcType == GL_UNSIGNED_INT_24_8_EXT);
+    assert(dstFormat == &_mesa_texformat_z24_s8);
+    assert(srcFormat == GL_DEPTH_STENCIL_EXT);
+    assert(srcType == GL_UNSIGNED_INT_24_8_EXT);
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes) {
@@ -2380,19 +2380,19 @@ _mesa_texstore_rgba_float32(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(dstFormat->BaseFormat);
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_float32 ||
+    assert(dstFormat == &_mesa_texformat_rgba_float32 ||
 	   dstFormat == &_mesa_texformat_rgb_float32 ||
 	   dstFormat == &_mesa_texformat_alpha_float32 ||
 	   dstFormat == &_mesa_texformat_luminance_float32 ||
 	   dstFormat == &_mesa_texformat_luminance_alpha_float32 ||
 	   dstFormat == &_mesa_texformat_intensity_float32);
-    ASSERT(baseInternalFormat == GL_RGBA ||
+    assert(baseInternalFormat == GL_RGBA ||
 	   baseInternalFormat == GL_RGB ||
 	   baseInternalFormat == GL_ALPHA ||
 	   baseInternalFormat == GL_LUMINANCE ||
 	   baseInternalFormat == GL_LUMINANCE_ALPHA ||
 	   baseInternalFormat == GL_INTENSITY);
-    ASSERT(dstFormat->TexelBytes == components * sizeof(GLfloat));
+    assert(dstFormat->TexelBytes == components * sizeof(GLfloat));
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2443,19 +2443,19 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(dstFormat->BaseFormat);
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_float16 ||
+    assert(dstFormat == &_mesa_texformat_rgba_float16 ||
 	   dstFormat == &_mesa_texformat_rgb_float16 ||
 	   dstFormat == &_mesa_texformat_alpha_float16 ||
 	   dstFormat == &_mesa_texformat_luminance_float16 ||
 	   dstFormat == &_mesa_texformat_luminance_alpha_float16 ||
 	   dstFormat == &_mesa_texformat_intensity_float16);
-    ASSERT(baseInternalFormat == GL_RGBA ||
+    assert(baseInternalFormat == GL_RGBA ||
 	   baseInternalFormat == GL_RGB ||
 	   baseInternalFormat == GL_ALPHA ||
 	   baseInternalFormat == GL_LUMINANCE ||
 	   baseInternalFormat == GL_LUMINANCE_ALPHA ||
 	   baseInternalFormat == GL_INTENSITY);
-    ASSERT(dstFormat->TexelBytes == components * sizeof(GLhalfARB));
+    assert(dstFormat->TexelBytes == components * sizeof(GLhalfARB));
 
     if (!ctx->_ImageTransferState &&
 	!srcPacking->SwapBytes &&
@@ -2509,7 +2509,7 @@ _mesa_texstore_srgb8(TEXSTORE_PARAMS)
     StoreTexImageFunc store;
     GLboolean k;
 
-    ASSERT(dstFormat == &_mesa_texformat_srgb8);
+    assert(dstFormat == &_mesa_texformat_srgb8);
 
     /* reuse normal rgb texstore code */
     if (littleEndian) {
@@ -2538,7 +2538,7 @@ _mesa_texstore_srgba8(TEXSTORE_PARAMS)
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
-    ASSERT(dstFormat == &_mesa_texformat_srgba8);
+    assert(dstFormat == &_mesa_texformat_srgba8);
 
     /* reuse normal rgba texstore code */
     if (littleEndian)
@@ -2563,7 +2563,7 @@ _mesa_texstore_sl8(TEXSTORE_PARAMS)
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
-    ASSERT(dstFormat == &_mesa_texformat_sl8);
+    assert(dstFormat == &_mesa_texformat_sl8);
 
     newDstFormat = &_mesa_texformat_l8;
 
@@ -2586,7 +2586,7 @@ _mesa_texstore_sla8(TEXSTORE_PARAMS)
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
-    ASSERT(dstFormat == &_mesa_texformat_sla8);
+    assert(dstFormat == &_mesa_texformat_sla8);
 
     /* reuse normal luminance/alpha texstore code */
     if (littleEndian)
@@ -2704,7 +2704,7 @@ fetch_texel_float_to_chan(const struct gl_texture_image *texImage,
 			  GLint i, GLint j, GLint k, GLchan *texelOut)
 {
     GLfloat temp[4];
-    ASSERT(texImage->FetchTexelf);
+    assert(texImage->FetchTexelf);
     texImage->FetchTexelf(texImage, i, j, k, temp);
     if (texImage->TexFormat->BaseFormat == GL_DEPTH_COMPONENT ||
 	texImage->TexFormat->BaseFormat == GL_DEPTH_STENCIL_EXT) {
@@ -2728,7 +2728,7 @@ fetch_texel_chan_to_float(const struct gl_texture_image *texImage,
 			  GLint i, GLint j, GLint k, GLfloat *texelOut)
 {
     GLchan temp[4];
-    ASSERT(texImage->FetchTexelc);
+    assert(texImage->FetchTexelc);
     texImage->FetchTexelc(texImage, i, j, k, temp);
     if (texImage->TexFormat->BaseFormat == GL_DEPTH_COMPONENT ||
 	texImage->TexFormat->BaseFormat == GL_DEPTH_STENCIL_EXT) {
@@ -2750,8 +2750,8 @@ fetch_texel_chan_to_float(const struct gl_texture_image *texImage,
 void
 _mesa_set_fetch_functions(struct gl_texture_image *texImage, GLuint dims)
 {
-    ASSERT(dims == 1 || dims == 2 || dims == 3);
-    ASSERT(texImage->TexFormat);
+    assert(dims == 1 || dims == 2 || dims == 3);
+    assert(texImage->TexFormat);
 
     switch (dims) {
 	case 1:
@@ -2778,8 +2778,8 @@ _mesa_set_fetch_functions(struct gl_texture_image *texImage, GLuint dims)
     }
 
 
-    ASSERT(texImage->FetchTexelc);
-    ASSERT(texImage->FetchTexelf);
+    assert(texImage->FetchTexelc);
+    assert(texImage->FetchTexelf);
 }
 
 
@@ -2799,13 +2799,13 @@ choose_texture_format(GLcontext *ctx, struct gl_texture_image *texImage,
 		      GLuint dims,
 		      GLenum format, GLenum type, GLint internalFormat)
 {
-    ASSERT(dims == 1 || dims == 2 || dims == 3);
-    ASSERT(ctx->Driver.ChooseTextureFormat);
+    assert(dims == 1 || dims == 2 || dims == 3);
+    assert(ctx->Driver.ChooseTextureFormat);
 
     texImage->TexFormat
 	= ctx->Driver.ChooseTextureFormat(ctx, internalFormat, format, type);
 
-    ASSERT(texImage->TexFormat);
+    assert(texImage->TexFormat);
 
     _mesa_set_fetch_functions(texImage, dims);
 
@@ -2870,7 +2870,7 @@ _mesa_store_teximage1d(GLcontext *ctx, GLenum target, GLint level,
     } else {
 	const GLint dstRowStride = 0;
 	GLboolean success;
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 1, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -2954,7 +2954,7 @@ _mesa_store_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 	} else {
 	    dstRowStride = texImage->RowStride * texImage->TexFormat->TexelBytes;
 	}
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 2, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -3028,7 +3028,7 @@ _mesa_store_teximage3d(GLcontext *ctx, GLenum target, GLint level,
 	} else {
 	    dstRowStride = texImage->RowStride * texImage->TexFormat->TexelBytes;
 	}
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 3, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -3076,7 +3076,7 @@ _mesa_store_texsubimage1d(GLcontext *ctx, GLenum target, GLint level,
     {
 	const GLint dstRowStride = 0;
 	GLboolean success;
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 1, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -3130,7 +3130,7 @@ _mesa_store_texsubimage2d(GLcontext *ctx, GLenum target, GLint level,
 	} else {
 	    dstRowStride = texImage->RowStride * texImage->TexFormat->TexelBytes;
 	}
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 2, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -3184,7 +3184,7 @@ _mesa_store_texsubimage3d(GLcontext *ctx, GLenum target, GLint level,
 	} else {
 	    dstRowStride = texImage->RowStride * texImage->TexFormat->TexelBytes;
 	}
-	ASSERT(texImage->TexFormat->StoreImage);
+	assert(texImage->TexFormat->StoreImage);
 	success = texImage->TexFormat->StoreImage(ctx, 3, texImage->_BaseFormat,
 		  texImage->TexFormat,
 		  texImage->Data,
@@ -3253,12 +3253,12 @@ _mesa_store_compressed_teximage2d(GLcontext *ctx, GLenum target, GLint level,
     /* This is pretty simple, basically just do a memcpy without worrying
      * about the usual image unpacking or image transfer operations.
      */
-    ASSERT(texObj);
-    ASSERT(texImage);
-    ASSERT(texImage->Width > 0);
-    ASSERT(texImage->Height > 0);
-    ASSERT(texImage->Depth == 1);
-    ASSERT(texImage->Data == nullptr); /* was freed in glCompressedTexImage2DARB */
+    assert(texObj);
+    assert(texImage);
+    assert(texImage->Width > 0);
+    assert(texImage->Height > 0);
+    assert(texImage->Depth == 1);
+    assert(texImage->Data == nullptr); /* was freed in glCompressedTexImage2DARB */
 
     choose_texture_format(ctx, texImage, 2, 0, 0, internalFormat);
 
@@ -3276,7 +3276,7 @@ _mesa_store_compressed_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 	return;
 
     /* copy the data */
-    ASSERT(texImage->CompressedSize == static_cast<GLuint>(imageSize));
+    assert(texImage->CompressedSize == static_cast<GLuint>(imageSize));
     memcpy(texImage->Data, data, imageSize);
 
     /* GL_SGIS_generate_mipmap */
@@ -3368,10 +3368,10 @@ _mesa_store_compressed_texsubimage2d(GLcontext *ctx, GLenum target,
     (void) format;
 
     /* these should have been caught sooner */
-    ASSERT((width & 3) == 0 || width == 2 || width == 1);
-    ASSERT((height & 3) == 0 || height == 2 || height == 1);
-    ASSERT((xoffset & 3) == 0);
-    ASSERT((yoffset & 3) == 0);
+    assert((width & 3) == 0 || width == 2 || width == 1);
+    assert((height & 3) == 0 || height == 2 || height == 1);
+    assert((xoffset & 3) == 0);
+    assert((yoffset & 3) == 0);
 
     /* get pointer to src pixels (may be in a pbo which we'll map here) */
     data = _mesa_validate_pbo_compressed_teximage(ctx, imageSize, data,

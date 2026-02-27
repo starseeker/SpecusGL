@@ -63,7 +63,7 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
     array->Ptr = static_cast<const GLubyte *>(ptr);
 #if FEATURE_ARB_vertex_buffer_object
     if (array->BufferObj->unref()) {
-	ASSERT(array->BufferObj->Name);
+	assert(array->BufferObj->Name);
 	_mesa_remove_buffer_object(ctx, array->BufferObj);
 	(*ctx->Driver.DeleteBuffer)(ctx, array->BufferObj);
     }

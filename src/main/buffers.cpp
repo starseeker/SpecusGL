@@ -175,7 +175,7 @@ _mesa_Clear(GLbitfield mask)
 	    bufferMask |= BUFFER_BIT_ACCUM;
 	}
 
-	ASSERT(ctx->Driver.Clear);
+	assert(ctx->Driver.Clear);
 	ctx->Driver.Clear(ctx, bufferMask);
     }
 }
@@ -197,7 +197,7 @@ supported_buffer_bitmask(const GLcontext *ctx, GLuint framebufferID)
     if (framebufferID > 0) {
 	/* A user-created renderbuffer */
 	GLuint i;
-	ASSERT(ctx->Extensions.EXT_framebuffer_object);
+	assert(ctx->Extensions.EXT_framebuffer_object);
 	for (i = 0; i < ctx->Const.MaxColorAttachments; i++) {
 	    mask |= (BUFFER_BIT_COLOR0 << i);
 	}
@@ -470,7 +470,7 @@ set_color_output(GLcontext *ctx, GLuint output, GLenum buffer,
 {
     struct gl_framebuffer *fb = ctx->DrawBuffer;
 
-    ASSERT(output < ctx->Const.MaxDrawBuffers);
+    assert(output < ctx->Const.MaxDrawBuffers);
 
     /* Set per-FBO state */
     fb->ColorDrawBuffer[output] = buffer;
@@ -508,7 +508,7 @@ _mesa_drawbuffers(GLcontext *ctx, GLuint n, const GLenum *buffers,
 	const GLbitfield supportedMask = supported_buffer_bitmask(ctx, bufferID);
 	for (output = 0; output < n; output++) {
 	    mask[output] = draw_buffer_enum_to_bitmask(buffers[output]);
-	    ASSERT(mask[output] != BAD_MASK);
+	    assert(mask[output] != BAD_MASK);
 	    mask[output] &= supportedMask;
 	}
 	destMask = mask;

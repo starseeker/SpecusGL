@@ -74,10 +74,10 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
     const GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgb_fxt1);
-    ASSERT(dstXoffset % 8 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset     == 0);
+    assert(dstFormat == &_mesa_texformat_rgb_fxt1);
+    assert(dstXoffset % 8 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset     == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 
@@ -127,10 +127,10 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
     GLint texWidth = dstRowStride * 8 / 16; /* a bit of a hack */
     std::vector<GLchan> tempVec;
 
-    ASSERT(dstFormat == &_mesa_texformat_rgba_fxt1);
-    ASSERT(dstXoffset % 8 == 0);
-    ASSERT(dstYoffset % 4 == 0);
-    ASSERT(dstZoffset     == 0);
+    assert(dstFormat == &_mesa_texformat_rgba_fxt1);
+    assert(dstXoffset % 8 == 0);
+    assert(dstYoffset % 4 == 0);
+    assert(dstZoffset     == 0);
     (void) dstZoffset;
     (void) dstImageOffsets;
 

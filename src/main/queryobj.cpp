@@ -130,7 +130,7 @@ _mesa_DeleteQueriesARB(GLsizei n, const GLuint *ids)
 	if (ids[i] > 0) {
 	    struct gl_query_object *q = lookup_query_object(ctx, ids[i]);
 	    if (q) {
-		ASSERT(!q->Active); /* should be caught earlier */
+		assert(!q->Active); /* should be caught earlier */
 		ctx->Query.QueryObjects.remove(ids[i]);
 		delete_query_object(q);
 	    }
@@ -346,7 +346,7 @@ _mesa_GetQueryObjectivARB(GLuint id, GLenum pname, GLint *params)
 		/* If using software rendering, the result will always be ready
 		 * by time we get here.  Otherwise, we must be using hardware!
 		 */
-		ASSERT(ctx->Driver.EndQuery);
+		assert(ctx->Driver.EndQuery);
 	    }
 	    /* if result is too large for returned type, clamp to max value */
 	    if (q->Result > 0x7fffffff) {
@@ -389,7 +389,7 @@ _mesa_GetQueryObjectuivARB(GLuint id, GLenum pname, GLuint *params)
 		/* If using software rendering, the result will always be ready
 		 * by time we get here.  Otherwise, we must be using hardware!
 		 */
-		ASSERT(ctx->Driver.EndQuery);
+		assert(ctx->Driver.EndQuery);
 	    }
 	    /* if result is too large for returned type, clamp to max value */
 	    if (q->Result > 0xffffffff) {
@@ -437,7 +437,7 @@ _mesa_GetQueryObjecti64vEXT(GLuint id, GLenum pname, GLint64EXT *params)
 		/* If using software rendering, the result will always be ready
 		 * by time we get here.  Otherwise, we must be using hardware!
 		 */
-		ASSERT(ctx->Driver.EndQuery);
+		assert(ctx->Driver.EndQuery);
 	    }
 	    *params = q->Result;
 	    break;
@@ -478,7 +478,7 @@ _mesa_GetQueryObjectui64vEXT(GLuint id, GLenum pname, GLuint64EXT *params)
 		/* If using software rendering, the result will always be ready
 		 * by time we get here.  Otherwise, we must be using hardware!
 		 */
-		ASSERT(ctx->Driver.EndQuery);
+		assert(ctx->Driver.EndQuery);
 	    }
 	    *params = q->Result;
 	    break;

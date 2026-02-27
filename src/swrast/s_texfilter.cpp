@@ -138,7 +138,7 @@ lerp_rgba(GLchan result[4], GLfloat t, const GLchan a[4], const GLchan b[4])
 #else
     /* fixed point interpolants in [0, ILERP_SCALE] */
     const GLint it = IROUND_POS(t * ILERP_SCALE);
-    ASSERT(CHAN_TYPE == GL_UNSIGNED_BYTE);
+    assert(CHAN_TYPE == GL_UNSIGNED_BYTE);
     result[0] = ILERP(it, a[0], b[0]);
     result[1] = ILERP(it, a[1], b[1]);
     result[2] = ILERP(it, a[2], b[2]);
@@ -168,7 +168,7 @@ lerp_rgba_2d(GLchan result[4], GLfloat a, GLfloat b,
 #else
     const GLint ia = IROUND_POS(a * ILERP_SCALE);
     const GLint ib = IROUND_POS(b * ILERP_SCALE);
-    ASSERT(CHAN_TYPE == GL_UNSIGNED_BYTE);
+    assert(CHAN_TYPE == GL_UNSIGNED_BYTE);
     result[0] = ilerp_2d(ia, ib, t00[0], t10[0], t01[0], t11[0]);
     result[1] = ilerp_2d(ia, ib, t00[1], t10[1], t01[1], t11[1]);
     result[2] = ilerp_2d(ia, ib, t00[2], t10[2], t01[2], t11[2]);
@@ -578,7 +578,7 @@ compute_min_mag_ranges(const struct gl_texture_object *tObj,
     GLfloat minMagThresh;
 
     /* we shouldn't be here if minfilter == magfilter */
-    ASSERT(tObj->MinFilter != tObj->MagFilter);
+    assert(tObj->MinFilter != tObj->MagFilter);
 
     /* This bit comes from the OpenGL spec: */
     if (tObj->MagFilter == GL_LINEAR
@@ -599,11 +599,11 @@ compute_min_mag_ranges(const struct gl_texture_object *tObj,
 	printf("lambda delta = %g\n", lambda[0] - lambda[n-1]);
 	if (lambda[0] >= lambda[n-1]) { /* decreasing */
 	    for (i = 0; i < n - 1; i++) {
-		ASSERT(static_cast<GLint>((lambda[i] * 10)) >= static_cast<GLint>((lambda[i+1] * 10)));
+		assert(static_cast<GLint>((lambda[i] * 10)) >= static_cast<GLint>((lambda[i+1] * 10)));
 	    }
 	} else { /* increasing */
 	    for (i = 0; i < n - 1; i++) {
-		ASSERT(static_cast<GLint>((lambda[i] * 10)) <= static_cast<GLint>((lambda[i+1] * 10)));
+		assert(static_cast<GLint>((lambda[i] * 10)) <= static_cast<GLint>((lambda[i+1] * 10)));
 	    }
 	}
     }
@@ -654,12 +654,12 @@ compute_min_mag_ranges(const struct gl_texture_object *tObj,
 	for (i = 0; i < n; i++) {
 	    if (lambda[i] > minMagThresh) {
 		/* minification */
-		ASSERT(i >= *minStart);
-		ASSERT(i < *minEnd);
+		assert(i >= *minStart);
+		assert(i < *minEnd);
 	    } else {
 		/* magnification */
-		ASSERT(i >= *magStart);
-		ASSERT(i < *magEnd);
+		assert(i >= *magStart);
+		assert(i < *magEnd);
 	    }
 	}
     }
@@ -745,7 +745,7 @@ sample_1d_nearest_mipmap_nearest(GLcontext *ctx,
 				 const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_1d_nearest(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -760,7 +760,7 @@ sample_1d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_1d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -775,7 +775,7 @@ sample_1d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -800,7 +800,7 @@ sample_1d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -864,7 +864,7 @@ sample_lambda_1d(GLcontext *ctx,
     GLuint magStart, magEnd;  /* texels with magnification */
     GLuint i;
 
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1113,11 +1113,11 @@ sample_2d_linear_repeat(GLcontext *ctx,
 
     (void) ctx;
 
-    ASSERT(tObj->WrapS == GL_REPEAT);
-    ASSERT(tObj->WrapT == GL_REPEAT);
-    ASSERT(img->Border == 0);
-    ASSERT(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
-    ASSERT(img->_IsPowerOfTwo);
+    assert(tObj->WrapS == GL_REPEAT);
+    assert(tObj->WrapT == GL_REPEAT);
+    assert(img->Border == 0);
+    assert(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
+    assert(img->_IsPowerOfTwo);
 
     COMPUTE_LINEAR_REPEAT_TEXEL_LOCATION(texcoord[0], u, width,  i0, i1);
     COMPUTE_LINEAR_REPEAT_TEXEL_LOCATION(texcoord[1], v, height, j0, j1);
@@ -1156,7 +1156,7 @@ sample_2d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_2d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -1172,7 +1172,7 @@ sample_2d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1198,7 +1198,7 @@ sample_2d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1222,9 +1222,9 @@ sample_2d_linear_mipmap_linear_repeat(GLcontext *ctx,
 				      const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
-    ASSERT(tObj->WrapS == GL_REPEAT);
-    ASSERT(tObj->WrapT == GL_REPEAT);
+    assert(lambda != nullptr);
+    assert(tObj->WrapS == GL_REPEAT);
+    assert(tObj->WrapT == GL_REPEAT);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1304,11 +1304,11 @@ opt_sample_rgb_2d(GLcontext *ctx,
     GLuint k;
     (void) ctx;
     (void) lambda;
-    ASSERT(tObj->WrapS==GL_REPEAT);
-    ASSERT(tObj->WrapT==GL_REPEAT);
-    ASSERT(img->Border==0);
-    ASSERT(img->TexFormat->MesaFormat==MESA_FORMAT_RGB);
-    ASSERT(img->_IsPowerOfTwo);
+    assert(tObj->WrapS==GL_REPEAT);
+    assert(tObj->WrapT==GL_REPEAT);
+    assert(img->Border==0);
+    assert(img->TexFormat->MesaFormat==MESA_FORMAT_RGB);
+    assert(img->_IsPowerOfTwo);
 
     for (k=0; k<n; k++) {
 	GLint i = IFLOOR(texcoords[k][0] * width) & colMask;
@@ -1346,11 +1346,11 @@ opt_sample_rgba_2d(GLcontext *ctx,
     GLuint i;
     (void) ctx;
     (void) lambda;
-    ASSERT(tObj->WrapS==GL_REPEAT);
-    ASSERT(tObj->WrapT==GL_REPEAT);
-    ASSERT(img->Border==0);
-    ASSERT(img->TexFormat->MesaFormat==MESA_FORMAT_RGBA);
-    ASSERT(img->_IsPowerOfTwo);
+    assert(tObj->WrapS==GL_REPEAT);
+    assert(tObj->WrapT==GL_REPEAT);
+    assert(img->Border==0);
+    assert(img->TexFormat->MesaFormat==MESA_FORMAT_RGBA);
+    assert(img->_IsPowerOfTwo);
 
     for (i = 0; i < n; i++) {
 	const GLint col = IFLOOR(texcoords[i][0] * width) & colMask;
@@ -1382,7 +1382,7 @@ sample_lambda_2d(GLcontext *ctx,
 					&& (tImg->TexFormat->BaseFormat != GL_COLOR_INDEX)
 					&& tImg->_IsPowerOfTwo;
 
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1584,7 +1584,7 @@ sample_lambda_2d_f(GLcontext *ctx,
     const GLfloat texcoords[][4], const GLfloat lambda[], GLfloat rgba[][4])
 {
     GLuint minStart, minEnd, magStart, magEnd;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -1833,7 +1833,7 @@ sample_3d_linear_mipmap_nearest(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = nearest_mipmap_level(tObj, lambda[i]);
 	sample_3d_linear(ctx, tObj, tObj->Image[0][level], texcoord[i], rgba[i]);
@@ -1848,7 +1848,7 @@ sample_3d_nearest_mipmap_linear(GLcontext *ctx,
 				const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1872,7 +1872,7 @@ sample_3d_linear_mipmap_linear(GLcontext *ctx,
 			       const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	GLint level = linear_mipmap_level(tObj, lambda[i]);
 	if (level >= tObj->_MaxLevel) {
@@ -1934,7 +1934,7 @@ sample_lambda_3d(GLcontext *ctx,
     GLuint magStart, magEnd;  /* texels with magnification */
     GLuint i;
 
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -2113,7 +2113,7 @@ sample_cube_nearest_mipmap_nearest(GLcontext *ctx,
 				   const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2131,7 +2131,7 @@ sample_cube_linear_mipmap_nearest(GLcontext *ctx,
 				  const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2149,7 +2149,7 @@ sample_cube_nearest_mipmap_linear(GLcontext *ctx,
 				  const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2176,7 +2176,7 @@ sample_cube_linear_mipmap_linear(GLcontext *ctx,
 				 const GLfloat lambda[], GLchan rgba[][4])
 {
     GLuint i;
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     for (i = 0; i < n; i++) {
 	const struct gl_texture_image **images;
 	GLfloat newCoord[4];
@@ -2205,7 +2205,7 @@ sample_lambda_cube(GLcontext *ctx,
     GLuint minStart, minEnd;  /* texels with minification */
     GLuint magStart, magEnd;  /* texels with magnification */
 
-    ASSERT(lambda != nullptr);
+    assert(lambda != nullptr);
     compute_min_mag_ranges(tObj, n, lambda,
 			   &minStart, &minEnd, &magStart, &magEnd);
 
@@ -2308,7 +2308,7 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
 	if (i1 > max - 1)
 	    i1 = max - 1;
     } else {
-	ASSERT(wrapMode == GL_CLAMP_TO_BORDER);
+	assert(wrapMode == GL_CLAMP_TO_BORDER);
 	fcol = CLAMP(coord, -0.5F, max + 0.5F);
 	fcol -= 0.5F;
 	i0 = IFLOOR(fcol);
@@ -2335,13 +2335,13 @@ sample_nearest_rect(GLcontext *ctx,
     (void) ctx;
     (void) lambda;
 
-    ASSERT(tObj->WrapS == GL_CLAMP ||
+    assert(tObj->WrapS == GL_CLAMP ||
 	   tObj->WrapS == GL_CLAMP_TO_EDGE ||
 	   tObj->WrapS == GL_CLAMP_TO_BORDER);
-    ASSERT(tObj->WrapT == GL_CLAMP ||
+    assert(tObj->WrapT == GL_CLAMP ||
 	   tObj->WrapT == GL_CLAMP_TO_EDGE ||
 	   tObj->WrapT == GL_CLAMP_TO_BORDER);
-    ASSERT(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
+    assert(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
 
     for (i = 0; i < n; i++) {
 	GLint row, col;
@@ -2371,13 +2371,13 @@ sample_linear_rect(GLcontext *ctx,
     (void) ctx;
     (void) lambda;
 
-    ASSERT(tObj->WrapS == GL_CLAMP ||
+    assert(tObj->WrapS == GL_CLAMP ||
 	   tObj->WrapS == GL_CLAMP_TO_EDGE ||
 	   tObj->WrapS == GL_CLAMP_TO_BORDER);
-    ASSERT(tObj->WrapT == GL_CLAMP ||
+    assert(tObj->WrapT == GL_CLAMP ||
 	   tObj->WrapT == GL_CLAMP_TO_EDGE ||
 	   tObj->WrapT == GL_CLAMP_TO_BORDER);
-    ASSERT(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
+    assert(img->TexFormat->BaseFormat != GL_COLOR_INDEX);
 
     /* XXX lots of opportunity for optimization in this loop */
     for (i = 0; i < n; i++) {
@@ -2401,7 +2401,7 @@ sample_linear_rect(GLcontext *ctx,
 	    if (i1 > width_minus_1)
 		i1 = width_minus_1;
 	} else {
-	    ASSERT(tObj->WrapS == GL_CLAMP_TO_BORDER);
+	    assert(tObj->WrapS == GL_CLAMP_TO_BORDER);
 	    fcol = CLAMP(texcoords[i][0], -0.5F, width + 0.5F);
 	    fcol -= 0.5F;
 	    i0 = IFLOOR(fcol);
@@ -2421,7 +2421,7 @@ sample_linear_rect(GLcontext *ctx,
 	    if (j1 > height_minus_1)
 		j1 = height_minus_1;
 	} else {
-	    ASSERT(tObj->WrapT == GL_CLAMP_TO_BORDER);
+	    assert(tObj->WrapT == GL_CLAMP_TO_BORDER);
 	    frow = CLAMP(texcoords[i][1], -0.5F, height + 0.5F);
 	    frow -= 0.5F;
 	    j0 = IFLOOR(frow);
@@ -2519,10 +2519,10 @@ sample_depth_texture(GLcontext *ctx,
 
     (void) lambda;
 
-    ASSERT(img->TexFormat->BaseFormat == GL_DEPTH_COMPONENT ||
+    assert(img->TexFormat->BaseFormat == GL_DEPTH_COMPONENT ||
 	   img->TexFormat->BaseFormat == GL_DEPTH_STENCIL_EXT);
 
-    ASSERT(tObj->Target == GL_TEXTURE_1D ||
+    assert(tObj->Target == GL_TEXTURE_1D ||
 	   tObj->Target == GL_TEXTURE_2D ||
 	   tObj->Target == GL_TEXTURE_RECTANGLE_NV);
 
@@ -2536,7 +2536,7 @@ sample_depth_texture(GLcontext *ctx,
 	if (tObj->CompareOperator == GL_TEXTURE_LEQUAL_R_SGIX) {
 	    function = GL_LEQUAL;
 	} else {
-	    ASSERT(tObj->CompareOperator == GL_TEXTURE_GEQUAL_R_SGIX);
+	    assert(tObj->CompareOperator == GL_TEXTURE_GEQUAL_R_SGIX);
 	    function = GL_GEQUAL;
 	}
     } else if (tObj->CompareMode == GL_COMPARE_R_TO_TEXTURE_ARB) {
@@ -2624,7 +2624,7 @@ sample_depth_texture(GLcontext *ctx,
 	}
     } else {
 	GLuint i;
-	ASSERT(tObj->MagFilter == GL_LINEAR);
+	assert(tObj->MagFilter == GL_LINEAR);
 	for (i = 0; i < n; i++) {
 	    GLfloat depth00, depth01, depth10, depth11;
 	    GLint i0 = 0;
@@ -2938,7 +2938,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
 		} else if (t->MinFilter == GL_LINEAR) {
 		    return &sample_linear_1d;
 		} else {
-		    ASSERT(t->MinFilter == GL_NEAREST);
+		    assert(t->MinFilter == GL_NEAREST);
 		    return &sample_nearest_1d;
 		}
 	    case GL_TEXTURE_2D:
@@ -2951,7 +2951,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
 		} else {
 		    /* check for a few optimized cases */
 		    const struct gl_texture_image *img = t->Image[0][t->BaseLevel];
-		    ASSERT(t->MinFilter == GL_NEAREST);
+		    assert(t->MinFilter == GL_NEAREST);
 		    if (t->WrapS == GL_REPEAT &&
 			t->WrapT == GL_REPEAT &&
 			img->_IsPowerOfTwo &&
@@ -2974,7 +2974,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
 		} else if (t->MinFilter == GL_LINEAR) {
 		    return &sample_linear_3d;
 		} else {
-		    ASSERT(t->MinFilter == GL_NEAREST);
+		    assert(t->MinFilter == GL_NEAREST);
 		    return &sample_nearest_3d;
 		}
 	    case GL_TEXTURE_CUBE_MAP:
@@ -2983,7 +2983,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
 		} else if (t->MinFilter == GL_LINEAR) {
 		    return &sample_linear_cube;
 		} else {
-		    ASSERT(t->MinFilter == GL_NEAREST);
+		    assert(t->MinFilter == GL_NEAREST);
 		    return &sample_nearest_cube;
 		}
 	    case GL_TEXTURE_RECTANGLE_NV:
@@ -2994,7 +2994,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
 		} else if (t->MinFilter == GL_LINEAR) {
 		    return &sample_linear_rect;
 		} else {
-		    ASSERT(t->MinFilter == GL_NEAREST);
+		    assert(t->MinFilter == GL_NEAREST);
 		    return &sample_nearest_rect;
 		}
 	    default:

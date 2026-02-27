@@ -225,7 +225,7 @@ _swrast_exec_fragment_program(GLcontext *ctx, SWspan *span)
 
     /* incoming colors should be floats */
     if (program->InputsRead & FRAG_BIT_COL0) {
-	ASSERT(span->array->ChanType == GL_FLOAT);
+	assert(span->array->ChanType == GL_FLOAT);
     }
 
     ctx->_CurrentProgram = GL_FRAGMENT_PROGRAM_ARB; /* or NV, doesn't matter */

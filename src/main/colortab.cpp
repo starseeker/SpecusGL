@@ -674,7 +674,7 @@ _mesa_GetColorTable(GLenum target, GLenum format,
 	    return;
     }
 
-    ASSERT(table);
+    assert(table);
 
     if (table->Size <= 0) {
 	return;

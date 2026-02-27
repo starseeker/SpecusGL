@@ -85,8 +85,8 @@ _swrast_culltriangle(GLcontext *ctx,
 #define INTERP_Z 1
 #define INTERP_FOG 1
 #define SETUP_CODE				\
-   ASSERT(ctx->Texture._EnabledCoordUnits == 0);\
-   ASSERT(ctx->Light.ShadeModel==GL_FLAT);	\
+   assert(ctx->Texture._EnabledCoordUnits == 0);\
+   assert(ctx->Light.ShadeModel==GL_FLAT);	\
    span.interpMask |= SPAN_RGBA;		\
    span.red = ChanToFixed(v2->color[0]);	\
    span.green = ChanToFixed(v2->color[1]);	\
@@ -112,8 +112,8 @@ _swrast_culltriangle(GLcontext *ctx,
 #define SETUP_CODE				\
    {						\
       /* texturing must be off */		\
-      ASSERT(ctx->Texture._EnabledCoordUnits == 0);	\
-      ASSERT(ctx->Light.ShadeModel==GL_SMOOTH);	\
+      assert(ctx->Texture._EnabledCoordUnits == 0);	\
+      assert(ctx->Light.ShadeModel==GL_SMOOTH);	\
    }
 #define RENDER_SPAN( span )  _swrast_write_rgba_span(ctx, &span);
 #include "s_tritemp.h"
@@ -499,7 +499,7 @@ affine_span(GLcontext *ctx, SWspan *span,
 	    break;
     }
     span->interpMask &= ~SPAN_RGBA;
-    ASSERT(span->arrayMask & SPAN_RGBA);
+    assert(span->arrayMask & SPAN_RGBA);
     _swrast_write_rgba_span(ctx, span);
 
 #undef SPAN_NEAREST
@@ -766,7 +766,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 	    break;
     }
 
-    ASSERT(span->arrayMask & SPAN_RGBA);
+    assert(span->arrayMask & SPAN_RGBA);
     _swrast_write_rgba_span(ctx, span);
 
 #undef SPAN_NEAREST
@@ -875,9 +875,9 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 #define SETUP_CODE							\
    struct gl_renderbuffer *rb = ctx->DrawBuffer->_DepthBuffer;		\
    struct gl_query_object *q = ctx->Query.CurrentOcclusionObject;	\
-   ASSERT(ctx->Depth.Test);						\
-   ASSERT(!ctx->Depth.Mask);						\
-   ASSERT(ctx->Depth.Func == GL_LESS);					\
+   assert(ctx->Depth.Test);						\
+   assert(!ctx->Depth.Mask);						\
+   assert(ctx->Depth.Func == GL_LESS);					\
    if (!q) {								\
       return;								\
    }
@@ -1022,7 +1022,7 @@ _swrast_choose_triangle(GLcontext *ctx)
 
 	if (ctx->Polygon.SmoothFlag) {
 	    _swrast_set_aa_triangle_function(ctx);
-	    ASSERT(swrast->Triangle);
+	    assert(swrast->Triangle);
 	    return;
 	}
 
@@ -1112,7 +1112,7 @@ _swrast_choose_triangle(GLcontext *ctx)
 		USE(general_triangle);
 	    }
 	} else {
-	    ASSERT(!ctx->Texture._EnabledCoordUnits);
+	    assert(!ctx->Texture._EnabledCoordUnits);
 	    if (ctx->Light.ShadeModel==GL_SMOOTH) {
 		/* smooth shaded, no texturing, stippled or some raster ops */
 		USE(smooth_rgba_triangle);

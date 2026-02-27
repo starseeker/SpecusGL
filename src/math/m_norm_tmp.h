@@ -323,9 +323,9 @@ TAG(normalize_normals)(const GLmatrix *mat,
 	    if (len > 1e-50)
 	    {
 		len = INV_SQRTF(len);
-		out[i][0] = (GLfloat)(x * len);
-		out[i][1] = (GLfloat)(y * len);
-		out[i][2] = (GLfloat)(z * len);
+		out[i][0] = static_cast<GLfloat>((x * len));
+		out[i][1] = static_cast<GLfloat>((y * len));
+		out[i][2] = static_cast<GLfloat>((z * len));
 	    } else
 	    {
 		out[i][0] = x;

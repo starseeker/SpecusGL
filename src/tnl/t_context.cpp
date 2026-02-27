@@ -102,7 +102,7 @@ _tnl_InvalidateState(GLcontext *ctx, GLuint new_state)
     const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
 
     if (new_state & (_NEW_HINT)) {
-	ASSERT(tnl->AllowVertexFog || tnl->AllowPixelFog);
+	assert(tnl->AllowVertexFog || tnl->AllowPixelFog);
 	tnl->_DoVertexFog = (tnl->AllowVertexFog && (ctx->Hint.Fog != GL_NICEST))
 			    || !tnl->AllowPixelFog;
     }

@@ -77,7 +77,7 @@ get_register_pointer(const struct prog_src_register *source,
 		return machine->EnvParams[reg];
 	else {
 	    const struct gl_program_parameter_list *params;
-	    ASSERT(source->File == PROGRAM_LOCAL_PARAM ||
+	    assert(source->File == PROGRAM_LOCAL_PARAM ||
 		   source->File == PROGRAM_STATE_VAR);
 	    params = machine->CurProgram->Parameters;
 	    if (reg < 0 || reg >= params->NumParameters())
@@ -89,28 +89,28 @@ get_register_pointer(const struct prog_src_register *source,
 
     switch (source->File) {
 	case PROGRAM_TEMPORARY:
-	    ASSERT(source->Index < MAX_PROGRAM_TEMPS);
+	    assert(source->Index < MAX_PROGRAM_TEMPS);
 	    return machine->Temporaries[source->Index];
 
 	case PROGRAM_INPUT:
 	    if (machine->CurProgram->Target == GL_VERTEX_PROGRAM_ARB) {
-		ASSERT(source->Index < VERT_ATTRIB_MAX);
+		assert(source->Index < VERT_ATTRIB_MAX);
 		return machine->VertAttribs[source->Index];
 	    } else {
-		ASSERT(source->Index < FRAG_ATTRIB_MAX);
+		assert(source->Index < FRAG_ATTRIB_MAX);
 		return machine->Attribs[source->Index][machine->CurElement];
 	    }
 
 	case PROGRAM_OUTPUT:
-	    ASSERT(source->Index < MAX_PROGRAM_OUTPUTS);
+	    assert(source->Index < MAX_PROGRAM_OUTPUTS);
 	    return machine->Outputs[source->Index];
 
 	case PROGRAM_LOCAL_PARAM:
-	    ASSERT(source->Index < MAX_PROGRAM_LOCAL_PARAMS);
+	    assert(source->Index < MAX_PROGRAM_LOCAL_PARAMS);
 	    return machine->CurProgram->LocalParams[source->Index];
 
 	case PROGRAM_ENV_PARAM:
-	    ASSERT(source->Index < MAX_PROGRAM_ENV_PARAMS);
+	    assert(source->Index < MAX_PROGRAM_ENV_PARAMS);
 	    return machine->EnvParams[source->Index];
 
 	case PROGRAM_STATE_VAR:
@@ -120,8 +120,8 @@ get_register_pointer(const struct prog_src_register *source,
 	case PROGRAM_UNIFORM:
 	/* Fallthrough */
 	case PROGRAM_NAMED_PARAM:
-	    ASSERT(source->Index <
-		   (GLint) machine->CurProgram->Parameters->NumParameters());
+	    assert(source->Index <
+		   static_cast<GLint>(machine->CurProgram->Parameters->NumParameters()));
 	    return machine->CurProgram->Parameters->ParameterValues[source->Index].data();
 
 	default:
@@ -141,16 +141,16 @@ fetch_vector4(const struct prog_src_register *source,
 	      const struct gl_program_machine *machine, GLfloat result[4])
 {
     const GLfloat *src = get_register_pointer(source, machine);
-    ASSERT(src);
+    assert(src);
 
     if (source->Swizzle == SWIZZLE_NOOP) {
 	/* no swizzling */
 	COPY_4V(result, src);
     } else {
-	ASSERT(GET_SWZ(source->Swizzle, 0) <= 3);
-	ASSERT(GET_SWZ(source->Swizzle, 1) <= 3);
-	ASSERT(GET_SWZ(source->Swizzle, 2) <= 3);
-	ASSERT(GET_SWZ(source->Swizzle, 3) <= 3);
+	assert(GET_SWZ(source->Swizzle, 0) <= 3);
+	assert(GET_SWZ(source->Swizzle, 1) <= 3);
+	assert(GET_SWZ(source->Swizzle, 2) <= 3);
+	assert(GET_SWZ(source->Swizzle, 3) <= 3);
 	result[0] = src[GET_SWZ(source->Swizzle, 0)];
 	result[1] = src[GET_SWZ(source->Swizzle, 1)];
 	result[2] = src[GET_SWZ(source->Swizzle, 2)];
@@ -243,7 +243,7 @@ fetch_vector1(const struct prog_src_register *source,
 	      const struct gl_program_machine *machine, GLfloat result[4])
 {
     const GLfloat *src = get_register_pointer(source, machine);
-    ASSERT(src);
+    assert(src);
 
     result[0] = src[GET_SWZ(source->Swizzle, 0)];
 
@@ -372,11 +372,11 @@ store_vector4(const struct prog_instruction *inst,
 
     switch (dest->File) {
 	case PROGRAM_OUTPUT:
-	    ASSERT(dest->Index < MAX_PROGRAM_OUTPUTS);
+	    assert(dest->Index < MAX_PROGRAM_OUTPUTS);
 	    dstReg = machine->Outputs[dest->Index];
 	    break;
 	case PROGRAM_TEMPORARY:
-	    ASSERT(dest->Index < MAX_PROGRAM_TEMPS);
+	    assert(dest->Index < MAX_PROGRAM_TEMPS);
 	    dstReg = machine->Temporaries[dest->Index];
 	    break;
 	case PROGRAM_WRITE_ONLY:
@@ -521,7 +521,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_ARL: {
 		GLfloat t[4];
 		fetch_vector4(&inst->SrcReg[0], machine, t);
-		machine->AddressReg[0][0] = (GLint) FLOORF(t[0]);
+		machine->AddressReg[0][0] = static_cast<GLint>(FLOORF(t[0]));
 	    }
 	    break;
 	    case OPCODE_BGNLOOP:
@@ -573,7 +573,7 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		result[0] = result[1] = result[2] = result[3]
-						    = (GLfloat) cos(a[0]);
+						    = static_cast<GLfloat>(cos(a[0]));
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -663,7 +663,7 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		result[0] = result[1] = result[2] = result[3] =
-							(GLfloat) pow(2.0, a[0]);
+							static_cast<GLfloat>(pow(2.0, a[0]));
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -721,10 +721,10 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_INT: {       /* float to int */
 		GLfloat a[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
-		result[0] = (GLfloat)(GLint) a[0];
-		result[1] = (GLfloat)(GLint) a[1];
-		result[2] = (GLfloat)(GLint) a[2];
-		result[3] = (GLfloat)(GLint) a[3];
+		result[0] = static_cast<GLfloat>(static_cast<GLint>(a[0]));
+		result[1] = static_cast<GLfloat>(static_cast<GLint>(a[1]));
+		result[2] = static_cast<GLfloat>(static_cast<GLint>(a[2]));
+		result[3] = static_cast<GLfloat>(static_cast<GLint>(a[3]));
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -789,9 +789,9 @@ _mesa_execute_program(GLcontext * ctx,
 		    } else {
 			int exponent;
 			GLfloat mantissa = FREXPF(t[0], &exponent);
-			q[0] = (GLfloat)(exponent - 1);
-			q[1] = (GLfloat)(2.0 * mantissa);  /* map [.5, 1) -> [1, 2) */
-			q[2] = (GLfloat)(q[0] + LOG2(q[1]));
+			q[0] = static_cast<GLfloat>((exponent - 1));
+			q[1] = static_cast<GLfloat>((2.0 * mantissa));  /* map [.5, 1) -> [1, 2) */
+			q[2] = static_cast<GLfloat>((q[0] + LOG2(q[1])));
 		    }
 		} else {
 		    SET_NEG_INFINITY(q[0]);
@@ -999,7 +999,7 @@ _mesa_execute_program(GLcontext * ctx,
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		fetch_vector1(&inst->SrcReg[1], machine, b);
 		result[0] = result[1] = result[2] = result[3]
-						    = (GLfloat) pow(a[0], b[0]);
+						    = static_cast<GLfloat>(pow(a[0], b[0]));
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -1052,8 +1052,8 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_SCS: {       /* sine and cos */
 		GLfloat a[4], result[4];
 		fetch_vector1(&inst->SrcReg[0], machine, a);
-		result[0] = (GLfloat) cos(a[0]);
-		result[1] = (GLfloat) sin(a[0]);
+		result[0] = static_cast<GLfloat>(cos(a[0]));
+		result[1] = static_cast<GLfloat>(sin(a[0]));
 		result[2] = 0.0;    /* undefined! */
 		result[3] = 0.0;    /* undefined! */
 		store_vector4(inst, machine, result);
@@ -1119,7 +1119,7 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		result[0] = result[1] = result[2] = result[3]
-						    = (GLfloat) sin(a[0]);
+						    = static_cast<GLfloat>(sin(a[0]));
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -1207,8 +1207,8 @@ _mesa_execute_program(GLcontext * ctx,
 		    else if (swz == SWIZZLE_ONE)
 			result[i] = 1.0;
 		    else {
-			ASSERT(swz >= 0);
-			ASSERT(swz <= 3);
+			assert(swz >= 0);
+			assert(swz <= 3);
 			result[i] = src[swz];
 		    }
 		    if (source->NegateBase & (1 << i))

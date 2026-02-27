@@ -32,8 +32,8 @@ return GL_FALSE;
 GLint x, GLint y, void *values) override {
 const GLint z = Zoffset;
 GLuint i;
-ASSERT(TexImage->Width == Width);
-ASSERT(TexImage->Height == Height);
+assert(TexImage->Width == Width);
+assert(TexImage->Height == Height);
 if (DataType == CHAN_TYPE) {
     GLchan *rgbaOut = (GLchan *) values;
     for (i = 0; i < count; i++) {
@@ -264,8 +264,8 @@ if (!mask || mask[i]) {
 static int
 wrap_texture(GLcontext *ctx, struct gl_renderbuffer_attachment *att)
 {
-    ASSERT(att->Type == GL_TEXTURE);
-    ASSERT(att->Renderbuffer == nullptr);
+    assert(att->Type == GL_TEXTURE);
+    assert(att->Renderbuffer == nullptr);
 
     auto *trb = new TextureRenderbuffer{};
     if (!trb) {
@@ -289,13 +289,13 @@ return;
 
     TextureRenderbuffer *trb = static_cast<TextureRenderbuffer *>(att->Renderbuffer);
     (void) ctx;
-    ASSERT(trb);
+    assert(trb);
 
     trb->TexImage = att->Texture->Image[att->CubeMapFace][att->TextureLevel];
-    ASSERT(trb->TexImage);
+    assert(trb->TexImage);
 
     trb->Store = trb->TexImage->TexFormat->StoreTexel;
-    ASSERT(trb->Store);
+    assert(trb->Store);
 
     trb->Zoffset = att->Zoffset;
 

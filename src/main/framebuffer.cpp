@@ -201,8 +201,8 @@ _mesa_free_framebuffer_data(struct gl_framebuffer *fb)
 	if (att->Texture) {
 	    _mesa_reference_texobj(&att->Texture, nullptr);
 	}
-	ASSERT(!att->Renderbuffer);
-	ASSERT(!att->Texture);
+	assert(!att->Renderbuffer);
+	assert(!att->Texture);
 	att->Type = GL_NONE;
     }
 
@@ -306,8 +306,8 @@ _mesa_resize_framebuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 	    if (rb->Width != width || rb->Height != height) {
 		/* could just as well pass rb->_ActualFormat here */
 		if (rb->AllocStorage(ctx, rb->InternalFormat, width, height)) {
-		    ASSERT(rb->Width == width);
-		    ASSERT(rb->Height == height);
+		    assert(rb->Width == width);
+		    assert(rb->Height == height);
 		} else {
 		    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Resizing framebuffer");
 		    /* no return */
@@ -431,8 +431,8 @@ _mesa_update_draw_buffer_bounds(GLcontext *ctx)
 	}
     }
 
-    ASSERT(buffer->_Xmin <= buffer->_Xmax);
-    ASSERT(buffer->_Ymin <= buffer->_Ymax);
+    assert(buffer->_Xmin <= buffer->_Xmax);
+    assert(buffer->_Ymin <= buffer->_Ymax);
 }
 
 
@@ -525,7 +525,7 @@ _mesa_update_depth_buffer(GLcontext *ctx,
     struct gl_renderbuffer *depthRb;
 
     /* only one possiblity for now */
-    ASSERT(attIndex == BUFFER_DEPTH);
+    assert(attIndex == BUFFER_DEPTH);
 
     depthRb = fb->Attachment[attIndex].Renderbuffer;
 
@@ -538,7 +538,7 @@ _mesa_update_depth_buffer(GLcontext *ctx,
 	    struct gl_renderbuffer *wrapper
 		= _mesa_new_z24_renderbuffer_wrapper(ctx, depthRb);
 	    _mesa_reference_renderbuffer(&fb->_DepthBuffer, wrapper);
-	    ASSERT(fb->_DepthBuffer->Wrapped == depthRb);
+	    assert(fb->_DepthBuffer->Wrapped == depthRb);
 	}
     } else {
 	/* depthRb may be null */
@@ -564,7 +564,7 @@ _mesa_update_stencil_buffer(GLcontext *ctx,
 {
     struct gl_renderbuffer *stencilRb;
 
-    ASSERT(attIndex == BUFFER_DEPTH ||
+    assert(attIndex == BUFFER_DEPTH ||
 	   attIndex == BUFFER_STENCIL);
 
     stencilRb = fb->Attachment[attIndex].Renderbuffer;
@@ -578,7 +578,7 @@ _mesa_update_stencil_buffer(GLcontext *ctx,
 	    struct gl_renderbuffer *wrapper
 		= _mesa_new_s8_renderbuffer_wrapper(ctx, stencilRb);
 	    _mesa_reference_renderbuffer(&fb->_StencilBuffer, wrapper);
-	    ASSERT(fb->_StencilBuffer->Wrapped == stencilRb);
+	    assert(fb->_StencilBuffer->Wrapped == stencilRb);
 	}
     } else {
 	/* stencilRb may be null */
@@ -644,8 +644,8 @@ update_color_read_buffer(GLcontext *ctx, struct gl_framebuffer *fb)
 	fb->Height == 0) {
 	fb->_ColorReadBuffer = nullptr; /* legal! */
     } else {
-	ASSERT(fb->_ColorReadBufferIndex >= 0);
-	ASSERT(fb->_ColorReadBufferIndex < BUFFER_COUNT);
+	assert(fb->_ColorReadBufferIndex >= 0);
+	assert(fb->_ColorReadBufferIndex < BUFFER_COUNT);
 	fb->_ColorReadBuffer
 	    = fb->Attachment[fb->_ColorReadBufferIndex].Renderbuffer;
     }
@@ -721,7 +721,7 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 		return GL_FALSE;
 	    }
 	    /* XXX enable this post 6.5 release:
-	    ASSERT(ctx->ReadBuffer->_ColorReadBuffer->RedBits > 0 ||
+	    assert(ctx->ReadBuffer->_ColorReadBuffer->RedBits > 0 ||
 	           ctx->ReadBuffer->_ColorReadBuffer->IndexBits > 0);
 	    */
 	    break;
@@ -730,22 +730,22 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 	    if (!att[BUFFER_DEPTH].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
+	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    break;
 	case GL_STENCIL:
 	case GL_STENCIL_INDEX:
 	    if (!att[BUFFER_STENCIL].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
+	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer ||
 		!att[BUFFER_STENCIL].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
-	    ASSERT(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
+	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
+	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	default:
 	    _mesa_problem(ctx,
@@ -796,22 +796,22 @@ _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format)
 	    if (!att[BUFFER_DEPTH].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
+	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    break;
 	case GL_STENCIL:
 	case GL_STENCIL_INDEX:
 	    if (!att[BUFFER_STENCIL].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
+	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer ||
 		!att[BUFFER_STENCIL].Renderbuffer) {
 		return GL_FALSE;
 	    }
-	    ASSERT(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
-	    ASSERT(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
+	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
+	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	default:
 	    _mesa_problem(ctx,

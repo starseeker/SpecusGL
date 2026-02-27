@@ -78,8 +78,8 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
 
     /* there can be multiple #version directives - grab the last one */
     I = &prod[size - 6];
-    *version = (GLuint)(I[0]) + (GLuint)(I[1]) * 100;
-    *eaten = (GLuint)(I[2]) + ((GLuint)(I[3]) << 8) + ((GLuint)(I[4]) << 16) + ((GLuint)(I[5]) << 24);
+    *version = static_cast<GLuint>((I[0])) + static_cast<GLuint>((I[1])) * 100;
+    *eaten = static_cast<GLuint>((I[2])) + (static_cast<GLuint>((I[3])) << 8) + (static_cast<GLuint>((I[4])) << 16) + (static_cast<GLuint>((I[5])) << 24);
 
     grammar_destroy(id);
     grammar_alloc_free(prod);

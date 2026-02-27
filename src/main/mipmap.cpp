@@ -742,7 +742,7 @@ make_3d_mipmap(const struct gl_texture_format *format, GLint border,
 	    }
 	} else {
 	    /* average border pixels from adjacent src image pairs */
-	    ASSERT(srcDepthNB == 2 * dstDepthNB);
+	    assert(srcDepthNB == 2 * dstDepthNB);
 	    for (img = 0; img < dstDepthNB; img++) {
 		const GLubyte *src;
 		GLubyte *dst;
@@ -796,13 +796,13 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
     GLubyte *dstData = nullptr;
     GLint level, maxLevels;
 
-    ASSERT(texObj);
+    assert(texObj);
     /* XXX choose cube map face here??? */
     srcImage = texObj->Image[0][texObj->BaseLevel];
-    ASSERT(srcImage);
+    assert(srcImage);
 
     maxLevels = _mesa_max_texture_levels(ctx, texObj->Target);
-    ASSERT(maxLevels > 0);  /* bad target */
+    assert(maxLevels > 0);  /* bad target */
 
     /* Find convertFormat - the format that do_row() will process */
     if (srcImage->IsCompressed) {
@@ -858,7 +858,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 
 	/* get src image parameters */
 	srcImage = _mesa_select_tex_image(ctx, texObj, target, level);
-	ASSERT(srcImage);
+	assert(srcImage);
 	srcWidth = srcImage->Width;
 	srcHeight = srcImage->Height;
 	srcDepth = srcImage->Depth;
@@ -919,12 +919,12 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 						    dstImage->Height,
 						    dstImage->Depth,
 						    dstImage->TexFormat->MesaFormat);
-	    ASSERT(dstImage->CompressedSize > 0);
+	    assert(dstImage->CompressedSize > 0);
 	}
 
-	ASSERT(dstImage->TexFormat);
-	ASSERT(dstImage->FetchTexelc);
-	ASSERT(dstImage->FetchTexelf);
+	assert(dstImage->TexFormat);
+	assert(dstImage->FetchTexelc);
+	assert(dstImage->FetchTexelf);
 
 	/* Alloc new teximage data buffer.
 	 * Setup src and dest data pointers.
@@ -936,11 +936,11 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 		return;
 	    }
 	    /* srcData and dstData are already set */
-	    ASSERT(srcData);
-	    ASSERT(dstData);
+	    assert(srcData);
+	    assert(dstData);
 	} else {
 	    bytesPerTexel = dstImage->TexFormat->TexelBytes;
-	    ASSERT(dstWidth * dstHeight * dstDepth * bytesPerTexel > 0);
+	    assert(dstWidth * dstHeight * dstDepth * bytesPerTexel > 0);
 	    dstImage->Data = _mesa_alloc_texmemory(dstWidth * dstHeight
 						   * dstDepth * bytesPerTexel);
 
@@ -992,7 +992,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 	    const GLenum srcFormat = convertFormat->BaseFormat;
 	    GLint dstRowStride
 		= _mesa_compressed_row_stride(dstImage->TexFormat->MesaFormat, dstWidth);
-	    ASSERT(srcFormat == GL_RGB || srcFormat == GL_RGBA);
+	    assert(srcFormat == GL_RGB || srcFormat == GL_RGBA);
 	    dstImage->TexFormat->StoreImage(ctx, 2, dstImage->_BaseFormat,
 					    dstImage->TexFormat,
 					    dstImage->Data,
@@ -1102,12 +1102,12 @@ _mesa_upscale_teximage2d(GLsizei inWidth, GLsizei inHeight,
 {
     GLint i, j, k;
 
-    ASSERT(outWidth >= inWidth);
-    ASSERT(outHeight >= inHeight);
+    assert(outWidth >= inWidth);
+    assert(outHeight >= inHeight);
 #if 0
-    ASSERT(inWidth == 1 || inWidth == 2 || inHeight == 1 || inHeight == 2);
-    ASSERT((outWidth & 3) == 0);
-    ASSERT((outHeight & 3) == 0);
+    assert(inWidth == 1 || inWidth == 2 || inHeight == 1 || inHeight == 2);
+    assert((outWidth & 3) == 0);
+    assert((outHeight & 3) == 0);
 #endif
 
     for (i = 0; i < outHeight; i++) {

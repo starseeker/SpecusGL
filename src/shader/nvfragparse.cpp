@@ -366,7 +366,7 @@ Peek_Token(struct parse_state *parseState, GLubyte *token)
 	parseState->pos += (-i);
 	return GL_FALSE;
     }
-    len = (GLint)strlen(reinterpret_cast<const char *>(token));
+    len = static_cast<GLint>(strlen(reinterpret_cast<const char *>(token)));
     parseState->pos += (i - len);
     return GL_TRUE;
 }
@@ -421,7 +421,7 @@ Parse_String(struct parse_state *parseState, const char *pattern)
     /* Try to match the pattern */
     m = parseState->pos;
     for (i = 0; pattern[i]; i++) {
-	if (*m != (GLubyte) pattern[i])
+	if (*m != static_cast<GLubyte>(pattern[i]))
 	    return GL_FALSE;
 	m += 1;
     }
@@ -453,7 +453,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 {
     char *end = nullptr;
 
-    *number = (GLfloat) strtod((const char *) parseState->pos, &end);
+    *number = static_cast<GLfloat>(strtod((const char *) parseState->pos, &end));
 
     if (end && end > const_cast<char *>(reinterpret_cast<const char *>(parseState->pos))) {
 	/* got a number */
@@ -1323,7 +1323,7 @@ Parse_InstructionSequence(struct parse_state *parseState,
 		    if (!Parse_CondCodeMask(parseState, &inst->DstReg))
 			RETURN_ERROR;
 		} else {
-		    ASSERT(instMatch.opcode == OPCODE_PRINT);
+		    assert(instMatch.opcode == OPCODE_PRINT);
 		}
 	    }
 
@@ -1524,7 +1524,7 @@ PrintSrcReg(const struct gl_fragment_program *program,
 	    v = program->Parameters->ParameterValues[src->Index].data();
 	    std::printf("{%g, %g, %g, %g}", v[0], v[1], v[2], v[3]);
 	} else {
-	    ASSERT(program->Parameters->Parameters[src->Index].Type
+	    assert(program->Parameters->Parameters[src->Index].Type
 		   == PROGRAM_NAMED_PARAM);
 	    std::printf("%s", program->Parameters->Parameters[src->Index].Name.c_str());
 	}
@@ -1654,7 +1654,7 @@ PrintDstReg(const struct prog_dst_register *dst)
 void
 _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 {
-    for (GLuint _i = 0; _i < (GLuint)program->Instructions.size(); _i++) {
+    for (GLuint _i = 0; _i < static_cast<GLuint>(program->Instructions.size()); _i++) {
 	const struct prog_instruction *inst = &program->Instructions[_i];
 	if (inst->Opcode == OPCODE_END) break;
 	int i;
@@ -1724,7 +1724,7 @@ _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 const char *
 _mesa_nv_fragment_input_register_name(GLuint i)
 {
-    ASSERT(i < MAX_NV_FRAGMENT_PROGRAM_INPUTS);
+    assert(i < MAX_NV_FRAGMENT_PROGRAM_INPUTS);
     return InputRegisters[i];
 }
 
@@ -1732,7 +1732,7 @@ _mesa_nv_fragment_input_register_name(GLuint i)
 const char *
 _mesa_nv_fragment_output_register_name(GLuint i)
 {
-    ASSERT(i < MAX_NV_FRAGMENT_PROGRAM_OUTPUTS);
+    assert(i < MAX_NV_FRAGMENT_PROGRAM_OUTPUTS);
     return OutputRegisters[i];
 }
 

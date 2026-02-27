@@ -98,7 +98,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	}
 	simpleZoom = GL_TRUE;
 	yStep = static_cast<GLint>(ctx->Pixel.ZoomY);
-	ASSERT(yStep == 1 || yStep == -1);
+	assert(yStep == 1 || yStep == -1);
     } else {
 	/* non-simple zooming */
 	simpleZoom = GL_FALSE;
@@ -180,7 +180,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	if (simpleZoom) {
 	    /* no zooming */
 	    GLint row;
-	    ASSERT(drawWidth <= MAX_WIDTH);
+	    assert(drawWidth <= MAX_WIDTH);
 	    for (row = 0; row < drawHeight; row++) {
 		GLchan rgb[MAX_WIDTH][3];
 		GLint i;
@@ -196,7 +196,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	} else {
 	    /* with zooming */
 	    GLint row;
-	    ASSERT(drawWidth <= MAX_WIDTH);
+	    assert(drawWidth <= MAX_WIDTH);
 	    for (row = 0; row < drawHeight; row++) {
 		GLchan rgb[MAX_WIDTH][3];
 		GLint i;
@@ -221,7 +221,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 			    + (unpack.SkipRows * unpack.RowLength + unpack.SkipPixels)*2;
 	if (simpleZoom) {
 	    GLint row;
-	    ASSERT(drawWidth <= MAX_WIDTH);
+	    assert(drawWidth <= MAX_WIDTH);
 	    for (row = 0; row < drawHeight; row++) {
 		GLint i;
 		const GLchan *ptr = src;
@@ -239,7 +239,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	} else {
 	    /* with zooming */
 	    GLint row;
-	    ASSERT(drawWidth <= MAX_WIDTH);
+	    assert(drawWidth <= MAX_WIDTH);
 	    for (row = 0; row < drawHeight; row++) {
 		const GLchan *ptr = src;
 		GLint i;
@@ -269,7 +269,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	    if (simpleZoom) {
 		GLint row;
 		for (row = 0; row < drawHeight; row++) {
-		    ASSERT(drawWidth <= MAX_WIDTH);
+		    assert(drawWidth <= MAX_WIDTH);
 		    _mesa_map_ci8_to_rgba8(ctx, drawWidth, src,
 					   span.array->color.sz1.rgba);
 		    rb->PutRow(ctx, drawWidth, destX, destY,
@@ -281,7 +281,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		/* ubyte/CI to ubyte/RGBA with zooming */
 		GLint row;
 		for (row = 0; row < drawHeight; row++) {
-		    ASSERT(drawWidth <= MAX_WIDTH);
+		    assert(drawWidth <= MAX_WIDTH);
 		    _mesa_map_ci8_to_rgba8(ctx, drawWidth, src,
 					   span.array->color.sz1.rgba);
 		    span.x = destX;
@@ -346,7 +346,7 @@ draw_index_pixels(GLcontext *ctx, GLint x, GLint y,
     skipPixels = 0;
     while (skipPixels < width) {
 	const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
-	ASSERT(spanWidth <= MAX_WIDTH);
+	assert(spanWidth <= MAX_WIDTH);
 	for (row = 0; row < height; row++) {
 	    const GLvoid *source = _mesa_image_address2d(unpack, pixels,
 				   width, height,
@@ -494,7 +494,7 @@ draw_depth_pixels(GLcontext *ctx, GLint x, GLint y,
 	while (skipPixels < width) {
 	    const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
 	    GLint row;
-	    ASSERT(span.end <= MAX_WIDTH);
+	    assert(span.end <= MAX_WIDTH);
 	    for (row = 0; row < height; row++) {
 		const GLvoid *zSrc = _mesa_image_address2d(unpack,
 				     pixels, width, height,
@@ -585,7 +585,7 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	if (ctx->Pixel.Convolution2DEnabled) {
 	    _mesa_convolve_2d_image(ctx, &width, &height, tmpImage, convImage.data());
 	} else {
-	    ASSERT(ctx->Pixel.Separable2DEnabled);
+	    assert(ctx->Pixel.Separable2DEnabled);
 	    _mesa_convolve_sep_image(ctx, &width, &height, tmpImage, convImage.data());
 	}
 
@@ -703,8 +703,8 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 
     depthRb = ctx->ReadBuffer->Attachment[BUFFER_DEPTH].Renderbuffer;
     stencilRb = ctx->ReadBuffer->Attachment[BUFFER_STENCIL].Renderbuffer;
-    ASSERT(depthRb);
-    ASSERT(stencilRb);
+    assert(depthRb);
+    assert(stencilRb);
 
     if (depthRb->_BaseFormat == GL_DEPTH_STENCIL_EXT &&
 	stencilRb->_BaseFormat == GL_DEPTH_STENCIL_EXT &&
@@ -743,7 +743,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 		    /* fast path 24-bit zbuffer */
 		    GLuint zValues[MAX_WIDTH];
 		    GLint j;
-		    ASSERT(depthRb->DataType == GL_UNSIGNED_INT);
+		    assert(depthRb->DataType == GL_UNSIGNED_INT);
 		    for (j = 0; j < width; j++) {
 			zValues[j] = depthStencilSrc[j] >> 8;
 		    }
@@ -756,7 +756,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 		    /* fast path 16-bit zbuffer */
 		    GLushort zValues[MAX_WIDTH];
 		    GLint j;
-		    ASSERT(depthRb->DataType == GL_UNSIGNED_SHORT);
+		    assert(depthRb->DataType == GL_UNSIGNED_SHORT);
 		    for (j = 0; j < width; j++) {
 			zValues[j] = depthStencilSrc[j] >> 16;
 		    }

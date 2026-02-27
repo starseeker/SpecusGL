@@ -128,8 +128,8 @@ read_depth_stencil_image(GLcontext *ctx, GLint x, GLint y,
     struct gl_renderbuffer *stencilRb = ctx->ReadBuffer->_StencilBuffer;
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    ASSERT(depthRb);
-    ASSERT(stencilRb);
+    assert(depthRb);
+    assert(stencilRb);
 
     std::vector<GLuint> image(width * height, 0u);
 
@@ -144,7 +144,7 @@ read_depth_stencil_image(GLcontext *ctx, GLint x, GLint y,
 	}
     } else {
 	GLushort z16[MAX_WIDTH];
-	ASSERT(depthRb->DataType == GL_UNSIGNED_SHORT);
+	assert(depthRb->DataType == GL_UNSIGNED_SHORT);
 	for (GLint i = 0; i < height; i++) {
 	    _swrast_get_row(ctx, depthRb, width, x, y + i, z16, sizeof(GLushort));
 	    /* convert GLushorts to GLuints */
@@ -178,7 +178,7 @@ read_depth_stencil_image(GLcontext *ctx, GLint x, GLint y,
     dst = image.data();
     for (GLint i = 0; i < height; i++) {
 	GLstencil stencil[MAX_WIDTH];
-	ASSERT(8 * sizeof(GLstencil) == stencilRb->StencilBits);
+	assert(8 * sizeof(GLstencil) == stencilRb->StencilBits);
 	_swrast_get_row(ctx, stencilRb, width, x, y + i,
 			stencil, sizeof(GLstencil));
 	for (GLint j = 0; j < width; j++) {
@@ -235,11 +235,11 @@ _swrast_copy_teximage1d(GLcontext *ctx, GLenum target, GLint level,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    ASSERT(texObj);
+    assert(texObj);
     texImage = _mesa_select_tex_image(ctx, texObj, target, level);
-    ASSERT(texImage);
+    assert(texImage);
 
-    ASSERT(ctx->Driver.TexImage1D);
+    assert(ctx->Driver.TexImage1D);
 
     if (is_depth_format(internalFormat)) {
 	/* read depth image from framebuffer */
@@ -307,11 +307,11 @@ _swrast_copy_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    ASSERT(texObj);
+    assert(texObj);
     texImage = _mesa_select_tex_image(ctx, texObj, target, level);
-    ASSERT(texImage);
+    assert(texImage);
 
-    ASSERT(ctx->Driver.TexImage2D);
+    assert(ctx->Driver.TexImage2D);
 
     if (is_depth_format(internalFormat)) {
 	/* read depth image from framebuffer */
@@ -371,11 +371,11 @@ _swrast_copy_texsubimage1d(GLcontext *ctx, GLenum target, GLint level,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    ASSERT(texObj);
+    assert(texObj);
     texImage = _mesa_select_tex_image(ctx, texObj, target, level);
-    ASSERT(texImage);
+    assert(texImage);
 
-    ASSERT(ctx->Driver.TexImage1D);
+    assert(ctx->Driver.TexImage1D);
 
     if (texImage->_BaseFormat == GL_DEPTH_COMPONENT) {
 	/* read depth image from framebuffer */
@@ -440,11 +440,11 @@ _swrast_copy_texsubimage2d(GLcontext *ctx,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    ASSERT(texObj);
+    assert(texObj);
     texImage = _mesa_select_tex_image(ctx, texObj, target, level);
-    ASSERT(texImage);
+    assert(texImage);
 
-    ASSERT(ctx->Driver.TexImage2D);
+    assert(ctx->Driver.TexImage2D);
 
     if (texImage->_BaseFormat == GL_DEPTH_COMPONENT) {
 	/* read depth image from framebuffer */
@@ -508,11 +508,11 @@ _swrast_copy_texsubimage3d(GLcontext *ctx,
 
     texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     texObj = _mesa_select_tex_object(ctx, texUnit, target);
-    ASSERT(texObj);
+    assert(texObj);
     texImage = _mesa_select_tex_image(ctx, texObj, target, level);
-    ASSERT(texImage);
+    assert(texImage);
 
-    ASSERT(ctx->Driver.TexImage3D);
+    assert(ctx->Driver.TexImage3D);
 
     if (texImage->_BaseFormat == GL_DEPTH_COMPONENT) {
 	/* read depth image from framebuffer */

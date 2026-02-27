@@ -517,7 +517,7 @@ _mesa_make_extension_string(GLcontext *ctx)
 	}
     }
 
-    ASSERT(!ext.empty());
+    assert(!ext.empty());
 
     return ext;
 }

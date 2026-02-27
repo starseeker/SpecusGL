@@ -46,9 +46,9 @@ _swrast_mask_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
     const GLuint n = span->end;
     void *rbPixels;
 
-    ASSERT(n < MAX_WIDTH);
-    ASSERT(span->arrayMask & SPAN_RGBA);
-    ASSERT(rb->DataType == span->array->ChanType);
+    assert(n < MAX_WIDTH);
+    assert(span->arrayMask & SPAN_RGBA);
+    assert(rb->DataType == span->array->ChanType);
 
     rbPixels = _swrast_get_dest_rgba(ctx, rb, span);
 
@@ -114,9 +114,9 @@ _swrast_mask_ci_span(GLcontext *ctx, struct gl_renderbuffer *rb,
     GLuint dest[MAX_WIDTH];
     GLuint i;
 
-    ASSERT(span->arrayMask & SPAN_INDEX);
-    ASSERT(span->end <= MAX_WIDTH);
-    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+    assert(span->arrayMask & SPAN_INDEX);
+    assert(span->end <= MAX_WIDTH);
+    assert(rb->DataType == GL_UNSIGNED_INT);
 
     if (span->arrayMask & SPAN_XY) {
 	_swrast_get_values(ctx, rb, span->end, span->array->x, span->array->y,

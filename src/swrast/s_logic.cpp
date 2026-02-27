@@ -193,8 +193,8 @@ _swrast_logicop_ci_span(GLcontext *ctx, struct gl_renderbuffer *rb,
     GLuint dest[MAX_WIDTH];
     GLuint *index = span->array->index;
 
-    ASSERT(span->end < MAX_WIDTH);
-    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+    assert(span->end < MAX_WIDTH);
+    assert(rb->DataType == GL_UNSIGNED_INT);
 
     /* Read dest values from frame buffer */
     if (span->arrayMask & SPAN_XY) {
@@ -219,9 +219,9 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
     void *rbPixels;
 
-    ASSERT(span->end < MAX_WIDTH);
-    ASSERT(span->arrayMask & SPAN_RGBA);
-    ASSERT(rb->DataType == span->array->ChanType);
+    assert(span->end < MAX_WIDTH);
+    assert(span->arrayMask & SPAN_RGBA);
+    assert(rb->DataType == span->array->ChanType);
 
     rbPixels = _swrast_get_dest_rgba(ctx, rb, span);
 

@@ -173,11 +173,8 @@
 #endif
 
 
-#if defined(DEBUG)
-#  define ASSERT(X)   assert(X)
-#else
-#  define ASSERT(X)
-#endif
+/* ASSERT is kept as an alias for assert() for legacy code in the slang module. */
+#define ASSERT(X) assert(X)
 
 
 #if (!defined(__GNUC__) || __GNUC__ < 3) && (!defined(__IBMC__) || __IBMC__ < 900)

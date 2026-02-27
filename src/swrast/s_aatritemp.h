@@ -142,7 +142,7 @@
 	/* Do backface culling */
 	if (area * bf < 0 || area == 0 || IS_INF_OR_NAN(area))
 	    return;
-	ltor = (GLboolean)(area < 0.0F);
+	ltor = static_cast<GLboolean>((area < 0.0F));
 
 	span.facing = area * swrast->_BackfaceSign > 0.0F;
     }
@@ -183,7 +183,7 @@
 #ifdef DO_INDEX
     if (ctx->Light.ShadeModel == GL_SMOOTH)
     {
-	compute_plane(p0, p1, p2, (GLfloat) v0->index,
+	compute_plane(p0, p1, p2, static_cast<GLfloat>(v0->index),
 		      v1->index, v2->index, iPlane);
     } else
     {
@@ -240,8 +240,8 @@
      */
     yMin = vMin->win[1];
     yMax = vMax->win[1];
-    iyMin = (GLint) yMin;
-    iyMax = (GLint) yMax + 1;
+    iyMin = static_cast<GLint>(yMin);
+    iyMax = static_cast<GLint>(yMax) + 1;
 
     if (ltor)
     {
@@ -254,7 +254,7 @@
 	GLfloat x = pMin[0] - (yMin - iyMin) * dxdy;
 	GLint iy;
 	for (iy = iyMin; iy < iyMax; iy++, x += dxdy) {
-	    GLint ix, startX = (GLint)(x - xAdj);
+	    GLint ix, startX = static_cast<GLint>((x - xAdj));
 	    GLuint count;
 	    GLfloat coverage = 0.0F;
 
@@ -274,12 +274,12 @@
 		const GLfloat cx = ix + 0.5F, cy = iy + 0.5F;
 		SWspanarrays *array = span.array;
 #ifdef DO_INDEX
-		array->coverage[count] = (GLfloat) compute_coveragei(pMin, pMid, pMax, ix, iy);
+		array->coverage[count] = static_cast<GLfloat>(compute_coveragei(pMin, pMid, pMax, ix, iy));
 #else
 		array->coverage[count] = coverage;
 #endif
 #ifdef DO_Z
-		array->z[count] = (GLuint) solve_plane(cx, cy, zPlane);
+		array->z[count] = static_cast<GLuint>(solve_plane(cx, cy, zPlane));
 #endif
 #ifdef DO_FOG
 		array->attribs[FRAG_ATTRIB_FOGC][count][0] = solve_plane(cx, cy, fogPlane);
@@ -291,7 +291,7 @@
 		array->rgba[count][ACOMP] = solve_plane_chan(cx, cy, aPlane);
 #endif
 #ifdef DO_INDEX
-		array->index[count] = (GLint) solve_plane(cx, cy, iPlane);
+		array->index[count] = static_cast<GLint>(solve_plane(cx, cy, iPlane));
 #endif
 #ifdef DO_SPEC
 		array->spec[count][RCOMP] = solve_plane_chan(cx, cy, srPlane);
@@ -325,8 +325,8 @@
 
 	    span.x = startX;
 	    span.y = iy;
-	    span.end = (GLuint) ix - (GLuint) startX;
-	    ASSERT(span.interpMask == 0);
+	    span.end = static_cast<GLuint>(ix) - static_cast<GLuint>(startX);
+	    assert(span.interpMask == 0);
 #if defined(DO_RGBA)
 	    _swrast_write_rgba_span(ctx, &span);
 #else
@@ -344,7 +344,7 @@
 	GLfloat x = pMin[0] - (yMin - iyMin) * dxdy;
 	GLint iy;
 	for (iy = iyMin; iy < iyMax; iy++, x += dxdy) {
-	    GLint ix, left, startX = (GLint)(x + xAdj);
+	    GLint ix, left, startX = static_cast<GLint>((x + xAdj));
 	    GLuint count, n;
 	    GLfloat coverage = 0.0F;
 
@@ -368,14 +368,14 @@
 		/* (cx,cy) = center of fragment */
 		const GLfloat cx = ix + 0.5F, cy = iy + 0.5F;
 		SWspanarrays *array = span.array;
-		ASSERT(ix >= 0);
+		assert(ix >= 0);
 #ifdef DO_INDEX
-		array->coverage[ix] = (GLfloat) compute_coveragei(pMin, pMax, pMid, ix, iy);
+		array->coverage[ix] = static_cast<GLfloat>(compute_coveragei(pMin, pMax, pMid, ix, iy));
 #else
 		array->coverage[ix] = coverage;
 #endif
 #ifdef DO_Z
-		array->z[ix] = (GLuint) solve_plane(cx, cy, zPlane);
+		array->z[ix] = static_cast<GLuint>(solve_plane(cx, cy, zPlane));
 #endif
 #ifdef DO_FOG
 		array->attribs[FRAG_ATTRIB_FOGC][ix][0] = solve_plane(cx, cy, fogPlane);
@@ -387,7 +387,7 @@
 		array->rgba[ix][ACOMP] = solve_plane_chan(cx, cy, aPlane);
 #endif
 #ifdef DO_INDEX
-		array->index[ix] = (GLint) solve_plane(cx, cy, iPlane);
+		array->index[ix] = static_cast<GLint>(solve_plane(cx, cy, iPlane));
 #endif
 #ifdef DO_SPEC
 		array->spec[ix][RCOMP] = solve_plane_chan(cx, cy, srPlane);
@@ -419,7 +419,7 @@
 	    if (startX <= ix)
 		continue;
 
-	    n = (GLuint) startX - (GLuint) ix;
+	    n = static_cast<GLuint>(startX) - static_cast<GLuint>(ix);
 
 	    left = ix + 1;
 
@@ -428,7 +428,7 @@
 	    {
 		SWspanarrays *array = span.array;
 		GLint j;
-		for (j = 0; j < (GLint) n; j++) {
+		for (j = 0; j < static_cast<GLint>(n); j++) {
 #ifdef DO_RGBA
 		    COPY_CHAN4(array->rgba[j], array->rgba[j + left]);
 #endif
@@ -457,7 +457,7 @@
 		SWspanarrays *array = span.array;
 		ATTRIB_LOOP_BEGIN
 		GLint j;
-		for (j = 0; j < (GLint) n; j++) {
+		for (j = 0; j < static_cast<GLint>(n); j++) {
 		    array->attribs[attr][j][0] = array->attribs[attr][j + left][0];
 		    array->attribs[attr][j][1] = array->attribs[attr][j + left][1];
 		    array->attribs[attr][j][2] = array->attribs[attr][j + left][2];
@@ -470,7 +470,7 @@
 	    span.x = left;
 	    span.y = iy;
 	    span.end = n;
-	    ASSERT(span.interpMask == 0);
+	    assert(span.interpMask == 0);
 #if defined(DO_RGBA)
 	    _swrast_write_rgba_span(ctx, &span);
 #else

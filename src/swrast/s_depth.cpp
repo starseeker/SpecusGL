@@ -476,8 +476,8 @@ depth_test_span(GLcontext *ctx, SWspan *span)
     GLubyte *mask = span->array->mask;
     GLuint passed;
 
-    ASSERT((span->arrayMask & SPAN_XY) == 0);
-    ASSERT(span->arrayMask & SPAN_Z);
+    assert((span->arrayMask & SPAN_XY) == 0);
+    assert(span->arrayMask & SPAN_Z);
 
     if (rb->GetPointer(ctx, 0, 0)) {
 	/* Directly access buffer */
@@ -486,7 +486,7 @@ depth_test_span(GLcontext *ctx, SWspan *span)
 	    passed = depth_test_span16(ctx, count, zbuffer, zValues, mask);
 	} else {
 	    GLuint *zbuffer = reinterpret_cast<GLuint *>(rb->GetPointer(ctx, x, y));
-	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	    assert(rb->DataType == GL_UNSIGNED_INT);
 	    passed = depth_test_span32(ctx, count, zbuffer, zValues, mask);
 	}
     } else {
@@ -498,7 +498,7 @@ depth_test_span(GLcontext *ctx, SWspan *span)
 	    rb->PutRow(ctx, count, x, y, zbuffer, nullptr);
 	} else {
 	    GLuint zbuffer[MAX_WIDTH];
-	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	    assert(rb->DataType == GL_UNSIGNED_INT);
 	    rb->GetRow(ctx, count, x, y, zbuffer);
 	    passed = depth_test_span32(ctx, count, zbuffer, zValues, mask);
 	    rb->PutRow(ctx, count, x, y, zbuffer, nullptr);
@@ -991,7 +991,7 @@ depth_test_pixels(GLcontext *ctx, SWspan *span)
 	} else {
 	    GLuint *zStart = static_cast<GLuint *>(rb->Data);
 	    GLuint stride = rb->Width;
-	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	    assert(rb->DataType == GL_UNSIGNED_INT);
 	    direct_depth_test_pixels32(ctx, zStart, stride, count, x, y, z, mask);
 	}
     } else {
@@ -1003,7 +1003,7 @@ depth_test_pixels(GLcontext *ctx, SWspan *span)
 	    rb->PutValues(ctx, count, x, y, zbuffer, nullptr);
 	} else {
 	    GLuint zbuffer[MAX_WIDTH];
-	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	    assert(rb->DataType == GL_UNSIGNED_INT);
 	    _swrast_get_values(ctx, rb, count, x, y, zbuffer, sizeof(GLuint));
 	    depth_test_span32(ctx, count, zbuffer, z, mask);
 	    rb->PutValues(ctx, count, x, y, zbuffer, nullptr);
@@ -1075,7 +1075,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
     } else {
 	/* get 32-bit values */
 	GLuint zbuffer32[MAX_WIDTH], *zbuffer;
-	ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	assert(rb->DataType == GL_UNSIGNED_INT);
 	if (span->arrayMask & SPAN_XY) {
 	    _swrast_get_values(ctx, rb, count, span->array->x, span->array->y,
 			       zbuffer32, sizeof(GLuint));
@@ -1129,7 +1129,7 @@ _swrast_read_depth_span_float(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return;
     }
 
-    ASSERT(rb->_BaseFormat == GL_DEPTH_COMPONENT);
+    assert(rb->_BaseFormat == GL_DEPTH_COMPONENT);
 
     if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
 	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
@@ -1191,7 +1191,7 @@ _swrast_read_depth_span_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return;
     }
 
-    ASSERT(rb->_BaseFormat == GL_DEPTH_COMPONENT);
+    assert(rb->_BaseFormat == GL_DEPTH_COMPONENT);
 
     if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
 	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
@@ -1306,7 +1306,7 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    }
 	} else {
 	    GLint i, j;
-	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
+	    assert(rb->DataType == GL_UNSIGNED_INT);
 	    for (i = 0; i < height; i++) {
 		GLuint *dst = reinterpret_cast<GLuint *>(rb->GetPointer(ctx, x, y + i));
 		for (j = 0; j < width; j++) {
@@ -1324,7 +1324,7 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    }
 	} else if (rb->DataType == GL_UNSIGNED_INT) {
 	    GLint i;
-	    ASSERT(sizeof(clearValue) == sizeof(GLuint));
+	    assert(sizeof(clearValue) == sizeof(GLuint));
 	    for (i = 0; i < height; i++) {
 		rb->PutMonoRow(ctx, width, x, y + i, &clearValue, nullptr);
 	    }

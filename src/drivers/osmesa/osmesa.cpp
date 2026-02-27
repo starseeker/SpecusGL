@@ -1098,7 +1098,7 @@ public:
 	    }
 	    RedBits = GreenBits = BlueBits = bpc;
 	} else if (osmesa->format == OSMESA_RGB_565) {
-	    ASSERT(DataType == GL_UNSIGNED_BYTE);
+	    assert(DataType == GL_UNSIGNED_BYTE);
 	    m_GetRow = get_row_RGB_565; m_GetValues = get_values_RGB_565;
 	    m_PutRow = put_row_RGB_565; m_PutRowRGB = put_row_rgb_RGB_565;
 	    m_PutMonoRow = put_mono_row_RGB_565;

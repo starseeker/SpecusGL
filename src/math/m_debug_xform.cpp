@@ -201,7 +201,7 @@ static int test_transform_function(transform_func func, int psize,
     mat->type = mtypes[mtype];
 
     m = mat->m;
-    ASSERT(((long)m & 15) == 0);
+    assert(((long)m & 15) == 0);
 
     init_matrix(m);
 

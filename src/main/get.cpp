@@ -1070,7 +1070,7 @@ _mesa_GetBooleanv(GLenum pname, GLboolean *params)
 	    {
 		GLint formats[100];
 		GLuint i, n = _mesa_get_compressed_formats(ctx, formats, GL_FALSE);
-		ASSERT(n <= 100);
+		assert(n <= 100);
 		for (i = 0; i < n; i++)
 		    params[i] = ENUM_TO_INT(formats[i]);
 	    }
@@ -2889,7 +2889,7 @@ _mesa_GetFloatv(GLenum pname, GLfloat *params)
 	    {
 		GLint formats[100];
 		GLuint i, n = _mesa_get_compressed_formats(ctx, formats, GL_FALSE);
-		ASSERT(n <= 100);
+		assert(n <= 100);
 		for (i = 0; i < n; i++)
 		    params[i] = ENUM_TO_INT(formats[i]);
 	    }
@@ -4706,7 +4706,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    {
 		GLint formats[100];
 		GLuint i, n = _mesa_get_compressed_formats(ctx, formats, GL_FALSE);
-		ASSERT(n <= 100);
+		assert(n <= 100);
 		for (i = 0; i < n; i++)
 		    params[i] = ENUM_TO_INT(formats[i]);
 	    }

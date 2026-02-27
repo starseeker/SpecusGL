@@ -99,7 +99,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_points4)(GLvector4f *clip_vec,
     }
 
     *orMask = tmpOrMask;
-    *andMask = (GLubyte)(c < count ? 0 : tmpAndMask);
+    *andMask = static_cast<GLubyte>((c < count ? 0 : tmpAndMask));
 
     proj_vec->flags |= VEC_SIZE_4;
     proj_vec->size = 4;
@@ -165,7 +165,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_np_points4)(GLvector4f *clip_vec,
     }
 
     *orMask = tmpOrMask;
-    *andMask = (GLubyte)(c < count ? 0 : tmpAndMask);
+    *andMask = static_cast<GLubyte>((c < count ? 0 : tmpAndMask));
     return clip_vec;
 }
 

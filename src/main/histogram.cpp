@@ -268,7 +268,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x7) << 5)
 			     | ((rgba[i][GCOMP] & 0x7) << 2)
@@ -288,7 +288,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x3) << 6)
 			     | ((rgba[i][GCOMP] & 0x7) << 3)
@@ -308,7 +308,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x3f) <<  5)
@@ -328,7 +328,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_BGR);
+		assert(format == GL_BGR);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x3f) <<  5)
@@ -358,7 +358,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xf) << 12)
 			     | ((rgba[i][BCOMP] & 0xf) <<  8)
@@ -389,7 +389,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xf) << 12)
 			     | ((rgba[i][GCOMP] & 0xf) <<  8)
@@ -420,7 +420,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x1f) << 11)
 			     | ((rgba[i][BCOMP] & 0x1f) <<  6)
@@ -451,7 +451,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
 			     | ((rgba[i][GCOMP] & 0x1f) <<  6)
@@ -482,7 +482,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xff) << 24)
 			     | ((rgba[i][BCOMP] & 0xff) << 16)
@@ -513,7 +513,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xff) << 24)
 			     | ((rgba[i][GCOMP] & 0xff) << 16)
@@ -544,7 +544,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x3ff) << 22)
 			     | ((rgba[i][BCOMP] & 0x3ff) << 12)
@@ -575,7 +575,7 @@ pack_histogram(GLcontext *ctx,
 	    } else {
 		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
-		ASSERT(format == GL_ABGR_EXT);
+		assert(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x3ff) << 22)
 			     | ((rgba[i][GCOMP] & 0x3ff) << 12)

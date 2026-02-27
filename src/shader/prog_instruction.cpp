@@ -171,8 +171,8 @@ static const struct instruction_info InstInfo[MAX_OPCODE] = {
 GLuint
 _mesa_num_inst_src_regs(gl_inst_opcode opcode)
 {
-    ASSERT(opcode == InstInfo[opcode].Opcode);
-    ASSERT(OPCODE_XPD == InstInfo[OPCODE_XPD].Opcode);
+    assert(opcode == InstInfo[opcode].Opcode);
+    assert(OPCODE_XPD == InstInfo[OPCODE_XPD].Opcode);
     return InstInfo[opcode].NumSrcRegs;
 }
 
@@ -183,7 +183,7 @@ _mesa_num_inst_src_regs(gl_inst_opcode opcode)
 const char *
 _mesa_opcode_string(gl_inst_opcode opcode)
 {
-    ASSERT(opcode < MAX_OPCODE);
+    assert(opcode < MAX_OPCODE);
     return InstInfo[opcode].Name;
 }
 
