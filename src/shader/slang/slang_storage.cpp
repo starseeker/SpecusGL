@@ -40,8 +40,9 @@
 bool
 slang_storage_array_construct(slang_storage_array * arr)
 {
+    /* slang_storage_array has default member initialisers; this is now a no-op */
     arr->type = SLANG_STORE_AGGREGATE;
-    arr->aggregate = nullptr;
+    arr->aggregate.reset();  /* ensure null (already default) */
     arr->length = 0;
     return true;
 }
@@ -49,11 +50,8 @@ slang_storage_array_construct(slang_storage_array * arr)
 GLvoid
 slang_storage_array_destruct(slang_storage_array * arr)
 {
-    if (arr->aggregate != nullptr) {
-	slang_storage_aggregate_destruct(arr->aggregate);
-	delete arr->aggregate;
-	arr->aggregate = nullptr;
-    }
+    /* unique_ptr member 'aggregate' frees itself automatically */
+    arr->aggregate.reset();
 }
 
 /* slang_storage_aggregate */
@@ -108,13 +106,12 @@ aggregate_matrix(slang_storage_aggregate * agg, slang_storage_type basic_type,
 	return false;
     arr->type = SLANG_STORE_AGGREGATE;
     arr->length = columns;
-    arr->aggregate = new slang_storage_aggregate();
-    if (!slang_storage_aggregate_construct(arr->aggregate)) {
-	delete arr->aggregate;
-	arr->aggregate = nullptr;
+    arr->aggregate = std::make_unique<slang_storage_aggregate>();
+    if (!slang_storage_aggregate_construct(arr->aggregate.get())) {
+	arr->aggregate.reset();
 	return false;
     }
-    if (!aggregate_vector(arr->aggregate, basic_type, rows))
+    if (!aggregate_vector(arr->aggregate.get(), basic_type, rows))
 	return false;
     return true;
 }
@@ -208,13 +205,12 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 	    if (arr == nullptr)
 		return false;
 	    arr->type = SLANG_STORE_AGGREGATE;
-	    arr->aggregate = new slang_storage_aggregate();
-	    if (!slang_storage_aggregate_construct(arr->aggregate)) {
-		delete arr->aggregate;
-		arr->aggregate = nullptr;
+	    arr->aggregate = std::make_unique<slang_storage_aggregate>();
+	    if (!slang_storage_aggregate_construct(arr->aggregate.get())) {
+		arr->aggregate.reset();
 		return false;
 	    }
-	    if (!_slang_aggregate_variable(arr->aggregate, spec->_array.get(), 0,
+	    if (!_slang_aggregate_variable(arr->aggregate.get(), spec->_array.get(), 0,
 					   funcs, structs, vars, atoms))
 		return false;
 	    arr->length = array_len;
@@ -247,7 +243,7 @@ _slang_sizeof_aggregate(const slang_storage_aggregate * agg)
 	GLuint element_size;
 
 	if (arr.type == SLANG_STORE_AGGREGATE)
-	    element_size = _slang_sizeof_aggregate(arr.aggregate);
+	    element_size = _slang_sizeof_aggregate(arr.aggregate.get());
 	else
 	    element_size = _slang_sizeof_type(arr.type);
 	size += element_size * arr.length;

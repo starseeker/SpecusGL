@@ -583,7 +583,7 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		    return 0;
 		}
 
-		spec->_struct = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct(*stru));
+		spec->_struct = std::make_unique<slang_struct>(*stru);
 	    }
 	    break;
 	default:

@@ -170,16 +170,6 @@ _slang_multiply_swizzles(slang_swizzle * dst, const slang_swizzle * left,
 /* slang_type_specifier RAII implementation                           */
 /* ------------------------------------------------------------------ */
 
-/**
- * Custom deleter: now that slang_struct has a proper destructor that frees
- * its owned members, we can simply delete the object.  We keep the
- * slang_struct_destruct() call for backward-compatibility safety.
- */
-void SlangStructDeleter::operator()(slang_struct *s) const noexcept
-{
-    delete s;   /* ~slang_struct() frees fields and structs via unique_ptr */
-}
-
 /** Destructor – unique_ptr members handle cleanup automatically. */
 slang_type_specifier::~slang_type_specifier() = default;
 
@@ -188,7 +178,7 @@ slang_type_specifier::slang_type_specifier(const slang_type_specifier &other)
     : type(other.type)
 {
     if (other._struct)
-        _struct.reset(new slang_struct(*other._struct));  /* copy via slang_struct copy ctor */
+        _struct = std::make_unique<slang_struct>(*other._struct);  /* copy via slang_struct copy ctor */
     if (other._array)
         _array = std::make_unique<slang_type_specifier>(*other._array);
 }
@@ -576,7 +566,7 @@ _slang_typeof_operation_(slang_operation * op,
 			/* struct initializer */
 			ti->spec.type = SLANG_SPEC_STRUCT;
 			/* Use slang_struct copy constructor directly */
-			ti->spec._struct = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct(*s));
+			ti->spec._struct = std::make_unique<slang_struct>(*s);
 		    } else {
 			/* float, int, vec4, mat3, etc. constructor? */
 			const char *name;

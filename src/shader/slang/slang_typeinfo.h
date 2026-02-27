@@ -138,29 +138,14 @@ enum slang_type_specifier_type {
  * Describes more sophisticated types, like structs and arrays.
  *
  * C++17 modernisation: _struct and _array are now RAII-managed via
- * std::unique_ptr.  A custom deleter (SlangStructDeleter) is used for
- * _struct so that slang_struct_destruct() is called before deallocation;
- * the full definition of SlangStructDeleter::operator() lives in
- * slang_typeinfo.cpp where slang_struct is complete.
- *
- * The legacy slang_type_specifier_ctr/dtr/copy free functions are kept
- * as thin wrappers so that existing call sites do not need to change
- * immediately; they now delegate to the C++ constructor/destructor/copy.
+ * std::unique_ptr.  The default deleter is sufficient since ~slang_struct()
+ * handles all cleanup of owned members.
  */
-
-/**
- * Custom deleter for slang_struct: calls slang_struct_destruct() before
- * releasing the object.  Defined out-of-line in slang_typeinfo.cpp so that
- * slang_struct is complete at the point of instantiation.
- */
-struct SlangStructDeleter {
-    void operator()(slang_struct *s) const noexcept;
-};
 
 struct slang_type_specifier {
     slang_type_specifier_type type = SLANG_SPEC_VOID;
     /** Owned struct definition (only when type == SLANG_SPEC_STRUCT). */
-    std::unique_ptr<slang_struct, SlangStructDeleter> _struct;
+    std::unique_ptr<slang_struct> _struct;
     /** Owned element-type specifier (only when type == SLANG_SPEC_ARRAY). */
     std::unique_ptr<slang_type_specifier> _array;
 

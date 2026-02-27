@@ -30,6 +30,7 @@
 #include "slang_compile.h"
 #include "slang_typeinfo.h"
 
+#include <memory>
 #include <vector>
 
 
@@ -67,7 +68,7 @@ struct slang_storage_aggregate;
  */
 struct slang_storage_array {
     slang_storage_type type{SLANG_STORE_AGGREGATE};
-    slang_storage_aggregate *aggregate{nullptr}; /**< owned; deleted by destruct */
+    std::unique_ptr<slang_storage_aggregate> aggregate; /**< owned sub-aggregate (RAII) */
     GLuint length{0};
 };
 
