@@ -183,7 +183,7 @@ _slang_find_variable(const slang_var_table *vt, slang_atom name)
  * \return  position for var, measured in floats
  */
 static GLint
-alloc_reg(slang_var_table *vt, GLint size, GLboolean isTemp)
+alloc_reg(slang_var_table *vt, GLint size, bool isTemp)
 {
     struct table *t = vt->Top;
     /* if size == 1, allocate anywhere, else, pos must be multiple of 4 */
@@ -220,13 +220,13 @@ alloc_reg(slang_var_table *vt, GLint size, GLboolean isTemp)
  * \param swizzle  returns swizzle mask for accessing var in register
  * \return  register allocated, or -1
  */
-GLboolean
+bool
 _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 {
     struct table *t = vt->Top;
-    const int i = alloc_reg(vt, store->Size, GL_FALSE);
+    const int i = alloc_reg(vt, store->Size, false);
     if (i < 0)
-	return GL_FALSE;
+	return false;
 
     store->Index = i / 4;
     if (store->Size == 1) {
@@ -239,7 +239,7 @@ _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 	if (dbg) printf("Alloc var sz %d at %d.xyzw (level %d)\n",
 			    store->Size, store->Index, t->Level);
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -247,13 +247,13 @@ _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 /**
  * Allocate temp register(s) for storing an unnamed intermediate value.
  */
-GLboolean
+bool
 _slang_alloc_temp(slang_var_table *vt, slang_ir_storage *store)
 {
     struct table *t = vt->Top;
-    const int i = alloc_reg(vt, store->Size, GL_TRUE);
+    const int i = alloc_reg(vt, store->Size, true);
     if (i < 0)
-	return GL_FALSE;
+	return false;
 
     store->Index = i / 4;
     if (store->Size == 1) {
@@ -266,7 +266,7 @@ _slang_alloc_temp(slang_var_table *vt, slang_ir_storage *store)
 	if (dbg) printf("Alloc temp sz %d at %d.xyzw (level %d)\n",
 			    store->Size, store->Index, t->Level);
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -297,7 +297,7 @@ _slang_free_temp(slang_var_table *vt, slang_ir_storage *store)
 }
 
 
-GLboolean
+bool
 _slang_is_temp(const slang_var_table *vt, const slang_ir_storage *store)
 {
     struct table *t = vt->Top;
@@ -310,9 +310,9 @@ _slang_is_temp(const slang_var_table *vt, const slang_ir_storage *store)
 	comp = GET_SWZ(store->Swizzle, 0);
 
     if (t->Temps[store->Index * 4 + comp] == TEMP)
-	return GL_TRUE;
+	return true;
     else
-	return GL_FALSE;
+	return false;
 }
 
 /*

@@ -28,16 +28,16 @@ _slang_add_variable(slang_var_table *t, slang_variable *v);
 extern slang_variable *
 _slang_find_variable(const slang_var_table *t, slang_atom name);
 
-extern GLboolean
+extern bool
 _slang_alloc_var(slang_var_table *t, slang_ir_storage *store);
 
-extern GLboolean
+extern bool
 _slang_alloc_temp(slang_var_table *t, slang_ir_storage *store);
 
 extern void
 _slang_free_temp(slang_var_table *t, slang_ir_storage *store);
 
-extern GLboolean
+extern bool
 _slang_is_temp(const slang_var_table *t, const slang_ir_storage *store);
 
 

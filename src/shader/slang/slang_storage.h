@@ -71,7 +71,7 @@ struct slang_storage_array {
     GLuint length{0};
 };
 
-GLboolean slang_storage_array_construct(slang_storage_array *);
+bool slang_storage_array_construct(slang_storage_array *);
 GLvoid slang_storage_array_destruct(slang_storage_array *);
 
 
@@ -85,11 +85,11 @@ struct slang_storage_aggregate {
     std::vector<slang_storage_array> arrays; /**< owned array elements */
 };
 
-GLboolean slang_storage_aggregate_construct(slang_storage_aggregate *);
+bool slang_storage_aggregate_construct(slang_storage_aggregate *);
 GLvoid slang_storage_aggregate_destruct(slang_storage_aggregate *);
 
 
-extern GLboolean
+extern bool
 _slang_aggregate_variable(slang_storage_aggregate *agg,
 			  slang_type_specifier *spec,
 			  GLuint array_len,

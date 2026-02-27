@@ -55,7 +55,7 @@ struct slang_fixup_table {
 
 inline void slang_fixup_table_init(slang_fixup_table *fix) { fix->table.clear(); }
 inline void slang_fixup_table_free(slang_fixup_table *fix) { fix->table.clear(); }
-extern GLboolean slang_fixup_save(slang_fixup_table *fixups, GLuint address);
+extern bool slang_fixup_save(slang_fixup_table *fixups, GLuint address);
 
 
 /**
@@ -98,7 +98,7 @@ _slang_function_scope_ctr(slang_function_scope *);
 extern void
 slang_function_scope_destruct(slang_function_scope *);
 
-extern GLboolean
+extern bool
 _slang_function_has_return_value(const slang_function *fun);
 
 extern int

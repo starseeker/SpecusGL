@@ -37,13 +37,13 @@
 
 /* slang_storage_array */
 
-GLboolean
+bool
 slang_storage_array_construct(slang_storage_array * arr)
 {
     arr->type = SLANG_STORE_AGGREGATE;
     arr->aggregate = nullptr;
     arr->length = 0;
-    return GL_TRUE;
+    return true;
 }
 
 GLvoid
@@ -58,11 +58,11 @@ slang_storage_array_destruct(slang_storage_array * arr)
 
 /* slang_storage_aggregate */
 
-GLboolean
+bool
 slang_storage_aggregate_construct(slang_storage_aggregate * agg)
 {
     agg->arrays.clear();
-    return GL_TRUE;
+    return true;
 }
 
 GLvoid
@@ -87,40 +87,40 @@ slang_storage_aggregate_push_new(slang_storage_aggregate * agg)
 
 /* _slang_aggregate_variable() */
 
-static GLboolean
+static bool
 aggregate_vector(slang_storage_aggregate * agg, slang_storage_type basic_type,
 		 GLuint row_count)
 {
     slang_storage_array *arr = slang_storage_aggregate_push_new(agg);
     if (arr == nullptr)
-	return GL_FALSE;
+	return false;
     arr->type = basic_type;
     arr->length = row_count;
-    return GL_TRUE;
+    return true;
 }
 
-static GLboolean
+static bool
 aggregate_matrix(slang_storage_aggregate * agg, slang_storage_type basic_type,
 		 GLuint columns, GLuint rows)
 {
     slang_storage_array *arr = slang_storage_aggregate_push_new(agg);
     if (arr == nullptr)
-	return GL_FALSE;
+	return false;
     arr->type = SLANG_STORE_AGGREGATE;
     arr->length = columns;
     arr->aggregate = new slang_storage_aggregate();
     if (!slang_storage_aggregate_construct(arr->aggregate)) {
 	delete arr->aggregate;
 	arr->aggregate = nullptr;
-	return GL_FALSE;
+	return false;
     }
     if (!aggregate_vector(arr->aggregate, basic_type, rows))
-	return GL_FALSE;
-    return GL_TRUE;
+	return false;
+    return true;
 }
 
 
-static GLboolean
+static bool
 aggregate_variables(slang_storage_aggregate * agg,
 		    slang_variable_scope * vars, slang_function_scope * funcs,
 		    slang_struct_scope * structs,
@@ -131,12 +131,12 @@ aggregate_variables(slang_storage_aggregate * agg,
 	if (!_slang_aggregate_variable(agg, &vars->variables[i]->type.specifier,
 				       vars->variables[i]->array_len, funcs,
 				       structs, globals, atoms))
-	    return GL_FALSE;
-    return GL_TRUE;
+	    return false;
+    return true;
 }
 
 
-GLboolean
+bool
 _slang_aggregate_variable(slang_storage_aggregate * agg,
 			  slang_type_specifier * spec, GLuint array_len,
 			  slang_function_scope * funcs,
@@ -206,23 +206,23 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 
 	    arr = slang_storage_aggregate_push_new(agg);
 	    if (arr == nullptr)
-		return GL_FALSE;
+		return false;
 	    arr->type = SLANG_STORE_AGGREGATE;
 	    arr->aggregate = new slang_storage_aggregate();
 	    if (!slang_storage_aggregate_construct(arr->aggregate)) {
 		delete arr->aggregate;
 		arr->aggregate = nullptr;
-		return GL_FALSE;
+		return false;
 	    }
 	    if (!_slang_aggregate_variable(arr->aggregate, spec->_array.get(), 0,
 					   funcs, structs, vars, atoms))
-		return GL_FALSE;
+		return false;
 	    arr->length = array_len;
 	    /* TODO: check if 0 < arr->length <= 65535 */
 	}
-	return GL_TRUE;
+	return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 

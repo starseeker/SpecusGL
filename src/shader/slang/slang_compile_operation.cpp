@@ -46,10 +46,10 @@ slang_operation::slang_operation()
     /* locals is default-constructed (empty variables, null outer_scope) */
 }
 
-GLboolean
+bool
 slang_operation_construct(slang_operation *oper)
 {
-    return oper->locals != nullptr ? GL_TRUE : GL_FALSE;
+    return oper->locals != nullptr ? true : false;
 }
 
 void
@@ -63,9 +63,9 @@ slang_operation_destruct(slang_operation *oper)
 
 /**
  * Recursively copy a slang_operation node.
- * \return GL_TRUE for success, GL_FALSE if failure
+ * \return true for success, false if failure
  */
-GLboolean
+bool
 slang_operation_copy(slang_operation *x, const slang_operation *y)
 {
     slang_operation z;
@@ -74,7 +74,7 @@ slang_operation_copy(slang_operation *x, const slang_operation *y)
     z.children.resize(y->children.size());
     for (GLuint i = 0; i < (GLuint)y->children.size(); i++) {
         if (!slang_operation_copy(&z.children[i], &y->children[i])) {
-            return GL_FALSE;
+            return false;
         }
     }
     std::copy(std::begin(y->literal), std::end(y->literal), z.literal);
@@ -84,11 +84,11 @@ slang_operation_copy(slang_operation *x, const slang_operation *y)
     z.a_id = y->a_id;
     if (y->locals) {
         if (!slang_variable_scope_copy(z.locals.get(), y->locals.get())) {
-            return GL_FALSE;
+            return false;
         }
     }
     *x = std::move(z);   /* move assignment destroys x's old state, then transfers z */
-    return GL_TRUE;
+    return true;
 }
 
 

@@ -141,13 +141,13 @@ struct slang_operation {
 };
 
 
-extern GLboolean
+extern bool
 slang_operation_construct(slang_operation *);
 
 extern void
 slang_operation_destruct(slang_operation *);
 
-extern GLboolean
+extern bool
 slang_operation_copy(slang_operation *, const slang_operation *);
 
 extern slang_operation *

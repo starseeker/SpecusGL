@@ -93,8 +93,8 @@ _slang_simplify(slang_operation *oper,
 		const slang_name_space * space,
 		slang_atom_pool * atoms)
 {
-    GLboolean isFloat[4];
-    GLboolean isBool[4];
+    bool isFloat[4];
+    bool isBool[4];
     GLuint i, n;
 
     if (oper->type == SLANG_OPER_IDENTIFIER) {
@@ -308,12 +308,12 @@ _slang_simplify(slang_operation *oper,
  *    satisfy constructors.
  */
 #define SLANG_DEBUG 0
-GLboolean
+bool
 _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 		  const slang_name_space * space,
 		  slang_atom_pool * atoms, slang_info_log *log)
 {
-    const GLboolean haveRetValue = _slang_function_has_return_value(fun);
+    const bool haveRetValue = _slang_function_has_return_value(fun);
     const int numParams = fun->param_count - haveRetValue;
     int i;
 
@@ -324,7 +324,7 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
     /* Only try adapting for constructors */
     if (fun->kind != SLANG_FUNC_CONSTRUCTOR)
-	return GL_FALSE;
+	return false;
 
     if ((GLuint)callOper->children.size() != numParams) {
 	/* number of arguments doesn't match number of parameters */
@@ -339,11 +339,11 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 		/* Get type of arg[i] */
 		if (!slang_typeinfo_construct(&argType))
-		    return GL_FALSE;
+		    return false;
 		if (!_slang_typeof_operation_(&callOper->children[i], space,
 					      &argType, atoms, log)) {
 		    slang_typeinfo_destruct(&argType);
-		    return GL_FALSE;
+		    return false;
 		}
 
 		/*
@@ -382,17 +382,17 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 	    /* non-constructor function: number of args must match number
 	     * of function params.
 	     */
-	    return GL_FALSE; /* caller will record an error msg */
+	    return false; /* caller will record an error msg */
 	}
     }
 
     if ((GLuint)callOper->children.size() < numParams) {
 	/* still not enough args for all params */
-	return GL_FALSE;
+	return false;
     } else if ((GLuint)callOper->children.size() > numParams) {
 	/* now too many arguments */
 	/* XXX this isn't always an error, see spec */
-	return GL_FALSE;
+	return false;
     }
 
     /*
@@ -409,11 +409,11 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 	/* Get type of arg[i] */
 	if (!slang_typeinfo_construct(&argType))
-	    return GL_FALSE;
+	    return false;
 	if (!_slang_typeof_operation_(&callOper->children[i], space,
 				      &argType, atoms, log)) {
 	    slang_typeinfo_destruct(&argType);
-	    return GL_FALSE;
+	    return false;
 	}
 
 	/* see if arg type matches parameter type */
@@ -441,7 +441,7 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 	slang_print_tree(callOper, 5);
 #endif
 
-    return GL_TRUE;
+    return true;
 }
 
 /*

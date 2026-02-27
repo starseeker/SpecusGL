@@ -39,11 +39,11 @@
 /**
  * Add a new fixup address to the table.
  */
-GLboolean
+bool
 slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 {
     fixups->table.push_back(address);
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -91,7 +91,7 @@ slang_function_scope_destruct(slang_function_scope * scope)
 /**
  * Does this function have a non-void return value?
  */
-GLboolean
+bool
 _slang_function_has_return_value(const slang_function *fun)
 {
     return fun->header.type.specifier.type != SLANG_SPEC_VOID;
