@@ -16,7 +16,7 @@
 #include "texcompress.h"
 
 
-[[nodiscard]] static constexpr GLboolean FLOAT_TO_BOOLEAN(GLfloat x) noexcept { return x ? GL_TRUE : GL_FALSE; }
+[[nodiscard]] static constexpr GLboolean FLOAT_TO_BOOLEAN(GLfloat x) noexcept { return x != 0.0f ? GL_TRUE : GL_FALSE; }
 [[nodiscard]] static constexpr GLboolean INT_TO_BOOLEAN(GLint i) noexcept { return i ? GL_TRUE : GL_FALSE; }
 [[nodiscard]] static constexpr GLboolean ENUM_TO_BOOLEAN(GLenum e) noexcept { return e ? GL_TRUE : GL_FALSE; }
 [[nodiscard]] static constexpr GLint ENUM_TO_INT(GLenum e) noexcept { return static_cast<GLint>(e); }
@@ -5541,7 +5541,7 @@ _mesa_GetDoublev(GLenum pname, GLdouble *params)
     _mesa_GetFloatv(pname, values);
 
     for (i = 0; i < 16 && values[i] != magic; i++)
-	params[i] = (GLdouble) values[i];
+	params[i] = static_cast<GLdouble>(values[i]);
 }
 
 
