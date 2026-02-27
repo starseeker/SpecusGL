@@ -49,7 +49,7 @@
     _slang_struct_scope_ctr(slang_struct_scope *);  /* legacy no-op; members are default-constructed */
 
     void slang_struct_scope_destruct(slang_struct_scope *);
-    int slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
+    bool slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
     slang_struct *slang_struct_scope_find(slang_struct_scope *, slang_atom, int);
 
     struct slang_struct {
@@ -76,10 +76,10 @@
 	slang_struct &operator=(slang_struct &&) noexcept = default;
     };
 
-    int slang_struct_construct(slang_struct *);
+    bool slang_struct_construct(slang_struct *);
     void slang_struct_destruct(slang_struct *);
-    int slang_struct_copy(slang_struct *, const slang_struct *);
-    int slang_struct_equal(const slang_struct *, const slang_struct *);
+    bool slang_struct_copy(slang_struct *, const slang_struct *);
+    bool slang_struct_equal(const slang_struct *, const slang_struct *);
 
 
 

@@ -71,7 +71,7 @@ slang_struct_scope_destruct(slang_struct_scope * scope)
     /* do not free scope->outer_scope */
 }
 
-int
+bool
 slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
 {
     /* Use slang_struct copy constructor for each element */
@@ -79,7 +79,7 @@ slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
     z.structs = y->structs;  /* copies each slang_struct via copy assignment */
     z.outer_scope = y->outer_scope;
     *x = std::move(z);
-    return 1;
+    return true;
 }
 
 slang_struct *
@@ -127,13 +127,13 @@ slang_struct &slang_struct::operator=(const slang_struct &other)
 
 /* slang_struct */
 
-int
+bool
 slang_struct_construct(slang_struct * stru)
 {
     stru->a_name = SLANG_ATOM_NULL;
     stru->fields = std::make_unique<slang_variable_scope>();
     stru->structs = std::make_unique<slang_struct_scope>();
-    return 1;
+    return true;
 }
 
 void
@@ -145,47 +145,47 @@ slang_struct_destruct(slang_struct * stru)
     stru->a_name = SLANG_ATOM_NULL;
 }
 
-int
+bool
 slang_struct_copy(slang_struct * x, const slang_struct * y)
 {
     slang_struct z;
 
     if (!slang_struct_construct(&z))
-	return 0;
+	return false;
     z.a_name = y->a_name;
     if (!slang_variable_scope_copy(z.fields.get(), y->fields.get())) {
 	slang_struct_destruct(&z);
-	return 0;
+	return false;
     }
     if (!slang_struct_scope_copy(z.structs.get(), y->structs.get())) {
 	slang_struct_destruct(&z);
-	return 0;
+	return false;
     }
     slang_struct_destruct(x);
     *x = std::move(z);
-    return 1;
+    return true;
 }
 
-int
+bool
 slang_struct_equal(const slang_struct * x, const slang_struct * y)
 {
     if (x->fields->variables.size() != y->fields->variables.size())
-	return 0;
+	return false;
 
     for (GLuint i = 0; i < x->fields->variables.size(); i++) {
 	const slang_variable *varx = x->fields->variables[i];
 	const slang_variable *vary = y->fields->variables[i];
 
 	if (varx->a_name != vary->a_name)
-	    return 0;
+	    return false;
 	if (!slang_type_specifier_equal(&varx->type.specifier,
 					&vary->type.specifier))
-	    return 0;
+	    return false;
 	if (varx->type.specifier.type == SLANG_SPEC_ARRAY)
 	    if (varx->array_len != vary->array_len)
 		return GL_FALSE;
     }
-    return 1;
+    return true;
 }
 
 /*

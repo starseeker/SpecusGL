@@ -65,10 +65,10 @@
     };
 
     /** Legacy no-op: qualifier has a default initialiser; specifier is RAII. */
-    inline int slang_fully_specified_type_construct(slang_fully_specified_type *type) {
+    inline bool slang_fully_specified_type_construct(slang_fully_specified_type *type) {
         type->qualifier = SLANG_QUAL_NONE;
         type->specifier = slang_type_specifier{};
-        return 1;
+        return true;
     }
 
     /** Legacy no-op: specifier unique_ptrs free themselves. */
@@ -76,7 +76,7 @@
         type->specifier = slang_type_specifier{};
     }
 
-    extern int
+    extern bool
     slang_fully_specified_type_copy(slang_fully_specified_type *,
 				    const slang_fully_specified_type *);
 
@@ -131,7 +131,7 @@
     extern void
     slang_variable_scope_destruct(slang_variable_scope *);
 
-    extern int
+    extern bool
     slang_variable_scope_copy(slang_variable_scope *,
 			      const slang_variable_scope *);
 
@@ -142,7 +142,7 @@
      * Legacy no-op: slang_variable is fully default-constructible.
      * Kept for backward compatibility only.
      */
-    inline int slang_variable_construct(slang_variable *) { return 1; }
+    inline bool slang_variable_construct(slang_variable *) { return true; }
 
     /**
      * Legacy cleanup: resets RAII members; kept for backward compatibility.
@@ -153,7 +153,7 @@
         var->initializer.reset();
     }
 
-    extern int
+    extern bool
     slang_variable_copy(slang_variable *, const slang_variable *);
 
     extern slang_variable *

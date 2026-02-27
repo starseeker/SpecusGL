@@ -77,7 +77,7 @@ struct slang_function {
     slang_fixup_table fixups;   /**< Mem locations which need func's address */
 };
 
-extern int slang_function_construct(slang_function *);
+extern bool slang_function_construct(slang_function *);
 extern void slang_function_destruct(slang_function *);
 
 
@@ -101,8 +101,8 @@ slang_function_scope_destruct(slang_function_scope *);
 extern bool
 _slang_function_has_return_value(const slang_function *fun);
 
-extern int
-slang_function_scope_find_by_name(slang_function_scope *, slang_atom, int);
+extern bool
+slang_function_scope_find_by_name(slang_function_scope *, slang_atom, bool);
 
 extern slang_function *
 slang_function_scope_find(slang_function_scope *, slang_function *, int);

@@ -1065,7 +1065,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		C->I++;
 
 		if (!C->parsing_builtin
-		    && !slang_function_scope_find_by_name(O->funs, op->a_id, 1)) {
+		    && !slang_function_scope_find_by_name(O->funs, op->a_id, true)) {
 		    const char *id;
 
 		    id = slang_atom_pool_id(C->atoms, op->a_id);

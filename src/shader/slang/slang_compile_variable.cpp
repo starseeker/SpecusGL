@@ -99,13 +99,13 @@ slang_type_specifier_type_to_string(slang_type_specifier_type type)
 
 /* slang_fully_specified_type_construct, _destruct are now inline in the header. */
 
-int
+bool
 slang_fully_specified_type_copy(slang_fully_specified_type * x,
 				const slang_fully_specified_type * y)
 {
     x->qualifier = y->qualifier;
     x->specifier = y->specifier;  /* deep copy via slang_type_specifier copy assignment */
-    return 1;
+    return true;
 }
 
 
@@ -181,7 +181,7 @@ slang_variable_scope_destruct(slang_variable_scope * scope)
     /* do not free scope->outer_scope */
 }
 
-int
+bool
 slang_variable_scope_copy(slang_variable_scope * x,
 			  const slang_variable_scope * y)
 {
@@ -194,19 +194,19 @@ slang_variable_scope_copy(slang_variable_scope * x,
 	z.variables[i] = slang_variable_new();
 	if (!z.variables[i]) {
 	    slang_variable_scope_destruct(&z);
-	    return 0;
+	    return false;
 	}
     }
     for (i = 0; i < n; i++) {
 	if (!slang_variable_copy(z.variables[i], y->variables[i])) {
 	    slang_variable_scope_destruct(&z);
-	    return 0;
+	    return false;
 	}
     }
     z.outer_scope = y->outer_scope;
     slang_variable_scope_destruct(x);
     *x = std::move(z);
-    return 1;
+    return true;
 }
 
 
@@ -231,26 +231,26 @@ slang_variable_scope_grow(slang_variable_scope *scope)
 /* slang_variable_construct and slang_variable_destruct are now inline in the header. */
 
 
-int
+bool
 slang_variable_copy(slang_variable * x, const slang_variable * y)
 {
     slang_variable z;
 
     if (!slang_fully_specified_type_copy(&z.type, &y->type))
-	return 0;
+	return false;
     z.a_name = y->a_name;
     z.array_len = y->array_len;
     if (y->initializer) {
 	z.initializer = std::make_unique<slang_operation>();
 	if (!slang_operation_construct(z.initializer.get()))
-	    return 0;
+	    return false;
 	if (!slang_operation_copy(z.initializer.get(), y->initializer.get()))
-	    return 0;
+	    return false;
     }
     z.address = y->address;
     z.size = y->size;
     *x = std::move(z);   /* move assignment: destroys x's old state, transfers z */
-    return 1;
+    return true;
 }
 
 

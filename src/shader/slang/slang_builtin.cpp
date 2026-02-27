@@ -87,7 +87,7 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
     };
     gl_state_index tokens[STATE_LENGTH];
     GLuint i;
-    GLboolean isMatrix = GL_FALSE;
+    bool isMatrix = false;
 
     for (i = 0; i < STATE_LENGTH; i++) {
 	tokens[i] = static_cast<gl_state_index>(0);
@@ -100,7 +100,7 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
 	    tokens[0] = matrices[i].matrix;
 	    /* tokens[1], [2] and [3] filled below */
 	    tokens[4] = matrices[i].modifier;
-	    isMatrix = GL_TRUE;
+	    isMatrix = true;
 	    break;
 	}
     }

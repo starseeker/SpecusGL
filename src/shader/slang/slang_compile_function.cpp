@@ -50,13 +50,13 @@ slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 
 /* slang_function */
 
-int
+bool
 slang_function_construct(slang_function * func)
 {
     /* POD fields have default initialisers; just set up the parameters scope */
     func->parameters = std::make_unique<slang_variable_scope>();
     slang_fixup_table_init(&func->fixups);
-    return 1;
+    return true;
 }
 
 void
@@ -105,16 +105,16 @@ _slang_function_has_return_value(const slang_function *fun)
  * \param all_scopes  if non-zero, search containing scopes too.
  * \return pointer to found function, or nullptr.
  */
-int
+bool
 slang_function_scope_find_by_name(slang_function_scope * funcs,
-				  slang_atom a_name, int all_scopes)
+				  slang_atom a_name, bool all_scopes)
 {
     for (const auto &f : funcs->functions)
 	if (a_name == f.header.a_name)
-	    return 1;
+	    return true;
     if (all_scopes && funcs->outer_scope != nullptr)
-	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, 1);
-    return 0;
+	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, true);
+    return false;
 }
 
 
@@ -130,7 +130,7 @@ slang_function_scope_find_by_name(slang_function_scope * funcs,
  */
 slang_function *
 slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
-			  int all_scopes)
+			  bool all_scopes)
 {
     for (auto &f : funcs->functions) {
 	const GLuint haveRetValue = 0;
