@@ -590,7 +590,7 @@ _mesa_set_viewport(GLcontext *ctx, GLint x, GLint y,
 	/* Many drivers will use this call to check for window size changes
 	 * and reallocate the z/stencil/accum/etc buffers if needed.
 	 */
-	(*ctx->Driver.Viewport)(ctx, x, y, width, height);
+	ctx->Driver.Viewport(ctx, x, y, width, height);
     }
 }
 
@@ -629,7 +629,7 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
 #endif
 
     if (ctx->Driver.DepthRange) {
-	(*ctx->Driver.DepthRange)(ctx, nearval, farval);
+	ctx->Driver.DepthRange(ctx, nearval, farval);
     }
 }
 #endif

@@ -512,19 +512,19 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
 	    ctx->Texture.Unit[i].Enabled = enable->Texture[i];
 	    if (ctx->Driver.Enable) {
 		if (ctx->Driver.ActiveTexture) {
-		    (*ctx->Driver.ActiveTexture)(ctx, i);
+		    ctx->Driver.ActiveTexture(ctx, i);
 		}
-		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_1D,
+		ctx->Driver.Enable(ctx, GL_TEXTURE_1D,
 				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_1D_BIT)));
-		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_2D,
+		ctx->Driver.Enable(ctx, GL_TEXTURE_2D,
 				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_2D_BIT)));
-		(*ctx->Driver.Enable)(ctx, GL_TEXTURE_3D,
+		ctx->Driver.Enable(ctx, GL_TEXTURE_3D,
 				      static_cast<GLboolean>((enable->Texture[i] & TEXTURE_3D_BIT)));
 		if (ctx->Extensions.ARB_texture_cube_map)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_CUBE_MAP_ARB,
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_CUBE_MAP_ARB,
 					  static_cast<GLboolean>((enable->Texture[i] & TEXTURE_CUBE_BIT)));
 		if (ctx->Extensions.NV_texture_rectangle)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_RECTANGLE_NV,
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_RECTANGLE_NV,
 					  static_cast<GLboolean>((enable->Texture[i] & TEXTURE_RECT_BIT)));
 	    }
 	}
@@ -533,24 +533,24 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
 	    ctx->Texture.Unit[i].TexGenEnabled = enable->TexGen[i];
 	    if (ctx->Driver.Enable) {
 		if (ctx->Driver.ActiveTexture) {
-		    (*ctx->Driver.ActiveTexture)(ctx, i);
+		    ctx->Driver.ActiveTexture(ctx, i);
 		}
 		if (enable->TexGen[i] & S_BIT)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_S, GL_TRUE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_S, GL_TRUE);
 		else
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_S, GL_FALSE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_S, GL_FALSE);
 		if (enable->TexGen[i] & T_BIT)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_T, GL_TRUE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_T, GL_TRUE);
 		else
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_T, GL_FALSE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_T, GL_FALSE);
 		if (enable->TexGen[i] & R_BIT)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_R, GL_TRUE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_R, GL_TRUE);
 		else
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_R, GL_FALSE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_R, GL_FALSE);
 		if (enable->TexGen[i] & Q_BIT)
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_Q, GL_TRUE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_Q, GL_TRUE);
 		else
-		    (*ctx->Driver.Enable)(ctx, GL_TEXTURE_GEN_Q, GL_FALSE);
+		    ctx->Driver.Enable(ctx, GL_TEXTURE_GEN_Q, GL_FALSE);
 	    }
 	}
 
@@ -559,7 +559,7 @@ pop_enable_group(GLcontext *ctx, const struct gl_enable_attrib *enable)
     }
 
     if (ctx->Driver.ActiveTexture) {
-	(*ctx->Driver.ActiveTexture)(ctx, ctx->Texture.CurrentUnit);
+	ctx->Driver.ActiveTexture(ctx, ctx->Texture.CurrentUnit);
     }
 }
 
@@ -1252,7 +1252,7 @@ _mesa_PopClientAttrib(void)
 #if FEATURE_EXT_pixel_buffer_object
 		if (ctx->Pack.BufferObj->unref()) {
 		    _mesa_remove_buffer_object(ctx, ctx->Pack.BufferObj);
-		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Pack.BufferObj);
+		    ctx->Driver.DeleteBuffer(ctx, ctx->Pack.BufferObj);
 		}
 #endif
 		ctx->Pack = *static_cast<const struct gl_pixelstore_attrib *>(data);
@@ -1262,7 +1262,7 @@ _mesa_PopClientAttrib(void)
 #if FEATURE_EXT_pixel_buffer_object
 		if (ctx->Unpack.BufferObj->unref()) {
 		    _mesa_remove_buffer_object(ctx, ctx->Unpack.BufferObj);
-		    (*ctx->Driver.DeleteBuffer)(ctx, ctx->Unpack.BufferObj);
+		    ctx->Driver.DeleteBuffer(ctx, ctx->Unpack.BufferObj);
 		}
 #endif
 		ctx->Unpack = *static_cast<const struct gl_pixelstore_attrib *>(data);

@@ -246,7 +246,7 @@ _mesa_BindVertexArrayAPPLE(GLuint id)
 	    /* If this is a new array object id, allocate an array object now.
 	     */
 
-	    newObj = (*ctx->Driver.NewArrayObject)(ctx, id);
+	    newObj = ctx->Driver.NewArrayObject(ctx, id);
 	    if (!newObj) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindVertexArrayAPPLE");
 		return;
@@ -263,7 +263,7 @@ _mesa_BindVertexArrayAPPLE(GLuint id)
 
     /* Pass BindVertexArray call to device driver */
     if (ctx->Driver.BindArrayObject && newObj)
-	(*ctx->Driver.BindArrayObject)(ctx, newObj);
+	ctx->Driver.BindArrayObject(ctx, newObj);
 }
 
 
@@ -364,7 +364,7 @@ _mesa_GenVertexArraysAPPLE(GLsizei n, GLuint *arrays)
 	struct gl_array_object *obj;
 	GLuint name = first + i;
 
-	obj = (*ctx->Driver.NewArrayObject)(ctx, name);
+	obj = ctx->Driver.NewArrayObject(ctx, name);
 	if (!obj) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenVertexArraysAPPLE");
 	    return;

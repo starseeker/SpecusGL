@@ -31,6 +31,8 @@
 #ifndef DD_INCLUDED
 #define DD_INCLUDED
 
+#include <functional>
+
 /* THIS FILE ONLY INCLUDED BY mtypes.h !!!!! */
 
 struct gl_pixelstore_attrib;
@@ -61,7 +63,7 @@ struct dd_function_table {
      * Only the GL_RENDERER query must be implemented.  Otherwise, nullptr can be
      * returned.
      */
-    const GLubyte * (*GetString)(GLcontext *ctx, GLenum name);
+    std::function<const GLubyte *(GLcontext *ctx, GLenum name)> GetString;
 
     /**
      * Notify the driver after Mesa has made some internal state changes.
@@ -69,7 +71,7 @@ struct dd_function_table {
      * This is in addition to any state change callbacks Mesa may already have
      * made.
      */
-    void (*UpdateState)(GLcontext *ctx, GLbitfield new_state);
+    std::function<void(GLcontext *ctx, GLbitfield new_state)> UpdateState;
 
     /**
      * Get the width and height of the named buffer/window.
@@ -77,43 +79,41 @@ struct dd_function_table {
      * Mesa uses this to determine when the driver's window size has changed.
      * XXX OBSOLETE: this function will be removed in the future.
      */
-    void (*GetBufferSize)(GLframebuffer *buffer,
-			  GLuint *width, GLuint *height);
+    std::function<void(GLframebuffer *buffer, GLuint *width, GLuint *height)> GetBufferSize;
 
     /**
      * Resize the given framebuffer to the given size.
      * XXX OBSOLETE: this function will be removed in the future.
      */
-    void (*ResizeBuffers)(GLcontext *ctx, GLframebuffer *fb,
-			  GLuint width, GLuint height);
+    std::function<void(GLcontext *ctx, GLframebuffer *fb, GLuint width, GLuint height)> ResizeBuffers;
 
     /**
      * Called whenever an error is generated.
      * __GLcontextRec::ErrorValue contains the error value.
      */
-    void (*Error)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> Error;
 
     /**
      * This is called whenever glFinish() is called.
      */
-    void (*Finish)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> Finish;
 
     /**
      * This is called whenever glFlush() is called.
      */
-    void (*Flush)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> Flush;
 
     /**
      * Clear the color/depth/stencil/accum buffer(s).
      * \param buffers  a bitmask of BUFFER_BIT_* flags indicating which
      *                 renderbuffers need to be cleared.
      */
-    void (*Clear)(GLcontext *ctx, GLbitfield buffers);
+    std::function<void(GLcontext *ctx, GLbitfield buffers)> Clear;
 
     /**
      * Execute glAccum command.
      */
-    void (*Accum)(GLcontext *ctx, GLenum op, GLfloat value);
+    std::function<void(GLcontext *ctx, GLenum op, GLfloat value)> Accum;
 
 
     /**
@@ -125,35 +125,22 @@ struct dd_function_table {
      * Called by glDrawPixels().
      * \p unpack describes how to unpack the source image data.
      */
-    void (*DrawPixels)(GLcontext *ctx,
-		       GLint x, GLint y, GLsizei width, GLsizei height,
-		       GLenum format, GLenum type,
-		       const struct gl_pixelstore_attrib *unpack,
-		       const GLvoid *pixels);
+    std::function<void(GLcontext *ctx, GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, const struct gl_pixelstore_attrib *unpack, const GLvoid *pixels)> DrawPixels;
 
     /**
      * Called by glReadPixels().
      */
-    void (*ReadPixels)(GLcontext *ctx,
-		       GLint x, GLint y, GLsizei width, GLsizei height,
-		       GLenum format, GLenum type,
-		       const struct gl_pixelstore_attrib *unpack,
-		       GLvoid *dest);
+    std::function<void(GLcontext *ctx, GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, const struct gl_pixelstore_attrib *unpack, GLvoid *dest)> ReadPixels;
 
     /**
      * Called by glCopyPixels().
      */
-    void (*CopyPixels)(GLcontext *ctx, GLint srcx, GLint srcy,
-		       GLsizei width, GLsizei height,
-		       GLint dstx, GLint dsty, GLenum type);
+    std::function<void(GLcontext *ctx, GLint srcx, GLint srcy, GLsizei width, GLsizei height, GLint dstx, GLint dsty, GLenum type)> CopyPixels;
 
     /**
      * Called by glBitmap().
      */
-    void (*Bitmap)(GLcontext *ctx,
-		   GLint x, GLint y, GLsizei width, GLsizei height,
-		   const struct gl_pixelstore_attrib *unpack,
-		   const GLubyte *bitmap);
+    std::function<void(GLcontext *ctx, GLint x, GLint y, GLsizei width, GLsizei height, const struct gl_pixelstore_attrib *unpack, const GLubyte *bitmap)> Bitmap;
     /*@}*/
 
 
@@ -169,8 +156,7 @@ struct dd_function_table {
      * functions.  The driver should examine \p internalFormat and return a
      * pointer to an appropriate gl_texture_format.
      */
-    const struct gl_texture_format *(*ChooseTextureFormat)(GLcontext *ctx,
-	    GLint internalFormat, GLenum srcFormat, GLenum srcType);
+    std::function<const struct gl_texture_format *(GLcontext *ctx, GLint internalFormat, GLenum srcFormat, GLenum srcType)> ChooseTextureFormat;
 
     /**
      * Called by glTexImage1D().
@@ -189,39 +175,21 @@ struct dd_function_table {
      *
      * Drivers should call a fallback routine from texstore.c if needed.
      */
-    void (*TexImage1D)(GLcontext *ctx, GLenum target, GLint level,
-		       GLint internalFormat,
-		       GLint width, GLint border,
-		       GLenum format, GLenum type, const GLvoid *pixels,
-		       const struct gl_pixelstore_attrib *packing,
-		       struct gl_texture_object *texObj,
-		       struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLint width, GLint border, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexImage1D;
 
     /**
      * Called by glTexImage2D().
      *
      * \sa dd_function_table::TexImage1D.
      */
-    void (*TexImage2D)(GLcontext *ctx, GLenum target, GLint level,
-		       GLint internalFormat,
-		       GLint width, GLint height, GLint border,
-		       GLenum format, GLenum type, const GLvoid *pixels,
-		       const struct gl_pixelstore_attrib *packing,
-		       struct gl_texture_object *texObj,
-		       struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLint width, GLint height, GLint border, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexImage2D;
 
     /**
      * Called by glTexImage3D().
      *
      * \sa dd_function_table::TexImage1D.
      */
-    void (*TexImage3D)(GLcontext *ctx, GLenum target, GLint level,
-		       GLint internalFormat,
-		       GLint width, GLint height, GLint depth, GLint border,
-		       GLenum format, GLenum type, const GLvoid *pixels,
-		       const struct gl_pixelstore_attrib *packing,
-		       struct gl_texture_object *texObj,
-		       struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLint width, GLint height, GLint depth, GLint border, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexImage3D;
 
     /**
      * Called by glTexSubImage1D().
@@ -244,94 +212,59 @@ struct dd_function_table {
      *
      * The driver should use a fallback routine from texstore.c if needed.
      */
-    void (*TexSubImage1D)(GLcontext *ctx, GLenum target, GLint level,
-			  GLint xoffset, GLsizei width,
-			  GLenum format, GLenum type,
-			  const GLvoid *pixels,
-			  const struct gl_pixelstore_attrib *packing,
-			  struct gl_texture_object *texObj,
-			  struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexSubImage1D;
 
     /**
      * Called by glTexSubImage2D().
      *
      * \sa dd_function_table::TexSubImage1D.
      */
-    void (*TexSubImage2D)(GLcontext *ctx, GLenum target, GLint level,
-			  GLint xoffset, GLint yoffset,
-			  GLsizei width, GLsizei height,
-			  GLenum format, GLenum type,
-			  const GLvoid *pixels,
-			  const struct gl_pixelstore_attrib *packing,
-			  struct gl_texture_object *texObj,
-			  struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexSubImage2D;
 
     /**
      * Called by glTexSubImage3D().
      *
      * \sa dd_function_table::TexSubImage1D.
      */
-    void (*TexSubImage3D)(GLcontext *ctx, GLenum target, GLint level,
-			  GLint xoffset, GLint yoffset, GLint zoffset,
-			  GLsizei width, GLsizei height, GLint depth,
-			  GLenum format, GLenum type,
-			  const GLvoid *pixels,
-			  const struct gl_pixelstore_attrib *packing,
-			  struct gl_texture_object *texObj,
-			  struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLint depth, GLenum format, GLenum type, const GLvoid *pixels, const struct gl_pixelstore_attrib *packing, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> TexSubImage3D;
 
     /**
      * Called by glGetTexImage().
      */
-    void (*GetTexImage)(GLcontext *ctx, GLenum target, GLint level,
-			GLenum format, GLenum type, GLvoid *pixels,
-			struct gl_texture_object *texObj,
-			struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> GetTexImage;
 
     /**
      * Called by glCopyTexImage1D().
      *
      * Drivers should use a fallback routine from texstore.c if needed.
      */
-    void (*CopyTexImage1D)(GLcontext *ctx, GLenum target, GLint level,
-			   GLenum internalFormat, GLint x, GLint y,
-			   GLsizei width, GLint border);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLenum internalFormat, GLint x, GLint y, GLsizei width, GLint border)> CopyTexImage1D;
 
     /**
      * Called by glCopyTexImage2D().
      *
      * Drivers should use a fallback routine from texstore.c if needed.
      */
-    void (*CopyTexImage2D)(GLcontext *ctx, GLenum target, GLint level,
-			   GLenum internalFormat, GLint x, GLint y,
-			   GLsizei width, GLsizei height, GLint border);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLenum internalFormat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)> CopyTexImage2D;
 
     /**
      * Called by glCopyTexSubImage1D().
      *
      * Drivers should use a fallback routine from texstore.c if needed.
      */
-    void (*CopyTexSubImage1D)(GLcontext *ctx, GLenum target, GLint level,
-			      GLint xoffset,
-			      GLint x, GLint y, GLsizei width);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width)> CopyTexSubImage1D;
     /**
      * Called by glCopyTexSubImage2D().
      *
      * Drivers should use a fallback routine from texstore.c if needed.
      */
-    void (*CopyTexSubImage2D)(GLcontext *ctx, GLenum target, GLint level,
-			      GLint xoffset, GLint yoffset,
-			      GLint x, GLint y,
-			      GLsizei width, GLsizei height);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)> CopyTexSubImage2D;
     /**
      * Called by glCopyTexSubImage3D().
      *
      * Drivers should use a fallback routine from texstore.c if needed.
      */
-    void (*CopyTexSubImage3D)(GLcontext *ctx, GLenum target, GLint level,
-			      GLint xoffset, GLint yoffset, GLint zoffset,
-			      GLint x, GLint y,
-			      GLsizei width, GLsizei height);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)> CopyTexSubImage3D;
 
     /**
      * Called by glTexImage[123]D when user specifies a proxy texture
@@ -339,11 +272,7 @@ struct dd_function_table {
      *
      * \return GL_TRUE if the proxy test passes, or GL_FALSE if the test fails.
      */
-    GLboolean(*TestProxyTexImage)(GLcontext *ctx, GLenum target,
-				  GLint level, GLint internalFormat,
-				  GLenum format, GLenum type,
-				  GLint width, GLint height,
-				  GLint depth, GLint border);
+    std::function<GLboolean(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLenum format, GLenum type, GLint width, GLint height, GLint depth, GLint border)> TestProxyTexImage;
     /*@}*/
 
 
@@ -367,35 +296,19 @@ struct dd_function_table {
      * \a retainInternalCopy is returned by this function and indicates whether
      * core Mesa should keep an internal copy of the texture image.
      */
-    void (*CompressedTexImage1D)(GLcontext *ctx, GLenum target,
-				 GLint level, GLint internalFormat,
-				 GLsizei width, GLint border,
-				 GLsizei imageSize, const GLvoid *data,
-				 struct gl_texture_object *texObj,
-				 struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexImage1D;
     /**
      * Called by glCompressedTexImage2D().
      *
      * \sa dd_function_table::CompressedTexImage1D.
      */
-    void (*CompressedTexImage2D)(GLcontext *ctx, GLenum target,
-				 GLint level, GLint internalFormat,
-				 GLsizei width, GLsizei height, GLint border,
-				 GLsizei imageSize, const GLvoid *data,
-				 struct gl_texture_object *texObj,
-				 struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexImage2D;
     /**
      * Called by glCompressedTexImage3D().
      *
      * \sa dd_function_table::CompressedTexImage3D.
      */
-    void (*CompressedTexImage3D)(GLcontext *ctx, GLenum target,
-				 GLint level, GLint internalFormat,
-				 GLsizei width, GLsizei height, GLsizei depth,
-				 GLint border,
-				 GLsizei imageSize, const GLvoid *data,
-				 struct gl_texture_object *texObj,
-				 struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexImage3D;
 
     /**
      * Called by glCompressedTexSubImage1D().
@@ -414,53 +327,31 @@ struct dd_function_table {
      * \param texImage is the target texture image.  It will have the texture \p
      * width, \p height, \p depth, \p border and \p internalFormat information.
      */
-    void (*CompressedTexSubImage1D)(GLcontext *ctx, GLenum target, GLint level,
-				    GLint xoffset, GLsizei width,
-				    GLenum format,
-				    GLsizei imageSize, const GLvoid *data,
-				    struct gl_texture_object *texObj,
-				    struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexSubImage1D;
     /**
      * Called by glCompressedTexSubImage2D().
      *
      * \sa dd_function_table::CompressedTexImage3D.
      */
-    void (*CompressedTexSubImage2D)(GLcontext *ctx, GLenum target, GLint level,
-				    GLint xoffset, GLint yoffset,
-				    GLsizei width, GLint height,
-				    GLenum format,
-				    GLsizei imageSize, const GLvoid *data,
-				    struct gl_texture_object *texObj,
-				    struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLint height, GLenum format, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexSubImage2D;
     /**
      * Called by glCompressedTexSubImage3D().
      *
      * \sa dd_function_table::CompressedTexImage3D.
      */
-    void (*CompressedTexSubImage3D)(GLcontext *ctx, GLenum target, GLint level,
-				    GLint xoffset, GLint yoffset, GLint zoffset,
-				    GLsizei width, GLint height, GLint depth,
-				    GLenum format,
-				    GLsizei imageSize, const GLvoid *data,
-				    struct gl_texture_object *texObj,
-				    struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLint height, GLint depth, GLenum format, GLsizei imageSize, const GLvoid *data, struct gl_texture_object *texObj, struct gl_texture_image *texImage)> CompressedTexSubImage3D;
 
 
     /**
      * Called by glGetCompressedTexImage.
      */
-    void (*GetCompressedTexImage)(GLcontext *ctx, GLenum target, GLint level,
-				  GLvoid *img,
-				  const struct gl_texture_object *texObj,
-				  const struct gl_texture_image *texImage);
+    std::function<void(GLcontext *ctx, GLenum target, GLint level, GLvoid *img, const struct gl_texture_object *texObj, const struct gl_texture_image *texImage)> GetCompressedTexImage;
 
     /**
      * Called to query number of bytes of storage needed to store the
      * specified compressed texture.
      */
-    GLuint(*CompressedTextureSize)(GLcontext *ctx, GLsizei width,
-				   GLsizei height, GLsizei depth,
-				   GLenum format);
+    std::function<GLuint(GLcontext *ctx, GLsizei width, GLsizei height, GLsizei depth, GLenum format)> CompressedTextureSize;
     /*@}*/
 
     /**
@@ -471,38 +362,36 @@ struct dd_function_table {
     /**
      * Called by glBindTexture().
      */
-    void (*BindTexture)(GLcontext *ctx, GLenum target,
-			struct gl_texture_object *tObj);
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_texture_object *tObj)> BindTexture;
 
     /**
      * Called to allocate a new texture object.
      * A new gl_texture_object should be returned.  The driver should
      * attach to it any device-specific info it needs.
      */
-    struct gl_texture_object * (*NewTextureObject)(GLcontext *ctx, GLuint name,
-	    GLenum target);
+    std::function<struct gl_texture_object *(GLcontext *ctx, GLuint name, GLenum target)> NewTextureObject;
     /**
      * Called when a texture object is about to be deallocated.
      *
      * Driver should delete the gl_texture_object object and anything
      * hanging off of it.
      */
-    void (*DeleteTexture)(GLcontext *ctx, struct gl_texture_object *tObj);
+    std::function<void(GLcontext *ctx, struct gl_texture_object *tObj)> DeleteTexture;
 
     /**
      * Called to allocate a new texture image object.
      */
-    struct gl_texture_image * (*NewTextureImage)(GLcontext *ctx);
+    std::function<struct gl_texture_image *(GLcontext *ctx)> NewTextureImage;
 
     /**
      * Called to free tImage->Data.
      */
-    void (*FreeTexImageData)(GLcontext *ctx, struct gl_texture_image *tImage);
+    std::function<void(GLcontext *ctx, struct gl_texture_image *tImage)> FreeTexImageData;
 
     /** Map texture image data into user space */
-    void (*MapTexture)(GLcontext *ctx, struct gl_texture_object *tObj);
+    std::function<void(GLcontext *ctx, struct gl_texture_object *tObj)> MapTexture;
     /** Unmap texture images from user space */
-    void (*UnmapTexture)(GLcontext *ctx, struct gl_texture_object *tObj);
+    std::function<void(GLcontext *ctx, struct gl_texture_object *tObj)> UnmapTexture;
 
     /**
      * Note: no context argument.  This function doesn't initially look
@@ -515,24 +404,22 @@ struct dd_function_table {
      * from -- a pointer into client memory or a mesa temporary.
      * sz -- nr bytes to copy.
      */
-    void* (*TextureMemCpy)(void *to, const void *from, size_t sz);
+    std::function<void*(void *to, const void *from, size_t sz)> TextureMemCpy;
 
     /**
      * Called by glAreTextureResident().
      */
-    GLboolean(*IsTextureResident)(GLcontext *ctx,
-				  struct gl_texture_object *t);
+    std::function<GLboolean(GLcontext *ctx, struct gl_texture_object *t)> IsTextureResident;
 
     /**
      * Called by glPrioritizeTextures().
      */
-    void (*PrioritizeTexture)(GLcontext *ctx,  struct gl_texture_object *t,
-			      GLclampf priority);
+    std::function<void(GLcontext *ctx, struct gl_texture_object *t, GLclampf priority)> PrioritizeTexture;
 
     /**
      * Called by glActiveTextureARB() to set current texture unit.
      */
-    void (*ActiveTexture)(GLcontext *ctx, GLuint texUnitNumber);
+    std::function<void(GLcontext *ctx, GLuint texUnitNumber)> ActiveTexture;
 
     /**
      * Called when the texture's color lookup table is changed.
@@ -540,8 +427,7 @@ struct dd_function_table {
      * If \p tObj is nullptr then the shared texture palette
      * gl_texture_object::Palette is to be updated.
      */
-    void (*UpdateTexturePalette)(GLcontext *ctx,
-				 struct gl_texture_object *tObj);
+    std::function<void(GLcontext *ctx, struct gl_texture_object *tObj)> UpdateTexturePalette;
     /*@}*/
 
 
@@ -549,22 +435,13 @@ struct dd_function_table {
      * \name Imaging functionality
      */
     /*@{*/
-    void (*CopyColorTable)(GLcontext *ctx,
-			   GLenum target, GLenum internalformat,
-			   GLint x, GLint y, GLsizei width);
+    std::function<void(GLcontext *ctx, GLenum target, GLenum internalformat, GLint x, GLint y, GLsizei width)> CopyColorTable;
 
-    void (*CopyColorSubTable)(GLcontext *ctx,
-			      GLenum target, GLsizei start,
-			      GLint x, GLint y, GLsizei width);
+    std::function<void(GLcontext *ctx, GLenum target, GLsizei start, GLint x, GLint y, GLsizei width)> CopyColorSubTable;
 
-    void (*CopyConvolutionFilter1D)(GLcontext *ctx, GLenum target,
-				    GLenum internalFormat,
-				    GLint x, GLint y, GLsizei width);
+    std::function<void(GLcontext *ctx, GLenum target, GLenum internalFormat, GLint x, GLint y, GLsizei width)> CopyConvolutionFilter1D;
 
-    void (*CopyConvolutionFilter2D)(GLcontext *ctx, GLenum target,
-				    GLenum internalFormat,
-				    GLint x, GLint y,
-				    GLsizei width, GLsizei height);
+    std::function<void(GLcontext *ctx, GLenum target, GLenum internalFormat, GLint x, GLint y, GLsizei width, GLsizei height)> CopyConvolutionFilter2D;
     /*@}*/
 
 
@@ -573,21 +450,18 @@ struct dd_function_table {
      */
     /*@{*/
     /** Bind a vertex/fragment program */
-    void (*BindProgram)(GLcontext *ctx, GLenum target, struct gl_program *prog);
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_program *prog)> BindProgram;
     /** Allocate a new program */
-    struct gl_program * (*NewProgram)(GLcontext *ctx, GLenum target, GLuint id);
+    std::function<struct gl_program *(GLcontext *ctx, GLenum target, GLuint id)> NewProgram;
     /** Delete a program */
-    void (*DeleteProgram)(GLcontext *ctx, struct gl_program *prog);
+    std::function<void(GLcontext *ctx, struct gl_program *prog)> DeleteProgram;
     /** Notify driver that a program string has been specified. */
-    void (*ProgramStringNotify)(GLcontext *ctx, GLenum target,
-				struct gl_program *prog);
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_program *prog)> ProgramStringNotify;
     /** Get value of a program register during program execution. */
-    void (*GetProgramRegister)(GLcontext *ctx, enum register_file file,
-			       GLuint index, GLfloat val[4]);
+    std::function<void(GLcontext *ctx, enum register_file file, GLuint index, GLfloat val[4])> GetProgramRegister;
 
     /** Query if program can be loaded onto hardware */
-    GLboolean(*IsProgramNative)(GLcontext *ctx, GLenum target,
-				struct gl_program *prog);
+    std::function<GLboolean(GLcontext *ctx, GLenum target, struct gl_program *prog)> IsProgramNative;
 
     /*@}*/
 
@@ -603,105 +477,94 @@ struct dd_function_table {
      */
     /*@{*/
     /** Specify the alpha test function */
-    void (*AlphaFunc)(GLcontext *ctx, GLenum func, GLfloat ref);
+    std::function<void(GLcontext *ctx, GLenum func, GLfloat ref)> AlphaFunc;
     /** Set the blend color */
-    void (*BlendColor)(GLcontext *ctx, const GLfloat color[4]);
+    std::function<void(GLcontext *ctx, const GLfloat color[4])> BlendColor;
     /** Set the blend equation */
-    void (*BlendEquationSeparate)(GLcontext *ctx, GLenum modeRGB, GLenum modeA);
+    std::function<void(GLcontext *ctx, GLenum modeRGB, GLenum modeA)> BlendEquationSeparate;
     /** Specify pixel arithmetic */
-    void (*BlendFuncSeparate)(GLcontext *ctx,
-			      GLenum sfactorRGB, GLenum dfactorRGB,
-			      GLenum sfactorA, GLenum dfactorA);
+    std::function<void(GLcontext *ctx, GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorA, GLenum dfactorA)> BlendFuncSeparate;
     /** Specify clear values for the color buffers */
-    void (*ClearColor)(GLcontext *ctx, const GLfloat color[4]);
+    std::function<void(GLcontext *ctx, const GLfloat color[4])> ClearColor;
     /** Specify the clear value for the depth buffer */
-    void (*ClearDepth)(GLcontext *ctx, GLclampd d);
+    std::function<void(GLcontext *ctx, GLclampd d)> ClearDepth;
     /** Specify the clear value for the color index buffers */
-    void (*ClearIndex)(GLcontext *ctx, GLuint index);
+    std::function<void(GLcontext *ctx, GLuint index)> ClearIndex;
     /** Specify the clear value for the stencil buffer */
-    void (*ClearStencil)(GLcontext *ctx, GLint s);
+    std::function<void(GLcontext *ctx, GLint s)> ClearStencil;
     /** Specify a plane against which all geometry is clipped */
-    void (*ClipPlane)(GLcontext *ctx, GLenum plane, const GLfloat *equation);
+    std::function<void(GLcontext *ctx, GLenum plane, const GLfloat *equation)> ClipPlane;
     /** Enable and disable writing of frame buffer color components */
-    void (*ColorMask)(GLcontext *ctx, GLboolean rmask, GLboolean gmask,
-		      GLboolean bmask, GLboolean amask);
+    std::function<void(GLcontext *ctx, GLboolean rmask, GLboolean gmask, GLboolean bmask, GLboolean amask)> ColorMask;
     /** Cause a material color to track the current color */
-    void (*ColorMaterial)(GLcontext *ctx, GLenum face, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum face, GLenum mode)> ColorMaterial;
     /** Specify whether front- or back-facing facets can be culled */
-    void (*CullFace)(GLcontext *ctx, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum mode)> CullFace;
     /** Define front- and back-facing polygons */
-    void (*FrontFace)(GLcontext *ctx, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum mode)> FrontFace;
     /** Specify the value used for depth buffer comparisons */
-    void (*DepthFunc)(GLcontext *ctx, GLenum func);
+    std::function<void(GLcontext *ctx, GLenum func)> DepthFunc;
     /** Enable or disable writing into the depth buffer */
-    void (*DepthMask)(GLcontext *ctx, GLboolean flag);
+    std::function<void(GLcontext *ctx, GLboolean flag)> DepthMask;
     /** Specify mapping of depth values from NDC to window coordinates */
-    void (*DepthRange)(GLcontext *ctx, GLclampd nearval, GLclampd farval);
+    std::function<void(GLcontext *ctx, GLclampd nearval, GLclampd farval)> DepthRange;
     /** Specify the current buffer for writing */
-    void (*DrawBuffer)(GLcontext *ctx, GLenum buffer);
+    std::function<void(GLcontext *ctx, GLenum buffer)> DrawBuffer;
     /** Specify the buffers for writing for fragment programs*/
-    void (*DrawBuffers)(GLcontext *ctx, GLsizei n, const GLenum *buffers);
+    std::function<void(GLcontext *ctx, GLsizei n, const GLenum *buffers)> DrawBuffers;
     /** Enable or disable server-side gl capabilities */
-    void (*Enable)(GLcontext *ctx, GLenum cap, GLboolean state);
+    std::function<void(GLcontext *ctx, GLenum cap, GLboolean state)> Enable;
     /** Specify fog parameters */
-    void (*Fogfv)(GLcontext *ctx, GLenum pname, const GLfloat *params);
+    std::function<void(GLcontext *ctx, GLenum pname, const GLfloat *params)> Fogfv;
     /** Specify implementation-specific hints */
-    void (*Hint)(GLcontext *ctx, GLenum target, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum target, GLenum mode)> Hint;
     /** Control the writing of individual bits in the color index buffers */
-    void (*IndexMask)(GLcontext *ctx, GLuint mask);
+    std::function<void(GLcontext *ctx, GLuint mask)> IndexMask;
     /** Set light source parameters.
      * Note: for GL_POSITION and GL_SPOT_DIRECTION, params will have already
      * been transformed to eye-space.
      */
-    void (*Lightfv)(GLcontext *ctx, GLenum light,
-		    GLenum pname, const GLfloat *params);
+    std::function<void(GLcontext *ctx, GLenum light, GLenum pname, const GLfloat *params)> Lightfv;
     /** Set the lighting model parameters */
-    void (*LightModelfv)(GLcontext *ctx, GLenum pname, const GLfloat *params);
+    std::function<void(GLcontext *ctx, GLenum pname, const GLfloat *params)> LightModelfv;
     /** Specify the line stipple pattern */
-    void (*LineStipple)(GLcontext *ctx, GLint factor, GLushort pattern);
+    std::function<void(GLcontext *ctx, GLint factor, GLushort pattern)> LineStipple;
     /** Specify the width of rasterized lines */
-    void (*LineWidth)(GLcontext *ctx, GLfloat width);
+    std::function<void(GLcontext *ctx, GLfloat width)> LineWidth;
     /** Specify a logical pixel operation for color index rendering */
-    void (*LogicOpcode)(GLcontext *ctx, GLenum opcode);
-    void (*PointParameterfv)(GLcontext *ctx, GLenum pname,
-			     const GLfloat *params);
+    std::function<void(GLcontext *ctx, GLenum opcode)> LogicOpcode;
+    std::function<void(GLcontext *ctx, GLenum pname, const GLfloat *params)> PointParameterfv;
     /** Specify the diameter of rasterized points */
-    void (*PointSize)(GLcontext *ctx, GLfloat size);
+    std::function<void(GLcontext *ctx, GLfloat size)> PointSize;
     /** Select a polygon rasterization mode */
-    void (*PolygonMode)(GLcontext *ctx, GLenum face, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum face, GLenum mode)> PolygonMode;
     /** Set the scale and units used to calculate depth values */
-    void (*PolygonOffset)(GLcontext *ctx, GLfloat factor, GLfloat units);
+    std::function<void(GLcontext *ctx, GLfloat factor, GLfloat units)> PolygonOffset;
     /** Set the polygon stippling pattern */
-    void (*PolygonStipple)(GLcontext *ctx, const GLubyte *mask);
+    std::function<void(GLcontext *ctx, const GLubyte *mask)> PolygonStipple;
     /* Specifies the current buffer for reading */
-    void (*ReadBuffer)(GLcontext *ctx, GLenum buffer);
+    std::function<void(GLcontext *ctx, GLenum buffer)> ReadBuffer;
     /** Set rasterization mode */
-    void (*RenderMode)(GLcontext *ctx, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum mode)> RenderMode;
     /** Define the scissor box */
-    void (*Scissor)(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h);
+    std::function<void(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)> Scissor;
     /** Select flat or smooth shading */
-    void (*ShadeModel)(GLcontext *ctx, GLenum mode);
+    std::function<void(GLcontext *ctx, GLenum mode)> ShadeModel;
     /** OpenGL 2.0 two-sided StencilFunc */
-    void (*StencilFuncSeparate)(GLcontext *ctx, GLenum face, GLenum func,
-				GLint ref, GLuint mask);
+    std::function<void(GLcontext *ctx, GLenum face, GLenum func, GLint ref, GLuint mask)> StencilFuncSeparate;
     /** OpenGL 2.0 two-sided StencilMask */
-    void (*StencilMaskSeparate)(GLcontext *ctx, GLenum face, GLuint mask);
+    std::function<void(GLcontext *ctx, GLenum face, GLuint mask)> StencilMaskSeparate;
     /** OpenGL 2.0 two-sided StencilOp */
-    void (*StencilOpSeparate)(GLcontext *ctx, GLenum face, GLenum fail,
-			      GLenum zfail, GLenum zpass);
+    std::function<void(GLcontext *ctx, GLenum face, GLenum fail, GLenum zfail, GLenum zpass)> StencilOpSeparate;
     /** Control the generation of texture coordinates */
-    void (*TexGen)(GLcontext *ctx, GLenum coord, GLenum pname,
-		   const GLfloat *params);
+    std::function<void(GLcontext *ctx, GLenum coord, GLenum pname, const GLfloat *params)> TexGen;
     /** Set texture environment parameters */
-    void (*TexEnv)(GLcontext *ctx, GLenum target, GLenum pname,
-		   const GLfloat *param);
+    std::function<void(GLcontext *ctx, GLenum target, GLenum pname, const GLfloat *param)> TexEnv;
     /** Set texture parameters */
-    void (*TexParameter)(GLcontext *ctx, GLenum target,
-			 struct gl_texture_object *texObj,
-			 GLenum pname, const GLfloat *params);
-    void (*TextureMatrix)(GLcontext *ctx, GLuint unit, const GLmatrix *mat);
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_texture_object *texObj, GLenum pname, const GLfloat *params)> TexParameter;
+    std::function<void(GLcontext *ctx, GLuint unit, const GLmatrix *mat)> TextureMatrix;
     /** Set the viewport */
-    void (*Viewport)(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h);
+    std::function<void(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)> Viewport;
     /*@}*/
 
 
@@ -711,25 +574,17 @@ struct dd_function_table {
      * Called by the corresponding OpenGL functions.
      */
     /*@{*/
-    void (*VertexPointer)(GLcontext *ctx, GLint size, GLenum type,
-			  GLsizei stride, const GLvoid *ptr);
-    void (*NormalPointer)(GLcontext *ctx, GLenum type,
-			  GLsizei stride, const GLvoid *ptr);
-    void (*ColorPointer)(GLcontext *ctx, GLint size, GLenum type,
-			 GLsizei stride, const GLvoid *ptr);
-    void (*FogCoordPointer)(GLcontext *ctx, GLenum type,
-			    GLsizei stride, const GLvoid *ptr);
-    void (*IndexPointer)(GLcontext *ctx, GLenum type,
-			 GLsizei stride, const GLvoid *ptr);
-    void (*SecondaryColorPointer)(GLcontext *ctx, GLint size, GLenum type,
-				  GLsizei stride, const GLvoid *ptr);
-    void (*TexCoordPointer)(GLcontext *ctx, GLint size, GLenum type,
-			    GLsizei stride, const GLvoid *ptr);
-    void (*EdgeFlagPointer)(GLcontext *ctx, GLsizei stride, const GLvoid *ptr);
-    void (*VertexAttribPointer)(GLcontext *ctx, GLuint index, GLint size,
-				GLenum type, GLsizei stride, const GLvoid *ptr);
-    void (*LockArraysEXT)(GLcontext *ctx, GLint first, GLsizei count);
-    void (*UnlockArraysEXT)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx, GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)> VertexPointer;
+    std::function<void(GLcontext *ctx, GLenum type, GLsizei stride, const GLvoid *ptr)> NormalPointer;
+    std::function<void(GLcontext *ctx, GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)> ColorPointer;
+    std::function<void(GLcontext *ctx, GLenum type, GLsizei stride, const GLvoid *ptr)> FogCoordPointer;
+    std::function<void(GLcontext *ctx, GLenum type, GLsizei stride, const GLvoid *ptr)> IndexPointer;
+    std::function<void(GLcontext *ctx, GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)> SecondaryColorPointer;
+    std::function<void(GLcontext *ctx, GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)> TexCoordPointer;
+    std::function<void(GLcontext *ctx, GLsizei stride, const GLvoid *ptr)> EdgeFlagPointer;
+    std::function<void(GLcontext *ctx, GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)> VertexAttribPointer;
+    std::function<void(GLcontext *ctx, GLint first, GLsizei count)> LockArraysEXT;
+    std::function<void(GLcontext *ctx)> UnlockArraysEXT;
     /*@}*/
 
 
@@ -740,15 +595,15 @@ struct dd_function_table {
      */
     /*@{*/
     /** Return the value or values of a selected parameter */
-    GLboolean(*GetBooleanv)(GLcontext *ctx, GLenum pname, GLboolean *result);
+    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLboolean *result)> GetBooleanv;
     /** Return the value or values of a selected parameter */
-    GLboolean(*GetDoublev)(GLcontext *ctx, GLenum pname, GLdouble *result);
+    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLdouble *result)> GetDoublev;
     /** Return the value or values of a selected parameter */
-    GLboolean(*GetFloatv)(GLcontext *ctx, GLenum pname, GLfloat *result);
+    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLfloat *result)> GetFloatv;
     /** Return the value or values of a selected parameter */
-    GLboolean(*GetIntegerv)(GLcontext *ctx, GLenum pname, GLint *result);
+    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLint *result)> GetIntegerv;
     /** Return the value or values of a selected parameter */
-    GLboolean(*GetPointerv)(GLcontext *ctx, GLenum pname, GLvoid **result);
+    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLvoid **result)> GetPointerv;
     /*@}*/
 
 
@@ -757,31 +612,21 @@ struct dd_function_table {
      */
 #if FEATURE_ARB_vertex_buffer_object
     /*@{*/
-    void (*BindBuffer)(GLcontext *ctx, GLenum target,
-		       struct gl_buffer_object *obj);
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_buffer_object *obj)> BindBuffer;
 
-    struct gl_buffer_object * (*NewBufferObject)(GLcontext *ctx, GLuint buffer,
-	    GLenum target);
+    std::function<struct gl_buffer_object *(GLcontext *ctx, GLuint buffer, GLenum target)> NewBufferObject;
 
-    void (*DeleteBuffer)(GLcontext *ctx, struct gl_buffer_object *obj);
+    std::function<void(GLcontext *ctx, struct gl_buffer_object *obj)> DeleteBuffer;
 
-    void (*BufferData)(GLcontext *ctx, GLenum target, GLsizeiptrARB size,
-		       const GLvoid *data, GLenum usage,
-		       struct gl_buffer_object *obj);
+    std::function<void(GLcontext *ctx, GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage, struct gl_buffer_object *obj)> BufferData;
 
-    void (*BufferSubData)(GLcontext *ctx, GLenum target, GLintptrARB offset,
-			  GLsizeiptrARB size, const GLvoid *data,
-			  struct gl_buffer_object *obj);
+    std::function<void(GLcontext *ctx, GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid *data, struct gl_buffer_object *obj)> BufferSubData;
 
-    void (*GetBufferSubData)(GLcontext *ctx, GLenum target,
-			     GLintptrARB offset, GLsizeiptrARB size,
-			     GLvoid *data, struct gl_buffer_object *obj);
+    std::function<void(GLcontext *ctx, GLenum target, GLintptrARB offset, GLsizeiptrARB size, GLvoid *data, struct gl_buffer_object *obj)> GetBufferSubData;
 
-    void * (*MapBuffer)(GLcontext *ctx, GLenum target, GLenum access,
-			struct gl_buffer_object *obj);
+    std::function<void *(GLcontext *ctx, GLenum target, GLenum access, struct gl_buffer_object *obj)> MapBuffer;
 
-    GLboolean(*UnmapBuffer)(GLcontext *ctx, GLenum target,
-			    struct gl_buffer_object *obj);
+    std::function<GLboolean(GLcontext *ctx, GLenum target, struct gl_buffer_object *obj)> UnmapBuffer;
     /*@}*/
 #endif
 
@@ -790,36 +635,25 @@ struct dd_function_table {
      */
 #if FEATURE_EXT_framebuffer_object
     /*@{*/
-    struct gl_framebuffer * (*NewFramebuffer)(GLcontext *ctx, GLuint name);
-    struct gl_renderbuffer * (*NewRenderbuffer)(GLcontext *ctx, GLuint name);
-    void (*BindFramebuffer)(GLcontext *ctx, GLenum target,
-			    struct gl_framebuffer *fb);
-    void (*FramebufferRenderbuffer)(GLcontext *ctx,
-				    struct gl_framebuffer *fb,
-				    GLenum attachment,
-				    struct gl_renderbuffer *rb);
-    void (*RenderTexture)(GLcontext *ctx,
-			  struct gl_framebuffer *fb,
-			  struct gl_renderbuffer_attachment *att);
-    void (*FinishRenderTexture)(GLcontext *ctx,
-				struct gl_renderbuffer_attachment *att);
+    std::function<struct gl_framebuffer *(GLcontext *ctx, GLuint name)> NewFramebuffer;
+    std::function<struct gl_renderbuffer *(GLcontext *ctx, GLuint name)> NewRenderbuffer;
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_framebuffer *fb)> BindFramebuffer;
+    std::function<void(GLcontext *ctx, struct gl_framebuffer *fb, GLenum attachment, struct gl_renderbuffer *rb)> FramebufferRenderbuffer;
+    std::function<void(GLcontext *ctx, struct gl_framebuffer *fb, struct gl_renderbuffer_attachment *att)> RenderTexture;
+    std::function<void(GLcontext *ctx, struct gl_renderbuffer_attachment *att)> FinishRenderTexture;
     /*@}*/
 #endif
 #if FEATURE_EXT_framebuffer_blit
-    void (*BlitFramebuffer)(GLcontext *ctx,
-			    GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1,
-			    GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1,
-			    GLbitfield mask, GLenum filter);
+    std::function<void(GLcontext *ctx, GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)> BlitFramebuffer;
 #endif
 
     /**
      * \name Query objects
      */
     /*@{*/
-    struct gl_query_object * (*NewQueryObject)(GLcontext *ctx, GLuint id);
-    void (*BeginQuery)(GLcontext *ctx, GLenum target,
-		       struct gl_query_object *q);
-    void (*EndQuery)(GLcontext *ctx, GLenum target, struct gl_query_object *q);
+    std::function<struct gl_query_object *(GLcontext *ctx, GLuint id)> NewQueryObject;
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_query_object *q)> BeginQuery;
+    std::function<void(GLcontext *ctx, GLenum target, struct gl_query_object *q)> EndQuery;
     /*@}*/
 
 
@@ -827,62 +661,44 @@ struct dd_function_table {
      * \name Vertex Array objects
      */
     /*@{*/
-    struct gl_array_object * (*NewArrayObject)(GLcontext *ctx, GLuint id);
-    void (*DeleteArrayObject)(GLcontext *ctx, struct gl_array_object *obj);
-    void (*BindArrayObject)(GLcontext *ctx, struct gl_array_object *obj);
+    std::function<struct gl_array_object *(GLcontext *ctx, GLuint id)> NewArrayObject;
+    std::function<void(GLcontext *ctx, struct gl_array_object *obj)> DeleteArrayObject;
+    std::function<void(GLcontext *ctx, struct gl_array_object *obj)> BindArrayObject;
     /*@}*/
 
     /**
      * \name GLSL-related functions (ARB extensions and OpenGL 2.x)
      */
     /*@{*/
-    void (*AttachShader)(GLcontext *ctx, GLuint program, GLuint shader);
-    void (*BindAttribLocation)(GLcontext *ctx, GLuint program, GLuint index,
-			       const GLcharARB *name);
-    void (*CompileShader)(GLcontext *ctx, GLuint shader);
-    GLuint(*CreateShader)(GLcontext *ctx, GLenum type);
-    GLuint(*CreateProgram)(GLcontext *ctx);
-    void (*DeleteProgram2)(GLcontext *ctx, GLuint program);
-    void (*DeleteShader)(GLcontext *ctx, GLuint shader);
-    void (*DetachShader)(GLcontext *ctx, GLuint program, GLuint shader);
-    void (*GetActiveAttrib)(GLcontext *ctx, GLuint program, GLuint index,
-			    GLsizei maxLength, GLsizei * length, GLint * size,
-			    GLenum * type, GLcharARB * name);
-    void (*GetActiveUniform)(GLcontext *ctx, GLuint program, GLuint index,
-			     GLsizei maxLength, GLsizei *length, GLint *size,
-			     GLenum *type, GLcharARB *name);
-    void (*GetAttachedShaders)(GLcontext *ctx, GLuint program, GLsizei maxCount,
-			       GLsizei *count, GLuint *obj);
-    GLint(*GetAttribLocation)(GLcontext *ctx, GLuint program,
-			      const GLcharARB *name);
-    GLuint(*GetHandle)(GLcontext *ctx, GLenum pname);
-    void (*GetProgramiv)(GLcontext *ctx, GLuint program,
-			 GLenum pname, GLint *params);
-    void (*GetProgramInfoLog)(GLcontext *ctx, GLuint program, GLsizei bufSize,
-			      GLsizei *length, GLchar *infoLog);
-    void (*GetShaderiv)(GLcontext *ctx, GLuint shader,
-			GLenum pname, GLint *params);
-    void (*GetShaderInfoLog)(GLcontext *ctx, GLuint shader, GLsizei bufSize,
-			     GLsizei *length, GLchar *infoLog);
-    void (*GetShaderSource)(GLcontext *ctx, GLuint shader, GLsizei maxLength,
-			    GLsizei *length, GLcharARB *sourceOut);
-    void (*GetUniformfv)(GLcontext *ctx, GLuint program, GLint location,
-			 GLfloat *params);
-    void (*GetUniformiv)(GLcontext *ctx, GLuint program, GLint location,
-			 GLint *params);
-    GLint(*GetUniformLocation)(GLcontext *ctx, GLuint program,
-			       const GLcharARB *name);
-    GLboolean(*IsProgram)(GLcontext *ctx, GLuint name);
-    GLboolean(*IsShader)(GLcontext *ctx, GLuint name);
-    void (*LinkProgram)(GLcontext *ctx, GLuint program);
-    void (*ShaderSource)(GLcontext *ctx, GLuint shader, const GLchar *source);
-    void (*Uniform)(GLcontext *ctx, GLint location, GLsizei count,
-		    const GLvoid *values, GLenum type);
-    void (*UniformMatrix)(GLcontext *ctx, GLint cols, GLint rows,
-			  GLenum matrixType, GLint location, GLsizei count,
-			  GLboolean transpose, const GLfloat *values);
-    void (*UseProgram)(GLcontext *ctx, GLuint program);
-    void (*ValidateProgram)(GLcontext *ctx, GLuint program);
+    std::function<void(GLcontext *ctx, GLuint program, GLuint shader)> AttachShader;
+    std::function<void(GLcontext *ctx, GLuint program, GLuint index, const GLcharARB *name)> BindAttribLocation;
+    std::function<void(GLcontext *ctx, GLuint shader)> CompileShader;
+    std::function<GLuint(GLcontext *ctx, GLenum type)> CreateShader;
+    std::function<GLuint(GLcontext *ctx)> CreateProgram;
+    std::function<void(GLcontext *ctx, GLuint program)> DeleteProgram2;
+    std::function<void(GLcontext *ctx, GLuint shader)> DeleteShader;
+    std::function<void(GLcontext *ctx, GLuint program, GLuint shader)> DetachShader;
+    std::function<void(GLcontext *ctx, GLuint program, GLuint index, GLsizei maxLength, GLsizei * length, GLint * size, GLenum * type, GLcharARB * name)> GetActiveAttrib;
+    std::function<void(GLcontext *ctx, GLuint program, GLuint index, GLsizei maxLength, GLsizei *length, GLint *size, GLenum *type, GLcharARB *name)> GetActiveUniform;
+    std::function<void(GLcontext *ctx, GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj)> GetAttachedShaders;
+    std::function<GLint(GLcontext *ctx, GLuint program, const GLcharARB *name)> GetAttribLocation;
+    std::function<GLuint(GLcontext *ctx, GLenum pname)> GetHandle;
+    std::function<void(GLcontext *ctx, GLuint program, GLenum pname, GLint *params)> GetProgramiv;
+    std::function<void(GLcontext *ctx, GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog)> GetProgramInfoLog;
+    std::function<void(GLcontext *ctx, GLuint shader, GLenum pname, GLint *params)> GetShaderiv;
+    std::function<void(GLcontext *ctx, GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog)> GetShaderInfoLog;
+    std::function<void(GLcontext *ctx, GLuint shader, GLsizei maxLength, GLsizei *length, GLcharARB *sourceOut)> GetShaderSource;
+    std::function<void(GLcontext *ctx, GLuint program, GLint location, GLfloat *params)> GetUniformfv;
+    std::function<void(GLcontext *ctx, GLuint program, GLint location, GLint *params)> GetUniformiv;
+    std::function<GLint(GLcontext *ctx, GLuint program, const GLcharARB *name)> GetUniformLocation;
+    std::function<GLboolean(GLcontext *ctx, GLuint name)> IsProgram;
+    std::function<GLboolean(GLcontext *ctx, GLuint name)> IsShader;
+    std::function<void(GLcontext *ctx, GLuint program)> LinkProgram;
+    std::function<void(GLcontext *ctx, GLuint shader, const GLchar *source)> ShaderSource;
+    std::function<void(GLcontext *ctx, GLint location, GLsizei count, const GLvoid *values, GLenum type)> Uniform;
+    std::function<void(GLcontext *ctx, GLint cols, GLint rows, GLenum matrixType, GLint location, GLsizei count, GLboolean transpose, const GLfloat *values)> UniformMatrix;
+    std::function<void(GLcontext *ctx, GLuint program)> UseProgram;
+    std::function<void(GLcontext *ctx, GLuint program)> ValidateProgram;
     /* XXX many more to come */
     /*@}*/
 
@@ -896,7 +712,7 @@ struct dd_function_table {
      * Bitmask of state changes that require the current T&L module to be
      * validated, using ValidateTnlModule() below.
      */
-    GLuint NeedValidate;
+    GLuint NeedValidate = 0;
 
     /**
      * Validate the current T&L module.
@@ -909,14 +725,14 @@ struct dd_function_table {
      * This must be non-nullptr if a driver installs a custom T&L module and sets
      * the dd_function_table::NeedValidate bitmask, but may be nullptr otherwise.
      */
-    void (*ValidateTnlModule)(GLcontext *ctx, GLuint new_state);
+    std::function<void(GLcontext *ctx, GLuint new_state)> ValidateTnlModule;
 
     /**
      * Set by the driver-supplied T&L engine.
      *
      * Set to PRIM_OUTSIDE_BEGIN_END when outside glBegin()/glEnd().
      */
-    GLuint CurrentExecPrimitive;
+    GLuint CurrentExecPrimitive = 0;
 
     /**
      * Current state of an in-progress compilation.
@@ -924,7 +740,7 @@ struct dd_function_table {
      * May take on any of the additional values PRIM_OUTSIDE_BEGIN_END,
      * PRIM_INSIDE_UNKNOWN_PRIM or PRIM_UNKNOWN defined above.
      */
-    GLuint CurrentSavePrimitive;
+    GLuint CurrentSavePrimitive = 0;
 
     /**
      * Set by the driver-supplied T&L engine whenever vertices are buffered
@@ -934,8 +750,8 @@ struct dd_function_table {
      * The dd_function_table::FlushVertices call below may be used to resolve
      * these conditions.
      */
-    GLuint NeedFlush;
-    GLuint SaveNeedFlush;
+    GLuint NeedFlush = 0;
+    GLuint SaveNeedFlush = 0;
 
     /**
      * If inside glBegin()/glEnd(), it should assert(0).  Otherwise, if
@@ -946,21 +762,21 @@ struct dd_function_table {
      * Note that the default T&L engine never clears the
      * FLUSH_UPDATE_CURRENT bit, even after performing the update.
      */
-    void (*FlushVertices)(GLcontext *ctx, GLuint flags);
-    void (*SaveFlushVertices)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx, GLuint flags)> FlushVertices;
+    std::function<void(GLcontext *ctx)> SaveFlushVertices;
 
     /**
      * Give the driver the opportunity to hook in its own vtxfmt for
      * compiling optimized display lists.  This is called on each valid
      * glBegin() during list compilation.
      */
-    GLboolean(*NotifySaveBegin)(GLcontext *ctx, GLenum mode);
+    std::function<GLboolean(GLcontext *ctx, GLenum mode)> NotifySaveBegin;
 
     /**
      * Notify driver that the special derived value _NeedEyeCoords has
      * changed.
      */
-    void (*LightingSpaceChange)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> LightingSpaceChange;
 
     /**
      * Called by glNewList().
@@ -968,27 +784,26 @@ struct dd_function_table {
      * Let the T&L component know what is going on with display lists
      * in time to make changes to dispatch tables, etc.
      */
-    void (*NewList)(GLcontext *ctx, GLuint list, GLenum mode);
+    std::function<void(GLcontext *ctx, GLuint list, GLenum mode)> NewList;
     /**
      * Called by glEndList().
      *
      * \sa dd_function_table::NewList.
      */
-    void (*EndList)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> EndList;
 
     /**
      * Called by glCallList(s).
      *
      * Notify the T&L component before and after calling a display list.
      */
-    void (*BeginCallList)(GLcontext *ctx,
-			  struct mesa_display_list *dlist);
+    std::function<void(GLcontext *ctx, struct mesa_display_list *dlist)> BeginCallList;
     /**
      * Called by glEndCallList().
      *
      * \sa dd_function_table::BeginCallList.
      */
-    void (*EndCallList)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> EndCallList;
 
 };
 

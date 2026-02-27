@@ -436,15 +436,15 @@ alloc_shared_state(GLcontext *ctx)
             _mesa_delete_ati_fragment_shader(ctx, ss->DefaultFragmentShader);
 #endif
         if (ss->Default1D)
-            (*ctx->Driver.DeleteTexture)(ctx, ss->Default1D);
+            ctx->Driver.DeleteTexture(ctx, ss->Default1D);
         if (ss->Default2D)
-            (*ctx->Driver.DeleteTexture)(ctx, ss->Default2D);
+            ctx->Driver.DeleteTexture(ctx, ss->Default2D);
         if (ss->Default3D)
-            (*ctx->Driver.DeleteTexture)(ctx, ss->Default3D);
+            ctx->Driver.DeleteTexture(ctx, ss->Default3D);
         if (ss->DefaultCubeMap)
-            (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultCubeMap);
+            ctx->Driver.DeleteTexture(ctx, ss->DefaultCubeMap);
         if (ss->DefaultRect)
-            (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultRect);
+            ctx->Driver.DeleteTexture(ctx, ss->DefaultRect);
         delete ss;
     };
 
@@ -465,19 +465,19 @@ alloc_shared_state(GLcontext *ctx)
     if (!ss->DefaultFragmentShader) { do_cleanup(); return GL_FALSE; }
 #endif
 
-    ss->Default1D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_1D);
+    ss->Default1D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_1D);
     if (!ss->Default1D) { do_cleanup(); return GL_FALSE; }
 
-    ss->Default2D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_2D);
+    ss->Default2D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_2D);
     if (!ss->Default2D) { do_cleanup(); return GL_FALSE; }
 
-    ss->Default3D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_3D);
+    ss->Default3D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_3D);
     if (!ss->Default3D) { do_cleanup(); return GL_FALSE; }
 
-    ss->DefaultCubeMap = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
+    ss->DefaultCubeMap = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
     if (!ss->DefaultCubeMap) { do_cleanup(); return GL_FALSE; }
 
-    ss->DefaultRect = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
+    ss->DefaultRect = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
     if (!ss->DefaultRect) { do_cleanup(); return GL_FALSE; }
 
     /* sanity check */

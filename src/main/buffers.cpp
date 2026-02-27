@@ -57,7 +57,7 @@ _mesa_ClearIndex(GLfloat c)
 
     if (!ctx->Visual.rgbMode && ctx->Driver.ClearIndex) {
 	/* it's OK to call glClearIndex in RGBA mode but it should be a NOP */
-	(*ctx->Driver.ClearIndex)(ctx, ctx->Color.ClearIndex);
+	ctx->Driver.ClearIndex(ctx, ctx->Color.ClearIndex);
     }
 }
 #endif
@@ -97,7 +97,7 @@ _mesa_ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
 
     if (ctx->Visual.rgbMode && ctx->Driver.ClearColor) {
 	/* it's OK to call glClearColor in CI mode but it should be a NOP */
-	(*ctx->Driver.ClearColor)(ctx, ctx->Color.ClearColor);
+	ctx->Driver.ClearColor(ctx, ctx->Color.ClearColor);
     }
 }
 
@@ -585,7 +585,7 @@ _mesa_ReadBuffer(GLenum buffer)
      * Call device driver function.
      */
     if (ctx->Driver.ReadBuffer)
-	(*ctx->Driver.ReadBuffer)(ctx, buffer);
+	ctx->Driver.ReadBuffer(ctx, buffer);
 }
 
 

@@ -472,7 +472,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
     if (texObj || target == GL_SHARED_TEXTURE_PALETTE_EXT) {
 	/* texture object palette, texObj==nullptr means the shared palette */
 	if (ctx->Driver.UpdateTexturePalette) {
-	    (*ctx->Driver.UpdateTexturePalette)(ctx, texObj);
+	    ctx->Driver.UpdateTexturePalette(ctx, texObj);
 	}
     }
 
@@ -585,7 +585,7 @@ _mesa_ColorSubTable(GLenum target, GLsizei start,
     if (texObj || target == GL_SHARED_TEXTURE_PALETTE_EXT) {
 	/* per-texture object palette */
 	if (ctx->Driver.UpdateTexturePalette) {
-	    (*ctx->Driver.UpdateTexturePalette)(ctx, texObj);
+	    ctx->Driver.UpdateTexturePalette(ctx, texObj);
 	}
     }
 

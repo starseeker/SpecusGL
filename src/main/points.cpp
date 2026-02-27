@@ -248,7 +248,7 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
     }
 
     if (ctx->Driver.PointParameterfv)
-	(*ctx->Driver.PointParameterfv)(ctx, pname, params);
+	ctx->Driver.PointParameterfv(ctx, pname, params);
 }
 #endif
 

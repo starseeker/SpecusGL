@@ -207,7 +207,7 @@ _mesa_BlendFuncSeparateEXT(GLenum sfactorRGB, GLenum dfactorRGB,
     ctx->Color.BlendDstA = dfactorA;
 
     if (ctx->Driver.BlendFuncSeparate) {
-	(*ctx->Driver.BlendFuncSeparate)(ctx, sfactorRGB, dfactorRGB,
+	ctx->Driver.BlendFuncSeparate(ctx, sfactorRGB, dfactorRGB,
 					 sfactorA, dfactorA);
     }
 }
@@ -276,7 +276,7 @@ _mesa_BlendEquation(GLenum mode)
     ctx->Color.BlendEquationA = mode;
 
     if (ctx->Driver.BlendEquationSeparate)
-	(*ctx->Driver.BlendEquationSeparate)(ctx, mode, mode);
+	ctx->Driver.BlendEquationSeparate(ctx, mode, mode);
 }
 
 
@@ -317,7 +317,7 @@ _mesa_BlendEquationSeparateEXT(GLenum modeRGB, GLenum modeA)
     ctx->Color.BlendEquationA = modeA;
 
     if (ctx->Driver.BlendEquationSeparate)
-	(*ctx->Driver.BlendEquationSeparate)(ctx, modeRGB, modeA);
+	ctx->Driver.BlendEquationSeparate(ctx, modeRGB, modeA);
 }
 #endif
 
@@ -355,7 +355,7 @@ _mesa_BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     COPY_4FV(ctx->Color.BlendColor, tmp);
 
     if (ctx->Driver.BlendColor)
-	(*ctx->Driver.BlendColor)(ctx, tmp);
+	ctx->Driver.BlendColor(ctx, tmp);
 }
 
 

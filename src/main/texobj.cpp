@@ -657,7 +657,7 @@ _mesa_GenTextures(GLsizei n, GLuint *textures)
 	struct gl_texture_object *texObj;
 	GLuint name = first + i;
 	GLenum target = 0;
-	texObj = (*ctx->Driver.NewTextureObject)(ctx, name, target);
+	texObj = ctx->Driver.NewTextureObject(ctx, name, target);
 	if (!texObj) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "glGenTextures");
 	    return;
@@ -863,15 +863,15 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 		if (ctx->Driver.TexParameter) {
 		    static const GLfloat fparam_wrap[1] = {static_cast<GLfloat>(GL_CLAMP_TO_EDGE)};
 		    static const GLfloat fparam_filter[1] = {static_cast<GLfloat>(GL_LINEAR)};
-		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_S, fparam_wrap);
-		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_T, fparam_wrap);
-		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_WRAP_R, fparam_wrap);
-		    (*ctx->Driver.TexParameter)(ctx, target, newTexObj, GL_TEXTURE_MIN_FILTER, fparam_filter);
+		    ctx->Driver.TexParameter(ctx, target, newTexObj, GL_TEXTURE_WRAP_S, fparam_wrap);
+		    ctx->Driver.TexParameter(ctx, target, newTexObj, GL_TEXTURE_WRAP_T, fparam_wrap);
+		    ctx->Driver.TexParameter(ctx, target, newTexObj, GL_TEXTURE_WRAP_R, fparam_wrap);
+		    ctx->Driver.TexParameter(ctx, target, newTexObj, GL_TEXTURE_MIN_FILTER, fparam_filter);
 		}
 	    }
 	} else {
 	    /* if this is a new texture id, allocate a texture object now */
-	    newTexObj = (*ctx->Driver.NewTextureObject)(ctx, texName, target);
+	    newTexObj = ctx->Driver.NewTextureObject(ctx, texName, target);
 	    if (!newTexObj) {
 		_mesa_error(ctx, GL_OUT_OF_MEMORY, "glBindTexture");
 		return;
@@ -919,7 +919,7 @@ _mesa_BindTexture(GLenum target, GLuint texName)
 
     /* Pass BindTexture call to device driver */
     if (ctx->Driver.BindTexture)
-	(*ctx->Driver.BindTexture)(ctx, target, newTexObj);
+	ctx->Driver.BindTexture(ctx, target, newTexObj);
 }
 
 
