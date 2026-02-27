@@ -157,7 +157,7 @@ parse_identifier(slang_parse_ctx * C)
     return slang_atom_pool_atom(C->atoms, id);
 }
 
-static int
+static bool
 parse_number(slang_parse_ctx * C, int *number)
 {
     const int radix = (int)(*C->I++);
@@ -176,10 +176,10 @@ parse_number(slang_parse_ctx * C, int *number)
     C->I++;
     if (*number > 65535)
 	slang_info_log_warning(C->L, "%d: literal integer overflow.", *number);
-    return 1;
+    return true;
 }
 
-static int
+static bool
 parse_float(slang_parse_ctx * C, float *number)
 {
     const char *integral   = nullptr;
@@ -195,28 +195,28 @@ parse_float(slang_parse_ctx * C, float *number)
     const std::string whole = std::string(integral) + "." + fractional + "E" + exponent;
     *number = static_cast<float>(std::strtod(whole.c_str(), nullptr));
 
-    return 1;
+    return true;
 }
 
 /* revision number - increment after each change affecting emitted output */
 #define REVISION 3
 
-static int
+static bool
 check_revision(slang_parse_ctx * C)
 {
     if (*C->I != REVISION) {
 	slang_info_log_error(C->L, "Internal compiler error.");
-	return 0;
+	return false;
     }
     C->I++;
-    return 1;
+    return true;
 }
 
-static int parse_statement(slang_parse_ctx *, slang_output_ctx *,
+static bool parse_statement(slang_parse_ctx *, slang_output_ctx *,
 			   slang_operation *);
-static int parse_expression(slang_parse_ctx *, slang_output_ctx *,
+static bool parse_expression(slang_parse_ctx *, slang_output_ctx *,
 			    slang_operation *);
-static int parse_type_specifier(slang_parse_ctx *, slang_output_ctx *,
+static bool parse_type_specifier(slang_parse_ctx *, slang_output_ctx *,
 				slang_type_specifier *);
 
 static bool
@@ -304,7 +304,7 @@ parse_struct_field_var(slang_parse_ctx * C, slang_output_ctx * O,
     return calculate_var_size(C, O, var);
 }
 
-static int
+static bool
 parse_struct_field(slang_parse_ctx * C, slang_output_ctx * O,
 		   slang_struct * st, slang_type_specifier * sp)
 {
@@ -312,22 +312,22 @@ parse_struct_field(slang_parse_ctx * C, slang_output_ctx * O,
 
     o.structs = st->structs.get();
     if (!parse_type_specifier(C, &o, sp))
-	return 0;
+	return false;
 
     do {
 	slang_variable *var = slang_variable_scope_grow(st->fields.get());
 	if (!var) {
 	    slang_info_log_memory(C->L);
-	    return 0;
+	    return false;
 	}
 	if (!parse_struct_field_var(C, &o, var, sp))
-	    return 0;
+	    return false;
     } while (*C->I++ != FIELD_NONE);
 
-    return 1;
+    return true;
 }
 
-static int
+static bool
 parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 {
     slang_atom a_name;
@@ -336,13 +336,13 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
     /* parse struct name (if any) and make sure it is unique in current scope */
     a_name = parse_identifier(C);
     if (a_name == SLANG_ATOM_NULL)
-	return 0;
+	return false;
 
     name = slang_atom_pool_id(C->atoms, a_name);
     if (name[0] != '\0'
 	&& slang_struct_scope_find(O->structs, a_name, 0) != nullptr) {
 	slang_info_log_error(C->L, "%s: duplicate type name.", name);
-	return 0;
+	return false;
     }
 
     /* set-up a new struct */
@@ -351,7 +351,7 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 	delete *st;
 	*st = nullptr;
 	slang_info_log_memory(C->L);
-	return 0;
+	return false;
     }
     (**st).a_name = a_name;
     (**st).structs->outer_scope = O->structs;
@@ -363,7 +363,7 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 	slang_type_specifier_ctr(&sp);
 	if (!parse_struct_field(C, O, *st, &sp)) {
 	    slang_type_specifier_dtr(&sp);
-	    return 0;
+	    return false;
 	}
 	slang_type_specifier_dtr(&sp);
     } while (*C->I++ != FIELD_NONE);
@@ -376,13 +376,13 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 	s = &O->structs->structs.back();
 	if (!slang_struct_construct(s)) {
 	    O->structs->structs.pop_back();
-	    return 0;
+	    return false;
 	}
 	if (!slang_struct_copy(s, *st))
-	    return 0;
+	    return false;
     }
 
-    return 1;
+    return true;
 }
 
 
@@ -395,7 +395,7 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 #define TYPE_QUALIFIER_FIXEDOUTPUT 5
 #define TYPE_QUALIFIER_FIXEDINPUT 6
 
-static int
+static bool
 parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 {
     switch (*C->I++) {
@@ -421,9 +421,9 @@ parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 	    *qual = SLANG_QUAL_FIXEDINPUT;
 	    break;
 	default:
-	    return 0;
+	    return false;
     }
-    return 1;
+    return true;
 }
 
 /* type specifier */
@@ -461,7 +461,7 @@ parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 #define TYPE_SPECIFIER_MAT43 31
 
 
-static int
+static bool
 parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		     slang_type_specifier * spec)
 {
@@ -561,7 +561,7 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 	    {
 		slang_struct *raw = nullptr;
 		if (!parse_struct(C, O, &raw))
-		    return 0;
+		    return false;
 		spec->_struct.reset(raw);
 	    }
 	    break;
@@ -573,33 +573,33 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 
 		a_name = parse_identifier(C);
 		if (a_name == nullptr)
-		    return 0;
+		    return false;
 
 		stru = slang_struct_scope_find(O->structs, a_name, 1);
 		if (stru == nullptr) {
 		    slang_info_log_error(C->L, "undeclared type name '%s'",
 					 slang_atom_pool_id(C->atoms, a_name));
-		    return 0;
+		    return false;
 		}
 
 		spec->_struct = std::make_unique<slang_struct>(*stru);
 	    }
 	    break;
 	default:
-	    return 0;
+	    return false;
     }
-    return 1;
+    return true;
 }
 
-static int
+static bool
 parse_fully_specified_type(slang_parse_ctx * C, slang_output_ctx * O,
 			   slang_fully_specified_type * type)
 {
     if (!parse_type_qualifier(C, &type->qualifier))
-	return 0;
+	return false;
     if (!parse_type_specifier(C, O, &type->specifier))
-	return 0;
-    return 1;
+	return false;
+    return true;
 }
 
 /* operation */
@@ -679,7 +679,7 @@ parse_fully_specified_type(slang_parse_ctx * C, slang_output_ctx * O,
  * \param statement  indicates whether parsing a statement, or expression
  * \return 1 if success, 0 if error
  */
-static int
+static bool
 parse_child_operation(slang_parse_ctx * C, slang_output_ctx * O,
 		      slang_operation * oper, bool statement)
 {
@@ -692,9 +692,9 @@ parse_child_operation(slang_parse_ctx * C, slang_output_ctx * O,
     return parse_expression(C, O, ch);
 }
 
-static int parse_declaration(slang_parse_ctx * C, slang_output_ctx * O);
+static bool parse_declaration(slang_parse_ctx * C, slang_output_ctx * O);
 
-static int
+static bool
 parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 		slang_operation * oper)
 {
@@ -705,7 +705,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    oper->type = SLANG_OPER_BLOCK_NO_NEW_SCOPE;
 	    while (*C->I != OP_END)
 		if (!parse_child_operation(C, O, oper, 1))
-		    return 0;
+		    return false;
 	    C->I++;
 	    break;
 	case OP_BLOCK_BEGIN_NEW_SCOPE:
@@ -717,7 +717,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    o.vars = oper->locals.get();
 	    while (*C->I != OP_END)
 		if (!parse_child_operation(C, &o, oper, 1))
-		    return 0;
+		    return false;
 	    C->I++;
 	}
 	break;
@@ -733,7 +733,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 		 * than one declarators
 		 */
 		if (!parse_declaration(C, O))
-		    return 0;
+		    return false;
 		if (first_var < O->vars->variables.size()) {
 		    const unsigned int num_vars = static_cast<unsigned int>(O->vars->variables.size()) - first_var;
 		    unsigned int i;
@@ -755,10 +755,10 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    oper->type = SLANG_OPER_ASM;
 	    oper->a_id = parse_identifier(C);
 	    if (oper->a_id == SLANG_ATOM_NULL)
-		return 0;
+		return false;
 	    while (*C->I != OP_END) {
 		if (!parse_child_operation(C, O, oper, 0))
-		    return 0;
+		    return false;
 	    }
 	    C->I++;
 	    break;
@@ -774,21 +774,21 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	case OP_RETURN:
 	    oper->type = SLANG_OPER_RETURN;
 	    if (!parse_child_operation(C, O, oper, 0))
-		return 0;
+		return false;
 	    break;
 	case OP_EXPRESSION:
 	    oper->type = SLANG_OPER_EXPRESSION;
 	    if (!parse_child_operation(C, O, oper, 0))
-		return 0;
+		return false;
 	    break;
 	case OP_IF:
 	    oper->type = SLANG_OPER_IF;
 	    if (!parse_child_operation(C, O, oper, 0))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, O, oper, 1))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, O, oper, 1))
-		return 0;
+		return false;
 	    break;
 	case OP_WHILE: {
 	    slang_output_ctx o = *O;
@@ -796,17 +796,17 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    oper->type = SLANG_OPER_WHILE;
 	    o.vars = oper->locals.get();
 	    if (!parse_child_operation(C, &o, oper, 1))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, &o, oper, 1))
-		return 0;
+		return false;
 	}
 	break;
 	case OP_DO:
 	    oper->type = SLANG_OPER_DO;
 	    if (!parse_child_operation(C, O, oper, 1))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, O, oper, 0))
-		return 0;
+		return false;
 	    break;
 	case OP_FOR: {
 	    slang_output_ctx o = *O;
@@ -814,19 +814,19 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    oper->type = SLANG_OPER_FOR;
 	    o.vars = oper->locals.get();
 	    if (!parse_child_operation(C, &o, oper, 1))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, &o, oper, 1))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, &o, oper, 0))
-		return 0;
+		return false;
 	    if (!parse_child_operation(C, &o, oper, 1))
-		return 0;
+		return false;
 	}
 	break;
 	default:
-	    return 0;
+	    return false;
     }
-    return 1;
+    return true;
 }
 
 static int
@@ -847,16 +847,16 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
     return 1;
 }
 
-static int
+static bool
 is_constructor_name(const char *name, slang_atom a_name,
 		    slang_struct_scope * structs)
 {
     if (slang_type_specifier_type_from_string(name) != SLANG_SPEC_VOID)
-	return 1;
+	return true;
     return slang_struct_scope_find(structs, a_name, 1) != nullptr;
 }
 
-static int
+static bool
 parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		 slang_operation * oper)
 {
@@ -879,7 +879,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    case OP_PUSH_BOOL:
 		op->type = SLANG_OPER_LITERAL_BOOL;
 		if (!parse_number(C, &number))
-		    return 0;
+		    return false;
 		op->literal[0] =
 		    op->literal[1] =
 			op->literal[2] =
@@ -889,7 +889,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    case OP_PUSH_INT:
 		op->type = SLANG_OPER_LITERAL_INT;
 		if (!parse_number(C, &number))
-		    return 0;
+		    return false;
 		op->literal[0] =
 		    op->literal[1] =
 			op->literal[2] =
@@ -899,7 +899,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    case OP_PUSH_FLOAT:
 		op->type = SLANG_OPER_LITERAL_FLOAT;
 		if (!parse_float(C, &op->literal[0]))
-		    return 0;
+		    return false;
 		op->literal[1] =
 		    op->literal[2] =
 			op->literal[3] = op->literal[0];
@@ -909,37 +909,37 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		op->type = SLANG_OPER_IDENTIFIER;
 		op->a_id = parse_identifier(C);
 		if (op->a_id == SLANG_ATOM_NULL)
-		    return 0;
+		    return false;
 		break;
 	    case OP_SEQUENCE:
 		op->type = SLANG_OPER_SEQUENCE;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_ASSIGN:
 		op->type = SLANG_OPER_ASSIGN;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_ADDASSIGN:
 		op->type = SLANG_OPER_ADDASSIGN;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_SUBASSIGN:
 		op->type = SLANG_OPER_SUBASSIGN;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_MULASSIGN:
 		op->type = SLANG_OPER_MULASSIGN;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_DIVASSIGN:
 		op->type = SLANG_OPER_DIVASSIGN;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    /*case OP_MODASSIGN: */
 	    /*case OP_LSHASSIGN: */
@@ -950,22 +950,22 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    case OP_SELECT:
 		op->type = SLANG_OPER_SELECT;
 		if (!handle_nary_expression(C, op, &ops, 3))
-		    return 0;
+		    return false;
 		break;
 	    case OP_LOGICALOR:
 		op->type = SLANG_OPER_LOGICALOR;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_LOGICALXOR:
 		op->type = SLANG_OPER_LOGICALXOR;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_LOGICALAND:
 		op->type = SLANG_OPER_LOGICALAND;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    /*case OP_BITOR: */
 	    /*case OP_BITXOR: */
@@ -973,95 +973,95 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    case OP_EQUAL:
 		op->type = SLANG_OPER_EQUAL;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_NOTEQUAL:
 		op->type = SLANG_OPER_NOTEQUAL;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_LESS:
 		op->type = SLANG_OPER_LESS;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_GREATER:
 		op->type = SLANG_OPER_GREATER;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_LESSEQUAL:
 		op->type = SLANG_OPER_LESSEQUAL;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_GREATEREQUAL:
 		op->type = SLANG_OPER_GREATEREQUAL;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    /*case OP_LSHIFT: */
 	    /*case OP_RSHIFT: */
 	    case OP_ADD:
 		op->type = SLANG_OPER_ADD;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_SUBTRACT:
 		op->type = SLANG_OPER_SUBTRACT;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_MULTIPLY:
 		op->type = SLANG_OPER_MULTIPLY;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_DIVIDE:
 		op->type = SLANG_OPER_DIVIDE;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    /*case OP_MODULUS: */
 	    case OP_PREINCREMENT:
 		op->type = SLANG_OPER_PREINCREMENT;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_PREDECREMENT:
 		op->type = SLANG_OPER_PREDECREMENT;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_PLUS:
 		op->type = SLANG_OPER_PLUS;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_MINUS:
 		op->type = SLANG_OPER_MINUS;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_NOT:
 		op->type = SLANG_OPER_NOT;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    /*case OP_COMPLEMENT: */
 	    case OP_SUBSCRIPT:
 		op->type = SLANG_OPER_SUBSCRIPT;
 		if (!handle_nary_expression(C, op, &ops, 2))
-		    return 0;
+		    return false;
 		break;
 	    case OP_CALL:
 		op->type = SLANG_OPER_CALL;
 		op->a_id = parse_identifier(C);
 		if (op->a_id == SLANG_ATOM_NULL)
-		    return 0;
+		    return false;
 		while (*C->I != OP_END)
 		    if (!parse_child_operation(C, O, op, 0))
-			return 0;
+			return false;
 		C->I++;
 
 		if (!C->parsing_builtin
@@ -1071,7 +1071,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		    id = slang_atom_pool_id(C->atoms, op->a_id);
 		    if (!is_constructor_name(id, op->a_id, O->structs)) {
 			slang_info_log_error(C->L, "%s: undeclared function name.", id);
-			return 0;
+			return false;
 		    }
 		}
 		break;
@@ -1079,22 +1079,22 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		op->type = SLANG_OPER_FIELD;
 		op->a_id = parse_identifier(C);
 		if (op->a_id == SLANG_ATOM_NULL)
-		    return 0;
+		    return false;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_POSTINCREMENT:
 		op->type = SLANG_OPER_POSTINCREMENT;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    case OP_POSTDECREMENT:
 		op->type = SLANG_OPER_POSTDECREMENT;
 		if (!handle_nary_expression(C, op, &ops, 1))
-		    return 0;
+		    return false;
 		break;
 	    default:
-		return 0;
+		return false;
 	}
     }
     C->I++;
@@ -1106,7 +1106,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	slang_operation_destruct(oper);
     }
 
-    return 1;
+    return true;
 }
 
 /* parameter qualifier */
@@ -1118,7 +1118,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 #define PARAMETER_ARRAY_NOT_PRESENT 0
 #define PARAMETER_ARRAY_PRESENT 1
 
-static int
+static bool
 parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 			    slang_variable * param)
 {
@@ -1126,13 +1126,13 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
      * two at most) because not all combinations are valid
      */
     if (!parse_type_qualifier(C, &param->type.qualifier))
-	return 0;
+	return false;
     switch (*C->I++) {
 	case PARAM_QUALIFIER_IN:
 	    if (param->type.qualifier != SLANG_QUAL_CONST
 		&& param->type.qualifier != SLANG_QUAL_NONE) {
 		slang_info_log_error(C->L, "Invalid type qualifier.");
-		return 0;
+		return false;
 	    }
 	    break;
 	case PARAM_QUALIFIER_OUT:
@@ -1140,7 +1140,7 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 		param->type.qualifier = SLANG_QUAL_OUT;
 	    else {
 		slang_info_log_error(C->L, "Invalid type qualifier.");
-		return 0;
+		return false;
 	    }
 	    break;
 	case PARAM_QUALIFIER_INOUT:
@@ -1148,19 +1148,19 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 		param->type.qualifier = SLANG_QUAL_INOUT;
 	    else {
 		slang_info_log_error(C->L, "Invalid type qualifier.");
-		return 0;
+		return false;
 	    }
 	    break;
 	default:
-	    return 0;
+	    return false;
     }
 
     /* parse parameter's type specifier and name */
     if (!parse_type_specifier(C, O, &param->type.specifier))
-	return 0;
+	return false;
     param->a_name = parse_identifier(C);
     if (param->a_name == SLANG_ATOM_NULL)
-	return 0;
+	return false;
 
     /* if the parameter is an array, parse its size (the size must be
      * explicitly defined
@@ -1187,7 +1187,7 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 	return false;
 
     /* TODO: allocate the local address here? */
-    return 1;
+    return true;
 }
 
 /* function type */
@@ -1285,41 +1285,41 @@ parse_operator_name(slang_parse_ctx * C)
     return 0;
 }
 
-static int
+static bool
 parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
 			 slang_function * func)
 {
     /* parse function type and name */
     if (!parse_fully_specified_type(C, O, &func->header.type))
-	return 0;
+	return false;
     switch (*C->I++) {
 	case FUNCTION_ORDINARY:
 	    func->kind = SLANG_FUNC_ORDINARY;
 	    func->header.a_name = parse_identifier(C);
 	    if (func->header.a_name == SLANG_ATOM_NULL)
-		return 0;
+		return false;
 	    break;
 	case FUNCTION_CONSTRUCTOR:
 	    func->kind = SLANG_FUNC_CONSTRUCTOR;
 	    if (func->header.type.specifier.type == SLANG_SPEC_STRUCT)
-		return 0;
+		return false;
 	    func->header.a_name =
 		slang_atom_pool_atom(C->atoms,
 				     slang_type_specifier_type_to_string
 				     (func->header.type.specifier.type));
 	    if (func->header.a_name == SLANG_ATOM_NULL) {
 		slang_info_log_memory(C->L);
-		return 0;
+		return false;
 	    }
 	    break;
 	case FUNCTION_OPERATOR:
 	    func->kind = SLANG_FUNC_OPERATOR;
 	    func->header.a_name = parse_operator_name(C);
 	    if (func->header.a_name == SLANG_ATOM_NULL)
-		return 0;
+		return false;
 	    break;
 	default:
-	    return 0;
+	    return false;
     }
 
     /* parse function parameters */
@@ -1327,10 +1327,10 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
 	slang_variable *p = slang_variable_scope_grow(func->parameters.get());
 	if (!p) {
 	    slang_info_log_memory(C->L);
-	    return 0;
+	    return false;
 	}
 	if (!parse_parameter_declaration(C, O, p))
-	    return 0;
+	    return false;
     }
 
     /* if the function returns a value, append a hidden __retVal 'out'
@@ -1354,17 +1354,17 @@ parse_function_prototype(slang_parse_ctx * C, slang_output_ctx * O,
     func->param_count = static_cast<unsigned int>(func->parameters->variables.size());
     func->parameters->outer_scope = O->vars;
 
-    return 1;
+    return true;
 }
 
-static int
+static bool
 parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 			  slang_function * func)
 {
     slang_output_ctx o = *O;
 
     if (!parse_function_prototype(C, O, func))
-	return 0;
+	return false;
 
     /* create function's body operation */
     func->body = std::make_unique<slang_operation>();
@@ -1375,10 +1375,10 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
     C->global_scope = false;
     o.vars = func->parameters.get();
     if (!parse_statement(C, &o, func->body.get()))
-	return 0;
+	return false;
 
     C->global_scope = true;
-    return 1;
+    return true;
 }
 
 static bool
@@ -1416,7 +1416,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 /**
  * Parse the initializer for a variable declaration.
  */
-static int
+static bool
 parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 		      const slang_fully_specified_type * type)
 {
@@ -1424,39 +1424,39 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 
     /* empty init declatator (without name, e.g. "float ;") */
     if (*C->I++ == VARIABLE_NONE)
-	return 1;
+	return true;
 
     /* make room for the new variable and initialize it */
     var = slang_variable_scope_grow(O->vars);
     if (!var) {
 	slang_info_log_memory(C->L);
-	return 0;
+	return false;
     }
 
     /* copy the declarator qualifier type, parse the identifier */
     var->type.qualifier = type->qualifier;
     var->a_name = parse_identifier(C);
     if (var->a_name == SLANG_ATOM_NULL)
-	return 0;
+	return false;
 
     switch (*C->I++) {
 	case VARIABLE_NONE:
 	    /* simple variable declarator - just copy the specifier */
 	    if (!slang_type_specifier_copy(&var->type.specifier, &type->specifier))
-		return 0;
+		return false;
 	    break;
 	case VARIABLE_INITIALIZER:
 	    /* initialized variable - copy the specifier and parse the expression */
 	    if (!slang_type_specifier_copy(&var->type.specifier, &type->specifier))
-		return 0;
+		return false;
 	    var->initializer = std::make_unique<slang_operation>();
 	    if (!slang_operation_construct(var->initializer.get())) {
 		var->initializer.reset();
 		slang_info_log_memory(C->L);
-		return 0;
+		return false;
 	    }
 	    if (!parse_expression(C, O, var->initializer.get()))
-		return 0;
+		return false;
 	    break;
 	case VARIABLE_ARRAY_UNKNOWN:
 	    /* unsized array - mark it as array and copy the specifier to
@@ -1472,7 +1472,7 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 		return false;
 	    break;
 	default:
-	    return 0;
+	    return false;
     }
 
     /* emit code for global var decl */
@@ -1486,7 +1486,7 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 	A.vartable = O->vartable;
 	A.curFuncEndLabel = nullptr;
 	if (!_slang_codegen_global_variable(&A, var, C->type))
-	    return 0;
+	    return false;
     }
 
     /* allocate global address space for a variable with a known size */
@@ -1508,39 +1508,39 @@ parse_init_declarator(slang_parse_ctx * C, slang_output_ctx * O,
 	    A.space.structs = O->structs;
 	    A.space.vars = O->vars;
 	    if (!initialize_global(&A, var))
-		return 0;
+		return false;
 	}
     }
-    return 1;
+    return true;
 }
 
 /**
  * Parse a list of variable declarations.  Each variable may have an
  * initializer.
  */
-static int
+static bool
 parse_init_declarator_list(slang_parse_ctx * C, slang_output_ctx * O)
 {
     slang_fully_specified_type type;
 
     /* parse the fully specified type, common to all declarators */
     if (!slang_fully_specified_type_construct(&type))
-	return 0;
+	return false;
     if (!parse_fully_specified_type(C, O, &type)) {
 	slang_fully_specified_type_destruct(&type);
-	return 0;
+	return false;
     }
 
     /* parse declarators, pass-in the parsed type */
     do {
 	if (!parse_init_declarator(C, O, &type)) {
 	    slang_fully_specified_type_destruct(&type);
-	    return 0;
+	    return false;
 	}
     } while (*C->I++ == DECLARATOR_NEXT);
 
     slang_fully_specified_type_destruct(&type);
-    return 1;
+    return true;
 }
 
 
@@ -1633,25 +1633,25 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 #define DECLARATION_FUNCTION_PROTOTYPE 1
 #define DECLARATION_INIT_DECLARATOR_LIST 2
 
-static int
+static bool
 parse_declaration(slang_parse_ctx * C, slang_output_ctx * O)
 {
     switch (*C->I++) {
 	case DECLARATION_INIT_DECLARATOR_LIST:
 	    if (!parse_init_declarator_list(C, O))
-		return 0;
+		return false;
 	    break;
 	case DECLARATION_FUNCTION_PROTOTYPE: {
 	    slang_function *dummy_func;
 
 	    if (!parse_function(C, O, 0, &dummy_func))
-		return 0;
+		return false;
 	}
 	break;
 	default:
-	    return 0;
+	    return false;
     }
-    return 1;
+    return true;
 }
 
 /* external declaration */
