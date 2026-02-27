@@ -229,7 +229,7 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
     if (!slang_operation_construct(&array_size))
 	return false;
     if (!parse_expression(C, O, &array_size))
-	return false;   /* array_size cleans up via its RAII members when this stack frame exits */
+	return false;   /* array_size destructor releases its RAII members automatically */
 
     space.funcs = O->funs;
     space.structs = O->structs;
@@ -1550,7 +1550,7 @@ parse_init_declarator_list(slang_parse_ctx * C, slang_output_ctx * O)
  * \param O  output context
  * \param definition if non-zero expect a definition, else a declaration
  * \param parsed_func_ret  returns the parsed function
- * \return true if success, GL_FALSE if failure
+ * \return true if success, false if failure
  */
 static bool
 parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
