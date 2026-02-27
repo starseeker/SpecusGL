@@ -127,7 +127,13 @@ struct slang_operation {
     slang_label *label;
 
     slang_operation();
-    ~slang_operation();
+    /**
+     * Destructor.
+     * children (vector) and locals (unique_ptr) handle their own cleanup
+     * automatically.  ~slang_variable_scope() frees the owned variables, so
+     * an explicit slang_variable_scope_destruct() call is no longer needed.
+     */
+    ~slang_operation() = default;
     slang_operation(const slang_operation&) = delete;
     slang_operation& operator=(const slang_operation&) = delete;
     slang_operation(slang_operation&&) noexcept = default;

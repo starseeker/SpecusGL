@@ -46,12 +46,6 @@ slang_operation::slang_operation()
         _slang_variable_scope_ctr(locals.get());
 }
 
-slang_operation::~slang_operation()
-{
-    if (locals)
-        slang_variable_scope_destruct(locals.get());
-}
-
 GLboolean
 slang_operation_construct(slang_operation *oper)
 {
@@ -61,11 +55,10 @@ slang_operation_construct(slang_operation *oper)
 void
 slang_operation_destruct(slang_operation *oper)
 {
+    /* Reset all fields to a clean state, equivalent to re-constructing.
+     * children and locals unique_ptr handle their own cleanup. */
     oper->children.clear();
-    if (oper->locals) {
-        slang_variable_scope_destruct(oper->locals.get());
-        oper->locals.reset();
-    }
+    oper->locals.reset();
 }
 
 /**

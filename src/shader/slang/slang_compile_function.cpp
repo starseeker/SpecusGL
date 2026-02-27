@@ -70,12 +70,8 @@ void
 slang_function_destruct(slang_function * func)
 {
     slang_variable_destruct(&func->header);
-    /* parameters and body unique_ptrs handle their own cleanup */
-    if (func->parameters)
-	slang_variable_scope_destruct(func->parameters.get());
+    /* parameters and body unique_ptrs + their destructors handle cleanup */
     func->parameters.reset();
-    if (func->body)
-	slang_operation_destruct(func->body.get());
     func->body.reset();
     slang_fixup_table_free(&func->fixups);
 }
