@@ -37,7 +37,7 @@ inline size_t slang_string_length(const char *str) { return strlen(str); }
 
 char *slang_string_concat(char *, const char *);
 
-using slang_atom = GLvoid *;
+using slang_atom = const char *;
 constexpr slang_atom SLANG_ATOM_NULL = nullptr;
 
 using slang_string = std::string;

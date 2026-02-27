@@ -1816,7 +1816,7 @@ compile_with_grammar(grammar id, const char *source, slang_code_unit * unit,
 	{
 	    int line, col;
 	    char *s;
-	    s = reinterpret_cast<char *>(_mesa_find_line_column(reinterpret_cast<const GLubyte *>(source)),
+	    s = _mesa_find_line_column(reinterpret_cast<const GLubyte *>(source),
 						reinterpret_cast<const GLubyte *>(source) + pos,
 						&line, &col);
 	    printf("Error on line %d, col %d: %s\n", line, col, s);

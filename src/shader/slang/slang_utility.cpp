@@ -79,9 +79,8 @@ slang_atom
 slang_atom_pool_atom(slang_atom_pool * pool, const char * id)
 {
     auto [it, _] = pool->strings.emplace(id);
-    /* The pool's interface contracts that the atom is the string pointer.
-     * const_cast is safe here: callers only read through the atom. */
-    return static_cast<slang_atom>(const_cast<char *>(it->c_str()));
+    /* The atom IS the interned string pointer (stable for the lifetime of pool). */
+    return it->c_str();
 }
 
 /**
@@ -91,5 +90,5 @@ const char *
 slang_atom_pool_id(slang_atom_pool * pool, slang_atom atom)
 {
     (void) pool;
-    return reinterpret_cast<const char *>(atom);
+    return atom;  /* slang_atom IS a const char* now */
 }

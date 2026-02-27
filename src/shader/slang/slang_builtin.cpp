@@ -379,7 +379,7 @@ _slang_alloc_statevar(slang_ir_node *n,
     }
 
     assert(n->Opcode == IR_VAR);
-    var = reinterpret_cast<char *>(n->Var->a_name);
+    var = n->Var->a_name;
 
     pos = lookup_statevar(var, index1, index2, field, &swizzle, paramList);
     if (pos >= 0) {

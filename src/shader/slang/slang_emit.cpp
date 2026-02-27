@@ -1502,7 +1502,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		}
 		/*
 		printf("IR_VAR_DECL %s %d store %p\n",
-		       static_cast<char*>(n->Var->a_name), n->Store->Index, static_cast<void*>(n->Store));
+		       n->Var->a_name, n->Store->Index, static_cast<void*>(n->Store));
 		*/
 		assert(n->Var->aux == n->Store);
 	    }
@@ -1512,7 +1512,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		snprintf(s, sizeof(s), "TEMP[%d]%s = variable %s (size %d)",
 			n->Store->Index,
 			_mesa_swizzle_string(n->Store->Swizzle, 0, GL_FALSE),
-			(n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "anonymous"),
+			(n->Var ? n->Var->a_name : "anonymous"),
 			n->Store->Size);
 		inst = emit_comment(emitInfo, s);
 		return inst;

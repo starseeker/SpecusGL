@@ -322,13 +322,13 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 
 	case IR_VAR:
 	    printf("VAR %s%s at %s  store %p\n",
-		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
+		   (n->Var ? n->Var->a_name : "TEMP"),
 		   swizzle_string(n->Store->Swizzle),
 		   storage_string(n->Store).c_str(), static_cast<void*>(n->Store));
 	    break;
 	case IR_VAR_DECL:
 	    printf("VAR_DECL %s (%p) at %s  store %p\n",
-		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
+		   (n->Var ? n->Var->a_name : "TEMP"),
 		   static_cast<void*>(n->Var), storage_string(n->Store).c_str(),
 		   static_cast<void*>(n->Store));
 	    break;

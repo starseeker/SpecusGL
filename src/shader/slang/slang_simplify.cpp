@@ -99,7 +99,7 @@ _slang_simplify(slang_operation *oper,
 
     if (oper->type == SLANG_OPER_IDENTIFIER) {
 	/* see if it's a named constant */
-	GLint value = _slang_lookup_constant(reinterpret_cast<char *>(oper->a_id));
+	GLint value = _slang_lookup_constant(oper->a_id);
 	if (value >= 0) {
 	    oper->literal[0] =
 		oper->literal[1] =
@@ -230,7 +230,7 @@ _slang_simplify(slang_operation *oper,
 	&& isFloat[0] && isFloat[1] && isFloat[2] && isFloat[3]) {
 	/* vec4(flt, flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec4") == 0) {
+	    if (strcmp(oper->a_id, "vec4") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -246,7 +246,7 @@ _slang_simplify(slang_operation *oper,
     if ((GLuint)oper->children.size() == 3 && isFloat[0] && isFloat[1] && isFloat[2]) {
 	/* vec3(flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec3") == 0) {
+	    if (strcmp(oper->a_id, "vec3") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -262,7 +262,7 @@ _slang_simplify(slang_operation *oper,
     if ((GLuint)oper->children.size() == 2 && isFloat[0] && isFloat[1]) {
 	/* vec2(flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec2") == 0) {
+	    if (strcmp(oper->a_id, "vec2") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->literal[1];
@@ -437,7 +437,7 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 #ifdef SLANG_DEBUG
 	printf("===== New call to %s with adapted arguments ===============\n",
-	       static_cast<char*>(fun->header.a_name));
+	       fun->header.a_name);
 	slang_print_tree(callOper, 5);
 #endif
 
