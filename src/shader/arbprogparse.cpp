@@ -2972,7 +2972,7 @@ parse_fp_instruction(GLcontext * ctx, const GLubyte ** inst,
 	    }
 	    Program->TexturesUsed[texcoord] |= (1 << fp->TexSrcTarget);
 	    /* Check that both "2D" and "CUBE" (for example) aren't both used */
-	    if (_mesa_bitcount(Program->TexturesUsed[texcoord]) > 1) {
+	    if (static_cast<GLuint>(__builtin_popcount(Program->TexturesUsed[texcoord])) > 1) {
 		program_error(ctx, Program->Position,
 			      "multiple targets used on one texture image unit");
 		return 1;
@@ -3833,7 +3833,7 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     program->Parameters    = ap.Base.Parameters;
 
 #if DEBUG_FP
-    _mesa_printf("____________Fragment program %u ________\n", program->ID);
+    std::printf("____________Fragment program %u ________\n", program->ID);
     _mesa_print_program(&program->Base);
 #endif
 }
@@ -3883,7 +3883,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
     program->Parameters = ap.Base.Parameters;
 
 #if DEBUG_VP
-    _mesa_printf("____________Vertex program %u __________\n", program->Id);
+    std::printf("____________Vertex program %u __________\n", program->Id);
     _mesa_print_program(&program->Base);
 #endif
 }

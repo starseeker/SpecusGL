@@ -63,13 +63,6 @@
 /** Memory macros (legacy – prefer new/delete or std::vector in new code) */
 /*@{*/
 
-/** Allocate \p BYTES aligned at \p N bytes */
-#define ALIGN_MALLOC(BYTES, N)     _mesa_align_malloc(BYTES, N)
-/** Allocate and zero \p BYTES bytes aligned at \p N bytes */
-#define ALIGN_CALLOC(BYTES, N)     _mesa_align_calloc(BYTES, N)
-/** Free aligned memory */
-#define ALIGN_FREE(PTR)            _mesa_align_free(PTR)
-
 /*@}*/
 
 /* Forward declarations needed by the RAII types below. */
@@ -435,57 +428,11 @@ extern void *
 _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 		    unsigned long alignment);
 
-extern void *
-_mesa_realloc(void *oldBuffer, size_t oldSize, size_t newSize);
-
-extern float
-_mesa_sinf(float a);
-
-extern float
-_mesa_asinf(float x);
-
-extern float
-_mesa_atanf(float x);
-
-extern float
-_mesa_sqrtf(float x);
-
-extern float
-_mesa_inv_sqrtf(float x);
-
-extern void
-_mesa_init_sqrt_table(void);
-
-extern int
-_mesa_ffs(int i);
-
-extern int
-#ifdef __MINGW32__
-_mesa_ffsll(long i);
-#else
-_mesa_ffsll(long long i);
-#endif
-
-extern unsigned int
-_mesa_bitcount(unsigned int n);
-
 extern GLhalfARB
 _mesa_float_to_half(float f);
 
 extern float
 _mesa_half_to_float(GLhalfARB h);
-
-extern char *
-_mesa_getenv(const char *var);
-
-extern char *
-_mesa_strdup(const char *s);
-
-extern int
-_mesa_sprintf(char *str, const char *fmt, ...);
-
-extern void
-_mesa_printf(const char *fmtString, ...);
 
 
 extern void

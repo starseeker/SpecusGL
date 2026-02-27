@@ -379,8 +379,6 @@ one_time_init(GLcontext *ctx)
 	assert(sizeof(GLint) == 4);
 	assert(sizeof(GLuint) == 4);
 
-	_mesa_init_sqrt_table();
-
 #if _HAVE_FULL_GL
 	_math_init();
 
@@ -389,7 +387,7 @@ one_time_init(GLcontext *ctx)
 	}
 #endif
 
-	if (_mesa_getenv("MESA_DEBUG")) {
+	if (std::getenv("MESA_DEBUG")) {
 	    _glapi_noop_enable_warnings(GL_TRUE);
 	    _glapi_set_warning_func((_glapi_warning_func) _mesa_warning);
 	} else {
@@ -951,11 +949,11 @@ __GLcontextRec::initialize(const GLvisual *visual,
 #endif
 
     FragmentProgram._MaintainTexEnvProgram
-	= (_mesa_getenv("MESA_TEX_PROG") != nullptr);
+	= (std::getenv("MESA_TEX_PROG") != nullptr);
     FragmentProgram._UseTexEnvProgram = FragmentProgram._MaintainTexEnvProgram;
 
     VertexProgram._MaintainTnlProgram
-	= (_mesa_getenv("MESA_TNL_PROG") != nullptr);
+	= (std::getenv("MESA_TNL_PROG") != nullptr);
     if (VertexProgram._MaintainTnlProgram) {
 	/* this is required... */
 	FragmentProgram._MaintainTexEnvProgram = GL_TRUE;
@@ -1354,7 +1352,7 @@ __GLcontextRec::bind(GLframebuffer *drawBuffer, GLframebuffer *readBuffer)
 
     /* First time this context is made current: optionally print info. */
     if (FirstTimeCurrent) {
-	if (_mesa_getenv("MESA_INFO")) {
+	if (std::getenv("MESA_INFO")) {
 	    _mesa_print_info();
 	}
 	FirstTimeCurrent = GL_FALSE;

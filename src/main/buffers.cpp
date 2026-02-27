@@ -426,7 +426,7 @@ _mesa_DrawBuffersARB(GLsizei n, const GLenum *buffers)
 	} else {
 	    destMask[output] = draw_buffer_enum_to_bitmask(buffers[output]);
 	    if (destMask[output] == BAD_MASK
-		|| _mesa_bitcount(destMask[output]) > 1) {
+		|| static_cast<GLuint>(__builtin_popcount(destMask[output])) > 1) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glDrawBuffersARB(buffer)");
 		return;
 	    }

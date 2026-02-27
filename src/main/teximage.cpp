@@ -80,7 +80,7 @@ static void PrintTexture(GLcontext *ctx, const struct gl_texture_image *img)
     const GLubyte *data = static_cast<const GLubyte *>(img->Data);
 
     if (!data) {
-	_mesa_printf("No texture data\n");
+	std::printf("No texture data\n");
 	return;
     }
 
@@ -108,17 +108,17 @@ static void PrintTexture(GLcontext *ctx, const struct gl_texture_image *img)
     for (i = 0; i < img->Height; i++) {
 	for (j = 0; j < img->Width; j++) {
 	    if (c==1)
-		_mesa_printf("%02x  ", data[0]);
+		std::printf("%02x  ", data[0]);
 	    else if (c==2)
-		_mesa_printf("%02x%02x  ", data[0], data[1]);
+		std::printf("%02x%02x  ", data[0], data[1]);
 	    else if (c==3)
-		_mesa_printf("%02x%02x%02x  ", data[0], data[1], data[2]);
+		std::printf("%02x%02x%02x  ", data[0], data[1], data[2]);
 	    else if (c==4)
-		_mesa_printf("%02x%02x%02x%02x  ", data[0], data[1], data[2], data[3]);
+		std::printf("%02x%02x%02x%02x  ", data[0], data[1], data[2], data[3]);
 	    data += (img->RowStride - img->Width) * c;
 	}
 	/* XXX use img->ImageStride here */
-	_mesa_printf("\n");
+	std::printf("\n");
     }
 #endif
 }
@@ -1137,9 +1137,9 @@ gl_texture_image::init_fields(GLcontext *ctx, GLenum target,
     IsCompressed = GL_FALSE;
     CompressedSize = 0;
 
-    if ((width == 1 || _mesa_bitcount(Width2) == 1) &&
-	(height == 1 || _mesa_bitcount(Height2) == 1) &&
-	(depth == 1 || _mesa_bitcount(Depth2) == 1))
+    if ((width == 1 || static_cast<GLuint>(__builtin_popcount(Width2)) == 1) &&
+	(height == 1 || static_cast<GLuint>(__builtin_popcount(Height2)) == 1) &&
+	(depth == 1 || static_cast<GLuint>(__builtin_popcount(Depth2)) == 1))
 	_IsPowerOfTwo = GL_TRUE;
     else
 	_IsPowerOfTwo = GL_FALSE;
@@ -1226,7 +1226,7 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 	    maxSize = 1 << (ctx->Const.MaxTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 width > 0 && _mesa_bitcount(width - 2 * border) != 1) ||
+		 width > 0 && static_cast<GLuint>(__builtin_popcount(width - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxTextureLevels) {
 		/* bad width or level */
 		return GL_FALSE;
@@ -1236,10 +1236,10 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 	    maxSize = 1 << (ctx->Const.MaxTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 width > 0 && _mesa_bitcount(width - 2 * border) != 1) ||
+		 width > 0 && static_cast<GLuint>(__builtin_popcount(width - 2 * border)) != 1) ||
 		height < 2 * border || height > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 height > 0 && _mesa_bitcount(height - 2 * border) != 1) ||
+		 height > 0 && static_cast<GLuint>(__builtin_popcount(height - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxTextureLevels) {
 		/* bad width or height or level */
 		return GL_FALSE;
@@ -1249,13 +1249,13 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 	    maxSize = 1 << (ctx->Const.Max3DTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 width > 0 && _mesa_bitcount(width - 2 * border) != 1) ||
+		 width > 0 && static_cast<GLuint>(__builtin_popcount(width - 2 * border)) != 1) ||
 		height < 2 * border || height > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 height > 0 && _mesa_bitcount(height - 2 * border) != 1) ||
+		 height > 0 && static_cast<GLuint>(__builtin_popcount(height - 2 * border)) != 1) ||
 		depth < 2 * border || depth > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 depth > 0 && _mesa_bitcount(depth - 2 * border) != 1) ||
+		 depth > 0 && static_cast<GLuint>(__builtin_popcount(depth - 2 * border)) != 1) ||
 		level >= ctx->Const.Max3DTextureLevels) {
 		/* bad width or height or depth or level */
 		return GL_FALSE;
@@ -1273,10 +1273,10 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 	    maxSize = 1 << (ctx->Const.MaxCubeTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 width > 0 && _mesa_bitcount(width - 2 * border) != 1) ||
+		 width > 0 && static_cast<GLuint>(__builtin_popcount(width - 2 * border)) != 1) ||
 		height < 2 * border || height > 2 + maxSize ||
 		(!ctx->Extensions.ARB_texture_non_power_of_two &&
-		 height > 0 && _mesa_bitcount(height - 2 * border) != 1) ||
+		 height > 0 && static_cast<GLuint>(__builtin_popcount(height - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxCubeTextureLevels) {
 		/* bad width or height */
 		return GL_FALSE;
@@ -1468,7 +1468,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	if (type != GL_UNSIGNED_SHORT_8_8_MESA &&
 	    type != GL_UNSIGNED_SHORT_8_8_REV_MESA) {
 	    char message[100];
-	    _mesa_sprintf(message,
+	    std::snprintf(message, sizeof(message),
 			  "glTexImage%d(format/type YCBCR mismatch", dimensions);
 	    _mesa_error(ctx, GL_INVALID_ENUM, message);
 	    return GL_TRUE; /* error */
@@ -1484,7 +1484,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	if (border != 0) {
 	    if (!isProxy) {
 		char message[100];
-		_mesa_sprintf(message,
+		std::snprintf(message, sizeof(message),
 			      "glTexImage%d(format=GL_YCBCR_MESA and border=%d)",
 			      dimensions, border);
 		_mesa_error(ctx, GL_INVALID_VALUE, message);
@@ -3008,11 +3008,11 @@ compressed_texture_error_check(GLcontext *ctx, GLint dimensions,
      * XXX We should probably use the proxy texture error check function here.
      */
     if (width < 1 || width > maxTextureSize ||
-	(!ctx->Extensions.ARB_texture_non_power_of_two && _mesa_bitcount(width) != 1))
+	(!ctx->Extensions.ARB_texture_non_power_of_two && static_cast<GLuint>(__builtin_popcount(width)) != 1))
 	return GL_INVALID_VALUE;
 
     if ((height < 1 || height > maxTextureSize ||
-	 (!ctx->Extensions.ARB_texture_non_power_of_two && _mesa_bitcount(height) != 1))
+	 (!ctx->Extensions.ARB_texture_non_power_of_two && static_cast<GLuint>(__builtin_popcount(height)) != 1))
 	&& dimensions > 1)
 	return GL_INVALID_VALUE;
 

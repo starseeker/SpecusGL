@@ -655,7 +655,7 @@ make_3d_mipmap(const struct gl_texture_format *format, GLint border,
      */
 
     /*
-    _mesa_printf("mip3d %d x %d x %d  ->  %d x %d x %d\n",
+    std::printf("mip3d %d x %d x %d  ->  %d x %d x %d\n",
            srcWidth, srcHeight, srcDepth, dstWidth, dstHeight, dstDepth);
     */
 

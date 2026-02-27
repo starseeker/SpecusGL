@@ -108,7 +108,7 @@ do {									\
 #define RETURN_ERROR2(msg1, msg2)					\
 do {									\
    char err[1000];							\
-   _mesa_sprintf(err, "%s %s", msg1, msg2);				\
+   std::snprintf(err, sizeof(err), "%s %s", msg1, msg2);				\
    record_error(parseState, err, __LINE__);				\
    return GL_FALSE;							\
 } while(0)
@@ -1307,9 +1307,9 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
 	program->IsNVProgram = GL_TRUE;
 
 #ifdef DEBUG_foo
-	_mesa_printf("--- glLoadProgramNV result ---\n");
+	std::printf("--- glLoadProgramNV result ---\n");
 	_mesa_print_nv_vertex_program(program);
-	_mesa_printf("------------------------------\n");
+	std::printf("------------------------------\n");
 #endif
     } else {
 	/* Error! */
@@ -1328,31 +1328,31 @@ PrintSrcReg(const struct prog_src_register *src)
 {
     static const char comps[5] = "xyzw";
     if (src->NegateBase)
-	_mesa_printf("-");
+	std::printf("-");
     if (src->RelAddr) {
 	if (src->Index > 0)
-	    _mesa_printf("c[A0.x + %d]", src->Index);
+	    std::printf("c[A0.x + %d]", src->Index);
 	else if (src->Index < 0)
-	    _mesa_printf("c[A0.x - %d]", -src->Index);
+	    std::printf("c[A0.x - %d]", -src->Index);
 	else
-	    _mesa_printf("c[A0.x]");
+	    std::printf("c[A0.x]");
     } else if (src->File == PROGRAM_OUTPUT) {
-	_mesa_printf("o[%s]", OutputRegisters[src->Index]);
+	std::printf("o[%s]", OutputRegisters[src->Index]);
     } else if (src->File == PROGRAM_INPUT) {
-	_mesa_printf("v[%s]", InputRegisters[src->Index]);
+	std::printf("v[%s]", InputRegisters[src->Index]);
     } else if (src->File == PROGRAM_ENV_PARAM) {
-	_mesa_printf("c[%d]", src->Index);
+	std::printf("c[%d]", src->Index);
     } else {
 	ASSERT(src->File == PROGRAM_TEMPORARY);
-	_mesa_printf("R%d", src->Index);
+	std::printf("R%d", src->Index);
     }
 
     if (GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 1) &&
 	GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 2) &&
 	GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 3)) {
-	_mesa_printf(".%c", comps[GET_SWZ(src->Swizzle, 0)]);
+	std::printf(".%c", comps[GET_SWZ(src->Swizzle, 0)]);
     } else if (src->Swizzle != SWIZZLE_NOOP) {
-	_mesa_printf(".%c%c%c%c",
+	std::printf(".%c%c%c%c",
 		     comps[GET_SWZ(src->Swizzle, 0)],
 		     comps[GET_SWZ(src->Swizzle, 1)],
 		     comps[GET_SWZ(src->Swizzle, 2)],
@@ -1365,26 +1365,26 @@ static void
 PrintDstReg(const struct prog_dst_register *dst)
 {
     if (dst->File == PROGRAM_OUTPUT) {
-	_mesa_printf("o[%s]", OutputRegisters[dst->Index]);
+	std::printf("o[%s]", OutputRegisters[dst->Index]);
     } else if (dst->File == PROGRAM_INPUT) {
-	_mesa_printf("v[%s]", InputRegisters[dst->Index]);
+	std::printf("v[%s]", InputRegisters[dst->Index]);
     } else if (dst->File == PROGRAM_ENV_PARAM) {
-	_mesa_printf("c[%d]", dst->Index);
+	std::printf("c[%d]", dst->Index);
     } else {
 	ASSERT(dst->File == PROGRAM_TEMPORARY);
-	_mesa_printf("R%d", dst->Index);
+	std::printf("R%d", dst->Index);
     }
 
     if (dst->WriteMask != 0 && dst->WriteMask != WRITEMASK_XYZW) {
-	_mesa_printf(".");
+	std::printf(".");
 	if (dst->WriteMask & WRITEMASK_X)
-	    _mesa_printf("x");
+	    std::printf("x");
 	if (dst->WriteMask & WRITEMASK_Y)
-	    _mesa_printf("y");
+	    std::printf("y");
 	if (dst->WriteMask & WRITEMASK_Z)
-	    _mesa_printf("z");
+	    std::printf("z");
 	if (dst->WriteMask & WRITEMASK_W)
-	    _mesa_printf("w");
+	    std::printf("w");
     }
 }
 
@@ -1418,37 +1418,37 @@ _mesa_print_nv_vertex_instruction(const struct prog_instruction *inst)
 	case OPCODE_DPH:
 	case OPCODE_SUB:
 	case OPCODE_MAD:
-	    _mesa_printf("%s ", _mesa_opcode_string(inst->Opcode));
+	    std::printf("%s ", _mesa_opcode_string(inst->Opcode));
 	    PrintDstReg(&inst->DstReg);
-	    _mesa_printf(", ");
+	    std::printf(", ");
 	    n = _mesa_num_inst_src_regs(inst->Opcode);
 	    for (i = 0; i < n; i++) {
 		PrintSrcReg(&inst->SrcReg[i]);
 		if (i + 1 < n)
-		    _mesa_printf(", ");
+		    std::printf(", ");
 	    }
-	    _mesa_printf(";\n");
+	    std::printf(";\n");
 	    break;
 	case OPCODE_ARL:
-	    _mesa_printf("ARL A0.x, ");
+	    std::printf("ARL A0.x, ");
 	    PrintSrcReg(&inst->SrcReg[0]);
-	    _mesa_printf(";\n");
+	    std::printf(";\n");
 	    break;
 	case OPCODE_PRINT:
-	    _mesa_printf("PRINT '%s'", inst->Data.c_str());
+	    std::printf("PRINT '%s'", inst->Data.c_str());
 	    if (inst->SrcReg[0].File != PROGRAM_UNDEFINED) {
-		_mesa_printf(", ");
+		std::printf(", ");
 		PrintSrcReg(&inst->SrcReg[0]);
-		_mesa_printf(";\n");
+		std::printf(";\n");
 	    } else {
-		_mesa_printf("\n");
+		std::printf("\n");
 	    }
 	    break;
 	case OPCODE_END:
-	    _mesa_printf("END\n");
+	    std::printf("END\n");
 	    break;
 	default:
-	    _mesa_printf("BAD INSTRUCTION\n");
+	    std::printf("BAD INSTRUCTION\n");
     }
 }
 

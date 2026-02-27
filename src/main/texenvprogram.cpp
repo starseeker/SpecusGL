@@ -392,12 +392,12 @@ static struct ureg get_temp(struct texenv_fragment_program *p)
 
     /* First try and reuse temps which have been used already:
      */
-    bit = _mesa_ffs(~p->temp_in_use & p->alu_temps);
+    bit = __builtin_ffs(~p->temp_in_use & p->alu_temps);
 
     /* Then any unused temporary:
      */
     if (!bit)
-	bit = _mesa_ffs(~p->temp_in_use);
+	bit = __builtin_ffs(~p->temp_in_use);
 
     if (!bit) {
 	_mesa_problem(nullptr, "%s: out of temporaries\n", __FILE__);
@@ -421,12 +421,12 @@ static struct ureg get_tex_temp(struct texenv_fragment_program *p)
      * ~p->temps_output isn't necessary, but will keep it there for
      * now:
      */
-    bit = _mesa_ffs(~p->temp_in_use & ~p->alu_temps & ~p->temps_output);
+    bit = __builtin_ffs(~p->temp_in_use & ~p->alu_temps & ~p->temps_output);
 
     /* Then any unused temporary:
      */
     if (!bit)
-	bit = _mesa_ffs(~p->temp_in_use);
+	bit = __builtin_ffs(~p->temp_in_use);
 
     if (!bit) {
 	_mesa_problem(nullptr, "%s: out of temporaries\n", __FILE__);
@@ -1155,7 +1155,7 @@ create_new_program(GLcontext *ctx, struct state_key *key,
 
     if (DISASSEM) {
 	_mesa_print_program(p.program);
-	_mesa_printf("\n");
+	std::printf("\n");
     }
 }
 
@@ -1185,12 +1185,12 @@ _mesa_UpdateTexEnvProgram(GLcontext *ctx)
 	auto it = cache.map.find(map_key);
 	if (it != cache.map.end()) {
 	    if (0)
-		_mesa_printf("Found existing texenv program\n");
+		std::printf("Found existing texenv program\n");
 	    ctx->FragmentProgram._Current =
 		ctx->FragmentProgram._TexEnvProgram = it->second;
 	} else {
 	    if (0)
-		_mesa_printf("Building new texenv proggy\n");
+		std::printf("Building new texenv proggy\n");
 
 	    /* create new tex env program */
 	    struct gl_fragment_program *prog =

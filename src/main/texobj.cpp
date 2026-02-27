@@ -324,7 +324,7 @@ _mesa_reference_texobj(struct gl_texture_object **ptr,
 static void
 incomplete(const struct gl_texture_object *t, const char *why)
 {
-    _mesa_printf("Texture Obj %d incomplete because: %s\n", t->Name, why);
+    std::printf("Texture Obj %d incomplete because: %s\n", t->Name, why);
 }
 #else
 #define incomplete(t, why)
@@ -355,7 +355,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     /* Always need the base level image */
     if (!t->Image[0][baseLevel]) {
 	char s[100];
-	_mesa_sprintf(s, "obj %p (%d) Image[baseLevel=%d] == nullptr",
+	std::snprintf(s, sizeof(s), "obj %p (%d) Image[baseLevel=%d] == nullptr",
 		      static_cast<void *>(t), t->Name, baseLevel);
 	incomplete(t, s);
 	t->Complete = GL_FALSE;

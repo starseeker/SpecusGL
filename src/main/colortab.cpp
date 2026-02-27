@@ -414,7 +414,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	return;
     }
 
-    if (width < 0 || (width != 0 && _mesa_bitcount(width) != 1)) {
+    if (width < 0 || (width != 0 && static_cast<GLuint>(__builtin_popcount(width)) != 1)) {
 	/* error */
 	if (proxy) {
 	    table->Size = 0;

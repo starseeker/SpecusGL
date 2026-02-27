@@ -215,19 +215,19 @@ _mesa_print_line_function(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
 
-    _mesa_printf("Line Func == ");
+    std::printf("Line Func == ");
     if (swrast->Line == simple_ci_line)
-	_mesa_printf("simple_ci_line\n");
+	std::printf("simple_ci_line\n");
     else if (swrast->Line == simple_rgba_line)
-	_mesa_printf("simple_rgba_line\n");
+	std::printf("simple_rgba_line\n");
     else if (swrast->Line == general_ci_line)
-	_mesa_printf("general_ci_line\n");
+	std::printf("general_ci_line\n");
     else if (swrast->Line == general_rgba_line)
-	_mesa_printf("general_rgba_line\n");
+	std::printf("general_rgba_line\n");
     else if (swrast->Line == textured_line)
-	_mesa_printf("textured_line\n");
+	std::printf("textured_line\n");
     else
-	_mesa_printf("Driver func %p\n", (void *(*)()) swrast->Line);
+	std::printf("Driver func %p\n", (void *(*)()) swrast->Line);
 }
 #endif
 
@@ -241,7 +241,7 @@ static const char *lineFuncName = nullptr;
 #define USE(lineFunc)                   \
 do {                                    \
     lineFuncName = #lineFunc;           \
-    /*_mesa_printf("%s\n", lineFuncName);*/   \
+    /*std::printf("%s\n", lineFuncName);*/   \
     swrast->Line = lineFunc;            \
 } while (0)
 

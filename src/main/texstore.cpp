@@ -269,7 +269,7 @@ compute_component_mapping(GLenum inFormat, GLenum outFormat,
     map[ONE] = ONE;
 
     /*
-       _mesa_printf("from %x/%s to %x/%s map %d %d %d %d %d %d\n",
+       std::printf("from %x/%s to %x/%s map %d %d %d %d %d %d\n",
     		inFormat, _mesa_lookup_enum_by_nr(inFormat),
     		outFormat, _mesa_lookup_enum_by_nr(outFormat),
     		map[0],
@@ -850,7 +850,7 @@ _mesa_swizzle_ubyte_image(GLcontext *ctx,
     for (i = 0; i < 4; i++)
 	map[i] = srctype2ubyte[swap[src2base[base2rgba[rgba2dst[i]]]]];
 
-    /*    _mesa_printf("map %d %d %d %d\n", map[0], map[1], map[2], map[3]);  */
+    /*    std::printf("map %d %d %d %d\n", map[0], map[1], map[2], map[3]);  */
 
     if (srcRowStride == dstRowStride &&
 	srcComponents == dstComponents &&

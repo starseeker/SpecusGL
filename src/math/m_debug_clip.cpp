@@ -258,20 +258,20 @@ static int test_cliptest_function(clip_func func, int np,
     }
 
     if (dco != rco) {
-	_mesa_printf("\n-----------------------------\n");
-	_mesa_printf("dco = 0x%02x   rco = 0x%02x\n", dco, rco);
+	std::printf("\n-----------------------------\n");
+	std::printf("dco = 0x%02x   rco = 0x%02x\n", dco, rco);
 	return 0;
     }
     if (dca != rca) {
-	_mesa_printf("\n-----------------------------\n");
-	_mesa_printf("dca = 0x%02x   rca = 0x%02x\n", dca, rca);
+	std::printf("\n-----------------------------\n");
+	std::printf("dca = 0x%02x   rca = 0x%02x\n", dca, rca);
 	return 0;
     }
     for (i = 0 ; i < TEST_COUNT ; i++) {
 	if (dm[i] != rm[i]) {
-	    _mesa_printf("\n-----------------------------\n");
-	    _mesa_printf("(i = %i)\n", i);
-	    _mesa_printf("dm = 0x%02x   rm = 0x%02x\n", dm[i], rm[i]);
+	    std::printf("\n-----------------------------\n");
+	    std::printf("(i = %i)\n", i);
+	    std::printf("dm = 0x%02x   rm = 0x%02x\n", dm[i], rm[i]);
 	    return 0;
 	}
     }
@@ -285,19 +285,19 @@ static int test_cliptest_function(clip_func func, int np,
     for (i = 0 ; i < TEST_COUNT ; i++) {
 	for (j = 0 ; j < 4 ; j++) {
 	    if (significand_match(d[i][j], r[i][j]) < REQUIRED_PRECISION) {
-		_mesa_printf("\n-----------------------------\n");
-		_mesa_printf("(i = %i, j = %i)  dm = 0x%02x   rm = 0x%02x\n",
+		std::printf("\n-----------------------------\n");
+		std::printf("(i = %i, j = %i)  dm = 0x%02x   rm = 0x%02x\n",
 			     i, j, dm[i], rm[i]);
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][0], r[i][0], r[i][0]-d[i][0],
 			     MAX_PRECISION - significand_match(d[i][0], r[i][0]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][1], r[i][1], r[i][1]-d[i][1],
 			     MAX_PRECISION - significand_match(d[i][1], r[i][1]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][2], r[i][2], r[i][2]-d[i][2],
 			     MAX_PRECISION - significand_match(d[i][2], r[i][2]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][3], r[i][3], r[i][3]-d[i][3],
 			     MAX_PRECISION - significand_match(d[i][3], r[i][3]));
 		return 0;
@@ -316,26 +316,26 @@ void _math_test_all_cliptest_functions(char *description)
 
     if (first_time) {
 	first_time = 0;
-	mesa_profile = _mesa_getenv("MESA_PROFILE");
+	mesa_profile = std::getenv("MESA_PROFILE");
     }
 
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
 	if (!counter_overhead) {
 	    INIT_COUNTER();
-	    _mesa_printf("counter overhead: %ld cycles\n\n", counter_overhead);
+	    std::printf("counter overhead: %ld cycles\n\n", counter_overhead);
 	}
-	_mesa_printf("cliptest results after hooking in %s functions:\n", description);
+	std::printf("cliptest results after hooking in %s functions:\n", description);
     }
 #endif
 
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
-	_mesa_printf("\n\t");
+	std::printf("\n\t");
 	for (psize = 2 ; psize <= 4 ; psize++) {
-	    _mesa_printf(" p%d\t", psize);
+	    std::printf(" p%d\t", psize);
 	}
-	_mesa_printf("\n--------------------------------------------------------\n\t");
+	std::printf("\n--------------------------------------------------------\n\t");
     }
 #endif
 
@@ -346,23 +346,23 @@ void _math_test_all_cliptest_functions(char *description)
 
 	    if (test_cliptest_function(func, np, psize, cycles) == 0) {
 		char buf[100];
-		_mesa_sprintf(buf, "%s[%d] failed test (%s)",
+		std::snprintf(buf, sizeof(buf), "%s[%d] failed test (%s)",
 			      cnames[np], psize, description);
 		_mesa_problem(nullptr, buf);
 	    }
 #ifdef RUN_DEBUG_BENCHMARK
 	    if (mesa_profile)
-		_mesa_printf(" %li\t", benchmark_tab[np][psize-1]);
+		std::printf(" %li\t", benchmark_tab[np][psize-1]);
 #endif
 	}
 #ifdef RUN_DEBUG_BENCHMARK
 	if (mesa_profile)
-	    _mesa_printf(" | [%s]\n\t", cstrings[np]);
+	    std::printf(" | [%s]\n\t", cstrings[np]);
 #endif
     }
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile)
-	_mesa_printf("\n");
+	std::printf("\n");
 #endif
 }
 

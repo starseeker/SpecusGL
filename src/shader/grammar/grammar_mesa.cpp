@@ -84,7 +84,7 @@ byte *grammar_string_copy_n(byte *dst, const byte *src, size_t n)
 
 byte *grammar_string_duplicate(const byte *src)
 {
-    return (byte *) _mesa_strdup(reinterpret_cast<const char *>(src));
+    return (byte *) strdup(reinterpret_cast<const char *>(src));
 }
 
 unsigned int grammar_string_length(const byte *str)

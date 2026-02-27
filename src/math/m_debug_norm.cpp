@@ -312,15 +312,15 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
     for (i = 0 ; i < TEST_COUNT ; i++) {
 	for (j = 0 ; j < 3 ; j++) {
 	    if (significand_match(d[i][j], r[i][j]) < REQUIRED_PRECISION) {
-		_mesa_printf("-----------------------------\n");
-		_mesa_printf("(i = %i, j = %i)\n", i, j);
-		_mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		std::printf("-----------------------------\n");
+		std::printf("(i = %i, j = %i)\n", i, j);
+		std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 			     d[i][0], r[i][0], r[i][0]/d[i][0],
 			     MAX_PRECISION - significand_match(d[i][0], r[i][0]));
-		_mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 			     d[i][1], r[i][1], r[i][1]/d[i][1],
 			     MAX_PRECISION - significand_match(d[i][1], r[i][1]));
-		_mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 			     d[i][2], r[i][2], r[i][2]/d[i][2],
 			     MAX_PRECISION - significand_match(d[i][2], r[i][2]));
 		return 0;
@@ -328,15 +328,15 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
 
 	    if (norm_normalize_types[mtype] != 0) {
 		if (significand_match(d2[i][j], r2[i][j]) < REQUIRED_PRECISION) {
-		    _mesa_printf("------------------- precalculated length case ------\n");
-		    _mesa_printf("(i = %i, j = %i)\n", i, j);
-		    _mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		    std::printf("------------------- precalculated length case ------\n");
+		    std::printf("(i = %i, j = %i)\n", i, j);
+		    std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 				 d2[i][0], r2[i][0], r2[i][0]/d2[i][0],
 				 MAX_PRECISION - significand_match(d2[i][0], r2[i][0]));
-		    _mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		    std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 				 d2[i][1], r2[i][1], r2[i][1]/d2[i][1],
 				 MAX_PRECISION - significand_match(d2[i][1], r2[i][1]));
-		    _mesa_printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
+		    std::printf("%f \t %f \t [ratio = %e - %i bit missed]\n",
 				 d2[i][2], r2[i][2], r2[i][2]/d2[i][2],
 				 MAX_PRECISION - significand_match(d2[i][2], r2[i][2]));
 		    return 0;
@@ -357,18 +357,18 @@ void _math_test_all_normal_transform_functions(char *description)
 
     if (first_time) {
 	first_time = 0;
-	mesa_profile = _mesa_getenv("MESA_PROFILE");
+	mesa_profile = std::getenv("MESA_PROFILE");
     }
 
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
 	if (!counter_overhead) {
 	    INIT_COUNTER();
-	    _mesa_printf("counter overhead: %ld cycles\n\n", counter_overhead);
+	    std::printf("counter overhead: %ld cycles\n\n", counter_overhead);
 	}
-	_mesa_printf("normal transform results after hooking in %s functions:\n",
+	std::printf("normal transform results after hooking in %s functions:\n",
 		     description);
-	_mesa_printf("\n-------------------------------------------------------\n");
+	std::printf("\n-------------------------------------------------------\n");
     }
 #endif
 
@@ -378,21 +378,21 @@ void _math_test_all_normal_transform_functions(char *description)
 
 	if (test_norm_function(func, mtype, cycles) == 0) {
 	    char buf[100];
-	    _mesa_sprintf(buf, "_mesa_normal_tab[0][%s] failed test (%s)",
+	    std::snprintf(buf, sizeof(buf), "_mesa_normal_tab[0][%s] failed test (%s)",
 			  norm_strings[mtype], description);
 	    _mesa_problem(nullptr, buf);
 	}
 
 #ifdef RUN_DEBUG_BENCHMARK
 	if (mesa_profile) {
-	    _mesa_printf(" %li\t", benchmark_tab[mtype]);
-	    _mesa_printf(" | [%s]\n", norm_strings[mtype]);
+	    std::printf(" %li\t", benchmark_tab[mtype]);
+	    std::printf(" | [%s]\n", norm_strings[mtype]);
 	}
 #endif
     }
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
-	_mesa_printf("\n");
+	std::printf("\n");
     }
 #endif
 }

@@ -290,7 +290,7 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     rz = u[2] - normal[2] * two_nu;
     m = rx * rx + ry * ry + (rz + 1.0F) * (rz + 1.0F);
     if (m > 0.0F)
-	mInv = 0.5F * _mesa_inv_sqrtf(m);
+	mInv = 0.5F * (1.0f / std::sqrt(m));
     else
 	mInv = 0.0F;
 

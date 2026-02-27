@@ -4848,7 +4848,7 @@ const char *_mesa_lookup_enum_by_nr(int nr)
 	return & enum_string_table[ all_enums[ *i ].offset ];
     } else {
 	/* this is not re-entrant safe, no big deal here */
-	_mesa_sprintf(token_tmp, "0x%x", nr);
+	std::snprintf(token_tmp, sizeof(token_tmp), "0x%x", nr);
 	return token_tmp;
     }
 }

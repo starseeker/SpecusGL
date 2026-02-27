@@ -436,7 +436,7 @@ simple_blit(GLcontext *ctx,
     GLint comps, bytesPerRow;
 
     /* only one buffer */
-    ASSERT(_mesa_bitcount(buffer) == 1);
+    ASSERT(static_cast<GLuint>(__builtin_popcount(buffer)) == 1);
     /* no flipping checks */
     ASSERT(srcX0 < srcX1);
     ASSERT(srcY0 < srcY1);

@@ -266,18 +266,18 @@ static int test_transform_function(transform_func func, int psize,
     for (i = 0 ; i < TEST_COUNT ; i++) {
 	for (j = 0 ; j < 4 ; j++) {
 	    if (significand_match(d[i][j], r[i][j]) < REQUIRED_PRECISION) {
-		_mesa_printf("-----------------------------\n");
-		_mesa_printf("(i = %i, j = %i)\n", i, j);
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("-----------------------------\n");
+		std::printf("(i = %i, j = %i)\n", i, j);
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][0], r[i][0], r[i][0]-d[i][0],
 			     MAX_PRECISION - significand_match(d[i][0], r[i][0]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][1], r[i][1], r[i][1]-d[i][1],
 			     MAX_PRECISION - significand_match(d[i][1], r[i][1]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][2], r[i][2], r[i][2]-d[i][2],
 			     MAX_PRECISION - significand_match(d[i][2], r[i][2]));
-		_mesa_printf("%f \t %f \t [diff = %e - %i bit missed]\n",
+		std::printf("%f \t %f \t [diff = %e - %i bit missed]\n",
 			     d[i][3], r[i][3], r[i][3]-d[i][3],
 			     MAX_PRECISION - significand_match(d[i][3], r[i][3]));
 		return 0;
@@ -297,26 +297,26 @@ void _math_test_all_transform_functions(char *description)
 
     if (first_time) {
 	first_time = 0;
-	mesa_profile = _mesa_getenv("MESA_PROFILE");
+	mesa_profile = std::getenv("MESA_PROFILE");
     }
 
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
 	if (!counter_overhead) {
 	    INIT_COUNTER();
-	    _mesa_printf("counter overhead: %lu cycles\n\n", counter_overhead);
+	    std::printf("counter overhead: %lu cycles\n\n", counter_overhead);
 	}
-	_mesa_printf("transform results after hooking in %s functions:\n", description);
+	std::printf("transform results after hooking in %s functions:\n", description);
     }
 #endif
 
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile) {
-	_mesa_printf("\n");
+	std::printf("\n");
 	for (psize = 1 ; psize <= 4 ; psize++) {
-	    _mesa_printf(" p%d\t", psize);
+	    std::printf(" p%d\t", psize);
 	}
-	_mesa_printf("\n--------------------------------------------------------\n");
+	std::printf("\n--------------------------------------------------------\n");
     }
 #endif
 
@@ -327,23 +327,23 @@ void _math_test_all_transform_functions(char *description)
 
 	    if (test_transform_function(func, psize, mtype, cycles) == 0) {
 		char buf[100];
-		_mesa_sprintf(buf, "_mesa_transform_tab[0][%d][%s] failed test (%s)",
+		std::snprintf(buf, sizeof(buf), "_mesa_transform_tab[0][%d][%s] failed test (%s)",
 			      psize, mstrings[mtype], description);
 		_mesa_problem(nullptr, buf);
 	    }
 #ifdef RUN_DEBUG_BENCHMARK
 	    if (mesa_profile)
-		_mesa_printf(" %li\t", benchmark_tab[psize-1][mtype]);
+		std::printf(" %li\t", benchmark_tab[psize-1][mtype]);
 #endif
 	}
 #ifdef RUN_DEBUG_BENCHMARK
 	if (mesa_profile)
-	    _mesa_printf(" | [%s]\n", mstrings[mtype]);
+	    std::printf(" | [%s]\n", mstrings[mtype]);
 #endif
     }
 #ifdef RUN_DEBUG_BENCHMARK
     if (mesa_profile)
-	_mesa_printf("\n");
+	std::printf("\n");
 #endif
 }
 

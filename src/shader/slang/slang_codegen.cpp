@@ -2482,7 +2482,7 @@ _slang_check_matmul_optimization(slang_assemble_ctx *A, slang_operation *oper)
 	    if (matOp->a_id
 		== slang_atom_pool_atom(A->atoms, matrices[i].orig)) {
 		/*
-		_mesa_printf("Replace %s with %s\n",
+		std::printf("Replace %s with %s\n",
 		             matrices[i].orig, matrices[i].tranpose);
 		*/
 		assert(matOp->type == SLANG_OPER_IDENTIFIER);

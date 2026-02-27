@@ -310,7 +310,7 @@ static struct ureg swizzle1(struct ureg reg, int x)
 
 static struct ureg get_temp(struct tnl_program *p)
 {
-    int bit = _mesa_ffs(~p->temp_in_use);
+    int bit = __builtin_ffs(~p->temp_in_use);
     if (!bit) {
 	_mesa_problem(nullptr, "%s: out of temporaries\n", __FILE__);
 	_mesa_exit(1);
@@ -487,10 +487,10 @@ static void debug_insn(struct prog_instruction *inst, const char *fn,
 
 	if (fn != last_fn) {
 	    last_fn = fn;
-	    _mesa_printf("%s:\n", fn);
+	    std::printf("%s:\n", fn);
 	}
 
-	_mesa_printf("%d:\t", line);
+	std::printf("%d:\t", line);
 	_mesa_print_instruction(inst);
     }
 }
@@ -1394,7 +1394,7 @@ static void build_tnl_program(struct tnl_program *p)
     /* Disassemble:
      */
     if (DISASSEM) {
-	_mesa_printf("\n");
+	std::printf("\n");
     }
 }
 

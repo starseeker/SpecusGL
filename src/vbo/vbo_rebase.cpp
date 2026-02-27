@@ -113,7 +113,7 @@ void vbo_rebase_prims(GLcontext *ctx,
     assert(min_index != 0);
 
     if (0)
-	_mesa_printf("%s %d..%d\n", __func__, min_index, max_index);
+	std::printf("%s %d..%d\n", __func__, min_index, max_index);
 
     if (ib) {
 	/* Unfortunately need to adjust each index individually.

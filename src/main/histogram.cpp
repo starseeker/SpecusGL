@@ -985,7 +985,7 @@ _mesa_Histogram(GLenum target, GLsizei width, GLenum internalFormat, GLboolean s
 	}
     }
 
-    if (width != 0 && _mesa_bitcount(width) != 1) {
+    if (width != 0 && static_cast<GLuint>(__builtin_popcount(width)) != 1) {
 	if (target == GL_PROXY_HISTOGRAM) {
 	    error = GL_TRUE;
 	} else {

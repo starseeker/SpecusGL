@@ -197,7 +197,7 @@ do {									\
 #define RETURN_ERROR2(msg1, msg2)					\
 do {									\
    char err[1000];							\
-   _mesa_sprintf(err, "%s %s", msg1, msg2);				\
+   std::snprintf(err, sizeof(err), "%s %s", msg1, msg2);				\
    record_error(parseState, err, __LINE__);				\
    return GL_FALSE;							\
 } while(0)
@@ -609,7 +609,7 @@ Parse_TextureImageId(struct parse_state *parseState,
 
     /* update record of referenced texture units */
     parseState->texturesUsed[*texUnit] |= *texTargetBit;
-    if (_mesa_bitcount(parseState->texturesUsed[*texUnit]) > 1) {
+    if (static_cast<GLuint>(__builtin_popcount(parseState->texturesUsed[*texUnit])) > 1) {
 	RETURN_ERROR1("Only one texture target can be used per texture unit.");
     }
 
@@ -1490,9 +1490,9 @@ _mesa_parse_nv_fragment_program(GLcontext *ctx, GLenum dstTarget,
 #endif
 
 #ifdef DEBUG_foo
-	_mesa_printf("--- glLoadProgramNV(%d) result ---\n", program->Id);
+	std::printf("--- glLoadProgramNV(%d) result ---\n", program->Id);
 	_mesa_print_nv_fragment_program(program);
-	_mesa_printf("----------------------------------\n");
+	std::printf("----------------------------------\n");
 #endif
     } else {
 	/* Error! */
@@ -1509,38 +1509,38 @@ PrintSrcReg(const struct gl_fragment_program *program,
     static const char comps[5] = "xyzw";
 
     if (src->NegateAbs) {
-	_mesa_printf("-");
+	std::printf("-");
     }
     if (src->Abs) {
-	_mesa_printf("|");
+	std::printf("|");
     }
     if (src->NegateBase) {
-	_mesa_printf("-");
+	std::printf("-");
     }
     if (src->File == PROGRAM_NAMED_PARAM) {
 	if (program->Parameters->Parameters[src->Index].Type
 	    == PROGRAM_CONSTANT) {
 	    const GLfloat *v;
 	    v = program->Parameters->ParameterValues[src->Index].data();
-	    _mesa_printf("{%g, %g, %g, %g}", v[0], v[1], v[2], v[3]);
+	    std::printf("{%g, %g, %g, %g}", v[0], v[1], v[2], v[3]);
 	} else {
 	    ASSERT(program->Parameters->Parameters[src->Index].Type
 		   == PROGRAM_NAMED_PARAM);
-	    _mesa_printf("%s", program->Parameters->Parameters[src->Index].Name.c_str());
+	    std::printf("%s", program->Parameters->Parameters[src->Index].Name.c_str());
 	}
     } else if (src->File == PROGRAM_OUTPUT) {
-	_mesa_printf("o[%s]", OutputRegisters[src->Index]);
+	std::printf("o[%s]", OutputRegisters[src->Index]);
     } else if (src->File == PROGRAM_INPUT) {
-	_mesa_printf("f[%s]", InputRegisters[src->Index]);
+	std::printf("f[%s]", InputRegisters[src->Index]);
     } else if (src->File == PROGRAM_LOCAL_PARAM) {
-	_mesa_printf("p[%d]", src->Index);
+	std::printf("p[%d]", src->Index);
     } else if (src->File == PROGRAM_TEMPORARY) {
 	if (src->Index >= 32)
-	    _mesa_printf("H%d", src->Index);
+	    std::printf("H%d", src->Index);
 	else
-	    _mesa_printf("R%d", src->Index);
+	    std::printf("R%d", src->Index);
     } else if (src->File == PROGRAM_WRITE_ONLY) {
-	_mesa_printf("%cC", "HR"[src->Index]);
+	std::printf("%cC", "HR"[src->Index]);
     } else {
 	_mesa_problem(nullptr, "Invalid fragment register %d", src->Index);
 	return;
@@ -1548,38 +1548,38 @@ PrintSrcReg(const struct gl_fragment_program *program,
     if (GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 1) &&
 	GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 2) &&
 	GET_SWZ(src->Swizzle, 0) == GET_SWZ(src->Swizzle, 3)) {
-	_mesa_printf(".%c", comps[GET_SWZ(src->Swizzle, 0)]);
+	std::printf(".%c", comps[GET_SWZ(src->Swizzle, 0)]);
     } else if (src->Swizzle != SWIZZLE_NOOP) {
-	_mesa_printf(".%c%c%c%c",
+	std::printf(".%c%c%c%c",
 		     comps[GET_SWZ(src->Swizzle, 0)],
 		     comps[GET_SWZ(src->Swizzle, 1)],
 		     comps[GET_SWZ(src->Swizzle, 2)],
 		     comps[GET_SWZ(src->Swizzle, 3)]);
     }
     if (src->Abs) {
-	_mesa_printf("|");
+	std::printf("|");
     }
 }
 
 static void
 PrintTextureSrc(const struct prog_instruction *inst)
 {
-    _mesa_printf("TEX%d, ", inst->TexSrcUnit);
+    std::printf("TEX%d, ", inst->TexSrcUnit);
     switch (inst->TexSrcTarget) {
 	case TEXTURE_1D_INDEX:
-	    _mesa_printf("1D");
+	    std::printf("1D");
 	    break;
 	case TEXTURE_2D_INDEX:
-	    _mesa_printf("2D");
+	    std::printf("2D");
 	    break;
 	case TEXTURE_3D_INDEX:
-	    _mesa_printf("3D");
+	    std::printf("3D");
 	    break;
 	case TEXTURE_RECT_INDEX:
-	    _mesa_printf("RECT");
+	    std::printf("RECT");
 	    break;
 	case TEXTURE_CUBE_INDEX:
-	    _mesa_printf("CUBE");
+	    std::printf("CUBE");
 	    break;
 	default:
 	    _mesa_problem(nullptr, "Invalid textue target in PrintTextureSrc");
@@ -1594,13 +1594,13 @@ PrintCondCode(const struct prog_dst_register *dst)
 	"??", "GT", "EQ", "LT", "UN", "GE", "LE", "NE", "TR", "FL", "??"
     };
 
-    _mesa_printf("%s", ccString[dst->CondMask]);
+    std::printf("%s", ccString[dst->CondMask]);
     if (GET_SWZ(dst->CondSwizzle, 0) == GET_SWZ(dst->CondSwizzle, 1) &&
 	GET_SWZ(dst->CondSwizzle, 0) == GET_SWZ(dst->CondSwizzle, 2) &&
 	GET_SWZ(dst->CondSwizzle, 0) == GET_SWZ(dst->CondSwizzle, 3)) {
-	_mesa_printf(".%c", comps[GET_SWZ(dst->CondSwizzle, 0)]);
+	std::printf(".%c", comps[GET_SWZ(dst->CondSwizzle, 0)]);
     } else if (dst->CondSwizzle != SWIZZLE_NOOP) {
-	_mesa_printf(".%c%c%c%c",
+	std::printf(".%c%c%c%c",
 		     comps[GET_SWZ(dst->CondSwizzle, 0)],
 		     comps[GET_SWZ(dst->CondSwizzle, 1)],
 		     comps[GET_SWZ(dst->CondSwizzle, 2)],
@@ -1613,37 +1613,37 @@ static void
 PrintDstReg(const struct prog_dst_register *dst)
 {
     if (dst->File == PROGRAM_OUTPUT) {
-	_mesa_printf("o[%s]", OutputRegisters[dst->Index]);
+	std::printf("o[%s]", OutputRegisters[dst->Index]);
     } else if (dst->File == PROGRAM_TEMPORARY) {
 	if (dst->Index >= 32)
-	    _mesa_printf("H%d", dst->Index);
+	    std::printf("H%d", dst->Index);
 	else
-	    _mesa_printf("R%d", dst->Index);
+	    std::printf("R%d", dst->Index);
     } else if (dst->File == PROGRAM_LOCAL_PARAM) {
-	_mesa_printf("p[%d]", dst->Index);
+	std::printf("p[%d]", dst->Index);
     } else if (dst->File == PROGRAM_WRITE_ONLY) {
-	_mesa_printf("%cC", "HR"[dst->Index]);
+	std::printf("%cC", "HR"[dst->Index]);
     } else {
-	_mesa_printf("???");
+	std::printf("???");
     }
 
     if (dst->WriteMask != 0 && dst->WriteMask != WRITEMASK_XYZW) {
-	_mesa_printf(".");
+	std::printf(".");
 	if (dst->WriteMask & WRITEMASK_X)
-	    _mesa_printf("x");
+	    std::printf("x");
 	if (dst->WriteMask & WRITEMASK_Y)
-	    _mesa_printf("y");
+	    std::printf("y");
 	if (dst->WriteMask & WRITEMASK_Z)
-	    _mesa_printf("z");
+	    std::printf("z");
 	if (dst->WriteMask & WRITEMASK_W)
-	    _mesa_printf("w");
+	    std::printf("w");
     }
 
     if (dst->CondMask != COND_TR ||
 	dst->CondSwizzle != SWIZZLE_NOOP) {
-	_mesa_printf(" (");
+	std::printf(" (");
 	PrintCondCode(dst);
-	_mesa_printf(")");
+	std::printf(")");
     }
 }
 
@@ -1661,16 +1661,16 @@ _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 	for (i = 0; Instructions[i].name; i++) {
 	    if (inst->Opcode == Instructions[i].opcode) {
 		/* print instruction name */
-		_mesa_printf("%s", Instructions[i].name);
+		std::printf("%s", Instructions[i].name);
 		if (inst->Precision == FLOAT16)
-		    _mesa_printf("H");
+		    std::printf("H");
 		else if (inst->Precision == FIXED12)
-		    _mesa_printf("X");
+		    std::printf("X");
 		if (inst->CondUpdate)
-		    _mesa_printf("C");
+		    std::printf("C");
 		if (inst->SaturateMode == SATURATE_ZERO_ONE)
-		    _mesa_printf("_SAT");
-		_mesa_printf(" ");
+		    std::printf("_SAT");
+		std::printf(" ");
 
 		if (Instructions[i].inputs == INPUT_CC) {
 		    PrintCondCode(&inst->DstReg);
@@ -1678,7 +1678,7 @@ _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 			   Instructions[i].outputs == OUTPUT_S) {
 		    /* print dest register */
 		    PrintDstReg(&inst->DstReg);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		}
 
 		/* print source register(s) */
@@ -1688,36 +1688,36 @@ _mesa_print_nv_fragment_program(const struct gl_fragment_program *program)
 		} else if (Instructions[i].inputs == INPUT_2V ||
 			   Instructions[i].inputs == INPUT_2S) {
 		    PrintSrcReg(program, &inst->SrcReg[0]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintSrcReg(program, &inst->SrcReg[1]);
 		} else if (Instructions[i].inputs == INPUT_3V) {
 		    PrintSrcReg(program, &inst->SrcReg[0]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintSrcReg(program, &inst->SrcReg[1]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintSrcReg(program, &inst->SrcReg[2]);
 		} else if (Instructions[i].inputs == INPUT_1V_T) {
 		    PrintSrcReg(program, &inst->SrcReg[0]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintTextureSrc(inst);
 		} else if (Instructions[i].inputs == INPUT_3V_T) {
 		    PrintSrcReg(program, &inst->SrcReg[0]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintSrcReg(program, &inst->SrcReg[1]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintSrcReg(program, &inst->SrcReg[2]);
-		    _mesa_printf(", ");
+		    std::printf(", ");
 		    PrintTextureSrc(inst);
 		}
-		_mesa_printf(";\n");
+		std::printf(";\n");
 		break;
 	    }
 	}
 	if (!Instructions[i].name) {
-	    _mesa_printf("Invalid opcode %d\n", inst->Opcode);
+	    std::printf("Invalid opcode %d\n", inst->Opcode);
 	}
     }
-    _mesa_printf("END\n");
+    std::printf("END\n");
 }
 
 

@@ -185,35 +185,35 @@ void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, GLboolean culling)
     GLfloat *d = reinterpret_cast<GLfloat *>(v->data);
     GLuint j, i = 0, count;
 
-    _mesa_printf("data-start\n");
+    std::printf("data-start\n");
     for (; d != v->start ; STRIDE_F(d, v->stride), i++)
-	_mesa_printf(t, i, d[0], d[1], d[2], d[3]);
+	std::printf(t, i, d[0], d[1], d[2], d[3]);
 
-    _mesa_printf("start-count(%u)\n", v->count);
+    std::printf("start-count(%u)\n", v->count);
     count = i + v->count;
 
     if (culling) {
 	for (; i < count ; STRIDE_F(d, v->stride), i++)
 	    if (cullmask[i])
-		_mesa_printf(t, i, d[0], d[1], d[2], d[3]);
+		std::printf(t, i, d[0], d[1], d[2], d[3]);
     } else {
 	for (; i < count ; STRIDE_F(d, v->stride), i++)
-	    _mesa_printf(t, i, d[0], d[1], d[2], d[3]);
+	    std::printf(t, i, d[0], d[1], d[2], d[3]);
     }
 
     for (j = v->size ; j < 4; j++) {
 	if ((v->flags & (1<<j)) == 0) {
 
-	    _mesa_printf("checking col %u is clean as advertised ", j);
+	    std::printf("checking col %u is clean as advertised ", j);
 
 	    for (i = 0, d = reinterpret_cast<GLfloat *>(v->data) ;
 		 i < count && d[j] == c[j] ;
 		 i++, STRIDE_F(d, v->stride)) {};
 
 	    if (i == count)
-		_mesa_printf(" --> ok\n");
+		std::printf(" --> ok\n");
 	    else
-		_mesa_printf(" --> Failed at %u ******\n", i);
+		std::printf(" --> Failed at %u ******\n", i);
 	}
     }
 }
