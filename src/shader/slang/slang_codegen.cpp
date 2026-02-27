@@ -866,8 +866,6 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     GLuint i;
     slang_operation *inlined;
     const bool haveRetValue = _slang_function_has_return_value(fun);
-    slang_variable **substOld;
-    slang_operation **substNew;
 
     ASSERT(slang_is_asm_function(fun));
     ASSERT(fun->param_count == numArgs + haveRetValue);
@@ -881,8 +879,8 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     /*
      * We'll substitute formal params with actual args in the asm call.
      */
-    substOld = new slang_variable *[numArgs];
-    substNew = new slang_operation *[numArgs];
+    std::vector<slang_variable *> substOld(numArgs);
+    std::vector<slang_operation *> substNew(numArgs);
     for (i = 0; i < numArgs; i++) {
 	substOld[i] = fun->parameters->variables[i];
 	substNew[i] = &oper->children[i];
@@ -900,10 +898,7 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     }
 
     /* now do formal->actual substitutions */
-    slang_substitute(A, inlined, numArgs, substOld, substNew, false);
-
-    delete[] substOld;
-    delete[] substNew;
+    slang_substitute(A, inlined, numArgs, substOld.data(), substNew.data(), false);
 
     return inlined;
 }
@@ -922,14 +917,11 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	COPY_IN,
 	COPY_OUT
     };
-    ParamMode *paramMode;
     const bool haveRetValue = _slang_function_has_return_value(fun);
     const GLuint numArgs = (GLuint)oper->children.size();
     const GLuint totalArgs = numArgs + haveRetValue;
     slang_operation *args = oper->children.data();
     slang_operation *inlined, *top;
-    slang_variable **substOld;
-    slang_operation **substNew;
     GLuint substCount, numCopyIn, i;
     slang_function *prevFunction;
 
@@ -940,10 +932,10 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     /*assert(oper->type == SLANG_OPER_CALL); (or (matrix) multiply, etc) */
     assert(fun->param_count == totalArgs);
 
-    /* allocate temporary arrays */
-    paramMode = new ParamMode[totalArgs];
-    substOld = new slang_variable *[totalArgs];
-    substNew = new slang_operation *[totalArgs];
+    /* allocate temporary arrays (RAII: no manual delete[] needed) */
+    std::vector<ParamMode> paramMode(totalArgs);
+    std::vector<slang_variable *> substOld(totalArgs);
+    std::vector<slang_operation *> substNew(totalArgs);
 
 #if 0
     printf("Inline call to %s  (total vars=%d  nparams=%d)\n",
@@ -1072,7 +1064,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 #endif
 
     /* do parameter substitution in inlined code: */
-    slang_substitute(A, inlined, substCount, substOld, substNew, false);
+    slang_substitute(A, inlined, substCount, substOld.data(), substNew.data(), false);
 
 #if 0
     printf("======================= subst code ==========================\n");
@@ -1131,9 +1123,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	}
     }
 
-    delete[] paramMode;
-    delete[] substOld;
-    delete[] substNew;
+    /* paramMode, substOld, substNew are std::vector - auto-freed here */
 
 #if 0
     printf("Done Inline call to %s  (total vars=%d  nparams=%d)\n",

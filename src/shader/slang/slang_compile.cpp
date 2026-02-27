@@ -832,28 +832,19 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 
 static int
 handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
-		       slang_operation ** ops, unsigned int *total_ops,
+		       std::vector<slang_operation> * ops,
 		       unsigned int n)
 {
-    unsigned int i;
-
+    const unsigned int total = (unsigned int)ops->size();
     op->children.resize(n);
 
-    for (i = 0; i < n; i++) {
-	op->children[i] = std::move((*ops)[*total_ops - (n + 1 - i)]);
+    for (unsigned int i = 0; i < n; i++) {
+	op->children[i] = std::move((*ops)[total - (n + 1 - i)]);
     }
 
-    (*ops)[*total_ops - (n + 1)] = std::move((*ops)[*total_ops - 1]);
-    *total_ops -= n;
-
-    /* shrink ops array */
-    {
-	slang_operation *new_ops = new slang_operation[*total_ops];
-	for (unsigned int k = 0; k < *total_ops; k++)
-	    new_ops[k] = std::move((*ops)[k]);
-	delete[] *ops;
-	*ops = new_ops;
-    }
+    (*ops)[total - (n + 1)] = std::move((*ops)[total - 1]);
+    /* shrink: remove the last n elements */
+    ops->resize(total - n);
     return 1;
 }
 
@@ -870,24 +861,16 @@ static int
 parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		 slang_operation * oper)
 {
-    slang_operation *ops = nullptr;
-    unsigned int num_ops = 0;
+    std::vector<slang_operation> ops;
     int number;
 
     while (*C->I != OP_END) {
 	slang_operation *op;
 	const unsigned int op_code = *C->I++;
 
-	/* allocate default operation, becomes a no-op if not used  */
-	{
-	    slang_operation *new_ops = new slang_operation[num_ops + 1];
-	    for (unsigned int k = 0; k < num_ops; k++)
-		new_ops[k] = std::move(ops[k]);
-	    delete[] ops;
-	    ops = new_ops;
-	}
-	op = &ops[num_ops];
-	num_ops++;
+	/* push a new default operation onto the stack */
+	ops.emplace_back();
+	op = &ops.back();
 	op->locals->outer_scope = O->vars;
 
 	switch (op_code) {
@@ -931,32 +914,32 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		break;
 	    case OP_SEQUENCE:
 		op->type = SLANG_OPER_SEQUENCE;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_ASSIGN:
 		op->type = SLANG_OPER_ASSIGN;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_ADDASSIGN:
 		op->type = SLANG_OPER_ADDASSIGN;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_SUBASSIGN:
 		op->type = SLANG_OPER_SUBASSIGN;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_MULASSIGN:
 		op->type = SLANG_OPER_MULASSIGN;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_DIVASSIGN:
 		op->type = SLANG_OPER_DIVASSIGN;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    /*case OP_MODASSIGN: */
@@ -967,22 +950,22 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    /*case OP_ANDASSIGN: */
 	    case OP_SELECT:
 		op->type = SLANG_OPER_SELECT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 3))
+		if (!handle_nary_expression(C, op, &ops, 3))
 		    return 0;
 		break;
 	    case OP_LOGICALOR:
 		op->type = SLANG_OPER_LOGICALOR;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_LOGICALXOR:
 		op->type = SLANG_OPER_LOGICALXOR;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_LOGICALAND:
 		op->type = SLANG_OPER_LOGICALAND;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    /*case OP_BITOR: */
@@ -990,86 +973,86 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	    /*case OP_BITAND: */
 	    case OP_EQUAL:
 		op->type = SLANG_OPER_EQUAL;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_NOTEQUAL:
 		op->type = SLANG_OPER_NOTEQUAL;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_LESS:
 		op->type = SLANG_OPER_LESS;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_GREATER:
 		op->type = SLANG_OPER_GREATER;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_LESSEQUAL:
 		op->type = SLANG_OPER_LESSEQUAL;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_GREATEREQUAL:
 		op->type = SLANG_OPER_GREATEREQUAL;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    /*case OP_LSHIFT: */
 	    /*case OP_RSHIFT: */
 	    case OP_ADD:
 		op->type = SLANG_OPER_ADD;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_SUBTRACT:
 		op->type = SLANG_OPER_SUBTRACT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_MULTIPLY:
 		op->type = SLANG_OPER_MULTIPLY;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_DIVIDE:
 		op->type = SLANG_OPER_DIVIDE;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    /*case OP_MODULUS: */
 	    case OP_PREINCREMENT:
 		op->type = SLANG_OPER_PREINCREMENT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_PREDECREMENT:
 		op->type = SLANG_OPER_PREDECREMENT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_PLUS:
 		op->type = SLANG_OPER_PLUS;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_MINUS:
 		op->type = SLANG_OPER_MINUS;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_NOT:
 		op->type = SLANG_OPER_NOT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    /*case OP_COMPLEMENT: */
 	    case OP_SUBSCRIPT:
 		op->type = SLANG_OPER_SUBSCRIPT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 2))
+		if (!handle_nary_expression(C, op, &ops, 2))
 		    return 0;
 		break;
 	    case OP_CALL:
@@ -1098,17 +1081,17 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 		op->a_id = parse_identifier(C);
 		if (op->a_id == SLANG_ATOM_NULL)
 		    return 0;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_POSTINCREMENT:
 		op->type = SLANG_OPER_POSTINCREMENT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    case OP_POSTDECREMENT:
 		op->type = SLANG_OPER_POSTDECREMENT;
-		if (!handle_nary_expression(C, op, &ops, &num_ops, 1))
+		if (!handle_nary_expression(C, op, &ops, 1))
 		    return 0;
 		break;
 	    default:
@@ -1117,9 +1100,8 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
     }
     C->I++;
 
-    if (ops) {
+    if (!ops.empty()) {
 	*oper = std::move(ops[0]);  /* move assignment destroys oper's old state */
-	delete[] ops;
     } else {
 	/* Clear the operation if no result was produced */
 	slang_operation_destruct(oper);
