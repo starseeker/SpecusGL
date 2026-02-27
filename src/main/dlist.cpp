@@ -545,9 +545,9 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
 GLint
 _mesa_alloc_opcode(GLcontext *ctx,
 		   GLuint size,
-		   void (*execute)(GLcontext *, void *),
-		   void (*destroy)(GLcontext *, void *),
-		   void (*print)(GLcontext *, void *))
+		   std::function<void(GLcontext *, void *)> execute,
+		   std::function<void(GLcontext *, void *)> destroy,
+		   std::function<void(GLcontext *, void *)> print)
 {
     if (ctx->ListExt.NumOpcodes < MAX_DLIST_EXT_OPCODES) {
 	const GLuint i = ctx->ListExt.NumOpcodes++;

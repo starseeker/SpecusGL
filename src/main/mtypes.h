@@ -1701,11 +1701,11 @@ struct gl_viewport_attrib {
 struct gl_attrib_entry {
     GLbitfield kind    = 0;
     void      *data    = nullptr;
-    void     (*deleter)(void *) = nullptr;
+    std::function<void(void *)> deleter;
 
     gl_attrib_entry() = default;
-    gl_attrib_entry(GLbitfield k, void *d, void(*del)(void*))
-        : kind(k), data(d), deleter(del) {}
+    gl_attrib_entry(GLbitfield k, void *d, std::function<void(void *)> del)
+        : kind(k), data(d), deleter(std::move(del)) {}
 
     /** RAII destructor: frees the owned snapshot via the typed deleter. */
     ~gl_attrib_entry()
@@ -1720,7 +1720,7 @@ struct gl_attrib_entry {
 
     /** Movable: transfers ownership and resets source. */
     gl_attrib_entry(gl_attrib_entry &&o) noexcept
-        : kind(o.kind), data(o.data), deleter(o.deleter)
+        : kind(o.kind), data(o.data), deleter(std::move(o.deleter))
     {
         o.data    = nullptr;
         o.deleter = nullptr;
@@ -1729,7 +1729,7 @@ struct gl_attrib_entry {
     {
         if (this != &o) {
             if (data && deleter) deleter(data);
-            kind = o.kind; data = o.data; deleter = o.deleter;
+            kind = o.kind; data = o.data; deleter = std::move(o.deleter);
             o.data = nullptr; o.deleter = nullptr;
         }
         return *this;

@@ -74,9 +74,9 @@ extern void _mesa_compile_error(GLcontext *ctx, GLenum error, const char *s);
 extern void *_mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint sz);
 
 extern GLint _mesa_alloc_opcode(GLcontext *ctx, GLuint sz,
-				void (*execute)(GLcontext *, void *),
-				void (*destroy)(GLcontext *, void *),
-				void (*print)(GLcontext *, void *));
+				std::function<void(GLcontext *, void *)> execute,
+				std::function<void(GLcontext *, void *)> destroy,
+				std::function<void(GLcontext *, void *)> print);
 
 extern void _mesa_init_display_list(GLcontext * ctx);
 
