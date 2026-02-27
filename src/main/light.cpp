@@ -129,7 +129,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
 	    light->SpotCutoff = params[0];
-	    light->_CosCutoffNeg = (GLfloat)(cos(light->SpotCutoff * DEG2RAD));
+	    light->_CosCutoffNeg = static_cast<GLfloat>((cos(light->SpotCutoff * DEG2RAD)));
 	    if (light->_CosCutoffNeg < 0)
 		light->_CosCutoff = 0;
 	    else
@@ -183,10 +183,10 @@ void GLAPIENTRY
 _mesa_Lightfv(GLenum light, GLenum pname, const GLfloat *params)
 {
     GET_CURRENT_CONTEXT(ctx);
-    GLint i = (GLint)(light - GL_LIGHT0);
+    GLint i = static_cast<GLint>((light - GL_LIGHT0));
     GLfloat temp[4];
 
-    if (i < 0 || i >= (GLint) ctx->Const.MaxLights) {
+    if (i < 0 || i >= static_cast<GLint>(ctx->Const.MaxLights)) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glLight(light=0x%x)", light);
 	return;
     }
@@ -274,22 +274,22 @@ _mesa_Lightiv(GLenum light, GLenum pname, const GLint *params)
 	    fparam[3] = INT_TO_FLOAT(params[3]);
 	    break;
 	case GL_POSITION:
-	    fparam[0] = (GLfloat) params[0];
-	    fparam[1] = (GLfloat) params[1];
-	    fparam[2] = (GLfloat) params[2];
-	    fparam[3] = (GLfloat) params[3];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
+	    fparam[1] = static_cast<GLfloat>(params[1]);
+	    fparam[2] = static_cast<GLfloat>(params[2]);
+	    fparam[3] = static_cast<GLfloat>(params[3]);
 	    break;
 	case GL_SPOT_DIRECTION:
-	    fparam[0] = (GLfloat) params[0];
-	    fparam[1] = (GLfloat) params[1];
-	    fparam[2] = (GLfloat) params[2];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
+	    fparam[1] = static_cast<GLfloat>(params[1]);
+	    fparam[2] = static_cast<GLfloat>(params[2]);
 	    break;
 	case GL_SPOT_EXPONENT:
 	case GL_SPOT_CUTOFF:
 	case GL_CONSTANT_ATTENUATION:
 	case GL_LINEAR_ATTENUATION:
 	case GL_QUADRATIC_ATTENUATION:
-	    fparam[0] = (GLfloat) params[0];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
 	    break;
 	default:
 	    /* error will be caught later in gl_Lightfv */
@@ -305,10 +305,10 @@ void GLAPIENTRY
 _mesa_GetLightfv(GLenum light, GLenum pname, GLfloat *params)
 {
     GET_CURRENT_CONTEXT(ctx);
-    GLint l = (GLint)(light - GL_LIGHT0);
+    GLint l = static_cast<GLint>((light - GL_LIGHT0));
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    if (l < 0 || l >= (GLint) ctx->Const.MaxLights) {
+    if (l < 0 || l >= static_cast<GLint>(ctx->Const.MaxLights)) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetLightfv");
 	return;
     }
@@ -355,10 +355,10 @@ void GLAPIENTRY
 _mesa_GetLightiv(GLenum light, GLenum pname, GLint *params)
 {
     GET_CURRENT_CONTEXT(ctx);
-    GLint l = (GLint)(light - GL_LIGHT0);
+    GLint l = static_cast<GLint>((light - GL_LIGHT0));
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    if (l < 0 || l >= (GLint) ctx->Const.MaxLights) {
+    if (l < 0 || l >= static_cast<GLint>(ctx->Const.MaxLights)) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glGetLightiv");
 	return;
     }
@@ -383,30 +383,30 @@ _mesa_GetLightiv(GLenum light, GLenum pname, GLint *params)
 	    params[3] = FLOAT_TO_INT(ctx->Light.Light[l].Specular[3]);
 	    break;
 	case GL_POSITION:
-	    params[0] = (GLint) ctx->Light.Light[l].EyePosition[0];
-	    params[1] = (GLint) ctx->Light.Light[l].EyePosition[1];
-	    params[2] = (GLint) ctx->Light.Light[l].EyePosition[2];
-	    params[3] = (GLint) ctx->Light.Light[l].EyePosition[3];
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].EyePosition[0]);
+	    params[1] = static_cast<GLint>(ctx->Light.Light[l].EyePosition[1]);
+	    params[2] = static_cast<GLint>(ctx->Light.Light[l].EyePosition[2]);
+	    params[3] = static_cast<GLint>(ctx->Light.Light[l].EyePosition[3]);
 	    break;
 	case GL_SPOT_DIRECTION:
-	    params[0] = (GLint) ctx->Light.Light[l].EyeDirection[0];
-	    params[1] = (GLint) ctx->Light.Light[l].EyeDirection[1];
-	    params[2] = (GLint) ctx->Light.Light[l].EyeDirection[2];
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].EyeDirection[0]);
+	    params[1] = static_cast<GLint>(ctx->Light.Light[l].EyeDirection[1]);
+	    params[2] = static_cast<GLint>(ctx->Light.Light[l].EyeDirection[2]);
 	    break;
 	case GL_SPOT_EXPONENT:
-	    params[0] = (GLint) ctx->Light.Light[l].SpotExponent;
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].SpotExponent);
 	    break;
 	case GL_SPOT_CUTOFF:
-	    params[0] = (GLint) ctx->Light.Light[l].SpotCutoff;
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].SpotCutoff);
 	    break;
 	case GL_CONSTANT_ATTENUATION:
-	    params[0] = (GLint) ctx->Light.Light[l].ConstantAttenuation;
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].ConstantAttenuation);
 	    break;
 	case GL_LINEAR_ATTENUATION:
-	    params[0] = (GLint) ctx->Light.Light[l].LinearAttenuation;
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].LinearAttenuation);
 	    break;
 	case GL_QUADRATIC_ATTENUATION:
-	    params[0] = (GLint) ctx->Light.Light[l].QuadraticAttenuation;
+	    params[0] = static_cast<GLint>(ctx->Light.Light[l].QuadraticAttenuation);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetLightiv");
@@ -455,13 +455,13 @@ _mesa_LightModelfv(GLenum pname, const GLfloat *params)
 		ctx->_TriangleCaps &= ~DD_TRI_LIGHT_TWOSIDE;
 	    break;
 	case GL_LIGHT_MODEL_COLOR_CONTROL:
-	    if (params[0] == (GLfloat) GL_SINGLE_COLOR)
+	    if (params[0] == static_cast<GLfloat>(GL_SINGLE_COLOR))
 		newenum = GL_SINGLE_COLOR;
-	    else if (params[0] == (GLfloat) GL_SEPARATE_SPECULAR_COLOR)
+	    else if (params[0] == static_cast<GLfloat>(GL_SEPARATE_SPECULAR_COLOR))
 		newenum = GL_SEPARATE_SPECULAR_COLOR;
 	    else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glLightModel(param=0x0%x)",
-			    (GLint) params[0]);
+			    static_cast<GLint>(params[0]));
 		return;
 	    }
 	    if (ctx->Light.Model.ColorControl == newenum)
@@ -494,7 +494,7 @@ _mesa_LightModeliv(GLenum pname, const GLint *params)
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	case GL_LIGHT_MODEL_TWO_SIDE:
 	case GL_LIGHT_MODEL_COLOR_CONTROL:
-	    fparam[0] = (GLfloat) params[0];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
 	    break;
 	default:
 	    /* Error will be caught later in gl_LightModelfv */
@@ -898,13 +898,13 @@ gl_light::validate_spot_exp_table()
 
     for (i = EXP_TABLE_SIZE - 1; i > 0 ; i--) {
 	if (clamp == 0) {
-	    tmp = pow(i / (GLdouble)(EXP_TABLE_SIZE - 1), exponent);
+	    tmp = pow(i / static_cast<GLdouble>((EXP_TABLE_SIZE - 1)), exponent);
 	    if (tmp < FLT_MIN * 100.0) {
 		tmp = 0.0;
 		clamp = 1;
 	    }
 	}
-	_SpotExpTable[i][0] = (GLfloat) tmp;
+	_SpotExpTable[i][0] = static_cast<GLfloat>(tmp);
     }
     for (i = 0; i < EXP_TABLE_SIZE - 1; i++) {
 	_SpotExpTable[i][1] = (_SpotExpTable[i+1][0] - _SpotExpTable[i][0]);
@@ -963,12 +963,12 @@ validate_shine_table(GLcontext *ctx, GLuint side, GLfloat shininess)
 		m[j] = 1.0;
 	} else {
 	    for (j = 1 ; j < SHINE_TABLE_SIZE ; j++) {
-		GLdouble t, x = j / (GLfloat)(SHINE_TABLE_SIZE - 1);
+		GLdouble t, x = j / static_cast<GLfloat>((SHINE_TABLE_SIZE - 1));
 		if (x < 0.005) /* underflow check */
 		    x = 0.005;
 		t = pow(x, shininess);
 		if (t > 1e-20)
-		    m[j] = (GLfloat) t;
+		    m[j] = static_cast<GLfloat>(t);
 		else
 		    m[j] = 0.0;
 	    }
@@ -1161,8 +1161,8 @@ compute_light_positions(GLcontext *ctx)
 		    double x = PV_dot_dir * (EXP_TABLE_SIZE-1);
 		    int k = (int) x;
 		    light->_VP_inf_spot_attenuation =
-			(GLfloat)(light->_SpotExpTable[k][0] +
-				  (x-k)*light->_SpotExpTable[k][1]);
+			static_cast<GLfloat>((light->_SpotExpTable[k][0] +
+				  (x-k)*light->_SpotExpTable[k][1]));
 		} else {
 		    light->_VP_inf_spot_attenuation = 0;
 		}
@@ -1182,9 +1182,9 @@ update_modelview_scale(GLcontext *ctx)
 	GLfloat f = m[2] * m[2] + m[6] * m[6] + m[10] * m[10];
 	if (f < 1e-12) f = 1.0;
 	if (ctx->_NeedEyeCoords)
-	    ctx->_ModelViewInvScale = (GLfloat) INV_SQRTF(f);
+	    ctx->_ModelViewInvScale = static_cast<GLfloat>(INV_SQRTF(f));
 	else
-	    ctx->_ModelViewInvScale = (GLfloat) SQRTF(f);
+	    ctx->_ModelViewInvScale = static_cast<GLfloat>(SQRTF(f));
     }
 }
 

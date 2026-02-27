@@ -1109,7 +1109,7 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_z32(TEXSTORE_PARAMS)
 {
-    const GLfloat depthScale = (GLfloat) 0xffffffff;
+    const GLfloat depthScale = static_cast<GLfloat>(0xffffffff);
     (void) dims;
     ASSERT(dstFormat == &_mesa_texformat_z32);
     ASSERT(dstFormat->TexelBytes == sizeof(GLuint));
@@ -2305,7 +2305,7 @@ _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
 GLboolean
 _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
 {
-    const GLfloat depthScale = (GLfloat) 0xffffff;
+    const GLfloat depthScale = static_cast<GLfloat>(0xffffff);
 
     ASSERT(dstFormat == &_mesa_texformat_z24_s8);
     ASSERT(srcFormat == GL_DEPTH_STENCIL_EXT);
@@ -3276,7 +3276,7 @@ _mesa_store_compressed_teximage2d(GLcontext *ctx, GLenum target, GLint level,
 	return;
 
     /* copy the data */
-    ASSERT(texImage->CompressedSize == (GLuint) imageSize);
+    ASSERT(texImage->CompressedSize == static_cast<GLuint>(imageSize));
     memcpy(texImage->Data, data, imageSize);
 
     /* GL_SGIS_generate_mipmap */

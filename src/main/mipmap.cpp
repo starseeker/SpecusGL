@@ -61,7 +61,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLchan(*rowA)[4] = (const GLchan(*)[4]) srcRowA;
 	    const GLchan(*rowB)[4] = (const GLchan(*)[4]) srcRowB;
 	    GLchan(*dst)[4] = (GLchan(*)[4]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) / 4;
@@ -79,7 +79,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLchan(*rowA)[3] = (const GLchan(*)[3]) srcRowA;
 	    const GLchan(*rowB)[3] = (const GLchan(*)[3]) srcRowB;
 	    GLchan(*dst)[3] = (GLchan(*)[3]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) / 4;
@@ -97,7 +97,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLchan *rowA = (const GLchan *) srcRowA;
 	    const GLchan *rowB = (const GLchan *) srcRowB;
 	    GLchan *dst = (GLchan *) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) / 4;
 	    }
@@ -108,7 +108,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLchan(*rowA)[2] = (const GLchan(*)[2]) srcRowA;
 	    const GLchan(*rowB)[2] = (const GLchan(*)[2]) srcRowB;
 	    GLchan(*dst)[2] = (GLchan(*)[2]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) / 4;
@@ -122,7 +122,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLuint *rowA = static_cast<const GLuint *>(srcRowA);
 	    const GLuint *rowB = static_cast<const GLuint *>(srcRowB);
 	    GLfloat *dst = static_cast<GLfloat *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = rowA[j] / 4 + rowA[k] / 4 + rowB[j] / 4 + rowB[k] / 4;
 	    }
@@ -133,7 +133,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
 	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
 	    GLushort *dst = static_cast<GLushort *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) / 4;
 	    }
@@ -152,7 +152,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLubyte(*rowA)[4] = (const GLubyte(*)[4]) srcRowA;
 	    const GLubyte(*rowB)[4] = (const GLubyte(*)[4]) srcRowB;
 	    GLubyte(*dst)[4] = (GLubyte(*)[4]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) / 4;
@@ -175,7 +175,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLubyte(*rowA)[3] = (const GLubyte(*)[3]) srcRowA;
 	    const GLubyte(*rowB)[3] = (const GLubyte(*)[3]) srcRowB;
 	    GLubyte(*dst)[3] = (GLubyte(*)[3]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) / 4;
@@ -192,7 +192,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
 	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
 	    GLushort *dst = static_cast<GLushort *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x1f;
 		const GLint rowAr1 = rowA[k] & 0x1f;
@@ -219,7 +219,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
 	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
 	    GLushort *dst = static_cast<GLushort *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0xf;
 		const GLint rowAr1 = rowA[k] & 0xf;
@@ -251,7 +251,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
 	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
 	    GLushort *dst = static_cast<GLushort *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x1f;
 		const GLint rowAr1 = rowA[k] & 0x1f;
@@ -287,7 +287,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLubyte(*rowA)[2] = (const GLubyte(*)[2]) srcRowA;
 	    const GLubyte(*rowB)[2] = (const GLubyte(*)[2]) srcRowB;
 	    GLubyte(*dst)[2] = (GLubyte(*)[2]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) >> 2;
@@ -301,7 +301,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLubyte *rowA = static_cast<const GLubyte *>(srcRowA);
 	    const GLubyte *rowB = static_cast<const GLubyte *>(srcRowB);
 	    GLubyte *dst = static_cast<GLubyte *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x3;
 		const GLint rowAr1 = rowA[k] & 0x3;
@@ -334,7 +334,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLubyte *rowA = static_cast<const GLubyte *>(srcRowA);
 	    const GLubyte *rowB = static_cast<const GLubyte *>(srcRowB);
 	    GLubyte *dst = static_cast<GLubyte *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) >> 2;
 	    }
@@ -345,7 +345,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLfloat(*rowA)[4] = (const GLfloat(*)[4]) srcRowA;
 	    const GLfloat(*rowB)[4] = (const GLfloat(*)[4]) srcRowB;
 	    GLfloat(*dst)[4] = (GLfloat(*)[4]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) * 0.25F;
@@ -363,7 +363,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLhalfARB(*rowA)[4] = (const GLhalfARB(*)[4]) srcRowA;
 	    const GLhalfARB(*rowB)[4] = (const GLhalfARB(*)[4]) srcRowB;
 	    GLhalfARB(*dst)[4] = (GLhalfARB(*)[4]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 4; comp++) {
 		    GLfloat aj, ak, bj, bk;
@@ -381,7 +381,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLfloat(*rowA)[3] = (const GLfloat(*)[3]) srcRowA;
 	    const GLfloat(*rowB)[3] = (const GLfloat(*)[3]) srcRowB;
 	    GLfloat(*dst)[3] = (GLfloat(*)[3]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) * 0.25F;
@@ -397,7 +397,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLhalfARB(*rowA)[3] = (const GLhalfARB(*)[3]) srcRowA;
 	    const GLhalfARB(*rowB)[3] = (const GLhalfARB(*)[3]) srcRowB;
 	    GLhalfARB(*dst)[3] = (GLhalfARB(*)[3]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 3; comp++) {
 		    GLfloat aj, ak, bj, bk;
@@ -415,7 +415,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLfloat(*rowA)[2] = (const GLfloat(*)[2]) srcRowA;
 	    const GLfloat(*rowB)[2] = (const GLfloat(*)[2]) srcRowB;
 	    GLfloat(*dst)[2] = (GLfloat(*)[2]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
 			     rowB[j][0] + rowB[k][0]) * 0.25F;
@@ -429,7 +429,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLhalfARB(*rowA)[2] = (const GLhalfARB(*)[2]) srcRowA;
 	    const GLhalfARB(*rowB)[2] = (const GLhalfARB(*)[2]) srcRowB;
 	    GLhalfARB(*dst)[2] = (GLhalfARB(*)[2]) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 2; comp++) {
 		    GLfloat aj, ak, bj, bk;
@@ -449,7 +449,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLfloat *rowA = static_cast<const GLfloat *>(srcRowA);
 	    const GLfloat *rowB = static_cast<const GLfloat *>(srcRowB);
 	    GLfloat *dst = static_cast<GLfloat *>(dstRow);
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) * 0.25F;
 	    }
@@ -462,7 +462,7 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	    const GLhalfARB *rowA = (const GLhalfARB *) srcRowA;
 	    const GLhalfARB *rowB = (const GLhalfARB *) srcRowB;
 	    GLhalfARB *dst = (GLhalfARB *) dstRow;
-	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
+	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		GLfloat aj, ak, bj, bk;
 		aj = _mesa_half_to_float(rowA[j]);

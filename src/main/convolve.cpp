@@ -318,10 +318,10 @@ _mesa_ConvolutionParameterf(GLenum target, GLenum pname, GLfloat param)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_MODE:
-	    if (param == (GLfloat) GL_REDUCE ||
-		param == (GLfloat) GL_CONSTANT_BORDER ||
-		param == (GLfloat) GL_REPLICATE_BORDER) {
-		ctx->Pixel.ConvolutionBorderMode[c] = (GLenum) param;
+	    if (param == static_cast<GLfloat>(GL_REDUCE) ||
+		param == static_cast<GLfloat>(GL_CONSTANT_BORDER) ||
+		param == static_cast<GLfloat>(GL_REPLICATE_BORDER)) {
+		ctx->Pixel.ConvolutionBorderMode[c] = static_cast<GLenum>(param);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameterf(params)");
 		return;
@@ -363,10 +363,10 @@ _mesa_ConvolutionParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 	    COPY_4V(ctx->Pixel.ConvolutionBorderColor[c], params);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
-	    if (params[0] == (GLfloat) GL_REDUCE ||
-		params[0] == (GLfloat) GL_CONSTANT_BORDER ||
-		params[0] == (GLfloat) GL_REPLICATE_BORDER) {
-		ctx->Pixel.ConvolutionBorderMode[c] = (GLenum) params[0];
+	    if (params[0] == static_cast<GLfloat>(GL_REDUCE) ||
+		params[0] == static_cast<GLfloat>(GL_CONSTANT_BORDER) ||
+		params[0] == static_cast<GLfloat>(GL_REPLICATE_BORDER)) {
+		ctx->Pixel.ConvolutionBorderMode[c] = static_cast<GLenum>(params[0]);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameterfv(params)");
 		return;
@@ -411,10 +411,10 @@ _mesa_ConvolutionParameteri(GLenum target, GLenum pname, GLint param)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_MODE:
-	    if (param == (GLint) GL_REDUCE ||
-		param == (GLint) GL_CONSTANT_BORDER ||
-		param == (GLint) GL_REPLICATE_BORDER) {
-		ctx->Pixel.ConvolutionBorderMode[c] = (GLenum) param;
+	    if (param == static_cast<GLint>(GL_REDUCE) ||
+		param == static_cast<GLint>(GL_CONSTANT_BORDER) ||
+		param == static_cast<GLint>(GL_REPLICATE_BORDER)) {
+		ctx->Pixel.ConvolutionBorderMode[c] = static_cast<GLenum>(param);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameteri(params)");
 		return;
@@ -459,10 +459,10 @@ _mesa_ConvolutionParameteriv(GLenum target, GLenum pname, const GLint *params)
 	    ctx->Pixel.ConvolutionBorderColor[c][3] = INT_TO_FLOAT(params[3]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
-	    if (params[0] == (GLint) GL_REDUCE ||
-		params[0] == (GLint) GL_CONSTANT_BORDER ||
-		params[0] == (GLint) GL_REPLICATE_BORDER) {
-		ctx->Pixel.ConvolutionBorderMode[c] = (GLenum) params[0];
+	    if (params[0] == static_cast<GLint>(GL_REDUCE) ||
+		params[0] == static_cast<GLint>(GL_CONSTANT_BORDER) ||
+		params[0] == static_cast<GLint>(GL_REPLICATE_BORDER)) {
+		ctx->Pixel.ConvolutionBorderMode[c] = static_cast<GLenum>(params[0]);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameteriv(params)");
 		return;
@@ -471,18 +471,18 @@ _mesa_ConvolutionParameteriv(GLenum target, GLenum pname, const GLint *params)
 	case GL_CONVOLUTION_FILTER_SCALE:
 	    /* COPY_4V(ctx->Pixel.ConvolutionFilterScale[c], params); */
 	    /* need cast to prevent compiler warnings */
-	    ctx->Pixel.ConvolutionFilterScale[c][0] = (GLfloat) params[0];
-	    ctx->Pixel.ConvolutionFilterScale[c][1] = (GLfloat) params[1];
-	    ctx->Pixel.ConvolutionFilterScale[c][2] = (GLfloat) params[2];
-	    ctx->Pixel.ConvolutionFilterScale[c][3] = (GLfloat) params[3];
+	    ctx->Pixel.ConvolutionFilterScale[c][0] = static_cast<GLfloat>(params[0]);
+	    ctx->Pixel.ConvolutionFilterScale[c][1] = static_cast<GLfloat>(params[1]);
+	    ctx->Pixel.ConvolutionFilterScale[c][2] = static_cast<GLfloat>(params[2]);
+	    ctx->Pixel.ConvolutionFilterScale[c][3] = static_cast<GLfloat>(params[3]);
 	    break;
 	case GL_CONVOLUTION_FILTER_BIAS:
 	    /* COPY_4V(ctx->Pixel.ConvolutionFilterBias[c], params); */
 	    /* need cast to prevent compiler warnings */
-	    ctx->Pixel.ConvolutionFilterBias[c][0] = (GLfloat) params[0];
-	    ctx->Pixel.ConvolutionFilterBias[c][1] = (GLfloat) params[1];
-	    ctx->Pixel.ConvolutionFilterBias[c][2] = (GLfloat) params[2];
-	    ctx->Pixel.ConvolutionFilterBias[c][3] = (GLfloat) params[3];
+	    ctx->Pixel.ConvolutionFilterBias[c][0] = static_cast<GLfloat>(params[0]);
+	    ctx->Pixel.ConvolutionFilterBias[c][1] = static_cast<GLfloat>(params[1]);
+	    ctx->Pixel.ConvolutionFilterBias[c][2] = static_cast<GLfloat>(params[2]);
+	    ctx->Pixel.ConvolutionFilterBias[c][3] = static_cast<GLfloat>(params[3]);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameteriv(pname)");
@@ -661,7 +661,7 @@ _mesa_GetConvolutionParameterfv(GLenum target, GLenum pname, GLfloat *params)
 	    COPY_4V(params, ctx->Pixel.ConvolutionBorderColor[c]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
-	    *params = (GLfloat) ctx->Pixel.ConvolutionBorderMode[c];
+	    *params = static_cast<GLfloat>(ctx->Pixel.ConvolutionBorderMode[c]);
 	    break;
 	case GL_CONVOLUTION_FILTER_SCALE:
 	    COPY_4V(params, ctx->Pixel.ConvolutionFilterScale[c]);
@@ -670,19 +670,19 @@ _mesa_GetConvolutionParameterfv(GLenum target, GLenum pname, GLfloat *params)
 	    COPY_4V(params, ctx->Pixel.ConvolutionFilterBias[c]);
 	    break;
 	case GL_CONVOLUTION_FORMAT:
-	    *params = (GLfloat) conv->Format;
+	    *params = static_cast<GLfloat>(conv->Format);
 	    break;
 	case GL_CONVOLUTION_WIDTH:
-	    *params = (GLfloat) conv->Width;
+	    *params = static_cast<GLfloat>(conv->Width);
 	    break;
 	case GL_CONVOLUTION_HEIGHT:
-	    *params = (GLfloat) conv->Height;
+	    *params = static_cast<GLfloat>(conv->Height);
 	    break;
 	case GL_MAX_CONVOLUTION_WIDTH:
-	    *params = (GLfloat) ctx->Const.MaxConvolutionWidth;
+	    *params = static_cast<GLfloat>(ctx->Const.MaxConvolutionWidth);
 	    break;
 	case GL_MAX_CONVOLUTION_HEIGHT:
-	    *params = (GLfloat) ctx->Const.MaxConvolutionHeight;
+	    *params = static_cast<GLfloat>(ctx->Const.MaxConvolutionHeight);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetConvolutionParameterfv(pname)");
@@ -725,34 +725,34 @@ _mesa_GetConvolutionParameteriv(GLenum target, GLenum pname, GLint *params)
 	    params[3] = FLOAT_TO_INT(ctx->Pixel.ConvolutionBorderColor[c][3]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
-	    *params = (GLint) ctx->Pixel.ConvolutionBorderMode[c];
+	    *params = static_cast<GLint>(ctx->Pixel.ConvolutionBorderMode[c]);
 	    break;
 	case GL_CONVOLUTION_FILTER_SCALE:
-	    params[0] = (GLint) ctx->Pixel.ConvolutionFilterScale[c][0];
-	    params[1] = (GLint) ctx->Pixel.ConvolutionFilterScale[c][1];
-	    params[2] = (GLint) ctx->Pixel.ConvolutionFilterScale[c][2];
-	    params[3] = (GLint) ctx->Pixel.ConvolutionFilterScale[c][3];
+	    params[0] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterScale[c][0]);
+	    params[1] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterScale[c][1]);
+	    params[2] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterScale[c][2]);
+	    params[3] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterScale[c][3]);
 	    break;
 	case GL_CONVOLUTION_FILTER_BIAS:
-	    params[0] = (GLint) ctx->Pixel.ConvolutionFilterBias[c][0];
-	    params[1] = (GLint) ctx->Pixel.ConvolutionFilterBias[c][1];
-	    params[2] = (GLint) ctx->Pixel.ConvolutionFilterBias[c][2];
-	    params[3] = (GLint) ctx->Pixel.ConvolutionFilterBias[c][3];
+	    params[0] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterBias[c][0]);
+	    params[1] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterBias[c][1]);
+	    params[2] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterBias[c][2]);
+	    params[3] = static_cast<GLint>(ctx->Pixel.ConvolutionFilterBias[c][3]);
 	    break;
 	case GL_CONVOLUTION_FORMAT:
-	    *params = (GLint) conv->Format;
+	    *params = static_cast<GLint>(conv->Format);
 	    break;
 	case GL_CONVOLUTION_WIDTH:
-	    *params = (GLint) conv->Width;
+	    *params = static_cast<GLint>(conv->Width);
 	    break;
 	case GL_CONVOLUTION_HEIGHT:
-	    *params = (GLint) conv->Height;
+	    *params = static_cast<GLint>(conv->Height);
 	    break;
 	case GL_MAX_CONVOLUTION_WIDTH:
-	    *params = (GLint) ctx->Const.MaxConvolutionWidth;
+	    *params = static_cast<GLint>(ctx->Const.MaxConvolutionWidth);
 	    break;
 	case GL_MAX_CONVOLUTION_HEIGHT:
-	    *params = (GLint) ctx->Const.MaxConvolutionHeight;
+	    *params = static_cast<GLint>(ctx->Const.MaxConvolutionHeight);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetConvolutionParameteriv(pname)");

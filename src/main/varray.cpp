@@ -74,8 +74,8 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
      * be sure we won't go out of bounds.
      */
     if (ctx->Array.ArrayBufferObj->Name)
-	array->_MaxElement = ((GLsizeiptrARB) ctx->Array.ArrayBufferObj->Data.size()
-			      - (GLsizeiptrARB) array->Ptr + array->StrideB
+	array->_MaxElement = (static_cast<GLsizeiptrARB>(ctx->Array.ArrayBufferObj->Data.size())
+			      - reinterpret_cast<GLsizeiptrARB>(array->Ptr) + array->StrideB
 			      - elementSize) / array->StrideB;
     else
 #endif
@@ -863,7 +863,7 @@ _mesa_LockArraysEXT(GLint first, GLsizei count)
 	_mesa_debug(ctx, "glLockArrays %d %d\n", first, count);
 
     if (first == 0 && count > 0 &&
-	count <= (GLint) ctx->Const.MaxArrayLockSize) {
+	count <= static_cast<GLint>(ctx->Const.MaxArrayLockSize)) {
 	ctx->Array.LockFirst = first;
 	ctx->Array.LockCount = count;
     } else {
