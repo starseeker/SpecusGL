@@ -3540,8 +3540,8 @@ _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
 		    GLfloat depthRow[MAX_WIDTH];
 		    GLint col;
 		    for (col = 0; col < width; col++) {
-			(*texImage->FetchTexelf)(texImage, col, row, img,
-						 depthRow + col);
+			texImage->FetchTexelf(texImage, col, row, img,
+					      depthRow + col);
 		    }
 		    _mesa_pack_depth_span(ctx, width, dest, type,
 					  depthRow, &ctx->Pack);
@@ -3585,7 +3585,7 @@ _mesa_get_teximage(GLcontext *ctx, GLenum target, GLint level,
 		    GLfloat rgba[MAX_WIDTH][4];
 		    GLint col;
 		    for (col = 0; col < width; col++) {
-			(*texImage->FetchTexelf)(texImage, col, row, img, rgba[col]);
+			texImage->FetchTexelf(texImage, col, row, img, rgba[col]);
 			if (texImage->TexFormat->BaseFormat == GL_ALPHA) {
 			    rgba[col][RCOMP] = 0.0;
 			    rgba[col][GCOMP] = 0.0;

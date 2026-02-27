@@ -65,7 +65,7 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
     if (array->BufferObj->unref()) {
 	assert(array->BufferObj->Name);
 	_mesa_remove_buffer_object(ctx, array->BufferObj);
-	(*ctx->Driver.DeleteBuffer)(ctx, array->BufferObj);
+	ctx->Driver.DeleteBuffer(ctx, array->BufferObj);
     }
     array->BufferObj = ctx->Array.ArrayBufferObj;
     array->BufferObj->ref();

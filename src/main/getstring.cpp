@@ -70,7 +70,7 @@ _mesa_GetString(GLenum name)
     assert(ctx->Driver.GetString);
     {
 	/* Give the driver the chance to handle this query */
-	const GLubyte *str = (*ctx->Driver.GetString)(ctx, name);
+	const GLubyte *str = ctx->Driver.GetString(ctx, name);
 	if (str)
 	    return str;
     }
@@ -189,7 +189,7 @@ _mesa_GetPointerv(GLenum pname, GLvoid **params)
 	_mesa_debug(ctx, "glGetPointerv %s\n", _mesa_lookup_enum_by_nr(pname));
 
     if (ctx->Driver.GetPointerv
-	&& (*ctx->Driver.GetPointerv)(ctx, pname, params))
+	&& ctx->Driver.GetPointerv(ctx, pname, params))
 	return;
 
     switch (pname) {

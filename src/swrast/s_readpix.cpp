@@ -232,7 +232,6 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
 						format, type, 0, 0));
 	GLint row;
-	assert(rb->GetRow);
 	for (row = 0; row < height; row++) {
 	    rb->GetRow(ctx, width, x, y + row, dest);
 	    dest += dstStride;
@@ -249,7 +248,6 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
 						format, type, 0, 0));
 	GLint row;
-	assert(rb->GetRow);
 	for (row = 0; row < height; row++) {
 	    GLubyte tempRow[MAX_WIDTH][4];
 	    GLint col;

@@ -162,7 +162,7 @@ struct SWcontext {
     GLuint StateChanges;
     GLenum Primitive;    /* current primitive being drawn (ala glBegin) */
 
-    void (*InvalidateState)(GLcontext *ctx, GLbitfield new_state);
+    std::function<void(GLcontext *ctx, GLbitfield new_state)> InvalidateState;
 
     /**
      * When the NewState mask intersects these masks, we invalidate the
@@ -179,9 +179,9 @@ struct SWcontext {
      * Will be called when the GL state change mask intersects the above masks.
      */
     /*@{*/
-    void (*choose_point)(GLcontext *);
-    void (*choose_line)(GLcontext *);
-    void (*choose_triangle)(GLcontext *);
+    std::function<void(GLcontext *)> choose_point;
+    std::function<void(GLcontext *)> choose_line;
+    std::function<void(GLcontext *)> choose_triangle;
     /*@}*/
 
     /**
@@ -248,14 +248,14 @@ _swrast_update_texture_samplers(GLcontext *ctx);
 #define RENDER_START(SWctx, GLctx)			\
    do {							\
       if ((SWctx)->Driver.SpanRenderStart) {		\
-         (*(SWctx)->Driver.SpanRenderStart)(GLctx);	\
+         (SWctx)->Driver.SpanRenderStart(GLctx);	\
       }							\
    } while (0)
 
 #define RENDER_FINISH(SWctx, GLctx)			\
    do {							\
       if ((SWctx)->Driver.SpanRenderFinish) {		\
-         (*(SWctx)->Driver.SpanRenderFinish)(GLctx);	\
+         (SWctx)->Driver.SpanRenderFinish(GLctx);	\
       }							\
    } while (0)
 

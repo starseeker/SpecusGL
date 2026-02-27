@@ -715,7 +715,7 @@ _mesa_TexEnvfv(GLenum target, GLenum pname, const GLfloat *param)
 
     /* Tell device driver about the new texture environment */
     if (ctx->Driver.TexEnv) {
-	(*ctx->Driver.TexEnv)(ctx, target, pname, param);
+	ctx->Driver.TexEnv(ctx, target, pname, param);
     }
 }
 
@@ -1407,7 +1407,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
     texObj->Complete = GL_FALSE;
 
     if (ctx->Driver.TexParameter) {
-	(*ctx->Driver.TexParameter)(ctx, target, texObj, pname, params);
+	ctx->Driver.TexParameter(ctx, target, texObj, pname, params);
     }
 }
 
@@ -2547,7 +2547,7 @@ _mesa_ActiveTextureARB(GLenum texture)
     }
 
     if (ctx->Driver.ActiveTexture) {
-	(*ctx->Driver.ActiveTexture)(ctx, static_cast<GLuint>(texUnit));
+	ctx->Driver.ActiveTexture(ctx, static_cast<GLuint>(texUnit));
     }
 }
 
@@ -2859,19 +2859,19 @@ alloc_proxy_textures(GLcontext *ctx)
             (ctx->Driver.DeleteTexture)(ctx, ctx->Texture.ProxyRect);
     };
 
-    ctx->Texture.Proxy1D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_1D);
+    ctx->Texture.Proxy1D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_1D);
     if (!ctx->Texture.Proxy1D) { delete_proxies(); return GL_FALSE; }
 
-    ctx->Texture.Proxy2D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_2D);
+    ctx->Texture.Proxy2D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_2D);
     if (!ctx->Texture.Proxy2D) { delete_proxies(); return GL_FALSE; }
 
-    ctx->Texture.Proxy3D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_3D);
+    ctx->Texture.Proxy3D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_3D);
     if (!ctx->Texture.Proxy3D) { delete_proxies(); return GL_FALSE; }
 
-    ctx->Texture.ProxyCubeMap = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
+    ctx->Texture.ProxyCubeMap = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
     if (!ctx->Texture.ProxyCubeMap) { delete_proxies(); return GL_FALSE; }
 
-    ctx->Texture.ProxyRect = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
+    ctx->Texture.ProxyRect = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
     if (!ctx->Texture.ProxyRect) { delete_proxies(); return GL_FALSE; }
 
     assert(ctx->Texture.Proxy1D->RefCount == 1);

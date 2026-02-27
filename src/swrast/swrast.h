@@ -282,8 +282,8 @@ struct swrast_device_driver {
      * these functions.  Locking in that case must be organized by the
      * driver by other mechanisms.
      */
-    void (*SpanRenderStart)(GLcontext *ctx);
-    void (*SpanRenderFinish)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> SpanRenderStart;
+    std::function<void(GLcontext *ctx)> SpanRenderFinish;
 };
 
 

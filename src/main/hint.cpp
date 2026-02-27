@@ -129,7 +129,7 @@ _mesa_Hint(GLenum target, GLenum mode)
     }
 
     if (ctx->Driver.Hint) {
-	(*ctx->Driver.Hint)(ctx, target, mode);
+	ctx->Driver.Hint(ctx, target, mode);
     }
 }
 

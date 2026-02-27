@@ -3786,10 +3786,10 @@ _mesa_pack_stencil_span(const GLcontext *ctx, GLuint n,
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dest;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dest);
 	    GLuint i;
 	    for (i=0; i<n; i++) {
-		dst[i] = _mesa_float_to_half((float) source[i]);
+		dst[i] = _mesa_float_to_half(static_cast<float>(source[i]));
 	    }
 	    if (dstPacking->SwapBytes) {
 		_mesa_swap2(reinterpret_cast<GLushort *>(dst), n);

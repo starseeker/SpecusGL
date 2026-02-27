@@ -166,7 +166,8 @@ _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 GLhalfARB
 _mesa_float_to_half(float val)
 {
-    const int flt = (const int)val;
+    /* Reinterpret val's bit pattern as an integer. */
+    const int flt = float_bits(val);
     const int flt_m = flt & 0x7fffff;
     const int flt_e = (flt >> 23) & 0xff;
     const int flt_s = (flt >> 31) & 0x1;
@@ -202,7 +203,7 @@ _mesa_float_to_half(float val)
 	    e = 0;
 	} else if (new_exp < -14) {
 	    /* this maps to a denorm */
-	    unsigned int exp_val = (unsigned int)(-14 - new_exp);  /* 2^-exp_val*/
+	    unsigned int exp_val = static_cast<unsigned int>(-14 - new_exp);  /* 2^-exp_val*/
 	    e = 0;
 	    switch (exp_val) {
 		case 1:
@@ -282,7 +283,7 @@ _mesa_half_to_float(GLhalfARB val)
     } else if ((e == 0) && (m != 0)) {
 	/* denorm -- denorm half will fit in non-denorm single */
 	const float half_denorm = 1.0f / 16384.0f; /* 2^-14 */
-	float mantissa = ((float)(m)) / 1024.0f;
+	float mantissa = static_cast<float>(m) / 1024.0f;
 	float sign = s ? -1.0f : 1.0f;
 	return sign * mantissa * half_denorm;
     } else if ((e == 31) && (m == 0)) {
@@ -300,7 +301,7 @@ _mesa_half_to_float(GLhalfARB val)
     }
 
     flt = (flt_s << 31) | (flt_e << 23) | flt_m;
-    result = (int)flt;
+    result = bits_float(flt);
     return result;
 }
 

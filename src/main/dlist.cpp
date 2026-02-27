@@ -545,9 +545,9 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
 GLint
 _mesa_alloc_opcode(GLcontext *ctx,
 		   GLuint size,
-		   void (*execute)(GLcontext *, void *),
-		   void (*destroy)(GLcontext *, void *),
-		   void (*print)(GLcontext *, void *))
+		   std::function<void(GLcontext *, void *)> execute,
+		   std::function<void(GLcontext *, void *)> destroy,
+		   std::function<void(GLcontext *, void *)> print)
 {
     if (ctx->ListExt.NumOpcodes < MAX_DLIST_EXT_OPCODES) {
 	const GLuint i = ctx->ListExt.NumOpcodes++;
@@ -5453,7 +5453,7 @@ execute_list(GLcontext *ctx, GLuint list)
     done = GL_FALSE;
     while (!done) {
 	OpCode opcode = n[0].opcode;
-	int i = (int) n[0].opcode - (int) OPCODE_EXT_0;
+	int i = static_cast<int>(n[0].opcode) - static_cast<int>(OPCODE_EXT_0);
 
 	if (i >= 0 && i < static_cast<GLint>(ctx->ListExt.NumOpcodes)) {
 	    /* this is a driver-extended opcode */
@@ -6280,7 +6280,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		default: {
 		    char msg[1000];
 		    std::snprintf(msg, sizeof(msg), "Error in execute_list: opcode=%d",
-				  (int) opcode);
+				  static_cast<int>(opcode));
 		    _mesa_problem(ctx, msg);
 		}
 		done = GL_TRUE;
