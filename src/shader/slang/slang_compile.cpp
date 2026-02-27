@@ -229,10 +229,8 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
 
     if (!slang_operation_construct(&array_size))
 	return GL_FALSE;
-    if (!parse_expression(C, O, &array_size)) {
-	slang_operation_destruct(&array_size);
-	return GL_FALSE;
-    }
+    if (!parse_expression(C, O, &array_size))
+	return GL_FALSE;   /* array_size destructor cleans up on scope exit */
 
     space.funcs = O->funs;
     space.structs = O->structs;
@@ -244,7 +242,6 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
 
     *len = static_cast<GLint>(array_size.literal[0]);
 
-    slang_operation_destruct(&array_size);
     return result;
 }
 
@@ -1120,10 +1117,12 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
     }
     C->I++;
 
-    slang_operation_destruct(oper);
     if (ops) {
-	*oper = std::move(ops[0]);
+	*oper = std::move(ops[0]);  /* move assignment destroys oper's old state */
 	delete[] ops;
+    } else {
+	/* Clear the operation if no result was produced */
+	slang_operation_destruct(oper);
     }
 
     return 1;
@@ -1416,7 +1415,7 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
     slang_operation_copy(&op_assign.children[1], var->initializer.get());
 
     op_id.locals->variables.clear();  /* don't own var, don't delete it */
-    slang_operation_destruct(&op_id);
+    /* op_id destructor handles remaining cleanup when function returns */
 
     return GL_TRUE;
 }

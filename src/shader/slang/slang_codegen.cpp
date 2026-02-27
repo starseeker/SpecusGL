@@ -810,7 +810,7 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 
 		/* install new code */
 		slang_operation_copy(oper, blockOper);
-		slang_operation_destruct(blockOper);
+		slang_operation_delete(blockOper);  /* free blockOper and its content */
 	    } else {
 		/* check if return value was expected */
 		assert(A->CurFunction);
@@ -1199,8 +1199,7 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
 	return nullptr;
 
     /* Replace the function call with the inlined block */
-    slang_operation_destruct(oper);
-    *oper = std::move(*inlined);
+    *oper = std::move(*inlined);   /* move assignment destroys oper's old state */
     delete inlined;
 
 #if 0

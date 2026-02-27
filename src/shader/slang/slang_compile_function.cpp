@@ -53,15 +53,8 @@ slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 int
 slang_function_construct(slang_function * func)
 {
-    func->kind = SLANG_FUNC_ORDINARY;
-    if (!slang_variable_construct(&func->header))
-	return 0;
-
+    /* POD fields have default initialisers; just set up the parameters scope */
     func->parameters = std::make_unique<slang_variable_scope>();
-    _slang_variable_scope_ctr(func->parameters.get());
-    func->param_count = 0;
-    /* body is a unique_ptr, default-constructed to null */
-    func->address = ~0;
     slang_fixup_table_init(&func->fixups);
     return 1;
 }
@@ -69,8 +62,8 @@ slang_function_construct(slang_function * func)
 void
 slang_function_destruct(slang_function * func)
 {
-    slang_variable_destruct(&func->header);
-    /* parameters and body unique_ptrs + their destructors handle cleanup */
+    /* unique_ptr members + their destructors handle memory cleanup.
+     * slang_fixup_table_free clears the fixup vector. */
     func->parameters.reset();
     func->body.reset();
     slang_fixup_table_free(&func->fixups);
