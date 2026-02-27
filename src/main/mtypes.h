@@ -135,7 +135,7 @@ struct gl_texture_image;
 struct gl_texture_object;
 struct __GLcontextRec;
 using GLcontext = __GLcontextRec;
-typedef __GLcontextModes GLvisual;
+using GLvisual = __GLcontextModes;
 struct gl_framebuffer;
 using GLframebuffer = gl_framebuffer;
 /*@}*/
