@@ -1040,8 +1040,8 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 {
     struct gl_framebuffer *fb = ctx->DrawBuffer;
     struct gl_renderbuffer *rb = fb->_DepthBuffer;
-    GLuint zMin = (GLuint)(ctx->Depth.BoundsMin * fb->_DepthMaxF + 0.5F);
-    GLuint zMax = (GLuint)(ctx->Depth.BoundsMax * fb->_DepthMaxF + 0.5F);
+    GLuint zMin = static_cast<GLuint>((ctx->Depth.BoundsMin * fb->_DepthMaxF + 0.5F));
+    GLuint zMax = static_cast<GLuint>((ctx->Depth.BoundsMax * fb->_DepthMaxF + 0.5F));
     GLubyte *mask = span->array->mask;
     const GLuint count = span->end;
     GLuint i;
@@ -1131,8 +1131,8 @@ _swrast_read_depth_span_float(GLcontext *ctx, struct gl_renderbuffer *rb,
 
     ASSERT(rb->_BaseFormat == GL_DEPTH_COMPONENT);
 
-    if (y < 0 || y >= (GLint) rb->Height ||
-	x + n <= 0 || x >= (GLint) rb->Width) {
+    if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
+	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
 	/* span is completely outside framebuffer */
 	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
@@ -1147,8 +1147,8 @@ _swrast_read_depth_span_float(GLcontext *ctx, struct gl_renderbuffer *rb,
 	n -= dx;
 	depth += dx;
     }
-    if (x + n > (GLint) rb->Width) {
-	GLint dx = x + n - (GLint) rb->Width;
+    if (x + n > static_cast<GLint>(rb->Width)) {
+	GLint dx = x + n - static_cast<GLint>(rb->Width);
 	GLint i;
 	for (i = 0; i < dx; i++)
 	    depth[n - i - 1] = 0.0;
@@ -1193,8 +1193,8 @@ _swrast_read_depth_span_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 
     ASSERT(rb->_BaseFormat == GL_DEPTH_COMPONENT);
 
-    if (y < 0 || y >= (GLint) rb->Height ||
-	x + n <= 0 || x >= (GLint) rb->Width) {
+    if (y < 0 || y >= static_cast<GLint>(rb->Height) ||
+	x + n <= 0 || x >= static_cast<GLint>(rb->Width)) {
 	/* span is completely outside framebuffer */
 	std::memset(depth, 0, n * sizeof(GLfloat));
 	return;
@@ -1209,8 +1209,8 @@ _swrast_read_depth_span_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 	n -= dx;
 	depth += dx;
     }
-    if (x + n > (GLint) rb->Width) {
-	GLint dx = x + n - (GLint) rb->Width;
+    if (x + n > static_cast<GLint>(rb->Width)) {
+	GLint dx = x + n - static_cast<GLint>(rb->Width);
 	GLint i;
 	for (i = 0; i < dx; i++)
 	    depth[n - i - 1] = 0;
@@ -1271,7 +1271,7 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     if (ctx->Depth.Clear == 1.0) {
 	clearValue = ctx->DrawBuffer->_DepthMax;
     } else {
-	clearValue = (GLuint)(ctx->Depth.Clear * ctx->DrawBuffer->_DepthMaxF);
+	clearValue = static_cast<GLuint>((ctx->Depth.Clear * ctx->DrawBuffer->_DepthMaxF));
     }
 
     assert(rb->_BaseFormat == GL_DEPTH_COMPONENT);
@@ -1317,7 +1317,7 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     } else {
 	/* Direct access not possible.  Use PutRow to write new values. */
 	if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    GLushort clearVal16 = (GLushort)(clearValue & 0xffff);
+	    GLushort clearVal16 = static_cast<GLushort>((clearValue & 0xffff));
 	    GLint i;
 	    for (i = 0; i < height; i++) {
 		rb->PutMonoRow(ctx, width, x, y + i, &clearVal16, nullptr);

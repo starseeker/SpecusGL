@@ -365,7 +365,7 @@ static void _save_wrap_buffers(GLcontext *ctx)
     GLenum mode;
     GLboolean weak;
 
-    assert(i < (GLint) save->prim_max);
+    assert(i < static_cast<GLint>(save->prim_max));
     assert(i >= 0);
 
     /* Close off in-progress primitive.
@@ -748,7 +748,7 @@ static void GLAPIENTRY _save_End(void)
     save->prim[i].count = (save->vert_count -
 			   save->prim[i].start);
 
-    if (i == (GLint) save->prim_max - 1) {
+    if (i == static_cast<GLint>(save->prim_max) - 1) {
 	_save_compile_vertex_list(ctx);
 	assert(save->copied.nr == 0);
     }

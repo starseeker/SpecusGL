@@ -98,8 +98,8 @@ read_depth_pixels(GLcontext *ctx,
     /* clipping should have been done already */
     ASSERT(x >= 0);
     ASSERT(y >= 0);
-    ASSERT(x + width <= (GLint) rb->Width);
-    ASSERT(y + height <= (GLint) rb->Height);
+    ASSERT(x + width <= static_cast<GLint>(rb->Width));
+    ASSERT(y + height <= static_cast<GLint>(rb->Height));
     /* width should never be > MAX_WIDTH since we did clipping earlier */
     ASSERT(width <= MAX_WIDTH);
 
@@ -215,8 +215,8 @@ fast_read_rgba_pixels(GLcontext *ctx,
     ASSERT(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
 
     /* clipping should have already been done */
-    ASSERT(x + width <= (GLint) rb->Width);
-    ASSERT(y + height <= (GLint) rb->Height);
+    ASSERT(x + width <= static_cast<GLint>(rb->Width));
+    ASSERT(y + height <= static_cast<GLint>(rb->Height));
 
     /* check for things we can't handle here */
     if (transferOps ||
@@ -285,9 +285,9 @@ adjust_colors(GLcontext *ctx, GLuint n, GLfloat rgba[][4])
     const GLuint rShift = 8 - ctx->Visual.redBits;
     const GLuint gShift = 8 - ctx->Visual.greenBits;
     const GLuint bShift = 8 - ctx->Visual.blueBits;
-    const GLfloat rScale = 1.0F / (GLfloat)((1 << ctx->Visual.redBits) - 1);
-    const GLfloat gScale = 1.0F / (GLfloat)((1 << ctx->Visual.greenBits) - 1);
-    const GLfloat bScale = 1.0F / (GLfloat)((1 << ctx->Visual.blueBits) - 1);
+    const GLfloat rScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.redBits) - 1));
+    const GLfloat gScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.greenBits) - 1));
+    const GLfloat bScale = 1.0F / static_cast<GLfloat>(((1 << ctx->Visual.blueBits) - 1));
     GLuint i;
     for (i = 0; i < n; i++) {
 	GLint r, g, b;
@@ -298,9 +298,9 @@ adjust_colors(GLcontext *ctx, GLuint n, GLfloat rgba[][4])
 	/* using only the N most significant bits of the ubyte value, convert to
 	 * float in [0,1].
 	 */
-	rgba[i][RCOMP] = (GLfloat)(r >> rShift) * rScale;
-	rgba[i][GCOMP] = (GLfloat)(g >> gShift) * gScale;
-	rgba[i][BCOMP] = (GLfloat)(b >> bShift) * bScale;
+	rgba[i][RCOMP] = static_cast<GLfloat>((r >> rShift)) * rScale;
+	rgba[i][GCOMP] = static_cast<GLfloat>((g >> gShift)) * gScale;
+	rgba[i][BCOMP] = static_cast<GLfloat>((b >> bShift)) * bScale;
     }
 }
 

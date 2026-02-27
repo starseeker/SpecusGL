@@ -240,7 +240,7 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	int i, j;
 	for (i = 0; i < MAX_WIDTH; i++) {
 	    for (j = 0; j < 4; j++) {
-		crgba[i][j] = (GLuint) span->array->attribs[FRAG_ATTRIB_COL0][i][j];
+		crgba[i][j] = static_cast<GLuint>(span->array->attribs[FRAG_ATTRIB_COL0][i][j]);
 	    }
 	}
 	logicop_uint4(ctx, 4 * span->end,

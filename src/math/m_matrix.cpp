@@ -857,8 +857,8 @@ GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
     GLfloat rmat[16];  /* local rotation matrix (renamed to avoid clash with member m) */
     GLboolean optimized;
 
-    s = (GLfloat) sin(angle * DEG2RAD);
-    c = (GLfloat) cos(angle * DEG2RAD);
+    s = static_cast<GLfloat>(sin(angle * DEG2RAD));
+    c = static_cast<GLfloat>(cos(angle * DEG2RAD));
 
     memcpy(rmat, Identity, sizeof(GLfloat)*16);
     optimized = GL_FALSE;
@@ -1183,9 +1183,9 @@ void
 GLmatrix::viewport(GLint x, GLint y, GLint width, GLint height,
 		   GLfloat zNear, GLfloat zFar, GLfloat depthMax)
 {
-    m[MAT_SX] = (GLfloat) width / 2.0F;
+    m[MAT_SX] = static_cast<GLfloat>(width) / 2.0F;
     m[MAT_TX] = m[MAT_SX] + x;
-    m[MAT_SY] = (GLfloat) height / 2.0F;
+    m[MAT_SY] = static_cast<GLfloat>(height) / 2.0F;
     m[MAT_TY] = m[MAT_SY] + y;
     m[MAT_SZ] = depthMax * ((zFar - zNear) / 2.0F);
     m[MAT_TZ] = depthMax * ((zFar - zNear) / 2.0F + zNear);
@@ -1291,14 +1291,14 @@ void GLmatrix::analyse_from_scratch()
 
     /* Do the real work
      */
-    if (mask == (GLuint) MASK_IDENTITY) {
+    if (mask == static_cast<GLuint>(MASK_IDENTITY)) {
 	type = MATRIX_IDENTITY;
-    } else if ((mask & MASK_2D_NO_ROT) == (GLuint) MASK_2D_NO_ROT) {
+    } else if ((mask & MASK_2D_NO_ROT) == static_cast<GLuint>(MASK_2D_NO_ROT)) {
 	type = MATRIX_2D_NO_ROT;
 
 	if ((mask & MASK_NO_2D_SCALE) != MASK_NO_2D_SCALE)
 	    flags |= MAT_FLAG_GENERAL_SCALE;
-    } else if ((mask & MASK_2D) == (GLuint) MASK_2D) {
+    } else if ((mask & MASK_2D) == static_cast<GLuint>(MASK_2D)) {
 	GLfloat mm = DOT2(m, m);
 	GLfloat m4m4 = DOT2(m+4,m+4);
 	GLfloat mm4 = DOT2(m,m+4);
@@ -1316,7 +1316,7 @@ void GLmatrix::analyse_from_scratch()
 	else
 	    flags |= MAT_FLAG_ROTATION;
 
-    } else if ((mask & MASK_3D_NO_ROT) == (GLuint) MASK_3D_NO_ROT) {
+    } else if ((mask & MASK_3D_NO_ROT) == static_cast<GLuint>(MASK_3D_NO_ROT)) {
 	type = MATRIX_3D_NO_ROT;
 
 	/* Check for scale */
@@ -1328,7 +1328,7 @@ void GLmatrix::analyse_from_scratch()
 	} else {
 	    flags |= MAT_FLAG_GENERAL_SCALE;
 	}
-    } else if ((mask & MASK_3D) == (GLuint) MASK_3D) {
+    } else if ((mask & MASK_3D) == static_cast<GLuint>(MASK_3D)) {
 	GLfloat c1 = DOT3(m,m);
 	GLfloat c2 = DOT3(m+4,m+4);
 	GLfloat c3 = DOT3(m+8,m+8);
@@ -1670,22 +1670,22 @@ _math_transposed(GLdouble to[16], const GLdouble from[16])
 void
 _math_transposefd(GLfloat to[16], const GLdouble from[16])
 {
-    to[0] = (GLfloat) from[0];
-    to[1] = (GLfloat) from[4];
-    to[2] = (GLfloat) from[8];
-    to[3] = (GLfloat) from[12];
-    to[4] = (GLfloat) from[1];
-    to[5] = (GLfloat) from[5];
-    to[6] = (GLfloat) from[9];
-    to[7] = (GLfloat) from[13];
-    to[8] = (GLfloat) from[2];
-    to[9] = (GLfloat) from[6];
-    to[10] = (GLfloat) from[10];
-    to[11] = (GLfloat) from[14];
-    to[12] = (GLfloat) from[3];
-    to[13] = (GLfloat) from[7];
-    to[14] = (GLfloat) from[11];
-    to[15] = (GLfloat) from[15];
+    to[0] = static_cast<GLfloat>(from[0]);
+    to[1] = static_cast<GLfloat>(from[4]);
+    to[2] = static_cast<GLfloat>(from[8]);
+    to[3] = static_cast<GLfloat>(from[12]);
+    to[4] = static_cast<GLfloat>(from[1]);
+    to[5] = static_cast<GLfloat>(from[5]);
+    to[6] = static_cast<GLfloat>(from[9]);
+    to[7] = static_cast<GLfloat>(from[13]);
+    to[8] = static_cast<GLfloat>(from[2]);
+    to[9] = static_cast<GLfloat>(from[6]);
+    to[10] = static_cast<GLfloat>(from[10]);
+    to[11] = static_cast<GLfloat>(from[14]);
+    to[12] = static_cast<GLfloat>(from[3]);
+    to[13] = static_cast<GLfloat>(from[7]);
+    to[14] = static_cast<GLfloat>(from[11]);
+    to[15] = static_cast<GLfloat>(from[15]);
 }
 
 /*@}*/

@@ -455,7 +455,7 @@ static void GLAPIENTRY vbo_exec_EvalPoint1(GLint i)
 {
     GET_CURRENT_CONTEXT(ctx);
     GLfloat du = ((ctx->Eval.MapGrid1u2 - ctx->Eval.MapGrid1u1) /
-		  (GLfloat) ctx->Eval.MapGrid1un);
+		  static_cast<GLfloat>(ctx->Eval.MapGrid1un));
     GLfloat u = i * du + ctx->Eval.MapGrid1u1;
 
     vbo_exec_EvalCoord1f(u);
@@ -466,9 +466,9 @@ static void GLAPIENTRY vbo_exec_EvalPoint2(GLint i, GLint j)
 {
     GET_CURRENT_CONTEXT(ctx);
     GLfloat du = ((ctx->Eval.MapGrid2u2 - ctx->Eval.MapGrid2u1) /
-		  (GLfloat) ctx->Eval.MapGrid2un);
+		  static_cast<GLfloat>(ctx->Eval.MapGrid2un));
     GLfloat dv = ((ctx->Eval.MapGrid2v2 - ctx->Eval.MapGrid2v1) /
-		  (GLfloat) ctx->Eval.MapGrid2vn);
+		  static_cast<GLfloat>(ctx->Eval.MapGrid2vn));
     GLfloat u = i * du + ctx->Eval.MapGrid2u1;
     GLfloat v = j * dv + ctx->Eval.MapGrid2v1;
 

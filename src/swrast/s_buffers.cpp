@@ -208,18 +208,18 @@ clear_ci_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     ASSERT(!ctx->Visual.rgbMode);
 
     ASSERT((ctx->Color.IndexMask & ((1 << rb->IndexBits) - 1))
-	   == (GLuint)((1 << rb->IndexBits) - 1));
+	   == static_cast<GLuint>(((1 << rb->IndexBits) - 1)));
 
     ASSERT(rb->PutMonoRow);
 
     /* setup clear value */
     switch (rb->DataType) {
 	case GL_UNSIGNED_BYTE:
-	    clear8 = (GLubyte) ctx->Color.ClearIndex;
+	    clear8 = static_cast<GLubyte>(ctx->Color.ClearIndex);
 	    clearVal = &clear8;
 	    break;
 	case GL_UNSIGNED_SHORT:
-	    clear16 = (GLushort) ctx->Color.ClearIndex;
+	    clear16 = static_cast<GLushort>(ctx->Color.ClearIndex);
 	    clearVal = &clear16;
 	    break;
 	case GL_UNSIGNED_INT:

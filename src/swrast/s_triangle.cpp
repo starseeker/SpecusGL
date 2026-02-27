@@ -135,8 +135,8 @@ _swrast_culltriangle(GLcontext *ctx,
    struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0][0];\
    struct gl_texture_object *obj = ctx->Texture.Unit[0].Current2D;	\
    const GLint b = obj->BaseLevel;					\
-   const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
-   const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
+   const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
+   const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
    const GLint twidth_log2 = obj->Image[0][b]->WidthLog2;		\
    const GLchan *texture = (const GLchan *) obj->Image[0][b]->Data;	\
    const GLint smask = obj->Image[0][b]->Width - 1;			\
@@ -187,8 +187,8 @@ _swrast_culltriangle(GLcontext *ctx,
    struct gl_renderbuffer *rb = ctx->DrawBuffer->_ColorDrawBuffers[0][0];\
    struct gl_texture_object *obj = ctx->Texture.Unit[0].Current2D;	\
    const GLint b = obj->BaseLevel;					\
-   const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
-   const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
+   const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
+   const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
    const GLint twidth_log2 = obj->Image[0][b]->WidthLog2;		\
    const GLchan *texture = (const GLchan *) obj->Image[0][b]->Data;	\
    const GLint smask = obj->Image[0][b]->Width - 1;			\
@@ -328,9 +328,9 @@ affine_span(GLcontext *ctx, SWspan *span,
 
 #define ADD								\
    {									\
-      GLint rSum = FixedToInt(span->red)   + (GLint) sample[RCOMP];	\
-      GLint gSum = FixedToInt(span->green) + (GLint) sample[GCOMP];	\
-      GLint bSum = FixedToInt(span->blue)  + (GLint) sample[BCOMP];	\
+      GLint rSum = FixedToInt(span->red)   + static_cast<GLint>(sample[RCOMP]);	\
+      GLint gSum = FixedToInt(span->green) + static_cast<GLint>(sample[GCOMP]);	\
+      GLint bSum = FixedToInt(span->blue)  + static_cast<GLint>(sample[BCOMP]);	\
       dest[RCOMP] = MIN2(rSum, CHAN_MAX);				\
       dest[GCOMP] = MIN2(gSum, CHAN_MAX);				\
       dest[BCOMP] = MIN2(bSum, CHAN_MAX);				\
@@ -525,8 +525,8 @@ affine_span(GLcontext *ctx, SWspan *span,
    struct gl_texture_unit *unit = ctx->Texture.Unit+0;			\
    struct gl_texture_object *obj = unit->Current2D;			\
    const GLint b = obj->BaseLevel;					\
-   const GLfloat twidth = (GLfloat) obj->Image[0][b]->Width;		\
-   const GLfloat theight = (GLfloat) obj->Image[0][b]->Height;		\
+   const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
+   const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
    info.texture = (const GLchan *) obj->Image[0][b]->Data;		\
    info.twidth_log2 = obj->Image[0][b]->WidthLog2;			\
    info.smask = obj->Image[0][b]->Width - 1;				\
@@ -602,8 +602,8 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 	for (i = 0; i < span->end; i++) {				\
            GLdouble invQ = tex_coord[2] ?				\
                                  (1.0 / tex_coord[2]) : 1.0;            \
-           GLfloat s_tmp = (GLfloat) (tex_coord[0] * invQ);		\
-           GLfloat t_tmp = (GLfloat) (tex_coord[1] * invQ);		\
+           GLfloat s_tmp = static_cast<GLfloat>((tex_coord[0] * invQ));		\
+           GLfloat t_tmp = static_cast<GLfloat>((tex_coord[1] * invQ));		\
            GLint s = IFLOOR(s_tmp) & info->smask;	        	\
            GLint t = IFLOOR(t_tmp) & info->tmask;	        	\
            GLint pos = (t << info->twidth_log2) + s;			\
@@ -623,8 +623,8 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 	for (i = 0; i < span->end; i++) {				\
            GLdouble invQ = tex_coord[2] ?				\
                                  (1.0 / tex_coord[2]) : 1.0;            \
-           const GLfloat s_tmp = (GLfloat) (tex_coord[0] * invQ);	\
-           const GLfloat t_tmp = (GLfloat) (tex_coord[1] * invQ);	\
+           const GLfloat s_tmp = static_cast<GLfloat>((tex_coord[0] * invQ));	\
+           const GLfloat t_tmp = static_cast<GLfloat>((tex_coord[1] * invQ));	\
            const GLfixed s_fix = FloatToFixed(s_tmp) - FIXED_HALF;	\
            const GLfixed t_fix = FloatToFixed(t_tmp) - FIXED_HALF;      \
            const GLint s = FixedToInt(FixedFloor(s_fix)) & info->smask;	\
@@ -902,7 +902,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
          rb->GetPointer(ctx, span.x, span.y);			\
       if (zRow) {							\
          for (i = 0; i < span.end; i++) {				\
-            if ((GLuint)span.z < zRow[i]) {				\
+            if (static_cast<GLuint>(span.z) < zRow[i]) {				\
                q->Result++;						\
             }								\
             span.z += span.zStep;					\
@@ -1060,8 +1060,8 @@ _swrast_choose_triangle(GLcontext *ctx)
 	    texObj2D = ctx->Texture.Unit[0].Current2D;
 	    texImg = texObj2D ? texObj2D->Image[0][texObj2D->BaseLevel] : nullptr;
 	    format = texImg ? texImg->TexFormat->MesaFormat : -1;
-	    minFilter = texObj2D ? texObj2D->MinFilter : (GLenum) 0;
-	    magFilter = texObj2D ? texObj2D->MagFilter : (GLenum) 0;
+	    minFilter = texObj2D ? texObj2D->MinFilter : static_cast<GLenum>(0);
+	    magFilter = texObj2D ? texObj2D->MagFilter : static_cast<GLenum>(0);
 	    envMode = ctx->Texture.Unit[0].EnvMode;
 
 	    /* First see if we can use an optimized 2-D texture function */

@@ -64,7 +64,7 @@ _swrast_span_default_z(GLcontext *ctx, SWspan *span)
     else {
 	GLfloat tmpf = ctx->Current.RasterPos[2] * depthMax;
 	tmpf = MIN2(tmpf, depthMax);
-	span->z = (GLint) tmpf;
+	span->z = static_cast<GLint>(tmpf);
     }
     span->zStep = 0;
     span->interpMask |= SPAN_Z;
@@ -236,10 +236,10 @@ interpolate_colors(SWspan *span)
 		GLint db = span->blueStep;
 		GLint da = span->alphaStep;
 		for (i = 0; i < n; i++) {
-		    rgba[i][RCOMP] = (GLubyte) CLAMP(FixedToChan(r), 0, CHAN_MAX);
-		    rgba[i][GCOMP] = (GLubyte) CLAMP(FixedToChan(g), 0, CHAN_MAX);
-		    rgba[i][BCOMP] = (GLubyte) CLAMP(FixedToChan(b), 0, CHAN_MAX);
-		    rgba[i][ACOMP] = (GLubyte) CLAMP(FixedToChan(a), 0, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(r), 0, CHAN_MAX));
+		    rgba[i][GCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(g), 0, CHAN_MAX));
+		    rgba[i][BCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(b), 0, CHAN_MAX));
+		    rgba[i][ACOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(a), 0, CHAN_MAX));
 		    r += dr;
 		    g += dg;
 		    b += db;
@@ -272,10 +272,10 @@ interpolate_colors(SWspan *span)
 		db = span->blueStep;
 		da = span->alphaStep;
 		for (i = 0; i < n; i++) {
-		    rgba[i][RCOMP] = (GLushort) CLAMP(FixedToChan(r), 0, CHAN_MAX);
-		    rgba[i][GCOMP] = (GLushort) CLAMP(FixedToChan(g), 0, CHAN_MAX);
-		    rgba[i][BCOMP] = (GLushort) CLAMP(FixedToChan(b), 0, CHAN_MAX);
-		    rgba[i][ACOMP] = (GLushort) CLAMP(FixedToChan(a), 0, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(r), 0, CHAN_MAX));
+		    rgba[i][GCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(g), 0, CHAN_MAX));
+		    rgba[i][BCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(b), 0, CHAN_MAX));
+		    rgba[i][ACOMP] = static_cast<GLushort>(CLAMP(FixedToChan(a), 0, CHAN_MAX));
 		    r += dr;
 		    g += dg;
 		    b += db;
@@ -773,20 +773,20 @@ interpolate_wpos(GLcontext *ctx, SWspan *span)
 
     if (span->arrayMask & SPAN_XY) {
 	for (i = 0; i < span->end; i++) {
-	    wpos[i][0] = (GLfloat) span->array->x[i];
-	    wpos[i][1] = (GLfloat) span->array->y[i];
+	    wpos[i][0] = static_cast<GLfloat>(span->array->x[i]);
+	    wpos[i][1] = static_cast<GLfloat>(span->array->y[i]);
 	}
     } else {
 	for (i = 0; i < span->end; i++) {
-	    wpos[i][0] = (GLfloat) span->x + i;
-	    wpos[i][1] = (GLfloat) span->y;
+	    wpos[i][0] = static_cast<GLfloat>(span->x) + i;
+	    wpos[i][1] = static_cast<GLfloat>(span->y);
 	}
     }
 
     w = span->attrStart[FRAG_ATTRIB_WPOS][3];
     dw = span->attrStepX[FRAG_ATTRIB_WPOS][3];
     for (i = 0; i < span->end; i++) {
-	wpos[i][2] = (GLfloat) span->array->z[i] * zScale;
+	wpos[i][2] = static_cast<GLfloat>(span->array->z[i]) * zScale;
 	wpos[i][3] = w;
 	w += dw;
     }
@@ -818,7 +818,7 @@ stipple_polygon_span(GLcontext *ctx, SWspan *span)
 	/* horizontal span of pixels */
 	const GLuint highBit = 1 << 31;
 	const GLuint stipple = ctx->PolygonStipple[span->y % 32];
-	GLuint i, m = highBit >> (GLuint)(span->x % 32);
+	GLuint i, m = highBit >> static_cast<GLuint>((span->x % 32));
 	for (i = 0; i < span->end; i++) {
 	    if ((m & stipple) == 0) {
 		mask[i] = 0;
@@ -1020,7 +1020,7 @@ _swrast_write_index_span(GLcontext *ctx, SWspan *span)
 	GLuint i;
 	for (i = 0; i < span->end; i++) {
 	    ASSERT(coverage[i] < 16);
-	    index[i] = (index[i] & ~0xf) | ((GLuint) coverage[i]);
+	    index[i] = (index[i] & ~0xf) | (static_cast<GLuint>(coverage[i]));
 	}
     }
 
@@ -1087,13 +1087,13 @@ _swrast_write_index_span(GLcontext *ctx, SWspan *span)
 		if (rb->DataType == GL_UNSIGNED_BYTE) {
 		    GLuint k;
 		    for (k = 0; k < span->end; k++) {
-			index8[k] = (GLubyte) span->array->index[k];
+			index8[k] = static_cast<GLubyte>(span->array->index[k]);
 		    }
 		    values = index8;
 		} else if (rb->DataType == GL_UNSIGNED_SHORT) {
 		    GLuint k;
 		    for (k = 0; k < span->end; k++) {
-			index16[k] = (GLushort) span->array->index[k];
+			index16[k] = static_cast<GLushort>(span->array->index[k]);
 		    }
 		    values = index16;
 		} else {
@@ -1194,7 +1194,7 @@ apply_aa_coverage(SWspan *span)
 	GLubyte(*rgba)[4] = span->array->color.sz1.rgba;
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat a = rgba[i][ACOMP] * coverage[i];
-	    rgba[i][ACOMP] = (GLubyte) CLAMP(a, 0.0, 255.0);
+	    rgba[i][ACOMP] = static_cast<GLubyte>(CLAMP(a, 0.0, 255.0));
 	    ASSERT(coverage[i] >= 0.0);
 	    ASSERT(coverage[i] <= 1.0);
 	}
@@ -1202,7 +1202,7 @@ apply_aa_coverage(SWspan *span)
 	GLushort(*rgba)[4] = span->array->color.sz2.rgba;
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat a = rgba[i][ACOMP] * coverage[i];
-	    rgba[i][ACOMP] = (GLushort) CLAMP(a, 0.0, 65535.0);
+	    rgba[i][ACOMP] = static_cast<GLushort>(CLAMP(a, 0.0, 65535.0));
 	}
     } else {
 	GLfloat(*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
@@ -1643,10 +1643,10 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 		       GLuint n, GLint x, GLint y, GLenum dstType,
 		       GLvoid *rgba)
 {
-    const GLint bufWidth = (GLint) rb->Width;
-    const GLint bufHeight = (GLint) rb->Height;
+    const GLint bufWidth = static_cast<GLint>(rb->Width);
+    const GLint bufHeight = static_cast<GLint>(rb->Height);
 
-    if (y < 0 || y >= bufHeight || x + (GLint) n < 0 || x >= bufWidth) {
+    if (y < 0 || y >= bufHeight || x + static_cast<GLint>(n) < 0 || x >= bufWidth) {
 	/* completely above, below, or right */
 	/* XXX maybe leave rgba values undefined? */
 	std::memset(rgba, 0, 4 * n * sizeof(GLchan));
@@ -1655,7 +1655,7 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	if (x < 0) {
 	    /* left edge clipping */
 	    skip = -x;
-	    length = (GLint) n - skip;
+	    length = static_cast<GLint>(n) - skip;
 	    if (length < 0) {
 		/* completely left of window */
 		return;
@@ -1663,7 +1663,7 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    if (length > bufWidth) {
 		length = bufWidth;
 	    }
-	} else if ((GLint)(x + n) > bufWidth) {
+	} else if (static_cast<GLint>((x + n)) > bufWidth) {
 	    /* right edge clipping */
 	    skip = 0;
 	    length = bufWidth - x;
@@ -1674,7 +1674,7 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	} else {
 	    /* no clipping */
 	    skip = 0;
-	    length = (GLint) n;
+	    length = static_cast<GLint>(n);
 	}
 
 	ASSERT(rb);
@@ -1703,10 +1703,10 @@ void
 _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 			GLuint n, GLint x, GLint y, GLuint index[])
 {
-    const GLint bufWidth = (GLint) rb->Width;
-    const GLint bufHeight = (GLint) rb->Height;
+    const GLint bufWidth = static_cast<GLint>(rb->Width);
+    const GLint bufHeight = static_cast<GLint>(rb->Height);
 
-    if (y < 0 || y >= bufHeight || x + (GLint) n < 0 || x >= bufWidth) {
+    if (y < 0 || y >= bufHeight || x + static_cast<GLint>(n) < 0 || x >= bufWidth) {
 	/* completely above, below, or right */
 	std::memset(index, 0, n * sizeof(GLuint));
     } else {
@@ -1714,7 +1714,7 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	if (x < 0) {
 	    /* left edge clipping */
 	    skip = -x;
-	    length = (GLint) n - skip;
+	    length = static_cast<GLint>(n) - skip;
 	    if (length < 0) {
 		/* completely left of window */
 		return;
@@ -1722,7 +1722,7 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    if (length > bufWidth) {
 		length = bufWidth;
 	    }
-	} else if ((GLint)(x + n) > bufWidth) {
+	} else if (static_cast<GLint>((x + n)) > bufWidth) {
 	    /* right edge clipping */
 	    skip = 0;
 	    length = bufWidth - x;
@@ -1733,7 +1733,7 @@ _swrast_read_index_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	} else {
 	    /* no clipping */
 	    skip = 0;
-	    length = (GLint) n;
+	    length = static_cast<GLint>(n);
 	}
 
 	ASSERT(rb->GetRow);
@@ -1774,7 +1774,7 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
 
     for (i = 0; i < count; i++) {
 	if (x[i] >= 0 && y[i] >= 0 &&
-	    x[i] < (GLint) rb->Width && y[i] < (GLint) rb->Height) {
+	    x[i] < static_cast<GLint>(rb->Width) && y[i] < static_cast<GLint>(rb->Height)) {
 	    /* inside */
 	    if (inCount == 0)
 		inStart = i;
@@ -1807,13 +1807,13 @@ _swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
     GLint skip = 0;
 
-    if (y < 0 || y >= (GLint) rb->Height)
+    if (y < 0 || y >= static_cast<GLint>(rb->Height))
 	return; /* above or below */
 
-    if (x + (GLint) count <= 0 || x >= (GLint) rb->Width)
+    if (x + static_cast<GLint>(count) <= 0 || x >= static_cast<GLint>(rb->Width))
 	return; /* entirely left or right */
 
-    if ((GLint)(x + count) > (GLint) rb->Width) {
+    if (static_cast<GLint>((x + count)) > static_cast<GLint>(rb->Width)) {
 	/* right clip */
 	GLint clip = x + count - rb->Width;
 	count -= clip;
@@ -1842,10 +1842,10 @@ _swrast_get_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 {
     GLint skip = 0;
 
-    if (y < 0 || y >= (GLint) rb->Height)
+    if (y < 0 || y >= static_cast<GLint>(rb->Height))
 	return; /* above or below */
 
-    if (x + (GLint) count <= 0 || x >= (GLint) rb->Width)
+    if (x + static_cast<GLint>(count) <= 0 || x >= static_cast<GLint>(rb->Width))
 	return; /* entirely left or right */
 
     if (x + count > rb->Width) {

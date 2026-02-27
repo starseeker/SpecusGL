@@ -66,7 +66,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
 
     ASSERT(span->end < MAX_WIDTH);
 
-    width = (GLint) CLAMP(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH);
+    width = static_cast<GLint>(CLAMP(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH));
 
     if (width & 1)
 	start = width / 2;
@@ -140,7 +140,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);    \
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_index_span(ctx, &span);			\
@@ -159,7 +159,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\
@@ -180,7 +180,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, (GLboolean)(dx > dy));		\
+      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\

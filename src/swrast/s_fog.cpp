@@ -207,18 +207,18 @@ _swrast_fog_rgba_span(const GLcontext *ctx, SWspan *span)
 	    for (i = 0; i < span->end; i++) {
 		const GLfloat f = span->array->attribs[FRAG_ATTRIB_FOGC][i][0];
 		const GLfloat oneMinusF = 1.0F - f;
-		rgba[i][RCOMP] = (GLubyte)(f * rgba[i][RCOMP] + oneMinusF * rFog);
-		rgba[i][GCOMP] = (GLubyte)(f * rgba[i][GCOMP] + oneMinusF * gFog);
-		rgba[i][BCOMP] = (GLubyte)(f * rgba[i][BCOMP] + oneMinusF * bFog);
+		rgba[i][RCOMP] = static_cast<GLubyte>((f * rgba[i][RCOMP] + oneMinusF * rFog));
+		rgba[i][GCOMP] = static_cast<GLubyte>((f * rgba[i][GCOMP] + oneMinusF * gFog));
+		rgba[i][BCOMP] = static_cast<GLubyte>((f * rgba[i][BCOMP] + oneMinusF * bFog));
 	    }
 	} else if (span->array->ChanType == GL_UNSIGNED_SHORT) {
 	    GLushort(*rgba)[4] = span->array->color.sz2.rgba;
 	    for (i = 0; i < span->end; i++) {
 		const GLfloat f = span->array->attribs[FRAG_ATTRIB_FOGC][i][0];
 		const GLfloat oneMinusF = 1.0F - f;
-		rgba[i][RCOMP] = (GLushort)(f * rgba[i][RCOMP] + oneMinusF * rFog);
-		rgba[i][GCOMP] = (GLushort)(f * rgba[i][GCOMP] + oneMinusF * gFog);
-		rgba[i][BCOMP] = (GLushort)(f * rgba[i][BCOMP] + oneMinusF * bFog);
+		rgba[i][RCOMP] = static_cast<GLushort>((f * rgba[i][RCOMP] + oneMinusF * rFog));
+		rgba[i][GCOMP] = static_cast<GLushort>((f * rgba[i][GCOMP] + oneMinusF * gFog));
+		rgba[i][BCOMP] = static_cast<GLushort>((f * rgba[i][BCOMP] + oneMinusF * bFog));
 	    }
 	} else {
 	    GLfloat(*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
@@ -261,7 +261,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 {
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
     const GLuint haveW = (span->interpMask & SPAN_W);
-    const GLuint fogIndex = (GLuint) ctx->Fog.Index;
+    const GLuint fogIndex = static_cast<GLuint>(ctx->Fog.Index);
     GLuint *index = span->array->index;
 
     ASSERT(swrast->_FogEnabled);
@@ -286,7 +286,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 		for (i = 0; i < span->end; i++) {
 		    GLfloat f = (fogEnd - fogCoord / w) * fogScale;
 		    f = CLAMP(f, 0.0F, 1.0F);
-		    index[i] = (GLuint)((GLfloat) index[i] + (1.0F - f) * fogIndex);
+		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;
 		}
@@ -302,7 +302,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 		for (i = 0; i < span->end; i++) {
 		    GLfloat f = EXPF(density * fogCoord / w);
 		    f = CLAMP(f, 0.0F, 1.0F);
-		    index[i] = (GLuint)((GLfloat) index[i] + (1.0F - f) * fogIndex);
+		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;
 		}
@@ -326,7 +326,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 #endif
 		    f = EXPF(tmp);
 		    f = CLAMP(f, 0.0F, 1.0F);
-		    index[i] = (GLuint)((GLfloat) index[i] + (1.0F - f) * fogIndex);
+		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;
 		}
@@ -343,7 +343,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 	GLuint i;
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat f = span->array->attribs[FRAG_ATTRIB_FOGC][i][0];
-	    index[i] = (GLuint)((GLfloat) index[i] + (1.0F - f) * fogIndex);
+	    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 	}
     } else {
 	/* The span's fog start/step values are blend factors.
@@ -357,7 +357,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 	ASSERT(span->interpMask & SPAN_FOG);
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat f = fog / w;
-	    index[i] = (GLuint)((GLfloat) index[i] + (1.0F - f) * fogIndex);
+	    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 	    fog += fogStep;
 	    w += wStep;
 	}

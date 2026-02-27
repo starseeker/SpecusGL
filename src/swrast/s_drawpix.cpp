@@ -97,7 +97,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	    return GL_TRUE;
 	}
 	simpleZoom = GL_TRUE;
-	yStep = (GLint) ctx->Pixel.ZoomY;
+	yStep = static_cast<GLint>(ctx->Pixel.ZoomY);
 	ASSERT(yStep == 1 || yStep == -1);
     } else {
 	/* non-simple zooming */

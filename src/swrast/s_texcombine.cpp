@@ -34,8 +34,8 @@
 #include "s_texcombine.h"
 
 
-#define PROD(A,B)   ( (GLuint)(A) * ((GLuint)(B)+1) )
-#define S_PROD(A,B) ( (GLint)(A) * ((GLint)(B)+1) )
+#define PROD(A,B)   ( static_cast<GLuint>((A)) * (static_cast<GLuint>((B))+1) )
+#define S_PROD(A,B) ( static_cast<GLint>((A)) * (static_cast<GLint>((B))+1) )
 #if CHAN_BITS == 32
 using ChanTemp = GLfloat;
 #else
@@ -70,8 +70,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
     const GLuint RGBshift = textureUnit->_CurrentCombine->ScaleShiftRGB;
     const GLuint Ashift   = textureUnit->_CurrentCombine->ScaleShiftA;
 #if CHAN_TYPE == GL_FLOAT
-    const GLchan RGBmult = (GLfloat)(1 << RGBshift);
-    const GLchan Amult = (GLfloat)(1 << Ashift);
+    const GLchan RGBmult = static_cast<GLfloat>((1 << RGBshift));
+    const GLchan Amult = static_cast<GLfloat>((1 << Ashift));
 #else
     const GLint half = (CHAN_MAX + 1) / 2;
 #endif
@@ -262,9 +262,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 			    arg0[i][RCOMP] && arg0[i][GCOMP] && arg0[i][BCOMP]
 		       ) {
 
-			GLuint r = (GLuint) arg0[i][RCOMP] << RGBshift;
-			GLuint g = (GLuint) arg0[i][GCOMP] << RGBshift;
-			GLuint b = (GLuint) arg0[i][BCOMP] << RGBshift;
+			GLuint r = static_cast<GLuint>(arg0[i][RCOMP]) << RGBshift;
+			GLuint g = static_cast<GLuint>(arg0[i][GCOMP]) << RGBshift;
+			GLuint b = static_cast<GLuint>(arg0[i][BCOMP]) << RGBshift;
 			rgba[i][RCOMP] = MIN2(r, CHAN_MAX);
 			rgba[i][GCOMP] = MIN2(g, CHAN_MAX);
 			rgba[i][BCOMP] = MIN2(b, CHAN_MAX);
@@ -300,11 +300,11 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		GLuint g = (arg0[i][GCOMP] && arg1[i][GCOMP]) ? (PROD(arg0[i][GCOMP], arg1[i][GCOMP]) >> shift) : 0;
 		GLuint b = (arg0[i][BCOMP] && arg1[i][BCOMP]) ? (PROD(arg0[i][BCOMP], arg1[i][BCOMP]) >> shift) : 0;
 		if (rgba[i][RCOMP])
-		    rgba[i][RCOMP] = (GLchan) MIN2(r, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(MIN2(r, CHAN_MAX));
 		if (rgba[i][GCOMP])
-		    rgba[i][GCOMP] = (GLchan) MIN2(g, CHAN_MAX);
+		    rgba[i][GCOMP] = static_cast<GLchan>(MIN2(g, CHAN_MAX));
 		if (rgba[i][BCOMP])
-		    rgba[i][BCOMP] = (GLchan) MIN2(b, CHAN_MAX);
+		    rgba[i][BCOMP] = static_cast<GLchan>(MIN2(b, CHAN_MAX));
 #endif
 	    }
 	}
@@ -318,15 +318,15 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][GCOMP] = (arg0[i][GCOMP] + arg1[i][GCOMP]) * RGBmult;
 		rgba[i][BCOMP] = (arg0[i][BCOMP] + arg1[i][BCOMP]) * RGBmult;
 #else
-		GLint r = (arg0[i][RCOMP] && arg1[i][RCOMP]) ? (((GLint) arg0[i][RCOMP] + (GLint) arg1[i][RCOMP]) << RGBshift) : 0;
-		GLint g = (arg0[i][GCOMP] && arg1[i][GCOMP]) ? (((GLint) arg0[i][GCOMP] + (GLint) arg1[i][GCOMP]) << RGBshift) : 0;
-		GLint b = (arg0[i][BCOMP] && arg1[i][BCOMP]) ? (((GLint) arg0[i][BCOMP] + (GLint) arg1[i][BCOMP]) << RGBshift) : 0;
+		GLint r = (arg0[i][RCOMP] && arg1[i][RCOMP]) ? ((static_cast<GLint>(arg0[i][RCOMP]) + static_cast<GLint>(arg1[i][RCOMP])) << RGBshift) : 0;
+		GLint g = (arg0[i][GCOMP] && arg1[i][GCOMP]) ? ((static_cast<GLint>(arg0[i][GCOMP]) + static_cast<GLint>(arg1[i][GCOMP])) << RGBshift) : 0;
+		GLint b = (arg0[i][BCOMP] && arg1[i][BCOMP]) ? ((static_cast<GLint>(arg0[i][BCOMP]) + static_cast<GLint>(arg1[i][BCOMP])) << RGBshift) : 0;
 		if (rgba[i][RCOMP])
-		    rgba[i][RCOMP] = (GLchan) MIN2(r, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(MIN2(r, CHAN_MAX));
 		if (rgba[i][GCOMP])
-		    rgba[i][GCOMP] = (GLchan) MIN2(g, CHAN_MAX);
+		    rgba[i][GCOMP] = static_cast<GLchan>(MIN2(g, CHAN_MAX));
 		if (rgba[i][BCOMP])
-		    rgba[i][BCOMP] = (GLchan) MIN2(b, CHAN_MAX);
+		    rgba[i][BCOMP] = static_cast<GLchan>(MIN2(b, CHAN_MAX));
 #endif
 	    }
 	}
@@ -340,18 +340,18 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][GCOMP] = (arg0[i][GCOMP] + arg1[i][GCOMP] - 0.5) * RGBmult;
 		rgba[i][BCOMP] = (arg0[i][BCOMP] + arg1[i][BCOMP] - 0.5) * RGBmult;
 #else
-		GLint r = (GLint) arg0[i][RCOMP] + (GLint) arg1[i][RCOMP] -half;
-		GLint g = (GLint) arg0[i][GCOMP] + (GLint) arg1[i][GCOMP] -half;
-		GLint b = (GLint) arg0[i][BCOMP] + (GLint) arg1[i][BCOMP] -half;
+		GLint r = static_cast<GLint>(arg0[i][RCOMP]) + static_cast<GLint>(arg1[i][RCOMP]) -half;
+		GLint g = static_cast<GLint>(arg0[i][GCOMP]) + static_cast<GLint>(arg1[i][GCOMP]) -half;
+		GLint b = static_cast<GLint>(arg0[i][BCOMP]) + static_cast<GLint>(arg1[i][BCOMP]) -half;
 		r = (r < 0) ? 0 : r << RGBshift;
 		g = (g < 0) ? 0 : g << RGBshift;
 		b = (b < 0) ? 0 : b << RGBshift;
 		if (rgba[i][RCOMP])
-		    rgba[i][RCOMP] = (GLchan) MIN2(r, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(MIN2(r, CHAN_MAX));
 		if (rgba[i][GCOMP])
-		    rgba[i][GCOMP] = (GLchan) MIN2(g, CHAN_MAX);
+		    rgba[i][GCOMP] = static_cast<GLchan>(MIN2(g, CHAN_MAX));
 		if (rgba[i][BCOMP])
-		    rgba[i][BCOMP] = (GLchan) MIN2(b, CHAN_MAX);
+		    rgba[i][BCOMP] = static_cast<GLchan>(MIN2(b, CHAN_MAX));
 #endif
 	    }
 	}
@@ -385,11 +385,11 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 			+ PROD(arg1[i][BCOMP], CHAN_MAX - arg2[i][BCOMP]))
 		    >> shift;
 		if (rgba[i][RCOMP])
-		    rgba[i][RCOMP] = (GLchan) MIN2(r, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(MIN2(r, CHAN_MAX));
 		if (rgba[i][GCOMP])
-		    rgba[i][GCOMP] = (GLchan) MIN2(g, CHAN_MAX);
+		    rgba[i][GCOMP] = static_cast<GLchan>(MIN2(g, CHAN_MAX));
 		if (rgba[i][BCOMP])
-		    rgba[i][BCOMP] = (GLchan) MIN2(b, CHAN_MAX);
+		    rgba[i][BCOMP] = static_cast<GLchan>(MIN2(b, CHAN_MAX));
 #endif
 	    }
 	}
@@ -403,15 +403,15 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][GCOMP] = (arg0[i][GCOMP] - arg1[i][GCOMP]) * RGBmult;
 		rgba[i][BCOMP] = (arg0[i][BCOMP] - arg1[i][BCOMP]) * RGBmult;
 #else
-		GLint r = (arg0[i][RCOMP] && arg1[i][RCOMP]) ? (((GLint) arg0[i][RCOMP] - (GLint) arg1[i][RCOMP]) << RGBshift) : 0;
-		GLint g = (arg0[i][GCOMP] && arg1[i][GCOMP]) ? (((GLint) arg0[i][GCOMP] - (GLint) arg1[i][GCOMP]) << RGBshift) : 0;
-		GLint b = (arg0[i][BCOMP] && arg1[i][BCOMP]) ? (((GLint) arg0[i][BCOMP] - (GLint) arg1[i][BCOMP]) << RGBshift) : 0;
+		GLint r = (arg0[i][RCOMP] && arg1[i][RCOMP]) ? ((static_cast<GLint>(arg0[i][RCOMP]) - static_cast<GLint>(arg1[i][RCOMP])) << RGBshift) : 0;
+		GLint g = (arg0[i][GCOMP] && arg1[i][GCOMP]) ? ((static_cast<GLint>(arg0[i][GCOMP]) - static_cast<GLint>(arg1[i][GCOMP])) << RGBshift) : 0;
+		GLint b = (arg0[i][BCOMP] && arg1[i][BCOMP]) ? ((static_cast<GLint>(arg0[i][BCOMP]) - static_cast<GLint>(arg1[i][BCOMP])) << RGBshift) : 0;
 		if (rgba[i][RCOMP])
-		    rgba[i][RCOMP] = (GLchan) CLAMP(r, 0, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(CLAMP(r, 0, CHAN_MAX));
 		if (rgba[i][GCOMP])
-		    rgba[i][GCOMP] = (GLchan) CLAMP(g, 0, CHAN_MAX);
+		    rgba[i][GCOMP] = static_cast<GLchan>(CLAMP(g, 0, CHAN_MAX));
 		if (rgba[i][BCOMP])
-		    rgba[i][BCOMP] = (GLchan) CLAMP(b, 0, CHAN_MAX);
+		    rgba[i][BCOMP] = static_cast<GLchan>(CLAMP(b, 0, CHAN_MAX));
 #endif
 	    }
 	}
@@ -432,17 +432,17 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		GLint dot = 0;
 		if (arg0[i][RCOMP] && arg0[i][GCOMP] && arg0[i][BCOMP] &&
 		       	arg1[i][RCOMP] && arg1[i][GCOMP] && arg1[i][BCOMP]) {
-		    dot = (S_PROD((GLint)arg0[i][RCOMP] - half,
-				(GLint)arg1[i][RCOMP] - half) +
-			    S_PROD((GLint)arg0[i][GCOMP] - half,
-				(GLint)arg1[i][GCOMP] - half) +
-			    S_PROD((GLint)arg0[i][BCOMP] - half,
-				(GLint)arg1[i][BCOMP] - half)) >> 6;
+		    dot = (S_PROD(static_cast<GLint>(arg0[i][RCOMP]) - half,
+				static_cast<GLint>(arg1[i][RCOMP]) - half) +
+			    S_PROD(static_cast<GLint>(arg0[i][GCOMP]) - half,
+				static_cast<GLint>(arg1[i][GCOMP]) - half) +
+			    S_PROD(static_cast<GLint>(arg0[i][BCOMP]) - half,
+				static_cast<GLint>(arg1[i][BCOMP]) - half)) >> 6;
 		    dot = CLAMP(dot, 0, CHAN_MAX);
 		}
 #endif
 		if (rgba[i][RCOMP] && rgba[i][GCOMP] && rgba[i][BCOMP])
-		    rgba[i][RCOMP] = rgba[i][GCOMP] = rgba[i][BCOMP] = (GLchan) dot;
+		    rgba[i][RCOMP] = rgba[i][GCOMP] = rgba[i][BCOMP] = static_cast<GLchan>(dot);
 	    }
 	}
 	break;
@@ -463,18 +463,18 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		if (arg0[i][RCOMP] && arg0[i][GCOMP] && arg0[i][BCOMP] &&
 			arg1[i][RCOMP] && arg1[i][GCOMP] && arg1[i][BCOMP]) {
 
-		    dot = (S_PROD((GLint)arg0[i][RCOMP] - half,
-				(GLint)arg1[i][RCOMP] - half) +
-			    S_PROD((GLint)arg0[i][GCOMP] - half,
-				(GLint)arg1[i][GCOMP] - half) +
-			    S_PROD((GLint)arg0[i][BCOMP] - half,
-				(GLint)arg1[i][BCOMP] - half)) >> 6;
+		    dot = (S_PROD(static_cast<GLint>(arg0[i][RCOMP]) - half,
+				static_cast<GLint>(arg1[i][RCOMP]) - half) +
+			    S_PROD(static_cast<GLint>(arg0[i][GCOMP]) - half,
+				static_cast<GLint>(arg1[i][GCOMP]) - half) +
+			    S_PROD(static_cast<GLint>(arg0[i][BCOMP]) - half,
+				static_cast<GLint>(arg1[i][BCOMP]) - half)) >> 6;
 		}
 		dot <<= RGBshift;
 		dot = CLAMP(dot, 0, CHAN_MAX);
 #endif
 		if (rgba[i][RCOMP] && rgba[i][GCOMP] && rgba[i][BCOMP])
-		    rgba[i][RCOMP] = rgba[i][GCOMP] = rgba[i][BCOMP] = (GLchan) dot;
+		    rgba[i][RCOMP] = rgba[i][GCOMP] = rgba[i][BCOMP] = static_cast<GLchan>(dot);
 	    }
 	}
 	break;
@@ -498,18 +498,18 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 			arg2[i][RCOMP] && arg2[i][GCOMP] && arg2[i][BCOMP]) {
 
 		    r = (PROD(arg0[i][RCOMP], arg2[i][RCOMP])
-			    + ((GLuint) arg1[i][RCOMP] << CHAN_BITS)) >> shift;
+			    + (static_cast<GLuint>(arg1[i][RCOMP]) << CHAN_BITS)) >> shift;
 		    g = (PROD(arg0[i][GCOMP], arg2[i][GCOMP])
-			    + ((GLuint) arg1[i][GCOMP] << CHAN_BITS)) >> shift;
+			    + (static_cast<GLuint>(arg1[i][GCOMP]) << CHAN_BITS)) >> shift;
 		    b = (PROD(arg0[i][BCOMP], arg2[i][BCOMP])
-			    + ((GLuint) arg1[i][BCOMP] << CHAN_BITS)) >> shift;
+			    + (static_cast<GLuint>(arg1[i][BCOMP]) << CHAN_BITS)) >> shift;
 
 		}
 
 		if (rgba[i][RCOMP] && rgba[i][GCOMP] && rgba[i][BCOMP]) {
-		    rgba[i][RCOMP] = (GLchan) MIN2(r, CHAN_MAX);
-		    rgba[i][GCOMP] = (GLchan) MIN2(g, CHAN_MAX);
-		    rgba[i][BCOMP] = (GLchan) MIN2(b, CHAN_MAX);
+		    rgba[i][RCOMP] = static_cast<GLchan>(MIN2(r, CHAN_MAX));
+		    rgba[i][GCOMP] = static_cast<GLchan>(MIN2(g, CHAN_MAX));
+		    rgba[i][BCOMP] = static_cast<GLchan>(MIN2(b, CHAN_MAX));
 		}
 #endif
 	    }
@@ -534,20 +534,20 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 
 
 		    GLint r = (S_PROD(arg0[i][RCOMP], arg2[i][RCOMP])
-			    + (((GLint) arg1[i][RCOMP] - half) << CHAN_BITS))
+			    + ((static_cast<GLint>(arg1[i][RCOMP]) - half) << CHAN_BITS))
 			>> shift;
 		    GLint g = (S_PROD(arg0[i][GCOMP], arg2[i][GCOMP])
-			    + (((GLint) arg1[i][GCOMP] - half) << CHAN_BITS))
+			    + ((static_cast<GLint>(arg1[i][GCOMP]) - half) << CHAN_BITS))
 			>> shift;
 		    GLint b = (S_PROD(arg0[i][BCOMP], arg2[i][BCOMP])
-			    + (((GLint) arg1[i][BCOMP] - half) << CHAN_BITS))
+			    + ((static_cast<GLint>(arg1[i][BCOMP]) - half) << CHAN_BITS))
 			>> shift;
 		    if (rgba[i][RCOMP])
-			rgba[i][RCOMP] = (GLchan) CLAMP(r, 0, CHAN_MAX);
+			rgba[i][RCOMP] = static_cast<GLchan>(CLAMP(r, 0, CHAN_MAX));
 		    if (rgba[i][GCOMP])
-			rgba[i][GCOMP] = (GLchan) CLAMP(g, 0, CHAN_MAX);
+			rgba[i][GCOMP] = static_cast<GLchan>(CLAMP(g, 0, CHAN_MAX));
 		    if (rgba[i][BCOMP])
-			rgba[i][BCOMP] = (GLchan) CLAMP(b, 0, CHAN_MAX);
+			rgba[i][BCOMP] = static_cast<GLchan>(CLAMP(b, 0, CHAN_MAX));
 		}
 #endif
 	    }
@@ -571,20 +571,20 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 			arg0[i][BCOMP] && arg1[i][BCOMP] && arg2[i][BCOMP]) {
 
 		    GLint r = (S_PROD(arg0[i][RCOMP], arg2[i][RCOMP])
-			    - ((GLint) arg1[i][RCOMP] << CHAN_BITS))
+			    - (static_cast<GLint>(arg1[i][RCOMP]) << CHAN_BITS))
 			>> shift;
 		    GLint g = (S_PROD(arg0[i][GCOMP], arg2[i][GCOMP])
-			    - ((GLint) arg1[i][GCOMP] << CHAN_BITS))
+			    - (static_cast<GLint>(arg1[i][GCOMP]) << CHAN_BITS))
 			>> shift;
 		    GLint b = (S_PROD(arg0[i][BCOMP], arg2[i][BCOMP])
-			    - ((GLint) arg1[i][BCOMP] << CHAN_BITS))
+			    - (static_cast<GLint>(arg1[i][BCOMP]) << CHAN_BITS))
 			>> shift;
 		    if (rgba[i][RCOMP])
-			rgba[i][RCOMP] = (GLchan) CLAMP(r, 0, CHAN_MAX);
+			rgba[i][RCOMP] = static_cast<GLchan>(CLAMP(r, 0, CHAN_MAX));
 		    if (rgba[i][GCOMP])
-			rgba[i][GCOMP] = (GLchan) CLAMP(g, 0, CHAN_MAX);
+			rgba[i][GCOMP] = static_cast<GLchan>(CLAMP(g, 0, CHAN_MAX));
 		    if (rgba[i][BCOMP])
-			rgba[i][BCOMP] = (GLchan) CLAMP(b, 0, CHAN_MAX);
+			rgba[i][BCOMP] = static_cast<GLchan>(CLAMP(b, 0, CHAN_MAX));
 		}
 #endif
 	    }
@@ -602,10 +602,10 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 #if CHAN_TYPE == GL_FLOAT
 		    GLchan a = arg0[i][ACOMP] * Amult;
 #else
-		    GLuint a = (arg0[i][ACOMP]) ? (GLuint) arg0[i][ACOMP] << Ashift : 0;
+		    GLuint a = (arg0[i][ACOMP]) ? static_cast<GLuint>(arg0[i][ACOMP]) << Ashift : 0;
 #endif
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) MIN2(a, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(MIN2(a, CHAN_MAX));
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
@@ -628,7 +628,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		if (arg0[i][ACOMP] && arg1[i][ACOMP]) {
 		    GLuint a = (PROD(arg0[i][ACOMP], arg1[i][ACOMP]) >> shift);
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) MIN2(a, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(MIN2(a, CHAN_MAX));
 		}
 #endif
 	    }
@@ -642,9 +642,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][ACOMP] = (arg0[i][ACOMP] + arg1[i][ACOMP]) * Amult;
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP]) {
-		    GLint a = ((GLint) arg0[i][ACOMP] + arg1[i][ACOMP]) << Ashift;
+		    GLint a = (static_cast<GLint>(arg0[i][ACOMP]) + arg1[i][ACOMP]) << Ashift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) MIN2(a, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(MIN2(a, CHAN_MAX));
 		}
 #endif
 	    }
@@ -658,10 +658,10 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][ACOMP] = (arg0[i][ACOMP] + arg1[i][ACOMP] - 0.5F) * Amult;
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP]) {
-		    GLint a = (GLint) arg0[i][ACOMP] + (GLint) arg1[i][ACOMP] -half;
+		    GLint a = static_cast<GLint>(arg0[i][ACOMP]) + static_cast<GLint>(arg1[i][ACOMP]) -half;
 		    a = (a < 0) ? 0 : a << Ashift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) MIN2(a, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(MIN2(a, CHAN_MAX));
 		}
 #endif
 	    }
@@ -685,7 +685,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 			    + PROD(arg1[i][ACOMP], CHAN_MAX - arg2[i][ACOMP]))
 			>> shift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) MIN2(a, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(MIN2(a, CHAN_MAX));
 		}
 #endif
 	    }
@@ -699,9 +699,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		rgba[i][ACOMP] = (arg0[i][ACOMP] - arg1[i][ACOMP]) * Amult;
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP]) {
-		    GLint a = ((GLint) arg0[i][ACOMP] - (GLint) arg1[i][ACOMP]) << Ashift;
+		    GLint a = (static_cast<GLint>(arg0[i][ACOMP]) - static_cast<GLint>(arg1[i][ACOMP])) << Ashift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) CLAMP(a, 0, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(CLAMP(a, 0, CHAN_MAX));
 		}
 #endif
 	    }
@@ -720,10 +720,10 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP] && arg2[i][ACOMP]) {
 		    GLint a = (PROD(arg0[i][ACOMP], arg2[i][ACOMP])
-			    + ((GLuint) arg1[i][ACOMP] << CHAN_BITS))
+			    + (static_cast<GLuint>(arg1[i][ACOMP]) << CHAN_BITS))
 			>> shift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) CLAMP(a, 0, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(CLAMP(a, 0, CHAN_MAX));
 		}
 #endif
 	    }
@@ -742,10 +742,10 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP] && arg2[i][ACOMP]) {
 		    GLint a = (S_PROD(arg0[i][ACOMP], arg2[i][ACOMP])
-			    + (((GLint) arg1[i][ACOMP] - half) << CHAN_BITS))
+			    + ((static_cast<GLint>(arg1[i][ACOMP]) - half) << CHAN_BITS))
 			>> shift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) CLAMP(a, 0, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(CLAMP(a, 0, CHAN_MAX));
 		}
 #endif
 	    }
@@ -764,9 +764,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 #else
 		if (arg0[i][ACOMP] && arg1[i][ACOMP] && arg2[i][ACOMP]) {
 		    GLint a = (S_PROD(arg0[i][ACOMP], arg2[i][ACOMP])
-			    - ((GLint) arg1[i][ACOMP] << CHAN_BITS)) >> shift;
+			    - (static_cast<GLint>(arg1[i][ACOMP]) << CHAN_BITS)) >> shift;
 		    if (rgba[i][ACOMP])
-			rgba[i][ACOMP] = (GLchan) CLAMP(a, 0, CHAN_MAX);
+			rgba[i][ACOMP] = static_cast<GLchan>(CLAMP(a, 0, CHAN_MAX));
 		}
 #endif
 	    }

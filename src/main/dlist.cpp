@@ -260,8 +260,8 @@ _mesa_delete_list(GLcontext *ctx, struct mesa_display_list *dlist)
     bool done = (n == nullptr);
 
     while (!done) {
-	GLint i = (GLint) n[0].opcode - (GLint) OPCODE_EXT_0;
-	if (i >= 0 && i < (GLint) ctx->ListExt.NumOpcodes) {
+	GLint i = static_cast<GLint>(n[0].opcode) - static_cast<GLint>(OPCODE_EXT_0);
+	if (i >= 0 && i < static_cast<GLint>(ctx->ListExt.NumOpcodes)) {
 	    ctx->ListExt.Opcode[i].Destroy(ctx, &n[1]);
 	    n += ctx->ListExt.Opcode[i].Size;
 	} else {
@@ -427,37 +427,37 @@ translate_id(GLsizei n, GLenum type, const GLvoid * list)
     switch (type) {
 	case GL_BYTE:
 	    bptr = static_cast<const GLbyte *>(list);
-	    return (GLuint) *(bptr + n);
+	    return static_cast<GLuint>(*(bptr + n));
 	case GL_UNSIGNED_BYTE:
 	    ubptr = static_cast<const GLubyte *>(list);
-	    return (GLuint) *(ubptr + n);
+	    return static_cast<GLuint>(*(ubptr + n));
 	case GL_SHORT:
 	    sptr = static_cast<const GLshort *>(list);
-	    return (GLuint) *(sptr + n);
+	    return static_cast<GLuint>(*(sptr + n));
 	case GL_UNSIGNED_SHORT:
 	    usptr = static_cast<const GLushort *>(list);
-	    return (GLuint) *(usptr + n);
+	    return static_cast<GLuint>(*(usptr + n));
 	case GL_INT:
 	    iptr = static_cast<const GLint *>(list);
-	    return (GLuint) *(iptr + n);
+	    return static_cast<GLuint>(*(iptr + n));
 	case GL_UNSIGNED_INT:
 	    uiptr = static_cast<const GLuint *>(list);
-	    return (GLuint) *(uiptr + n);
+	    return static_cast<GLuint>(*(uiptr + n));
 	case GL_FLOAT:
 	    fptr = static_cast<const GLfloat *>(list);
-	    return (GLuint) *(fptr + n);
+	    return static_cast<GLuint>(*(fptr + n));
 	case GL_2_BYTES:
 	    ubptr = (static_cast<const GLubyte *>(list)) + 2 * n;
-	    return (GLuint) *ubptr * 256 + (GLuint) * (ubptr + 1);
+	    return static_cast<GLuint>(*ubptr) * 256 + (GLuint) * (ubptr + 1);
 	case GL_3_BYTES:
 	    ubptr = (static_cast<const GLubyte *>(list)) + 3 * n;
 	    return (GLuint) * ubptr * 65536
-		   + (GLuint) *(ubptr + 1) * 256 + (GLuint) * (ubptr + 2);
+		   + static_cast<GLuint>(*(ubptr + 1)) * 256 + (GLuint) * (ubptr + 2);
 	case GL_4_BYTES:
 	    ubptr = (static_cast<const GLubyte *>(list)) + 4 * n;
-	    return (GLuint) *ubptr * 16777216
-		   + (GLuint) *(ubptr + 1) * 65536
-		   + (GLuint) *(ubptr + 2) * 256 + (GLuint) * (ubptr + 3);
+	    return static_cast<GLuint>(*ubptr) * 16777216
+		   + static_cast<GLuint>(*(ubptr + 1)) * 65536
+		   + static_cast<GLuint>(*(ubptr + 2)) * 256 + (GLuint) * (ubptr + 3);
 	default:
 	    return 0;
     }
@@ -507,7 +507,7 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
     const GLuint numNodes = 1 + (bytes + sizeof(Node) - 1) / sizeof(Node);
     Node *n;
 
-    if (opcode < (GLuint) OPCODE_EXT_0) {
+    if (opcode < static_cast<GLuint>(OPCODE_EXT_0)) {
 	if (InstSize[opcode] == 0) {
 	    /* save instruction size now */
 	    InstSize[opcode] = numNodes;
@@ -604,7 +604,7 @@ save_AlphaFunc(GLenum func, GLclampf ref)
     n = ALLOC_INSTRUCTION(ctx, OPCODE_ALPHA_FUNC, 2);
     if (n) {
 	n[1].e = func;
-	n[2].f = (GLfloat) ref;
+	n[2].f = static_cast<GLfloat>(ref);
     }
     if (ctx->ExecuteFlag) {
 	CALL_AlphaFunc(ctx->Exec, (func, ref));
@@ -639,8 +639,8 @@ save_Bitmap(GLsizei width, GLsizei height,
     Node *n;
     ASSERT_OUTSIDE_SAVE_BEGIN_END_FREE_AND_FLUSH(ctx, image);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_BITMAP, 7);
-    n[1].i = (GLint) width;
-    n[2].i = (GLint) height;
+    n[1].i = static_cast<GLint>(width);
+    n[2].i = static_cast<GLint>(height);
     n[3].f = xorig;
     n[4].f = yorig;
     n[5].f = xmove;
@@ -855,7 +855,7 @@ save_ClearDepth(GLclampd depth)
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_CLEAR_DEPTH, 1);
     if (n) {
-	n[1].f = (GLfloat) depth;
+	n[1].f = static_cast<GLfloat>(depth);
     }
     if (ctx->ExecuteFlag) {
 	CALL_ClearDepth(ctx->Exec, (depth));
@@ -904,10 +904,10 @@ save_ClipPlane(GLenum plane, const GLdouble * equ)
     n = ALLOC_INSTRUCTION(ctx, OPCODE_CLIP_PLANE, 5);
     if (n) {
 	n[1].e = plane;
-	n[2].f = (GLfloat) equ[0];
-	n[3].f = (GLfloat) equ[1];
-	n[4].f = (GLfloat) equ[2];
-	n[5].f = (GLfloat) equ[3];
+	n[2].f = static_cast<GLfloat>(equ[0]);
+	n[3].f = static_cast<GLfloat>(equ[1]);
+	n[4].f = static_cast<GLfloat>(equ[2]);
+	n[5].f = static_cast<GLfloat>(equ[3]);
     }
     if (ctx->ExecuteFlag) {
 	CALL_ClipPlane(ctx->Exec, (plane, equ));
@@ -1262,8 +1262,8 @@ save_CopyPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum type)
     if (n) {
 	n[1].i = x;
 	n[2].i = y;
-	n[3].i = (GLint) width;
-	n[4].i = (GLint) height;
+	n[3].i = static_cast<GLint>(width);
+	n[4].i = static_cast<GLint>(height);
 	n[5].e = type;
     }
     if (ctx->ExecuteFlag) {
@@ -1458,8 +1458,8 @@ save_DepthRange(GLclampd nearval, GLclampd farval)
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_DEPTH_RANGE, 2);
     if (n) {
-	n[1].f = (GLfloat) nearval;
-	n[2].f = (GLfloat) farval;
+	n[1].f = static_cast<GLfloat>(nearval);
+	n[2].f = static_cast<GLfloat>(farval);
     }
     if (ctx->ExecuteFlag) {
 	CALL_DepthRange(ctx->Exec, (nearval, farval));
@@ -1617,7 +1617,7 @@ save_Fogiv(GLenum pname, const GLint *params)
 	case GL_FOG_START:
 	case GL_FOG_END:
 	case GL_FOG_INDEX:
-	    p[0] = (GLfloat) *params;
+	    p[0] = static_cast<GLfloat>(*params);
 	    break;
 	case GL_FOG_COLOR:
 	    p[0] = INT_TO_FLOAT(params[0]);
@@ -1667,12 +1667,12 @@ save_Frustum(GLdouble left, GLdouble right,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_FRUSTUM, 6);
     if (n) {
-	n[1].f = (GLfloat) left;
-	n[2].f = (GLfloat) right;
-	n[3].f = (GLfloat) bottom;
-	n[4].f = (GLfloat) top;
-	n[5].f = (GLfloat) nearval;
-	n[6].f = (GLfloat) farval;
+	n[1].f = static_cast<GLfloat>(left);
+	n[2].f = static_cast<GLfloat>(right);
+	n[3].f = static_cast<GLfloat>(bottom);
+	n[4].f = static_cast<GLfloat>(top);
+	n[5].f = static_cast<GLfloat>(nearval);
+	n[6].f = static_cast<GLfloat>(farval);
     }
     if (ctx->ExecuteFlag) {
 	CALL_Frustum(ctx->Exec, (left, right, bottom, top, nearval, farval));
@@ -1824,22 +1824,22 @@ save_Lightiv(GLenum light, GLenum pname, const GLint *params)
 	    fparam[3] = INT_TO_FLOAT(params[3]);
 	    break;
 	case GL_POSITION:
-	    fparam[0] = (GLfloat) params[0];
-	    fparam[1] = (GLfloat) params[1];
-	    fparam[2] = (GLfloat) params[2];
-	    fparam[3] = (GLfloat) params[3];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
+	    fparam[1] = static_cast<GLfloat>(params[1]);
+	    fparam[2] = static_cast<GLfloat>(params[2]);
+	    fparam[3] = static_cast<GLfloat>(params[3]);
 	    break;
 	case GL_SPOT_DIRECTION:
-	    fparam[0] = (GLfloat) params[0];
-	    fparam[1] = (GLfloat) params[1];
-	    fparam[2] = (GLfloat) params[2];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
+	    fparam[1] = static_cast<GLfloat>(params[1]);
+	    fparam[2] = static_cast<GLfloat>(params[2]);
 	    break;
 	case GL_SPOT_EXPONENT:
 	case GL_SPOT_CUTOFF:
 	case GL_CONSTANT_ATTENUATION:
 	case GL_LINEAR_ATTENUATION:
 	case GL_QUADRATIC_ATTENUATION:
-	    fparam[0] = (GLfloat) params[0];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
 	    break;
 	default:
 	    /* error will be caught later in gl_Lightfv */
@@ -1901,7 +1901,7 @@ save_LightModeliv(GLenum pname, const GLint *params)
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	case GL_LIGHT_MODEL_TWO_SIDE:
 	case GL_LIGHT_MODEL_COLOR_CONTROL:
-	    fparam[0] = (GLfloat) params[0];
+	    fparam[0] = static_cast<GLfloat>(params[0]);
 	    break;
 	default:
 	    /* Error will be caught later in gl_LightModelfv */
@@ -2006,7 +2006,7 @@ save_LoadMatrixd(const GLdouble * m)
     GLfloat f[16];
     GLint i;
     for (i = 0; i < 16; i++) {
-	f[i] = (GLfloat) m[i];
+	f[i] = static_cast<GLfloat>(m[i]);
     }
     save_LoadMatrixf(f);
 }
@@ -2057,8 +2057,8 @@ save_Map1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride,
 	GLfloat *pnts = new GLfloat[pntsVec.size()];
 	std::copy(pntsVec.begin(), pntsVec.end(), pnts);
 	n[1].e = target;
-	n[2].f = (GLfloat) u1;
-	n[3].f = (GLfloat) u2;
+	n[2].f = static_cast<GLfloat>(u1);
+	n[3].f = static_cast<GLfloat>(u2);
 	n[4].i = _mesa_evaluator_components(target);      /* stride */
 	n[5].i = order;
 	n[6].data = static_cast<void *>(pnts);
@@ -2109,10 +2109,10 @@ save_Map2d(GLenum target,
 	auto *pnts = new GLfloat[ptsVec.size()];
 	std::copy(ptsVec.begin(), ptsVec.end(), pnts);
 	n[1].e = target;
-	n[2].f = (GLfloat) u1;
-	n[3].f = (GLfloat) u2;
-	n[4].f = (GLfloat) v1;
-	n[5].f = (GLfloat) v2;
+	n[2].f = static_cast<GLfloat>(u1);
+	n[3].f = static_cast<GLfloat>(u2);
+	n[4].f = static_cast<GLfloat>(v1);
+	n[5].f = static_cast<GLfloat>(v2);
 	/* XXX verify these strides are correct */
 	n[6].i = _mesa_evaluator_components(target) * vorder;     /*ustride */
 	n[7].i = _mesa_evaluator_components(target);      /*vstride */
@@ -2183,7 +2183,7 @@ save_MapGrid1f(GLint un, GLfloat u1, GLfloat u2)
 static void GLAPIENTRY
 save_MapGrid1d(GLint un, GLdouble u1, GLdouble u2)
 {
-    save_MapGrid1f(un, (GLfloat) u1, (GLfloat) u2);
+    save_MapGrid1f(un, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2));
 }
 
 
@@ -2214,8 +2214,8 @@ static void GLAPIENTRY
 save_MapGrid2d(GLint un, GLdouble u1, GLdouble u2,
 	       GLint vn, GLdouble v1, GLdouble v2)
 {
-    save_MapGrid2f(un, (GLfloat) u1, (GLfloat) u2,
-		   vn, (GLfloat) v1, (GLfloat) v2);
+    save_MapGrid2f(un, static_cast<GLfloat>(u1), static_cast<GLfloat>(u2),
+		   vn, static_cast<GLfloat>(v1), static_cast<GLfloat>(v2));
 }
 
 
@@ -2279,7 +2279,7 @@ save_MultMatrixd(const GLdouble * m)
     GLfloat f[16];
     GLint i;
     for (i = 0; i < 16; i++) {
-	f[i] = (GLfloat) m[i];
+	f[i] = static_cast<GLfloat>(m[i]);
     }
     save_MultMatrixf(f);
 }
@@ -2306,12 +2306,12 @@ save_Ortho(GLdouble left, GLdouble right,
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_ORTHO, 6);
     if (n) {
-	n[1].f = (GLfloat) left;
-	n[2].f = (GLfloat) right;
-	n[3].f = (GLfloat) bottom;
-	n[4].f = (GLfloat) top;
-	n[5].f = (GLfloat) nearval;
-	n[6].f = (GLfloat) farval;
+	n[1].f = static_cast<GLfloat>(left);
+	n[2].f = static_cast<GLfloat>(right);
+	n[3].f = static_cast<GLfloat>(bottom);
+	n[4].f = static_cast<GLfloat>(top);
+	n[5].f = static_cast<GLfloat>(nearval);
+	n[6].f = static_cast<GLfloat>(farval);
     }
     if (ctx->ExecuteFlag) {
 	CALL_Ortho(ctx->Exec, (left, right, bottom, top, nearval, farval));
@@ -2345,7 +2345,7 @@ save_PixelMapuiv(GLenum map, GLint mapsize, const GLuint *values)
     GLint i;
     if (map == GL_PIXEL_MAP_I_TO_I || map == GL_PIXEL_MAP_S_TO_S) {
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = (GLfloat) values[i];
+	    fvalues[i] = static_cast<GLfloat>(values[i]);
 	}
     } else {
 	for (i = 0; i < mapsize; i++) {
@@ -2363,7 +2363,7 @@ save_PixelMapusv(GLenum map, GLint mapsize, const GLushort *values)
     GLint i;
     if (map == GL_PIXEL_MAP_I_TO_I || map == GL_PIXEL_MAP_S_TO_S) {
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = (GLfloat) values[i];
+	    fvalues[i] = static_cast<GLfloat>(values[i]);
 	}
     } else {
 	for (i = 0; i < mapsize; i++) {
@@ -2394,7 +2394,7 @@ save_PixelTransferf(GLenum pname, GLfloat param)
 static void GLAPIENTRY
 save_PixelTransferi(GLenum pname, GLint param)
 {
-    save_PixelTransferf(pname, (GLfloat) param);
+    save_PixelTransferf(pname, static_cast<GLfloat>(param));
 }
 
 
@@ -2438,7 +2438,7 @@ static void GLAPIENTRY
 save_PointParameterfEXT(GLenum pname, GLfloat param)
 {
     GLfloat p[4] = {0};
-    p[0] = (GLfloat) param;
+    p[0] = static_cast<GLfloat>(param);
     save_PointParameterfvEXT(pname, p);
 }
 
@@ -2446,7 +2446,7 @@ static void GLAPIENTRY
 save_PointParameteriNV(GLenum pname, GLint param)
 {
     GLfloat p[4] = {0};
-    p[0] = (GLfloat) param;
+    p[0] = static_cast<GLfloat>(param);
     save_PointParameterfvEXT(pname, p);
 }
 
@@ -2454,7 +2454,7 @@ static void GLAPIENTRY
 save_PointParameterivNV(GLenum pname, const GLint * param)
 {
     GLfloat p[4] = {0};
-    p[0] = (GLfloat) param[0];
+    p[0] = static_cast<GLfloat>(param[0]);
     save_PointParameterfvEXT(pname, p);
 }
 
@@ -2657,7 +2657,7 @@ save_RasterPos4f(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 static void GLAPIENTRY
 save_RasterPos2d(GLdouble x, GLdouble y)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2669,7 +2669,7 @@ save_RasterPos2f(GLfloat x, GLfloat y)
 static void GLAPIENTRY
 save_RasterPos2i(GLint x, GLint y)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2681,7 +2681,7 @@ save_RasterPos2s(GLshort x, GLshort y)
 static void GLAPIENTRY
 save_RasterPos3d(GLdouble x, GLdouble y, GLdouble z)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2693,7 +2693,7 @@ save_RasterPos3f(GLfloat x, GLfloat y, GLfloat z)
 static void GLAPIENTRY
 save_RasterPos3i(GLint x, GLint y, GLint z)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2705,13 +2705,13 @@ save_RasterPos3s(GLshort x, GLshort y, GLshort z)
 static void GLAPIENTRY
 save_RasterPos4d(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 save_RasterPos4i(GLint x, GLint y, GLint z, GLint w)
 {
-    save_RasterPos4f((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    save_RasterPos4f(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
@@ -2723,7 +2723,7 @@ save_RasterPos4s(GLshort x, GLshort y, GLshort z, GLshort w)
 static void GLAPIENTRY
 save_RasterPos2dv(const GLdouble * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2735,7 +2735,7 @@ save_RasterPos2fv(const GLfloat * v)
 static void GLAPIENTRY
 save_RasterPos2iv(const GLint * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2747,7 +2747,7 @@ save_RasterPos2sv(const GLshort * v)
 static void GLAPIENTRY
 save_RasterPos3dv(const GLdouble * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2759,7 +2759,7 @@ save_RasterPos3fv(const GLfloat * v)
 static void GLAPIENTRY
 save_RasterPos3iv(const GLint * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -2771,8 +2771,8 @@ save_RasterPos3sv(const GLshort * v)
 static void GLAPIENTRY
 save_RasterPos4dv(const GLdouble * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1],
-		     (GLfloat) v[2], (GLfloat) v[3]);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		     static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
@@ -2784,8 +2784,8 @@ save_RasterPos4fv(const GLfloat * v)
 static void GLAPIENTRY
 save_RasterPos4iv(const GLint * v)
 {
-    save_RasterPos4f((GLfloat) v[0], (GLfloat) v[1],
-		     (GLfloat) v[2], (GLfloat) v[3]);
+    save_RasterPos4f(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+		     static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
@@ -2881,7 +2881,7 @@ save_Rotatef(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 static void GLAPIENTRY
 save_Rotated(GLdouble angle, GLdouble x, GLdouble y, GLdouble z)
 {
-    save_Rotatef((GLfloat) angle, (GLfloat) x, (GLfloat) y, (GLfloat) z);
+    save_Rotatef(static_cast<GLfloat>(angle), static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 
@@ -2906,7 +2906,7 @@ save_Scalef(GLfloat x, GLfloat y, GLfloat z)
 static void GLAPIENTRY
 save_Scaled(GLdouble x, GLdouble y, GLdouble z)
 {
-    save_Scalef((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    save_Scalef(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 
@@ -3121,7 +3121,7 @@ static void GLAPIENTRY
 save_TexEnvi(GLenum target, GLenum pname, GLint param)
 {
     GLfloat p[4];
-    p[0] = (GLfloat) param;
+    p[0] = static_cast<GLfloat>(param);
     p[1] = p[2] = p[3] = 0.0;
     save_TexEnvfv(target, pname, p);
 }
@@ -3137,7 +3137,7 @@ save_TexEnviv(GLenum target, GLenum pname, const GLint * param)
 	p[2] = INT_TO_FLOAT(param[2]);
 	p[3] = INT_TO_FLOAT(param[3]);
     } else {
-	p[0] = (GLfloat) param[0];
+	p[0] = static_cast<GLfloat>(param[0]);
 	p[1] = p[2] = p[3] = 0.0F;
     }
     save_TexEnvfv(target, pname, p);
@@ -3169,10 +3169,10 @@ static void GLAPIENTRY
 save_TexGeniv(GLenum coord, GLenum pname, const GLint *params)
 {
     GLfloat p[4];
-    p[0] = (GLfloat) params[0];
-    p[1] = (GLfloat) params[1];
-    p[2] = (GLfloat) params[2];
-    p[3] = (GLfloat) params[3];
+    p[0] = static_cast<GLfloat>(params[0]);
+    p[1] = static_cast<GLfloat>(params[1]);
+    p[2] = static_cast<GLfloat>(params[2]);
+    p[3] = static_cast<GLfloat>(params[3]);
     save_TexGenfv(coord, pname, p);
 }
 
@@ -3181,7 +3181,7 @@ static void GLAPIENTRY
 save_TexGend(GLenum coord, GLenum pname, GLdouble param)
 {
     GLfloat p[4] = {0};
-    p[0] = (GLfloat) param;
+    p[0] = static_cast<GLfloat>(param);
     save_TexGenfv(coord, pname, p);
 }
 
@@ -3190,10 +3190,10 @@ static void GLAPIENTRY
 save_TexGendv(GLenum coord, GLenum pname, const GLdouble *params)
 {
     GLfloat p[4];
-    p[0] = (GLfloat) params[0];
-    p[1] = (GLfloat) params[1];
-    p[2] = (GLfloat) params[2];
-    p[3] = (GLfloat) params[3];
+    p[0] = static_cast<GLfloat>(params[0]);
+    p[1] = static_cast<GLfloat>(params[1]);
+    p[2] = static_cast<GLfloat>(params[2]);
+    p[3] = static_cast<GLfloat>(params[3]);
     save_TexGenfv(coord, pname, p);
 }
 
@@ -3250,7 +3250,7 @@ static void GLAPIENTRY
 save_TexParameteri(GLenum target, GLenum pname, GLint param)
 {
     GLfloat fparam[4];
-    fparam[0] = (GLfloat) param;
+    fparam[0] = static_cast<GLfloat>(param);
     fparam[1] = fparam[2] = fparam[3] = 0.0;
     save_TexParameterfv(target, pname, fparam);
 }
@@ -3260,7 +3260,7 @@ static void GLAPIENTRY
 save_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
 {
     GLfloat fparam[4];
-    fparam[0] = (GLfloat) params[0];
+    fparam[0] = static_cast<GLfloat>(params[0]);
     fparam[1] = fparam[2] = fparam[3] = 0.0;
     save_TexParameterfv(target, pname, fparam);
 }
@@ -3286,7 +3286,7 @@ save_TexImage1D(GLenum target,
 	n[1].e = target;
 	n[2].i = level;
 	n[3].i = components;
-	n[4].i = (GLint) width;
+	n[4].i = static_cast<GLint>(width);
 	n[5].i = border;
 	n[6].e = format;
 	n[7].e = type;
@@ -3319,8 +3319,8 @@ save_TexImage2D(GLenum target,
 	n[1].e = target;
 	n[2].i = level;
 	n[3].i = components;
-	n[4].i = (GLint) width;
-	n[5].i = (GLint) height;
+	n[4].i = static_cast<GLint>(width);
+	n[5].i = static_cast<GLint>(height);
 	n[6].i = border;
 	n[7].e = format;
 	n[8].e = type;
@@ -3354,10 +3354,10 @@ save_TexImage3D(GLenum target,
 	n = ALLOC_INSTRUCTION(ctx, OPCODE_TEX_IMAGE3D, 10);
 	n[1].e = target;
 	n[2].i = level;
-	n[3].i = (GLint) internalFormat;
-	n[4].i = (GLint) width;
-	n[5].i = (GLint) height;
-	n[6].i = (GLint) depth;
+	n[3].i = static_cast<GLint>(internalFormat);
+	n[4].i = static_cast<GLint>(width);
+	n[5].i = static_cast<GLint>(height);
+	n[6].i = static_cast<GLint>(depth);
 	n[7].i = border;
 	n[8].e = format;
 	n[9].e = type;
@@ -3385,7 +3385,7 @@ save_TexSubImage1D(GLenum target, GLint level, GLint xoffset,
     n[1].e = target;
     n[2].i = level;
     n[3].i = xoffset;
-    n[4].i = (GLint) width;
+    n[4].i = static_cast<GLint>(width);
     n[5].e = format;
     n[6].e = type;
     n[7].data = image;
@@ -3412,8 +3412,8 @@ save_TexSubImage2D(GLenum target, GLint level,
     n[2].i = level;
     n[3].i = xoffset;
     n[4].i = yoffset;
-    n[5].i = (GLint) width;
-    n[6].i = (GLint) height;
+    n[5].i = static_cast<GLint>(width);
+    n[6].i = static_cast<GLint>(height);
     n[7].e = format;
     n[8].e = type;
     n[9].data = image;
@@ -3441,9 +3441,9 @@ save_TexSubImage3D(GLenum target, GLint level,
     n[3].i = xoffset;
     n[4].i = yoffset;
     n[5].i = zoffset;
-    n[6].i = (GLint) width;
-    n[7].i = (GLint) height;
-    n[8].i = (GLint) depth;
+    n[6].i = static_cast<GLint>(width);
+    n[7].i = static_cast<GLint>(height);
+    n[8].i = static_cast<GLint>(depth);
     n[9].e = format;
     n[10].e = type;
     n[11].data = image;
@@ -3477,7 +3477,7 @@ save_Translatef(GLfloat x, GLfloat y, GLfloat z)
 static void GLAPIENTRY
 save_Translated(GLdouble x, GLdouble y, GLdouble z)
 {
-    save_Translatef((GLfloat) x, (GLfloat) y, (GLfloat) z);
+    save_Translatef(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z));
 }
 
 
@@ -3492,8 +3492,8 @@ save_Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     if (n) {
 	n[1].i = x;
 	n[2].i = y;
-	n[3].i = (GLint) width;
-	n[4].i = (GLint) height;
+	n[3].i = static_cast<GLint>(width);
+	n[4].i = static_cast<GLint>(height);
     }
     if (ctx->ExecuteFlag) {
 	CALL_Viewport(ctx->Exec, (x, y, width, height));
@@ -3522,7 +3522,7 @@ save_WindowPos4fMESA(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 static void GLAPIENTRY
 save_WindowPos2dMESA(GLdouble x, GLdouble y)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3534,7 +3534,7 @@ save_WindowPos2fMESA(GLfloat x, GLfloat y)
 static void GLAPIENTRY
 save_WindowPos2iMESA(GLint x, GLint y)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, 0.0F, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3546,7 +3546,7 @@ save_WindowPos2sMESA(GLshort x, GLshort y)
 static void GLAPIENTRY
 save_WindowPos3dMESA(GLdouble x, GLdouble y, GLdouble z)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3558,7 +3558,7 @@ save_WindowPos3fMESA(GLfloat x, GLfloat y, GLfloat z)
 static void GLAPIENTRY
 save_WindowPos3iMESA(GLint x, GLint y, GLint z)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, (GLfloat) z, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3570,13 +3570,13 @@ save_WindowPos3sMESA(GLshort x, GLshort y, GLshort z)
 static void GLAPIENTRY
 save_WindowPos4dMESA(GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
 save_WindowPos4iMESA(GLint x, GLint y, GLint z, GLint w)
 {
-    save_WindowPos4fMESA((GLfloat) x, (GLfloat) y, (GLfloat) z, (GLfloat) w);
+    save_WindowPos4fMESA(static_cast<GLfloat>(x), static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 static void GLAPIENTRY
@@ -3588,7 +3588,7 @@ save_WindowPos4sMESA(GLshort x, GLshort y, GLshort z, GLshort w)
 static void GLAPIENTRY
 save_WindowPos2dvMESA(const GLdouble * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3600,7 +3600,7 @@ save_WindowPos2fvMESA(const GLfloat * v)
 static void GLAPIENTRY
 save_WindowPos2ivMESA(const GLint * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1], 0.0F, 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), 0.0F, 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3612,7 +3612,7 @@ save_WindowPos2svMESA(const GLshort * v)
 static void GLAPIENTRY
 save_WindowPos3dvMESA(const GLdouble * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3624,7 +3624,7 @@ save_WindowPos3fvMESA(const GLfloat * v)
 static void GLAPIENTRY
 save_WindowPos3ivMESA(const GLint * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1], (GLfloat) v[2], 1.0F);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]), 1.0F);
 }
 
 static void GLAPIENTRY
@@ -3636,8 +3636,8 @@ save_WindowPos3svMESA(const GLshort * v)
 static void GLAPIENTRY
 save_WindowPos4dvMESA(const GLdouble * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1],
-			 (GLfloat) v[2], (GLfloat) v[3]);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+			 static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
@@ -3649,8 +3649,8 @@ save_WindowPos4fvMESA(const GLfloat * v)
 static void GLAPIENTRY
 save_WindowPos4ivMESA(const GLint * v)
 {
-    save_WindowPos4fMESA((GLfloat) v[0], (GLfloat) v[1],
-			 (GLfloat) v[2], (GLfloat) v[3]);
+    save_WindowPos4fMESA(static_cast<GLfloat>(v[0]), static_cast<GLfloat>(v[1]),
+			 static_cast<GLfloat>(v[2]), static_cast<GLfloat>(v[3]));
 }
 
 static void GLAPIENTRY
@@ -3740,7 +3740,7 @@ save_CompressedTexImage1DARB(GLenum target, GLint level,
 	n[1].e = target;
 	n[2].i = level;
 	n[3].e = internalFormat;
-	n[4].i = (GLint) width;
+	n[4].i = static_cast<GLint>(width);
 	n[5].i = border;
 	n[6].i = imageSize;
 	n[7].data = image;
@@ -3776,8 +3776,8 @@ save_CompressedTexImage2DARB(GLenum target, GLint level,
 	n[1].e = target;
 	n[2].i = level;
 	n[3].e = internalFormat;
-	n[4].i = (GLint) width;
-	n[5].i = (GLint) height;
+	n[4].i = static_cast<GLint>(width);
+	n[5].i = static_cast<GLint>(height);
 	n[6].i = border;
 	n[7].i = imageSize;
 	n[8].data = image;
@@ -3813,9 +3813,9 @@ save_CompressedTexImage3DARB(GLenum target, GLint level,
 	n[1].e = target;
 	n[2].i = level;
 	n[3].e = internalFormat;
-	n[4].i = (GLint) width;
-	n[5].i = (GLint) height;
-	n[6].i = (GLint) depth;
+	n[4].i = static_cast<GLint>(width);
+	n[5].i = static_cast<GLint>(height);
+	n[6].i = static_cast<GLint>(depth);
 	n[7].i = border;
 	n[8].i = imageSize;
 	n[9].data = image;
@@ -3847,7 +3847,7 @@ save_CompressedTexSubImage1DARB(GLenum target, GLint level, GLint xoffset,
     n[1].e = target;
     n[2].i = level;
     n[3].i = xoffset;
-    n[4].i = (GLint) width;
+    n[4].i = static_cast<GLint>(width);
     n[5].e = format;
     n[6].i = imageSize;
     n[7].data = image;
@@ -3879,8 +3879,8 @@ save_CompressedTexSubImage2DARB(GLenum target, GLint level, GLint xoffset,
     n[2].i = level;
     n[3].i = xoffset;
     n[4].i = yoffset;
-    n[5].i = (GLint) width;
-    n[6].i = (GLint) height;
+    n[5].i = static_cast<GLint>(width);
+    n[6].i = static_cast<GLint>(height);
     n[7].e = format;
     n[8].i = imageSize;
     n[9].data = image;
@@ -3913,9 +3913,9 @@ save_CompressedTexSubImage3DARB(GLenum target, GLint level, GLint xoffset,
     n[3].i = xoffset;
     n[4].i = yoffset;
     n[5].i = zoffset;
-    n[6].i = (GLint) width;
-    n[7].i = (GLint) height;
-    n[8].i = (GLint) depth;
+    n[6].i = static_cast<GLint>(width);
+    n[7].i = static_cast<GLint>(height);
+    n[8].i = static_cast<GLint>(depth);
     n[9].e = format;
     n[10].i = imageSize;
     n[11].data = image;
@@ -4024,8 +4024,8 @@ static void GLAPIENTRY
 save_ProgramParameter4dNV(GLenum target, GLuint index,
 			  GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    save_ProgramParameter4fNV(target, index, (GLfloat) x, (GLfloat) y,
-			      (GLfloat) z, (GLfloat) w);
+    save_ProgramParameter4fNV(target, index, static_cast<GLfloat>(x), static_cast<GLfloat>(y),
+			      static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -4033,9 +4033,9 @@ static void GLAPIENTRY
 save_ProgramParameter4dvNV(GLenum target, GLuint index,
 			   const GLdouble *params)
 {
-    save_ProgramParameter4fNV(target, index, (GLfloat) params[0],
-			      (GLfloat) params[1], (GLfloat) params[2],
-			      (GLfloat) params[3]);
+    save_ProgramParameter4fNV(target, index, static_cast<GLfloat>(params[0]),
+			      static_cast<GLfloat>(params[1]), static_cast<GLfloat>(params[2]),
+			      static_cast<GLfloat>(params[3]));
 }
 
 
@@ -4222,10 +4222,10 @@ save_ProgramLocalParameter4dARB(GLenum target, GLuint index,
     if (n) {
 	n[1].e = target;
 	n[2].ui = index;
-	n[3].f = (GLfloat) x;
-	n[4].f = (GLfloat) y;
-	n[5].f = (GLfloat) z;
-	n[6].f = (GLfloat) w;
+	n[3].f = static_cast<GLfloat>(x);
+	n[4].f = static_cast<GLfloat>(y);
+	n[5].f = static_cast<GLfloat>(z);
+	n[6].f = static_cast<GLfloat>(w);
     }
     if (ctx->ExecuteFlag) {
 	CALL_ProgramLocalParameter4dARB(ctx->Exec, (target, index, x, y, z, w));
@@ -4244,10 +4244,10 @@ save_ProgramLocalParameter4dvARB(GLenum target, GLuint index,
     if (n) {
 	n[1].e = target;
 	n[2].ui = index;
-	n[3].f = (GLfloat) params[0];
-	n[4].f = (GLfloat) params[1];
-	n[5].f = (GLfloat) params[2];
-	n[6].f = (GLfloat) params[3];
+	n[3].f = static_cast<GLfloat>(params[0]);
+	n[4].f = static_cast<GLfloat>(params[1]);
+	n[5].f = static_cast<GLfloat>(params[2]);
+	n[6].f = static_cast<GLfloat>(params[3]);
     }
     if (ctx->ExecuteFlag) {
 	CALL_ProgramLocalParameter4dvARB(ctx->Exec, (target, index, params));
@@ -4294,8 +4294,8 @@ static void GLAPIENTRY
 save_ProgramNamedParameter4dNV(GLuint id, GLsizei len, const GLubyte * name,
 			       GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
-    save_ProgramNamedParameter4fNV(id, len, name, (GLfloat) x, (GLfloat) y,
-				   (GLfloat) z, (GLfloat) w);
+    save_ProgramNamedParameter4fNV(id, len, name, static_cast<GLfloat>(x), static_cast<GLfloat>(y),
+				   static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -4303,9 +4303,9 @@ static void GLAPIENTRY
 save_ProgramNamedParameter4dvNV(GLuint id, GLsizei len, const GLubyte * name,
 				const double v[])
 {
-    save_ProgramNamedParameter4fNV(id, len, name, (GLfloat) v[0],
-				   (GLfloat) v[1], (GLfloat) v[2],
-				   (GLfloat) v[3]);
+    save_ProgramNamedParameter4fNV(id, len, name, static_cast<GLfloat>(v[0]),
+				   static_cast<GLfloat>(v[1]), static_cast<GLfloat>(v[2]),
+				   static_cast<GLfloat>(v[3]));
 }
 
 #endif /* FEATURE_NV_fragment_program */
@@ -4338,8 +4338,8 @@ save_DepthBoundsEXT(GLclampd zmin, GLclampd zmax)
     ASSERT_OUTSIDE_SAVE_BEGIN_END_AND_FLUSH(ctx);
     n = ALLOC_INSTRUCTION(ctx, OPCODE_DEPTH_BOUNDS_EXT, 2);
     if (n) {
-	n[1].f = (GLfloat) zmin;
-	n[2].f = (GLfloat) zmax;
+	n[1].f = static_cast<GLfloat>(zmin);
+	n[2].f = static_cast<GLfloat>(zmax);
     }
     if (ctx->ExecuteFlag) {
 	CALL_DepthBoundsEXT(ctx->Exec, (zmin, zmax));
@@ -4445,8 +4445,8 @@ save_ProgramEnvParameter4dARB(GLenum target, GLuint index,
 			      GLdouble x, GLdouble y, GLdouble z, GLdouble w)
 {
     save_ProgramEnvParameter4fARB(target, index,
-				  (GLfloat) x,
-				  (GLfloat) y, (GLfloat) z, (GLfloat) w);
+				  static_cast<GLfloat>(x),
+				  static_cast<GLfloat>(y), static_cast<GLfloat>(z), static_cast<GLfloat>(w));
 }
 
 
@@ -4455,9 +4455,9 @@ save_ProgramEnvParameter4dvARB(GLenum target, GLuint index,
 			       const GLdouble *params)
 {
     save_ProgramEnvParameter4fARB(target, index,
-				  (GLfloat) params[0],
-				  (GLfloat) params[1],
-				  (GLfloat) params[2], (GLfloat) params[3]);
+				  static_cast<GLfloat>(params[0]),
+				  static_cast<GLfloat>(params[1]),
+				  static_cast<GLfloat>(params[2]), static_cast<GLfloat>(params[3]));
 }
 
 #endif /* FEATURE_ARB_vertex_program || FEATURE_ARB_fragment_program */
@@ -5455,7 +5455,7 @@ execute_list(GLcontext *ctx, GLuint list)
 	OpCode opcode = n[0].opcode;
 	int i = (int) n[0].opcode - (int) OPCODE_EXT_0;
 
-	if (i >= 0 && i < (GLint) ctx->ListExt.NumOpcodes) {
+	if (i >= 0 && i < static_cast<GLint>(ctx->ListExt.NumOpcodes)) {
 	    /* this is a driver-extended opcode */
 	    ctx->ListExt.Opcode[i].Execute(ctx, &n[1]);
 	    n += ctx->ListExt.Opcode[i].Size;
@@ -5476,7 +5476,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		case OPCODE_BITMAP: {
 		    const struct gl_pixelstore_attrib save = ctx->Unpack;
 		    ctx->Unpack = ctx->DefaultPacking;
-		    CALL_Bitmap(ctx->Exec, ((GLsizei) n[1].i, (GLsizei) n[2].i,
+		    CALL_Bitmap(ctx->Exec, (static_cast<GLsizei>(n[1].i), static_cast<GLsizei>(n[2].i),
 					    n[3].f, n[4].f, n[5].f, n[6].f,
 					    static_cast<const GLubyte *>(n[7].data)));
 		    ctx->Unpack = save;      /* restore */
@@ -5520,10 +5520,10 @@ execute_list(GLcontext *ctx, GLuint list)
 		    CALL_ClearAccum(ctx->Exec, (n[1].f, n[2].f, n[3].f, n[4].f));
 		    break;
 		case OPCODE_CLEAR_DEPTH:
-		    CALL_ClearDepth(ctx->Exec, ((GLclampd) n[1].f));
+		    CALL_ClearDepth(ctx->Exec, (static_cast<GLclampd>(n[1].f)));
 		    break;
 		case OPCODE_CLEAR_INDEX:
-		    CALL_ClearIndex(ctx->Exec, ((GLfloat) n[1].ui));
+		    CALL_ClearIndex(ctx->Exec, (static_cast<GLfloat>(n[1].ui)));
 		    break;
 		case OPCODE_CLEAR_STENCIL:
 		    CALL_ClearStencil(ctx->Exec, (n[1].i));
@@ -5633,7 +5633,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_COPY_PIXELS:
 		    CALL_CopyPixels(ctx->Exec, (n[1].i, n[2].i,
-						(GLsizei) n[3].i, (GLsizei) n[4].i,
+						static_cast<GLsizei>(n[3].i), static_cast<GLsizei>(n[4].i),
 						n[5].e));
 		    break;
 		case OPCODE_COPY_TEX_IMAGE1D:
@@ -5669,7 +5669,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_DEPTH_RANGE:
 		    CALL_DepthRange(ctx->Exec,
-				    ((GLclampd) n[1].f, (GLclampd) n[2].f));
+				    (static_cast<GLclampd>(n[1].f), static_cast<GLclampd>(n[2].f)));
 		    break;
 		case OPCODE_DISABLE:
 		    CALL_Disable(ctx->Exec, (n[1].e));
@@ -6033,7 +6033,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_VIEWPORT:
 		    CALL_Viewport(ctx->Exec, (n[1].i, n[2].i,
-					      (GLsizei) n[3].i, (GLsizei) n[4].i));
+					      static_cast<GLsizei>(n[3].i), static_cast<GLsizei>(n[4].i)));
 		    break;
 		case OPCODE_WINDOW_POS:
 		    CALL_WindowPos4fMESA(ctx->Exec, (n[1].f, n[2].f, n[3].f, n[4].f));
@@ -7878,9 +7878,9 @@ print_list(GLcontext *ctx, GLuint list)
     done = n ? GL_FALSE : GL_TRUE;
     while (!done) {
 	OpCode opcode = n[0].opcode;
-	GLint i = (GLint) n[0].opcode - (GLint) OPCODE_EXT_0;
+	GLint i = static_cast<GLint>(n[0].opcode) - static_cast<GLint>(OPCODE_EXT_0);
 
-	if (i >= 0 && i < (GLint) ctx->ListExt.NumOpcodes) {
+	if (i >= 0 && i < static_cast<GLint>(ctx->ListExt.NumOpcodes)) {
 	    /* this is a driver-extended opcode */
 	    ctx->ListExt.Opcode[i].Print(ctx, &n[1]);
 	    n += ctx->ListExt.Opcode[i].Size;

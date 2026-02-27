@@ -112,7 +112,7 @@ client_state(GLcontext *ctx, GLenum cap, GLboolean state)
 	case GL_VERTEX_ATTRIB_ARRAY15_NV:
 	    CHECK_EXTENSION(NV_vertex_program, cap);
 	    {
-		GLint n = (GLint) cap - GL_VERTEX_ATTRIB_ARRAY0_NV;
+		GLint n = static_cast<GLint>(cap) - GL_VERTEX_ATTRIB_ARRAY0_NV;
 		var = &ctx->Array.ArrayObj->VertexAttrib[n].Enabled;
 		flag = _NEW_ARRAY_ATTRIB(n);
 	    }
@@ -260,7 +260,7 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 	case GL_CLIP_PLANE5: {
 	    const GLuint p = cap - GL_CLIP_PLANE0;
 
-	    if ((ctx->Transform.ClipPlanesEnabled & (1 << p)) == ((GLuint) state << p))
+	    if ((ctx->Transform.ClipPlanesEnabled & (1 << p)) == (static_cast<GLuint>(state) << p))
 		return;
 
 	    FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
@@ -830,7 +830,7 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 	case GL_MAP1_VERTEX_ATTRIB15_4_NV:
 	    CHECK_EXTENSION(NV_vertex_program, cap);
 	    {
-		const GLuint map = (GLuint)(cap - GL_MAP1_VERTEX_ATTRIB0_4_NV);
+		const GLuint map = static_cast<GLuint>((cap - GL_MAP1_VERTEX_ATTRIB0_4_NV));
 		FLUSH_VERTICES(ctx, _NEW_EVAL);
 		ctx->Eval.Map1Attrib[map] = state;
 	    }
@@ -853,7 +853,7 @@ _mesa_set_enable(GLcontext *ctx, GLenum cap, GLboolean state)
 	case GL_MAP2_VERTEX_ATTRIB15_4_NV:
 	    CHECK_EXTENSION(NV_vertex_program, cap);
 	    {
-		const GLuint map = (GLuint)(cap - GL_MAP2_VERTEX_ATTRIB0_4_NV);
+		const GLuint map = static_cast<GLuint>((cap - GL_MAP2_VERTEX_ATTRIB0_4_NV));
 		FLUSH_VERTICES(ctx, _NEW_EVAL);
 		ctx->Eval.Map2Attrib[map] = state;
 	    }
@@ -1267,7 +1267,7 @@ _mesa_IsEnabled(GLenum cap)
 	case GL_VERTEX_ATTRIB_ARRAY15_NV:
 	    CHECK_EXTENSION(NV_vertex_program);
 	    {
-		GLint n = (GLint) cap - GL_VERTEX_ATTRIB_ARRAY0_NV;
+		GLint n = static_cast<GLint>(cap) - GL_VERTEX_ATTRIB_ARRAY0_NV;
 		return (ctx->Array.ArrayObj->VertexAttrib[n].Enabled != 0);
 	    }
 	case GL_MAP1_VERTEX_ATTRIB0_4_NV:
@@ -1288,7 +1288,7 @@ _mesa_IsEnabled(GLenum cap)
 	case GL_MAP1_VERTEX_ATTRIB15_4_NV:
 	    CHECK_EXTENSION(NV_vertex_program);
 	    {
-		const GLuint map = (GLuint)(cap - GL_MAP1_VERTEX_ATTRIB0_4_NV);
+		const GLuint map = static_cast<GLuint>((cap - GL_MAP1_VERTEX_ATTRIB0_4_NV));
 		return ctx->Eval.Map1Attrib[map];
 	    }
 	case GL_MAP2_VERTEX_ATTRIB0_4_NV:
@@ -1309,7 +1309,7 @@ _mesa_IsEnabled(GLenum cap)
 	case GL_MAP2_VERTEX_ATTRIB15_4_NV:
 	    CHECK_EXTENSION(NV_vertex_program);
 	    {
-		const GLuint map = (GLuint)(cap - GL_MAP2_VERTEX_ATTRIB0_4_NV);
+		const GLuint map = static_cast<GLuint>((cap - GL_MAP2_VERTEX_ATTRIB0_4_NV));
 		return ctx->Eval.Map2Attrib[map];
 	    }
 #endif /* FEATURE_NV_vertex_program */

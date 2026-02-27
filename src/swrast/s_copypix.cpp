@@ -397,7 +397,7 @@ scale_and_bias_z(GLcontext *ctx, GLuint width,
 	/* no scale or bias and no clamping and no worry of overflow */
 	const GLfloat depthMaxF = ctx->DrawBuffer->_DepthMaxF;
 	for (i = 0; i < width; i++) {
-	    z[i] = (GLuint)(depth[i] * depthMaxF);
+	    z[i] = static_cast<GLuint>((depth[i] * depthMaxF));
 	}
     } else {
 	/* need to be careful with overflow */
@@ -408,7 +408,7 @@ scale_and_bias_z(GLcontext *ctx, GLuint width,
 	    if (d >= depthMaxF)
 		z[i] = depthMax;
 	    else
-		z[i] = (GLuint) d;
+		z[i] = static_cast<GLuint>(d);
 	}
     }
 }
@@ -725,13 +725,13 @@ copy_depth_stencil_pixels(GLcontext *ctx,
 	    if (depthDrawRb->DataType == GL_UNSIGNED_SHORT) {
 		GLint k;
 		for (k = 0; k < width; k++)
-		    zVals16[k] = (GLushort)(depth[k] * depthScale);
+		    zVals16[k] = static_cast<GLushort>((depth[k] * depthScale));
 		zVals = zVals16;
 		zBytes = 2;
 	    } else {
 		GLint k;
 		for (k = 0; k < width; k++)
-		    zVals32[k] = (GLuint)(depth[k] * depthScale);
+		    zVals32[k] = static_cast<GLuint>((depth[k] * depthScale));
 		zVals = zVals32;
 		zBytes = 4;
 	    }
@@ -798,8 +798,8 @@ fast_copy_pixels(GLcontext *ctx,
     }
 
     /* clipping not supported */
-    if (srcX < 0 || srcX + width > (GLint) srcFb->Width ||
-	srcY < 0 || srcY + height > (GLint) srcFb->Height ||
+    if (srcX < 0 || srcX + width > static_cast<GLint>(srcFb->Width) ||
+	srcY < 0 || srcY + height > static_cast<GLint>(srcFb->Height) ||
 	dstX < dstFb->_Xmin || dstX + width > dstFb->_Xmax ||
 	dstY < dstFb->_Ymin || dstY + height > dstFb->_Ymax) {
 	return GL_FALSE;

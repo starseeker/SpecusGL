@@ -331,7 +331,7 @@ struct Fx64 {
 #endif /* !__GNUC__ */
 
 
-#define F(i) (GLfloat)1 /* can be used to obtain an oblong metric: 0.30 / 0.59 / 0.11 */
+#define F(i) static_cast<GLfloat>(1) /* can be used to obtain an oblong metric: 0.30 / 0.59 / 0.11 */
 #define SAFECDOT 1 /* for paranoids */
 
 #define MAKEIVEC(NV, NC, IV, B, V0, V1)  \
@@ -344,7 +344,7 @@ struct Fx64 {
          IV[i] = (V1[i] - V0[i]) * F(i); \
          d2 += IV[i] * IV[i];            \
       }                                  \
-      rd2 = (GLfloat)NV / d2;            \
+      rd2 = static_cast<GLfloat>(NV) / d2;            \
       B = 0;                             \
       for (i = 0; i < NC; i++) {         \
          IV[i] *= F(i);                  \
@@ -360,7 +360,7 @@ struct Fx64 {
       for (i = 0; i < NC; i++) {         \
          dot += V[i] * IV[i];            \
       }                                  \
-      TEXEL = (GLint)(dot + B);          \
+      TEXEL = static_cast<GLint>((dot + B));          \
       if (SAFECDOT) {                    \
          if (TEXEL < 0) {                \
             TEXEL = 0;                   \
@@ -517,7 +517,7 @@ fxt1_choose(GLfloat vec[][MAX_COMP], GLint nv,
     if (lenh <= nv) {
 	for (j = 0; j < lenh; j++) {
 	    for (i = 0; i < nc; i++) {
-		vec[j][i] = (GLfloat)input[hist[j].idx][i];
+		vec[j][i] = static_cast<GLfloat>(input[hist[j].idx][i]);
 	    }
 	}
 	for (; j < nv; j++) {
@@ -530,7 +530,7 @@ fxt1_choose(GLfloat vec[][MAX_COMP], GLint nv,
 
     for (j = 0; j < nv; j++) {
 	for (i = 0; i < nc; i++) {
-	    vec[j][i] = ((nv - 1 - j) * input[minCol][i] + j * input[maxCol][i] + (nv - 1) / 2) / (GLfloat)(nv - 1);
+	    vec[j][i] = ((nv - 1 - j) * input[minCol][i] + j * input[maxCol][i] + (nv - 1) / 2) / static_cast<GLfloat>((nv - 1));
 	}
     }
 #endif
@@ -668,7 +668,7 @@ fxt1_quantize_CHROMA(GLuint *cc,
 	for (i = 0; i < n_comp; i++) {
 	    /* add in colors */
 	    FX64_SHL(hi, 5);
-	    FX64_OR32(hi, (GLuint)(vec[j][i] / 8.0F));
+	    FX64_OR32(hi, static_cast<GLuint>((vec[j][i] / 8.0F)));
 	}
     }
     ((Fx64 *)cc)[1] = hi;
@@ -715,13 +715,13 @@ fxt1_quantize_ALPHA0(GLuint *cc,
     for (j = n_vect - 1; j >= 0; j--) {
 	/* add in alphas */
 	FX64_SHL(hi, 5);
-	FX64_OR32(hi, (GLuint)(vec[j][ACOMP] / 8.0F));
+	FX64_OR32(hi, static_cast<GLuint>((vec[j][ACOMP] / 8.0F)));
     }
     for (j = n_vect - 1; j >= 0; j--) {
 	for (i = 0; i < n_comp - 1; i++) {
 	    /* add in colors */
 	    FX64_SHL(hi, 5);
-	    FX64_OR32(hi, (GLuint)(vec[j][i] / 8.0F));
+	    FX64_OR32(hi, static_cast<GLuint>((vec[j][i] / 8.0F)));
 	}
     }
     ((Fx64 *)cc)[1] = hi;
@@ -886,13 +886,13 @@ fxt1_quantize_ALPHA1(GLuint *cc,
     for (j = n_vect - 1; j >= 0; j--) {
 	/* add in alphas */
 	FX64_SHL(hi, 5);
-	FX64_OR32(hi, (GLuint)(vec[j][ACOMP] / 8.0F));
+	FX64_OR32(hi, static_cast<GLuint>((vec[j][ACOMP] / 8.0F)));
     }
     for (j = n_vect - 1; j >= 0; j--) {
 	for (i = 0; i < n_comp - 1; i++) {
 	    /* add in colors */
 	    FX64_SHL(hi, 5);
-	    FX64_OR32(hi, (GLuint)(vec[j][i] / 8.0F));
+	    FX64_OR32(hi, static_cast<GLuint>((vec[j][i] / 8.0F)));
 	}
     }
     ((Fx64 *)cc)[1] = hi;
@@ -1184,7 +1184,7 @@ fxt1_quantize_MIXED0(GLuint *cc,
 	}
 
 	/* funky encoding for LSB of green */
-	if ((GLint)((lolo >> 1) & 1) != (((vec[1][GCOMP] ^ vec[0][GCOMP]) >> 2) & 1)) {
+	if (static_cast<GLint>(((lolo >> 1) & 1)) != (((vec[1][GCOMP] ^ vec[0][GCOMP]) >> 2) & 1)) {
 	    for (i = 0; i < n_comp; i++) {
 		vec[1][i] = input[minColL][i];
 		vec[0][i] = input[maxColL][i];
@@ -1217,7 +1217,7 @@ fxt1_quantize_MIXED0(GLuint *cc,
 	}
 
 	/* funky encoding for LSB of green */
-	if ((GLint)((lohi >> 1) & 1) != (((vec[3][GCOMP] ^ vec[2][GCOMP]) >> 2) & 1)) {
+	if (static_cast<GLint>(((lohi >> 1) & 1)) != (((vec[3][GCOMP] ^ vec[2][GCOMP]) >> 2) & 1)) {
 	    for (i = 0; i < n_comp; i++) {
 		vec[3][i] = input[minColR][i];
 		vec[2][i] = input[maxColR][i];

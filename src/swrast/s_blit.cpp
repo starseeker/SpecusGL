@@ -254,7 +254,7 @@ resample_linear_row_ub(GLint srcWidth, GLint dstWidth,
     const GLubyte(*srcColor0)[4] = (const GLubyte(*)[4]) srcBuffer0;
     const GLubyte(*srcColor1)[4] = (const GLubyte(*)[4]) srcBuffer1;
     GLubyte(*dstColor)[4] = (GLubyte(*)[4]) dstBuffer;
-    const GLfloat dstWidthF = (GLfloat) dstWidth;
+    const GLfloat dstWidthF = static_cast<GLfloat>(dstWidth);
     GLint dstCol;
 
     for (dstCol = 0; dstCol < dstWidth; dstCol++) {
@@ -316,7 +316,7 @@ blit_linear(GLcontext *ctx,
     const GLint dstWidth = ABS(dstX1 - dstX0);
     const GLint srcHeight = ABS(srcY1 - srcY0);
     const GLint dstHeight = ABS(dstY1 - dstY0);
-    const GLfloat dstHeightF = (GLfloat) dstHeight;
+    const GLfloat dstHeightF = static_cast<GLfloat>(dstHeight);
 
     const GLint srcXpos = MIN2(srcX0, srcX1);
     const GLint srcYpos = MIN2(srcY0, srcY1);
@@ -527,21 +527,21 @@ clip_right_or_top(GLint *srcX0, GLint *srcX1,
     if (*dstX1 > maxValue) {
 	/* X1 outside right edge */
 	ASSERT(*dstX0 < maxValue); /* X0 should be inside right edge */
-	t = (GLfloat)(maxValue - *dstX0) / (GLfloat)(*dstX1 - *dstX0);
+	t = static_cast<GLfloat>((maxValue - *dstX0)) / static_cast<GLfloat>((*dstX1 - *dstX0));
 	/* chop off [t, 1] part */
 	ASSERT(t >= 0.0 && t <= 1.0);
 	*dstX1 = maxValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5;
-	*srcX1 = *srcX0 + (GLint)(t * (*srcX1 - *srcX0) + bias);
+	*srcX1 = *srcX0 + static_cast<GLint>((t * (*srcX1 - *srcX0) + bias));
     } else if (*dstX0 > maxValue) {
 	/* X0 outside right edge */
 	ASSERT(*dstX1 < maxValue); /* X1 should be inside right edge */
-	t = (GLfloat)(maxValue - *dstX1) / (GLfloat)(*dstX0 - *dstX1);
+	t = static_cast<GLfloat>((maxValue - *dstX1)) / static_cast<GLfloat>((*dstX0 - *dstX1));
 	/* chop off [t, 1] part */
 	ASSERT(t >= 0.0 && t <= 1.0);
 	*dstX0 = maxValue;
 	bias = (*srcX0 < *srcX1) ? -0.5 : 0.5;
-	*srcX0 = *srcX1 + (GLint)(t * (*srcX0 - *srcX1) + bias);
+	*srcX0 = *srcX1 + static_cast<GLint>((t * (*srcX0 - *srcX1) + bias));
     }
 }
 
@@ -559,21 +559,21 @@ clip_left_or_bottom(GLint *srcX0, GLint *srcX1,
     if (*dstX0 < minValue) {
 	/* X0 outside left edge */
 	ASSERT(*dstX1 > minValue); /* X1 should be inside left edge */
-	t = (GLfloat)(minValue - *dstX0) / (GLfloat)(*dstX1 - *dstX0);
+	t = static_cast<GLfloat>((minValue - *dstX0)) / static_cast<GLfloat>((*dstX1 - *dstX0));
 	/* chop off [0, t] part */
 	ASSERT(t >= 0.0 && t <= 1.0);
 	*dstX0 = minValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5; /* flipped??? */
-	*srcX0 = *srcX0 + (GLint)(t * (*srcX1 - *srcX0) + bias);
+	*srcX0 = *srcX0 + static_cast<GLint>((t * (*srcX1 - *srcX0) + bias));
     } else if (*dstX1 < minValue) {
 	/* X1 outside left edge */
 	ASSERT(*dstX0 > minValue); /* X0 should be inside left edge */
-	t = (GLfloat)(minValue - *dstX1) / (GLfloat)(*dstX0 - *dstX1);
+	t = static_cast<GLfloat>((minValue - *dstX1)) / static_cast<GLfloat>((*dstX0 - *dstX1));
 	/* chop off [0, t] part */
 	ASSERT(t >= 0.0 && t <= 1.0);
 	*dstX1 = minValue;
 	bias = (*srcX0 < *srcX1) ? 0.5 : -0.5;
-	*srcX1 = *srcX1 + (GLint)(t * (*srcX0 - *srcX1) + bias);
+	*srcX1 = *srcX1 + static_cast<GLint>((t * (*srcX0 - *srcX1) + bias));
     }
 }
 

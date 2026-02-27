@@ -316,7 +316,7 @@ static struct ureg get_temp(struct tnl_program *p)
 	_mesa_exit(1);
     }
 
-    if ((GLuint) bit > p->program->NumTemporaries)
+    if (static_cast<GLuint>(bit) > p->program->NumTemporaries)
 	p->program->NumTemporaries = bit;
 
     if (bit > 0)

@@ -76,7 +76,7 @@ static void free_space(GLcontext *ctx)
       for (i = 0; i < count; i++) {		\
 	 const TYPE *in = (TYPE *)ptr;		\
 	 for (j = 0; j < sz; j++) {		\
-	    *fptr++ = (GLfloat)(*in);		\
+	    *fptr++ = static_cast<GLfloat>((*in));		\
 	    in++;				\
 	 }					\
 	 ptr += input->StrideB;			\
@@ -290,11 +290,11 @@ static void bind_indices(GLcontext *ctx,
 	if (ib->type == GL_UNSIGNED_SHORT) {
 	    const GLushort *in = reinterpret_cast<GLushort *>(ptr);
 	    for (i = 0; i < ib->count; i++)
-		*elts++ = (GLuint)(*in++);
+		*elts++ = static_cast<GLuint>((*in++));
 	} else {
 	    const GLubyte *in = reinterpret_cast<GLubyte *>(ptr);
 	    for (i = 0; i < ib->count; i++)
-		*elts++ = (GLuint)(*in++);
+		*elts++ = static_cast<GLuint>((*in++));
 	}
     }
 }

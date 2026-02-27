@@ -108,7 +108,7 @@ static GLvector4f *ref_cliptest_points4(GLvector4f *clip_vec,
     }
 
     *orMask = tmpOrMask;
-    *andMask = (GLubyte)(c < count ? 0 : tmpAndMask);
+    *andMask = static_cast<GLubyte>((c < count ? 0 : tmpAndMask));
 
     proj_vec->flags |= VEC_SIZE_4;
     proj_vec->size = 4;

@@ -49,14 +49,14 @@ TexImage->FetchTexelf(TexImage, x + i, y, z, rgbaOut + 4 * i);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
     GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else {
     _mesa_problem(ctx, "invalid DataType in TextureRenderbuffer::GetRow");
@@ -82,14 +82,14 @@ TexImage->FetchTexelf(TexImage, x[i], y[i], z, rgbaOut + 4 * i);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
     GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
-zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
+zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
     }
 } else {
     _mesa_problem(ctx, "invalid DataType in TextureRenderbuffer::GetValues");

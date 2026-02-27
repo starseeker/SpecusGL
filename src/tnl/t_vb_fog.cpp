@@ -55,10 +55,10 @@ static GLfloat inited = 0;
 #if 1
 #define NEG_EXP( result, narg )						\
 do {									\
-   GLfloat f = (GLfloat) (narg * (1.0/FOG_INCR));			\
-   GLint k = (GLint) f;							\
+   GLfloat f = static_cast<GLfloat>((narg * (1.0/FOG_INCR)));			\
+   GLint k = static_cast<GLint>(f);							\
    if (k > FOG_EXP_TABLE_SIZE-2) 					\
-      result = (GLfloat) EXP_FOG_MAX;					\
+      result = static_cast<GLfloat>(EXP_FOG_MAX);					\
    else									\
       result = exp_table[k] + (f-k)*(exp_table[k+1]-exp_table[k]);	\
 } while (0)

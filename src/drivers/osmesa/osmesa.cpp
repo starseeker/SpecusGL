@@ -1454,17 +1454,17 @@ osmesa_context::get_integer(GLint pname, GLint *value)
 {
     switch (pname) {
 	case OSMESA_WIDTH:
-	    *value = gl_buffer ? (GLint)gl_buffer->Width  : 0; return;
+	    *value = gl_buffer ? static_cast<GLint>(gl_buffer->Width)  : 0; return;
 	case OSMESA_HEIGHT:
-	    *value = gl_buffer ? (GLint)gl_buffer->Height : 0; return;
+	    *value = gl_buffer ? static_cast<GLint>(gl_buffer->Height) : 0; return;
 	case OSMESA_FORMAT:
-	    *value = (GLint)format;   return;
+	    *value = static_cast<GLint>(format);   return;
 	case OSMESA_TYPE:
-	    *value = rb ? (GLint)rb->DataType : 0; return;
+	    *value = rb ? static_cast<GLint>(rb->DataType) : 0; return;
 	case OSMESA_ROW_LENGTH:
 	    *value = userRowLength;    return;
 	case OSMESA_Y_UP:
-	    *value = (GLint)yup;       return;
+	    *value = static_cast<GLint>(yup);       return;
 	case OSMESA_MAX_WIDTH:
 	    *value = MAX_WIDTH;        return;
 	case OSMESA_MAX_HEIGHT:
@@ -1494,11 +1494,11 @@ osmesa_context::get_depth_buffer(GLint *width, GLint *height,
 	return GL_FALSE;
     }
 
-    *width  = (GLint)drb->Width;
-    *height = (GLint)drb->Height;
+    *width  = static_cast<GLint>(drb->Width);
+    *height = static_cast<GLint>(drb->Height);
     *bytesPerValue = (gl_visual->depthBits <= 16)
-                     ? (GLint)sizeof(GLushort)
-                     : (GLint)sizeof(GLuint);
+                     ? static_cast<GLint>(sizeof(GLushort))
+                     : static_cast<GLint>(sizeof(GLuint));
     *buf = drb->Data;
     return GL_TRUE;
 }
@@ -1512,9 +1512,9 @@ osmesa_context::get_color_buffer(GLint *width, GLint *height,
                                   GLint *fmt, void **buf) const
 {
     if (rb && rb->Data) {
-	*width  = (GLint)rb->Width;
-	*height = (GLint)rb->Height;
-	*fmt    = (GLint)format;
+	*width  = static_cast<GLint>(rb->Width);
+	*height = static_cast<GLint>(rb->Height);
+	*fmt    = static_cast<GLint>(format);
 	*buf    = rb->Data;
 	return GL_TRUE;
     }
@@ -1531,7 +1531,7 @@ void
 osmesa_context::color_clamp(GLboolean enable)
 {
     mesa.Color.ClampFragmentColor = enable ? GL_TRUE
-                                           : (GLboolean)GL_FIXED_ONLY_ARB;
+                                           : static_cast<GLboolean>(GL_FIXED_ONLY_ARB);
 }
 
 
