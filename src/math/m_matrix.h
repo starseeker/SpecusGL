@@ -84,6 +84,16 @@ struct GLmatrix {
     GLmatrix();   /**< Initialises m to identity, inv to nullptr. */
     ~GLmatrix();  /**< Releases aligned m and inv allocations. */
 
+    /** Move constructor – transfers m/inv ownership; source is left empty. */
+    GLmatrix(GLmatrix &&other) noexcept;
+
+    /** Move assignment – transfers m/inv ownership; source is left empty. */
+    GLmatrix &operator=(GLmatrix &&other) noexcept;
+
+    /** Copy construction disabled – use copy_from() for explicit deep copies. */
+    GLmatrix(const GLmatrix &) = delete;
+    GLmatrix &operator=(const GLmatrix &) = delete;
+
     /** Allocate (or reallocate) the inverse array. */
     void alloc_inv();
 

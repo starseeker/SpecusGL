@@ -296,9 +296,9 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
 #define FX64_NATIVE 1
 
 #ifdef __MINGW32__
-typedef unsigned long Fx64;
+using Fx64 = unsigned long;
 #else
-typedef unsigned long long Fx64;
+using Fx64 = unsigned long long;
 #endif
 
 

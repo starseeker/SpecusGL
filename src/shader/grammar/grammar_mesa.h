@@ -32,8 +32,8 @@
 /* NOTE: include Mesa 3-D specific headers here */
 
 
-typedef GLuint grammar;
-typedef GLubyte byte;
+using grammar = GLuint;
+using byte = GLubyte;
 
 
 #define GRAMMAR_PORT_INCLUDE 1
