@@ -180,14 +180,14 @@ constexpr GLuint   MAX_GLUINT   = 0xffffffffU;
 #endif
 
 /* Degrees to radians conversion: */
-#define DEG2RAD (M_PI/180.0)
+constexpr double DEG2RAD = M_PI / 180.0;
 
 
 /***
- *** USE_IEEE: We should be using IEEE floating point
+ *** IEEE floating point constants
  ***/
-#define USE_IEEE
-#define IEEE_ONE 0x3f800000
+constexpr GLint IEEE_ONE  = 0x3f800000; /**< Bit pattern of 1.0f */
+constexpr GLint IEEE_0996 = 0x3f7f0000; /**< Bit pattern of ~0.996f */
 
 
 /**
@@ -206,9 +206,8 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 
 
 /***
- *** LOG2: Log base 2 of float
+ *** LOG2: Log base 2 of float – fast IEEE bit-manipulation approach.
  ***/
-#ifdef USE_IEEE
 /* Pretty fast, and accurate.
  * Based on code from http://www.flipcode.com/totd/
  */
@@ -222,61 +221,34 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
     const float result = ((-1.0f/3) * f0 + 2) * f0 - 2.0f/3;
     return result + static_cast<GLfloat>(log_2);
 }
-#else
-/*
- * NOTE: log_base_2(x) = log(x) / log(2)
- * NOTE: 1.442695 = 1/log(2).
- */
-#define LOG2(x)  ((GLfloat) (log(x) * 1.442695F))
-#endif
 
 
 /***
  *** IS_INF_OR_NAN: test if float is infinite or NaN
  ***/
-#ifdef USE_IEEE
 [[nodiscard]] static inline int IS_INF_OR_NAN(float x)
 {
     const GLint bits = float_bits(x);
     return !(static_cast<int>(static_cast<unsigned int>((bits & 0x7fffffff) - 0x7f800000) >> 31));
 }
-#elif defined(isfinite)
-#define IS_INF_OR_NAN(x)        (!isfinite(x))
-#elif defined(finite)
-#define IS_INF_OR_NAN(x)        (!finite(x))
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#define IS_INF_OR_NAN(x)        (!isfinite(x))
-#else
-#define IS_INF_OR_NAN(x)        (!finite(x))
-#endif
 
 
 /***
  *** IS_NEGATIVE: test if float is negative
  ***/
-#if defined(USE_IEEE)
 [[nodiscard]] static inline int GET_FLOAT_BITS(float x)
 {
     return float_bits(x);
 }
 #define IS_NEGATIVE(x) (GET_FLOAT_BITS(x) < 0)
-#else
-#define IS_NEGATIVE(x) (x < 0.0F)
-#endif
 
 
 /***
  *** DIFFERENT_SIGNS: test if two floats have opposite signs
  ***/
-#if defined(USE_IEEE)
 [[nodiscard]] inline bool different_signs(float x, float y) noexcept {
     return (GET_FLOAT_BITS(x) ^ GET_FLOAT_BITS(y)) & (1U << 31);
 }
-#else
-[[nodiscard]] inline bool different_signs(float x, float y) noexcept {
-    return x * y <= 0.0F && x - y != 0.0F;
-}
-#endif
 #define DIFFERENT_SIGNS(x, y) different_signs(x, y)
 
 
@@ -301,9 +273,8 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 
 
 /***
- *** IFLOOR: return (as an integer) floor of float
+ *** IFLOOR: return (as an integer) floor of float – fast IEEE bit-manipulation.
  ***/
-#if   defined(USE_IEEE)
 static inline int ifloor(float f)
 {
     const float af = static_cast<float>((3 << 22) + 0.5 + static_cast<double>(f));
@@ -313,20 +284,11 @@ static inline int ifloor(float f)
     return (ai - bi) >> 1;
 }
 #define IFLOOR(x)  ifloor(x)
-#else
-static inline int ifloor(float f)
-{
-    int i = IROUND(f);
-    return (i > f) ? i - 1 : i;
-}
-#define IFLOOR(x)  ifloor(x)
-#endif
 
 
 /***
- *** ICEIL: return (as an integer) ceiling of float
+ *** ICEIL: return (as an integer) ceiling of float – fast IEEE bit-manipulation.
  ***/
-#if   defined(USE_IEEE)
 static inline int iceil(float f)
 {
     const float af = static_cast<float>((3 << 22) + 0.5 + static_cast<double>(f));
@@ -336,22 +298,12 @@ static inline int iceil(float f)
     return (ai - bi + 1) >> 1;
 }
 #define ICEIL(x)  iceil(x)
-#else
-static inline int iceil(float f)
-{
-    int i = IROUND(f);
-    return (i < f) ? i + 1 : i;
-}
-#define ICEIL(x)  iceil(x)
-#endif
 
 
 /***
  *** UNCLAMPED_FLOAT_TO_UBYTE: clamp float to [0,1] and map to ubyte in [0,255]
  *** CLAMPED_FLOAT_TO_UBYTE: map float known to be in [0,1] to ubyte in [0,255]
  ***/
-#if defined(USE_IEEE) && !defined(DEBUG)
-#define IEEE_0996 0x3f7f0000	/* 0.996 or so */
 /* This function is sensitive to precision.  Test very carefully
  * if you change it!
  */
@@ -372,16 +324,6 @@ inline void clamped_float_to_ubyte(T& ub, float f) noexcept {
     const float adjusted = f * (255.0F/256.0F) + 32768.0F;
     ub = static_cast<T>(float_bits(adjusted));
 }
-#else
-template<typename T>
-inline void unclamped_float_to_ubyte(T& ub, float f) noexcept {
-    ub = static_cast<T>(iround(mesa_clamp(f, 0.0F, 1.0F) * 255.0F));
-}
-template<typename T>
-inline void clamped_float_to_ubyte(T& ub, float f) noexcept {
-    ub = static_cast<T>(iround(f * 255.0F));
-}
-#endif
 #define UNCLAMPED_FLOAT_TO_UBYTE(UB, F) unclamped_float_to_ubyte(UB, F)
 #define CLAMPED_FLOAT_TO_UBYTE(UB, F)   clamped_float_to_ubyte(UB, F)
 

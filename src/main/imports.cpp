@@ -205,7 +205,6 @@ static short sqrttab[0x100];    /* declare table of square roots */
 void
 _mesa_init_sqrt_table(void)
 {
-#if defined(USE_IEEE) && !defined(DEBUG)
     for (unsigned short i = 0; i <= 0x7f; i++) {
 	/* Build a float with the bit pattern i as mantissa
 	 * and an exponent of 0, stored as 127, then take its square root.
@@ -221,9 +220,6 @@ _mesa_init_sqrt_table(void)
 	f = static_cast<float>(sqrt(f));
 	sqrttab[i + 0x80] = (float_bits(f) & 0x7fffff) >> 16;
     }
-#else
-    (void) sqrttab;  /* silence compiler warnings */
-#endif /*HAVE_FAST_MATH*/
 }
 
 
@@ -233,7 +229,6 @@ _mesa_init_sqrt_table(void)
 float
 _mesa_sqrtf(float x)
 {
-#if defined(USE_IEEE) && !defined(DEBUG)
     short e;                     /* the exponent */
     if (x == 0.0F) return 0.0F;  /* check for square root of 0 */
     GLint bits = float_bits(x);
@@ -247,9 +242,6 @@ _mesa_sqrtf(float x)
      * then reconstruct the result back into a float */
     bits = (static_cast<GLint>(sqrttab[bits >> 16]) << 16) | ((e + 127) << 23);
     return bits_float(bits);
-#else
-    return static_cast<float>(sqrt(static_cast<double>(x)));
-#endif
 }
 
 
@@ -261,7 +253,6 @@ _mesa_sqrtf(float x)
 float
 _mesa_inv_sqrtf(float n)
 {
-#if defined(USE_IEEE) && !defined(DEBUG)
     float r0, x0, y0;
     float r1, x1, y1;
     float r2, x2, y2;
@@ -356,9 +347,6 @@ _mesa_inv_sqrtf(float n)
     r3 = 1.5f - y3;
 
     return x3 * r3;
-#endif
-#else
-    return (float)(1.0 / sqrt(n));
 #endif
 }
 
