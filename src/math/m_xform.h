@@ -127,10 +127,10 @@ typedef void (_NORMAPIP normal_func)(CONST GLmatrix *mat,
 
 /* Flags for selecting a normal transformation function.
  */
-#define NORM_RESCALE   0x1		/* apply the scale factor */
-#define NORM_NORMALIZE 0x2		/* normalize */
-#define NORM_TRANSFORM 0x4		/* apply the transformation matrix */
-#define NORM_TRANSFORM_NO_ROT 0x8	/* apply the transformation matrix */
+constexpr GLuint NORM_RESCALE = 0x1;            /* apply the scale factor */
+constexpr GLuint NORM_NORMALIZE = 0x2;          /* normalize */
+constexpr GLuint NORM_TRANSFORM = 0x4;          /* apply the transformation matrix */
+constexpr GLuint NORM_TRANSFORM_NO_ROT = 0x8;   /* apply the transformation matrix */
 
 
 

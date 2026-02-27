@@ -103,16 +103,15 @@ constexpr GLbitfield ATIFRAGSHADER_BIT = 0x4000; /**< ATI Fragment shader enable
 constexpr GLbitfield CLAMPING_BIT     = 0x8000; /**< Clamp colors to [0,1] */
 /*@}*/
 
-#define _SWRAST_NEW_RASTERMASK (_NEW_BUFFERS|	\
-			        _NEW_SCISSOR|	\
-			        _NEW_COLOR|	\
-			        _NEW_DEPTH|	\
-			        _NEW_FOG|	\
-                                _NEW_PROGRAM|   \
-			        _NEW_STENCIL|	\
-			        _NEW_TEXTURE|	\
-			        _NEW_VIEWPORT|	\
-			        _NEW_DEPTH)
+constexpr GLuint _SWRAST_NEW_RASTERMASK = (_NEW_BUFFERS |
+                                            _NEW_SCISSOR |
+                                            _NEW_COLOR |
+                                            _NEW_DEPTH |
+                                            _NEW_FOG |
+                                            _NEW_PROGRAM |
+                                            _NEW_STENCIL |
+                                            _NEW_TEXTURE |
+                                            _NEW_VIEWPORT);
 
 
 /**

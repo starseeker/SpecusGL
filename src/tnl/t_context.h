@@ -67,7 +67,7 @@
 #include <unordered_map>
 #include <vector>
 
-#define MAX_PIPELINE_STAGES     30
+constexpr GLint MAX_PIPELINE_STAGES = 30;
 
 /*
  * Note: The first attributes match the VERT_ATTRIB_* definitions
@@ -155,33 +155,33 @@ enum {
 #define _TNL_ATTRIB_GENERIC(n) (_TNL_ATTRIB_GENERIC0 + (n))
 
 /* special index used for handing invalid glVertexAttribute() indices */
-#define _TNL_ATTRIB_ERROR    (_TNL_ATTRIB_GENERIC15 + 1)
+constexpr auto _TNL_ATTRIB_ERROR = _TNL_ATTRIB_GENERIC15 + 1;
 
 /**
  * Handy attribute ranges:
  */
-#define _TNL_FIRST_PROG      _TNL_ATTRIB_WEIGHT
-#define _TNL_LAST_PROG       _TNL_ATTRIB_TEX7
+constexpr auto _TNL_FIRST_PROG = _TNL_ATTRIB_WEIGHT;
+constexpr auto _TNL_LAST_PROG = _TNL_ATTRIB_TEX7;
 
-#define _TNL_FIRST_TEX       _TNL_ATTRIB_TEX0
-#define _TNL_LAST_TEX        _TNL_ATTRIB_TEX7
+constexpr auto _TNL_FIRST_TEX = _TNL_ATTRIB_TEX0;
+constexpr auto _TNL_LAST_TEX = _TNL_ATTRIB_TEX7;
 
-#define _TNL_FIRST_GENERIC _TNL_ATTRIB_GENERIC0
-#define _TNL_LAST_GENERIC  _TNL_ATTRIB_GENERIC15
+constexpr auto _TNL_FIRST_GENERIC = _TNL_ATTRIB_GENERIC0;
+constexpr auto _TNL_LAST_GENERIC = _TNL_ATTRIB_GENERIC15;
 
-#define _TNL_FIRST_MAT       _TNL_ATTRIB_MAT_FRONT_AMBIENT /* GENERIC0 */
-#define _TNL_LAST_MAT        _TNL_ATTRIB_MAT_BACK_INDEXES  /* GENERIC11 */
+constexpr auto _TNL_FIRST_MAT = _TNL_ATTRIB_MAT_FRONT_AMBIENT;  /* GENERIC0 */
+constexpr auto _TNL_LAST_MAT = _TNL_ATTRIB_MAT_BACK_INDEXES;  /* GENERIC11 */
 
 /* Number of available generic attributes */
-#define _TNL_NUM_GENERIC 16
+constexpr GLint _TNL_NUM_GENERIC = 16;
 
 /* Number of attributes used for evaluators */
-#define _TNL_NUM_EVAL 16
+constexpr GLint _TNL_NUM_EVAL = 16;
 
 
-#define PRIM_BEGIN     0x10
-#define PRIM_END       0x20
-#define PRIM_MODE_MASK 0x0f
+constexpr GLuint PRIM_BEGIN = 0x10;
+constexpr GLuint PRIM_END = 0x20;
+constexpr GLuint PRIM_MODE_MASK = 0x0f;
 
 static inline GLuint _tnl_translate_prim(const struct _mesa_prim *prim)
 {
