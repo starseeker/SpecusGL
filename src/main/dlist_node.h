@@ -39,7 +39,7 @@
  * The fact that these identifiers are assigned consecutive
  * integer values starting at 0 is very important (see InstSize array usage).
  */
-typedef enum {
+enum OpCode {
     OPCODE_INVALID = -1,         /* Force signed enum */
     OPCODE_ACCUM,
     OPCODE_ALPHA_FUNC,
@@ -223,7 +223,7 @@ typedef enum {
     OPCODE_ERROR,                /* raise compiled-in error */
     OPCODE_END_OF_LIST,
     OPCODE_EXT_0
-} OpCode;
+};
 
 
 /**

@@ -26,11 +26,14 @@
  * \file slang_storage.c
  * slang variable storage
  * \author Michal Krol
+ *
+ * C++17 modernisation: slang_storage_aggregate now uses std::vector<slang_storage_array>
+ * instead of a raw array + count pair.  Owned aggregate pointers inside
+ * slang_storage_array are now managed with new/delete.
  */
 
 #include "imports.h"
 #include "slang_storage.h"
-#include "slang_mem.h"
 
 /* slang_storage_array */
 
@@ -48,7 +51,8 @@ slang_storage_array_destruct(slang_storage_array * arr)
 {
     if (arr->aggregate != nullptr) {
 	slang_storage_aggregate_destruct(arr->aggregate);
-	_slang_free(arr->aggregate);
+	delete arr->aggregate;
+	arr->aggregate = nullptr;
     }
 }
 
@@ -57,35 +61,26 @@ slang_storage_array_destruct(slang_storage_array * arr)
 GLboolean
 slang_storage_aggregate_construct(slang_storage_aggregate * agg)
 {
-    agg->arrays = nullptr;
-    agg->count = 0;
+    agg->arrays.clear();
     return GL_TRUE;
 }
 
 GLvoid
 slang_storage_aggregate_destruct(slang_storage_aggregate * agg)
 {
-    GLuint i;
-
-    for (i = 0; i < agg->count; i++)
-	slang_storage_array_destruct(agg->arrays + i);
-    _slang_free(agg->arrays);
+    for (auto &arr : agg->arrays)
+	slang_storage_array_destruct(&arr);
+    agg->arrays.clear();
 }
 
 static slang_storage_array *
 slang_storage_aggregate_push_new(slang_storage_aggregate * agg)
 {
-    slang_storage_array *arr = nullptr;
-
-    agg->arrays = (slang_storage_array *)
-		  _slang_realloc(agg->arrays,
-				 agg->count * sizeof(slang_storage_array),
-				 (agg->count + 1) * sizeof(slang_storage_array));
-    if (agg->arrays != nullptr) {
-	arr = agg->arrays + agg->count;
-	if (!slang_storage_array_construct(arr))
-	    return nullptr;
-	agg->count++;
+    agg->arrays.emplace_back();
+    slang_storage_array *arr = &agg->arrays.back();
+    if (!slang_storage_array_construct(arr)) {
+	agg->arrays.pop_back();
+	return nullptr;
     }
     return arr;
 }
@@ -113,12 +108,9 @@ aggregate_matrix(slang_storage_aggregate * agg, slang_storage_type basic_type,
 	return GL_FALSE;
     arr->type = SLANG_STORE_AGGREGATE;
     arr->length = columns;
-    arr->aggregate = (slang_storage_aggregate *)
-		     _slang_alloc(sizeof(slang_storage_aggregate));
-    if (arr->aggregate == nullptr)
-	return GL_FALSE;
+    arr->aggregate = new slang_storage_aggregate();
     if (!slang_storage_aggregate_construct(arr->aggregate)) {
-	_slang_free(arr->aggregate);
+	delete arr->aggregate;
 	arr->aggregate = nullptr;
 	return GL_FALSE;
     }
@@ -135,9 +127,7 @@ aggregate_variables(slang_storage_aggregate * agg,
 		    slang_variable_scope * globals,
 		    slang_atom_pool * atoms)
 {
-    GLuint i;
-
-    for (i = 0; i < vars->num_variables; i++)
+    for (GLuint i = 0; i < vars->variables.size(); i++)
 	if (!_slang_aggregate_variable(agg, &vars->variables[i]->type.specifier,
 				       vars->variables[i]->array_len, funcs,
 				       structs, globals, atoms))
@@ -218,12 +208,9 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 	    if (arr == nullptr)
 		return GL_FALSE;
 	    arr->type = SLANG_STORE_AGGREGATE;
-	    arr->aggregate = (slang_storage_aggregate *)
-			     _slang_alloc(sizeof(slang_storage_aggregate));
-	    if (arr->aggregate == nullptr)
-		return GL_FALSE;
+	    arr->aggregate = new slang_storage_aggregate();
 	    if (!slang_storage_aggregate_construct(arr->aggregate)) {
-		_slang_free(arr->aggregate);
+		delete arr->aggregate;
 		arr->aggregate = nullptr;
 		return GL_FALSE;
 	    }
@@ -254,17 +241,16 @@ _slang_sizeof_type(slang_storage_type type)
 GLuint
 _slang_sizeof_aggregate(const slang_storage_aggregate * agg)
 {
-    GLuint i, size = 0;
+    GLuint size = 0;
 
-    for (i = 0; i < agg->count; i++) {
-	slang_storage_array *arr = &agg->arrays[i];
+    for (const auto &arr : agg->arrays) {
 	GLuint element_size;
 
-	if (arr->type == SLANG_STORE_AGGREGATE)
-	    element_size = _slang_sizeof_aggregate(arr->aggregate);
+	if (arr.type == SLANG_STORE_AGGREGATE)
+	    element_size = _slang_sizeof_aggregate(arr.aggregate);
 	else
-	    element_size = _slang_sizeof_type(arr->type);
-	size += element_size * arr->length;
+	    element_size = _slang_sizeof_type(arr.type);
+	size += element_size * arr.length;
     }
     return size;
 }

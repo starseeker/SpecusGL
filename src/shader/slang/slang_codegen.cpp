@@ -48,7 +48,6 @@
 #include "slang_codegen.h"
 #include "slang_compile.h"
 #include "slang_label.h"
-#include "slang_mem.h"
 #include "slang_simplify.h"
 #include "slang_emit.h"
 #include "slang_vartable.h"
@@ -88,8 +87,7 @@ static GLint
 _slang_field_offset(const slang_type_specifier *spec, slang_atom field)
 {
     GLint offset = 0;
-    GLuint i;
-    for (i = 0; i < spec->_struct->fields->num_variables; i++) {
+    for (GLuint i = 0; i < spec->_struct->fields->variables.size(); i++) {
 	const slang_variable *v = spec->_struct->fields->variables[i];
 	const GLuint sz = _slang_sizeof_type_specifier(&v->type.specifier);
 	if (sz > 1) {
@@ -458,15 +456,13 @@ static slang_ir_node *
 new_node3(slang_ir_opcode op,
 	  slang_ir_node *c0, slang_ir_node *c1, slang_ir_node *c2)
 {
-    slang_ir_node *n = (slang_ir_node *) _slang_alloc(sizeof(slang_ir_node));
-    if (n) {
-	n->Opcode = op;
-	n->Children[0] = c0;
-	n->Children[1] = c1;
-	n->Children[2] = c2;
-	n->Writemask = WRITEMASK_XYZW;
-	n->InstLocation = -1;
-    }
+    slang_ir_node *n = new slang_ir_node;
+    n->Opcode = op;
+    n->Children[0] = c0;
+    n->Children[1] = c1;
+    n->Children[2] = c2;
+    n->Writemask = WRITEMASK_XYZW;
+    n->InstLocation = -1;
     return n;
 }
 
@@ -888,10 +884,8 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     /*
      * We'll substitute formal params with actual args in the asm call.
      */
-    substOld = (slang_variable **)
-	       _slang_alloc(numArgs * sizeof(slang_variable *));
-    substNew = (slang_operation **)
-	       _slang_alloc(numArgs * sizeof(slang_operation *));
+    substOld = new slang_variable *[numArgs];
+    substNew = new slang_operation *[numArgs];
     for (i = 0; i < numArgs; i++) {
 	substOld[i] = fun->parameters->variables[i];
 	substNew[i] = oper->children + i;
@@ -911,8 +905,8 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     /* now do formal->actual substitutions */
     slang_substitute(A, inlined, numArgs, substOld, substNew, GL_FALSE);
 
-    _slang_free(substOld);
-    _slang_free(substNew);
+    delete[] substOld;
+    delete[] substNew;
 
     return inlined;
 }
@@ -926,11 +920,11 @@ static slang_operation *
 slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 			   slang_operation *oper, slang_operation *returnOper)
 {
-    typedef enum {
+    enum ParamMode {
 	SUBST = 1,
 	COPY_IN,
 	COPY_OUT
-    } ParamMode;
+    };
     ParamMode *paramMode;
     const GLboolean haveRetValue = _slang_function_has_return_value(fun);
     const GLuint numArgs = oper->num_children;
@@ -950,12 +944,9 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     assert(fun->param_count == totalArgs);
 
     /* allocate temporary arrays */
-    paramMode = (ParamMode *)
-		_slang_alloc(totalArgs * sizeof(ParamMode));
-    substOld = (slang_variable **)
-	       _slang_alloc(totalArgs * sizeof(slang_variable *));
-    substNew = (slang_operation **)
-	       _slang_alloc(totalArgs * sizeof(slang_operation *));
+    paramMode = new ParamMode[totalArgs];
+    substOld = new slang_variable *[totalArgs];
+    substNew = new slang_operation *[totalArgs];
 
 #if 0
     printf("Inline call to %s  (total vars=%d  nparams=%d)\n",
@@ -1152,9 +1143,9 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	}
     }
 
-    _slang_free(paramMode);
-    _slang_free(substOld);
-    _slang_free(substNew);
+    delete[] paramMode;
+    delete[] substOld;
+    delete[] substNew;
 
 #if 0
     printf("Done Inline call to %s  (total vars=%d  nparams=%d)\n",
@@ -1222,7 +1213,7 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
     /* Replace the function call with the inlined block */
     slang_operation_destruct(oper);
     *oper = *inlined;
-    _slang_free(inlined);
+    delete[] inlined;
 
 #if 0
     assert(inlined->locals);
@@ -1359,7 +1350,7 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
 	n->Store = n0->Store;
 	n->Writemask = writemask;
 
-	_slang_free(n0);
+	delete n0;
     }
 
     return n;
@@ -1377,11 +1368,9 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
 static slang_function *
 _slang_first_function(slang_function_scope *scope, const char *name)
 {
-    GLuint i;
-    for (i = 0; i < scope->num_functions; i++) {
-	slang_function *f = &scope->functions[i];
-	if (strcmp(name, (char*) f->header.a_name) == 0)
-	    return f;
+    for (auto &f : scope->functions) {
+	if (strcmp(name, (char*) f.header.a_name) == 0)
+	    return &f;
     }
     if (scope->outer_scope)
 	return _slang_first_function(scope->outer_scope, name);
@@ -1779,7 +1768,7 @@ _slang_gen_temporary(GLint size)
 	if (n) {
 	    n->Store = store;
 	} else {
-	    _slang_free(store);
+	    delete store;
 	}
     }
     return n;

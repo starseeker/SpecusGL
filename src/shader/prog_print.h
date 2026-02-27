@@ -32,11 +32,11 @@
 /**
  * The output style to use when printing programs.
  */
-typedef enum {
+enum gl_prog_print_mode {
     PROG_PRINT_ARB,
     PROG_PRINT_NV,
     PROG_PRINT_DEBUG
-} gl_prog_print_mode;
+};
 
 
 extern const char *

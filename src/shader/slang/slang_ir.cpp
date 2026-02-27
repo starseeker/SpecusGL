@@ -26,7 +26,6 @@
 #include "imports.h"
 #include "context.h"
 #include "slang_ir.h"
-#include "slang_mem.h"
 #include "shader/prog_print.h"
 
 
@@ -143,20 +142,10 @@ _slang_free_ir(slang_ir_node *n)
     if (!n)
 	return;
 
-#if 0
-    if (n->Store) {
-	n->Store->RefCount--;
-	if (n->Store->RefCount == 0) {
-	    _slang_free(n->Store);
-	    n->Store = nullptr;
-	}
-    }
-#endif
-
     for (i = 0; i < 3; i++)
 	_slang_free_ir(n->Children[i]);
     /* Do not free n->List since it's a child elsewhere */
-    _slang_free(n);
+    delete n;
 }
 
 
@@ -270,7 +259,7 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 	    _slang_print_ir_tree(n->Children[1], indent+3);
 	    break;
 	case IR_LABEL:
-	    printf("LABEL: %s\n", n->Label->Name);
+	    printf("LABEL: %s\n", n->Label->Name.c_str());
 	    break;
 	case IR_COND:
 	    printf("COND\n");
@@ -302,7 +291,7 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 	    printf("RETURN\n");
 	    break;
 	case IR_CALL:
-	    printf("CALL %s\n", n->Label->Name);
+	    printf("CALL %s\n", n->Label->Name.c_str());
 	    break;
 
 	case IR_LOOP:

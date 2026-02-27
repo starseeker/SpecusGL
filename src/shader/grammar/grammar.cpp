@@ -503,19 +503,19 @@ static byte regbyte_ctx_extract(regbyte_ctx **re, map_byte *reg)
 /*
     emit type typedef
 */
-typedef enum emit_type_ {
+enum emit_type {
     et_byte,            /* explicit number */
     et_stream,          /* eaten character */
     et_position         /* current position */
-} emit_type;
+};
 
 /*
     emit destination typedef
 */
-typedef enum emit_dest_ {
+enum emit_dest {
     ed_output,          /* write to the output buffer */
     ed_regbyte          /* write a particular regbyte */
-} emit_dest;
+};
 
 /*
     emit typedef
@@ -640,10 +640,10 @@ error_get_token(error *, struct dict_ *, const byte *, int);
 /*
     condition operand type typedef
 */
-typedef enum cond_oper_type_ {
+enum cond_oper_type {
     cot_byte,               /* constant 8-bit unsigned integer */
     cot_regbyte             /* pointer to byte register containing the current value */
-} cond_oper_type;
+};
 
 /*
     condition operand typedef
@@ -658,10 +658,10 @@ typedef struct cond_oper_ {
 /*
     condition type typedef
 */
-typedef enum cond_type_ {
+enum cond_type {
     ct_equal,
     ct_not_equal
-} cond_type;
+};
 
 /*
     condition typedef
@@ -692,7 +692,7 @@ static void cond_destroy(cond **co)
 /*
     specifier type typedef
 */
-typedef enum spec_type_ {
+enum spec_type {
     st_false,
     st_true,
     st_byte,
@@ -701,7 +701,7 @@ typedef enum spec_type_ {
     st_identifier,
     st_identifier_loop,
     st_debug
-} spec_type;
+};
 
 /*
     specifier typedef
@@ -750,11 +750,11 @@ GRAMMAR_IMPLEMENT_LIST_APPEND(spec)
 /*
     operator typedef
 */
-typedef enum oper_ {
+enum oper {
     op_none,
     op_and,
     op_or
-} oper;
+};
 
 /*
     rule typedef
@@ -2098,13 +2098,13 @@ static void free_regbyte_ctx_stack(regbyte_ctx *top, regbyte_ctx *limit)
     }
 }
 
-typedef enum match_result_ {
+enum match_result {
     mr_not_matched,     /* the examined string does not match */
     mr_matched,         /* the examined string matches */
     mr_error_raised,    /* mr_not_matched + error has been raised */
     mr_dont_emit,       /* used by identifier loops only */
     mr_internal_error   /* an internal error has occured such as out of memory */
-} match_result;
+};
 
 /*
  * This function does the main job. It parses the text and generates output data.

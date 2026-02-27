@@ -26,29 +26,29 @@
  * \file slang_compile_struct.c
  * slang front-end compiler
  * \author Michal Krol
+ *
+ * C++17 modernisation: slang_struct_scope now uses std::vector<slang_struct>
+ * instead of a raw array + count pair.  slang_struct now owns its fields and
+ * structs sub-objects via new/delete.
  */
 
 #include "imports.h"
-#include "slang_mem.h"
 #include "slang_compile.h"
 
 
 GLvoid
 _slang_struct_scope_ctr(slang_struct_scope * self)
 {
-    self->structs = nullptr;
-    self->num_structs = 0;
+    self->structs.clear();
     self->outer_scope = nullptr;
 }
 
 void
 slang_struct_scope_destruct(slang_struct_scope * scope)
 {
-    GLuint i;
-
-    for (i = 0; i < scope->num_structs; i++)
-	slang_struct_destruct(scope->structs + i);
-    _slang_free(scope->structs);
+    for (auto &s : scope->structs)
+	slang_struct_destruct(&s);
+    scope->structs.clear();
     /* do not free scope->outer_scope */
 }
 
@@ -56,28 +56,25 @@ int
 slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
 {
     slang_struct_scope z;
+    const GLuint n = static_cast<GLuint>(y->structs.size());
     GLuint i;
 
-    _slang_struct_scope_ctr(&z);
-    z.structs = (slang_struct *)
-		_slang_alloc(y->num_structs * sizeof(slang_struct));
-    if (z.structs == nullptr) {
-	slang_struct_scope_destruct(&z);
-	return 0;
-    }
-    for (z.num_structs = 0; z.num_structs < y->num_structs; z.num_structs++)
-	if (!slang_struct_construct(&z.structs[z.num_structs])) {
+    z.structs.resize(n);
+    for (i = 0; i < n; i++) {
+	if (!slang_struct_construct(&z.structs[i])) {
 	    slang_struct_scope_destruct(&z);
 	    return 0;
 	}
-    for (i = 0; i < z.num_structs; i++)
+    }
+    for (i = 0; i < n; i++) {
 	if (!slang_struct_copy(&z.structs[i], &y->structs[i])) {
 	    slang_struct_scope_destruct(&z);
 	    return 0;
 	}
+    }
     z.outer_scope = y->outer_scope;
     slang_struct_scope_destruct(x);
-    *x = z;
+    *x = std::move(z);
     return 1;
 }
 
@@ -85,11 +82,9 @@ slang_struct *
 slang_struct_scope_find(slang_struct_scope * stru, slang_atom a_name,
 			int all_scopes)
 {
-    GLuint i;
-
-    for (i = 0; i < stru->num_structs; i++)
-	if (a_name == stru->structs[i].a_name)
-	    return &stru->structs[i];
+    for (auto &s : stru->structs)
+	if (a_name == s.a_name)
+	    return &s;
     if (all_scopes && stru->outer_scope != nullptr)
 	return slang_struct_scope_find(stru->outer_scope, a_name, 1);
     return nullptr;
@@ -101,19 +96,10 @@ int
 slang_struct_construct(slang_struct * stru)
 {
     stru->a_name = SLANG_ATOM_NULL;
-    stru->fields = (slang_variable_scope *)
-		   _slang_alloc(sizeof(slang_variable_scope));
-    if (stru->fields == nullptr)
-	return 0;
+    stru->fields = new slang_variable_scope;
     _slang_variable_scope_ctr(stru->fields);
 
-    stru->structs =
-	(slang_struct_scope *) _slang_alloc(sizeof(slang_struct_scope));
-    if (stru->structs == nullptr) {
-	slang_variable_scope_destruct(stru->fields);
-	_slang_free(stru->fields);
-	return 0;
-    }
+    stru->structs = new slang_struct_scope;
     _slang_struct_scope_ctr(stru->structs);
     return 1;
 }
@@ -122,9 +108,11 @@ void
 slang_struct_destruct(slang_struct * stru)
 {
     slang_variable_scope_destruct(stru->fields);
-    _slang_free(stru->fields);
+    delete stru->fields;
+    stru->fields = nullptr;
     slang_struct_scope_destruct(stru->structs);
-    _slang_free(stru->structs);
+    delete stru->structs;
+    stru->structs = nullptr;
 }
 
 int
@@ -151,12 +139,10 @@ slang_struct_copy(slang_struct * x, const slang_struct * y)
 int
 slang_struct_equal(const slang_struct * x, const slang_struct * y)
 {
-    GLuint i;
-
-    if (x->fields->num_variables != y->fields->num_variables)
+    if (x->fields->variables.size() != y->fields->variables.size())
 	return 0;
 
-    for (i = 0; i < x->fields->num_variables; i++) {
+    for (GLuint i = 0; i < x->fields->variables.size(); i++) {
 	const slang_variable *varx = x->fields->variables[i];
 	const slang_variable *vary = y->fields->variables[i];
 

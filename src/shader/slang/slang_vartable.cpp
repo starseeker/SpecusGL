@@ -12,11 +12,11 @@
 static int dbg = 0;
 
 
-typedef enum {
+enum TempState {
     FREE,
     VAR,
     TEMP
-} TempState;
+};
 
 
 /**

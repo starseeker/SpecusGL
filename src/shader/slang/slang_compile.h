@@ -34,13 +34,12 @@
 #include "slang_compile_function.h"
 
 
-
-    typedef enum slang_unit_type_ {
+    enum slang_unit_type {
 	SLANG_UNIT_FRAGMENT_SHADER,
 	SLANG_UNIT_VERTEX_SHADER,
 	SLANG_UNIT_FRAGMENT_BUILTIN,
 	SLANG_UNIT_VERTEX_BUILTIN
-    } slang_unit_type;
+    };
 
 
     struct slang_var_pool {
