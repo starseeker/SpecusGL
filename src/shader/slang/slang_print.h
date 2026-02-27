@@ -6,7 +6,7 @@
 
 
 extern void
-slang_print_function(const slang_function *f, GLboolean body);
+slang_print_function(const slang_function *f, bool body);
 
 extern void
 slang_print_tree(const slang_operation *op, int indent);

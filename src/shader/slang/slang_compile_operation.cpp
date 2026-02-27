@@ -72,7 +72,7 @@ slang_operation_copy(slang_operation *x, const slang_operation *y)
 
     z.type = y->type;
     z.children.resize(y->children.size());
-    for (GLuint i = 0; i < (GLuint)y->children.size(); i++) {
+    for (GLuint i = 0; i < static_cast<GLuint>(y->children.size()); i++) {
         if (!slang_operation_copy(&z.children[i], &y->children[i])) {
             return false;
         }

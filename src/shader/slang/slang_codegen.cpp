@@ -685,7 +685,7 @@ _slang_find_node_type(slang_operation *oper, slang_operation_type type)
     GLuint i;
     if (oper->type == type)
 	return oper;
-    for (i = 0; i < (GLuint)oper->children.size(); i++) {
+    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 	slang_operation *p = _slang_find_node_type(&oper->children[i], type);
 	if (p)
 	    return p;
@@ -838,7 +838,7 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 	    break;
 	default: {
 	    GLuint i;
-	    for (i = 0; i < (GLuint)oper->children.size(); i++)
+	    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++)
 		slang_substitute(A, &oper->children[i],
 				 substCount, substOld, substNew, false);
 	}
@@ -862,7 +862,7 @@ static slang_operation *
 slang_inline_asm_function(slang_assemble_ctx *A,
 			  slang_function *fun, slang_operation *oper)
 {
-    const GLuint numArgs = (GLuint)oper->children.size();
+    const GLuint numArgs = static_cast<GLuint>(oper->children.size());
     GLuint i;
     slang_operation *inlined;
     const bool haveRetValue = _slang_function_has_return_value(fun);
@@ -918,7 +918,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	COPY_OUT
     };
     const bool haveRetValue = _slang_function_has_return_value(fun);
-    const GLuint numArgs = (GLuint)oper->children.size();
+    const GLuint numArgs = static_cast<GLuint>(oper->children.size());
     const GLuint totalArgs = numArgs + haveRetValue;
     slang_operation *args = oper->children.data();
     slang_operation *inlined, *top;
@@ -1102,7 +1102,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
      * 2. Copy the 'out' parameter vars
      */
     {
-	slang_operation *lab = slang_operation_insert(inlined, (GLuint)inlined->children.size());
+	slang_operation *lab = slang_operation_insert(inlined, static_cast<GLuint>(inlined->children.size()));
 	lab->type = SLANG_OPER_LABEL;
 	lab->label = A->curFuncEndLabel;
     }
@@ -1112,7 +1112,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	    const slang_variable *p = fun->parameters->variables[i];
 	    /* actualCallVar = outParam */
 	    /*if (i > 0 || !haveRetValue)*/
-	    slang_operation *ass = slang_operation_insert(inlined, (GLuint)inlined->children.size());
+	    slang_operation *ass = slang_operation_insert(inlined, static_cast<GLuint>(inlined->children.size()));
 	    ass->type = SLANG_OPER_ASSIGN;
 	    ass->locals->outer_scope = inlined->locals.get();
 	    ass->children.resize(2);
@@ -1283,7 +1283,7 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
     }
     assert(info->NumParams <= 3);
 
-    if (info->NumParams == (GLuint)oper->children.size()) {
+    if (info->NumParams == static_cast<GLuint>(oper->children.size())) {
 	/* Storage for result is not specified.
 	 * Children[0], [1] are the operands.
 	 */
@@ -1365,7 +1365,7 @@ _slang_gen_function_call_name(slang_assemble_ctx *A, const char *name,
 			      slang_operation *oper, slang_operation *dest)
 {
     slang_operation *params = oper->children.data();
-    const GLuint param_count = (GLuint)oper->children.size();
+    const GLuint param_count = static_cast<GLuint>(oper->children.size());
     slang_atom atom;
     slang_function *fun;
 
@@ -1406,7 +1406,7 @@ _slang_is_constant_cond(const slang_operation *oper, bool *value)
 	    *value = false;
 	return true;
     } else if (oper->type == SLANG_OPER_EXPRESSION &&
-	       (GLuint)oper->children.size() == 1) {
+	       static_cast<GLuint>(oper->children.size()) == 1) {
 	return _slang_is_constant_cond(&oper->children[0], value);
     }
     return false;
@@ -1608,7 +1608,7 @@ is_operation_type(const slang_operation *oper, slang_operation_type type)
 	return true;
     else if ((oper->type == SLANG_OPER_BLOCK_NEW_SCOPE ||
 	      oper->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE) &&
-	     (GLuint)oper->children.size() == 1)
+	     static_cast<GLuint>(oper->children.size()) == 1)
 	return is_operation_type(&oper->children[0], type);
     else
 	return false;
@@ -1890,7 +1890,7 @@ static slang_ir_node *
 _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 {
     const bool haveReturnValue
-	= ((GLuint)oper->children.size() == 1 && oper->children[0].type != SLANG_OPER_VOID);
+	= (static_cast<GLuint>(oper->children.size()) == 1 && oper->children[0].type != SLANG_OPER_VOID);
 
     /* error checking */
     assert(A->CurFunction);
@@ -2501,7 +2501,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 		slang_ir_node *n, *tree = nullptr;
 		GLuint i;
 
-		for (i = 0; i < (GLuint)oper->children.size(); i++) {
+		for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 		    n = _slang_gen_operation(A, &oper->children[i]);
 		    if (!n) {
 			_slang_free_ir_tree(tree);
@@ -2722,7 +2722,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 	case SLANG_OPER_SEQUENCE: {
 	    slang_ir_node *tree = nullptr;
 	    GLuint i;
-	    for (i = 0; i < (GLuint)oper->children.size(); i++) {
+	    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 		slang_ir_node *n = _slang_gen_operation(A, &oper->children[i]);
 		tree = tree ? new_seq(tree, n) : n;
 	    }

@@ -576,7 +576,7 @@ slang_print_tree(const slang_operation *op, int indent)
 	    slang_function *fun
 		= _slang_locate_function(A->space.funcs, oper->a_id,
 					 oper->children.data(),
-				 (GLuint)oper->children.size(), &A->space, A->atoms);
+				 static_cast<GLuint>(oper->children.size()), &A->space, A->atoms);
 #endif
 	    spaces(indent);
 	    printf("CALL %s(\n", op->a_id);
@@ -618,7 +618,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 
 void
-slang_print_function(const slang_function *f, GLboolean body)
+slang_print_function(const slang_function *f, bool body)
 {
     int i;
 
