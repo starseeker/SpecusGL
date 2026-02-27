@@ -199,7 +199,7 @@ _slang_aggregate_variable(slang_storage_aggregate * agg,
 	case SLANG_SPEC_SAMPLER2DRECTSHADOW:
 	    return aggregate_vector(agg, SLANG_STORE_INT, 1);
 	case SLANG_SPEC_STRUCT:
-	    return aggregate_variables(agg, spec->_struct->fields, funcs, structs,
+	    return aggregate_variables(agg, spec->_struct->fields.get(), funcs, structs,
 				       vars, atoms);
 	case SLANG_SPEC_ARRAY: {
 	    slang_storage_array *arr;

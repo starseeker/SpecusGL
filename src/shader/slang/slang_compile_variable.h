@@ -90,10 +90,16 @@
      *
      * C++17 modernisation: replaced raw pointer array + count with
      * std::vector<slang_variable *>.  Each element is heap-owned by this scope.
+     *
+     * The destructor iterates over owned variables and frees them, mirroring
+     * the old slang_variable_scope_destruct() logic, so callers do not need to
+     * call slang_variable_scope_destruct() before delete.
      */
     struct slang_variable_scope {
 	std::vector<slang_variable *> variables; /**< Owned ptrs to variables */
 	slang_variable_scope *outer_scope{nullptr};
+
+	~slang_variable_scope();  /**< Defined in slang_compile_variable.cpp */
     };
 
 

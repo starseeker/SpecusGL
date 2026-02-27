@@ -2983,7 +2983,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
 	if (fun->header.type.specifier.type != SLANG_SPEC_VOID) {
 	    /* check that non-void functions actually return something */
 	    slang_operation *op
-		= _slang_find_node_type(fun->body, SLANG_OPER_RETURN);
+		= _slang_find_node_type(fun->body.get(), SLANG_OPER_RETURN);
 	    if (!op) {
 		slang_info_log_error(A->log,
 				     "function \"%s\" has no return statement",

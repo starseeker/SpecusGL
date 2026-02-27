@@ -43,11 +43,30 @@ _slang_struct_scope_ctr(slang_struct_scope * self)
     self->outer_scope = nullptr;
 }
 
+
+/* ------------------------------------------------------------------ */
+/* slang_struct_scope destructor                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Destructor: destruct each owned struct.
+ * The vector elements are destroyed automatically; we just need to call
+ * slang_struct_destruct() on each one before the vector is cleared so
+ * that resources held by their fields / structs scopes are freed.
+ * (Actually with RAII slang_struct members this is handled by ~slang_struct,
+ * but we keep the explicit loop for clarity and backward compatibility.)
+ */
+slang_struct_scope::~slang_struct_scope()
+{
+    /* slang_struct destructor handles cleanup via unique_ptr members. */
+    structs.clear();
+}
+
 void
 slang_struct_scope_destruct(slang_struct_scope * scope)
 {
-    for (auto &s : scope->structs)
-	slang_struct_destruct(&s);
+    /* With RAII slang_struct members, simply clearing the vector triggers
+     * ~slang_struct() for each element, which handles cleanup. */
     scope->structs.clear();
     /* do not free scope->outer_scope */
 }
@@ -90,29 +109,60 @@ slang_struct_scope_find(slang_struct_scope * stru, slang_atom a_name,
     return nullptr;
 }
 
+/* ------------------------------------------------------------------ */
+/* slang_struct RAII implementation                                    */
+/* ------------------------------------------------------------------ */
+
+/** Destructor – unique_ptr members handle cleanup automatically. */
+slang_struct::~slang_struct() = default;
+
+/** Deep copy constructor. */
+slang_struct::slang_struct(const slang_struct &other)
+    : a_name(other.a_name)
+{
+    if (other.fields) {
+        fields = std::make_unique<slang_variable_scope>();
+        _slang_variable_scope_ctr(fields.get());
+        if (!slang_variable_scope_copy(fields.get(), other.fields.get()))
+            fields.reset();
+    }
+    if (other.structs) {
+        structs = std::make_unique<slang_struct_scope>();
+        _slang_struct_scope_ctr(structs.get());
+        if (!slang_struct_scope_copy(structs.get(), other.structs.get()))
+            structs.reset();
+    }
+}
+
+/** Deep copy assignment. */
+slang_struct &slang_struct::operator=(const slang_struct &other)
+{
+    if (this != &other)
+        *this = slang_struct(other);
+    return *this;
+}
+
 /* slang_struct */
 
 int
 slang_struct_construct(slang_struct * stru)
 {
     stru->a_name = SLANG_ATOM_NULL;
-    stru->fields = new slang_variable_scope;
-    _slang_variable_scope_ctr(stru->fields);
+    stru->fields = std::make_unique<slang_variable_scope>();
+    _slang_variable_scope_ctr(stru->fields.get());
 
-    stru->structs = new slang_struct_scope;
-    _slang_struct_scope_ctr(stru->structs);
+    stru->structs = std::make_unique<slang_struct_scope>();
+    _slang_struct_scope_ctr(stru->structs.get());
     return 1;
 }
 
 void
 slang_struct_destruct(slang_struct * stru)
 {
-    slang_variable_scope_destruct(stru->fields);
-    delete stru->fields;
-    stru->fields = nullptr;
-    slang_struct_scope_destruct(stru->structs);
-    delete stru->structs;
-    stru->structs = nullptr;
+    /* unique_ptr members handle cleanup automatically when reset */
+    stru->fields.reset();
+    stru->structs.reset();
+    stru->a_name = SLANG_ATOM_NULL;
 }
 
 int
@@ -123,16 +173,16 @@ slang_struct_copy(slang_struct * x, const slang_struct * y)
     if (!slang_struct_construct(&z))
 	return 0;
     z.a_name = y->a_name;
-    if (!slang_variable_scope_copy(z.fields, y->fields)) {
+    if (!slang_variable_scope_copy(z.fields.get(), y->fields.get())) {
 	slang_struct_destruct(&z);
 	return 0;
     }
-    if (!slang_struct_scope_copy(z.structs, y->structs)) {
+    if (!slang_struct_scope_copy(z.structs.get(), y->structs.get())) {
 	slang_struct_destruct(&z);
 	return 0;
     }
     slang_struct_destruct(x);
-    *x = z;
+    *x = std::move(z);
     return 1;
 }
 

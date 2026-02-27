@@ -155,6 +155,25 @@ _slang_variable_scope_new(slang_variable_scope *parent)
 }
 
 
+/*
+ * slang_variable_scope
+ */
+
+/**
+ * Destructor: free all owned variables.
+ * This mirrors slang_variable_scope_destruct() so that deleting a scope
+ * automatically cleans up without a separate explicit destruct call.
+ */
+slang_variable_scope::~slang_variable_scope()
+{
+    for (auto *v : variables) {
+	if (v)
+	    slang_variable_delete(v);
+    }
+    variables.clear();
+    /* do not free outer_scope - not owned */
+}
+
 GLvoid
 _slang_variable_scope_ctr(slang_variable_scope * self)
 {

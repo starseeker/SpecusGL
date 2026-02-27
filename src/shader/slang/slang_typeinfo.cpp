@@ -170,13 +170,14 @@ _slang_multiply_swizzles(slang_swizzle * dst, const slang_swizzle * left,
 /* slang_type_specifier RAII implementation                           */
 /* ------------------------------------------------------------------ */
 
-/** Custom deleter: call slang_struct_destruct before freeing. */
+/**
+ * Custom deleter: now that slang_struct has a proper destructor that frees
+ * its owned members, we can simply delete the object.  We keep the
+ * slang_struct_destruct() call for backward-compatibility safety.
+ */
 void SlangStructDeleter::operator()(slang_struct *s) const noexcept
 {
-    if (s) {
-        slang_struct_destruct(s);
-        delete s;
-    }
+    delete s;   /* ~slang_struct() frees fields and structs via unique_ptr */
 }
 
 /** Destructor – unique_ptr members handle cleanup automatically. */
@@ -186,15 +187,8 @@ slang_type_specifier::~slang_type_specifier() = default;
 slang_type_specifier::slang_type_specifier(const slang_type_specifier &other)
     : type(other.type)
 {
-    if (other._struct) {
-        slang_struct *s = new slang_struct;
-        if (slang_struct_construct(s) && slang_struct_copy(s, other._struct.get()))
-            _struct.reset(s);
-        else {
-            slang_struct_destruct(s);
-            delete s;
-        }
-    }
+    if (other._struct)
+        _struct.reset(new slang_struct(*other._struct));  /* copy via slang_struct copy ctor */
     if (other._array)
         _array = std::make_unique<slang_type_specifier>(*other._array);
 }
@@ -588,12 +582,8 @@ _slang_typeof_operation_(slang_operation * op,
 		    if (s) {
 			/* struct initializer */
 			ti->spec.type = SLANG_SPEC_STRUCT;
-			auto new_s = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct);
-			if (!slang_struct_construct(new_s.get()))
-			    return GL_FALSE;
-			if (!slang_struct_copy(new_s.get(), s))
-			    return GL_FALSE;
-			ti->spec._struct = std::move(new_s);
+			/* Use slang_struct copy constructor directly */
+			ti->spec._struct = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct(*s));
 		    } else {
 			/* float, int, vec4, mat3, etc. constructor? */
 			const char *name;
@@ -622,7 +612,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    if (_ti.spec.type == SLANG_SPEC_STRUCT) {
 		slang_variable *field;
 
-		field = _slang_locate_variable(_ti.spec._struct->fields, op->a_id,
+		field = _slang_locate_variable(_ti.spec._struct->fields.get(), op->a_id,
 					       GL_FALSE);
 		if (field == nullptr) {
 		    slang_typeinfo_destruct(&_ti);

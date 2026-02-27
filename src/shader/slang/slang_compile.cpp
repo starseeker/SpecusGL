@@ -314,12 +314,12 @@ parse_struct_field(slang_parse_ctx * C, slang_output_ctx * O,
 {
     slang_output_ctx o = *O;
 
-    o.structs = st->structs;
+    o.structs = st->structs.get();
     if (!parse_type_specifier(C, &o, sp))
 	return 0;
 
     do {
-	slang_variable *var = slang_variable_scope_grow(st->fields);
+	slang_variable *var = slang_variable_scope_grow(st->fields.get());
 	if (!var) {
 	    slang_info_log_memory(C->L);
 	    return 0;
@@ -586,12 +586,7 @@ parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		    return 0;
 		}
 
-		auto new_s = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct);
-		if (!slang_struct_construct(new_s.get()))
-		    return 0;
-		if (!slang_struct_copy(new_s.get(), stru))
-		    return 0;
-		spec->_struct = std::move(new_s);
+		spec->_struct = std::unique_ptr<slang_struct, SlangStructDeleter>(new slang_struct(*stru));
 	    }
 	    break;
 	default:
