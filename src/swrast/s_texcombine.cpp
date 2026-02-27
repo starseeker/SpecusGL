@@ -37,9 +37,9 @@
 #define PROD(A,B)   ( (GLuint)(A) * ((GLuint)(B)+1) )
 #define S_PROD(A,B) ( (GLint)(A) * ((GLint)(B)+1) )
 #if CHAN_BITS == 32
-typedef GLfloat ChanTemp;
+using ChanTemp = GLfloat;
 #else
-typedef GLuint ChanTemp;
+using ChanTemp = GLuint;
 #endif
 
 
