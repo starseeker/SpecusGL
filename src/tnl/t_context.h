@@ -249,19 +249,19 @@ struct tnl_pipeline_stage {
      * _tnl_destroy_pipeline().  Keeps each stage free of boilerplate
      * delete-and-null cleanup code.
      */
-    void (*privateDeleter)(void *);
+    std::function<void(void *)> privateDeleter;
 
     /** Allocate private data (called once when the pipeline is installed). */
-    GLboolean(*create)(GLcontext *ctx, struct tnl_pipeline_stage *);
+    std::function<GLboolean(GLcontext *ctx, struct tnl_pipeline_stage *)> create;
 
     /** Called on any statechange, input array size change, or stride change. */
-    void (*validate)(GLcontext *ctx, struct tnl_pipeline_stage *);
+    std::function<void(GLcontext *ctx, struct tnl_pipeline_stage *)> validate;
 
     /**
      * Called from _tnl_run_pipeline().
      * Return value: GL_TRUE - keep going, GL_FALSE - finished pipeline.
      */
-    GLboolean(*run)(GLcontext *ctx, struct tnl_pipeline_stage *);
+    std::function<GLboolean(GLcontext *ctx, struct tnl_pipeline_stage *)> run;
 };
 
 
@@ -383,7 +383,7 @@ struct tnl_clipspace {
 
     struct tnl_clipspace_fastpath *fastpath;
 
-    void (*codegen_emit)(GLcontext *ctx);
+    std::function<void(GLcontext *ctx)> codegen_emit;
 };
 
 

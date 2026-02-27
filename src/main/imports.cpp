@@ -166,10 +166,8 @@ _mesa_align_realloc(void *oldBuffer, size_t oldSize, size_t newSize,
 GLhalfARB
 _mesa_float_to_half(float val)
 {
-    /* Reinterpret val's bit pattern as an integer (C++17 safe via memcpy). */
-    int flt_bits;
-    std::memcpy(&flt_bits, &val, sizeof(flt_bits));
-    const int flt = flt_bits;
+    /* Reinterpret val's bit pattern as an integer. */
+    const int flt = float_bits(val);
     const int flt_m = flt & 0x7fffff;
     const int flt_e = (flt >> 23) & 0xff;
     const int flt_s = (flt >> 31) & 0x1;
@@ -303,8 +301,7 @@ _mesa_half_to_float(GLhalfARB val)
     }
 
     flt = (flt_s << 31) | (flt_e << 23) | flt_m;
-    /* Reinterpret flt's bit pattern as a float (C++17 safe via memcpy). */
-    std::memcpy(&result, &flt, sizeof(result));
+    result = bits_float(flt);
     return result;
 }
 

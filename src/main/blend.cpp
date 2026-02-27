@@ -56,7 +56,7 @@ _mesa_BlendFunc(GLenum sfactor, GLenum dfactor)
 {
     GET_CURRENT_CONTEXT(ctx);
 
-    (*ctx->CurrentDispatch->BlendFuncSeparateEXT)(sfactor, dfactor,
+    ctx->CurrentDispatch->BlendFuncSeparateEXT(sfactor, dfactor,
 	    sfactor, dfactor);
 }
 
