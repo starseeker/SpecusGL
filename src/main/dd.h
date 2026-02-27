@@ -49,6 +49,12 @@ struct mesa_display_list;
  * Note: when new functions are added here, the drivers/common/driverfuncs.c
  * file should be updated too!!!
  */
+constexpr GLuint FLUSH_STORED_VERTICES = 0x1U;
+constexpr GLuint FLUSH_UPDATE_CURRENT  = 0x2U;
+constexpr GLenum PRIM_OUTSIDE_BEGIN_END   = GL_POLYGON + 1U;
+constexpr GLenum PRIM_INSIDE_UNKNOWN_PRIM = GL_POLYGON + 2U;
+constexpr GLenum PRIM_UNKNOWN             = GL_POLYGON + 3U;
+
 struct dd_function_table {
     /**
      * Return a string as needed by glGetString().
@@ -905,11 +911,6 @@ struct dd_function_table {
      */
     void (*ValidateTnlModule)(GLcontext *ctx, GLuint new_state);
 
-
-#define PRIM_OUTSIDE_BEGIN_END   GL_POLYGON+1
-#define PRIM_INSIDE_UNKNOWN_PRIM GL_POLYGON+2
-#define PRIM_UNKNOWN             GL_POLYGON+3
-
     /**
      * Set by the driver-supplied T&L engine.
      *
@@ -925,9 +926,6 @@ struct dd_function_table {
      */
     GLuint CurrentSavePrimitive;
 
-
-#define FLUSH_STORED_VERTICES 0x1
-#define FLUSH_UPDATE_CURRENT  0x2
     /**
      * Set by the driver-supplied T&L engine whenever vertices are buffered
      * between glBegin()/glEnd() objects or __GLcontextRec::Current is not

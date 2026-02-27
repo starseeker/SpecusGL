@@ -150,8 +150,8 @@ make_aligned_array(size_t count, unsigned long alignment, bool zero_init = false
  * Math macros
  */
 
-#define MAX_GLUSHORT	0xffff
-#define MAX_GLUINT	0xffffffff
+constexpr GLushort MAX_GLUSHORT = 0xffffU;
+constexpr GLuint   MAX_GLUINT   = 0xffffffffU;
 
 #ifndef M_PI
 #define M_PI (3.1415926536)
