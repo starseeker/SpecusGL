@@ -50,16 +50,31 @@
 
 
 
+    /**
+     * The type of a variable, including qualifier (const, varying, etc.) and
+     * the base type specifier.
+     *
+     * C++17 modernisation: qualifier now has a default initialiser of
+     * SLANG_QUAL_NONE so that a default-constructed value is already valid.
+     * slang_fully_specified_type_construct() is still provided as a no-op
+     * wrapper for existing callers.
+     */
     struct slang_fully_specified_type {
-	slang_type_qualifier qualifier;
+	slang_type_qualifier qualifier{SLANG_QUAL_NONE};
 	slang_type_specifier specifier;
     };
 
-    extern int
-    slang_fully_specified_type_construct(slang_fully_specified_type *);
+    /** Legacy no-op: qualifier has a default initialiser; specifier is RAII. */
+    inline int slang_fully_specified_type_construct(slang_fully_specified_type *type) {
+        type->qualifier = SLANG_QUAL_NONE;
+        type->specifier = slang_type_specifier{};
+        return 1;
+    }
 
-    extern void
-    slang_fully_specified_type_destruct(slang_fully_specified_type *);
+    /** Legacy no-op: specifier unique_ptrs free themselves. */
+    inline void slang_fully_specified_type_destruct(slang_fully_specified_type *type) {
+        type->specifier = slang_type_specifier{};
+    }
 
     extern int
     slang_fully_specified_type_copy(slang_fully_specified_type *,

@@ -97,20 +97,7 @@ slang_type_specifier_type_to_string(slang_type_specifier_type type)
 
 /* slang_fully_specified_type */
 
-int
-slang_fully_specified_type_construct(slang_fully_specified_type * type)
-{
-    type->qualifier = SLANG_QUAL_NONE;
-    /* specifier is default-constructed (VOID, null ptrs) by the struct */
-    return 1;
-}
-
-void
-slang_fully_specified_type_destruct(slang_fully_specified_type * type)
-{
-    /* specifier unique_ptrs handle their own cleanup */
-    slang_type_specifier_dtr(&type->specifier);
-}
+/* slang_fully_specified_type_construct, _destruct are now inline in the header. */
 
 int
 slang_fully_specified_type_copy(slang_fully_specified_type * x,
