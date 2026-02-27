@@ -662,9 +662,7 @@ parse_string(const GLubyte ** inst, struct var_cache **vc_head,
     struct var_cache *va = nullptr;
     (void) Program;
 
-    *inst += strlen((char *) i) + 1;
-
-    va = var_cache_find(*vc_head, i);
+    *inst += strlen(reinterpret_cast<const char *>(i)) + 1;
 
     if (va) {
 	*found = 1;
@@ -686,7 +684,7 @@ parse_string_without_adding(const GLubyte ** inst, struct arb_program *Program)
     const GLubyte *i = *inst;
     (void) Program;
 
-    *inst += strlen((char *) i) + 1;
+    *inst += strlen(reinterpret_cast<const char *>(i)) + 1;
 
     return const_cast<char *>(reinterpret_cast<const char *>(i));
 }

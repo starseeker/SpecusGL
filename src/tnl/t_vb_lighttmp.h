@@ -55,15 +55,15 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
     GLuint j;
 
     const GLuint vstride = input->stride;
-    const GLfloat *vertex = (GLfloat *)input->data;
+    const GLfloat *vertex = reinterpret_cast<const GLfloat *>(input->data);
     const GLuint nstride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
-    const GLfloat *normal = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
+    const GLfloat *normal = reinterpret_cast<const GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
 
-    GLfloat(*Fcolor)[4] = (GLfloat(*)[4]) store->LitColor[0].data;
-    GLfloat(*Fspec)[4] = (GLfloat(*)[4]) store->LitSecondary[0].data;
+    GLfloat(*Fcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[0].data);
+    GLfloat(*Fspec)[4] = static_cast<GLfloat(*)[4]>(store->LitSecondary[0].data);
 #if IDX & LIGHT_TWOSIDE
-    GLfloat(*Bcolor)[4] = (GLfloat(*)[4]) store->LitColor[1].data;
-    GLfloat(*Bspec)[4] = (GLfloat(*)[4]) store->LitSecondary[1].data;
+    GLfloat(*Bcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[1].data);
+    GLfloat(*Bspec)[4] = static_cast<GLfloat(*)[4]>(store->LitSecondary[1].data);
 #endif
 
     const GLuint nr = VB->Count;
@@ -126,7 +126,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 
 		SUB_3V(VP, light->_Position, vertex);
 
-		d = (GLfloat) LEN_3FV(VP);
+		d = static_cast<GLfloat>(LEN_3FV(VP));
 
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
@@ -146,7 +146,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 		    } else {
 			GLdouble x = PV_dot_dir * (EXP_TABLE_SIZE-1);
 			GLint k = (GLint) x;
-			GLfloat spot = (GLfloat)(light->_SpotExpTable[k][0]
+			GLfloat spot = static_cast<GLfloat>(light->_SpotExpTable[k][0]
 						 + (x-k)*light->_SpotExpTable[k][1]);
 			attenuation *= spot;
 		    }
@@ -238,13 +238,13 @@ static void TAG(light_rgba)(GLcontext *ctx,
     GLfloat sumA[2];
 
     const GLuint vstride = input->stride;
-    const GLfloat *vertex = (GLfloat *) input->data;
+    const GLfloat *vertex = reinterpret_cast<const GLfloat *>(input->data);
     const GLuint nstride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
-    const GLfloat *normal = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
+    const GLfloat *normal = reinterpret_cast<const GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
 
-    GLfloat(*Fcolor)[4] = (GLfloat(*)[4]) store->LitColor[0].data;
+    GLfloat(*Fcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[0].data);
 #if IDX & LIGHT_TWOSIDE
-    GLfloat(*Bcolor)[4] = (GLfloat(*)[4]) store->LitColor[1].data;
+    GLfloat(*Bcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[1].data);
 #endif
 
     const GLuint nr = VB->Count;
@@ -304,7 +304,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 
 		SUB_3V(VP, light->_Position, vertex);
 
-		d = (GLfloat) LEN_3FV(VP);
+		d = static_cast<GLfloat>(LEN_3FV(VP));
 
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
@@ -324,7 +324,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 		    } else {
 			GLdouble x = PV_dot_dir * (EXP_TABLE_SIZE-1);
 			GLint k = (GLint) x;
-			GLfloat spot = (GLfloat)(light->_SpotExpTable[k][0]
+			GLfloat spot = static_cast<GLfloat>(light->_SpotExpTable[k][0]
 						 + (x-k)*light->_SpotExpTable[k][1]);
 			attenuation *= spot;
 		    }
@@ -416,10 +416,10 @@ static void TAG(light_fast_rgba_single)(GLcontext *ctx,
 {
     struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
     const GLuint nstride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
-    const GLfloat *normal = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
-    GLfloat(*Fcolor)[4] = (GLfloat(*)[4]) store->LitColor[0].data;
+    const GLfloat *normal = reinterpret_cast<const GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
+    GLfloat(*Fcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[0].data);
 #if IDX & LIGHT_TWOSIDE
-    GLfloat(*Bcolor)[4] = (GLfloat(*)[4]) store->LitColor[1].data;
+    GLfloat(*Bcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[1].data);
 #endif
     const struct gl_light *light = ctx->Light.EnabledList.front();
     GLuint j = 0;
@@ -522,10 +522,10 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
     struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
     GLfloat sumA[2];
     const GLuint nstride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
-    const GLfloat *normal = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
-    GLfloat(*Fcolor)[4] = (GLfloat(*)[4]) store->LitColor[0].data;
+    const GLfloat *normal = reinterpret_cast<const GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
+    GLfloat(*Fcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[0].data);
 #if IDX & LIGHT_TWOSIDE
-    GLfloat(*Bcolor)[4] = (GLfloat(*)[4]) store->LitColor[1].data;
+    GLfloat(*Bcolor)[4] = static_cast<GLfloat(*)[4]>(store->LitColor[1].data);
 #endif
     GLuint j = 0;
 #if IDX & LIGHT_MATERIAL
@@ -638,9 +638,9 @@ static void TAG(light_ci)(GLcontext *ctx,
     struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
     GLuint j;
     const GLuint vstride = input->stride;
-    const GLfloat *vertex = (GLfloat *) input->data;
+    const GLfloat *vertex = reinterpret_cast<const GLfloat *>(input->data);
     const GLuint nstride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
-    const GLfloat *normal = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
+    const GLfloat *normal = reinterpret_cast<const GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
     GLfloat *indexResult[2];
     const GLuint nr = VB->Count;
 
@@ -653,9 +653,9 @@ static void TAG(light_ci)(GLcontext *ctx,
     VB->IndexPtr[1] = &store->LitIndex[1];
 #endif
 
-    indexResult[0] = (GLfloat *)VB->IndexPtr[0]->data;
+    indexResult[0] = reinterpret_cast<GLfloat *>(VB->IndexPtr[0]->data);
 #if IDX & LIGHT_TWOSIDE
-    indexResult[1] = (GLfloat *)VB->IndexPtr[1]->data;
+    indexResult[1] = reinterpret_cast<GLfloat *>(VB->IndexPtr[1]->data);
 #endif
 
     /* loop over vertices */
@@ -690,7 +690,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 
 		SUB_3V(VP, light->_Position, vertex);
 
-		d = (GLfloat) LEN_3FV(VP);
+		d = static_cast<GLfloat>(LEN_3FV(VP));
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
 		    SELF_SCALE_SCALAR_3V(VP, invd);
@@ -708,7 +708,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 		    } else {
 			GLdouble x = PV_dot_dir * (EXP_TABLE_SIZE-1);
 			GLint k = (GLint) x;
-			GLfloat spot = (GLfloat)(light->_SpotExpTable[k][0]
+			GLfloat spot = static_cast<GLfloat>(light->_SpotExpTable[k][0]
 						 + (x-k)*light->_SpotExpTable[k][1]);
 			attenuation *= spot;
 		    }

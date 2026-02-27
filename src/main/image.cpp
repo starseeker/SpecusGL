@@ -2052,7 +2052,7 @@ _mesa_pack_rgba_span_float(GLcontext *ctx, GLuint n, GLfloat rgba[][4],
 
 #define SWAP2BYTE(VALUE)			\
    {						\
-      GLubyte *bytes = (GLubyte *) &(VALUE);	\
+      GLubyte *bytes = reinterpret_cast<GLubyte *>(&(VALUE));	\
       GLubyte tmp = bytes[0];			\
       bytes[0] = bytes[1];			\
       bytes[1] = tmp;				\
@@ -2060,7 +2060,7 @@ _mesa_pack_rgba_span_float(GLcontext *ctx, GLuint n, GLfloat rgba[][4],
 
 #define SWAP4BYTE(VALUE)			\
    {						\
-      GLubyte *bytes = (GLubyte *) &(VALUE);	\
+      GLubyte *bytes = reinterpret_cast<GLubyte *>(&(VALUE));	\
       GLubyte tmp = bytes[0];			\
       bytes[0] = bytes[3];			\
       bytes[3] = tmp;				\
