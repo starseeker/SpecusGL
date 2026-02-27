@@ -317,7 +317,7 @@ typeof_math_call(const char *name, slang_operation *call,
 	assert(call->children.size() == 1 || call->children.size() == 2);
 
 	atom = slang_atom_pool_atom(atoms, name);
-	if (!_slang_typeof_function(atom, call->children.data(), (GLuint)call->children.size(),
+	if (!_slang_typeof_function(atom, call->children.data(), static_cast<GLuint>(call->children.size()),
 				    space, spec, &fun, atoms, log))
 	    return false;
 
@@ -488,22 +488,22 @@ _slang_typeof_operation_(slang_operation * op,
 	/*case SLANG_OPER_LSHIFT: */
 	/*case SLANG_OPER_RSHIFT: */
 	case SLANG_OPER_ADD:
-	    assert((GLuint)op->children.size() == 2);
+	    assert(static_cast<GLuint>(op->children.size()) == 2);
 	    if (!typeof_math_call("+", op, space, &ti->spec, atoms, log))
 		return false;
 	    break;
 	case SLANG_OPER_SUBTRACT:
-	    assert((GLuint)op->children.size() == 2);
+	    assert(static_cast<GLuint>(op->children.size()) == 2);
 	    if (!typeof_math_call("-", op, space, &ti->spec, atoms, log))
 		return false;
 	    break;
 	case SLANG_OPER_MULTIPLY:
-	    assert((GLuint)op->children.size() == 2);
+	    assert(static_cast<GLuint>(op->children.size()) == 2);
 	    if (!typeof_math_call("*", op, space, &ti->spec, atoms, log))
 		return false;
 	    break;
 	case SLANG_OPER_DIVIDE:
-	    assert((GLuint)op->children.size() == 2);
+	    assert(static_cast<GLuint>(op->children.size()) == 2);
 	    if (!typeof_math_call("/", op, space, &ti->spec, atoms, log))
 		return false;
 	    break;
@@ -515,7 +515,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    ti->is_swizzled = false;
 	    break;
 	case SLANG_OPER_MINUS:
-	    assert((GLuint)op->children.size() == 1);
+	    assert(static_cast<GLuint>(op->children.size()) == 1);
 	    if (!typeof_math_call("-", op, space, &ti->spec, atoms, log))
 		return false;
 	    break;
@@ -553,7 +553,7 @@ _slang_typeof_operation_(slang_operation * op,
 		slang_type_specifier_copy(&ti->spec, &op->fun->header.type.specifier);
 	    } else {
 		slang_function *fun;
-		if (!_slang_typeof_function(op->a_id, op->children.data(), (GLuint)op->children.size(),
+		if (!_slang_typeof_function(op->a_id, op->children.data(), static_cast<GLuint>(op->children.size()),
 					    space, &ti->spec, &fun, atoms, log))
 		    return false;
 		if (fun) {

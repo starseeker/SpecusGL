@@ -49,7 +49,9 @@ slang_operation::slang_operation()
 bool
 slang_operation_construct(slang_operation *oper)
 {
-    return oper->locals != nullptr ? true : false;
+    /* slang_operation is fully default-constructible via its constructor;
+     * locals is always initialized, so construction never fails. */
+    return oper->locals != nullptr;
 }
 
 void
