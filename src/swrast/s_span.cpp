@@ -1358,6 +1358,19 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
     const GLbitfield origInterpMask = span->interpMask;
     const GLbitfield origArrayMask = span->arrayMask;
     const GLenum chanType = span->array->ChanType;
+
+    /* RAII guard that restores span->interpMask, arrayMask, and ChanType on
+     * any return path (including early returns that replaced goto end). */
+    struct SpanRestorer {
+        SWspan        *span;
+        GLbitfield     interpMask, arrayMask;
+        GLenum         chanType;
+        ~SpanRestorer() noexcept {
+            span->interpMask         = interpMask;
+            span->arrayMask          = arrayMask;
+            span->array->ChanType    = chanType;
+        }
+    } restorer{span, origInterpMask, origArrayMask, chanType};
     const GLboolean shader = (ctx->FragmentProgram._Current
 			      || ctx->ATIFragmentShader._Enabled);
     const GLboolean shaderOrTexture = shader || ctx->Texture._EnabledUnits;
@@ -1454,7 +1467,7 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
     /* Do the alpha test */
     if (ctx->Color.AlphaEnabled) {
 	if (!_swrast_alpha_test(ctx, span)) {
-	    goto end;
+	    return;
 	}
     }
 
@@ -1466,14 +1479,14 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 	if (ctx->Stencil.Enabled && fb->Visual.stencilBits > 0) {
 	    /* Combined Z/stencil tests */
 	    if (!_swrast_stencil_and_ztest_span(ctx, span)) {
-		goto end;
+		return;
 	    }
 	} else if (fb->Visual.depthBits > 0) {
 	    /* Just regular depth testing */
 	    ASSERT(ctx->Depth.Test);
 	    ASSERT(span->arrayMask & SPAN_Z);
 	    if (!_swrast_depth_test_span(ctx, span)) {
-		goto end;
+		return;
 	    }
 	}
     }
@@ -1492,7 +1505,7 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
      * the occlusion test.
      */
     if (colorMask == 0x0) {
-	goto end;
+	return;
     }
 
     /* If we were able to defer fragment color computation to now, there's
@@ -1616,12 +1629,6 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 	    } /* for buf */
 	} /* if output is written to */
     } /* for output */
-
-end:
-    /* restore these values before returning */
-    span->interpMask = origInterpMask;
-    span->arrayMask = origArrayMask;
-    span->array->ChanType = chanType;
 }
 
 

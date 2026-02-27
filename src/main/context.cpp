@@ -422,79 +422,70 @@ alloc_shared_state(GLcontext *ctx)
 
     ctx->Shared = ss;
 
+    /* Cleanup helper – frees any partially-initialised objects and deletes
+     * the shared state.  Called on allocation failure before returning false. */
+    auto do_cleanup = [&]() {
+#if FEATURE_ARB_vertex_program
+        if (ss->DefaultVertexProgram)
+            ctx->Driver.DeleteProgram(ctx, ss->DefaultVertexProgram);
+#endif
+#if FEATURE_ARB_fragment_program
+        if (ss->DefaultFragmentProgram)
+            ctx->Driver.DeleteProgram(ctx, ss->DefaultFragmentProgram);
+#endif
+#if FEATURE_ATI_fragment_shader
+        if (ss->DefaultFragmentShader)
+            _mesa_delete_ati_fragment_shader(ctx, ss->DefaultFragmentShader);
+#endif
+        if (ss->Default1D)
+            (*ctx->Driver.DeleteTexture)(ctx, ss->Default1D);
+        if (ss->Default2D)
+            (*ctx->Driver.DeleteTexture)(ctx, ss->Default2D);
+        if (ss->Default3D)
+            (*ctx->Driver.DeleteTexture)(ctx, ss->Default3D);
+        if (ss->DefaultCubeMap)
+            (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultCubeMap);
+        if (ss->DefaultRect)
+            (*ctx->Driver.DeleteTexture)(ctx, ss->DefaultRect);
+        delete ss;
+    };
+
     /* Hash tables (DisplayList, TexObjects, Programs, etc.) are now value
      * members of gl_shared_state and are automatically default-constructed.
      * No explicit _mesa_NewHashTable() calls needed. */
 
 #if FEATURE_ARB_vertex_program
     ss->DefaultVertexProgram = ctx->Driver.NewProgram(ctx, GL_VERTEX_PROGRAM_ARB, 0);
-    if (!ss->DefaultVertexProgram)
-	goto cleanup;
+    if (!ss->DefaultVertexProgram) { do_cleanup(); return GL_FALSE; }
 #endif
 #if FEATURE_ARB_fragment_program
     ss->DefaultFragmentProgram = ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
-    if (!ss->DefaultFragmentProgram)
-	goto cleanup;
+    if (!ss->DefaultFragmentProgram) { do_cleanup(); return GL_FALSE; }
 #endif
 #if FEATURE_ATI_fragment_shader
     ss->DefaultFragmentShader = _mesa_new_ati_fragment_shader(ctx, 0);
-    if (!ss->DefaultFragmentShader)
-	goto cleanup;
+    if (!ss->DefaultFragmentShader) { do_cleanup(); return GL_FALSE; }
 #endif
 
     ss->Default1D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_1D);
-    if (!ss->Default1D)
-	goto cleanup;
+    if (!ss->Default1D) { do_cleanup(); return GL_FALSE; }
 
     ss->Default2D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_2D);
-    if (!ss->Default2D)
-	goto cleanup;
+    if (!ss->Default2D) { do_cleanup(); return GL_FALSE; }
 
     ss->Default3D = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_3D);
-    if (!ss->Default3D)
-	goto cleanup;
+    if (!ss->Default3D) { do_cleanup(); return GL_FALSE; }
 
     ss->DefaultCubeMap = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
-    if (!ss->DefaultCubeMap)
-	goto cleanup;
+    if (!ss->DefaultCubeMap) { do_cleanup(); return GL_FALSE; }
 
     ss->DefaultRect = (*ctx->Driver.NewTextureObject)(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
-    if (!ss->DefaultRect)
-	goto cleanup;
+    if (!ss->DefaultRect) { do_cleanup(); return GL_FALSE; }
 
     /* sanity check */
     assert(ss->Default1D->RefCount == 1);
 
     return GL_TRUE;
-
-cleanup:
-    /* Ran out of memory at some point.  Free partially-initialised objects.
-     * The hash table value members will be destroyed by 'delete ss'. */
-#if FEATURE_ARB_vertex_program
-    if (ss->DefaultVertexProgram)
-	ctx->Driver.DeleteProgram(ctx, ss->DefaultVertexProgram);
-#endif
-#if FEATURE_ARB_fragment_program
-    if (ss->DefaultFragmentProgram)
-	ctx->Driver.DeleteProgram(ctx, ss->DefaultFragmentProgram);
-#endif
-#if FEATURE_ATI_fragment_shader
-    if (ss->DefaultFragmentShader)
-	_mesa_delete_ati_fragment_shader(ctx, ss->DefaultFragmentShader);
-#endif
-
-    if (ss->Default1D)
-	(*ctx->Driver.DeleteTexture)(ctx, ss->Default1D);
-    if (ss->Default2D)
-	(*ctx->Driver.DeleteTexture)(ctx, ss->Default2D);
-    if (ss->Default3D)
-	(*ctx->Driver.DeleteTexture)(ctx, ss->Default3D);
-    if (ss->DefaultCubeMap)
-	(*ctx->Driver.DeleteTexture)(ctx, ss->DefaultCubeMap);
-    if (ss->DefaultRect)
-	(*ctx->Driver.DeleteTexture)(ctx, ss->DefaultRect);
-    delete ss;
-    return GL_FALSE;
 }
 
 
