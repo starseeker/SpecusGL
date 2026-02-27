@@ -1509,7 +1509,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 	    if (emitInfo->EmitComments) {
 		/* emit NOP with comment describing the variable's storage location */
 		char s[1000];
-		sprintf(s, "TEMP[%d]%s = variable %s (size %d)",
+		snprintf(s, sizeof(s), "TEMP[%d]%s = variable %s (size %d)",
 			n->Store->Index,
 			_mesa_swizzle_string(n->Store->Swizzle, 0, GL_FALSE),
 			(n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "anonymous"),

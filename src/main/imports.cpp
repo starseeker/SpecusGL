@@ -636,14 +636,14 @@ _mesa_strdup(const char *s)
 /** \name I/O */
 /*@{*/
 
-/** Wrapper around vsprintf() */
+/** Wrapper around vsnprintf() */
 int
 _mesa_sprintf(char *str, const char *fmt, ...)
 {
     int r;
     va_list args;
     va_start(args, fmt);
-    r = vsprintf(str, fmt, args);
+    r = vsnprintf(str, MAXSTRING, fmt, args);
     va_end(args);
     return r;
 }
