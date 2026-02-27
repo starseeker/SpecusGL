@@ -694,7 +694,7 @@ parse_child_operation(slang_parse_ctx * C, slang_output_ctx * O,
     slang_operation *ch;
 
     /* grow child array */
-    ch = slang_operation_grow(&oper->num_children, &oper->children);
+    ch = slang_operation_grow(oper);
     if (statement)
 	return parse_statement(C, O, ch);
     return parse_expression(C, O, ch);
@@ -722,7 +722,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    slang_output_ctx o = *O;
 
 	    oper->type = SLANG_OPER_BLOCK_NEW_SCOPE;
-	    o.vars = oper->locals;
+	    o.vars = oper->locals.get();
 	    while (*C->I != OP_END)
 		if (!parse_child_operation(C, &o, oper, 1))
 		    return 0;
@@ -745,13 +745,8 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 		if (first_var < O->vars->variables.size()) {
 		    const unsigned int num_vars = static_cast<unsigned int>(O->vars->variables.size()) - first_var;
 		    unsigned int i;
-		    assert(oper->num_children == 0);
-		    oper->num_children = num_vars;
-		    oper->children = slang_operation_new(num_vars);
-		    if (oper->children == nullptr) {
-			slang_info_log_memory(C->L);
-			return 0;
-		    }
+		    assert(oper->children.empty());
+		    oper->children.resize(num_vars);
 		    for (i = first_var; i < O->vars->variables.size(); i++) {
 			slang_operation *o = &oper->children[i - first_var];
 			o->type = SLANG_OPER_VARIABLE_DECL;
@@ -807,7 +802,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    slang_output_ctx o = *O;
 
 	    oper->type = SLANG_OPER_WHILE;
-	    o.vars = oper->locals;
+	    o.vars = oper->locals.get();
 	    if (!parse_child_operation(C, &o, oper, 1))
 		return 0;
 	    if (!parse_child_operation(C, &o, oper, 1))
@@ -825,7 +820,7 @@ parse_statement(slang_parse_ctx * C, slang_output_ctx * O,
 	    slang_output_ctx o = *O;
 
 	    oper->type = SLANG_OPER_FOR;
-	    o.vars = oper->locals;
+	    o.vars = oper->locals.get();
 	    if (!parse_child_operation(C, &o, oper, 1))
 		return 0;
 	    if (!parse_child_operation(C, &o, oper, 1))
@@ -849,26 +844,20 @@ handle_nary_expression(slang_parse_ctx * C, slang_operation * op,
 {
     unsigned int i;
 
-    op->children = slang_operation_new(n);
-    if (op->children == nullptr) {
-	slang_info_log_memory(C->L);
-	return 0;
-    }
-    op->num_children = n;
+    op->children.resize(n);
 
     for (i = 0; i < n; i++) {
-	slang_operation_destruct(&op->children[i]);
-	op->children[i] = (*ops)[*total_ops - (n + 1 - i)];
+	op->children[i] = std::move((*ops)[*total_ops - (n + 1 - i)]);
     }
 
-    (*ops)[*total_ops - (n + 1)] = (*ops)[*total_ops - 1];
+    (*ops)[*total_ops - (n + 1)] = std::move((*ops)[*total_ops - 1]);
     *total_ops -= n;
 
-    /* shrink ops array - shallow copy the first *total_ops elements */
+    /* shrink ops array */
     {
 	slang_operation *new_ops = new slang_operation[*total_ops];
 	for (unsigned int k = 0; k < *total_ops; k++)
-	    new_ops[k] = (*ops)[k];
+	    new_ops[k] = std::move((*ops)[k]);
 	delete[] *ops;
 	*ops = new_ops;
     }
@@ -900,15 +889,11 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 	{
 	    slang_operation *new_ops = new slang_operation[num_ops + 1];
 	    for (unsigned int k = 0; k < num_ops; k++)
-		new_ops[k] = ops[k];
+		new_ops[k] = std::move(ops[k]);
 	    delete[] ops;
 	    ops = new_ops;
 	}
 	op = &ops[num_ops];
-	if (!slang_operation_construct(op)) {
-	    slang_info_log_memory(C->L);
-	    return 0;
-	}
 	num_ops++;
 	op->locals->outer_scope = O->vars;
 
@@ -1141,7 +1126,7 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 
     slang_operation_destruct(oper);
     if (ops) {
-	*oper = *ops; /* struct copy - transfers resources from ops[0] */
+	*oper = std::move(ops[0]);
 	delete[] ops;
     }
 
@@ -1407,12 +1392,6 @@ parse_function_definition(slang_parse_ctx * C, slang_output_ctx * O,
 
     /* create function's body operation */
     func->body = new slang_operation;
-    if (!slang_operation_construct(func->body)) {
-	delete func->body;
-	func->body = nullptr;
-	slang_info_log_memory(C->L);
-	return 0;
-    }
 
     /* to parse the body the parse context is modified in order to
      * capture parsed variables into function's local variable scope
@@ -1431,38 +1410,15 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 {
     slang_operation op_id, op_assign;
 
-    /* Initialize */
-    op_id.label = nullptr;
-
-    /* Initialize */
-    op_id.label = nullptr;
-
-    /* construct the left side of assignment */
-    if (!slang_operation_construct(&op_id))
-	return GL_FALSE;
     op_id.type = SLANG_OPER_IDENTIFIER;
     op_id.a_id = var->a_name;
-
-    /* put the variable into operation's scope */
     op_id.locals->variables.push_back(var);  /* non-owned reference */
 
-    /* construct the assignment expression */
-    if (!slang_operation_construct(&op_assign)) {
-	op_id.locals->variables.clear();  /* don't own var, don't delete it */
-	slang_operation_destruct(&op_id);
-	return GL_FALSE;
-    }
     op_assign.type = SLANG_OPER_ASSIGN;
-    op_assign.children = new slang_operation[2];
-    op_assign.num_children = 2;
-    op_assign.children[0] = op_id;
-    op_assign.children[1] = *var->initializer;
+    op_assign.children.resize(2);
+    slang_operation_copy(&op_assign.children[0], &op_id);
+    slang_operation_copy(&op_assign.children[1], var->initializer);
 
-    /* carefully destroy the operations */
-    op_assign.num_children = 0;
-    delete[] op_assign.children;
-    op_assign.children = nullptr;
-    slang_operation_destruct(&op_assign);
     op_id.locals->variables.clear();  /* don't own var, don't delete it */
     slang_operation_destruct(&op_id);
 

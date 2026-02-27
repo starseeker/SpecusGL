@@ -634,7 +634,7 @@ static slang_ir_node *
 new_var(slang_assemble_ctx *A, slang_operation *oper, slang_atom name)
 {
     slang_ir_node *n;
-    slang_variable *var = _slang_locate_variable(oper->locals, name, GL_TRUE);
+    slang_variable *var = _slang_locate_variable(oper->locals.get(), name, GL_TRUE);
     if (!var)
 	return nullptr;
 
@@ -656,7 +656,7 @@ static GLboolean
 slang_is_asm_function(const slang_function *fun)
 {
     if (fun->body->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE &&
-	fun->body->num_children == 1 &&
+	fun->body->children.size() == 1 &&
 	fun->body->children[0].type == SLANG_OPER_ASM) {
 	return GL_TRUE;
     }
@@ -669,7 +669,7 @@ _slang_is_noop(const slang_operation *oper)
 {
     if (!oper ||
 	oper->type == SLANG_OPER_VOID ||
-	(oper->num_children == 1 && oper->children[0].type == SLANG_OPER_VOID))
+	(oper->children.size() == 1 && oper->children[0].type == SLANG_OPER_VOID))
 	return GL_TRUE;
     else
 	return GL_FALSE;
@@ -685,7 +685,7 @@ _slang_find_node_type(slang_operation *oper, slang_operation_type type)
     GLuint i;
     if (oper->type == type)
 	return oper;
-    for (i = 0; i < oper->num_children; i++) {
+    for (i = 0; i < (GLuint)oper->children.size(); i++) {
 	slang_operation *p = _slang_find_node_type(&oper->children[i], type);
 	if (p)
 	    return p;
@@ -698,7 +698,7 @@ static void
 slang_resolve_variable(slang_operation *oper)
 {
     if (oper->type == SLANG_OPER_IDENTIFIER && !oper->var) {
-	oper->var = _slang_locate_variable(oper->locals, oper->a_id, GL_TRUE);
+	oper->var = _slang_locate_variable(oper->locals.get(), oper->a_id, GL_TRUE);
     }
 }
 
@@ -713,16 +713,15 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 {
     switch (oper->type) {
 	case SLANG_OPER_VARIABLE_DECL: {
-	    slang_variable *v = _slang_locate_variable(oper->locals,
+	    slang_variable *v = _slang_locate_variable(oper->locals.get(),
 				oper->a_id, GL_TRUE);
 	    assert(v);
-	    if (v->initializer && oper->num_children == 0) {
+	    if (v->initializer && oper->children.empty()) {
 		/* set child of oper to copy of initializer */
-		oper->num_children = 1;
-		oper->children = slang_operation_new(1);
+		oper->children.resize(1);
 		slang_operation_copy(&oper->children[0], v->initializer);
 	    }
-	    if (oper->num_children == 1) {
+	    if (oper->children.size() == 1) {
 		/* the initializer */
 		slang_substitute(A, &oper->children[0], substCount,
 				 substOld, substNew, GL_FALSE);
@@ -730,12 +729,12 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 	}
 	break;
 	case SLANG_OPER_IDENTIFIER:
-	    assert(oper->num_children == 0);
+	    assert(oper->children.empty());
 	    if (1/**!isLHS XXX FIX */) {
 		slang_atom id = oper->a_id;
 		slang_variable *v;
 		GLuint i;
-		v = _slang_locate_variable(oper->locals, id, GL_TRUE);
+		v = _slang_locate_variable(oper->locals.get(), id, GL_TRUE);
 		if (!v) {
 		    _mesa_problem(nullptr, "var %s not found!\n", reinterpret_cast<char *>(oper->a_id));
 		    return;
@@ -767,8 +766,8 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 
 	case SLANG_OPER_RETURN:
 	    /* do return replacement here too */
-	    assert(oper->num_children == 0 || oper->num_children == 1);
-	    if (oper->num_children == 1 && !_slang_is_noop(&oper->children[0])) {
+	    assert(oper->children.size() == 0 || oper->children.size() == 1);
+	    if (oper->children.size() == 1 && !_slang_is_noop(&oper->children[0])) {
 		/* replace:
 		 *   return expr;
 		 * with:
@@ -785,27 +784,25 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 		    return;
 		}
 
-		blockOper = slang_operation_new(1);
+		blockOper = slang_operation_new();
 		blockOper->type = SLANG_OPER_BLOCK_NO_NEW_SCOPE;
-		blockOper->num_children = 2;
 		blockOper->locals->outer_scope = oper->locals->outer_scope;
-		blockOper->children = slang_operation_new(2);
-		assignOper = blockOper->children + 0;
-		returnOper = blockOper->children + 1;
+		blockOper->children.resize(2);
+		assignOper = &blockOper->children[0];
+		returnOper = &blockOper->children[1];
 
 		assignOper->type = SLANG_OPER_ASSIGN;
-		assignOper->num_children = 2;
-		assignOper->locals->outer_scope = blockOper->locals;
-		assignOper->children = slang_operation_new(2);
+		assignOper->locals->outer_scope = blockOper->locals.get();
+		assignOper->children.resize(2);
 		assignOper->children[0].type = SLANG_OPER_IDENTIFIER;
 		assignOper->children[0].a_id = slang_atom_pool_atom(A->atoms, "__retVal");
-		assignOper->children[0].locals->outer_scope = assignOper->locals;
+		assignOper->children[0].locals->outer_scope = assignOper->locals.get();
 
 		slang_operation_copy(&assignOper->children[1],
 				     &oper->children[0]);
 
 		returnOper->type = SLANG_OPER_RETURN; /* return w/ no value */
-		assert(returnOper->num_children == 0);
+		assert(returnOper->children.empty());
 
 		/* do substitutions on the "__retVal = expr" sub-tree */
 		slang_substitute(A, assignOper,
@@ -841,7 +838,7 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 	    break;
 	default: {
 	    GLuint i;
-	    for (i = 0; i < oper->num_children; i++)
+	    for (i = 0; i < (GLuint)oper->children.size(); i++)
 		slang_substitute(A, &oper->children[i],
 				 substCount, substOld, substNew, GL_FALSE);
 	}
@@ -865,7 +862,7 @@ static slang_operation *
 slang_inline_asm_function(slang_assemble_ctx *A,
 			  slang_function *fun, slang_operation *oper)
 {
-    const GLuint numArgs = oper->num_children;
+    const GLuint numArgs = (GLuint)oper->children.size();
     GLuint i;
     slang_operation *inlined;
     const GLboolean haveRetValue = _slang_function_has_return_value(fun);
@@ -888,18 +885,18 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     substNew = new slang_operation *[numArgs];
     for (i = 0; i < numArgs; i++) {
 	substOld[i] = fun->parameters->variables[i];
-	substNew[i] = oper->children + i;
+	substNew[i] = &oper->children[i];
     }
 
     /* make a copy of the code to inline */
-    inlined = slang_operation_new(1);
+    inlined = slang_operation_new();
     slang_operation_copy(inlined, &fun->body->children[0]);
     if (haveRetValue) {
 	/* get rid of the __retVal child */
 	for (i = 0; i < numArgs; i++) {
-	    inlined->children[i] = inlined->children[i + 1];
+	    inlined->children[i] = std::move(inlined->children[i + 1]);
 	}
-	inlined->num_children--;
+	inlined->children.resize(numArgs);
     }
 
     /* now do formal->actual substitutions */
@@ -927,9 +924,9 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     };
     ParamMode *paramMode;
     const GLboolean haveRetValue = _slang_function_has_return_value(fun);
-    const GLuint numArgs = oper->num_children;
+    const GLuint numArgs = (GLuint)oper->children.size();
     const GLuint totalArgs = numArgs + haveRetValue;
-    slang_operation *args = oper->children;
+    slang_operation *args = oper->children.data();
     slang_operation *inlined, *top;
     slang_variable **substOld;
     slang_operation **substNew;
@@ -964,17 +961,16 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	slang_operation *declOper = nullptr;
 	slang_variable *resultVar;
 
-	commaSeq = slang_operation_new(1);
+	commaSeq = slang_operation_new();
 	commaSeq->type = SLANG_OPER_SEQUENCE;
 	assert(commaSeq->locals);
 	commaSeq->locals->outer_scope = oper->locals->outer_scope;
-	commaSeq->num_children = 3;
-	commaSeq->children = slang_operation_new(3);
+	commaSeq->children.resize(3);
 	/* allocate the return var */
-	resultVar = slang_variable_scope_grow(commaSeq->locals);
+	resultVar = slang_variable_scope_grow(commaSeq->locals.get());
 	/*
 	printf("Alloc __resultTmp in scope %p for retval of calling %s\n",
-	       static_cast<void*>(commaSeq->locals), reinterpret_cast<char *>(fun->header.a_name));
+	       static_cast<void*>(commaSeq->locals.get()), reinterpret_cast<char *>(fun->header.a_name));
 	*/
 
 	resultVar->a_name = slang_atom_pool_atom(A->atoms, "__resultTmp");
@@ -985,21 +981,21 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	declOper = &commaSeq->children[0];
 	declOper->type = SLANG_OPER_VARIABLE_DECL;
 	declOper->a_id = resultVar->a_name;
-	declOper->locals->outer_scope = commaSeq->locals;
+	declOper->locals->outer_scope = commaSeq->locals.get();
 
 	/* child[1] = function body */
 	inlined = &commaSeq->children[1];
-	inlined->locals->outer_scope = commaSeq->locals;
+	inlined->locals->outer_scope = commaSeq->locals.get();
 
 	/* child[2] = __resultTmp reference */
 	returnOper = &commaSeq->children[2];
 	returnOper->type = SLANG_OPER_IDENTIFIER;
 	returnOper->a_id = resultVar->a_name;
-	returnOper->locals->outer_scope = commaSeq->locals;
+	returnOper->locals->outer_scope = commaSeq->locals.get();
 
 	top = commaSeq;
     } else {
-	top = inlined = slang_operation_new(1);
+	top = inlined = slang_operation_new();
 	/* XXXX this may be inappropriate!!!! */
 	inlined->locals->outer_scope = oper->locals->outer_scope;
     }
@@ -1092,18 +1088,15 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	if (paramMode[i] == COPY_IN) {
 	    slang_variable *p = fun->parameters->variables[i];
 	    /* declare parameter 'p' */
-	    slang_operation *decl = slang_operation_insert(&inlined->num_children,
-				    &inlined->children,
-				    numCopyIn);
+	    slang_operation *decl = slang_operation_insert(inlined, numCopyIn);
 	    /*
 	    printf("COPY_IN %s from expr\n", static_cast<char*>(p->a_name));
 	    */
 	    decl->type = SLANG_OPER_VARIABLE_DECL;
 	    assert(decl->locals);
-	    decl->locals->outer_scope = inlined->locals;
+	    decl->locals->outer_scope = inlined->locals.get();
 	    decl->a_id = p->a_name;
-	    decl->num_children = 1;
-	    decl->children = slang_operation_new(1);
+	    decl->children.resize(1);
 
 	    /* child[0] is the var's initializer */
 	    slang_operation_copy(&decl->children[0], args + i);
@@ -1117,9 +1110,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
      * 2. Copy the 'out' parameter vars
      */
     {
-	slang_operation *lab = slang_operation_insert(&inlined->num_children,
-			       &inlined->children,
-			       inlined->num_children);
+	slang_operation *lab = slang_operation_insert(inlined, (GLuint)inlined->children.size());
 	lab->type = SLANG_OPER_LABEL;
 	lab->label = A->curFuncEndLabel;
     }
@@ -1129,17 +1120,14 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	    const slang_variable *p = fun->parameters->variables[i];
 	    /* actualCallVar = outParam */
 	    /*if (i > 0 || !haveRetValue)*/
-	    slang_operation *ass = slang_operation_insert(&inlined->num_children,
-				   &inlined->children,
-				   inlined->num_children);
+	    slang_operation *ass = slang_operation_insert(inlined, (GLuint)inlined->children.size());
 	    ass->type = SLANG_OPER_ASSIGN;
-	    ass->num_children = 2;
-	    ass->locals->outer_scope = inlined->locals;
-	    ass->children = slang_operation_new(2);
-	    ass->children[0] = args[i]; /*XXX copy */
+	    ass->locals->outer_scope = inlined->locals.get();
+	    ass->children.resize(2);
+	    slang_operation_copy(&ass->children[0], &args[i]);
 	    ass->children[1].type = SLANG_OPER_IDENTIFIER;
 	    ass->children[1].a_id = p->a_name;
-	    ass->children[1].locals->outer_scope = ass->locals;
+	    ass->children[1].locals->outer_scope = ass->locals.get();
 	}
     }
 
@@ -1212,8 +1200,8 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
 
     /* Replace the function call with the inlined block */
     slang_operation_destruct(oper);
-    *oper = *inlined;
-    delete[] inlined;
+    *oper = std::move(*inlined);
+    delete inlined;
 
 #if 0
     assert(inlined->locals);
@@ -1306,7 +1294,7 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
     }
     assert(info->NumParams <= 3);
 
-    if (info->NumParams == oper->num_children) {
+    if (info->NumParams == (GLuint)oper->children.size()) {
 	/* Storage for result is not specified.
 	 * Children[0], [1] are the operands.
 	 */
@@ -1387,8 +1375,8 @@ static slang_ir_node *
 _slang_gen_function_call_name(slang_assemble_ctx *A, const char *name,
 			      slang_operation *oper, slang_operation *dest)
 {
-    slang_operation *params = oper->children;
-    const GLuint param_count = oper->num_children;
+    slang_operation *params = oper->children.data();
+    const GLuint param_count = (GLuint)oper->children.size();
     slang_atom atom;
     slang_function *fun;
 
@@ -1429,7 +1417,7 @@ _slang_is_constant_cond(const slang_operation *oper, GLboolean *value)
 	    *value = GL_FALSE;
 	return GL_TRUE;
     } else if (oper->type == SLANG_OPER_EXPRESSION &&
-	       oper->num_children == 1) {
+	       (GLuint)oper->children.size() == 1) {
 	return _slang_is_constant_cond(&oper->children[0], value);
     }
     return GL_FALSE;
@@ -1457,7 +1445,7 @@ _slang_is_scalar_or_boolean(slang_assemble_ctx *A, slang_operation *oper)
  * Generate loop code using high-level IR_LOOP instruction
  */
 static slang_ir_node *
-_slang_gen_while(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_while(slang_assemble_ctx * A, slang_operation *oper)
 {
     /*
      * LOOP:
@@ -1518,7 +1506,7 @@ _slang_gen_while(slang_assemble_ctx * A, const slang_operation *oper)
  * Generate IR tree for a do-while loop using high-level LOOP, IF instructions.
  */
 static slang_ir_node *
-_slang_gen_do(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_do(slang_assemble_ctx * A, slang_operation *oper)
 {
     /*
      * LOOP:
@@ -1568,7 +1556,7 @@ _slang_gen_do(slang_assemble_ctx * A, const slang_operation *oper)
  * Generate for-loop using high-level IR_LOOP instruction.
  */
 static slang_ir_node *
-_slang_gen_for(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_for(slang_assemble_ctx * A, slang_operation *oper)
 {
     /*
      * init code (child[0])
@@ -1631,7 +1619,7 @@ is_operation_type(const slang_operation *oper, slang_operation_type type)
 	return GL_TRUE;
     else if ((oper->type == SLANG_OPER_BLOCK_NEW_SCOPE ||
 	      oper->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE) &&
-	     oper->num_children == 1)
+	     (GLuint)oper->children.size() == 1)
 	return is_operation_type(&oper->children[0], type);
     else
 	return GL_FALSE;
@@ -1643,7 +1631,7 @@ is_operation_type(const slang_operation *oper, slang_operation_type type)
  * IR_IF instruction.
  */
 static slang_ir_node *
-_slang_gen_if(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_if(slang_assemble_ctx * A, slang_operation *oper)
 {
     /*
      * eval expr (child[0])
@@ -1708,7 +1696,7 @@ _slang_gen_if(slang_assemble_ctx * A, const slang_operation *oper)
 
 
 static slang_ir_node *
-_slang_gen_not(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_not(slang_assemble_ctx * A, slang_operation *oper)
 {
     slang_ir_node *n;
 
@@ -1730,7 +1718,7 @@ _slang_gen_not(slang_assemble_ctx * A, const slang_operation *oper)
 
 
 static slang_ir_node *
-_slang_gen_xor(slang_assemble_ctx * A, const slang_operation *oper)
+_slang_gen_xor(slang_assemble_ctx * A, slang_operation *oper)
 {
     slang_ir_node *n1, *n2;
 
@@ -1815,7 +1803,7 @@ _slang_gen_select(slang_assemble_ctx *A, slang_operation *oper)
     int size;
 
     assert(oper->type == SLANG_OPER_SELECT);
-    assert(oper->num_children == 3);
+    assert(oper->children.size() == 3);
 
     /* size of x or y's type */
     slang_typeinfo_construct(&type);
@@ -1866,10 +1854,9 @@ _slang_gen_logical_and(slang_assemble_ctx *A, slang_operation *oper)
     slang_operation *select;
     slang_ir_node *n;
 
-    select = slang_operation_new(1);
+    select = slang_operation_new();
     select->type = SLANG_OPER_SELECT;
-    select->num_children = 3;
-    select->children = slang_operation_new(3);
+    select->children.resize(3);
 
     slang_operation_copy(&select->children[0], &oper->children[0]);
     slang_operation_copy(&select->children[1], &oper->children[1]);
@@ -1892,10 +1879,9 @@ _slang_gen_logical_or(slang_assemble_ctx *A, slang_operation *oper)
     slang_operation *select;
     slang_ir_node *n;
 
-    select = slang_operation_new(1);
+    select = slang_operation_new();
     select->type = SLANG_OPER_SELECT;
-    select->num_children = 3;
-    select->children = slang_operation_new(3);
+    select->children.resize(3);
 
     slang_operation_copy(&select->children[0], &oper->children[0]);
     select->children[1].type = SLANG_OPER_LITERAL_BOOL;
@@ -1915,7 +1901,7 @@ static slang_ir_node *
 _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 {
     const GLboolean haveReturnValue
-	= (oper->num_children == 1 && oper->children[0].type != SLANG_OPER_VOID);
+	= ((GLuint)oper->children.size() == 1 && oper->children[0].type != SLANG_OPER_VOID);
 
     /* error checking */
     assert(A->CurFunction);
@@ -1949,7 +1935,7 @@ _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 #if 1 /* DEBUG */
 	{
 	    slang_variable *v
-		= _slang_locate_variable(oper->locals, a_retVal, GL_TRUE);
+		= _slang_locate_variable(oper->locals.get(), a_retVal, GL_TRUE);
 	    if (!v) {
 		/* trying to return a value in a void-valued function */
 		return nullptr;
@@ -1957,14 +1943,13 @@ _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 	}
 #endif
 
-	assign = slang_operation_new(1);
+	assign = slang_operation_new();
 	assign->type = SLANG_OPER_ASSIGN;
-	assign->num_children = 2;
-	assign->children = slang_operation_new(2);
+	assign->children.resize(2);
 	/* lhs (__retVal) */
 	assign->children[0].type = SLANG_OPER_IDENTIFIER;
 	assign->children[0].a_id = a_retVal;
-	assign->children[0].locals->outer_scope = assign->locals;
+	assign->children[0].locals->outer_scope = assign->locals.get();
 	/* rhs (expr) */
 	/* XXX we might be able to avoid this copy someday */
 	slang_operation_copy(&assign->children[1], &oper->children[0]);
@@ -1990,17 +1975,17 @@ _slang_gen_declaration(slang_assemble_ctx *A, slang_operation *oper)
     slang_variable *v;
     const char *varName = reinterpret_cast<char *>(oper->a_id);
 
-    assert(oper->num_children == 0 || oper->num_children == 1);
+    assert(oper->children.size() == 0 || oper->children.size() == 1);
 
-    v = _slang_locate_variable(oper->locals, oper->a_id, GL_TRUE);
+    v = _slang_locate_variable(oper->locals.get(), oper->a_id, GL_TRUE);
     assert(v);
 
     varDecl = _slang_gen_var_decl(A, v);
 
-    if (oper->num_children > 0) {
+    if (!oper->children.empty()) {
 	/* child is initializer */
 	slang_ir_node *var, *init, *rhs;
-	assert(oper->num_children == 1);
+	assert(oper->children.size() == 1);
 	var = new_var(A, oper, oper->a_id);
 	if (!var) {
 	    slang_info_log_error(A->log, "undefined variable '%s'", varName);
@@ -2188,7 +2173,7 @@ _slang_gen_assignment(slang_assemble_ctx * A, slang_operation *oper)
     if (oper->children[0].type == SLANG_OPER_IDENTIFIER) {
 	/* Check that var is writeable */
 	slang_variable *var
-	    = _slang_locate_variable(oper->children[0].locals,
+	    = _slang_locate_variable(oper->children[0].locals.get(),
 				     oper->children[0].a_id, GL_TRUE);
 	if (!var) {
 	    slang_info_log_error(A->log, "undefined variable '%s'",
@@ -2523,11 +2508,11 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 
 	case SLANG_OPER_BLOCK_NO_NEW_SCOPE:
 	    /* list of operations */
-	    if (oper->num_children > 0) {
+	    if (!oper->children.empty()) {
 		slang_ir_node *n, *tree = nullptr;
 		GLuint i;
 
-		for (i = 0; i < oper->num_children; i++) {
+		for (i = 0; i < (GLuint)oper->children.size(); i++) {
 		    n = _slang_gen_operation(A, &oper->children[i]);
 		    if (!n) {
 			_slang_free_ir_tree(tree);
@@ -2611,32 +2596,32 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 			     _slang_gen_operation(A, &oper->children[1]));
 	case SLANG_OPER_ADD: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "+", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_SUBTRACT: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "-", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_MULTIPLY: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    _slang_check_matmul_optimization(A, oper);
 	    n = _slang_gen_function_call_name(A, "*", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_DIVIDE: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "/", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_MINUS: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 1);
+	    assert(oper->children.size() == 1);
 	    n = _slang_gen_function_call_name(A, "-", oper, nullptr);
 	    return n;
 	}
@@ -2649,38 +2634,38 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 	    return _slang_gen_assignment(A, oper);
 	case SLANG_OPER_ADDASSIGN: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "+=", oper, &oper->children[0]);
 	    return n;
 	}
 	case SLANG_OPER_SUBASSIGN: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "-=", oper, &oper->children[0]);
 	    return n;
 	}
 	break;
 	case SLANG_OPER_MULASSIGN: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "*=", oper, &oper->children[0]);
 	    return n;
 	}
 	case SLANG_OPER_DIVASSIGN: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_function_call_name(A, "/=", oper, &oper->children[0]);
 	    return n;
 	}
 	case SLANG_OPER_LOGICALAND: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_logical_and(A, oper);
 	    return n;
 	}
 	case SLANG_OPER_LOGICALOR: {
 	    slang_ir_node *n;
-	    assert(oper->num_children == 2);
+	    assert(oper->children.size() == 2);
 	    n = _slang_gen_logical_or(A, oper);
 	    return n;
 	}
@@ -2690,7 +2675,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 	    return _slang_gen_not(A, oper);
 	case SLANG_OPER_SELECT: { /* b ? x : y */
 	    slang_ir_node *n;
-	    assert(oper->num_children == 3);
+	    assert(oper->children.size() == 3);
 	    n = _slang_gen_select(A, oper);
 	    return n;
 	}
@@ -2721,25 +2706,25 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 
 	case SLANG_OPER_POSTINCREMENT: { /* var++ */
 	    slang_ir_node *n;
-	    assert(oper->num_children == 1);
+	    assert(oper->children.size() == 1);
 	    n = _slang_gen_function_call_name(A, "__postIncr", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_POSTDECREMENT: { /* var-- */
 	    slang_ir_node *n;
-	    assert(oper->num_children == 1);
+	    assert(oper->children.size() == 1);
 	    n = _slang_gen_function_call_name(A, "__postDecr", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_PREINCREMENT: { /* ++var */
 	    slang_ir_node *n;
-	    assert(oper->num_children == 1);
+	    assert(oper->children.size() == 1);
 	    n = _slang_gen_function_call_name(A, "++", oper, nullptr);
 	    return n;
 	}
 	case SLANG_OPER_PREDECREMENT: { /* --var */
 	    slang_ir_node *n;
-	    assert(oper->num_children == 1);
+	    assert(oper->children.size() == 1);
 	    n = _slang_gen_function_call_name(A, "--", oper, nullptr);
 	    return n;
 	}
@@ -2748,7 +2733,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 	case SLANG_OPER_SEQUENCE: {
 	    slang_ir_node *tree = nullptr;
 	    GLuint i;
-	    for (i = 0; i < oper->num_children; i++) {
+	    for (i = 0; i < (GLuint)oper->children.size(); i++) {
 		slang_ir_node *n = _slang_gen_operation(A, &oper->children[i]);
 		tree = tree ? new_seq(tree, n) : n;
 	    }

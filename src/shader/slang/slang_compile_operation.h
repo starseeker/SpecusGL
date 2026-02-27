@@ -25,6 +25,9 @@
 #ifndef SLANG_COMPILE_OPERATION_H
 #define SLANG_COMPILE_OPERATION_H
 
+#include <vector>
+#include <memory>
+
 
 
 
@@ -114,15 +117,21 @@ struct slang_label;
  */
 struct slang_operation {
     slang_operation_type type;
-    slang_operation *children;
-    GLuint num_children;
-    GLfloat literal[4];           /**< Used for float, int and bool values */
-    GLuint literal_size;          /**< 1, 2, 3, or 4 */
-    slang_atom a_id;              /**< type: asm, identifier, call, field */
-    slang_variable_scope *locals; /**< local vars for scope */
-    slang_function *fun;  /**< If type == SLANG_OPER_CALL */
-    slang_variable *var;  /**< If type == slang_oper_identier */
-    slang_label *label;   /**< If type == SLANG_OPER_LABEL */
+    std::vector<slang_operation> children;
+    GLfloat literal[4];
+    GLuint literal_size;
+    slang_atom a_id;
+    std::unique_ptr<slang_variable_scope> locals;
+    slang_function *fun;
+    slang_variable *var;
+    slang_label *label;
+
+    slang_operation();
+    ~slang_operation();
+    slang_operation(const slang_operation&) = delete;
+    slang_operation& operator=(const slang_operation&) = delete;
+    slang_operation(slang_operation&&) noexcept = default;
+    slang_operation& operator=(slang_operation&&) noexcept = default;
 };
 
 
@@ -136,17 +145,16 @@ extern GLboolean
 slang_operation_copy(slang_operation *, const slang_operation *);
 
 extern slang_operation *
-slang_operation_new(GLuint count);
+slang_operation_new();
 
 extern void
 slang_operation_delete(slang_operation *oper);
 
 extern slang_operation *
-slang_operation_grow(GLuint *numChildren, slang_operation **children);
+slang_operation_grow(slang_operation *parent);
 
 extern slang_operation *
-slang_operation_insert(GLuint *numChildren, slang_operation **children,
-		       GLuint pos);
+slang_operation_insert(slang_operation *parent, GLuint pos);
 
 extern void
 _slang_operation_swap(slang_operation *oper0, slang_operation *oper1);
