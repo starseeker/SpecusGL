@@ -477,7 +477,7 @@ _mesa_disable_extension(GLcontext *ctx, const char *name)
  * Test if the named extension is enabled in this context.
  */
 GLboolean
-_mesa_extension_is_enabled(GLcontext *ctx, const char *name)
+_mesa_extension_is_enabled(const GLcontext *ctx, const char *name)
 {
     const GLboolean *base = reinterpret_cast<const GLboolean *>(&ctx->Extensions);
     GLuint i;

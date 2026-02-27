@@ -43,6 +43,7 @@ set(osmesa_srcs
   main/enums.cpp
   main/eval.cpp
   main/extensions.cpp
+  main/gl_driver_features.cpp
   main/fbobject.cpp
   main/feedback.cpp
   main/fog.cpp

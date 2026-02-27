@@ -14,6 +14,10 @@
 #include "OSMesa/gl.h"
 #include "OSMesa/osmesa.h"
 
+/* Internal headers for the feature-detection audit test. */
+#include "main/context.h"
+#include "main/gl_driver_features.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -660,6 +664,62 @@ static void test_display_lists()
     check(glGetError() == GL_NO_ERROR, "no GL errors");
 }
 
+/* --- feature detection (SoGLDriverDatabase audit) ----------------- */
+/**
+ * Verify that the by-name feature query introduced as the result of the
+ * SoGLDriverDatabase.cpp audit works correctly.
+ *
+ * The audit concluded that for a software renderer:
+ *   - All hardware-specific driver bug entries are irrelevant.
+ *   - The only retained functionality is a runtime extension/feature query
+ *     that wraps glGetString(GL_EXTENSIONS).
+ */
+static void test_feature_detection()
+{
+    printf("\n=== Feature detection (SoGLDriverDatabase audit) ===\n");
+    TestCtx tc;
+    if (!tc.valid()) { printf("  SKIP: no context\n"); return; }
+
+    /* The extension string from the public GL API is the authoritative source.
+     * A software renderer must advertise these core features. */
+    const char *exts = (const char *)glGetString(GL_EXTENSIONS);
+    check(exts != nullptr, "GL_EXTENSIONS string non-null");
+
+    check(exts && strstr(exts, "GL_ARB_vertex_buffer_object") != nullptr,
+          "GL_ARB_vertex_buffer_object advertised (VBO supported)");
+    check(exts && strstr(exts, "GL_ARB_texture_non_power_of_two") != nullptr,
+          "GL_ARB_texture_non_power_of_two advertised (NPOT textures supported)");
+    check(exts && strstr(exts, "GL_ARB_multitexture") != nullptr,
+          "GL_ARB_multitexture advertised");
+    check(exts && strstr(exts, "GL_EXT_framebuffer_object") != nullptr,
+          "GL_EXT_framebuffer_object advertised");
+
+    /* Test the internal _mesa_is_extension_supported() helper — the
+     * portion of the SoGLDriverDatabase concept that is still relevant:
+     * a by-name capability check with no hardware-specific overrides. */
+    GLcontext *ctx = _mesa_get_current_context();
+    check(ctx != nullptr, "_mesa_get_current_context() non-null");
+    if (ctx) {
+        check(_mesa_is_extension_supported(ctx, "GL_ARB_vertex_buffer_object")
+              == GL_TRUE,
+              "_mesa_is_extension_supported: VBO supported");
+        check(_mesa_is_extension_supported(ctx, "GL_ARB_texture_non_power_of_two")
+              == GL_TRUE,
+              "_mesa_is_extension_supported: NPOT textures supported");
+        check(_mesa_is_extension_supported(ctx, "GL_NO_SUCH_EXTENSION_XYZ")
+              == GL_FALSE,
+              "_mesa_is_extension_supported: unknown feature returns GL_FALSE");
+        /* Null-safety checks. */
+        check(_mesa_is_extension_supported(nullptr, "GL_ARB_multitexture")
+              == GL_FALSE,
+              "_mesa_is_extension_supported: null ctx returns GL_FALSE");
+        check(_mesa_is_extension_supported(ctx, nullptr)
+              == GL_FALSE,
+              "_mesa_is_extension_supported: null name returns GL_FALSE");
+    }
+    check(glGetError() == GL_NO_ERROR, "no GL errors");
+}
+
 /* ------------------------------------------------------------------ */
 /* Entry point                                                          */
 /* ------------------------------------------------------------------ */
@@ -685,6 +745,7 @@ int main()
     test_color_mask();
     test_multi_context();
     test_display_lists();
+    test_feature_detection();
 
     printf("\n================================\n");
     printf("Results: %d passed, %d failed\n", g_pass, g_fail);
