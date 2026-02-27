@@ -58,10 +58,10 @@ _swrast_mask_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
      */
     if (span->array->ChanType == GL_UNSIGNED_BYTE) {
 	/* treat 4xGLubyte as 1xGLuint */
-	const GLuint srcMask = *((GLuint *) ctx->Color.ColorMask);
+	const GLuint srcMask = *(reinterpret_cast<GLuint *>(ctx->Color.ColorMask));
 	const GLuint dstMask = ~srcMask;
-	const GLuint *dst = (const GLuint *) rbPixels;
-	GLuint *src = (GLuint *) span->array->color.sz1.rgba;
+	const GLuint *dst = reinterpret_cast<const GLuint *>(rbPixels);
+	GLuint *src = reinterpret_cast<GLuint *>(span->array->color.sz1.rgba);
 	GLuint i;
 	for (i = 0; i < n; i++) {
 	    src[i] = (src[i] & srcMask) | (dst[i] & dstMask);

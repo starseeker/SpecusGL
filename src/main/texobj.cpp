@@ -356,7 +356,7 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     if (!t->Image[0][baseLevel]) {
 	char s[100];
 	_mesa_sprintf(s, "obj %p (%d) Image[baseLevel=%d] == nullptr",
-		      (void *) t, t->Name, baseLevel);
+		      static_cast<void *>(t), t->Name, baseLevel);
 	incomplete(t, s);
 	t->Complete = GL_FALSE;
 	return;

@@ -534,7 +534,7 @@ static void trans_4_GLubyte_4ub_raw(GLubyte(*t)[4],
 				    GLuint stride,
 				    ARGS)
 {
-    const GLubyte *f = (GLubyte *) Ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(Ptr) + SRC_START * stride;
     GLuint i;
 
     if (((((uintptr_t) f | (uintptr_t) stride)) & 3L) == 0L) {

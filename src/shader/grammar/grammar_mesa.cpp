@@ -64,32 +64,32 @@ void *grammar_memory_copy(void *dst, const void * src, size_t size)
 
 int grammar_string_compare(const byte *str1, const byte *str2)
 {
-    return strcmp((const char *) str1, (const char *) str2);
+    return strcmp(reinterpret_cast<const char *>(str1), reinterpret_cast<const char *>(str2));
 }
 
 int grammar_string_compare_n(const byte *str1, const byte *str2, size_t n)
 {
-    return strncmp((const char *) str1, (const char *) str2, n);
+    return strncmp(reinterpret_cast<const char *>(str1), reinterpret_cast<const char *>(str2), n);
 }
 
 byte *grammar_string_copy(byte *dst, const byte *src)
 {
-    return (byte *) strcpy((char *) dst, (const char *) src);
+    return (byte *) strcpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src));
 }
 
 byte *grammar_string_copy_n(byte *dst, const byte *src, size_t n)
 {
-    return (byte *) strncpy((char *) dst, (const char *) src, n);
+    return (byte *) strncpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src), n);
 }
 
 byte *grammar_string_duplicate(const byte *src)
 {
-    return (byte *) _mesa_strdup((const char *) src);
+    return (byte *) _mesa_strdup(reinterpret_cast<const char *>(src));
 }
 
 unsigned int grammar_string_length(const byte *str)
 {
-    return (unsigned int)strlen((const char *) str);
+    return (unsigned int)strlen(reinterpret_cast<const char *>(str));
 }
 
 

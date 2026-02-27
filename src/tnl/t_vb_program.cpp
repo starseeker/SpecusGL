@@ -85,7 +85,7 @@ userclip(GLcontext *ctx,
 	    const GLfloat b = ctx->Transform._ClipUserPlane[p][1];
 	    const GLfloat c = ctx->Transform._ClipUserPlane[p][2];
 	    const GLfloat d = ctx->Transform._ClipUserPlane[p][3];
-	    GLfloat *coord = (GLfloat *)clip->data;
+	    GLfloat *coord = reinterpret_cast<GLfloat *>(clip->data);
 	    GLuint stride = clip->stride;
 	    GLuint count = clip->count;
 
@@ -354,10 +354,10 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	/* the vertex array case */
 	for (attr = 0; attr < VERT_ATTRIB_MAX; attr++) {
 	    if (program->InputsRead & (1 << attr)) {
-		const GLubyte *ptr = (const GLubyte*) VB->AttribPtr[attr]->data;
+		const GLubyte *ptr = reinterpret_cast<const GLubyte *>(VB->AttribPtr[attr]->data);
 		const GLuint size = VB->AttribPtr[attr]->size;
 		const GLuint stride = VB->AttribPtr[attr]->stride;
-		const GLfloat *data = (GLfloat *)(ptr + stride * i);
+		const GLfloat *data = reinterpret_cast<const GLfloat *>(ptr + stride * i);
 		COPY_CLEAN_4V(machine.VertAttribs[attr], size, data);
 	    }
 	}

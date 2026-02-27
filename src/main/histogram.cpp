@@ -191,17 +191,17 @@ pack_histogram(GLcontext *ctx,
 
     switch (type) {
 	case GL_UNSIGNED_BYTE: {
-	    GLubyte *dst = (GLubyte *) destination;
+	    GLubyte *dst = static_cast<GLubyte *>(destination);
 	    PACK_MACRO(GLubyte);
 	}
 	break;
 	case GL_BYTE: {
-	    GLbyte *dst = (GLbyte *) destination;
+	    GLbyte *dst = static_cast<GLbyte *>(destination);
 	    PACK_MACRO(GLbyte);
 	}
 	break;
 	case GL_UNSIGNED_SHORT: {
-	    GLushort *dst = (GLushort *) destination;
+	    GLushort *dst = reinterpret_cast<GLushort *>(destination);
 	    PACK_MACRO(GLushort);
 	    if (packing->SwapBytes) {
 		_mesa_swap2(dst, n * comps);
@@ -209,15 +209,15 @@ pack_histogram(GLcontext *ctx,
 	}
 	break;
 	case GL_SHORT: {
-	    GLshort *dst = (GLshort *) destination;
+	    GLshort *dst = static_cast<GLshort *>(destination);
 	    PACK_MACRO(GLshort);
 	    if (packing->SwapBytes) {
-		_mesa_swap2((GLushort *) dst, n * comps);
+		_mesa_swap2(reinterpret_cast<GLushort *>(dst), n * comps);
 	    }
 	}
 	break;
 	case GL_UNSIGNED_INT: {
-	    GLuint *dst = (GLuint *) destination;
+	    GLuint *dst = static_cast<GLuint *>(destination);
 	    PACK_MACRO(GLuint);
 	    if (packing->SwapBytes) {
 		_mesa_swap4(dst, n * comps);
@@ -225,18 +225,18 @@ pack_histogram(GLcontext *ctx,
 	}
 	break;
 	case GL_INT: {
-	    GLint *dst = (GLint *) destination;
+	    GLint *dst = static_cast<GLint *>(destination);
 	    PACK_MACRO(GLint);
 	    if (packing->SwapBytes) {
-		_mesa_swap4((GLuint *) dst, n * comps);
+		_mesa_swap4(reinterpret_cast<GLuint *>(dst), n * comps);
 	    }
 	}
 	break;
 	case GL_FLOAT: {
-	    GLfloat *dst = (GLfloat *) destination;
+	    GLfloat *dst = static_cast<GLfloat *>(destination);
 	    PACK_MACRO(GLfloat);
 	    if (packing->SwapBytes) {
-		_mesa_swap4((GLuint *) dst, n * comps);
+		_mesa_swap4(reinterpret_cast<GLuint *>(dst), n * comps);
 	    }
 	}
 	break;
@@ -252,13 +252,13 @@ pack_histogram(GLcontext *ctx,
 		dst[i] = _mesa_float_to_half((GLfloat) temp[i]);
 	    }
 	    if (packing->SwapBytes) {
-		_mesa_swap2((GLushort *) dst, n * comps);
+		_mesa_swap2(reinterpret_cast<GLushort *>(dst), n * comps);
 	    }
 	}
 	break;
 	case GL_UNSIGNED_BYTE_3_3_2:
 	    if (format == GL_RGB) {
-		GLubyte *dst = (GLubyte *) destination;
+		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x7) << 5)
@@ -266,7 +266,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0x3));
 		}
 	    } else {
-		GLubyte *dst = (GLubyte *) destination;
+		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
 		ASSERT(format == GL_BGR);
 		for (i = 0; i < n; i++) {
@@ -278,7 +278,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_BYTE_2_3_3_REV:
 	    if (format == GL_RGB) {
-		GLubyte *dst = (GLubyte *) destination;
+		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x3) << 6)
@@ -286,7 +286,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0x7));
 		}
 	    } else {
-		GLubyte *dst = (GLubyte *) destination;
+		GLubyte *dst = static_cast<GLubyte *>(destination);
 		GLuint i;
 		ASSERT(format == GL_BGR);
 		for (i = 0; i < n; i++) {
@@ -298,7 +298,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_5_6_5:
 	    if (format == GL_RGB) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
@@ -306,7 +306,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0x1f));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_BGR);
 		for (i = 0; i < n; i++) {
@@ -318,7 +318,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_5_6_5_REV:
 	    if (format == GL_RGB) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x1f) << 11)
@@ -326,7 +326,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][RCOMP] & 0x1f));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_BGR);
 		for (i = 0; i < n; i++) {
@@ -338,7 +338,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_4_4_4_4:
 	    if (format == GL_RGBA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xf) << 12)
@@ -347,7 +347,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0xf));
 		}
 	    } else if (format == GL_BGRA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0xf) << 12)
@@ -356,7 +356,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0xf));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -369,7 +369,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_4_4_4_4_REV:
 	    if (format == GL_RGBA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xf) << 12)
@@ -378,7 +378,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][RCOMP] & 0xf));
 		}
 	    } else if (format == GL_BGRA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xf) << 12)
@@ -387,7 +387,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0xf));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -400,7 +400,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_5_5_5_1:
 	    if (format == GL_RGBA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x1f) << 11)
@@ -409,7 +409,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0x1));
 		}
 	    } else if (format == GL_BGRA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x1f) << 11)
@@ -418,7 +418,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0x1));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -431,7 +431,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_SHORT_1_5_5_5_REV:
 	    if (format == GL_RGBA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x1f) << 11)
@@ -440,7 +440,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][RCOMP] & 0x1));
 		}
 	    } else if (format == GL_BGRA) {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x1f) << 11)
@@ -449,7 +449,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0x1));
 		}
 	    } else {
-		GLushort *dst = (GLushort *) destination;
+		GLushort *dst = reinterpret_cast<GLushort *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -462,7 +462,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_INT_8_8_8_8:
 	    if (format == GL_RGBA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0xff) << 24)
@@ -471,7 +471,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0xff));
 		}
 	    } else if (format == GL_BGRA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0xff) << 24)
@@ -480,7 +480,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0xff));
 		}
 	    } else {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -493,7 +493,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_INT_8_8_8_8_REV:
 	    if (format == GL_RGBA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xff) << 24)
@@ -502,7 +502,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][RCOMP] & 0xff));
 		}
 	    } else if (format == GL_BGRA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0xff) << 24)
@@ -511,7 +511,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0xff));
 		}
 	    } else {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -524,7 +524,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_INT_10_10_10_2:
 	    if (format == GL_RGBA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][RCOMP] & 0x3ff) << 22)
@@ -533,7 +533,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0x3));
 		}
 	    } else if (format == GL_BGRA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][BCOMP] & 0x3ff) << 22)
@@ -542,7 +542,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][ACOMP] & 0x3));
 		}
 	    } else {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -555,7 +555,7 @@ pack_histogram(GLcontext *ctx,
 	    break;
 	case GL_UNSIGNED_INT_2_10_10_10_REV:
 	    if (format == GL_RGBA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x3ff) << 22)
@@ -564,7 +564,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][RCOMP] & 0x3));
 		}
 	    } else if (format == GL_BGRA) {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		for (i = 0; i < n; i++) {
 		    dst[i] = ((rgba[i][ACOMP] & 0x3ff) << 22)
@@ -573,7 +573,7 @@ pack_histogram(GLcontext *ctx,
 			     | ((rgba[i][BCOMP] & 0x3));
 		}
 	    } else {
-		GLuint *dst = (GLuint *) destination;
+		GLuint *dst = static_cast<GLuint *>(destination);
 		GLuint i;
 		ASSERT(format == GL_ABGR_EXT);
 		for (i = 0; i < n; i++) {
@@ -695,9 +695,9 @@ _mesa_GetMinmax(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvo
 			"glGetMinMax(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,"glGetMinMax(PBO is mapped)");
@@ -778,9 +778,9 @@ _mesa_GetHistogram(GLenum target, GLboolean reset, GLenum format, GLenum type, G
 			"glGetHistogram(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx,GL_INVALID_OPERATION,"glGetHistogram(PBO is mapped)");

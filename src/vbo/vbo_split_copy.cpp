@@ -228,7 +228,7 @@ static GLuint elt(struct copy_context *copy, GLuint elt_idx)
 	    csr += copy->varying[i].size;
 
 	    if (0) {
-		const GLuint *f = (const GLuint *)srcptr;
+		const GLuint *f = reinterpret_cast<const GLuint *>(srcptr);
 		GLuint j;
 		_mesa_printf("  varying %d: ", i);
 		for (j = 0; j < copy->varying[i].size / 4; j++)
@@ -421,7 +421,7 @@ static void replay_init(struct copy_context *copy)
 			      GL_WRITE_ONLY, /* XXX */
 			      copy->ib->obj);
 
-    srcptr = (const GLubyte *)ADD_POINTERS(copy->ib->obj->Pointer, copy->ib->ptr);
+    srcptr = static_cast<const GLubyte *>(ADD_POINTERS(copy->ib->obj->Pointer, copy->ib->ptr));
 
     switch (copy->ib->type) {
 	case GL_UNSIGNED_BYTE:
@@ -429,7 +429,7 @@ static void replay_init(struct copy_context *copy)
 	    copy->srcelt = copy->translated_elt_buf.data();
 
 	    for (i = 0; i < copy->ib->count; i++)
-		copy->translated_elt_buf[i] = ((const GLubyte *)srcptr)[i];
+		copy->translated_elt_buf[i] = (static_cast<const GLubyte *>(srcptr))[i];
 	    break;
 
 	case GL_UNSIGNED_SHORT:
@@ -437,12 +437,12 @@ static void replay_init(struct copy_context *copy)
 	    copy->srcelt = copy->translated_elt_buf.data();
 
 	    for (i = 0; i < copy->ib->count; i++)
-		copy->translated_elt_buf[i] = ((const GLushort *)srcptr)[i];
+		copy->translated_elt_buf[i] = (static_cast<const GLushort *>(srcptr))[i];
 	    break;
 
 	case GL_UNSIGNED_INT:
 	    copy->translated_elt_buf.clear();
-	    copy->srcelt = (const GLuint *)srcptr;
+	    copy->srcelt = static_cast<const GLuint *>(srcptr);
 	    break;
     }
 

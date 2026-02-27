@@ -156,7 +156,7 @@ print_variable(const slang_variable *v, int indent)
     spaces(indent);
     printf("VAR ");
     print_type(&v->type);
-    printf(" %s", (char *) v->a_name);
+    printf(" %s", reinterpret_cast<char *>(v->a_name));
     if (v->initializer) {
 	printf(" :=\n");
 	slang_print_tree(v->initializer, indent + 3);
@@ -184,7 +184,7 @@ print_generic2(const slang_operation *op, const char *oper,
     int i;
     if (oper) {
 	spaces(indent);
-	printf("[%p locals %p] %s %s\n", (void*) op, (void*) op->locals, oper, s);
+	printf("[%p locals %p] %s %s\n", static_cast<const void *>(op), static_cast<const void *>(op->locals), oper, s);
     }
     for (i = 0; i < op->num_children; i++) {
 	spaces(indent);
@@ -241,7 +241,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_BLOCK_NO_NEW_SCOPE:
 	    spaces(indent);
-	    printf("{ locals %p  outer %p\n", (void*)op->locals, (void*)op->locals->outer_scope);
+	    printf("{ locals %p  outer %p\n", static_cast<const void *>(op->locals), static_cast<const void *>(op->locals->outer_scope));
 	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}\n");
@@ -249,7 +249,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_BLOCK_NEW_SCOPE:
 	    spaces(indent);
-	    printf("{{ // new scope  locals %p\n", (void*)op->locals);
+	    printf("{{ // new scope  locals %p\n", static_cast<const void *>(op->locals));
 	    print_generic(op, nullptr, indent+3);
 	    spaces(indent);
 	    printf("}}\n");
@@ -262,13 +262,13 @@ slang_print_tree(const slang_operation *op, int indent)
 		v = _slang_locate_variable(op->locals, op->a_id, GL_TRUE);
 		if (v) {
 		    spaces(indent);
-		    printf("DECL (locals=%p outer=%p) ", (void*)op->locals, (void*) op->locals->outer_scope);
+		    printf("DECL (locals=%p outer=%p) ", static_cast<const void *>(op->locals), static_cast<const void *>(op->locals->outer_scope));
 		    print_type(&v->type);
-		    printf(" %s (%p)", (char *) op->a_id,
-			   (void *) find_var(op->locals, op->a_id));
+		    printf(" %s (%p)", reinterpret_cast<char *>(op->a_id),
+			   static_cast<const void *>(find_var(op->locals, op->a_id)));
 
 		    printf(" (in scope %p) ",
-			   (void *) find_scope(op->locals, op->a_id));
+			   static_cast<const void *>(find_scope(op->locals, op->a_id)));
 		    if (op->num_children == 1) {
 			printf(" :=\n");
 			slang_print_tree(&op->children[0], indent + 3);
@@ -287,14 +287,14 @@ slang_print_tree(const slang_operation *op, int indent)
 		    */
 		} else {
 		    spaces(indent);
-		    printf("DECL %s (anonymous variable!!!!)\n", (char *) op->a_id);
+		    printf("DECL %s (anonymous variable!!!!)\n", reinterpret_cast<char *>(op->a_id));
 		}
 	    }
 	    break;
 
 	case SLANG_OPER_ASM:
 	    spaces(indent);
-	    printf("ASM: %s\n", (char*) op->a_id);
+	    printf("ASM: %s\n", static_cast<char*>(op->a_id));
 	    print_generic(op, nullptr, indent+3);
 	    break;
 
@@ -322,12 +322,12 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_LABEL:
 	    spaces(indent);
-	    printf("LABEL %s\n", (char *) op->a_id);
+	    printf("LABEL %s\n", reinterpret_cast<char *>(op->a_id));
 	    break;
 
 	case SLANG_OPER_EXPRESSION:
 	    spaces(indent);
-	    printf("EXPR:  locals %p\n", (void*) op->locals);
+	    printf("EXPR:  locals %p\n", static_cast<const void *>(op->locals));
 	    /*print_generic(op, "SLANG_OPER_EXPRESSION", indent);*/
 	    slang_print_tree(&op->children[0], indent + 3);
 	    break;
@@ -418,11 +418,11 @@ slang_print_tree(const slang_operation *op, int indent)
 	case SLANG_OPER_IDENTIFIER:
 	    spaces(indent);
 	    if (op->var && op->var->a_name)
-		printf("VAR %s  (in scope %p)\n", (char *) op->var->a_name,
-		       (void *) find_scope(op->locals, op->a_id));
+		printf("VAR %s  (in scope %p)\n", reinterpret_cast<char *>(op->var->a_name),
+		       static_cast<const void *>(find_scope(op->locals, op->a_id)));
 	    else
-		printf("VAR' %s  (in scope %p)\n", (char *) op->a_id,
-		       (void *) find_scope(op->locals, op->a_id));
+		printf("VAR' %s  (in scope %p)\n", reinterpret_cast<char *>(op->a_id),
+		       static_cast<const void *>(find_scope(op->locals, op->a_id)));
 	    break;
 
 	case SLANG_OPER_SEQUENCE:
@@ -431,7 +431,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_ASSIGN:
 	    spaces(indent);
-	    printf("ASSIGNMENT  locals %p\n", (void*)op->locals);
+	    printf("ASSIGNMENT  locals %p\n", static_cast<const void *>(op->locals));
 	    print_binary(op, ":=", indent);
 	    break;
 
@@ -579,7 +579,7 @@ slang_print_tree(const slang_operation *op, int indent)
 					 oper->num_children, &A->space, A->atoms);
 #endif
 	    spaces(indent);
-	    printf("CALL %s(\n", (char *) op->a_id);
+	    printf("CALL %s(\n", reinterpret_cast<char *>(op->a_id));
 	    for (i = 0; i < op->num_children; i++) {
 		slang_print_tree(&op->children[i], indent+3);
 		if (i + 1 < op->num_children) {
@@ -593,7 +593,7 @@ slang_print_tree(const slang_operation *op, int indent)
 
 	case SLANG_OPER_FIELD:
 	    spaces(indent);
-	    printf("FIELD %s of\n", (char*) op->a_id);
+	    printf("FIELD %s of\n", static_cast<char*>(op->a_id));
 	    slang_print_tree(&op->children[0], indent+3);
 	    break;
 
@@ -623,12 +623,12 @@ slang_print_function(const slang_function *f, GLboolean body)
     int i;
 
 #if 0
-    if (strcmp((char *) f->header.a_name, "main") != 0)
+    if (strcmp(reinterpret_cast<char *>(f->header.a_name), "main") != 0)
 	return;
 #endif
 
     printf("FUNCTION %s (\n",
-	   (char *) f->header.a_name);
+	   reinterpret_cast<char *>(f->header.a_name));
 
     for (i = 0; i < f->param_count; i++) {
 	print_variable(f->parameters->variables[i], 3);
@@ -755,7 +755,7 @@ slang_var_string(const slang_variable *v)
 {
     static char str[1000];
     sprintf(str, "%s : %s",
-	    (char *) v->a_name,
+	    reinterpret_cast<char *>(v->a_name),
 	    slang_fq_type_string(&v->type));
     return str;
 }
@@ -765,7 +765,7 @@ slang_var_string(const slang_variable *v)
 void
 slang_print_variable(const slang_variable *v)
 {
-    printf("Name: %s\n", (char *) v->a_name);
+    printf("Name: %s\n", reinterpret_cast<char *>(v->a_name));
     printf("Type: %s\n", slang_fq_type_string(&v->type).c_str());
 }
 
@@ -776,13 +776,13 @@ _slang_print_var_scope(const slang_variable_scope *vars, int indent)
     GLuint i;
 
     spaces(indent);
-    printf("Var scope %p  %zu vars:\n", (void *) vars, vars->variables.size());
+    printf("Var scope %p  %zu vars:\n", static_cast<const void *>(vars), vars->variables.size());
     for (GLuint i = 0; i < vars->variables.size(); i++) {
 	spaces(indent + 3);
-	printf("%s (at %p)\n", (char *) vars->variables[i]->a_name, (void*)&vars->variables[i]);
+	printf("%s (at %p)\n", reinterpret_cast<char *>(vars->variables[i]->a_name), static_cast<const void *>(&vars->variables[i]));
     }
     spaces(indent + 3);
-    printf("outer_scope = %p\n", (void*) vars->outer_scope);
+    printf("outer_scope = %p\n", static_cast<const void *>(vars->outer_scope));
 
     if (vars->outer_scope) {
 	/*spaces(indent + 3);*/

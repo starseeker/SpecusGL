@@ -1393,7 +1393,7 @@ _mesa_make_current(GLcontext *newCtx, GLframebuffer *drawBuffer,
 	_mesa_debug(newCtx, "_mesa_make_current()\n");
 
     /* We used to call _glapi_check_multithread() here.  Now do it in drivers */
-    _glapi_set_context((void *) newCtx);
+    _glapi_set_context(static_cast<void *>(newCtx));
     ASSERT(_mesa_get_current_context() == newCtx);
 
     if (!newCtx) {

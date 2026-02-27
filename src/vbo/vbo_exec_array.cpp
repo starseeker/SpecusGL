@@ -45,7 +45,7 @@ static void get_minmax_index(GLuint count, GLuint type,
 
     switch (type) {
 	case GL_UNSIGNED_INT: {
-	    const GLuint *ui_indices = (const GLuint *)indices;
+	    const GLuint *ui_indices = static_cast<const GLuint *>(indices);
 	    GLuint max_ui = ui_indices[0];
 	    GLuint min_ui = ui_indices[0];
 	    for (i = 1; i < count; i++) {
@@ -57,7 +57,7 @@ static void get_minmax_index(GLuint count, GLuint type,
 	    break;
 	}
 	case GL_UNSIGNED_SHORT: {
-	    const GLushort *us_indices = (const GLushort *)indices;
+	    const GLushort *us_indices = static_cast<const GLushort *>(indices);
 	    GLuint max_us = us_indices[0];
 	    GLuint min_us = us_indices[0];
 	    for (i = 1; i < count; i++) {
@@ -69,7 +69,7 @@ static void get_minmax_index(GLuint count, GLuint type,
 	    break;
 	}
 	case GL_UNSIGNED_BYTE: {
-	    const GLubyte *ub_indices = (const GLubyte *)indices;
+	    const GLubyte *ub_indices = static_cast<const GLubyte *>(indices);
 	    GLuint max_ub = ub_indices[0];
 	    GLuint min_ub = ub_indices[0];
 	    for (i = 1; i < count; i++) {

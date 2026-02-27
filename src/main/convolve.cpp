@@ -153,9 +153,9 @@ _mesa_ConvolutionFilter1D(GLenum target, GLenum internalFormat, GLsizei width, G
 			"glConvolutionFilter1D(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -250,9 +250,9 @@ _mesa_ConvolutionFilter2D(GLenum target, GLenum internalFormat, GLsizei width, G
 			"glConvolutionFilter2D(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -602,9 +602,9 @@ _mesa_GetConvolutionFilter(GLenum target, GLenum format, GLenum type,
 			"glGetConvolutionFilter(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -811,9 +811,9 @@ _mesa_GetSeparableFilter(GLenum target, GLenum format, GLenum type,
 			"glGetSeparableFilter(invalid PBO access, height)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
@@ -914,9 +914,9 @@ _mesa_SeparableFilter2D(GLenum target, GLenum internalFormat, GLsizei width, GLs
 			"glSeparableFilter2D(invalid PBO access, height)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,

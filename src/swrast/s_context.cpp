@@ -62,7 +62,7 @@ _swrast_update_rasterflags(GLcontext *ctx)
     if (ctx->Scissor.Enabled)              rasterMask |= CLIP_BIT;
     if (ctx->Stencil.Enabled)              rasterMask |= STENCIL_BIT;
     if (ctx->Visual.rgbMode) {
-	const GLuint colorMask = *((GLuint *) &ctx->Color.ColorMask);
+	const GLuint colorMask = *reinterpret_cast<const GLuint *>(&ctx->Color.ColorMask);
 	if (colorMask != 0xffffffff)        rasterMask |= MASKING_BIT;
 	if (ctx->Color._LogicOpEnabled)     rasterMask |= LOGIC_OP_BIT;
 	if (ctx->Texture._EnabledUnits)     rasterMask |= TEXTURE_BIT;
@@ -89,7 +89,7 @@ _swrast_update_rasterflags(GLcontext *ctx)
     if (ctx->DrawBuffer->_NumColorDrawBuffers[0] != 1) {
 	/* more than one color buffer designated for writing (or zero buffers) */
 	rasterMask |= MULTI_DRAW_BIT;
-    } else if (ctx->Visual.rgbMode && *((GLuint *) ctx->Color.ColorMask) == 0) {
+    } else if (ctx->Visual.rgbMode && *reinterpret_cast<const GLuint *>(ctx->Color.ColorMask) == 0) {
 	rasterMask |= MULTI_DRAW_BIT; /* all RGBA channels disabled */
     } else if (!ctx->Visual.rgbMode && ctx->Color.IndexMask==0) {
 	rasterMask |= MULTI_DRAW_BIT; /* all color index bits disabled */

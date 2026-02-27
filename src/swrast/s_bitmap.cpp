@@ -66,9 +66,9 @@ _swrast_Bitmap(GLcontext *ctx, GLint px, GLint py,
 	    _mesa_error(ctx, GL_INVALID_OPERATION,"glBitmap(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						unpack->BufferObj);
+						unpack->BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glBitmap(PBO is mapped)");
@@ -94,8 +94,8 @@ _swrast_Bitmap(GLcontext *ctx, GLint px, GLint py,
 	_swrast_span_default_texcoords(ctx, &span);
 
     for (row = 0; row < height; row++) {
-	const GLubyte *src = (const GLubyte *) _mesa_image_address2d(unpack,
-			     bitmap, width, height, GL_COLOR_INDEX, GL_BITMAP, row, 0);
+	const GLubyte *src = static_cast<const GLubyte *>(_mesa_image_address2d(unpack,
+			     bitmap, width, height, GL_COLOR_INDEX, GL_BITMAP, row, 0));
 
 	if (unpack->LsbFirst) {
 	    /* Lsb first */
@@ -201,8 +201,8 @@ _swrast_Bitmap(GLcontext *ctx, GLint px, GLint py,
 	_swrast_span_default_texcoords(ctx, &span);
 
     for (row=0; row<height; row++, span.y++) {
-	const GLubyte *src = (const GLubyte *) _mesa_image_address2d(unpack,
-			     bitmap, width, height, GL_COLOR_INDEX, GL_BITMAP, row, 0);
+	const GLubyte *src = static_cast<const GLubyte *>(_mesa_image_address2d(unpack,
+			     bitmap, width, height, GL_COLOR_INDEX, GL_BITMAP, row, 0));
 
 	if (unpack->LsbFirst) {
 	    /* Lsb first */

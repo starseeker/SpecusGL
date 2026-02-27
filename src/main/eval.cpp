@@ -397,9 +397,9 @@ map1(GLenum target, GLfloat u1, GLfloat u2, GLint ustride,
     /* make copy of the control points */
     std::vector<GLfloat> pnts;
     if (type == GL_FLOAT)
-	pnts = _mesa_copy_map_points1f(target, ustride, uorder, (GLfloat*) points);
+	pnts = _mesa_copy_map_points1f(target, ustride, uorder, static_cast<const GLfloat*>(points));
     else
-	pnts = _mesa_copy_map_points1d(target, ustride, uorder, (GLdouble*) points);
+	pnts = _mesa_copy_map_points1d(target, ustride, uorder, static_cast<const GLdouble*>(points));
 
 
     FLUSH_VERTICES(ctx, _NEW_EVAL);
@@ -489,9 +489,9 @@ map2(GLenum target, GLfloat u1, GLfloat u2, GLint ustride, GLint uorder,
     /* make copy of the control points */
     auto pnts = (type == GL_FLOAT)
 	? _mesa_copy_map_points2f(target, ustride, uorder,
-				  vstride, vorder, (const GLfloat*) points)
+				  vstride, vorder, static_cast<const GLfloat*>(points))
 	: _mesa_copy_map_points2d(target, ustride, uorder,
-				  vstride, vorder, (const GLdouble*) points);
+				  vstride, vorder, static_cast<const GLdouble*>(points));
 
     FLUSH_VERTICES(ctx, _NEW_EVAL);
     map->Uorder = uorder;

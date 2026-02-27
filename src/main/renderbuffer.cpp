@@ -73,7 +73,7 @@ get_pointer_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb,
     /* Can't assert _ActualFormat since these funcs may be used for serveral
      * different formats (GL_ALPHA8, GL_STENCIL_INDEX8, etc).
      */
-    return (GLubyte *) rb->Data + y * rb->Width + x;
+    return static_cast<GLubyte *>(rb->Data) + y * rb->Width + x;
 }
 
 
@@ -81,7 +81,7 @@ static void
 get_row_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	      GLint x, GLint y, void *values)
 {
-    const GLubyte *src = (const GLubyte *) rb->Data + y * rb->Width + x;
+    const GLubyte *src = static_cast<const GLubyte *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     memcpy(values, src, count * sizeof(GLubyte));
 }
@@ -91,11 +91,11 @@ static void
 get_values_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		 const GLint x[], const GLint y[], void *values)
 {
-    GLubyte *dst = (GLubyte *) values;
+    GLubyte *dst = static_cast<GLubyte *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
-	const GLubyte *src = (GLubyte *) rb->Data + y[i] * rb->Width + x[i];
+	const GLubyte *src = static_cast<GLubyte *>(rb->Data) + y[i] * rb->Width + x[i];
 	dst[i] = *src;
     }
 }
@@ -105,8 +105,8 @@ static void
 put_row_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	      GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) rb->Data + y * rb->Width + x;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     if (mask) {
 	GLuint i;
@@ -125,8 +125,8 @@ static void
 put_mono_row_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		   GLint x, GLint y, const void *value, const GLubyte *mask)
 {
-    const GLubyte val = *((const GLubyte *) value);
-    GLubyte *dst = (GLubyte *) rb->Data + y * rb->Width + x;
+    const GLubyte val = *(static_cast<const GLubyte *>(value));
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     if (mask) {
 	GLuint i;
@@ -149,12 +149,12 @@ put_values_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		 const GLint x[], const GLint y[],
 		 const void *values, const GLubyte *mask)
 {
-    const GLubyte *src = (const GLubyte *) values;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) rb->Data + y[i] * rb->Width + x[i];
+	    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = src[i];
 	}
     }
@@ -166,12 +166,12 @@ put_mono_values_ubyte(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		      const GLint x[], const GLint y[],
 		      const void *value, const GLubyte *mask)
 {
-    const GLubyte val = *((const GLubyte *) value);
+    const GLubyte val = *(static_cast<const GLubyte *>(value));
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) rb->Data + y[i] * rb->Width + x[i];
+	    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = val;
 	}
     }
@@ -191,7 +191,7 @@ get_pointer_ushort(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     ASSERT(rb->Width > 0);
-    return (GLushort *) rb->Data + y * rb->Width + x;
+    return static_cast<GLushort *>(rb->Data) + y * rb->Width + x;
 }
 
 
@@ -209,11 +209,11 @@ static void
 get_values_ushort(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLint x[], const GLint y[], void *values)
 {
-    GLushort *dst = (GLushort *) values;
+    GLushort *dst = static_cast<GLushort *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     for (i = 0; i < count; i++) {
-	const GLushort *src = (GLushort *) rb->Data + y[i] * rb->Width + x[i];
+	const GLushort *src = static_cast<GLushort *>(rb->Data) + y[i] * rb->Width + x[i];
 	dst[i] = *src;
     }
 }
@@ -223,8 +223,8 @@ static void
 put_row_ushort(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLushort *src = (const GLushort *) values;
-    GLushort *dst = (GLushort *) rb->Data + y * rb->Width + x;
+    const GLushort *src = static_cast<const GLushort *>(values);
+    GLushort *dst = static_cast<GLushort *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     if (mask) {
 	GLuint i;
@@ -243,8 +243,8 @@ static void
 put_mono_row_ushort(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		    GLint x, GLint y, const void *value, const GLubyte *mask)
 {
-    const GLushort val = *((const GLushort *) value);
-    GLushort *dst = (GLushort *) rb->Data + y * rb->Width + x;
+    const GLushort val = *(static_cast<const GLushort *>(value));
+    GLushort *dst = static_cast<GLushort *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     if (mask) {
 	GLuint i;
@@ -267,12 +267,12 @@ put_values_ushort(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLint x[], const GLint y[], const void *values,
 		  const GLubyte *mask)
 {
-    const GLushort *src = (const GLushort *) values;
+    const GLushort *src = static_cast<const GLushort *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLushort *dst = (GLushort *) rb->Data + y[i] * rb->Width + x[i];
+	    GLushort *dst = static_cast<GLushort *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = src[i];
 	}
     }
@@ -284,20 +284,20 @@ put_mono_values_ushort(GLcontext *ctx, struct gl_renderbuffer *rb,
 		       GLuint count, const GLint x[], const GLint y[],
 		       const void *value, const GLubyte *mask)
 {
-    const GLushort val = *((const GLushort *) value);
+    const GLushort val = *(static_cast<const GLushort *>(value));
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT);
     if (mask) {
 	GLuint i;
 	for (i = 0; i < count; i++) {
 	    if (mask[i]) {
-		GLushort *dst = (GLushort *) rb->Data + y[i] * rb->Width + x[i];
+		GLushort *dst = static_cast<GLushort *>(rb->Data) + y[i] * rb->Width + x[i];
 		*dst = val;
 	    }
 	}
     } else {
 	GLuint i;
 	for (i = 0; i < count; i++) {
-	    GLushort *dst = (GLushort *) rb->Data + y[i] * rb->Width + x[i];
+	    GLushort *dst = static_cast<GLushort *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = val;
 	}
     }
@@ -317,7 +317,7 @@ get_pointer_uint(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
-    return (GLuint *) rb->Data + y * rb->Width + x;
+    return static_cast<GLuint *>(rb->Data) + y * rb->Width + x;
 }
 
 
@@ -336,12 +336,12 @@ static void
 get_values_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		const GLint x[], const GLint y[], void *values)
 {
-    GLuint *dst = (GLuint *) values;
+    GLuint *dst = static_cast<GLuint *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     for (i = 0; i < count; i++) {
-	const GLuint *src = (GLuint *) rb->Data + y[i] * rb->Width + x[i];
+	const GLuint *src = static_cast<GLuint *>(rb->Data) + y[i] * rb->Width + x[i];
 	dst[i] = *src;
     }
 }
@@ -351,8 +351,8 @@ static void
 put_row_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	     GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLuint *src = (const GLuint *) values;
-    GLuint *dst = (GLuint *) rb->Data + y * rb->Width + x;
+    const GLuint *src = static_cast<const GLuint *>(values);
+    GLuint *dst = static_cast<GLuint *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     if (mask) {
@@ -372,8 +372,8 @@ static void
 put_mono_row_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  GLint x, GLint y, const void *value, const GLubyte *mask)
 {
-    const GLuint val = *((const GLuint *) value);
-    GLuint *dst = (GLuint *) rb->Data + y * rb->Width + x;
+    const GLuint val = *(static_cast<const GLuint *>(value));
+    GLuint *dst = static_cast<GLuint *>(rb->Data) + y * rb->Width + x;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     if (mask) {
@@ -397,13 +397,13 @@ put_values_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		const GLint x[], const GLint y[], const void *values,
 		const GLubyte *mask)
 {
-    const GLuint *src = (const GLuint *) values;
+    const GLuint *src = static_cast<const GLuint *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLuint *dst = (GLuint *) rb->Data + y[i] * rb->Width + x[i];
+	    GLuint *dst = static_cast<GLuint *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = src[i];
 	}
     }
@@ -415,13 +415,13 @@ put_mono_values_uint(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		     const GLint x[], const GLint y[], const void *value,
 		     const GLubyte *mask)
 {
-    const GLuint val = *((const GLuint *) value);
+    const GLuint val = *(static_cast<const GLuint *>(value));
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_INT ||
 	   rb->DataType == GL_UNSIGNED_INT_24_8_EXT);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLuint *dst = (GLuint *) rb->Data + y[i] * rb->Width + x[i];
+	    GLuint *dst = static_cast<GLuint *>(rb->Data) + y[i] * rb->Width + x[i];
 	    *dst = val;
 	}
     }
@@ -451,8 +451,8 @@ static void
 get_row_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, void *values)
 {
-    const GLubyte *src = (const GLubyte *) rb->Data + 3 * (y * rb->Width + x);
-    GLubyte *dst = (GLubyte *) values;
+    const GLubyte *src = static_cast<const GLubyte *>(rb->Data) + 3 * (y * rb->Width + x);
+    GLubyte *dst = static_cast<GLubyte *>(values);
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
@@ -469,13 +469,13 @@ static void
 get_values_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLint x[], const GLint y[], void *values)
 {
-    GLubyte *dst = (GLubyte *) values;
+    GLubyte *dst = static_cast<GLubyte *>(values);
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
 	const GLubyte *src
-	    = (GLubyte *) rb->Data + 3 * (y[i] * rb->Width + x[i]);
+	    = static_cast<GLubyte *>(rb->Data) + 3 * (y[i] * rb->Width + x[i]);
 	dst[i * 4 + 0] = src[0];
 	dst[i * 4 + 1] = src[1];
 	dst[i * 4 + 2] = src[2];
@@ -489,8 +489,8 @@ put_row_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, const void *values, const GLubyte *mask)
 {
     /* note: incoming values are RGB+A! */
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) rb->Data + 3 * (y * rb->Width + x);
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 3 * (y * rb->Width + x);
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
@@ -509,8 +509,8 @@ put_row_rgb_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		   GLint x, GLint y, const void *values, const GLubyte *mask)
 {
     /* note: incoming values are RGB+A! */
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) rb->Data + 3 * (y * rb->Width + x);
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 3 * (y * rb->Width + x);
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
@@ -529,10 +529,10 @@ put_mono_row_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		    GLint x, GLint y, const void *value, const GLubyte *mask)
 {
     /* note: incoming value is RGB+A! */
-    const GLubyte val0 = ((const GLubyte *) value)[0];
-    const GLubyte val1 = ((const GLubyte *) value)[1];
-    const GLubyte val2 = ((const GLubyte *) value)[2];
-    GLubyte *dst = (GLubyte *) rb->Data + 3 * (y * rb->Width + x);
+    const GLubyte val0 = (static_cast<const GLubyte *>(value))[0];
+    const GLubyte val1 = (static_cast<const GLubyte *>(value))[1];
+    const GLubyte val2 = (static_cast<const GLubyte *>(value))[2];
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 3 * (y * rb->Width + x);
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     if (!mask && val0 == val1 && val1 == val2) {
@@ -557,13 +557,13 @@ put_values_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLubyte *mask)
 {
     /* note: incoming values are RGB+A! */
-    const GLubyte *src = (const GLubyte *) values;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) rb->Data + 3 * (y[i] * rb->Width + x[i]);
+	    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 3 * (y[i] * rb->Width + x[i]);
 	    dst[0] = src[i * 4 + 0];
 	    dst[1] = src[i * 4 + 1];
 	    dst[2] = src[i * 4 + 2];
@@ -578,15 +578,15 @@ put_mono_values_ubyte3(GLcontext *ctx, struct gl_renderbuffer *rb,
 		       const void *value, const GLubyte *mask)
 {
     /* note: incoming value is RGB+A! */
-    const GLubyte val0 = ((const GLubyte *) value)[0];
-    const GLubyte val1 = ((const GLubyte *) value)[1];
-    const GLubyte val2 = ((const GLubyte *) value)[2];
+    const GLubyte val0 = (static_cast<const GLubyte *>(value))[0];
+    const GLubyte val1 = (static_cast<const GLubyte *>(value))[1];
+    const GLubyte val2 = (static_cast<const GLubyte *>(value))[2];
     GLuint i;
     ASSERT(rb->_ActualFormat == GL_RGB8);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) rb->Data + 3 * (y[i] * rb->Width + x[i]);
+	    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 3 * (y[i] * rb->Width + x[i]);
 	    dst[0] = val0;
 	    dst[1] = val1;
 	    dst[2] = val2;
@@ -608,7 +608,7 @@ get_pointer_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb,
 	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
-    return (GLubyte *) rb->Data + 4 * (y * rb->Width + x);
+    return static_cast<GLubyte *>(rb->Data) + 4 * (y * rb->Width + x);
 }
 
 
@@ -616,7 +616,7 @@ static void
 get_row_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, void *values)
 {
-    const GLubyte *src = (const GLubyte *) rb->Data + 4 * (y * rb->Width + x);
+    const GLubyte *src = static_cast<const GLubyte *>(rb->Data) + 4 * (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     memcpy(values, src, 4 * count * sizeof(GLubyte));
@@ -628,12 +628,12 @@ get_values_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLint x[], const GLint y[], void *values)
 {
     /* treat 4*GLubyte as 1*GLuint */
-    GLuint *dst = (GLuint *) values;
+    GLuint *dst = static_cast<GLuint *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     for (i = 0; i < count; i++) {
-	const GLuint *src = (GLuint *) rb->Data + (y[i] * rb->Width + x[i]);
+	const GLuint *src = static_cast<GLuint *>(rb->Data) + (y[i] * rb->Width + x[i]);
 	dst[i] = *src;
     }
 }
@@ -644,8 +644,8 @@ put_row_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 	       GLint x, GLint y, const void *values, const GLubyte *mask)
 {
     /* treat 4*GLubyte as 1*GLuint */
-    const GLuint *src = (const GLuint *) values;
-    GLuint *dst = (GLuint *) rb->Data + (y * rb->Width + x);
+    const GLuint *src = static_cast<const GLuint *>(values);
+    GLuint *dst = static_cast<GLuint *>(rb->Data) + (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     if (mask) {
@@ -666,8 +666,8 @@ put_row_rgb_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		   GLint x, GLint y, const void *values, const GLubyte *mask)
 {
     /* Store RGB values in RGBA buffer */
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) rb->Data + 4 * (y * rb->Width + x);
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(rb->Data) + 4 * (y * rb->Width + x);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
@@ -687,8 +687,8 @@ put_mono_row_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		    GLint x, GLint y, const void *value, const GLubyte *mask)
 {
     /* treat 4*GLubyte as 1*GLuint */
-    const GLuint val = *((const GLuint *) value);
-    GLuint *dst = (GLuint *) rb->Data + (y * rb->Width + x);
+    const GLuint val = *(static_cast<const GLuint *>(value));
+    GLuint *dst = static_cast<GLuint *>(rb->Data) + (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     if (!mask && val == 0) {
@@ -719,13 +719,13 @@ put_values_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		  const GLubyte *mask)
 {
     /* treat 4*GLubyte as 1*GLuint */
-    const GLuint *src = (const GLuint *) values;
+    const GLuint *src = static_cast<const GLuint *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLuint *dst = (GLuint *) rb->Data + (y[i] * rb->Width + x[i]);
+	    GLuint *dst = static_cast<GLuint *>(rb->Data) + (y[i] * rb->Width + x[i]);
 	    *dst = src[i];
 	}
     }
@@ -738,13 +738,13 @@ put_mono_values_ubyte4(GLcontext *ctx, struct gl_renderbuffer *rb,
 		       const void *value, const GLubyte *mask)
 {
     /* treat 4*GLubyte as 1*GLuint */
-    const GLuint val = *((const GLuint *) value);
+    const GLuint val = *(static_cast<const GLuint *>(value));
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_BYTE);
     ASSERT(rb->_ActualFormat == GL_RGBA8);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLuint *dst = (GLuint *) rb->Data + (y[i] * rb->Width + x[i]);
+	    GLuint *dst = static_cast<GLuint *>(rb->Data) + (y[i] * rb->Width + x[i]);
 	    *dst = val;
 	}
     }
@@ -763,7 +763,7 @@ get_pointer_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (!rb->Data)
 	return nullptr;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
-    return (GLushort *) rb->Data + 4 * (y * rb->Width + x);
+    return static_cast<GLushort *>(rb->Data) + 4 * (y * rb->Width + x);
 }
 
 
@@ -771,7 +771,7 @@ static void
 get_row_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		GLint x, GLint y, void *values)
 {
-    const GLshort *src = (const GLshort *) rb->Data + 4 * (y * rb->Width + x);
+    const GLshort *src = static_cast<const GLshort *>(rb->Data) + 4 * (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     memcpy(values, src, 4 * count * sizeof(GLshort));
 }
@@ -781,12 +781,12 @@ static void
 get_values_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		   const GLint x[], const GLint y[], void *values)
 {
-    GLushort *dst = (GLushort *) values;
+    GLushort *dst = static_cast<GLushort *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     for (i = 0; i < count; i++) {
 	const GLushort *src
-	    = (GLushort *) rb->Data + 4 * (y[i] * rb->Width + x[i]);
+	    = static_cast<GLushort *>(rb->Data) + 4 * (y[i] * rb->Width + x[i]);
 	dst[i] = *src;
     }
 }
@@ -796,8 +796,8 @@ static void
 put_row_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLushort *src = (const GLushort *) values;
-    GLushort *dst = (GLushort *) rb->Data + 4 * (y * rb->Width + x);
+    const GLushort *src = static_cast<const GLushort *>(values);
+    GLushort *dst = static_cast<GLushort *>(rb->Data) + 4 * (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     if (mask) {
 	GLuint i;
@@ -820,8 +820,8 @@ put_row_rgb_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		    GLint x, GLint y, const void *values, const GLubyte *mask)
 {
     /* Put RGB values in RGBA buffer */
-    const GLushort *src = (const GLushort *) values;
-    GLushort *dst = (GLushort *) rb->Data + 4 * (y * rb->Width + x);
+    const GLushort *src = static_cast<const GLushort *>(values);
+    GLushort *dst = static_cast<GLushort *>(rb->Data) + 4 * (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     if (mask) {
 	GLuint i;
@@ -843,11 +843,11 @@ static void
 put_mono_row_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		     GLint x, GLint y, const void *value, const GLubyte *mask)
 {
-    const GLushort val0 = ((const GLushort *) value)[0];
-    const GLushort val1 = ((const GLushort *) value)[1];
-    const GLushort val2 = ((const GLushort *) value)[2];
-    const GLushort val3 = ((const GLushort *) value)[3];
-    GLushort *dst = (GLushort *) rb->Data + 4 * (y * rb->Width + x);
+    const GLushort val0 = (static_cast<const GLushort *>(value))[0];
+    const GLushort val1 = (static_cast<const GLushort *>(value))[1];
+    const GLushort val2 = (static_cast<const GLushort *>(value))[2];
+    const GLushort val3 = (static_cast<const GLushort *>(value))[3];
+    GLushort *dst = static_cast<GLushort *>(rb->Data) + 4 * (y * rb->Width + x);
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     if (!mask && val0 == 0 && val1 == 0 && val2 == 0 && val3 == 0) {
 	/* common case for clearing accum buffer */
@@ -871,12 +871,12 @@ put_values_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb, GLuint count,
 		   const GLint x[], const GLint y[], const void *values,
 		   const GLubyte *mask)
 {
-    const GLushort *src = (const GLushort *) values;
+    const GLushort *src = static_cast<const GLushort *>(values);
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLushort *dst = (GLushort *) rb->Data + 4 * (y[i] * rb->Width + x[i]);
+	    GLushort *dst = static_cast<GLushort *>(rb->Data) + 4 * (y[i] * rb->Width + x[i]);
 	    dst[0] = src[i * 4 + 0];
 	    dst[1] = src[i * 4 + 1];
 	    dst[2] = src[i * 4 + 2];
@@ -891,15 +891,15 @@ put_mono_values_ushort4(GLcontext *ctx, struct gl_renderbuffer *rb,
 			GLuint count, const GLint x[], const GLint y[],
 			const void *value, const GLubyte *mask)
 {
-    const GLushort val0 = ((const GLushort *) value)[0];
-    const GLushort val1 = ((const GLushort *) value)[1];
-    const GLushort val2 = ((const GLushort *) value)[2];
-    const GLushort val3 = ((const GLushort *) value)[3];
+    const GLushort val0 = (static_cast<const GLushort *>(value))[0];
+    const GLushort val1 = (static_cast<const GLushort *>(value))[1];
+    const GLushort val2 = (static_cast<const GLushort *>(value))[2];
+    const GLushort val3 = (static_cast<const GLushort *>(value))[3];
     GLuint i;
     ASSERT(rb->DataType == GL_UNSIGNED_SHORT || rb->DataType == GL_SHORT);
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLushort *dst = (GLushort *) rb->Data + 4 * (y[i] * rb->Width + x[i]);
+	    GLushort *dst = static_cast<GLushort *>(rb->Data) + 4 * (y[i] * rb->Width + x[i]);
 	    dst[0] = val0;
 	    dst[1] = val1;
 	    dst[2] = val2;
@@ -1415,8 +1415,8 @@ get_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 	       GLint x, GLint y, void *values)
 {
     /* NOTE: 'values' is RGBA format! */
-    const GLubyte *src = (const GLubyte *) arb->Data + y * arb->Width + x;
-    GLubyte *dst = (GLubyte *) values;
+    const GLubyte *src = static_cast<const GLubyte *>(arb->Data) + y * arb->Width + x;
+    GLubyte *dst = static_cast<GLubyte *>(values);
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1433,7 +1433,7 @@ static void
 get_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 		  const GLint x[], const GLint y[], void *values)
 {
-    GLubyte *dst = (GLubyte *) values;
+    GLubyte *dst = static_cast<GLubyte *>(values);
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1441,7 +1441,7 @@ get_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
     arb->Wrapped->GetValues(ctx, count, x, y, values);
     /* second, fill in alpha values from this buffer! */
     for (i = 0; i < count; i++) {
-	const GLubyte *src = (GLubyte *) arb->Data + y[i] * arb->Width + x[i];
+	const GLubyte *src = static_cast<GLubyte *>(arb->Data) + y[i] * arb->Width + x[i];
 	dst[i * 4 + 3] = *src;
     }
 }
@@ -1451,8 +1451,8 @@ static void
 put_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 	       GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) arb->Data + y * arb->Width + x;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(arb->Data) + y * arb->Width + x;
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1471,8 +1471,8 @@ static void
 put_row_rgb_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 		   GLint x, GLint y, const void *values, const GLubyte *mask)
 {
-    const GLubyte *src = (const GLubyte *) values;
-    GLubyte *dst = (GLubyte *) arb->Data + y * arb->Width + x;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
+    GLubyte *dst = static_cast<GLubyte *>(arb->Data) + y * arb->Width + x;
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1491,8 +1491,8 @@ static void
 put_mono_row_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 		    GLint x, GLint y, const void *value, const GLubyte *mask)
 {
-    const GLubyte val = ((const GLubyte *) value)[3];
-    GLubyte *dst = (GLubyte *) arb->Data + y * arb->Width + x;
+    const GLubyte val = (static_cast<const GLubyte *>(value))[3];
+    GLubyte *dst = static_cast<GLubyte *>(arb->Data) + y * arb->Width + x;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
     /* first, pass the call to the wrapped RGB buffer */
@@ -1516,7 +1516,7 @@ put_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
 		  const GLint x[], const GLint y[],
 		  const void *values, const GLubyte *mask)
 {
-    const GLubyte *src = (const GLubyte *) values;
+    const GLubyte *src = static_cast<const GLubyte *>(values);
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1525,7 +1525,7 @@ put_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb, GLuint count,
     /* second, store alpha in our buffer */
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) arb->Data + y[i] * arb->Width + x[i];
+	    GLubyte *dst = static_cast<GLubyte *>(arb->Data) + y[i] * arb->Width + x[i];
 	    *dst = src[i * 4 + 3];
 	}
     }
@@ -1537,7 +1537,7 @@ put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 		       GLuint count, const GLint x[], const GLint y[],
 		       const void *value, const GLubyte *mask)
 {
-    const GLubyte val = ((const GLubyte *) value)[3];
+    const GLubyte val = (static_cast<const GLubyte *>(value))[3];
     GLuint i;
     ASSERT(arb != arb->Wrapped);
     ASSERT(arb->DataType == GL_UNSIGNED_BYTE);
@@ -1546,7 +1546,7 @@ put_mono_values_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
     /* second, store alpha in our buffer */
     for (i = 0; i < count; i++) {
 	if (!mask || mask[i]) {
-	    GLubyte *dst = (GLubyte *) arb->Data + y[i] * arb->Width + x[i];
+	    GLubyte *dst = static_cast<GLubyte *>(arb->Data) + y[i] * arb->Width + x[i];
 	    *dst = val;
 	}
     }

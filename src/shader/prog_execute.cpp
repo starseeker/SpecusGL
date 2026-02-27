@@ -936,7 +936,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_PK2H: {      /* pack two 16-bit floats in one 32-bit float */
 		GLfloat a[4], result[4];
 		GLhalfNV hx, hy;
-		GLuint *rawResult = (GLuint *) result;
+		GLuint *rawResult = reinterpret_cast<GLuint *>(result);
 		GLuint twoHalves;
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		hx = _mesa_float_to_half(a[0]);
@@ -949,7 +949,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_PK2US: {     /* pack two GLushorts into one 32-bit float */
 		GLfloat a[4], result[4];
-		GLuint usx, usy, *rawResult = (GLuint *) result;
+		GLuint usx, usy, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		a[0] = CLAMP(a[0], 0.0F, 1.0F);
 		a[1] = CLAMP(a[1], 0.0F, 1.0F);
@@ -962,7 +962,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_PK4B: {      /* pack four GLbytes into one 32-bit float */
 		GLfloat a[4], result[4];
-		GLuint ubx, uby, ubz, ubw, *rawResult = (GLuint *) result;
+		GLuint ubx, uby, ubz, ubw, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		a[0] = CLAMP(a[0], -128.0F / 127.0F, 1.0F);
 		a[1] = CLAMP(a[1], -128.0F / 127.0F, 1.0F);
@@ -979,7 +979,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_PK4UB: {     /* pack four GLubytes into one 32-bit float */
 		GLfloat a[4], result[4];
-		GLuint ubx, uby, ubz, ubw, *rawResult = (GLuint *) result;
+		GLuint ubx, uby, ubz, ubw, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		a[0] = CLAMP(a[0], 0.0F, 1.0F);
 		a[1] = CLAMP(a[1], 0.0F, 1.0F);
@@ -1310,7 +1310,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_UP2H: {      /* unpack two 16-bit floats */
 		GLfloat a[4] = {0.0}, result[4] = {0.0};
-		const GLuint *rawBits = (const GLuint *) a;
+		const GLuint *rawBits = reinterpret_cast<const GLuint *>(a);
 		GLhalfNV hx, hy;
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		hx = rawBits[0] & 0xffff;
@@ -1322,7 +1322,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_UP2US: {     /* unpack two GLushorts */
 		GLfloat a[4] = {0.0}, result[4] = {0.0};
-		const GLuint *rawBits = (const GLuint *) a;
+		const GLuint *rawBits = reinterpret_cast<const GLuint *>(a);
 		GLushort usx, usy;
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		usx = rawBits[0] & 0xffff;
@@ -1334,7 +1334,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_UP4B: {      /* unpack four GLbytes */
 		GLfloat a[4] = {0.0}, result[4] = {0.0};
-		const GLuint *rawBits = (const GLuint *) a;
+		const GLuint *rawBits = reinterpret_cast<const GLuint *>(a);
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		result[0] = (((rawBits[0] >> 0) & 0xff) - 128) / 127.0F;
 		result[1] = (((rawBits[0] >> 8) & 0xff) - 128) / 127.0F;
@@ -1345,7 +1345,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_UP4UB: {     /* unpack four GLubytes */
 		GLfloat a[4] = {0.0}, result[4] = {0.0};
-		const GLuint *rawBits = (const GLuint *) a;
+		const GLuint *rawBits = reinterpret_cast<const GLuint *>(a);
 		fetch_vector1(&inst->SrcReg[0], machine, a);
 		result[0] = ((rawBits[0] >> 0) & 0xff) / 255.0F;
 		result[1] = ((rawBits[0] >> 8) & 0xff) / 255.0F;

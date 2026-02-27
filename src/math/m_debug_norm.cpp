@@ -140,7 +140,7 @@ static void ref_norm_transform_rescale(const GLmatrix *mat,
 	TRANSFORM_NORMAL(t, s, m);
 	SCALE_SCALAR_3V(out[i], scale, t);
 
-	s = (GLfloat *)((char *)s + in->stride);
+	s = static_cast<GLfloat *>((char *)s + in->stride);
     }
 }
 
@@ -176,7 +176,7 @@ static void ref_norm_transform_normalize(const GLmatrix *mat,
 	    SCALE_SCALAR_3V(out[i], scale, t);
 	}
 
-	s = (GLfloat *)((char *)s + in->stride);
+	s = static_cast<GLfloat *>((char *)s + in->stride);
     }
 }
 
@@ -263,31 +263,31 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
     }
 
     source->data = (GLfloat(*)[4]) s;
-    source->start = (GLfloat *) s;
+    source->start = static_cast<GLfloat *>(s);
     source->count = TEST_COUNT;
     source->stride = sizeof(s[0]);
     source->flags = 0;
 
     dest->data = d;
-    dest->start = (GLfloat *) d;
+    dest->start = static_cast<GLfloat *>(d);
     dest->count = TEST_COUNT;
     dest->stride = sizeof(float[4]);
     dest->flags = 0;
 
     dest2->data = d2;
-    dest2->start = (GLfloat *) d2;
+    dest2->start = static_cast<GLfloat *>(d2);
     dest2->count = TEST_COUNT;
     dest2->stride = sizeof(float[4]);
     dest2->flags = 0;
 
     ref->data = r;
-    ref->start = (GLfloat *) r;
+    ref->start = static_cast<GLfloat *>(r);
     ref->count = TEST_COUNT;
     ref->stride = sizeof(float[4]);
     ref->flags = 0;
 
     ref2->data = r2;
-    ref2->start = (GLfloat *) r2;
+    ref2->start = static_cast<GLfloat *>(r2);
     ref2->count = TEST_COUNT;
     ref2->stride = sizeof(float[4]);
     ref2->flags = 0;

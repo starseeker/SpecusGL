@@ -50,7 +50,7 @@ run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     if (ctx->Point._Attenuated && !ctx->VertexProgram._Current) {
 	struct point_stage_data *store = POINT_STAGE_DATA(stage);
 	struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
-	const GLfloat *eyeCoord = (GLfloat *) VB->EyePtr->data + 2;
+	const GLfloat *eyeCoord = reinterpret_cast<GLfloat *>(VB->EyePtr->data) + 2;
 	const GLint eyeCoordStride = VB->EyePtr->stride / sizeof(GLfloat);
 	const GLfloat p0 = ctx->Point.Params[0];
 	const GLfloat p1 = ctx->Point.Params[1];

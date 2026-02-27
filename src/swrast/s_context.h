@@ -53,33 +53,32 @@
 #include <memory>
 
 
-typedef void (*texture_sample_func)(GLcontext *ctx,
-				    const struct gl_texture_object *tObj,
-				    GLuint n, const GLfloat texcoords[][4],
-				    const GLfloat lambda[], GLchan rgba[][4]);
+using texture_sample_func = void (*)(GLcontext *ctx,
+                                     const struct gl_texture_object *tObj,
+                                     GLuint n, const GLfloat texcoords[][4],
+                                     const GLfloat lambda[], GLchan rgba[][4]);
 
-typedef void (*texture_sample_func_f)(GLcontext *ctx,
-				      const struct gl_texture_object *tObj,
-				      GLuint n, const GLfloat texcoords[][4],
-				      const GLfloat lambda[], GLfloat rgba[][4]);
+using texture_sample_func_f = void (*)(GLcontext *ctx,
+                                       const struct gl_texture_object *tObj,
+                                       GLuint n, const GLfloat texcoords[][4],
+                                       const GLfloat lambda[], GLfloat rgba[][4]);
 
-typedef void (_ASMAPIP blend_func)(GLcontext *ctx, GLuint n,
-				   const GLubyte mask[],
-				   GLvoid *src, const GLvoid *dst,
-				   GLenum chanType);
+using blend_func = void (_ASMAPI *)(GLcontext *ctx, GLuint n,
+                                    const GLubyte mask[],
+                                    GLvoid *src, const GLvoid *dst,
+                                    GLenum chanType);
 
-typedef void (*swrast_point_func)(GLcontext *ctx, const SWvertex *);
+using swrast_point_func = void (*)(GLcontext *ctx, const SWvertex *);
 
-typedef void (*swrast_line_func)(GLcontext *ctx,
-				 const SWvertex *, const SWvertex *);
+using swrast_line_func = void (*)(GLcontext *ctx,
+                                  const SWvertex *, const SWvertex *);
 
-typedef void (*swrast_tri_func)(GLcontext *ctx, const SWvertex *,
-				const SWvertex *, const SWvertex *);
+using swrast_tri_func = void (*)(GLcontext *ctx, const SWvertex *,
+                                 const SWvertex *, const SWvertex *);
 
-
-typedef void (*validate_texture_image_func)(GLcontext *ctx,
-	struct gl_texture_object *texObj,
-	GLuint face, GLuint level);
+using validate_texture_image_func = void (*)(GLcontext *ctx,
+                                             struct gl_texture_object *texObj,
+                                             GLuint face, GLuint level);
 
 
 /**
@@ -88,21 +87,20 @@ typedef void (*validate_texture_image_func)(GLcontext *ctx,
  * (RasterMask)
  */
 /*@{*/
-#define ALPHATEST_BIT		0x001	/**< Alpha-test pixels */
-#define BLEND_BIT		0x002	/**< Blend pixels */
-#define DEPTH_BIT		0x004	/**< Depth-test pixels */
-#define FOG_BIT			0x008	/**< Fog pixels */
-#define LOGIC_OP_BIT		0x010	/**< Apply logic op in software */
-#define CLIP_BIT		0x020	/**< Scissor or window clip pixels */
-#define STENCIL_BIT		0x040	/**< Stencil pixels */
-#define MASKING_BIT		0x080	/**< Do glColorMask or glIndexMask */
-#define MULTI_DRAW_BIT		0x400	/**< Write to more than one color- */
-/**< buffer or no buffers. */
-#define OCCLUSION_BIT           0x800   /**< GL_HP_occlusion_test enabled */
-#define TEXTURE_BIT		0x1000	/**< Texturing really enabled */
-#define FRAGPROG_BIT            0x2000  /**< Fragment program enabled */
-#define ATIFRAGSHADER_BIT       0x4000  /**< ATI Fragment shader enabled */
-#define CLAMPING_BIT            0x8000  /**< Clamp colors to [0,1] */
+constexpr GLbitfield ALPHATEST_BIT    = 0x001; /**< Alpha-test pixels */
+constexpr GLbitfield BLEND_BIT        = 0x002; /**< Blend pixels */
+constexpr GLbitfield DEPTH_BIT        = 0x004; /**< Depth-test pixels */
+constexpr GLbitfield FOG_BIT          = 0x008; /**< Fog pixels */
+constexpr GLbitfield LOGIC_OP_BIT     = 0x010; /**< Apply logic op in software */
+constexpr GLbitfield CLIP_BIT         = 0x020; /**< Scissor or window clip pixels */
+constexpr GLbitfield STENCIL_BIT      = 0x040; /**< Stencil pixels */
+constexpr GLbitfield MASKING_BIT      = 0x080; /**< Do glColorMask or glIndexMask */
+constexpr GLbitfield MULTI_DRAW_BIT   = 0x400; /**< Write to more than one color-buffer or no buffers. */
+constexpr GLbitfield OCCLUSION_BIT    = 0x800; /**< GL_HP_occlusion_test enabled */
+constexpr GLbitfield TEXTURE_BIT      = 0x1000; /**< Texturing really enabled */
+constexpr GLbitfield FRAGPROG_BIT     = 0x2000; /**< Fragment program enabled */
+constexpr GLbitfield ATIFRAGSHADER_BIT = 0x4000; /**< ATI Fragment shader enabled */
+constexpr GLbitfield CLAMPING_BIT     = 0x8000; /**< Clamp colors to [0,1] */
 /*@}*/
 
 #define _SWRAST_NEW_RASTERMASK (_NEW_BUFFERS|	\

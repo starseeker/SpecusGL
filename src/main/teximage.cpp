@@ -77,7 +77,7 @@ static void PrintTexture(GLcontext *ctx, const struct gl_texture_image *img)
     _mesa_problem(nullptr, "PrintTexture not supported");
 #else
     GLuint i, j, c;
-    const GLubyte *data = (const GLubyte *) img->Data;
+    const GLubyte *data = static_cast<const GLubyte *>(img->Data);
 
     if (!data) {
 	_mesa_printf("No texture data\n");

@@ -75,7 +75,7 @@ struct RB16Wrap8 : public WrappedRenderbuffer {
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLushort *values16 = (GLushort *) values;
+GLushort *values16 = static_cast<GLushort *>(values);
 GLuint i;
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -89,7 +89,7 @@ for (i = 0; i < 4 * count; i++) {
     void GetValues(GLcontext *ctx, GLuint count,
    const GLint x[], const GLint y[], void *values) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLushort *values16 = (GLushort *) values;
+GLushort *values16 = static_cast<GLushort *>(values);
 GLuint i;
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -103,7 +103,7 @@ for (i = 0; i < 4 * count; i++) {
 GLint x, GLint y,
 const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLushort *values16 = (GLushort *) values;
+const GLushort *values16 = static_cast<const GLushort *>(values);
 GLuint i;
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -117,7 +117,7 @@ Wrapped->PutRow(ctx, count, x, y, values8, mask);
    GLint x, GLint y,
    const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 3];
-GLushort *values16 = (GLushort *) values;
+const GLushort *values16 = static_cast<const GLushort *>(values);
 GLuint i;
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -131,7 +131,7 @@ Wrapped->PutRowRGB(ctx, count, x, y, values8, mask);
     GLint x, GLint y,
     const void *value, const GLubyte *mask) override {
 GLubyte value8[4];
-GLushort *value16 = (GLushort *) value;
+const GLushort *value16 = static_cast<const GLushort *>(value);
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
 value8[0] = value16[0] >> 8;
@@ -145,7 +145,7 @@ Wrapped->PutMonoRow(ctx, count, x, y, value8, mask);
    const GLint x[], const GLint y[],
    const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLushort *values16 = (GLushort *) values;
+const GLushort *values16 = static_cast<const GLushort *>(values);
 GLuint i;
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -159,7 +159,7 @@ Wrapped->PutValues(ctx, count, x, y, values8, mask);
        const GLint x[], const GLint y[],
        const void *value, const GLubyte *mask) override {
 GLubyte value8[4];
-GLushort *value16 = (GLushort *) value;
+const GLushort *value16 = static_cast<const GLushort *>(value);
 ASSERT(DataType == GL_UNSIGNED_SHORT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
 value8[0] = value16[0] >> 8;
@@ -212,7 +212,7 @@ struct RB32Wrap8 : public WrappedRenderbuffer {
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+GLfloat *values32 = static_cast<GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -226,7 +226,7 @@ for (i = 0; i < 4 * count; i++) {
     void GetValues(GLcontext *ctx, GLuint count,
    const GLint x[], const GLint y[], void *values) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+GLfloat *values32 = static_cast<GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -240,7 +240,7 @@ for (i = 0; i < 4 * count; i++) {
 GLint x, GLint y,
 const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -254,7 +254,7 @@ Wrapped->PutRow(ctx, count, x, y, values8, mask);
    GLint x, GLint y,
    const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 3];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -268,7 +268,7 @@ Wrapped->PutRowRGB(ctx, count, x, y, values8, mask);
     GLint x, GLint y,
     const void *value, const GLubyte *mask) override {
 GLubyte value8[4];
-GLfloat *value32 = (GLfloat *) value;
+const GLfloat *value32 = static_cast<const GLfloat *>(value);
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
 UNCLAMPED_FLOAT_TO_UBYTE(value8[0], value32[0]);
@@ -282,7 +282,7 @@ Wrapped->PutMonoRow(ctx, count, x, y, value8, mask);
    const GLint x[], const GLint y[],
    const void *values, const GLubyte *mask) override {
 GLubyte values8[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
@@ -296,7 +296,7 @@ Wrapped->PutValues(ctx, count, x, y, values8, mask);
        const GLint x[], const GLint y[],
        const void *value, const GLubyte *mask) override {
 GLubyte value8[4];
-GLfloat *value32 = (GLfloat *) value;
+const GLfloat *value32 = static_cast<const GLfloat *>(value);
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_BYTE);
 UNCLAMPED_FLOAT_TO_UBYTE(value8[0], value32[0]);
@@ -349,7 +349,7 @@ struct RB32Wrap16 : public WrappedRenderbuffer {
     void GetRow(GLcontext *ctx, GLuint count,
 GLint x, GLint y, void *values) override {
 GLushort values16[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+GLfloat *values32 = static_cast<GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
@@ -363,7 +363,7 @@ for (i = 0; i < 4 * count; i++) {
     void GetValues(GLcontext *ctx, GLuint count,
    const GLint x[], const GLint y[], void *values) override {
 GLushort values16[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+GLfloat *values32 = static_cast<GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
@@ -377,7 +377,7 @@ for (i = 0; i < 4 * count; i++) {
 GLint x, GLint y,
 const void *values, const GLubyte *mask) override {
 GLushort values16[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
@@ -391,7 +391,7 @@ Wrapped->PutRow(ctx, count, x, y, values16, mask);
    GLint x, GLint y,
    const void *values, const GLubyte *mask) override {
 GLushort values16[MAX_WIDTH * 3];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
@@ -405,7 +405,7 @@ Wrapped->PutRowRGB(ctx, count, x, y, values16, mask);
     GLint x, GLint y,
     const void *value, const GLubyte *mask) override {
 GLushort value16[4];
-GLfloat *value32 = (GLfloat *) value;
+const GLfloat *value32 = static_cast<const GLfloat *>(value);
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
 UNCLAMPED_FLOAT_TO_USHORT(value16[0], value32[0]);
@@ -419,7 +419,7 @@ Wrapped->PutMonoRow(ctx, count, x, y, value16, mask);
    const GLint x[], const GLint y[],
    const void *values, const GLubyte *mask) override {
 GLushort values16[MAX_WIDTH * 4];
-GLfloat *values32 = (GLfloat *) values;
+const GLfloat *values32 = static_cast<const GLfloat *>(values);
 GLuint i;
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
@@ -433,7 +433,7 @@ Wrapped->PutValues(ctx, count, x, y, values16, mask);
        const GLint x[], const GLint y[],
        const void *value, const GLubyte *mask) override {
 GLushort value16[4];
-GLfloat *value32 = (GLfloat *) value;
+const GLfloat *value32 = static_cast<const GLfloat *>(value);
 ASSERT(DataType == GL_FLOAT);
 ASSERT(Wrapped->DataType == GL_UNSIGNED_SHORT);
 UNCLAMPED_FLOAT_TO_USHORT(value16[0], value32[0]);

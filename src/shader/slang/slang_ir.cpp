@@ -241,7 +241,7 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
     switch (n->Opcode) {
 	case IR_SEQ:
 #if IND
-	    printf("SEQ  at %p\n", (void*) n);
+	    printf("SEQ  at %p\n", static_cast<void*>(n));
 #endif
 	    assert(n->Children[0]);
 	    assert(n->Children[1]);
@@ -322,15 +322,15 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 
 	case IR_VAR:
 	    printf("VAR %s%s at %s  store %p\n",
-		   (n->Var ? (char *) n->Var->a_name : "TEMP"),
+		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
 		   swizzle_string(n->Store->Swizzle),
-		   storage_string(n->Store).c_str(), (void*) n->Store);
+		   storage_string(n->Store).c_str(), static_cast<void*>(n->Store));
 	    break;
 	case IR_VAR_DECL:
 	    printf("VAR_DECL %s (%p) at %s  store %p\n",
-		   (n->Var ? (char *) n->Var->a_name : "TEMP"),
-		   (void*) n->Var, storage_string(n->Store).c_str(),
-		   (void*) n->Store);
+		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
+		   static_cast<void*>(n->Var), storage_string(n->Store).c_str(),
+		   static_cast<void*>(n->Store));
 	    break;
 	case IR_FIELD:
 	    printf("FIELD %s of\n", n->Field);
@@ -350,12 +350,12 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 	    break;
 	case IR_SWIZZLE:
 	    printf("SWIZZLE %s of  (store %p) \n",
-		   swizzle_string(n->Store->Swizzle), (void*) n->Store);
+		   swizzle_string(n->Store->Swizzle), static_cast<void*>(n->Store));
 	    _slang_print_ir_tree(n->Children[0], indent + 3);
 	    break;
 	default:
 	    printf("%s (%p, %p)  (store %p)\n", _slang_ir_name(n->Opcode),
-		   (void*) n->Children[0], (void*) n->Children[1], (void*) n->Store);
+		   static_cast<void*>(n->Children[0]), static_cast<void*>(n->Children[1]), static_cast<void*>(n->Store));
 	    _slang_print_ir_tree(n->Children[0], indent+3);
 	    _slang_print_ir_tree(n->Children[1], indent+3);
     }

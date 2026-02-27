@@ -416,45 +416,45 @@ destroy_list(GLcontext *ctx, GLuint list)
 static GLuint
 translate_id(GLsizei n, GLenum type, const GLvoid * list)
 {
-    GLbyte *bptr;
-    GLubyte *ubptr;
-    GLshort *sptr;
-    GLushort *usptr;
-    GLint *iptr;
-    GLuint *uiptr;
-    GLfloat *fptr;
+    const GLbyte *bptr;
+    const GLubyte *ubptr;
+    const GLshort *sptr;
+    const GLushort *usptr;
+    const GLint *iptr;
+    const GLuint *uiptr;
+    const GLfloat *fptr;
 
     switch (type) {
 	case GL_BYTE:
-	    bptr = (GLbyte *) list;
+	    bptr = static_cast<const GLbyte *>(list);
 	    return (GLuint) *(bptr + n);
 	case GL_UNSIGNED_BYTE:
-	    ubptr = (GLubyte *) list;
+	    ubptr = static_cast<const GLubyte *>(list);
 	    return (GLuint) *(ubptr + n);
 	case GL_SHORT:
-	    sptr = (GLshort *) list;
+	    sptr = static_cast<const GLshort *>(list);
 	    return (GLuint) *(sptr + n);
 	case GL_UNSIGNED_SHORT:
-	    usptr = (GLushort *) list;
+	    usptr = static_cast<const GLushort *>(list);
 	    return (GLuint) *(usptr + n);
 	case GL_INT:
-	    iptr = (GLint *) list;
+	    iptr = static_cast<const GLint *>(list);
 	    return (GLuint) *(iptr + n);
 	case GL_UNSIGNED_INT:
-	    uiptr = (GLuint *) list;
+	    uiptr = static_cast<const GLuint *>(list);
 	    return (GLuint) *(uiptr + n);
 	case GL_FLOAT:
-	    fptr = (GLfloat *) list;
+	    fptr = static_cast<const GLfloat *>(list);
 	    return (GLuint) *(fptr + n);
 	case GL_2_BYTES:
-	    ubptr = ((GLubyte *) list) + 2 * n;
+	    ubptr = (static_cast<const GLubyte *>(list)) + 2 * n;
 	    return (GLuint) *ubptr * 256 + (GLuint) * (ubptr + 1);
 	case GL_3_BYTES:
-	    ubptr = ((GLubyte *) list) + 3 * n;
+	    ubptr = (static_cast<const GLubyte *>(list)) + 3 * n;
 	    return (GLuint) * ubptr * 65536
 		   + (GLuint) *(ubptr + 1) * 256 + (GLuint) * (ubptr + 2);
 	case GL_4_BYTES:
-	    ubptr = ((GLubyte *) list) + 4 * n;
+	    ubptr = (static_cast<const GLubyte *>(list)) + 4 * n;
 	    return (GLuint) *ubptr * 16777216
 		   + (GLuint) *(ubptr + 1) * 65536
 		   + (GLuint) *(ubptr + 2) * 256 + (GLuint) * (ubptr + 3);
@@ -528,7 +528,7 @@ _mesa_alloc_instruction(GLcontext *ctx, GLuint opcode, GLuint bytes)
     n = ctx->ListState.CurrentList->nodes.data() + ctx->ListState.CurrentPos;
     ctx->ListState.CurrentPos += numNodes;
     n[0].opcode = (OpCode) opcode;
-    return (void *)(n + 1);      /* return ptr to node following opcode */
+    return static_cast<void *>(n + 1);      /* return ptr to node following opcode */
 }
 
 
@@ -2061,7 +2061,7 @@ save_Map1d(GLenum target, GLdouble u1, GLdouble u2, GLint stride,
 	n[3].f = (GLfloat) u2;
 	n[4].i = _mesa_evaluator_components(target);      /* stride */
 	n[5].i = order;
-	n[6].data = (void *) pnts;
+	n[6].data = static_cast<void *>(pnts);
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map1d(ctx->Exec, (target, u1, u2, stride, order, points));
@@ -2085,7 +2085,7 @@ save_Map1f(GLenum target, GLfloat u1, GLfloat u2, GLint stride,
 	n[3].f = u2;
 	n[4].i = _mesa_evaluator_components(target);      /* stride */
 	n[5].i = order;
-	n[6].data = (void *) pnts;
+	n[6].data = static_cast<void *>(pnts);
     }
     if (ctx->ExecuteFlag) {
 	CALL_Map1f(ctx->Exec, (target, u1, u2, stride, order, points));
@@ -2330,7 +2330,7 @@ save_PixelMapfv(GLenum map, GLint mapsize, const GLfloat *values)
 	n[1].e = map;
 	n[2].i = mapsize;
 	n[3].data = new GLfloat[mapsize];
-	memcpy(n[3].data, (void *) values, mapsize * sizeof(GLfloat));
+	memcpy(n[3].data, static_cast<const void *>(values), mapsize * sizeof(GLfloat));
     }
     if (ctx->ExecuteFlag) {
 	CALL_PixelMapfv(ctx->Exec, (map, mapsize, values));
@@ -2503,7 +2503,7 @@ save_PolygonStipple(const GLubyte * pattern)
     n = ALLOC_INSTRUCTION(ctx, OPCODE_POLYGON_STIPPLE, 1);
     n[1].data = image;
     if (ctx->ExecuteFlag) {
-	CALL_PolygonStipple(ctx->Exec, ((GLubyte *) pattern));
+	CALL_PolygonStipple(ctx->Exec, (static_cast<const GLubyte *>(pattern)));
     }
 }
 
@@ -5380,7 +5380,7 @@ save_error(GLcontext *ctx, GLenum error, const char *s)
     n = ALLOC_INSTRUCTION(ctx, OPCODE_ERROR, 2);
     if (n) {
 	n[1].e = error;
-	n[2].data = (void *) s;
+	n[2].data = const_cast<char *>(s);
     }
 }
 
@@ -5462,7 +5462,7 @@ execute_list(GLcontext *ctx, GLuint list)
 	} else {
 	    switch (opcode) {
 		case OPCODE_ERROR:
-		    _mesa_error(ctx, n[1].e, (const char *) n[2].data);
+		    _mesa_error(ctx, n[1].e, static_cast<const char *>(n[2].data));
 		    break;
 		case OPCODE_ACCUM:
 		    CALL_Accum(ctx->Exec, (n[1].e, n[2].f));
@@ -5478,7 +5478,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    ctx->Unpack = ctx->DefaultPacking;
 		    CALL_Bitmap(ctx->Exec, ((GLsizei) n[1].i, (GLsizei) n[2].i,
 					    n[3].f, n[4].f, n[5].f, n[6].f,
-					    (const GLubyte *) n[7].data));
+					    static_cast<const GLubyte *>(n[7].data)));
 		    ctx->Unpack = save;      /* restore */
 		}
 		break;
@@ -5778,7 +5778,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    GLfloat u1 = n[2].f;
 		    GLfloat u2 = n[3].f;
 		    CALL_Map1f(ctx->Exec, (target, u1, u2, ustride, uorder,
-					   (GLfloat *) n[6].data));
+					   static_cast<GLfloat *>(n[6].data)));
 		}
 		break;
 		case OPCODE_MAP2: {
@@ -5793,7 +5793,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    GLint vorder = n[9].i;
 		    CALL_Map2f(ctx->Exec, (target, u1, u2, ustride, uorder,
 					   v1, v2, vstride, vorder,
-					   (GLfloat *) n[10].data));
+					   static_cast<GLfloat *>(n[10].data)));
 		}
 		break;
 		case OPCODE_MAPGRID1:
@@ -5830,7 +5830,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_PIXEL_MAP:
 		    CALL_PixelMapfv(ctx->Exec,
-				    (n[1].e, n[2].i, (GLfloat *) n[3].data));
+				    (n[1].e, n[2].i, static_cast<GLfloat *>(n[3].data)));
 		    break;
 		case OPCODE_PIXEL_TRANSFER:
 		    CALL_PixelTransferf(ctx->Exec, (n[1].e, n[2].f));
@@ -5855,7 +5855,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		case OPCODE_POLYGON_STIPPLE: {
 		    const struct gl_pixelstore_attrib save = ctx->Unpack;
 		    ctx->Unpack = ctx->DefaultPacking;
-		    CALL_PolygonStipple(ctx->Exec, ((GLubyte *) n[1].data));
+		    CALL_PolygonStipple(ctx->Exec, (static_cast<GLubyte *>(n[1].data)));
 		    ctx->Unpack = save;      /* restore */
 		}
 		break;
@@ -6097,11 +6097,11 @@ execute_list(GLcontext *ctx, GLuint list)
 		break;
 		case OPCODE_REQUEST_RESIDENT_PROGRAMS_NV:
 		    CALL_RequestResidentProgramsNV(ctx->Exec, (n[1].ui,
-						   (GLuint *) n[2].data));
+						   static_cast<GLuint *>(n[2].data)));
 		    break;
 		case OPCODE_LOAD_PROGRAM_NV:
 		    CALL_LoadProgramNV(ctx->Exec, (n[1].e, n[2].ui, n[3].i,
-						   (const GLubyte *) n[4].data));
+						   static_cast<const GLubyte *>(n[4].data)));
 		    break;
 		case OPCODE_PROGRAM_PARAMETER4F_NV:
 		    CALL_ProgramParameter4fNV(ctx->Exec, (n[1].e, n[2].ui, n[3].f,
@@ -6120,8 +6120,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_PROGRAM_NAMED_PARAMETER_NV:
 		    CALL_ProgramNamedParameter4fNV(ctx->Exec, (n[1].ui, n[2].i,
-						   (const GLubyte *) n[3].
-						   data, n[4].f, n[5].f,
+						   static_cast<const GLubyte *>(n[3].data), n[4].f, n[5].f,
 						   n[6].f, n[7].f));
 		    break;
 #endif
@@ -7874,7 +7873,7 @@ print_list(GLcontext *ctx, GLuint list)
 
     n = dlist->nodes.data();
 
-    _mesa_printf("START-LIST %u, address %p\n", list, (void *) n);
+    _mesa_printf("START-LIST %u, address %p\n", list, static_cast<void *>(n));
 
     done = n ? GL_FALSE : GL_TRUE;
     while (!done) {
@@ -7892,7 +7891,7 @@ print_list(GLcontext *ctx, GLuint list)
 		    break;
 		case OPCODE_BITMAP:
 		    _mesa_printf("Bitmap %d %d %g %g %g %g %p\n", n[1].i, n[2].i,
-				 n[3].f, n[4].f, n[5].f, n[6].f, (void *) n[7].data);
+				 n[3].f, n[4].f, n[5].f, n[6].f, static_cast<void *>(n[7].data));
 		    break;
 		case OPCODE_CALL_LIST:
 		    _mesa_printf("CallList %d\n", (int) n[1].ui);
@@ -8083,7 +8082,7 @@ print_list(GLcontext *ctx, GLuint list)
 		 */
 		case OPCODE_ERROR:
 		    _mesa_printf("Error: %s %s\n",
-				 enum_string(n[1].e), (const char *) n[2].data);
+				 enum_string(n[1].e), static_cast<const char *>(n[2].data));
 		    break;
 		case OPCODE_END_OF_LIST:
 		    _mesa_printf("END-LIST %u\n", list);
@@ -8093,7 +8092,7 @@ print_list(GLcontext *ctx, GLuint list)
 		    if (opcode < 0 || opcode > OPCODE_END_OF_LIST) {
 			_mesa_printf
 			("ERROR IN DISPLAY LIST: opcode = %d, address = %p\n",
-			 opcode, (void *) n);
+			 opcode, static_cast<void *>(n));
 			return;
 		    } else {
 			_mesa_printf("command %d, %u operands\n", opcode,

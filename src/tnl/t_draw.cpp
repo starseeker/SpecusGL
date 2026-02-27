@@ -102,7 +102,7 @@ static void _tnl_import_array(GLcontext *ctx,
     if (input->Type != GL_FLOAT) {
 	const GLuint sz = input->Size;
 	GLubyte *buf = get_space(ctx, count * sz * sizeof(GLfloat));
-	GLfloat *fptr = (GLfloat *)buf;
+	GLfloat *fptr = reinterpret_cast<GLfloat *>(buf);
 
 	switch (input->Type) {
 	    case GL_BYTE:
@@ -137,7 +137,7 @@ static void _tnl_import_array(GLcontext *ctx,
 
     VB->AttribPtr[attrib] = &tnl->tmp_inputs[attrib];
     VB->AttribPtr[attrib]->data = (GLfloat(*)[4])ptr;
-    VB->AttribPtr[attrib]->start = (GLfloat *)ptr;
+    VB->AttribPtr[attrib]->start = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(ptr));
     VB->AttribPtr[attrib]->count = count;
     VB->AttribPtr[attrib]->stride = stride;
     VB->AttribPtr[attrib]->size = input->Size;
@@ -158,9 +158,9 @@ static GLboolean *_tnl_import_edgeflag(GLcontext *ctx,
 				       const GLvector4f *input,
 				       GLuint count)
 {
-    const GLubyte *ptr = (const GLubyte *)input->data;
+    const GLubyte *ptr = reinterpret_cast<const GLubyte *>(input->data);
     const GLuint stride = input->stride;
-    GLboolean *space = (GLboolean *)get_space(ctx, count + CLIPVERTS);
+    GLboolean *space = static_cast<GLboolean *>(get_space(ctx, count + CLIPVERTS));
     GLboolean *bptr = space;
     GLuint i;
 
@@ -211,7 +211,7 @@ static void bind_inputs(GLcontext *ctx,
 	 * XXX: remove the GLvector4f type at some stage and just use
 	 * client arrays.
 	 */
-	_tnl_import_array(ctx, i, count, inputs[i], static_cast<const GLubyte*>(ptr));
+	_tnl_import_array(ctx, i, count, inputs[i], reinterpret_cast<const GLubyte*>(ptr));
     }
 
     /* We process only the vertices between min & max index:
@@ -282,17 +282,17 @@ static void bind_indices(GLcontext *ctx,
     ptr = ADD_POINTERS(ib->obj->Pointer, ib->ptr);
 
     if (ib->type == GL_UNSIGNED_INT) {
-	VB->Elts = (GLuint *) ptr;
+	VB->Elts = reinterpret_cast<GLuint *>(ptr);
     } else {
-	GLuint *elts = (GLuint *)get_space(ctx, ib->count * sizeof(GLuint));
+	GLuint *elts = reinterpret_cast<GLuint *>(get_space(ctx, ib->count * sizeof(GLuint)));
 	VB->Elts = elts;
 
 	if (ib->type == GL_UNSIGNED_SHORT) {
-	    const GLushort *in = (GLushort *)ptr;
+	    const GLushort *in = reinterpret_cast<GLushort *>(ptr);
 	    for (i = 0; i < ib->count; i++)
 		*elts++ = (GLuint)(*in++);
 	} else {
-	    const GLubyte *in = (GLubyte *)ptr;
+	    const GLubyte *in = reinterpret_cast<GLubyte *>(ptr);
 	    for (i = 0; i < ib->count; i++)
 		*elts++ = (GLuint)(*in++);
 	}

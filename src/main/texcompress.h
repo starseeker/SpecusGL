@@ -52,7 +52,7 @@ _mesa_compressed_row_stride(GLuint mesaFormat, GLsizei width);
 extern GLubyte *
 _mesa_compressed_image_address(GLint col, GLint row, GLint img,
 			       GLuint mesaFormat,
-			       GLsizei width, const GLubyte *image);
+			       GLsizei width, GLubyte *image);
 
 
 extern void

@@ -99,7 +99,7 @@ _slang_simplify(slang_operation *oper,
 
     if (oper->type == SLANG_OPER_IDENTIFIER) {
 	/* see if it's a named constant */
-	GLint value = _slang_lookup_constant((char *) oper->a_id);
+	GLint value = _slang_lookup_constant(reinterpret_cast<char *>(oper->a_id));
 	if (value >= 0) {
 	    oper->literal[0] =
 		oper->literal[1] =
@@ -230,7 +230,7 @@ _slang_simplify(slang_operation *oper,
 	&& isFloat[0] && isFloat[1] && isFloat[2] && isFloat[3]) {
 	/* vec4(flt, flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp((char *) oper->a_id, "vec4") == 0) {
+	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec4") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -246,7 +246,7 @@ _slang_simplify(slang_operation *oper,
     if (oper->num_children == 3 && isFloat[0] && isFloat[1] && isFloat[2]) {
 	/* vec3(flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp((char *) oper->a_id, "vec3") == 0) {
+	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec3") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -262,7 +262,7 @@ _slang_simplify(slang_operation *oper,
     if (oper->num_children == 2 && isFloat[0] && isFloat[1]) {
 	/* vec2(flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp((char *) oper->a_id, "vec2") == 0) {
+	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec2") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->literal[1];
@@ -279,7 +279,7 @@ _slang_simplify(slang_operation *oper,
     if (oper->num_children == 1 && isFloat[0]) {
 	/* vec2/3/4(flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    const char *func = (const char *) oper->a_id;
+	    const char *func = reinterpret_cast<const char *>(oper->a_id);
 	    if (strncmp(func, "vec", 3) == 0 && func[3] >= '2' && func[3] <= '4') {
 		oper->literal[0] =
 		    oper->literal[1] =
@@ -441,7 +441,7 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 #ifdef SLANG_DEBUG
 	printf("===== New call to %s with adapted arguments ===============\n",
-	       (char*) fun->header.a_name);
+	       static_cast<char*>(fun->header.a_name));
 	slang_print_tree(callOper, 5);
 #endif
 

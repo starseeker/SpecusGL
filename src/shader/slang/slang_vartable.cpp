@@ -107,7 +107,7 @@ _slang_pop_var_table(slang_var_table *vt)
 	GLint j;
 	GLuint comp;
 	if (dbg) printf("  Free var %s, size %d at %d\n",
-			    (char*) t->Vars[i]->a_name, store->Size,
+			    static_cast<char*>(t->Vars[i]->a_name), store->Size,
 			    store->Index);
 
 	if (store->Size == 1)
@@ -150,7 +150,7 @@ _slang_add_variable(slang_var_table *vt, slang_variable *v)
     assert(vt);
     t = vt->Top;
     assert(t);
-    if (dbg) printf("Adding var %s\n", (char *) v->a_name);
+    if (dbg) printf("Adding var %s\n", reinterpret_cast<char *>(v->a_name));
     t->Vars.push_back(v);
 }
 

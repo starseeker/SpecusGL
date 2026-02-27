@@ -153,7 +153,7 @@ parse_identifier(slang_parse_ctx * C)
 {
     const char *id;
 
-    id = (const char *) C->I;
+    id = reinterpret_cast<const char *>(C->I);
     C->I += strlen(id) + 1;
     return slang_atom_pool_atom(C->atoms, id);
 }
@@ -1867,8 +1867,8 @@ compile_with_grammar(grammar id, const char *source, slang_code_unit * unit,
 	{
 	    int line, col;
 	    char *s;
-	    s = (char *) _mesa_find_line_column((const GLubyte *) source,
-						(const GLubyte *) source + pos,
+	    s = reinterpret_cast<char *>(_mesa_find_line_column(reinterpret_cast<const GLubyte *>(source)),
+						reinterpret_cast<const GLubyte *>(source) + pos,
 						&line, &col);
 	    printf("Error on line %d, col %d: %s\n", line, col, s);
 	}
@@ -1926,7 +1926,7 @@ compile_object(grammar * id, const char *source, slang_code_object * object,
 	int pos;
 
 	grammar_get_last_error(buf, 1024, &pos);
-	slang_info_log_error(infolog, (const char *)(buf));
+	slang_info_log_error(infolog, reinterpret_cast<const char *>(buf));
 	return GL_FALSE;
     }
 

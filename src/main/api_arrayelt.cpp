@@ -1257,7 +1257,7 @@ void GLAPIENTRY _ae_loopback_array_elt(GLint elt)
 	const GLubyte *src
 	    = ADD_POINTERS(aa->array->BufferObj->Pointer, aa->array->Ptr)
 	      + elt * aa->array->StrideB;
-	CALL_by_offset(disp, (array_func), aa->offset, ((const void *) src));
+	CALL_by_offset(disp, (array_func), aa->offset, (static_cast<const void *>(src)));
     }
 
     if (do_map)

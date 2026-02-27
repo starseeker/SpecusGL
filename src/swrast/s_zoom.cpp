@@ -283,7 +283,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 	    }
 	}
     } else if (format == GL_COLOR_INDEX) {
-	const GLuint *indexes = (const GLuint *) src;
+	const GLuint *indexes = reinterpret_cast<const GLuint *>(src);
 	GLint i;
 	for (i = 0; i < zoomedWidth; i++) {
 	    GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -292,7 +292,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 	    zoomed.array->index[i] = indexes[j];
 	}
     } else if (format == GL_DEPTH_COMPONENT) {
-	const GLuint *zValues = (const GLuint *) src;
+	const GLuint *zValues = reinterpret_cast<const GLuint *>(src);
 	GLint i;
 	for (i = 0; i < zoomedWidth; i++) {
 	    GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -330,7 +330,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 	}
     } else if (format == GL_COLOR_INDEX) {
 	/* use specular color array for temp storage */
-	GLuint *indexSave = (GLuint *) zoomed.array->spec;
+	GLuint *indexSave = reinterpret_cast<GLuint *>(zoomed.array->spec);
 	const GLint end = zoomed.end; /* save */
 	if (y1 - y0 > 1) {
 	    memcpy(indexSave, zoomed.array->index, zoomed.end * sizeof(GLuint));
@@ -448,7 +448,7 @@ _swrast_write_zoomed_z_span(GLcontext *ctx, GLint imgX, GLint imgY,
 	    GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - spanX;
 	    ASSERT(j >= 0);
 	    ASSERT(j < width);
-	    zoomedVals16[i] = ((GLushort *) z)[j];
+	    zoomedVals16[i] = (reinterpret_cast<const GLushort *>(z))[j];
 	}
 	z = zoomedVals16;
     } else {
@@ -457,7 +457,7 @@ _swrast_write_zoomed_z_span(GLcontext *ctx, GLint imgX, GLint imgY,
 	    GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - spanX;
 	    ASSERT(j >= 0);
 	    ASSERT(j < width);
-	    zoomedVals32[i] = ((GLuint *) z)[j];
+	    zoomedVals32[i] = (reinterpret_cast<const GLuint *>(z))[j];
 	}
 	z = zoomedVals32;
     }

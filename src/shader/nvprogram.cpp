@@ -778,7 +778,7 @@ _mesa_ProgramNamedParameter4fNV(GLuint id, GLsizei len, const GLubyte *name,
 
     fragProg = static_cast<gl_fragment_program *>(prog);
     v = _mesa_lookup_parameter_value(fragProg->Parameters, len,
-				     (char *) name);
+				     const_cast<char *>(reinterpret_cast<const char *>(name)));
     if (v) {
 	v[0] = x;
 	v[1] = y;
@@ -844,7 +844,7 @@ _mesa_GetProgramNamedParameterfvNV(GLuint id, GLsizei len, const GLubyte *name,
 
     fragProg = static_cast<gl_fragment_program *>(prog);
     v = _mesa_lookup_parameter_value(fragProg->Parameters,
-				     len, (char *) name);
+				     len, const_cast<char *>(reinterpret_cast<const char *>(name)));
     if (v) {
 	params[0] = v[0];
 	params[1] = v[1];

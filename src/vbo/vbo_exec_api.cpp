@@ -59,7 +59,7 @@ static void vbo_exec_wrap_buffers(struct vbo_exec_context *exec)
     if (exec->vtx.prim_count == 0) {
 	exec->vtx.copied.nr = 0;
 	exec->vtx.vert_count = 0;
-	exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map.get();
+	exec->vtx.vbptr = reinterpret_cast<GLfloat *>(exec->vtx.buffer_map.get());
     } else {
 	GLuint last_begin = exec->vtx.prim[exec->vtx.prim_count-1].begin;
 	GLuint last_count;
@@ -139,7 +139,7 @@ static void vbo_exec_copy_to_current(struct vbo_exec_context *exec)
 
     for (i = VBO_ATTRIB_POS+1 ; i < VBO_ATTRIB_MAX ; i++) {
 	if (exec->vtx.attrsz[i]) {
-	    GLfloat *current = (GLfloat *)vbo->currval[i].Ptr;
+	    GLfloat *current = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(vbo->currval[i].Ptr));
 
 	    /* Note: the exec->vtx.current[i] pointers point into the
 	     * ctx->Current.Attrib and ctx->Light.Material.Attrib arrays.
@@ -184,7 +184,7 @@ static void vbo_exec_copy_from_current(struct vbo_exec_context *exec)
     GLint i;
 
     for (i = VBO_ATTRIB_POS+1 ; i < VBO_ATTRIB_MAX ; i++) {
-	const GLfloat *current = (GLfloat *)vbo->currval[i].Ptr;
+	const GLfloat *current = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(vbo->currval[i].Ptr));
 	switch (exec->vtx.attrsz[i]) {
 	    case 4:
 		exec->vtx.attrptr[i][3] = current[3];
@@ -246,7 +246,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
     exec->vtx.vertex_size += newsz - oldsz;
     exec->vtx.max_vert = VBO_VERT_BUFFER_SIZE / exec->vtx.vertex_size;
     exec->vtx.vert_count = 0;
-    exec->vtx.vbptr = (GLfloat *)exec->vtx.buffer_map.get();
+    exec->vtx.vbptr = reinterpret_cast<GLfloat *>(exec->vtx.buffer_map.get());
 
 
     /* Recalculate all the attrptr[] values
@@ -273,7 +273,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
 	GLfloat *dest = exec->vtx.vbptr;
 	GLuint j;
 
-	assert(exec->vtx.vbptr == (GLfloat *)exec->vtx.buffer_map.get());
+	assert(exec->vtx.vbptr == reinterpret_cast<GLfloat *>(exec->vtx.buffer_map.get()));
 
 	for (i = 0 ; i < exec->vtx.copied.nr ; i++) {
 	    for (j = 0 ; j < VBO_ATTRIB_MAX ; j++) {
@@ -284,7 +284,7 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
 			    data += oldsz;
 			    dest += newsz;
 			} else {
-			    const GLfloat *current = (const GLfloat *)vbo->currval[j].Ptr;
+			    const GLfloat *current = reinterpret_cast<const GLfloat *>(vbo->currval[j].Ptr);
 			    COPY_SZ_4V(dest, newsz, current);
 			    dest += newsz;
 			}

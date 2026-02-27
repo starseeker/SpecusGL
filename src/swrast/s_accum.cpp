@@ -97,7 +97,7 @@ rescale_accum(GLcontext *ctx)
 	GLuint y;
 	for (y = 0; y < rb->Height; y++) {
 	    GLuint i;
-	    GLshort *acc = (GLshort *) rb->GetPointer(ctx, 0, y);
+	    GLshort *acc = static_cast<GLshort *>(rb->GetPointer(ctx, 0, y));
 	    for (i = 0; i < 4 * rb->Width; i++) {
 		acc[i] = (GLshort)(acc[i] * s);
 	    }
@@ -199,7 +199,7 @@ accum_add(GLcontext *ctx, GLfloat value,
 	if (rb->GetPointer(ctx, 0, 0)) {
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
-		GLshort *acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
+		GLshort *acc = static_cast<GLshort *>(rb->GetPointer(ctx, xpos, ypos + i));
 		for (j = 0; j < 4 * width; j++) {
 		    acc[j] += incr;
 		}
@@ -239,7 +239,7 @@ accum_mult(GLcontext *ctx, GLfloat mult,
 	if (rb->GetPointer(ctx, 0, 0)) {
 	    GLint i, j;
 	    for (i = 0; i < height; i++) {
-		GLshort *acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
+		GLshort *acc = static_cast<GLshort *>(rb->GetPointer(ctx, xpos, ypos + i));
 		for (j = 0; j < 4 * width; j++) {
 		    acc[j] = (GLshort)(acc[j] * mult);
 		}
@@ -293,7 +293,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
 	for (i = 0; i < height; i++) {
 	    GLshort *acc;
 	    if (directAccess) {
-		acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
+		acc = static_cast<GLshort *>(rb->GetPointer(ctx, xpos, ypos + i));
 	    } else {
 		rb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;
@@ -373,7 +373,7 @@ accum_load(GLcontext *ctx, GLfloat value,
 	for (i = 0; i < height; i++) {
 	    GLshort *acc;
 	    if (directAccess) {
-		acc = (GLshort *) rb->GetPointer(ctx, xpos, ypos + i);
+		acc = static_cast<GLshort *>(rb->GetPointer(ctx, xpos, ypos + i));
 	    } else {
 		rb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;
@@ -466,7 +466,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 	    span.y = ypos + i;
 
 	    if (directAccess) {
-		acc = (GLshort *) accumRb->GetPointer(ctx, xpos, ypos +i);
+		acc = static_cast<GLshort *>(accumRb->GetPointer(ctx, xpos, ypos +i));
 	    } else {
 		accumRb->GetRow(ctx, width, xpos, ypos + i, accumRow);
 		acc = accumRow;

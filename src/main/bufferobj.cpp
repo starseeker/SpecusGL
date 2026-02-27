@@ -423,11 +423,11 @@ _mesa_validate_pbo_access(GLuint dimensions,
     /* buffer size, cast to a pointer */
     const GLubyte *sizeAddr = ((const GLubyte *) 0) + pack->BufferObj->Data.size();
 
-    if ((void *)start > (void *)sizeAddr) {
+    if (static_cast<const void *>(start) > static_cast<const void *>(sizeAddr)) {
 	/* This will catch negative values / wrap-around */
 	return GL_FALSE;
     }
-    if ((void *)end > (void *)sizeAddr) {
+    if (static_cast<const void *>(end) > static_cast<const void *>(sizeAddr)) {
 	/* Image read goes beyond end of buffer */
 	return GL_FALSE;
     }

@@ -287,7 +287,7 @@ static void clear_last_error(void)
 
     /* free error parameter - if error_param is a "???" don't free it - it's static */
     if (error_param != unknown)
-	mem_free((void **)(void *) &error_param);
+	mem_free(reinterpret_cast<void **>(&error_param));
     else
 	error_param = nullptr;
 
@@ -299,7 +299,7 @@ static void set_last_error(const byte *msg, byte *param, int pos)
 {
     /* error message can be set only once */
     if (error_message != nullptr) {
-	mem_free((void **)(void *) &param);
+	mem_free(reinterpret_cast<void **>(&param));
 	return;
     }
 
@@ -408,7 +408,7 @@ static void map_byte_destroy(map_byte **ma)
     if (*ma) {
 	map_byte_destroy(&(**ma).next);
 	mem_free((void **) &(**ma).key);
-	mem_free((void **) ma);
+	mem_free(reinterpret_cast<void **>(ma));
     }
 }
 
@@ -482,7 +482,7 @@ static void regbyte_ctx_create(regbyte_ctx **re)
 static void regbyte_ctx_destroy(regbyte_ctx **re)
 {
     if (*re) {
-	mem_free((void **) re);
+	mem_free(reinterpret_cast<void **>(re));
     }
 }
 
@@ -547,7 +547,7 @@ static void emit_destroy(emit **em)
     if (*em) {
 	emit_destroy(&(**em).m_next);
 	mem_free((void **) &(**em).m_regname);
-	mem_free((void **) em);
+	mem_free(reinterpret_cast<void **>(em));
     }
 }
 
@@ -628,7 +628,7 @@ static void error_destroy(error **er)
     if (*er) {
 	mem_free((void **) &(**er).m_text);
 	mem_free((void **) &(**er).m_token_name);
-	mem_free((void **) er);
+	mem_free(reinterpret_cast<void **>(er));
     }
 }
 
@@ -685,7 +685,7 @@ static void cond_destroy(cond **co)
     if (*co) {
 	mem_free((void **) &(**co).m_operands[0].m_regname);
 	mem_free((void **) &(**co).m_operands[1].m_regname);
-	mem_free((void **) co);
+	mem_free(reinterpret_cast<void **>(co));
     }
 }
 
@@ -741,7 +741,7 @@ static void spec_destroy(spec **sp)
 	error_destroy(&(**sp).m_errtext);
 	mem_free((void **) &(**sp).m_string);
 	cond_destroy(&(**sp).m_cond);
-	mem_free((void **) sp);
+	mem_free(reinterpret_cast<void **>(sp));
     }
 }
 
@@ -782,7 +782,7 @@ static void rule_destroy(rule **ru)
     if (*ru) {
 	rule_destroy(&(**ru).next);
 	spec_destroy(&(**ru).m_specs);
-	mem_free((void **) ru);
+	mem_free(reinterpret_cast<void **>(ru));
     }
 }
 
@@ -828,7 +828,7 @@ static void dict_destroy(dict **di)
     if (*di) {
 	rule_destroy(&(**di).m_rulez);
 	map_byte_destroy(&(**di).m_regbytes);
-	mem_free((void **) di);
+	mem_free(reinterpret_cast<void **>(di));
     }
 }
 
@@ -871,7 +871,7 @@ static void barray_destroy(barray **ba)
 {
     if (*ba) {
 	mem_free((void **) &(**ba).data);
-	mem_free((void **) ba);
+	mem_free(reinterpret_cast<void **>(ba));
     }
 }
 
@@ -948,7 +948,7 @@ static void bytepool_destroy(bytepool **by)
 {
     if (*by != nullptr) {
 	mem_free((void **) &(**by)._F);
-	mem_free((void **) by);
+	mem_free(reinterpret_cast<void **>(by));
     }
 }
 
@@ -1010,7 +1010,7 @@ static void map_str_destroy(map_str **ma)
 	map_str_destroy(&(**ma).next);
 	mem_free((void **) &(**ma).key);
 	mem_free((void **) &(**ma).data);
-	mem_free((void **) ma);
+	mem_free(reinterpret_cast<void **>(ma));
     }
 }
 
@@ -1064,7 +1064,7 @@ static void map_rule_destroy(map_rule **ma)
     if (*ma) {
 	map_rule_destroy(&(**ma).next);
 	mem_free((void **) &(**ma).key);
-	mem_free((void **) ma);
+	mem_free(reinterpret_cast<void **>(ma));
     }
 }
 
@@ -1212,7 +1212,7 @@ static int get_identifier(const byte **text, byte **id)
     /* loop while next character in buffer is valid for identifiers */
     while (is_identifier(*t)) {
 	if (string_grow(&p, &len, *t++)) {
-	    mem_free((void **)(void *) &p);
+	    mem_free(reinterpret_cast<void **>(&p));
 	    return 1;
 	}
     }
@@ -1372,7 +1372,7 @@ static int get_string(const byte **text, byte **str)
 	    c = *t++;
 
 	if (string_grow(&p, &len, c)) {
-	    mem_free((void **)(void *) &p);
+	    mem_free(reinterpret_cast<void **>(&p));
 	    return 1;
 	}
     }
@@ -1415,7 +1415,7 @@ static int get_emtcode(const byte **text, map_byte **ma)
 	}
 
 	m->data = (byte) c[0];
-	mem_free((void **)(void *) &c);
+	mem_free(reinterpret_cast<void **>(&c));
     } else if (t[0] == '0' && (t[1] == 'x' || t[1] == 'X')) {
 	/* skip HEX "0x" or "0X" prefix */
 	t += 2;
@@ -1492,11 +1492,11 @@ static int get_error(const byte **text, error **er, map_str *maps)
     eat_spaces(&t);
 
     if (!str_equal((byte *) "error", temp)) {
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
 	return 0;
     }
 
-    mem_free((void **)(void *) &temp);
+    mem_free(reinterpret_cast<void **>(&temp));
 
     error_create(er);
     if (*er == nullptr)
@@ -1516,12 +1516,12 @@ static int get_error(const byte **text, error **er, map_str *maps)
 	eat_spaces(&t);
 
 	if (map_str_find(&maps, temp, &(**er).m_text)) {
-	    mem_free((void **)(void *) &temp);
+	    mem_free(reinterpret_cast<void **>(&temp));
 	    error_destroy(er);
 	    return 1;
 	}
 
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
     }
 
     /* try to extract "token" from "...$token$..." */
@@ -1539,7 +1539,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 	    /* check if the dollar sign is repeated - if so skip it */
 	    if ((**er).m_text[i] == '$' && (**er).m_text[i + 1] == '$') {
 		if (string_grow(&processed, &len, '$')) {
-		    mem_free((void **)(void *) &processed);
+		    mem_free(reinterpret_cast<void **>(&processed));
 		    error_destroy(er);
 		    return 1;
 		}
@@ -1547,7 +1547,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 		i += 2;
 	    } else if ((**er).m_text[i] != '$') {
 		if (string_grow(&processed, &len, (**er).m_text[i])) {
-		    mem_free((void **)(void *) &processed);
+		    mem_free(reinterpret_cast<void **>(&processed));
 		    error_destroy(er);
 		    return 1;
 		}
@@ -1555,7 +1555,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 		i++;
 	    } else {
 		if (string_grow(&processed, &len, '$')) {
-		    mem_free((void **)(void *) &processed);
+		    mem_free(reinterpret_cast<void **>(&processed));
 		    error_destroy(er);
 		    return 1;
 		}
@@ -1565,7 +1565,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 		    unsigned int tlen = 0;
 
 		    if (string_grow(&(**er).m_token_name, &tlen, '\0')) {
-			mem_free((void **)(void *) &processed);
+			mem_free(reinterpret_cast<void **>(&processed));
 			error_destroy(er);
 			return 1;
 		    }
@@ -1575,7 +1575,7 @@ static int get_error(const byte **text, error **er, map_str *maps)
 
 		    while ((**er).m_text[i] != '$') {
 			if (string_grow(&(**er).m_token_name, &tlen, (**er).m_text[i])) {
-			    mem_free((void **)(void *) &processed);
+			    mem_free(reinterpret_cast<void **>(&processed));
 			    error_destroy(er);
 			    return 1;
 			}
@@ -1623,11 +1623,11 @@ static int get_emits(const byte **text, emit **em, map_byte *mapb)
     else if (str_equal((byte *) "load", temp))
 	dest = ed_regbyte;
     else {
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
 	return 0;
     }
 
-    mem_free((void **)(void *) &temp);
+    mem_free(reinterpret_cast<void **>(&temp));
 
     emit_create(&e);
     if (e == nullptr)
@@ -1676,7 +1676,7 @@ static int get_emits(const byte **text, emit **em, map_byte *mapb)
 	}
 	e->m_byte = (byte) temp[0];
 
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
 
 	e->m_emit_type = et_byte;
     } else {
@@ -1686,12 +1686,12 @@ static int get_emits(const byte **text, emit **em, map_byte *mapb)
 	}
 
 	if (map_byte_find(&mapb, temp, &e->m_byte)) {
-	    mem_free((void **)(void *) &temp);
+	    mem_free(reinterpret_cast<void **>(&temp));
 	    emit_destroy(&e);
 	    return 1;
 	}
 
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
 
 	e->m_emit_type = et_byte;
     }
@@ -1785,7 +1785,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	    t = u;
 	}
 
-	mem_free((void **)(void *) &keyword);
+	mem_free(reinterpret_cast<void **>(&keyword));
     }
 
     if (*t == '\'') {
@@ -1805,7 +1805,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	    eat_spaces(&t);
 
 	    if (get_string(&t, &temp2)) {
-		mem_free((void **)(void *) &temp);
+		mem_free(reinterpret_cast<void **>(&temp));
 		spec_destroy(&s);
 		return 1;
 	    }
@@ -1815,13 +1815,13 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	    s->m_byte[0] = *temp;
 	    s->m_byte[1] = *temp2;
 
-	    mem_free((void **)(void *) &temp2);
+	    mem_free(reinterpret_cast<void **>(&temp2));
 	} else {
 	    s->m_spec_type = st_byte;
 	    *s->m_byte = *temp;
 	}
 
-	mem_free((void **)(void *) &temp);
+	mem_free(reinterpret_cast<void **>(&temp));
     } else if (*t == '"') {
 	if (get_string(&t, &s->m_string)) {
 	    spec_destroy(&s);
@@ -1857,7 +1857,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 	/* .loop */
 	else if (str_equal((byte *) "loop", keyword)) {
 	    if (get_identifier(&t, &s->m_string)) {
-		mem_free((void **)(void *) &keyword);
+		mem_free(reinterpret_cast<void **>(&keyword));
 		spec_destroy(&s);
 		return 1;
 	    }
@@ -1865,7 +1865,7 @@ static int get_spec(const byte **text, spec **sp, map_str *maps, map_byte *mapb)
 
 	    s->m_spec_type = st_identifier_loop;
 	}
-	mem_free((void **)(void *) &keyword);
+	mem_free(reinterpret_cast<void **>(&keyword));
     } else {
 	if (get_identifier(&t, &s->m_string)) {
 	    spec_destroy(&s);
@@ -1932,7 +1932,7 @@ static int get_rule(const byte **text, rule **ru, map_str *maps, map_byte *mapb)
 		r->m_oper = op_or;
 	}
 
-	mem_free((void **)(void *) &op);
+	mem_free(reinterpret_cast<void **>(&op));
 
 	if (get_spec(&t, &sp, maps, mapb)) {
 	    rule_destroy(&r);
@@ -1979,8 +1979,8 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 	(*string_symbol != nullptr && update_dependency(mapr, *string_symbol, &di->m_string)))
 	return 1;
 
-    mem_free((void **) syntax_symbol);
-    mem_free((void **) string_symbol);
+    mem_free(reinterpret_cast<void **>(syntax_symbol));
+    mem_free(reinterpret_cast<void **>(string_symbol));
 
     /* update dependecies for the rest of the rules */
     while (rulez) {
@@ -1993,7 +1993,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 		if (update_dependency(mapr, sp->m_string, &sp->m_rule))
 		    return 1;
 
-		mem_free((void **) &sp->m_string);
+		mem_free(reinterpret_cast<void **>(&sp->m_string));
 	    }
 
 	    /* some errtexts reference to a rule */
@@ -2001,7 +2001,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 		if (update_dependency(mapr, sp->m_errtext->m_token_name, &sp->m_errtext->m_token))
 		    return 1;
 
-		mem_free((void **) &sp->m_errtext->m_token_name);
+		mem_free(reinterpret_cast<void **>(&sp->m_errtext->m_token_name));
 	    }
 
 	    /* update dependency for condition */
@@ -2015,7 +2015,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 			if (sp->m_cond->m_operands[i].m_regbyte == nullptr)
 			    return 1;
 
-			mem_free((void **) &sp->m_cond->m_operands[i].m_regname);
+			mem_free(reinterpret_cast<void **>(&sp->m_cond->m_operands[i].m_regname));
 		    }
 	    }
 
@@ -2029,7 +2029,7 @@ static int update_dependencies(dict *di, map_rule *mapr, byte **syntax_symbol,
 			if (em->m_regbyte == nullptr)
 			    return 1;
 
-			mem_free((void **) &em->m_regname);
+			mem_free(reinterpret_cast<void **>(&em->m_regname));
 		    }
 
 		    em = em->m_next;
@@ -2554,7 +2554,7 @@ static void grammar_load_state_destroy(grammar_load_state **gr)
 	map_str_destroy(&(**gr).maps);
 	map_byte_destroy(&(**gr).mapb);
 	map_rule_destroy(&(**gr).mapr);
-	mem_free((void **) gr);
+	mem_free(reinterpret_cast<void **>(gr));
     }
 }
 
@@ -2624,7 +2624,7 @@ grammar grammar_load_from_text(const byte *text)
 	if (is_dot && str_equal(symbol, (byte *) "emtcode")) {
 	    map_byte *ma = nullptr;
 
-	    mem_free((void **)(void *) &symbol);
+	    mem_free(reinterpret_cast<void **>(&symbol));
 
 	    if (get_emtcode(&text, &ma)) {
 		grammar_load_state_destroy(&g);
@@ -2638,7 +2638,7 @@ grammar grammar_load_from_text(const byte *text)
 	else if (is_dot && str_equal(symbol, (byte *) "regbyte")) {
 	    map_byte *ma = nullptr;
 
-	    mem_free((void **)(void *) &symbol);
+	    mem_free(reinterpret_cast<void **>(&symbol));
 
 	    if (get_regbyte(&text, &ma)) {
 		grammar_load_state_destroy(&g);
@@ -2652,7 +2652,7 @@ grammar grammar_load_from_text(const byte *text)
 	else if (is_dot && str_equal(symbol, (byte *) "errtext")) {
 	    map_str *ma = nullptr;
 
-	    mem_free((void **)(void *) &symbol);
+	    mem_free(reinterpret_cast<void **>(&symbol));
 
 	    if (get_errtext(&text, &ma)) {
 		grammar_load_state_destroy(&g);
@@ -2664,7 +2664,7 @@ grammar grammar_load_from_text(const byte *text)
 	}
 	/* .string */
 	else if (is_dot && str_equal(symbol, (byte *) "string")) {
-	    mem_free((void **)(void *) &symbol);
+	    mem_free(reinterpret_cast<void **>(&symbol));
 
 	    if (g->di->m_string != nullptr) {
 		grammar_load_state_destroy(&g);

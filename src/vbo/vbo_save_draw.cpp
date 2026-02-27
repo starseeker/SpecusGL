@@ -62,7 +62,7 @@ static void _playback_copy_to_current(GLcontext *ctx,
 
     for (i = VBO_ATTRIB_POS+1 ; i < VBO_ATTRIB_MAX ; i++) {
 	if (node->attrsz[i]) {
-	    GLfloat *current = (GLfloat *)vbo->currval[i].Ptr;
+	    GLfloat *current = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(vbo->currval[i].Ptr));
 
 	    COPY_CLEAN_4V(current,
 			  node->attrsz[i],
@@ -135,7 +135,7 @@ static void vbo_bind_vertex_list(GLcontext *ctx,
 	GLuint src = map[attr];
 
 	if (node->attrsz[src]) {
-	    arrays[attr].Ptr = (const GLubyte *)nullptr + buffer_offset;
+	    arrays[attr].Ptr = static_cast<const GLubyte *>(nullptr) + buffer_offset;
 	    arrays[attr].Size = node->attrsz[src];
 	    arrays[attr].StrideB = node->vertex_size * sizeof(GLfloat);
 	    arrays[attr].Stride = node->vertex_size * sizeof(GLfloat);
@@ -160,7 +160,7 @@ static void vbo_save_loopback_vertex_list(GLcontext *ctx,
 			 list->vertex_store->bufferobj));
 
     vbo_loopback_vertex_list(ctx,
-			     (const GLfloat *)(buffer + list->buffer_offset),
+			     reinterpret_cast<const GLfloat *>(buffer + list->buffer_offset),
 			     list->attrsz,
 			     list->prim,
 			     list->prim_count,

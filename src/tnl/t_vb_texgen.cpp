@@ -110,7 +110,7 @@ static void build_m3(GLfloat f[][3], GLfloat m[],
 		     const GLvector4f *eye)
 {
     GLuint stride = eye->stride;
-    GLfloat *coord = (GLfloat *)eye->start;
+    GLfloat *coord = reinterpret_cast<GLfloat *>(eye->start);
     GLuint count = eye->count;
     const GLfloat *norm = normal->start;
     GLuint i;
@@ -360,7 +360,7 @@ static void texgen(GLcontext *ctx,
     if (texUnit->_GenFlags & TEXGEN_NEED_M) {
 	build_m_tab[eye->size](store->tmp_f, store->tmp_m, normal, eye);
     } else if (texUnit->_GenFlags & TEXGEN_NEED_F) {
-	build_f_tab[eye->size]((GLfloat *)store->tmp_f, 3, normal, eye);
+	build_f_tab[eye->size](reinterpret_cast<GLfloat *>(store->tmp_f), 3, normal, eye);
     }
 
 
@@ -376,12 +376,12 @@ static void texgen(GLcontext *ctx,
 	GLuint i;
 	switch (texUnit->GenModeS) {
 	    case GL_OBJECT_LINEAR:
-		_mesa_dotprod_tab[obj->size]((GLfloat *)out->data,
+		_mesa_dotprod_tab[obj->size](reinterpret_cast<GLfloat *>(out->data),
 					     sizeof(out->data[0]), obj,
 					     texUnit->ObjectPlaneS);
 		break;
 	    case GL_EYE_LINEAR:
-		_mesa_dotprod_tab[eye->size]((GLfloat *)out->data,
+		_mesa_dotprod_tab[eye->size](reinterpret_cast<GLfloat *>(out->data),
 					     sizeof(out->data[0]), eye,
 					     texUnit->EyePlaneS);
 		break;

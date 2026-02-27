@@ -274,7 +274,7 @@ _mesa_compressed_row_stride(GLuint mesaFormat, GLsizei width)
 GLubyte *
 _mesa_compressed_image_address(GLint col, GLint row, GLint img,
 			       GLuint mesaFormat,
-			       GLsizei width, const GLubyte *image)
+			       GLsizei width, GLubyte *image)
 {
     GLubyte *addr;
 
@@ -291,15 +291,15 @@ _mesa_compressed_image_address(GLint col, GLint row, GLint img,
     switch (mesaFormat) {
 	case MESA_FORMAT_RGB_FXT1:
 	case MESA_FORMAT_RGBA_FXT1:
-	    addr = (GLubyte *) image + 16 * (((width + 7) / 8) * (row / 4) + col / 8);
+	    addr = static_cast<GLubyte *>(image) + 16 * (((width + 7) / 8) * (row / 4) + col / 8);
 	    break;
 	case MESA_FORMAT_RGB_DXT1:
 	case MESA_FORMAT_RGBA_DXT1:
-	    addr = (GLubyte *) image + 8 * (((width + 3) / 4) * (row / 4) + col / 4);
+	    addr = static_cast<GLubyte *>(image) + 8 * (((width + 3) / 4) * (row / 4) + col / 4);
 	    break;
 	case MESA_FORMAT_RGBA_DXT3:
 	case MESA_FORMAT_RGBA_DXT5:
-	    addr = (GLubyte *) image + 16 * (((width + 3) / 4) * (row / 4) + col / 4);
+	    addr = static_cast<GLubyte *>(image) + 16 * (((width + 3) / 4) * (row / 4) + col / 4);
 	    break;
 	default:
 	    _mesa_problem(nullptr, "bad mesaFormat in _mesa_compressed_image_address");

@@ -1230,23 +1230,23 @@ struct gl_stencil_attrib {
  * \param img texel image level/layer.
  * \param texelOut output texel (up to 4 GLchans)
  */
-typedef void (*FetchTexelFuncC)(const struct gl_texture_image *texImage,
-				GLint col, GLint row, GLint img,
-				GLchan *texelOut);
+using FetchTexelFuncC = void (*)(const struct gl_texture_image *texImage,
+                                  GLint col, GLint row, GLint img,
+                                  GLchan *texelOut);
 
 /**
  * As above, but returns floats.
  * Used for depth component images and for upcoming signed/float
  * texture images.
  */
-typedef void (*FetchTexelFuncF)(const struct gl_texture_image *texImage,
-				GLint col, GLint row, GLint img,
-				GLfloat *texelOut);
+using FetchTexelFuncF = void (*)(const struct gl_texture_image *texImage,
+                                  GLint col, GLint row, GLint img,
+                                  GLfloat *texelOut);
 
 
-typedef void (*StoreTexelFunc)(struct gl_texture_image *texImage,
-			       GLint col, GLint row, GLint img,
-			       const void *texel);
+using StoreTexelFunc = void (*)(struct gl_texture_image *texImage,
+                                 GLint col, GLint row, GLint img,
+                                 const void *texel);
 
 
 /**
@@ -1281,7 +1281,7 @@ typedef void (*StoreTexelFunc)(struct gl_texture_image *texImage,
 /**
  * Texture image storage function.
  */
-typedef GLboolean(*StoreTexImageFunc)(TEXSTORE_PARAMS);
+using StoreTexImageFunc = GLboolean (*)(TEXSTORE_PARAMS);
 
 
 /**

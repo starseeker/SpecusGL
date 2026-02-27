@@ -724,15 +724,15 @@ _mesa_noop_DrawElements(GLenum mode, GLsizei count, GLenum type,
     switch (type) {
 	case GL_UNSIGNED_BYTE:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLubyte *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLubyte *>(indices))[i]));
 	    break;
 	case GL_UNSIGNED_SHORT:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLushort *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLushort *>(indices))[i]));
 	    break;
 	case GL_UNSIGNED_INT:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLuint *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLuint *>(indices))[i]));
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glDrawElements(type)");

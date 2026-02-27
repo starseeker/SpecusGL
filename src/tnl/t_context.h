@@ -283,17 +283,17 @@ struct tnl_pipeline {
 struct tnl_clipspace;
 struct tnl_clipspace_attr;
 
-typedef void (*tnl_extract_func)(const struct tnl_clipspace_attr *a,
-				 GLfloat *out,
-				 const GLubyte *v);
+using tnl_extract_func = void (*)(const struct tnl_clipspace_attr *a,
+                                   GLfloat *out,
+                                   const GLubyte *v);
 
-typedef void (*tnl_insert_func)(const struct tnl_clipspace_attr *a,
-				GLubyte *v,
-				const GLfloat *in);
+using tnl_insert_func = void (*)(const struct tnl_clipspace_attr *a,
+                                  GLubyte *v,
+                                  const GLfloat *in);
 
-typedef void (*tnl_emit_func)(GLcontext *ctx,
-			      GLuint count,
-			      GLubyte *dest);
+using tnl_emit_func = void (*)(GLcontext *ctx,
+                                GLuint count,
+                                GLubyte *dest);
 
 
 /**
@@ -317,21 +317,21 @@ struct tnl_clipspace_attr {
 
 
 
-typedef void (*tnl_points_func)(GLcontext *ctx, GLuint first, GLuint last);
-typedef void (*tnl_line_func)(GLcontext *ctx, GLuint v1, GLuint v2);
-typedef void (*tnl_triangle_func)(GLcontext *ctx,
-				  GLuint v1, GLuint v2, GLuint v3);
-typedef void (*tnl_quad_func)(GLcontext *ctx, GLuint v1, GLuint v2,
-			      GLuint v3, GLuint v4);
-typedef void (*tnl_render_func)(GLcontext *ctx, GLuint start, GLuint count,
-				GLuint flags);
-typedef void (*tnl_interp_func)(GLcontext *ctx,
-				GLfloat t, GLuint dst, GLuint out, GLuint in,
-				GLboolean force_boundary);
-typedef void (*tnl_copy_pv_func)(GLcontext *ctx, GLuint dst, GLuint src);
-typedef void (*tnl_setup_func)(GLcontext *ctx,
-			       GLuint start, GLuint end,
-			       GLuint new_inputs);
+using tnl_points_func   = void (*)(GLcontext *ctx, GLuint first, GLuint last);
+using tnl_line_func     = void (*)(GLcontext *ctx, GLuint v1, GLuint v2);
+using tnl_triangle_func = void (*)(GLcontext *ctx,
+                                    GLuint v1, GLuint v2, GLuint v3);
+using tnl_quad_func     = void (*)(GLcontext *ctx, GLuint v1, GLuint v2,
+                                    GLuint v3, GLuint v4);
+using tnl_render_func   = void (*)(GLcontext *ctx, GLuint start, GLuint count,
+                                    GLuint flags);
+using tnl_interp_func   = void (*)(GLcontext *ctx,
+                                    GLfloat t, GLuint dst, GLuint out, GLuint in,
+                                    GLboolean force_boundary);
+using tnl_copy_pv_func  = void (*)(GLcontext *ctx, GLuint dst, GLuint src);
+using tnl_setup_func    = void (*)(GLcontext *ctx,
+                                    GLuint start, GLuint end,
+                                    GLuint new_inputs);
 
 
 struct tnl_attr_type {

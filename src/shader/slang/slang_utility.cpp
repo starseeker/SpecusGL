@@ -91,5 +91,5 @@ const char *
 slang_atom_pool_id(slang_atom_pool * pool, slang_atom atom)
 {
     (void) pool;
-    return static_cast<const char *>(atom);
+    return reinterpret_cast<const char *>(atom);
 }
