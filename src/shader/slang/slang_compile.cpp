@@ -229,7 +229,7 @@ parse_array_len(slang_parse_ctx * C, slang_output_ctx * O, GLuint * len)
     if (!slang_operation_construct(&array_size))
 	return false;
     if (!parse_expression(C, O, &array_size))
-	return false;   /* array_size destructor cleans up on scope exit */
+	return false;   /* array_size cleans up via its RAII members when this stack frame exits */
 
     space.funcs = O->funs;
     space.structs = O->structs;

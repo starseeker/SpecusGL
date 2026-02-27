@@ -39,8 +39,8 @@
 /**
  * Checks if a field selector is a general swizzle (an r-value swizzle
  * with replicated components or an l-value swizzle mask) for a
- * vector.  Returns GL_TRUE if this is the case, <swz> is filled with
- * swizzle information.  Returns GL_FALSE otherwise.
+ * vector.  (Returns true if this is the case), <swz> is filled with
+ * swizzle information.  Returns false otherwise.
  */
 bool
 _slang_is_swizzle(const char *field, GLuint rows, slang_swizzle * swz)
@@ -127,8 +127,8 @@ _slang_is_swizzle(const char *field, GLuint rows, slang_swizzle * swz)
 
 /**
  * Checks if a general swizzle is an l-value swizzle - these swizzles
- * do not have duplicated fields.  Returns GL_TRUE if this is a
- * swizzle mask.  Returns GL_FALSE otherwise
+ * do not have duplicated fields.  Returns true if this is a
+ * swizzle mask.  Returns false otherwise
  */
 bool
 _slang_is_swizzle_mask(const slang_swizzle * swz, GLuint rows)
@@ -270,7 +270,7 @@ slang_type_specifier_compatible(const slang_type_specifier * x,
  * \param space  namespace to search
  * \param spec  returns the type
  * \param funFound  returns pointer to the function, or nullptr if not found.
- * \return true for success, GL_FALSE if failure (bad function name)
+ * \return true for success, false if failure (bad function name)
  */
 static bool
 _slang_typeof_function(slang_atom a_name,
@@ -296,7 +296,7 @@ _slang_typeof_function(slang_atom a_name,
  * \param space  namespace to use
  * \param spec  returns the function's type
  * \param atoms  atom pool
- * \return true for success, GL_FALSE if failure
+ * \return true for success, false if failure
  */
 static bool
 typeof_math_call(const char *name, slang_operation *call,
@@ -345,7 +345,7 @@ _slang_typeof_operation(const slang_assemble_ctx * A,
  * \param space  the namespace to use
  * \param ti  the returned type
  * \param atoms  atom pool
- * \return true for success, GL_FALSE if failure
+ * \return true for success, false if failure
  */
 bool
 _slang_typeof_operation_(slang_operation * op,
@@ -762,7 +762,7 @@ _slang_locate_function(const slang_function_scope * funcs, slang_atom a_name,
 
 /**
  * Determine if a type is a matrix.
- * \return true if is a matrix, GL_FALSE otherwise.
+ * \return true if is a matrix, false otherwise.
  */
 bool
 _slang_type_is_matrix(slang_type_specifier_type ty)
@@ -786,7 +786,7 @@ _slang_type_is_matrix(slang_type_specifier_type ty)
 
 /**
  * Determine if a type is a vector.
- * \return true if is a vector, GL_FALSE otherwise.
+ * \return true if is a vector, false otherwise.
  */
 bool
 _slang_type_is_vector(slang_type_specifier_type ty)

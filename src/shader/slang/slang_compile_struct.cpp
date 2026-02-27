@@ -105,15 +105,16 @@ slang_struct::~slang_struct() = default;
 slang_struct::slang_struct(const slang_struct &other)
     : a_name(other.a_name)
 {
+    /* Build into temporaries first for strong exception safety */
     if (other.fields) {
-        fields = std::make_unique<slang_variable_scope>();
-        if (!slang_variable_scope_copy(fields.get(), other.fields.get()))
-            fields.reset();
+        auto tmp_fields = std::make_unique<slang_variable_scope>();
+        if (slang_variable_scope_copy(tmp_fields.get(), other.fields.get()))
+            fields = std::move(tmp_fields);
     }
     if (other.structs) {
-        structs = std::make_unique<slang_struct_scope>();
-        if (!slang_struct_scope_copy(structs.get(), other.structs.get()))
-            structs.reset();
+        auto tmp_structs = std::make_unique<slang_struct_scope>();
+        if (slang_struct_scope_copy(tmp_structs.get(), other.structs.get()))
+            structs = std::move(tmp_structs);
     }
 }
 
@@ -183,7 +184,7 @@ slang_struct_equal(const slang_struct * x, const slang_struct * y)
 	    return false;
 	if (varx->type.specifier.type == SLANG_SPEC_ARRAY)
 	    if (varx->array_len != vary->array_len)
-		return GL_FALSE;
+		return false;
     }
     return true;
 }
