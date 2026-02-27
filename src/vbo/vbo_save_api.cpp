@@ -205,10 +205,10 @@ static GLfloat *map_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *v
 {
     assert(vertex_store->bufferobj);
     assert(!vertex_store->buffer);
-    vertex_store->buffer = (GLfloat *)ctx->Driver.MapBuffer(ctx,
+    vertex_store->buffer = static_cast<GLfloat *>(ctx->Driver.MapBuffer(ctx,
 			   GL_ARRAY_BUFFER_ARB,	/* not used */
 			   GL_WRITE_ONLY, /* not used */
-			   vertex_store->bufferobj);
+			   vertex_store->bufferobj));
 
     assert(vertex_store->buffer);
     return vertex_store->buffer + vertex_store->used;
@@ -309,7 +309,7 @@ static void _save_compile_vertex_list(GLcontext *ctx)
 	_glapi_set_dispatch(ctx->Exec);
 
 	vbo_loopback_vertex_list(ctx,
-				 (const GLfloat *)((const char *)save->vertex_store->buffer +
+				 reinterpret_cast<const GLfloat *>((const char *)save->vertex_store->buffer +
 					 node->buffer_offset),
 				 node->attrsz,
 				 node->prim,
@@ -896,15 +896,15 @@ static void GLAPIENTRY _save_OBE_DrawElements(GLenum mode, GLsizei count, GLenum
     switch (type) {
 	case GL_UNSIGNED_BYTE:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLubyte *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLubyte *>(indices))[i]));
 	    break;
 	case GL_UNSIGNED_SHORT:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLushort *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLushort *>(indices))[i]));
 	    break;
 	case GL_UNSIGNED_INT:
 	    for (i = 0 ; i < count ; i++)
-		CALL_ArrayElement(GET_DISPATCH(), (((GLuint *)indices)[i]));
+		CALL_ArrayElement(GET_DISPATCH(), ((static_cast<const GLuint *>(indices))[i]));
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glDrawElements(type)");

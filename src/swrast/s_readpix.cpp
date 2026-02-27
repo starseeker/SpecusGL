@@ -229,8 +229,8 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	const GLint dstStride = _mesa_image_row_stride(packing, width,
 				format, type);
 	GLubyte *dest
-	    = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
-						format, type, 0, 0);
+	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
+						format, type, 0, 0));
 	GLint row;
 	ASSERT(rb->GetRow);
 	for (row = 0; row < height; row++) {
@@ -246,8 +246,8 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	const GLint dstStride = _mesa_image_row_stride(packing, width,
 				format, type);
 	GLubyte *dest
-	    = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
-						format, type, 0, 0);
+	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
+						format, type, 0, 0));
 	GLint row;
 	ASSERT(rb->GetRow);
 	for (row = 0; row < height; row++) {
@@ -392,8 +392,8 @@ read_rgba_pixels(GLcontext *ctx,
 	GLfloat(*rgba)[4] = swrast->SpanArrays->attribs[FRAG_ATTRIB_COL0];
 	GLint row;
 	GLubyte *dst
-	    = (GLubyte *) _mesa_image_address2d(packing, pixels, width, height,
-						format, type, 0, 0);
+	    = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels, width, height,
+						format, type, 0, 0));
 
 	/* make sure we don't apply 1D convolution */
 	transferOps &= ~(IMAGE_CONVOLUTION_BIT |
@@ -471,10 +471,10 @@ read_depth_stencil_pixels(GLcontext *ctx,
 	GLint i;
 	GLint dstStride = _mesa_image_row_stride(packing, width,
 			  GL_DEPTH_STENCIL_EXT, type);
-	GLubyte *dst = (GLubyte *) _mesa_image_address2d(packing, pixels,
+	GLubyte *dst = static_cast<GLubyte *>(_mesa_image_address2d(packing, pixels,
 		       width, height,
 		       GL_DEPTH_STENCIL_EXT,
-		       type, 0, 0);
+		       type, 0, 0));
 	for (i = 0; i < height; i++) {
 	    depthRb->GetRow(ctx, width, x, y + i, dst);
 	    dst += dstStride;
@@ -565,9 +565,9 @@ _swrast_ReadPixels(GLcontext *ctx,
 	    RENDER_FINISH(swrast, ctx);
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						clippedPacking.BufferObj);
+						clippedPacking.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glReadPixels(PBO is mapped)");

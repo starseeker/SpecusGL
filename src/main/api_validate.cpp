@@ -49,22 +49,22 @@ max_buffer_index(GLcontext *ctx, GLuint count, GLenum type,
 				    GL_READ_ONLY,
 				    elementBuf));
 	/* Actual address is the sum of pointers */
-	indices = (const GLvoid *) ADD_POINTERS(map, (const GLubyte *) indices);
+	indices = (const GLvoid *) ADD_POINTERS(map, static_cast<const GLubyte *>(indices));
     }
 
     if (type == GL_UNSIGNED_INT) {
 	for (i = 0; i < count; i++)
-	    if (((GLuint *) indices)[i] > max)
-		max = ((GLuint *) indices)[i];
+	    if ((static_cast<const GLuint *>(indices))[i] > max)
+		max = (static_cast<const GLuint *>(indices))[i];
     } else if (type == GL_UNSIGNED_SHORT) {
 	for (i = 0; i < count; i++)
-	    if (((GLushort *) indices)[i] > max)
-		max = ((GLushort *) indices)[i];
+	    if ((static_cast<const GLushort *>(indices))[i] > max)
+		max = (static_cast<const GLushort *>(indices))[i];
     } else {
 	ASSERT(type == GL_UNSIGNED_BYTE);
 	for (i = 0; i < count; i++)
-	    if (((GLubyte *) indices)[i] > max)
-		max = ((GLubyte *) indices)[i];
+	    if ((static_cast<const GLubyte *>(indices))[i] > max)
+		max = (static_cast<const GLubyte *>(indices))[i];
     }
 
     if (map) {

@@ -100,15 +100,15 @@ typedef int GLfixed;
  * Fixed point arithmetic macros
  */
 #ifndef FIXED_FRAC_BITS
-#define FIXED_FRAC_BITS 11
+constexpr GLuint FIXED_FRAC_BITS = 11;
 #endif
 
 #define FIXED_SHIFT     FIXED_FRAC_BITS
-#define FIXED_ONE       (1 << FIXED_SHIFT)
+constexpr GLuint FIXED_ONE = 1 << FIXED_SHIFT;
 #define FIXED_HALF      (1 << (FIXED_SHIFT-1))
-#define FIXED_FRAC_MASK (FIXED_ONE - 1)
-#define FIXED_INT_MASK  (~FIXED_FRAC_MASK)
-#define FIXED_EPSILON   1
+constexpr GLuint FIXED_FRAC_MASK = FIXED_ONE - 1;
+constexpr GLuint FIXED_INT_MASK = ~FIXED_FRAC_MASK;
+constexpr GLint FIXED_EPSILON = 1;
 #define FIXED_SCALE     ((float) FIXED_ONE)
 #define FIXED_DBL_SCALE ((double) FIXED_ONE)
 #define FloatToFixed(X) (IROUND((X) * FIXED_SCALE))
@@ -204,38 +204,38 @@ enum {
  * These are used in bitfields in many places.
  */
 /*@{*/
-#define VERT_BIT_POS         (1 << VERT_ATTRIB_POS)
-#define VERT_BIT_WEIGHT      (1 << VERT_ATTRIB_WEIGHT)
-#define VERT_BIT_NORMAL      (1 << VERT_ATTRIB_NORMAL)
-#define VERT_BIT_COLOR0      (1 << VERT_ATTRIB_COLOR0)
-#define VERT_BIT_COLOR1      (1 << VERT_ATTRIB_COLOR1)
-#define VERT_BIT_FOG         (1 << VERT_ATTRIB_FOG)
-#define VERT_BIT_COLOR_INDEX (1 << VERT_ATTRIB_COLOR_INDEX)
-#define VERT_BIT_EDGEFLAG    (1 << VERT_ATTRIB_EDGEFLAG)
-#define VERT_BIT_TEX0        (1 << VERT_ATTRIB_TEX0)
-#define VERT_BIT_TEX1        (1 << VERT_ATTRIB_TEX1)
-#define VERT_BIT_TEX2        (1 << VERT_ATTRIB_TEX2)
-#define VERT_BIT_TEX3        (1 << VERT_ATTRIB_TEX3)
-#define VERT_BIT_TEX4        (1 << VERT_ATTRIB_TEX4)
-#define VERT_BIT_TEX5        (1 << VERT_ATTRIB_TEX5)
-#define VERT_BIT_TEX6        (1 << VERT_ATTRIB_TEX6)
-#define VERT_BIT_TEX7        (1 << VERT_ATTRIB_TEX7)
-#define VERT_BIT_GENERIC0    (1 << VERT_ATTRIB_GENERIC0)
-#define VERT_BIT_GENERIC1    (1 << VERT_ATTRIB_GENERIC1)
-#define VERT_BIT_GENERIC2    (1 << VERT_ATTRIB_GENERIC2)
-#define VERT_BIT_GENERIC3    (1 << VERT_ATTRIB_GENERIC3)
-#define VERT_BIT_GENERIC4    (1 << VERT_ATTRIB_GENERIC4)
-#define VERT_BIT_GENERIC5    (1 << VERT_ATTRIB_GENERIC5)
-#define VERT_BIT_GENERIC6    (1 << VERT_ATTRIB_GENERIC6)
-#define VERT_BIT_GENERIC7    (1 << VERT_ATTRIB_GENERIC7)
-#define VERT_BIT_GENERIC8    (1 << VERT_ATTRIB_GENERIC8)
-#define VERT_BIT_GENERIC9    (1 << VERT_ATTRIB_GENERIC9)
-#define VERT_BIT_GENERIC10   (1 << VERT_ATTRIB_GENERIC10)
-#define VERT_BIT_GENERIC11   (1 << VERT_ATTRIB_GENERIC11)
-#define VERT_BIT_GENERIC12   (1 << VERT_ATTRIB_GENERIC12)
-#define VERT_BIT_GENERIC13   (1 << VERT_ATTRIB_GENERIC13)
-#define VERT_BIT_GENERIC14   (1 << VERT_ATTRIB_GENERIC14)
-#define VERT_BIT_GENERIC15   (1 << VERT_ATTRIB_GENERIC15)
+constexpr GLuint VERT_BIT_POS = 1 << VERT_ATTRIB_POS;
+constexpr GLuint VERT_BIT_WEIGHT = 1 << VERT_ATTRIB_WEIGHT;
+constexpr GLuint VERT_BIT_NORMAL = 1 << VERT_ATTRIB_NORMAL;
+constexpr GLuint VERT_BIT_COLOR0 = 1 << VERT_ATTRIB_COLOR0;
+constexpr GLuint VERT_BIT_COLOR1 = 1 << VERT_ATTRIB_COLOR1;
+constexpr GLuint VERT_BIT_FOG = 1 << VERT_ATTRIB_FOG;
+constexpr GLuint VERT_BIT_COLOR_INDEX = 1 << VERT_ATTRIB_COLOR_INDEX;
+constexpr GLuint VERT_BIT_EDGEFLAG = 1 << VERT_ATTRIB_EDGEFLAG;
+constexpr GLuint VERT_BIT_TEX0 = 1 << VERT_ATTRIB_TEX0;
+constexpr GLuint VERT_BIT_TEX1 = 1 << VERT_ATTRIB_TEX1;
+constexpr GLuint VERT_BIT_TEX2 = 1 << VERT_ATTRIB_TEX2;
+constexpr GLuint VERT_BIT_TEX3 = 1 << VERT_ATTRIB_TEX3;
+constexpr GLuint VERT_BIT_TEX4 = 1 << VERT_ATTRIB_TEX4;
+constexpr GLuint VERT_BIT_TEX5 = 1 << VERT_ATTRIB_TEX5;
+constexpr GLuint VERT_BIT_TEX6 = 1 << VERT_ATTRIB_TEX6;
+constexpr GLuint VERT_BIT_TEX7 = 1 << VERT_ATTRIB_TEX7;
+constexpr GLuint VERT_BIT_GENERIC0 = 1 << VERT_ATTRIB_GENERIC0;
+constexpr GLuint VERT_BIT_GENERIC1 = 1 << VERT_ATTRIB_GENERIC1;
+constexpr GLuint VERT_BIT_GENERIC2 = 1 << VERT_ATTRIB_GENERIC2;
+constexpr GLuint VERT_BIT_GENERIC3 = 1 << VERT_ATTRIB_GENERIC3;
+constexpr GLuint VERT_BIT_GENERIC4 = 1 << VERT_ATTRIB_GENERIC4;
+constexpr GLuint VERT_BIT_GENERIC5 = 1 << VERT_ATTRIB_GENERIC5;
+constexpr GLuint VERT_BIT_GENERIC6 = 1 << VERT_ATTRIB_GENERIC6;
+constexpr GLuint VERT_BIT_GENERIC7 = 1 << VERT_ATTRIB_GENERIC7;
+constexpr GLuint VERT_BIT_GENERIC8 = 1 << VERT_ATTRIB_GENERIC8;
+constexpr GLuint VERT_BIT_GENERIC9 = 1 << VERT_ATTRIB_GENERIC9;
+constexpr GLuint VERT_BIT_GENERIC10 = 1 << VERT_ATTRIB_GENERIC10;
+constexpr GLuint VERT_BIT_GENERIC11 = 1 << VERT_ATTRIB_GENERIC11;
+constexpr GLuint VERT_BIT_GENERIC12 = 1 << VERT_ATTRIB_GENERIC12;
+constexpr GLuint VERT_BIT_GENERIC13 = 1 << VERT_ATTRIB_GENERIC13;
+constexpr GLuint VERT_BIT_GENERIC14 = 1 << VERT_ATTRIB_GENERIC14;
+constexpr GLuint VERT_BIT_GENERIC15 = 1 << VERT_ATTRIB_GENERIC15;
 
 #define VERT_BIT_TEX(u)  (1 << (VERT_ATTRIB_TEX0 + (u)))
 #define VERT_BIT_GENERIC(g)  (1 << (VERT_ATTRIB_GENERIC0 + (g)))
@@ -246,24 +246,24 @@ enum {
  * Indexes for vertex program result attributes
  */
 /*@{*/
-#define VERT_RESULT_HPOS 0
-#define VERT_RESULT_COL0 1
-#define VERT_RESULT_COL1 2
-#define VERT_RESULT_FOGC 3
-#define VERT_RESULT_TEX0 4
-#define VERT_RESULT_TEX1 5
-#define VERT_RESULT_TEX2 6
-#define VERT_RESULT_TEX3 7
-#define VERT_RESULT_TEX4 8
-#define VERT_RESULT_TEX5 9
-#define VERT_RESULT_TEX6 10
-#define VERT_RESULT_TEX7 11
-#define VERT_RESULT_PSIZ 12
-#define VERT_RESULT_BFC0 13
-#define VERT_RESULT_BFC1 14
-#define VERT_RESULT_EDGE 15
-#define VERT_RESULT_VAR0 16  /**< shader varying */
-#define VERT_RESULT_MAX  (VERT_RESULT_VAR0 + MAX_VARYING)
+constexpr GLint VERT_RESULT_HPOS = 0;
+constexpr GLint VERT_RESULT_COL0 = 1;
+constexpr GLint VERT_RESULT_COL1 = 2;
+constexpr GLint VERT_RESULT_FOGC = 3;
+constexpr GLint VERT_RESULT_TEX0 = 4;
+constexpr GLint VERT_RESULT_TEX1 = 5;
+constexpr GLint VERT_RESULT_TEX2 = 6;
+constexpr GLint VERT_RESULT_TEX3 = 7;
+constexpr GLint VERT_RESULT_TEX4 = 8;
+constexpr GLint VERT_RESULT_TEX5 = 9;
+constexpr GLint VERT_RESULT_TEX6 = 10;
+constexpr GLint VERT_RESULT_TEX7 = 11;
+constexpr GLint VERT_RESULT_PSIZ = 12;
+constexpr GLint VERT_RESULT_BFC0 = 13;
+constexpr GLint VERT_RESULT_BFC1 = 14;
+constexpr GLint VERT_RESULT_EDGE = 15;
+constexpr GLint VERT_RESULT_VAR0 = 16;  /**< shader varying */
+constexpr GLint VERT_RESULT_MAX = VERT_RESULT_VAR0 + MAX_VARYING;
 /*@}*/
 
 
@@ -291,31 +291,31 @@ enum {
  * Bitflags for fragment program input attributes.
  */
 /*@{*/
-#define FRAG_BIT_WPOS  (1 << FRAG_ATTRIB_WPOS)
-#define FRAG_BIT_COL0  (1 << FRAG_ATTRIB_COL0)
-#define FRAG_BIT_COL1  (1 << FRAG_ATTRIB_COL1)
-#define FRAG_BIT_FOGC  (1 << FRAG_ATTRIB_FOGC)
-#define FRAG_BIT_TEX0  (1 << FRAG_ATTRIB_TEX0)
-#define FRAG_BIT_TEX1  (1 << FRAG_ATTRIB_TEX1)
-#define FRAG_BIT_TEX2  (1 << FRAG_ATTRIB_TEX2)
-#define FRAG_BIT_TEX3  (1 << FRAG_ATTRIB_TEX3)
-#define FRAG_BIT_TEX4  (1 << FRAG_ATTRIB_TEX4)
-#define FRAG_BIT_TEX5  (1 << FRAG_ATTRIB_TEX5)
-#define FRAG_BIT_TEX6  (1 << FRAG_ATTRIB_TEX6)
-#define FRAG_BIT_TEX7  (1 << FRAG_ATTRIB_TEX7)
-#define FRAG_BIT_VAR0  (1 << FRAG_ATTRIB_VAR0)
+constexpr GLuint FRAG_BIT_WPOS = 1 << FRAG_ATTRIB_WPOS;
+constexpr GLuint FRAG_BIT_COL0 = 1 << FRAG_ATTRIB_COL0;
+constexpr GLuint FRAG_BIT_COL1 = 1 << FRAG_ATTRIB_COL1;
+constexpr GLuint FRAG_BIT_FOGC = 1 << FRAG_ATTRIB_FOGC;
+constexpr GLuint FRAG_BIT_TEX0 = 1 << FRAG_ATTRIB_TEX0;
+constexpr GLuint FRAG_BIT_TEX1 = 1 << FRAG_ATTRIB_TEX1;
+constexpr GLuint FRAG_BIT_TEX2 = 1 << FRAG_ATTRIB_TEX2;
+constexpr GLuint FRAG_BIT_TEX3 = 1 << FRAG_ATTRIB_TEX3;
+constexpr GLuint FRAG_BIT_TEX4 = 1 << FRAG_ATTRIB_TEX4;
+constexpr GLuint FRAG_BIT_TEX5 = 1 << FRAG_ATTRIB_TEX5;
+constexpr GLuint FRAG_BIT_TEX6 = 1 << FRAG_ATTRIB_TEX6;
+constexpr GLuint FRAG_BIT_TEX7 = 1 << FRAG_ATTRIB_TEX7;
+constexpr GLuint FRAG_BIT_VAR0 = 1 << FRAG_ATTRIB_VAR0;
 
 #define FRAG_BIT_TEX(U)  (FRAG_BIT_TEX0 << (U))
 #define FRAG_BIT_VAR(V)  (FRAG_BIT_VAR0 << (V))
 
-#define FRAG_BITS_TEX_ANY (FRAG_BIT_TEX0|	\
-			   FRAG_BIT_TEX1|	\
-			   FRAG_BIT_TEX2|	\
-			   FRAG_BIT_TEX3|	\
-			   FRAG_BIT_TEX4|	\
-			   FRAG_BIT_TEX5|	\
-			   FRAG_BIT_TEX6|	\
-			   FRAG_BIT_TEX7)
+constexpr GLuint FRAG_BITS_TEX_ANY = (FRAG_BIT_TEX0 |
+                                       FRAG_BIT_TEX1 |
+                                       FRAG_BIT_TEX2 |
+                                       FRAG_BIT_TEX3 |
+                                       FRAG_BIT_TEX4 |
+                                       FRAG_BIT_TEX5 |
+                                       FRAG_BIT_TEX6 |
+                                       FRAG_BIT_TEX7);
 /*@}*/
 
 
@@ -360,53 +360,53 @@ enum {
 /**
  * Bit flags for all renderbuffers
  */
-#define BUFFER_BIT_FRONT_LEFT   (1 << BUFFER_FRONT_LEFT)
-#define BUFFER_BIT_BACK_LEFT    (1 << BUFFER_BACK_LEFT)
-#define BUFFER_BIT_FRONT_RIGHT  (1 << BUFFER_FRONT_RIGHT)
-#define BUFFER_BIT_BACK_RIGHT   (1 << BUFFER_BACK_RIGHT)
-#define BUFFER_BIT_AUX0         (1 << BUFFER_AUX0)
-#define BUFFER_BIT_AUX1         (1 << BUFFER_AUX1)
-#define BUFFER_BIT_AUX2         (1 << BUFFER_AUX2)
-#define BUFFER_BIT_AUX3         (1 << BUFFER_AUX3)
-#define BUFFER_BIT_DEPTH        (1 << BUFFER_DEPTH)
-#define BUFFER_BIT_STENCIL      (1 << BUFFER_STENCIL)
-#define BUFFER_BIT_ACCUM        (1 << BUFFER_ACCUM)
-#define BUFFER_BIT_COLOR0       (1 << BUFFER_COLOR0)
-#define BUFFER_BIT_COLOR1       (1 << BUFFER_COLOR1)
-#define BUFFER_BIT_COLOR2       (1 << BUFFER_COLOR2)
-#define BUFFER_BIT_COLOR3       (1 << BUFFER_COLOR3)
-#define BUFFER_BIT_COLOR4       (1 << BUFFER_COLOR4)
-#define BUFFER_BIT_COLOR5       (1 << BUFFER_COLOR5)
-#define BUFFER_BIT_COLOR6       (1 << BUFFER_COLOR6)
-#define BUFFER_BIT_COLOR7       (1 << BUFFER_COLOR7)
+constexpr GLuint BUFFER_BIT_FRONT_LEFT = 1 << BUFFER_FRONT_LEFT;
+constexpr GLuint BUFFER_BIT_BACK_LEFT = 1 << BUFFER_BACK_LEFT;
+constexpr GLuint BUFFER_BIT_FRONT_RIGHT = 1 << BUFFER_FRONT_RIGHT;
+constexpr GLuint BUFFER_BIT_BACK_RIGHT = 1 << BUFFER_BACK_RIGHT;
+constexpr GLuint BUFFER_BIT_AUX0 = 1 << BUFFER_AUX0;
+constexpr GLuint BUFFER_BIT_AUX1 = 1 << BUFFER_AUX1;
+constexpr GLuint BUFFER_BIT_AUX2 = 1 << BUFFER_AUX2;
+constexpr GLuint BUFFER_BIT_AUX3 = 1 << BUFFER_AUX3;
+constexpr GLuint BUFFER_BIT_DEPTH = 1 << BUFFER_DEPTH;
+constexpr GLuint BUFFER_BIT_STENCIL = 1 << BUFFER_STENCIL;
+constexpr GLuint BUFFER_BIT_ACCUM = 1 << BUFFER_ACCUM;
+constexpr GLuint BUFFER_BIT_COLOR0 = 1 << BUFFER_COLOR0;
+constexpr GLuint BUFFER_BIT_COLOR1 = 1 << BUFFER_COLOR1;
+constexpr GLuint BUFFER_BIT_COLOR2 = 1 << BUFFER_COLOR2;
+constexpr GLuint BUFFER_BIT_COLOR3 = 1 << BUFFER_COLOR3;
+constexpr GLuint BUFFER_BIT_COLOR4 = 1 << BUFFER_COLOR4;
+constexpr GLuint BUFFER_BIT_COLOR5 = 1 << BUFFER_COLOR5;
+constexpr GLuint BUFFER_BIT_COLOR6 = 1 << BUFFER_COLOR6;
+constexpr GLuint BUFFER_BIT_COLOR7 = 1 << BUFFER_COLOR7;
 
 /**
  * Mask of all the color buffer bits (but not accum).
  */
-#define BUFFER_BITS_COLOR  (BUFFER_BIT_FRONT_LEFT | \
-                            BUFFER_BIT_BACK_LEFT | \
-                            BUFFER_BIT_FRONT_RIGHT | \
-                            BUFFER_BIT_BACK_RIGHT | \
-                            BUFFER_BIT_AUX0 | \
-                            BUFFER_BIT_AUX1 | \
-                            BUFFER_BIT_AUX2 | \
-                            BUFFER_BIT_AUX3 | \
-                            BUFFER_BIT_COLOR0 | \
-                            BUFFER_BIT_COLOR1 | \
-                            BUFFER_BIT_COLOR2 | \
-                            BUFFER_BIT_COLOR3 | \
-                            BUFFER_BIT_COLOR4 | \
-                            BUFFER_BIT_COLOR5 | \
-                            BUFFER_BIT_COLOR6 | \
-                            BUFFER_BIT_COLOR7)
+constexpr GLuint BUFFER_BITS_COLOR = (BUFFER_BIT_FRONT_LEFT |
+                                       BUFFER_BIT_BACK_LEFT |
+                                       BUFFER_BIT_FRONT_RIGHT |
+                                       BUFFER_BIT_BACK_RIGHT |
+                                       BUFFER_BIT_AUX0 |
+                                       BUFFER_BIT_AUX1 |
+                                       BUFFER_BIT_AUX2 |
+                                       BUFFER_BIT_AUX3 |
+                                       BUFFER_BIT_COLOR0 |
+                                       BUFFER_BIT_COLOR1 |
+                                       BUFFER_BIT_COLOR2 |
+                                       BUFFER_BIT_COLOR3 |
+                                       BUFFER_BIT_COLOR4 |
+                                       BUFFER_BIT_COLOR5 |
+                                       BUFFER_BIT_COLOR6 |
+                                       BUFFER_BIT_COLOR7);
 
 
 /** The pixel transfer path has three color tables: */
 /*@{*/
-#define COLORTABLE_PRECONVOLUTION  0
-#define COLORTABLE_POSTCONVOLUTION 1
-#define COLORTABLE_POSTCOLORMATRIX 2
-#define COLORTABLE_MAX 3
+constexpr GLint COLORTABLE_PRECONVOLUTION = 0;
+constexpr GLint COLORTABLE_POSTCONVOLUTION = 1;
+constexpr GLint COLORTABLE_POSTCOLORMATRIX = 2;
+constexpr GLint COLORTABLE_MAX = 3;
 /*@}*/
 
 
@@ -443,19 +443,19 @@ struct gl_color_table {
  * \name Bit flags used for updating material values.
  */
 /*@{*/
-#define MAT_ATTRIB_FRONT_AMBIENT           0
-#define MAT_ATTRIB_BACK_AMBIENT            1
-#define MAT_ATTRIB_FRONT_DIFFUSE           2
-#define MAT_ATTRIB_BACK_DIFFUSE            3
-#define MAT_ATTRIB_FRONT_SPECULAR          4
-#define MAT_ATTRIB_BACK_SPECULAR           5
-#define MAT_ATTRIB_FRONT_EMISSION          6
-#define MAT_ATTRIB_BACK_EMISSION           7
-#define MAT_ATTRIB_FRONT_SHININESS         8
-#define MAT_ATTRIB_BACK_SHININESS          9
-#define MAT_ATTRIB_FRONT_INDEXES           10
-#define MAT_ATTRIB_BACK_INDEXES            11
-#define MAT_ATTRIB_MAX                     12
+constexpr GLint MAT_ATTRIB_FRONT_AMBIENT = 0;
+constexpr GLint MAT_ATTRIB_BACK_AMBIENT = 1;
+constexpr GLint MAT_ATTRIB_FRONT_DIFFUSE = 2;
+constexpr GLint MAT_ATTRIB_BACK_DIFFUSE = 3;
+constexpr GLint MAT_ATTRIB_FRONT_SPECULAR = 4;
+constexpr GLint MAT_ATTRIB_BACK_SPECULAR = 5;
+constexpr GLint MAT_ATTRIB_FRONT_EMISSION = 6;
+constexpr GLint MAT_ATTRIB_BACK_EMISSION = 7;
+constexpr GLint MAT_ATTRIB_FRONT_SHININESS = 8;
+constexpr GLint MAT_ATTRIB_BACK_SHININESS = 9;
+constexpr GLint MAT_ATTRIB_FRONT_INDEXES = 10;
+constexpr GLint MAT_ATTRIB_BACK_INDEXES = 11;
+constexpr GLint MAT_ATTRIB_MAX = 12;
 
 #define MAT_ATTRIB_AMBIENT(f)  (MAT_ATTRIB_FRONT_AMBIENT+(f))
 #define MAT_ATTRIB_DIFFUSE(f)  (MAT_ATTRIB_FRONT_DIFFUSE+(f))
@@ -464,44 +464,44 @@ struct gl_color_table {
 #define MAT_ATTRIB_SHININESS(f)(MAT_ATTRIB_FRONT_SHININESS+(f))
 #define MAT_ATTRIB_INDEXES(f)  (MAT_ATTRIB_FRONT_INDEXES+(f))
 
-#define MAT_INDEX_AMBIENT  0
-#define MAT_INDEX_DIFFUSE  1
-#define MAT_INDEX_SPECULAR 2
+constexpr GLint MAT_INDEX_AMBIENT = 0;
+constexpr GLint MAT_INDEX_DIFFUSE = 1;
+constexpr GLint MAT_INDEX_SPECULAR = 2;
 
-#define MAT_BIT_FRONT_AMBIENT         (1<<MAT_ATTRIB_FRONT_AMBIENT)
-#define MAT_BIT_BACK_AMBIENT          (1<<MAT_ATTRIB_BACK_AMBIENT)
-#define MAT_BIT_FRONT_DIFFUSE         (1<<MAT_ATTRIB_FRONT_DIFFUSE)
-#define MAT_BIT_BACK_DIFFUSE          (1<<MAT_ATTRIB_BACK_DIFFUSE)
-#define MAT_BIT_FRONT_SPECULAR        (1<<MAT_ATTRIB_FRONT_SPECULAR)
-#define MAT_BIT_BACK_SPECULAR         (1<<MAT_ATTRIB_BACK_SPECULAR)
-#define MAT_BIT_FRONT_EMISSION        (1<<MAT_ATTRIB_FRONT_EMISSION)
-#define MAT_BIT_BACK_EMISSION         (1<<MAT_ATTRIB_BACK_EMISSION)
-#define MAT_BIT_FRONT_SHININESS       (1<<MAT_ATTRIB_FRONT_SHININESS)
-#define MAT_BIT_BACK_SHININESS        (1<<MAT_ATTRIB_BACK_SHININESS)
-#define MAT_BIT_FRONT_INDEXES         (1<<MAT_ATTRIB_FRONT_INDEXES)
-#define MAT_BIT_BACK_INDEXES          (1<<MAT_ATTRIB_BACK_INDEXES)
+constexpr GLuint MAT_BIT_FRONT_AMBIENT = 1<<MAT_ATTRIB_FRONT_AMBIENT;
+constexpr GLuint MAT_BIT_BACK_AMBIENT = 1<<MAT_ATTRIB_BACK_AMBIENT;
+constexpr GLuint MAT_BIT_FRONT_DIFFUSE = 1<<MAT_ATTRIB_FRONT_DIFFUSE;
+constexpr GLuint MAT_BIT_BACK_DIFFUSE = 1<<MAT_ATTRIB_BACK_DIFFUSE;
+constexpr GLuint MAT_BIT_FRONT_SPECULAR = 1<<MAT_ATTRIB_FRONT_SPECULAR;
+constexpr GLuint MAT_BIT_BACK_SPECULAR = 1<<MAT_ATTRIB_BACK_SPECULAR;
+constexpr GLuint MAT_BIT_FRONT_EMISSION = 1<<MAT_ATTRIB_FRONT_EMISSION;
+constexpr GLuint MAT_BIT_BACK_EMISSION = 1<<MAT_ATTRIB_BACK_EMISSION;
+constexpr GLuint MAT_BIT_FRONT_SHININESS = 1<<MAT_ATTRIB_FRONT_SHININESS;
+constexpr GLuint MAT_BIT_BACK_SHININESS = 1<<MAT_ATTRIB_BACK_SHININESS;
+constexpr GLuint MAT_BIT_FRONT_INDEXES = 1<<MAT_ATTRIB_FRONT_INDEXES;
+constexpr GLuint MAT_BIT_BACK_INDEXES = 1<<MAT_ATTRIB_BACK_INDEXES;
 
 
-#define FRONT_MATERIAL_BITS	(MAT_BIT_FRONT_EMISSION | 	\
-				 MAT_BIT_FRONT_AMBIENT |	\
-				 MAT_BIT_FRONT_DIFFUSE | 	\
-				 MAT_BIT_FRONT_SPECULAR |	\
-				 MAT_BIT_FRONT_SHININESS | 	\
-				 MAT_BIT_FRONT_INDEXES)
+constexpr GLuint FRONT_MATERIAL_BITS = (MAT_BIT_FRONT_EMISSION |
+                                         MAT_BIT_FRONT_AMBIENT |
+                                         MAT_BIT_FRONT_DIFFUSE |
+                                         MAT_BIT_FRONT_SPECULAR |
+                                         MAT_BIT_FRONT_SHININESS |
+                                         MAT_BIT_FRONT_INDEXES);
 
-#define BACK_MATERIAL_BITS	(MAT_BIT_BACK_EMISSION |	\
-				 MAT_BIT_BACK_AMBIENT |		\
-				 MAT_BIT_BACK_DIFFUSE |		\
-				 MAT_BIT_BACK_SPECULAR |	\
-				 MAT_BIT_BACK_SHININESS |	\
-				 MAT_BIT_BACK_INDEXES)
+constexpr GLuint BACK_MATERIAL_BITS  = (MAT_BIT_BACK_EMISSION |
+                                         MAT_BIT_BACK_AMBIENT |
+                                         MAT_BIT_BACK_DIFFUSE |
+                                         MAT_BIT_BACK_SPECULAR |
+                                         MAT_BIT_BACK_SHININESS |
+                                         MAT_BIT_BACK_INDEXES);
 
-#define ALL_MATERIAL_BITS	(FRONT_MATERIAL_BITS | BACK_MATERIAL_BITS)
+constexpr GLuint ALL_MATERIAL_BITS = FRONT_MATERIAL_BITS | BACK_MATERIAL_BITS;
 /*@}*/
 
 
-#define EXP_TABLE_SIZE 512	/**< Specular exponent lookup table sizes */
-#define SHINE_TABLE_SIZE 256	/**< Material shininess lookup table sizes */
+constexpr GLint EXP_TABLE_SIZE = 512;  /**< Specular exponent lookup table sizes */
+constexpr GLint SHINE_TABLE_SIZE = 256;  /**< Material shininess lookup table sizes */
 
 /**
  * Material shininess lookup table.
@@ -885,10 +885,10 @@ struct gl_convolution_attrib {
  * Light state flags.
  */
 /*@{*/
-#define LIGHT_SPOT         0x1
-#define LIGHT_LOCAL_VIEWER 0x2
-#define LIGHT_POSITIONAL   0x4
-#define LIGHT_NEED_VERTICES (LIGHT_POSITIONAL|LIGHT_LOCAL_VIEWER)
+constexpr GLuint LIGHT_SPOT = 0x1;
+constexpr GLuint LIGHT_LOCAL_VIEWER = 0x2;
+constexpr GLuint LIGHT_POSITIONAL = 0x4;
+constexpr GLuint LIGHT_NEED_VERTICES = (LIGHT_POSITIONAL | LIGHT_LOCAL_VIEWER);
 /*@}*/
 
 
@@ -959,7 +959,7 @@ struct gl_list_instruction {
     void (*Print)(GLcontext *ctx, void *data);
 };
 
-#define MAX_DLIST_EXT_OPCODES 16
+constexpr GLint MAX_DLIST_EXT_OPCODES = 16;
 
 /**
  * Used by device drivers to hook new commands into display lists.
@@ -1138,17 +1138,17 @@ struct gl_stencil_attrib {
 };
 
 
-#define NUM_TEXTURE_TARGETS 5   /* 1D, 2D, 3D, CUBE and RECT */
+constexpr GLint NUM_TEXTURE_TARGETS = 5;  /* 1D, 2D, 3D, CUBE and RECT */
 
 /**
  * An index for each type of texture object
  */
 /*@{*/
-#define TEXTURE_1D_INDEX    0
-#define TEXTURE_2D_INDEX    1
-#define TEXTURE_3D_INDEX    2
-#define TEXTURE_CUBE_INDEX  3
-#define TEXTURE_RECT_INDEX  4
+constexpr GLint TEXTURE_1D_INDEX = 0;
+constexpr GLint TEXTURE_2D_INDEX = 1;
+constexpr GLint TEXTURE_3D_INDEX = 2;
+constexpr GLint TEXTURE_CUBE_INDEX = 3;
+constexpr GLint TEXTURE_RECT_INDEX = 4;
 /*@}*/
 
 /**
@@ -1156,11 +1156,11 @@ struct gl_stencil_attrib {
  * Used for Texture.Unit[]._ReallyEnabled flags.
  */
 /*@{*/
-#define TEXTURE_1D_BIT   (1 << TEXTURE_1D_INDEX)
-#define TEXTURE_2D_BIT   (1 << TEXTURE_2D_INDEX)
-#define TEXTURE_3D_BIT   (1 << TEXTURE_3D_INDEX)
-#define TEXTURE_CUBE_BIT (1 << TEXTURE_CUBE_INDEX)
-#define TEXTURE_RECT_BIT (1 << TEXTURE_RECT_INDEX)
+constexpr GLuint TEXTURE_1D_BIT = 1u << TEXTURE_1D_INDEX;
+constexpr GLuint TEXTURE_2D_BIT = 1u << TEXTURE_2D_INDEX;
+constexpr GLuint TEXTURE_3D_BIT = 1u << TEXTURE_3D_INDEX;
+constexpr GLuint TEXTURE_CUBE_BIT = 1u << TEXTURE_CUBE_INDEX;
+constexpr GLuint TEXTURE_RECT_BIT = 1u << TEXTURE_RECT_INDEX;
 /*@}*/
 
 
@@ -1168,10 +1168,10 @@ struct gl_stencil_attrib {
  * TexGenEnabled flags.
  */
 /*@{*/
-#define S_BIT 1
-#define T_BIT 2
-#define R_BIT 4
-#define Q_BIT 8
+constexpr GLuint S_BIT = 1;
+constexpr GLuint T_BIT = 2;
+constexpr GLuint R_BIT = 4;
+constexpr GLuint Q_BIT = 8;
 /*@}*/
 
 
@@ -1179,19 +1179,14 @@ struct gl_stencil_attrib {
  * Bit flag versions of the corresponding GL_ constants.
  */
 /*@{*/
-#define TEXGEN_SPHERE_MAP        0x1
-#define TEXGEN_OBJ_LINEAR        0x2
-#define TEXGEN_EYE_LINEAR        0x4
-#define TEXGEN_REFLECTION_MAP_NV 0x8
-#define TEXGEN_NORMAL_MAP_NV     0x10
+constexpr GLuint TEXGEN_SPHERE_MAP = 0x1;
+constexpr GLuint TEXGEN_OBJ_LINEAR = 0x2;
+constexpr GLuint TEXGEN_EYE_LINEAR = 0x4;
+constexpr GLuint TEXGEN_REFLECTION_MAP_NV = 0x8;
+constexpr GLuint TEXGEN_NORMAL_MAP_NV = 0x10;
 
-#define TEXGEN_NEED_NORMALS      (TEXGEN_SPHERE_MAP        | \
-				  TEXGEN_REFLECTION_MAP_NV | \
-				  TEXGEN_NORMAL_MAP_NV)
-#define TEXGEN_NEED_EYE_COORD    (TEXGEN_SPHERE_MAP        | \
-				  TEXGEN_REFLECTION_MAP_NV | \
-				  TEXGEN_NORMAL_MAP_NV     | \
-				  TEXGEN_EYE_LINEAR)
+constexpr GLuint TEXGEN_NEED_NORMALS = (TEXGEN_SPHERE_MAP | TEXGEN_REFLECTION_MAP_NV | TEXGEN_NORMAL_MAP_NV);
+constexpr GLuint TEXGEN_NEED_EYE_COORD = (TEXGEN_SPHERE_MAP | TEXGEN_REFLECTION_MAP_NV | TEXGEN_NORMAL_MAP_NV | TEXGEN_EYE_LINEAR);
 /*@}*/
 
 
@@ -1230,23 +1225,23 @@ struct gl_stencil_attrib {
  * \param img texel image level/layer.
  * \param texelOut output texel (up to 4 GLchans)
  */
-typedef void (*FetchTexelFuncC)(const struct gl_texture_image *texImage,
-				GLint col, GLint row, GLint img,
-				GLchan *texelOut);
+using FetchTexelFuncC = void (*)(const struct gl_texture_image *texImage,
+                                  GLint col, GLint row, GLint img,
+                                  GLchan *texelOut);
 
 /**
  * As above, but returns floats.
  * Used for depth component images and for upcoming signed/float
  * texture images.
  */
-typedef void (*FetchTexelFuncF)(const struct gl_texture_image *texImage,
-				GLint col, GLint row, GLint img,
-				GLfloat *texelOut);
+using FetchTexelFuncF = void (*)(const struct gl_texture_image *texImage,
+                                  GLint col, GLint row, GLint img,
+                                  GLfloat *texelOut);
 
 
-typedef void (*StoreTexelFunc)(struct gl_texture_image *texImage,
-			       GLint col, GLint row, GLint img,
-			       const void *texel);
+using StoreTexelFunc = void (*)(struct gl_texture_image *texImage,
+                                 GLint col, GLint row, GLint img,
+                                 const void *texel);
 
 
 /**
@@ -1281,7 +1276,7 @@ typedef void (*StoreTexelFunc)(struct gl_texture_image *texImage,
 /**
  * Texture image storage function.
  */
-typedef GLboolean(*StoreTexImageFunc)(TEXSTORE_PARAMS);
+using StoreTexImageFunc = GLboolean (*)(TEXSTORE_PARAMS);
 
 
 /**
@@ -1408,13 +1403,13 @@ struct gl_texture_image {
  * Indexes for cube map faces.
  */
 /*@{*/
-#define FACE_POS_X   0
-#define FACE_NEG_X   1
-#define FACE_POS_Y   2
-#define FACE_NEG_Y   3
-#define FACE_POS_Z   4
-#define FACE_NEG_Z   5
-#define MAX_FACES  6
+constexpr GLint FACE_POS_X = 0;
+constexpr GLint FACE_NEG_X = 1;
+constexpr GLint FACE_POS_Y = 2;
+constexpr GLint FACE_NEG_Y = 3;
+constexpr GLint FACE_POS_Z = 4;
+constexpr GLint FACE_NEG_Z = 5;
+constexpr GLint MAX_FACES = 6;
 /*@}*/
 
 
@@ -2146,12 +2141,12 @@ struct gl_fragment_program_state {
 /**
  * ATI_fragment_shader runtime state
  */
-#define ATI_FS_INPUT_PRIMARY 0
-#define ATI_FS_INPUT_SECONDARY 1
+constexpr GLint ATI_FS_INPUT_PRIMARY = 0;
+constexpr GLint ATI_FS_INPUT_SECONDARY = 1;
 
-#define MAX_NUM_INSTRUCTIONS_PER_PASS_ATI 8
-#define MAX_NUM_PASSES_ATI                2
-#define MAX_NUM_FRAGMENT_REGISTERS_ATI    6
+constexpr GLint MAX_NUM_INSTRUCTIONS_PER_PASS_ATI = 8;
+constexpr GLint MAX_NUM_PASSES_ATI = 2;
+constexpr GLint MAX_NUM_FRAGMENT_REGISTERS_ATI = 6;
 
 struct atifragshader_src_register {
     GLuint Index;
@@ -2165,10 +2160,10 @@ struct atifragshader_dst_register {
     GLuint dstMask;
 };
 
-#define ATI_FRAGMENT_SHADER_COLOR_OP  0
-#define ATI_FRAGMENT_SHADER_ALPHA_OP  1
-#define ATI_FRAGMENT_SHADER_PASS_OP   2
-#define ATI_FRAGMENT_SHADER_SAMPLE_OP 3
+constexpr GLint ATI_FRAGMENT_SHADER_COLOR_OP = 0;
+constexpr GLint ATI_FRAGMENT_SHADER_ALPHA_OP = 1;
+constexpr GLint ATI_FRAGMENT_SHADER_PASS_OP = 2;
+constexpr GLint ATI_FRAGMENT_SHADER_SAMPLE_OP = 3;
 
 /** Two opcodes – one for color, one for alpha; up to three source registers. */
 struct atifs_instruction {
@@ -2533,8 +2528,11 @@ struct gl_shared_state {
  * OsMesaRenderbuffer, Z24RenderbufferWrapper, etc.) override the virtual
  * pixel-access methods for each specific storage format.
  */
+
+/** Magic identifier value for renderbuffers. */
+constexpr GLuint RB_MAGIC = 0xaabbccdd;
+
 struct gl_renderbuffer {
-#define RB_MAGIC 0xaabbccdd
     int Magic; /** XXX TEMPORARY DEBUG INFO */
     mutable std::mutex Mutex;		   /**< for thread safety */
     GLuint ClassID;        /**< Useful for drivers */
@@ -3019,33 +3017,33 @@ struct gl_matrix_stack {
  * \sa __GLcontextRec::ImageTransferState.
  */
 /*@{*/
-#define IMAGE_SCALE_BIAS_BIT                      0x1
-#define IMAGE_SHIFT_OFFSET_BIT                    0x2
-#define IMAGE_MAP_COLOR_BIT                       0x4
-#define IMAGE_COLOR_TABLE_BIT                     0x8
-#define IMAGE_CONVOLUTION_BIT                     0x10
-#define IMAGE_POST_CONVOLUTION_SCALE_BIAS         0x20
-#define IMAGE_POST_CONVOLUTION_COLOR_TABLE_BIT    0x40
-#define IMAGE_COLOR_MATRIX_BIT                    0x80
-#define IMAGE_POST_COLOR_MATRIX_COLOR_TABLE_BIT   0x100
-#define IMAGE_HISTOGRAM_BIT                       0x200
-#define IMAGE_MIN_MAX_BIT                         0x400
-#define IMAGE_CLAMP_BIT                           0x800 /* extra */
+constexpr GLuint IMAGE_SCALE_BIAS_BIT = 0x1;
+constexpr GLuint IMAGE_SHIFT_OFFSET_BIT = 0x2;
+constexpr GLuint IMAGE_MAP_COLOR_BIT = 0x4;
+constexpr GLuint IMAGE_COLOR_TABLE_BIT = 0x8;
+constexpr GLuint IMAGE_CONVOLUTION_BIT = 0x10;
+constexpr GLuint IMAGE_POST_CONVOLUTION_SCALE_BIAS = 0x20;
+constexpr GLuint IMAGE_POST_CONVOLUTION_COLOR_TABLE_BIT = 0x40;
+constexpr GLuint IMAGE_COLOR_MATRIX_BIT = 0x80;
+constexpr GLuint IMAGE_POST_COLOR_MATRIX_COLOR_TABLE_BIT = 0x100;
+constexpr GLuint IMAGE_HISTOGRAM_BIT = 0x200;
+constexpr GLuint IMAGE_MIN_MAX_BIT = 0x400;
+constexpr GLuint IMAGE_CLAMP_BIT = 0x800;  /* extra */
 
 
 /** Pixel Transfer ops up to convolution */
-#define IMAGE_PRE_CONVOLUTION_BITS (IMAGE_SCALE_BIAS_BIT |     \
-                                    IMAGE_SHIFT_OFFSET_BIT |   \
-                                    IMAGE_MAP_COLOR_BIT |      \
-                                    IMAGE_COLOR_TABLE_BIT)
+constexpr GLuint IMAGE_PRE_CONVOLUTION_BITS = (IMAGE_SCALE_BIAS_BIT |
+                                                IMAGE_SHIFT_OFFSET_BIT |
+                                                IMAGE_MAP_COLOR_BIT |
+                                                IMAGE_COLOR_TABLE_BIT);
 
 /** Pixel transfer ops after convolution */
-#define IMAGE_POST_CONVOLUTION_BITS (IMAGE_POST_CONVOLUTION_SCALE_BIAS |      \
-                                     IMAGE_POST_CONVOLUTION_COLOR_TABLE_BIT | \
-                                     IMAGE_COLOR_MATRIX_BIT |                 \
-                                     IMAGE_POST_COLOR_MATRIX_COLOR_TABLE_BIT |\
-                                     IMAGE_HISTOGRAM_BIT |                    \
-                                     IMAGE_MIN_MAX_BIT)
+constexpr GLuint IMAGE_POST_CONVOLUTION_BITS = (IMAGE_POST_CONVOLUTION_SCALE_BIAS |
+                                                 IMAGE_POST_CONVOLUTION_COLOR_TABLE_BIT |
+                                                 IMAGE_COLOR_MATRIX_BIT |
+                                                 IMAGE_POST_COLOR_MATRIX_COLOR_TABLE_BIT |
+                                                 IMAGE_HISTOGRAM_BIT |
+                                                 IMAGE_MIN_MAX_BIT);
 /*@}*/
 
 
@@ -3055,35 +3053,35 @@ struct gl_matrix_stack {
  * 4 unused flags.
  */
 /*@{*/
-#define _NEW_MODELVIEW		0x1        /**< __GLcontextRec::ModelView */
-#define _NEW_PROJECTION		0x2        /**< __GLcontextRec::Projection */
-#define _NEW_TEXTURE_MATRIX	0x4        /**< __GLcontextRec::TextureMatrix */
-#define _NEW_COLOR_MATRIX	0x8        /**< __GLcontextRec::ColorMatrix */
-#define _NEW_ACCUM		0x10       /**< __GLcontextRec::Accum */
-#define _NEW_COLOR		0x20       /**< __GLcontextRec::Color */
-#define _NEW_DEPTH		0x40       /**< __GLcontextRec::Depth */
-#define _NEW_EVAL		0x80       /**< __GLcontextRec::Eval, __GLcontextRec::EvalMap */
-#define _NEW_FOG		0x100      /**< __GLcontextRec::Fog */
-#define _NEW_HINT		0x200      /**< __GLcontextRec::Hint */
-#define _NEW_LIGHT		0x400      /**< __GLcontextRec::Light */
-#define _NEW_LINE		0x800      /**< __GLcontextRec::Line */
-#define _NEW_PIXEL		0x1000     /**< __GLcontextRec::Pixel */
-#define _NEW_POINT		0x2000     /**< __GLcontextRec::Point */
-#define _NEW_POLYGON		0x4000     /**< __GLcontextRec::Polygon */
-#define _NEW_POLYGONSTIPPLE	0x8000     /**< __GLcontextRec::PolygonStipple */
-#define _NEW_SCISSOR		0x10000    /**< __GLcontextRec::Scissor */
-#define _NEW_STENCIL		0x20000    /**< __GLcontextRec::Stencil */
-#define _NEW_TEXTURE		0x40000    /**< __GLcontextRec::Texture */
-#define _NEW_TRANSFORM		0x80000    /**< __GLcontextRec::Transform */
-#define _NEW_VIEWPORT		0x100000   /**< __GLcontextRec::Viewport */
-#define _NEW_PACKUNPACK		0x200000   /**< __GLcontextRec::Pack, __GLcontextRec::Unpack */
-#define _NEW_ARRAY	        0x400000   /**< __GLcontextRec::Array */
-#define _NEW_RENDERMODE		0x800000   /**< __GLcontextRec::RenderMode, __GLcontextRec::Feedback, __GLcontextRec::Select */
-#define _NEW_BUFFERS            0x1000000  /**< __GLcontextRec::Visual, __GLcontextRec::DrawBuffer, */
-#define _NEW_MULTISAMPLE        0x2000000  /**< __GLcontextRec::Multisample */
-#define _NEW_TRACK_MATRIX       0x4000000  /**< __GLcontextRec::VertexProgram */
-#define _NEW_PROGRAM            0x8000000  /**< __GLcontextRec::VertexProgram */
-#define _NEW_ALL ~0
+constexpr GLuint _NEW_MODELVIEW = 0x1;  /**< __GLcontextRec::ModelView */
+constexpr GLuint _NEW_PROJECTION = 0x2;  /**< __GLcontextRec::Projection */
+constexpr GLuint _NEW_TEXTURE_MATRIX = 0x4;  /**< __GLcontextRec::TextureMatrix */
+constexpr GLuint _NEW_COLOR_MATRIX = 0x8;  /**< __GLcontextRec::ColorMatrix */
+constexpr GLuint _NEW_ACCUM = 0x10;  /**< __GLcontextRec::Accum */
+constexpr GLuint _NEW_COLOR = 0x20;  /**< __GLcontextRec::Color */
+constexpr GLuint _NEW_DEPTH = 0x40;  /**< __GLcontextRec::Depth */
+constexpr GLuint _NEW_EVAL = 0x80;  /**< __GLcontextRec::Eval, __GLcontextRec::EvalMap */
+constexpr GLuint _NEW_FOG = 0x100;  /**< __GLcontextRec::Fog */
+constexpr GLuint _NEW_HINT = 0x200;  /**< __GLcontextRec::Hint */
+constexpr GLuint _NEW_LIGHT = 0x400;  /**< __GLcontextRec::Light */
+constexpr GLuint _NEW_LINE = 0x800;  /**< __GLcontextRec::Line */
+constexpr GLuint _NEW_PIXEL = 0x1000;  /**< __GLcontextRec::Pixel */
+constexpr GLuint _NEW_POINT = 0x2000;  /**< __GLcontextRec::Point */
+constexpr GLuint _NEW_POLYGON = 0x4000;  /**< __GLcontextRec::Polygon */
+constexpr GLuint _NEW_POLYGONSTIPPLE = 0x8000;  /**< __GLcontextRec::PolygonStipple */
+constexpr GLuint _NEW_SCISSOR = 0x10000;  /**< __GLcontextRec::Scissor */
+constexpr GLuint _NEW_STENCIL = 0x20000;  /**< __GLcontextRec::Stencil */
+constexpr GLuint _NEW_TEXTURE = 0x40000;  /**< __GLcontextRec::Texture */
+constexpr GLuint _NEW_TRANSFORM = 0x80000;  /**< __GLcontextRec::Transform */
+constexpr GLuint _NEW_VIEWPORT = 0x100000;  /**< __GLcontextRec::Viewport */
+constexpr GLuint _NEW_PACKUNPACK = 0x200000;  /**< __GLcontextRec::Pack, __GLcontextRec::Unpack */
+constexpr GLuint _NEW_ARRAY = 0x400000;  /**< __GLcontextRec::Array */
+constexpr GLuint _NEW_RENDERMODE = 0x800000;  /**< __GLcontextRec::RenderMode, __GLcontextRec::Feedback, __GLcontextRec::Select */
+constexpr GLuint _NEW_BUFFERS = 0x1000000;  /**< __GLcontextRec::Visual, __GLcontextRec::DrawBuffer, */
+constexpr GLuint _NEW_MULTISAMPLE = 0x2000000;  /**< __GLcontextRec::Multisample */
+constexpr GLuint _NEW_TRACK_MATRIX = 0x4000000;  /**< __GLcontextRec::VertexProgram */
+constexpr GLuint _NEW_PROGRAM = 0x8000000;  /**< __GLcontextRec::VertexProgram */
+constexpr GLuint _NEW_ALL = ~0u;
 /*@}*/
 
 
@@ -3093,24 +3091,24 @@ struct gl_matrix_stack {
  * Also used to summarize array enabled.
  */
 /*@{*/
-#define _NEW_ARRAY_VERTEX           VERT_BIT_POS
-#define _NEW_ARRAY_WEIGHT           VERT_BIT_WEIGHT
-#define _NEW_ARRAY_NORMAL           VERT_BIT_NORMAL
-#define _NEW_ARRAY_COLOR0           VERT_BIT_COLOR0
-#define _NEW_ARRAY_COLOR1           VERT_BIT_COLOR1
-#define _NEW_ARRAY_FOGCOORD         VERT_BIT_FOG
-#define _NEW_ARRAY_INDEX            VERT_BIT_COLOR_INDEX
-#define _NEW_ARRAY_EDGEFLAG         VERT_BIT_EDGEFLAG
-#define _NEW_ARRAY_TEXCOORD_0       VERT_BIT_TEX0
-#define _NEW_ARRAY_TEXCOORD_1       VERT_BIT_TEX1
-#define _NEW_ARRAY_TEXCOORD_2       VERT_BIT_TEX2
-#define _NEW_ARRAY_TEXCOORD_3       VERT_BIT_TEX3
-#define _NEW_ARRAY_TEXCOORD_4       VERT_BIT_TEX4
-#define _NEW_ARRAY_TEXCOORD_5       VERT_BIT_TEX5
-#define _NEW_ARRAY_TEXCOORD_6       VERT_BIT_TEX6
-#define _NEW_ARRAY_TEXCOORD_7       VERT_BIT_TEX7
-#define _NEW_ARRAY_ATTRIB_0         VERT_BIT_GENERIC0  /* start at bit 16 */
-#define _NEW_ARRAY_ALL              0xffffffff
+constexpr GLuint _NEW_ARRAY_VERTEX = VERT_BIT_POS;
+constexpr GLuint _NEW_ARRAY_WEIGHT = VERT_BIT_WEIGHT;
+constexpr GLuint _NEW_ARRAY_NORMAL = VERT_BIT_NORMAL;
+constexpr GLuint _NEW_ARRAY_COLOR0 = VERT_BIT_COLOR0;
+constexpr GLuint _NEW_ARRAY_COLOR1 = VERT_BIT_COLOR1;
+constexpr GLuint _NEW_ARRAY_FOGCOORD = VERT_BIT_FOG;
+constexpr GLuint _NEW_ARRAY_INDEX = VERT_BIT_COLOR_INDEX;
+constexpr GLuint _NEW_ARRAY_EDGEFLAG = VERT_BIT_EDGEFLAG;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_0 = VERT_BIT_TEX0;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_1 = VERT_BIT_TEX1;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_2 = VERT_BIT_TEX2;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_3 = VERT_BIT_TEX3;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_4 = VERT_BIT_TEX4;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_5 = VERT_BIT_TEX5;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_6 = VERT_BIT_TEX6;
+constexpr GLuint _NEW_ARRAY_TEXCOORD_7 = VERT_BIT_TEX7;
+constexpr GLuint _NEW_ARRAY_ATTRIB_0 = VERT_BIT_GENERIC0;  /* start at bit 16 */
+constexpr GLuint _NEW_ARRAY_ALL = 0xffffffff;
 
 
 #define _NEW_ARRAY_TEXCOORD(i) (_NEW_ARRAY_TEXCOORD_0 << (i))
@@ -3124,21 +3122,21 @@ struct gl_matrix_stack {
  * Set in the __GLcontextRec::_TriangleCaps bitfield.
  */
 /*@{*/
-#define DD_FLATSHADE                0x1
-#define DD_SEPARATE_SPECULAR        0x2
-#define DD_TRI_CULL_FRONT_BACK      0x4 /* special case on some hw */
-#define DD_TRI_LIGHT_TWOSIDE        0x8
-#define DD_TRI_UNFILLED             0x10
-#define DD_TRI_SMOOTH               0x20
-#define DD_TRI_STIPPLE              0x40
-#define DD_TRI_OFFSET               0x80
-#define DD_LINE_SMOOTH              0x100
-#define DD_LINE_STIPPLE             0x200
-#define DD_LINE_WIDTH               0x400
-#define DD_POINT_SMOOTH             0x800
-#define DD_POINT_SIZE               0x1000
-#define DD_POINT_ATTEN              0x2000
-#define DD_TRI_TWOSTENCIL           0x4000
+constexpr GLuint DD_FLATSHADE = 0x1;
+constexpr GLuint DD_SEPARATE_SPECULAR = 0x2;
+constexpr GLuint DD_TRI_CULL_FRONT_BACK = 0x4;  /* special case on some hw */
+constexpr GLuint DD_TRI_LIGHT_TWOSIDE = 0x8;
+constexpr GLuint DD_TRI_UNFILLED = 0x10;
+constexpr GLuint DD_TRI_SMOOTH = 0x20;
+constexpr GLuint DD_TRI_STIPPLE = 0x40;
+constexpr GLuint DD_TRI_OFFSET = 0x80;
+constexpr GLuint DD_LINE_SMOOTH = 0x100;
+constexpr GLuint DD_LINE_STIPPLE = 0x200;
+constexpr GLuint DD_LINE_WIDTH = 0x400;
+constexpr GLuint DD_POINT_SMOOTH = 0x800;
+constexpr GLuint DD_POINT_SIZE = 0x1000;
+constexpr GLuint DD_POINT_ATTEN = 0x2000;
+constexpr GLuint DD_TRI_TWOSTENCIL = 0x4000;
 /*@}*/
 
 
@@ -3146,33 +3144,33 @@ struct gl_matrix_stack {
  * \name Define the state changes under which each of these bits might change
  */
 /*@{*/
-#define _DD_NEW_FLATSHADE                _NEW_LIGHT
-#define _DD_NEW_SEPARATE_SPECULAR        (_NEW_LIGHT | _NEW_FOG | _NEW_PROGRAM)
-#define _DD_NEW_TRI_CULL_FRONT_BACK      _NEW_POLYGON
-#define _DD_NEW_TRI_LIGHT_TWOSIDE        _NEW_LIGHT
-#define _DD_NEW_TRI_UNFILLED             _NEW_POLYGON
-#define _DD_NEW_TRI_SMOOTH               _NEW_POLYGON
-#define _DD_NEW_TRI_STIPPLE              _NEW_POLYGON
-#define _DD_NEW_TRI_OFFSET               _NEW_POLYGON
-#define _DD_NEW_LINE_SMOOTH              _NEW_LINE
-#define _DD_NEW_LINE_STIPPLE             _NEW_LINE
-#define _DD_NEW_LINE_WIDTH               _NEW_LINE
-#define _DD_NEW_POINT_SMOOTH             _NEW_POINT
-#define _DD_NEW_POINT_SIZE               _NEW_POINT
-#define _DD_NEW_POINT_ATTEN              _NEW_POINT
+constexpr GLuint _DD_NEW_FLATSHADE = _NEW_LIGHT;
+constexpr GLuint _DD_NEW_SEPARATE_SPECULAR = (_NEW_LIGHT | _NEW_FOG | _NEW_PROGRAM);
+constexpr GLuint _DD_NEW_TRI_CULL_FRONT_BACK = _NEW_POLYGON;
+constexpr GLuint _DD_NEW_TRI_LIGHT_TWOSIDE = _NEW_LIGHT;
+constexpr GLuint _DD_NEW_TRI_UNFILLED = _NEW_POLYGON;
+constexpr GLuint _DD_NEW_TRI_SMOOTH = _NEW_POLYGON;
+constexpr GLuint _DD_NEW_TRI_STIPPLE = _NEW_POLYGON;
+constexpr GLuint _DD_NEW_TRI_OFFSET = _NEW_POLYGON;
+constexpr GLuint _DD_NEW_LINE_SMOOTH = _NEW_LINE;
+constexpr GLuint _DD_NEW_LINE_STIPPLE = _NEW_LINE;
+constexpr GLuint _DD_NEW_LINE_WIDTH = _NEW_LINE;
+constexpr GLuint _DD_NEW_POINT_SMOOTH = _NEW_POINT;
+constexpr GLuint _DD_NEW_POINT_SIZE = _NEW_POINT;
+constexpr GLuint _DD_NEW_POINT_ATTEN = _NEW_POINT;
 /*@}*/
 
 
-#define _MESA_NEW_NEED_EYE_COORDS         (_NEW_LIGHT |		\
-                                           _NEW_TEXTURE |	\
-                                           _NEW_POINT |		\
-                                           _NEW_PROGRAM |	\
-                                           _NEW_MODELVIEW)
+constexpr GLuint _MESA_NEW_NEED_EYE_COORDS = (_NEW_LIGHT |
+                                               _NEW_TEXTURE |
+                                               _NEW_POINT |
+                                               _NEW_PROGRAM |
+                                               _NEW_MODELVIEW);
 
-#define _MESA_NEW_NEED_NORMALS            (_NEW_LIGHT |		\
-                                           _NEW_TEXTURE)
+constexpr GLuint _MESA_NEW_NEED_NORMALS = (_NEW_LIGHT |
+                                            _NEW_TEXTURE);
 
-#define _IMAGE_NEW_TRANSFER_STATE         (_NEW_PIXEL | _NEW_COLOR_MATRIX)
+constexpr GLuint _IMAGE_NEW_TRANSFER_STATE = (_NEW_PIXEL | _NEW_COLOR_MATRIX);
 
 
 
@@ -3213,7 +3211,7 @@ struct gl_tnl_module {
  * worthwhile adding a tnl private structure just to hold this one bit
  * of information:
  */
-#define MESA_DLIST_DANGLING_REFS     0x1
+constexpr GLuint MESA_DLIST_DANGLING_REFS = 0x1;
 
 /* Provide a location where information about a display list can be
  * collected.  Could be extended with driverPrivate structures,

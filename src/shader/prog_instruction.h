@@ -47,46 +47,48 @@
  * Do not change!
  */
 /*@{*/
-#define SWIZZLE_X    0
-#define SWIZZLE_Y    1
-#define SWIZZLE_Z    2
-#define SWIZZLE_W    3
-#define SWIZZLE_ZERO 4   /**< For SWZ instruction only */
-#define SWIZZLE_ONE  5   /**< For SWZ instruction only */
-#define SWIZZLE_NIL  7   /**< used during shader code gen (undefined value) */
+constexpr GLuint SWIZZLE_X    = 0;
+constexpr GLuint SWIZZLE_Y    = 1;
+constexpr GLuint SWIZZLE_Z    = 2;
+constexpr GLuint SWIZZLE_W    = 3;
+constexpr GLuint SWIZZLE_ZERO = 4; /**< For SWZ instruction only */
+constexpr GLuint SWIZZLE_ONE  = 5; /**< For SWZ instruction only */
+constexpr GLuint SWIZZLE_NIL  = 7; /**< used during shader code gen (undefined value) */
 /*@}*/
 
-#define MAKE_SWIZZLE4(a,b,c,d) (((a)<<0) | ((b)<<3) | ((c)<<6) | ((d)<<9))
-#define SWIZZLE_NOOP           MAKE_SWIZZLE4(0,1,2,3)
-#define GET_SWZ(swz, idx)      (((swz) >> ((idx)*3)) & 0x7)
-#define GET_BIT(msk, idx)      (((msk) >> (idx)) & 0x1)
+constexpr GLuint MAKE_SWIZZLE4(GLuint a, GLuint b, GLuint c, GLuint d) {
+    return (a << 0) | (b << 3) | (c << 6) | (d << 9);
+}
+constexpr GLuint SWIZZLE_NOOP = (0<<0)|(1<<3)|(2<<6)|(3<<9);
+constexpr GLuint GET_SWZ(GLuint swz, GLuint idx) { return (swz >> (idx*3)) & 0x7; }
+constexpr GLuint GET_BIT(GLuint msk, GLuint idx) { return (msk >> idx) & 0x1; }
 
-#define SWIZZLE_XYZW MAKE_SWIZZLE4(SWIZZLE_X, SWIZZLE_Y, SWIZZLE_Z, SWIZZLE_W)
-#define SWIZZLE_XXXX MAKE_SWIZZLE4(SWIZZLE_X, SWIZZLE_X, SWIZZLE_X, SWIZZLE_X)
-#define SWIZZLE_YYYY MAKE_SWIZZLE4(SWIZZLE_Y, SWIZZLE_Y, SWIZZLE_Y, SWIZZLE_Y)
-#define SWIZZLE_ZZZZ MAKE_SWIZZLE4(SWIZZLE_Z, SWIZZLE_Z, SWIZZLE_Z, SWIZZLE_Z)
-#define SWIZZLE_WWWW MAKE_SWIZZLE4(SWIZZLE_W, SWIZZLE_W, SWIZZLE_W, SWIZZLE_W)
+constexpr GLuint SWIZZLE_XYZW = (0<<0)|(1<<3)|(2<<6)|(3<<9);
+constexpr GLuint SWIZZLE_XXXX = (0<<0)|(0<<3)|(0<<6)|(0<<9);
+constexpr GLuint SWIZZLE_YYYY = (1<<0)|(1<<3)|(1<<6)|(1<<9);
+constexpr GLuint SWIZZLE_ZZZZ = (2<<0)|(2<<3)|(2<<6)|(2<<9);
+constexpr GLuint SWIZZLE_WWWW = (3<<0)|(3<<3)|(3<<6)|(3<<9);
 
 
 /**
  * Writemask values, 1 bit per component.
  */
 /*@{*/
-#define WRITEMASK_X     0x1
-#define WRITEMASK_Y     0x2
-#define WRITEMASK_XY    0x3
-#define WRITEMASK_Z     0x4
-#define WRITEMASK_XZ    0x5
-#define WRITEMASK_YZ    0x6
-#define WRITEMASK_XYZ   0x7
-#define WRITEMASK_W     0x8
-#define WRITEMASK_XW    0x9
-#define WRITEMASK_YW    0xa
-#define WRITEMASK_XYW   0xb
-#define WRITEMASK_ZW    0xc
-#define WRITEMASK_XZW   0xd
-#define WRITEMASK_YZW   0xe
-#define WRITEMASK_XYZW  0xf
+constexpr GLuint WRITEMASK_X    = 0x1;
+constexpr GLuint WRITEMASK_Y    = 0x2;
+constexpr GLuint WRITEMASK_XY   = 0x3;
+constexpr GLuint WRITEMASK_Z    = 0x4;
+constexpr GLuint WRITEMASK_XZ   = 0x5;
+constexpr GLuint WRITEMASK_YZ   = 0x6;
+constexpr GLuint WRITEMASK_XYZ  = 0x7;
+constexpr GLuint WRITEMASK_W    = 0x8;
+constexpr GLuint WRITEMASK_XW   = 0x9;
+constexpr GLuint WRITEMASK_YW   = 0xa;
+constexpr GLuint WRITEMASK_XYW  = 0xb;
+constexpr GLuint WRITEMASK_ZW   = 0xc;
+constexpr GLuint WRITEMASK_XZW  = 0xd;
+constexpr GLuint WRITEMASK_YZW  = 0xe;
+constexpr GLuint WRITEMASK_XYZW = 0xf;
 /*@}*/
 
 
@@ -94,15 +96,15 @@
  * Condition codes
  */
 /*@{*/
-#define COND_GT  1  /**< greater than zero */
-#define COND_EQ  2  /**< equal to zero */
-#define COND_LT  3  /**< less than zero */
-#define COND_UN  4  /**< unordered (NaN) */
-#define COND_GE  5  /**< greater then or equal to zero */
-#define COND_LE  6  /**< less then or equal to zero */
-#define COND_NE  7  /**< not equal to zero */
-#define COND_TR  8  /**< always true */
-#define COND_FL  9  /**< always false */
+constexpr GLuint COND_GT = 1; /**< greater than zero */
+constexpr GLuint COND_EQ = 2; /**< equal to zero */
+constexpr GLuint COND_LT = 3; /**< less than zero */
+constexpr GLuint COND_UN = 4; /**< unordered (NaN) */
+constexpr GLuint COND_GE = 5; /**< greater then or equal to zero */
+constexpr GLuint COND_LE = 6; /**< less then or equal to zero */
+constexpr GLuint COND_NE = 7; /**< not equal to zero */
+constexpr GLuint COND_TR = 8; /**< always true */
+constexpr GLuint COND_FL = 9; /**< always false */
 /*@}*/
 
 
@@ -110,9 +112,9 @@
  * Instruction precision for GL_NV_fragment_program
  */
 /*@{*/
-#define FLOAT32  0x1
-#define FLOAT16  0x2
-#define FIXED12  0x4
+constexpr GLuint FLOAT32 = 0x1;
+constexpr GLuint FLOAT16 = 0x2;
+constexpr GLuint FIXED12 = 0x4;
 /*@}*/
 
 
@@ -120,9 +122,9 @@
  * Saturation modes when storing values.
  */
 /*@{*/
-#define SATURATE_OFF            0
-#define SATURATE_ZERO_ONE       1
-#define SATURATE_PLUS_MINUS_ONE 2
+constexpr GLuint SATURATE_OFF            = 0;
+constexpr GLuint SATURATE_ZERO_ONE       = 1;
+constexpr GLuint SATURATE_PLUS_MINUS_ONE = 2;
 /*@}*/
 
 
@@ -130,12 +132,12 @@
  * Per-component negation masks
  */
 /*@{*/
-#define NEGATE_X    0x1
-#define NEGATE_Y    0x2
-#define NEGATE_Z    0x4
-#define NEGATE_W    0x8
-#define NEGATE_XYZW 0xf
-#define NEGATE_NONE 0x0
+constexpr GLuint NEGATE_X    = 0x1;
+constexpr GLuint NEGATE_Y    = 0x2;
+constexpr GLuint NEGATE_Z    = 0x4;
+constexpr GLuint NEGATE_W    = 0x8;
+constexpr GLuint NEGATE_XYZW = 0xf;
+constexpr GLuint NEGATE_NONE = 0x0;
 /*@}*/
 
 

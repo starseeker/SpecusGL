@@ -754,7 +754,7 @@ void GLAPIENTRY
 _mesa_GetProgramStringARB(GLenum target, GLenum pname, GLvoid *string)
 {
     const struct gl_program *prog;
-    char *dst = (char *) string;
+    char *dst = static_cast<char *>(string);
     GET_CURRENT_CONTEXT(ctx);
 
     if (!ctx->_CurrentProgram)

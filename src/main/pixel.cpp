@@ -361,16 +361,16 @@ _mesa_PixelMapfv(GLenum map, GLsizei mapsize, const GLfloat *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glPixelMapfv(PBO is mapped)");
 	    return;
 	}
-	values = (const GLfloat *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<const GLfloat *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }
@@ -419,16 +419,16 @@ _mesa_PixelMapuiv(GLenum map, GLsizei mapsize, const GLuint *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glPixelMapuiv(PBO is mapped)");
 	    return;
 	}
-	values = (const GLuint *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<const GLuint *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }
@@ -491,16 +491,16 @@ _mesa_PixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glPixelMapusv(PBO is mapped)");
 	    return;
 	}
-	values = (const GLushort *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<const GLushort *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }
@@ -557,16 +557,16 @@ _mesa_GetPixelMapfv(GLenum map, GLfloat *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glGetPixelMapfv(PBO is mapped)");
 	    return;
 	}
-	values = (GLfloat *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<GLfloat *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }
@@ -616,16 +616,16 @@ _mesa_GetPixelMapuiv(GLenum map, GLuint *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glGetPixelMapuiv(PBO is mapped)");
 	    return;
 	}
-	values = (GLuint *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<GLuint *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }
@@ -676,16 +676,16 @@ _mesa_GetPixelMapusv(GLenum map, GLushort *values)
 	}
 	/* restore */
 	ctx->DefaultPacking.BufferObj = ctx->Array.NullBufferObj;
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glGetPixelMapusv(PBO is mapped)");
 	    return;
 	}
-	values = (GLushort *) ADD_POINTERS(buf, values);
+	values = reinterpret_cast<GLushort *>(ADD_POINTERS(buf, values));
     } else if (!values) {
 	return;
     }

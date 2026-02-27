@@ -41,20 +41,20 @@
  * XXX We should replace these flags with the FRAG_BIT_ values someday...
  */
 /*@{*/
-#define SPAN_RGBA         0x001
-#define SPAN_SPEC         0x002
-#define SPAN_INDEX        0x004
-#define SPAN_Z            0x008
-#define SPAN_W            0x010
-#define SPAN_FOG          0x020
-#define SPAN_TEXTURE      0x040
-#define SPAN_INT_TEXTURE  0x080
-#define SPAN_LAMBDA       0x100
-#define SPAN_COVERAGE     0x200
-#define SPAN_FLAT         0x400  /**< flat shading? */
-#define SPAN_XY           0x800
-#define SPAN_MASK        0x1000
-#define SPAN_VARYING     0x2000
+constexpr GLbitfield SPAN_RGBA        = 0x001;
+constexpr GLbitfield SPAN_SPEC        = 0x002;
+constexpr GLbitfield SPAN_INDEX       = 0x004;
+constexpr GLbitfield SPAN_Z           = 0x008;
+constexpr GLbitfield SPAN_W           = 0x010;
+constexpr GLbitfield SPAN_FOG         = 0x020;
+constexpr GLbitfield SPAN_TEXTURE     = 0x040;
+constexpr GLbitfield SPAN_INT_TEXTURE = 0x080;
+constexpr GLbitfield SPAN_LAMBDA      = 0x100;
+constexpr GLbitfield SPAN_COVERAGE    = 0x200;
+constexpr GLbitfield SPAN_FLAT        = 0x400; /**< flat shading? */
+constexpr GLbitfield SPAN_XY          = 0x800;
+constexpr GLbitfield SPAN_MASK        = 0x1000;
+constexpr GLbitfield SPAN_VARYING     = 0x2000;
 /*@}*/
 
 

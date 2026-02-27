@@ -60,7 +60,7 @@ update_array(GLcontext *ctx, struct gl_client_array *array,
     array->Stride = stride;
     array->StrideB = stride ? stride : elementSize;
     array->Normalized = normalized;
-    array->Ptr = (const GLubyte *) ptr;
+    array->Ptr = static_cast<const GLubyte *>(ptr);
 #if FEATURE_ARB_vertex_buffer_object
     if (array->BufferObj->unref()) {
 	ASSERT(array->BufferObj->Name);
@@ -823,7 +823,7 @@ _mesa_InterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer)
     if (tflag) {
 	_mesa_EnableClientState(GL_TEXTURE_COORD_ARRAY);
 	_mesa_TexCoordPointer(tcomps, GL_FLOAT, stride,
-			      (GLubyte *) pointer + toffset);
+			      static_cast<const GLubyte *>(pointer) + toffset);
     } else {
 	_mesa_DisableClientState(GL_TEXTURE_COORD_ARRAY);
     }
@@ -832,7 +832,7 @@ _mesa_InterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer)
     if (cflag) {
 	_mesa_EnableClientState(GL_COLOR_ARRAY);
 	_mesa_ColorPointer(ccomps, ctype, stride,
-			   (GLubyte *) pointer + coffset);
+			   static_cast<const GLubyte *>(pointer) + coffset);
     } else {
 	_mesa_DisableClientState(GL_COLOR_ARRAY);
     }
@@ -841,7 +841,7 @@ _mesa_InterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer)
     /* Normals */
     if (nflag) {
 	_mesa_EnableClientState(GL_NORMAL_ARRAY);
-	_mesa_NormalPointer(GL_FLOAT, stride, (GLubyte *) pointer + noffset);
+	_mesa_NormalPointer(GL_FLOAT, stride, static_cast<const GLubyte *>(pointer) + noffset);
     } else {
 	_mesa_DisableClientState(GL_NORMAL_ARRAY);
     }
@@ -849,7 +849,7 @@ _mesa_InterleavedArrays(GLenum format, GLsizei stride, const GLvoid *pointer)
     /* Vertices */
     _mesa_EnableClientState(GL_VERTEX_ARRAY);
     _mesa_VertexPointer(vcomps, GL_FLOAT, stride,
-			(GLubyte *) pointer + voffset);
+			static_cast<const GLubyte *>(pointer) + voffset);
 }
 
 
@@ -948,7 +948,7 @@ _mesa_MultiModeDrawArraysIBM(const GLenum * mode, const GLint * first,
 
     for (i = 0 ; i < primcount ; i++) {
 	if (count[i] > 0) {
-	    GLenum m = *((GLenum *)((GLubyte *) mode + i * modestride));
+	    GLenum m = *reinterpret_cast<const GLenum *>(reinterpret_cast<const GLubyte *>(mode) + i * modestride);
 	    CALL_DrawArrays(ctx->Exec, (m, first[i], count[i]));
 	}
     }
@@ -970,7 +970,7 @@ _mesa_MultiModeDrawElementsIBM(const GLenum * mode, const GLsizei * count,
 
     for (i = 0 ; i < primcount ; i++) {
 	if (count[i] > 0) {
-	    GLenum m = *((GLenum *)((GLubyte *) mode + i * modestride));
+	    GLenum m = *reinterpret_cast<const GLenum *>(reinterpret_cast<const GLubyte *>(mode) + i * modestride);
 	    CALL_DrawElements(ctx->Exec, (m, count[i], type, indices[i]));
 	}
     }

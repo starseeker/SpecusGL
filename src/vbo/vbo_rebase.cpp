@@ -66,7 +66,7 @@ static void *rebase_##TYPE( const void *ptr,			\
    for (i = 0; i < count; i++)  				\
       tmp_indices[i] = in[i] - min_index;			\
 								\
-   return (void *)tmp_indices;					\
+   return static_cast<void *>(tmp_indices);					\
 }
 
 

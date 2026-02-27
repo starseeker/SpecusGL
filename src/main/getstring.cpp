@@ -77,9 +77,9 @@ _mesa_GetString(GLenum name)
 
     switch (name) {
 	case GL_VENDOR:
-	    return (const GLubyte *) vendor;
+	    return reinterpret_cast<const GLubyte *>(vendor);
 	case GL_RENDERER:
-	    return (const GLubyte *) renderer;
+	    return reinterpret_cast<const GLubyte *>(renderer);
 	case GL_VERSION:
 	    if (ctx->Extensions.ARB_multisample &&
 		ctx->Extensions.ARB_multitexture &&
@@ -119,21 +119,21 @@ _mesa_GetString(GLenum name)
 			    if (ctx->Extensions.ARB_shading_language_120 &&
 				ctx->Extensions.EXT_pixel_buffer_object &&
 				ctx->Extensions.EXT_texture_sRGB) {
-				return (const GLubyte *) version_2_1;
+				return reinterpret_cast<const GLubyte *>(version_2_1);
 			    } else {
-				return (const GLubyte *) version_2_0;
+				return reinterpret_cast<const GLubyte *>(version_2_0);
 			    }
 			} else {
-			    return (const GLubyte *) version_1_5;
+			    return reinterpret_cast<const GLubyte *>(version_1_5);
 			}
 		    } else {
-			return (const GLubyte *) version_1_4;
+			return reinterpret_cast<const GLubyte *>(version_1_4);
 		    }
 		} else {
-		    return (const GLubyte *) version_1_3;
+		    return reinterpret_cast<const GLubyte *>(version_1_3);
 		}
 	    } else {
-		return (const GLubyte *) version_1_2;
+		return reinterpret_cast<const GLubyte *>(version_1_2);
 	    }
 	case GL_EXTENSIONS:
 	    if (ctx->Extensions.String.empty())
@@ -142,7 +142,7 @@ _mesa_GetString(GLenum name)
 #if FEATURE_ARB_shading_language_100
 	case GL_SHADING_LANGUAGE_VERSION_ARB:
 	    if (ctx->Extensions.ARB_shading_language_100)
-		return (const GLubyte *) sl_version_110;
+		return reinterpret_cast<const GLubyte *>(sl_version_110);
 	    goto error;
 #endif
 #if FEATURE_NV_fragment_program || FEATURE_ARB_fragment_program || \
@@ -152,7 +152,7 @@ _mesa_GetString(GLenum name)
 		ctx->Extensions.ARB_fragment_program ||
 		ctx->Extensions.NV_vertex_program ||
 		ctx->Extensions.ARB_vertex_program) {
-		return (const GLubyte *) ctx->Program.ErrorString.c_str();
+		return reinterpret_cast<const GLubyte *>(ctx->Program.ErrorString.c_str());
 	    }
 	    /* FALL-THROUGH */
 #endif

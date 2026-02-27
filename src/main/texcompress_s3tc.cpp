@@ -104,7 +104,7 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
 
     if (ext_tx_compress_dxtn) {
 	(*ext_tx_compress_dxtn)(3, srcWidth, srcHeight, pixels,
@@ -160,7 +160,7 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
     if (ext_tx_compress_dxtn) {
 	(*ext_tx_compress_dxtn)(4, srcWidth, srcHeight, pixels,
 				GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,
@@ -215,7 +215,7 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
     if (ext_tx_compress_dxtn) {
 	(*ext_tx_compress_dxtn)(4, srcWidth, srcHeight, pixels,
 				GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,
@@ -270,7 +270,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
     if (ext_tx_compress_dxtn) {
 	(*ext_tx_compress_dxtn)(4, srcWidth, srcHeight, pixels,
 				GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,
@@ -291,7 +291,7 @@ fetch_texel_2d_rgb_dxt1_chk(const struct gl_texture_image *texImage,
     (void) k;
     if (fetch_ext_rgb_dxt1) {
 	ASSERT(sizeof(GLchan) == sizeof(GLubyte));
-	fetch_ext_rgb_dxt1(texImage->RowStride, (GLubyte *)(texImage)->Data, i, j, texel);
+	fetch_ext_rgb_dxt1(texImage->RowStride, static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
 
@@ -328,7 +328,7 @@ fetch_texel_2d_rgba_dxt1_chk(const struct gl_texture_image *texImage,
     (void) k;
     if (fetch_ext_rgba_dxt1) {
 	fetch_ext_rgba_dxt1(texImage->RowStride,
-			    (GLubyte *)(texImage)->Data, i, j, texel);
+			    static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
     _mesa_debug(nullptr, "attempted to decode s3tc texture without library available\n");
@@ -364,7 +364,7 @@ fetch_texel_2d_rgba_dxt3_chk(const struct gl_texture_image *texImage,
     (void) k;
     if (fetch_ext_rgba_dxt3) {
 	ASSERT(sizeof(GLchan) == sizeof(GLubyte));
-	fetch_ext_rgba_dxt3(texImage->RowStride, (GLubyte *)(texImage)->Data, i, j, texel);
+	fetch_ext_rgba_dxt3(texImage->RowStride, static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
     _mesa_debug(nullptr, "attempted to decode s3tc texture without library available\n");
@@ -399,7 +399,7 @@ fetch_texel_2d_rgba_dxt5_chk(const struct gl_texture_image *texImage,
 {
     (void) k;
     if (fetch_ext_rgba_dxt5) {
-	fetch_ext_rgba_dxt5(texImage->RowStride, (GLubyte *)(texImage)->Data, i, j, texel);
+	fetch_ext_rgba_dxt5(texImage->RowStride, static_cast<GLubyte *>(texImage->Data), i, j, texel);
 	return 0;
     }
 

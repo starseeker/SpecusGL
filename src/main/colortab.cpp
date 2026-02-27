@@ -187,9 +187,9 @@ store_colortable_entries(GLcontext *ctx, struct gl_color_table *table,
 			"glColor[Sub]Table(bad PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glColor[Sub]Table(PBO mapped)");
@@ -748,9 +748,9 @@ _mesa_GetColorTable(GLenum target, GLenum format,
 			"glGetColorTable(invalid PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION,

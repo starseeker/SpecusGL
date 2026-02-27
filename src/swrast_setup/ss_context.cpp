@@ -87,7 +87,7 @@ _swsetup_RenderPrimitive(GLcontext *ctx, GLenum mode)
  * Helper macros for setup_vertex_format()
  */
 #define SWZ ((SWvertex *)0)
-#define SWOffset(MEMBER) (((char *)&(SWZ->MEMBER)) - ((char *)SWZ))
+#define SWOffset(MEMBER) (((char *)&(SWZ->MEMBER)) - (reinterpret_cast<char *>(SWZ)))
 
 #define EMIT_ATTR( ATTR, STYLE, MEMBER )	\
 do {						\

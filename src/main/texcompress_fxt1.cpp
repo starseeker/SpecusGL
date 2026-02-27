@@ -105,7 +105,7 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
 
     fxt1_encode(srcWidth, srcHeight, 3, pixels, srcRowStride,
 		dst, dstRowStride);
@@ -158,7 +158,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 
     dst = _mesa_compressed_image_address(dstXoffset, dstYoffset, 0,
 					 dstFormat->MesaFormat,
-					 texWidth, (GLubyte *) dstAddr);
+					 texWidth, static_cast<GLubyte *>(dstAddr));
 
     fxt1_encode(srcWidth, srcHeight, 4, pixels, srcRowStride,
 		dst, dstRowStride);
@@ -285,7 +285,7 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
 #define LL_RMS_D 10 /* fault tolerance (maximum delta) */
 #define LL_RMS_E 255 /* fault tolerance (maximum error) */
 #define ALPHA_TS 2 /* alpha threshold: (255 - ALPHA_TS) deemed opaque */
-#define ISTBLACK(v) (*((GLuint *)(v)) == 0)
+#define ISTBLACK(v) (*reinterpret_cast<const GLuint *>(v) == 0)
 
 
 /*
@@ -957,7 +957,7 @@ fxt1_quantize_HI(GLuint *cc,
     /* add in texels */
     for (k = N_TEXELS - 1; k >= 0; k--) {
 	GLint t = k * 3;
-	GLuint *kk = (GLuint *)((char *)cc + t / 8);
+	GLuint *kk = reinterpret_cast<GLuint *>(reinterpret_cast<char *>(cc) + t / 8);
 	GLint texel = n_vect + 1; /* transparent black */
 
 	if (!ISTBLACK(input[k])) {
@@ -1336,7 +1336,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 {
     GLuint x, y;
     const GLubyte *data;
-    GLuint *encoded = (GLuint *)dest;
+    GLuint *encoded = static_cast<GLuint *>(dest);
     GLchan *newSourceGLchan = nullptr;  /* upscaled buffer */
     GLubyte *newSourceGLubyte = nullptr; /* channel-converted buffer */
 
@@ -1381,7 +1381,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
 	source = dest;  /* the new, GLubyte incoming image */
     }
 
-    data = (const GLubyte *) source;
+    data = static_cast<const GLubyte *>(source);
     destRowStride = (destRowStride - width * 2) / 4;
     for (y = 0; y < height; y += 4) {
 	GLuint offs = 0 + (y + 0) * srcRowStride;
@@ -1434,7 +1434,7 @@ static const GLubyte _rgb_scale_6[] = {
 };
 
 
-#define CC_SEL(cc, which) (((GLuint *)(cc))[(which) / 32] >> ((which) & 31))
+#define CC_SEL(cc, which) ((reinterpret_cast<const GLuint *>(cc))[(which) / 32] >> ((which) & 31))
 #define UP5(c) _rgb_scale_5[(c) & 31]
 #define UP6(c, b) _rgb_scale_6[(((c) & 31) << 1) | ((b) & 1)]
 #define LERP(n, t, c0, c1) (((n) - (t)) * (c0) + (t) * (c1) + (n) / 2) / (n)
@@ -1446,14 +1446,14 @@ fxt1_decode_1HI(const GLubyte *code, GLint t, GLchan *rgba)
     const GLuint *cc;
 
     t *= 3;
-    cc = (const GLuint *)(code + t / 8);
+    cc = reinterpret_cast<const GLuint *>(code + t / 8);
     t = (cc[0] >> (t & 7)) & 7;
 
     if (t == 7) {
 	rgba[RCOMP] = rgba[GCOMP] = rgba[BCOMP] = rgba[ACOMP] = 0;
     } else {
 	GLubyte r, g, b;
-	cc = (const GLuint *)(code + 12);
+	cc = reinterpret_cast<const GLuint *>(code + 12);
 	if (t == 0) {
 	    b = UP5(CC_SEL(cc, 0));
 	    g = UP5(CC_SEL(cc, 5));
@@ -1481,7 +1481,7 @@ fxt1_decode_1CHROMA(const GLubyte *code, GLint t, GLchan *rgba)
     const GLuint *cc;
     GLuint kk;
 
-    cc = (const GLuint *)code;
+    cc = reinterpret_cast<const GLuint *>(code);
     if (t & 16) {
 	cc++;
 	t &= 15;
@@ -1489,7 +1489,7 @@ fxt1_decode_1CHROMA(const GLubyte *code, GLint t, GLchan *rgba)
     t = (cc[0] >> (t * 2)) & 3;
 
     t *= 15;
-    cc = (const GLuint *)(code + 8 + t / 8);
+    cc = reinterpret_cast<const GLuint *>(code + 8 + t / 8);
     kk = cc[0] >> (t & 7);
     rgba[BCOMP] = UBYTE_TO_CHAN(UP5(kk));
     rgba[GCOMP] = UBYTE_TO_CHAN(UP5(kk >> 5));
@@ -1505,12 +1505,12 @@ fxt1_decode_1MIXED(const GLubyte *code, GLint t, GLchan *rgba)
     GLuint col[2][3];
     GLint glsb, selb;
 
-    cc = (const GLuint *)code;
+    cc = reinterpret_cast<const GLuint *>(code);
     if (t & 16) {
 	t &= 15;
 	t = (cc[1] >> (t * 2)) & 3;
 	/* col 2 */
-	col[0][BCOMP] = (*(const GLuint *)(code + 11)) >> 6;
+	col[0][BCOMP] = (*reinterpret_cast<const GLuint *>(code + 11)) >> 6;
 	col[0][GCOMP] = CC_SEL(cc, 99);
 	col[0][RCOMP] = CC_SEL(cc, 104);
 	/* col 3 */
@@ -1590,7 +1590,7 @@ fxt1_decode_1ALPHA(const GLubyte *code, GLint t, GLchan *rgba)
     const GLuint *cc;
     GLubyte r, g, b, a;
 
-    cc = (const GLuint *)code;
+    cc = reinterpret_cast<const GLuint *>(code);
     if (CC_SEL(cc, 124) & 1) {
 	/* lerp == 1 */
 	GLuint col0[4];
@@ -1599,7 +1599,7 @@ fxt1_decode_1ALPHA(const GLubyte *code, GLint t, GLchan *rgba)
 	    t &= 15;
 	    t = (cc[1] >> (t * 2)) & 3;
 	    /* col 2 */
-	    col0[BCOMP] = (*(const GLuint *)(code + 11)) >> 6;
+	    col0[BCOMP] = (*reinterpret_cast<const GLuint *>(code + 11)) >> 6;
 	    col0[GCOMP] = CC_SEL(cc, 99);
 	    col0[RCOMP] = CC_SEL(cc, 104);
 	    col0[ACOMP] = CC_SEL(cc, 119);
@@ -1642,10 +1642,10 @@ fxt1_decode_1ALPHA(const GLubyte *code, GLint t, GLchan *rgba)
 	    r = g = b = a = 0;
 	} else {
 	    GLuint kk;
-	    cc = (const GLuint *)code;
+	    cc = reinterpret_cast<const GLuint *>(code);
 	    a = UP5(cc[3] >> (t * 5 + 13));
 	    t *= 15;
-	    cc = (const GLuint *)(code + 8 + t / 8);
+	    cc = reinterpret_cast<const GLuint *>(code + 8 + t / 8);
 	    kk = cc[0] >> (t & 7);
 	    b = UP5(kk);
 	    g = UP5(kk >> 5);
@@ -1674,7 +1674,7 @@ fxt1_decode_1(const void *texture, GLint stride,  /* in pixels */
 	fxt1_decode_1MIXED   /* mixed     = "1??" */
     };
 
-    const GLubyte *code = (const GLubyte *)texture +
+    const GLubyte *code = static_cast<const GLubyte *>(texture) +
 			  ((j / 4) * (stride / 8) + (i / 8)) * 16;
     GLint mode = CC_SEL(code, 125);
     GLint t = i & 7;

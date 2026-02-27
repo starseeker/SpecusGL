@@ -940,15 +940,15 @@ _mesa_PopAttrib(void)
 		    _mesa_light(ctx, i, GL_POSITION, l->EyePosition);
 		    _mesa_light(ctx, i, GL_SPOT_DIRECTION, l->EyeDirection);
 		    params[0] = l->SpotExponent;
-		    _mesa_light(ctx, i, GL_SPOT_EXPONENT, (const GLfloat *)params);
+		    _mesa_light(ctx, i, GL_SPOT_EXPONENT, static_cast<const GLfloat *>(params));
 		    params[0] = l->SpotCutoff;
-		    _mesa_light(ctx, i, GL_SPOT_CUTOFF, (const GLfloat *)params);
+		    _mesa_light(ctx, i, GL_SPOT_CUTOFF, static_cast<const GLfloat *>(params));
 		    params[0] = l->ConstantAttenuation;
-		    _mesa_light(ctx, i, GL_CONSTANT_ATTENUATION, (const GLfloat *)params);
+		    _mesa_light(ctx, i, GL_CONSTANT_ATTENUATION, static_cast<const GLfloat *>(params));
 		    params[0] = l->LinearAttenuation;
-		    _mesa_light(ctx, i, GL_LINEAR_ATTENUATION, (const GLfloat *)params);
+		    _mesa_light(ctx, i, GL_LINEAR_ATTENUATION, static_cast<const GLfloat *>(params));
 		    params[0] = l->QuadraticAttenuation;
-		    _mesa_light(ctx, i, GL_QUADRATIC_ATTENUATION, (const GLfloat *)params);
+		    _mesa_light(ctx, i, GL_QUADRATIC_ATTENUATION, static_cast<const GLfloat *>(params));
 		}
 		/* light model */
 		_mesa_LightModelfv(GL_LIGHT_MODEL_AMBIENT,
@@ -1043,7 +1043,7 @@ _mesa_PopAttrib(void)
 		std::copy(static_cast<const GLuint *>(data), static_cast<const GLuint *>(data) + 32, ctx->PolygonStipple);
 		ctx->NewState |= _NEW_POLYGONSTIPPLE;
 		if (ctx->Driver.PolygonStipple)
-		    ctx->Driver.PolygonStipple(ctx, (const GLubyte *) data);
+		    ctx->Driver.PolygonStipple(ctx, static_cast<const GLubyte *>(data));
 		break;
 	    case GL_SCISSOR_BIT: {
 		const struct gl_scissor_attrib *scissor;

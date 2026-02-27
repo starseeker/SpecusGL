@@ -517,7 +517,7 @@ apply_stencil_op_to_pixels(GLcontext *ctx,
     const GLstencil wrtmask = ctx->Stencil.WriteMask[face];
     const GLstencil invmask = (GLstencil)(~wrtmask);
     GLuint i;
-    GLstencil *stencilStart = (GLubyte *) rb->Data;
+    GLstencil *stencilStart = static_cast<GLubyte *>(rb->Data);
     const GLuint stride = rb->Width;
 
     ASSERT(rb->GetPointer(ctx, 0, 0));
@@ -1127,7 +1127,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    if (rb->DataType == GL_UNSIGNED_BYTE) {
 		GLint i, j;
 		for (i = 0; i < height; i++) {
-		    GLubyte *stencil = (GLubyte*) rb->GetPointer(ctx, x, y + i);
+		    GLubyte *stencil = static_cast<GLubyte*>(rb->GetPointer(ctx, x, y + i));
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
@@ -1135,7 +1135,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    } else {
 		GLint i, j;
 		for (i = 0; i < height; i++) {
-		    GLushort *stencil = (GLushort*) rb->GetPointer(ctx, x, y + i);
+		    GLushort *stencil = static_cast<GLushort*>(rb->GetPointer(ctx, x, y + i));
 		    for (j = 0; j < width; j++) {
 			stencil[j] = (stencil[j] & invMask) | clearVal;
 		    }
@@ -1146,7 +1146,7 @@ _swrast_clear_stencil_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    if (width == (GLint) rb->Width && rb->DataType == GL_UNSIGNED_BYTE) {
 		/* optimized case */
 		/* Note: bottom-to-top raster assumed! */
-		GLubyte *stencil = (GLubyte *) rb->GetPointer(ctx, x, y);
+		GLubyte *stencil = static_cast<GLubyte *>(rb->GetPointer(ctx, x, y));
 		GLuint len = width * height * sizeof(GLubyte);
 		memset(stencil, clearVal, len);
 	    } else {

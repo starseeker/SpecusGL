@@ -42,7 +42,7 @@
 static inline void insert_4f_viewport_4(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -54,7 +54,7 @@ static inline void insert_4f_viewport_4(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_4f_viewport_3(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -66,7 +66,7 @@ static inline void insert_4f_viewport_3(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_4f_viewport_2(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -78,7 +78,7 @@ static inline void insert_4f_viewport_2(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_4f_viewport_1(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -90,7 +90,7 @@ static inline void insert_4f_viewport_1(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_3f_viewport_3(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -101,7 +101,7 @@ static inline void insert_3f_viewport_3(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_3f_viewport_2(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -112,7 +112,7 @@ static inline void insert_3f_viewport_2(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_3f_viewport_1(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -123,7 +123,7 @@ static inline void insert_3f_viewport_1(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_2f_viewport_2(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -133,7 +133,7 @@ static inline void insert_2f_viewport_2(const struct tnl_clipspace_attr *a, GLub
 static inline void insert_2f_viewport_1(const struct tnl_clipspace_attr *a, GLubyte *v,
 					const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)v;
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = vp[0] * in[0] + vp[12];
@@ -147,7 +147,7 @@ static inline void insert_2f_viewport_1(const struct tnl_clipspace_attr *a, GLub
 
 static inline void insert_4f_4(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -158,7 +158,7 @@ static inline void insert_4f_4(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_4f_3(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -169,7 +169,7 @@ static inline void insert_4f_3(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_4f_2(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -180,7 +180,7 @@ static inline void insert_4f_2(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_4f_1(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -191,7 +191,7 @@ static inline void insert_4f_1(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_3f_xyw_4(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -209,7 +209,7 @@ static inline void insert_3f_xyw_err(const struct tnl_clipspace_attr *a, GLubyte
 
 static inline void insert_3f_3(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -219,7 +219,7 @@ static inline void insert_3f_3(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_3f_2(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -229,7 +229,7 @@ static inline void insert_3f_2(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_3f_1(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -240,7 +240,7 @@ static inline void insert_3f_1(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_2f_2(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -249,7 +249,7 @@ static inline void insert_2f_2(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_2f_1(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -258,7 +258,7 @@ static inline void insert_2f_1(const struct tnl_clipspace_attr *a, GLubyte *v, c
 
 static inline void insert_1f_1(const struct tnl_clipspace_attr *a, GLubyte *v, const GLfloat *in)
 {
-    GLfloat *out = (GLfloat *)(v);
+    GLfloat *out = reinterpret_cast<GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -548,7 +548,7 @@ static inline void insert_1ub_1f_1(const struct tnl_clipspace_attr *a, GLubyte *
 static void extract_4f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out,
 				const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     /* Although included for completeness, the position coordinate is
@@ -563,7 +563,7 @@ static void extract_4f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out
 static void extract_3f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out,
 				const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = (in[0] - vp[12]) / vp[0];
@@ -576,7 +576,7 @@ static void extract_3f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out
 static void extract_2f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out,
 				const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     const GLfloat * const vp = a->vp;
 
     out[0] = (in[0] - vp[12]) / vp[0];
@@ -588,7 +588,7 @@ static void extract_2f_viewport(const struct tnl_clipspace_attr *a, GLfloat *out
 
 static void extract_4f(const struct tnl_clipspace_attr *a, GLfloat *out, const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -599,7 +599,7 @@ static void extract_4f(const struct tnl_clipspace_attr *a, GLfloat *out, const G
 
 static void extract_3f_xyw(const struct tnl_clipspace_attr *a, GLfloat *out, const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -611,7 +611,7 @@ static void extract_3f_xyw(const struct tnl_clipspace_attr *a, GLfloat *out, con
 
 static void extract_3f(const struct tnl_clipspace_attr *a, GLfloat *out, const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -623,7 +623,7 @@ static void extract_3f(const struct tnl_clipspace_attr *a, GLfloat *out, const G
 
 static void extract_2f(const struct tnl_clipspace_attr *a, GLfloat *out, const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -634,7 +634,7 @@ static void extract_2f(const struct tnl_clipspace_attr *a, GLfloat *out, const G
 
 static void extract_1f(const struct tnl_clipspace_attr *a, GLfloat *out, const GLubyte *v)
 {
-    const GLfloat *in = (const GLfloat *)v;
+    const GLfloat *in = reinterpret_cast<const GLfloat *>(v);
     (void) a;
 
     out[0] = in[0];
@@ -898,27 +898,27 @@ static void NAME( GLcontext *ctx,					\
 									\
    for (i = 0 ; i < count ; i++, v += vtx->vertex_size) {		\
       if (NR > 0) {							\
-	 F0( &a[0], v + a[0].vertoffset, (GLfloat *)a[0].inputptr );	\
+	 F0( &a[0], v + a[0].vertoffset, reinterpret_cast<GLfloat *>(a[0].inputptr) );	\
 	 a[0].inputptr += a[0].inputstride;				\
       }									\
       									\
       if (NR > 1) {							\
-	 F1( &a[1], v + a[1].vertoffset, (GLfloat *)a[1].inputptr );	\
+	 F1( &a[1], v + a[1].vertoffset, reinterpret_cast<GLfloat *>(a[1].inputptr) );	\
 	 a[1].inputptr += a[1].inputstride;				\
       }									\
       									\
       if (NR > 2) {							\
-	 F2( &a[2], v + a[2].vertoffset, (GLfloat *)a[2].inputptr );	\
+	 F2( &a[2], v + a[2].vertoffset, reinterpret_cast<GLfloat *>(a[2].inputptr) );	\
 	 a[2].inputptr += a[2].inputstride;				\
       }									\
       									\
       if (NR > 3) {							\
-	 F3( &a[3], v + a[3].vertoffset, (GLfloat *)a[3].inputptr );	\
+	 F3( &a[3], v + a[3].vertoffset, reinterpret_cast<GLfloat *>(a[3].inputptr) );	\
 	 a[3].inputptr += a[3].inputstride;				\
       }									\
 									\
       if (NR > 4) {							\
-	 F4( &a[4], v + a[4].vertoffset, (GLfloat *)a[4].inputptr );	\
+	 F4( &a[4], v + a[4].vertoffset, reinterpret_cast<GLfloat *>(a[4].inputptr) );	\
 	 a[4].inputptr += a[4].inputstride;				\
       }									\
    }									\
@@ -1018,7 +1018,7 @@ void _tnl_generic_emit(GLcontext *ctx,
 
     for (i = 0 ; i < count ; i++, v += stride) {
 	for (j = 0; j < attr_count; j++) {
-	    GLfloat *in = (GLfloat *)a[j].inputptr;
+	    GLfloat *in = reinterpret_cast<GLfloat *>(a[j].inputptr);
 	    a[j].inputptr += a[j].inputstride;
 	    a[j].emit(&a[j], v + a[j].vertoffset, in);
 	}

@@ -90,8 +90,8 @@ struct Z24RenderbufferWrapper : public DepthStencilWrapper {
 GLint x, GLint y, void *values) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-GLuint *dst = (GLuint *) values;
-const GLuint *src = (const GLuint *) dsrb->GetPointer(ctx, x, y);
+GLuint *dst = static_cast<GLuint *>(values);
+const GLuint *src = reinterpret_cast<const GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_INT);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -108,7 +108,7 @@ for (i = 0; i < count; i++) {
    const GLint x[], const GLint y[], void *values) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-GLuint *dst = (GLuint *) values;
+GLuint *dst = static_cast<GLuint *>(values);
 ASSERT(DataType == GL_UNSIGNED_INT);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -123,8 +123,8 @@ for (i = 0; i < count; i++) {
 GLint x, GLint y,
 const void *values, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLuint *src = (const GLuint *) values;
-GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x, y);
+const GLuint *src = static_cast<const GLuint *>(values);
+GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_INT);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -151,8 +151,8 @@ if (!mask || mask[i]) {
     GLint x, GLint y,
     const void *value, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLuint shiftedVal = *((GLuint *) value) << 8;
-GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x, y);
+const GLuint shiftedVal = *(static_cast<const GLuint *>(value)) << 8;
+GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_INT);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -179,7 +179,7 @@ if (!mask || mask[i]) {
    const GLint x[], const GLint y[],
    const void *values, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLuint *src = (const GLuint *) values;
+const GLuint *src = static_cast<const GLuint *>(values);
 ASSERT(DataType == GL_UNSIGNED_INT);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -187,7 +187,7 @@ if (dsrb->GetPointer(ctx, 0, 0)) {
     GLuint i;
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
-    GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x[i], y[i]);
+    GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x[i], y[i]));
     *dst = (src[i] << 8) | (*dst & 0xff);
 }
     }
@@ -208,7 +208,7 @@ if (!mask || mask[i]) {
        const void *value, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-const GLuint shiftedVal = *((GLuint *) value) << 8;
+const GLuint shiftedVal = *(static_cast<const GLuint *>(value)) << 8;
 dsrb->GetValues(ctx, count, x, y, temp);
 for (i = 0; i < count; i++) {
     if (!mask || mask[i]) {
@@ -261,8 +261,8 @@ struct S8RenderbufferWrapper : public DepthStencilWrapper {
 GLint x, GLint y, void *values) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-GLubyte *dst = (GLubyte *) values;
-const GLuint *src = (const GLuint *) dsrb->GetPointer(ctx, x, y);
+GLubyte *dst = static_cast<GLubyte *>(values);
+const GLuint *src = reinterpret_cast<const GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_BYTE);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -279,7 +279,7 @@ for (i = 0; i < count; i++) {
    const GLint x[], const GLint y[], void *values) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-GLubyte *dst = (GLubyte *) values;
+GLubyte *dst = static_cast<GLubyte *>(values);
 ASSERT(DataType == GL_UNSIGNED_BYTE);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -294,8 +294,8 @@ for (i = 0; i < count; i++) {
 GLint x, GLint y,
 const void *values, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLubyte *src = (const GLubyte *) values;
-GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x, y);
+const GLubyte *src = static_cast<const GLubyte *>(values);
+GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_BYTE);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -322,8 +322,8 @@ if (!mask || mask[i]) {
     GLint x, GLint y,
     const void *value, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLubyte val = *((GLubyte *) value);
-GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x, y);
+const GLubyte val = *(static_cast<const GLubyte *>(value));
+GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x, y));
 ASSERT(DataType == GL_UNSIGNED_BYTE);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -350,7 +350,7 @@ if (!mask || mask[i]) {
    const GLint x[], const GLint y[],
    const void *values, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
-const GLubyte *src = (const GLubyte *) values;
+const GLubyte *src = static_cast<const GLubyte *>(values);
 ASSERT(DataType == GL_UNSIGNED_BYTE);
 ASSERT(dsrb->_ActualFormat == GL_DEPTH24_STENCIL8_EXT);
 ASSERT(dsrb->DataType == GL_UNSIGNED_INT_24_8_EXT);
@@ -358,7 +358,7 @@ if (dsrb->GetPointer(ctx, 0, 0)) {
     GLuint i;
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
-    GLuint *dst = (GLuint *) dsrb->GetPointer(ctx, x[i], y[i]);
+    GLuint *dst = reinterpret_cast<GLuint *>(dsrb->GetPointer(ctx, x[i], y[i]));
     *dst = (*dst & 0xffffff00) | src[i];
 }
     }
@@ -379,7 +379,7 @@ if (!mask || mask[i]) {
        const void *value, const GLubyte *mask) override {
 gl_renderbuffer *dsrb = Wrapped;
 GLuint temp[MAX_WIDTH], i;
-const GLubyte val = *((GLubyte *) value);
+const GLubyte val = *(static_cast<const GLubyte *>(value));
 dsrb->GetValues(ctx, count, x, y, temp);
 for (i = 0; i < count; i++) {
     if (!mask || mask[i]) {

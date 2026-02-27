@@ -196,7 +196,7 @@ void _tnl_get_attr(GLcontext *ctx, const void *vin,
 
     for (j = 0; j < attr_count; j++) {
 	if (a[j].attrib == attr) {
-	    a[j].extract(&a[j], dest, (GLubyte *)vin + a[j].vertoffset);
+	    a[j].extract(&a[j], dest, reinterpret_cast<const GLubyte *>(vin) + a[j].vertoffset);
 	    return;
 	}
     }
@@ -226,7 +226,7 @@ void _tnl_set_attr(GLcontext *ctx, void *vout,
 
     for (j = 0; j < attr_count; j++) {
 	if (a[j].attrib == attr) {
-	    a[j].insert[4-1](&a[j], (GLubyte *)vout + a[j].vertoffset, src);
+	    a[j].insert[4-1](&a[j], reinterpret_cast<GLubyte *>(vout) + a[j].vertoffset, src);
 	    return;
 	}
     }
@@ -311,7 +311,7 @@ GLuint _tnl_install_attrs(GLcontext *ctx, const struct tnl_attr_map *map,
 
 	    if (DBG)
 		_mesa_printf("%d: %s, vp %p, offset %d\n", i,
-			     _tnl_format_info[format].name, (void *)vp,
+			     _tnl_format_info[format].name, static_cast<const void *>(vp),
 			     vtx->attr[j].vertoffset);
 
 	    offset += _tnl_format_info[format].attrsize;
@@ -366,7 +366,7 @@ static void update_input_ptrs(GLcontext *ctx, GLuint start)
 	    assert(a[j].inputsize == vptr->size);
 	}
 
-	a[j].inputptr = ((GLubyte *)vptr->data) + start * vptr->stride;
+	a[j].inputptr = (reinterpret_cast<GLubyte *>(vptr->data)) + start * vptr->stride;
     }
 
     if (a->vp) {
@@ -407,8 +407,8 @@ void *_tnl_emit_vertices_to_buffer(GLcontext *ctx,
 
     /* Note: dest should not be adjusted for non-zero 'start' values:
      */
-    vtx->emit(ctx, end - start, (GLubyte*) dest);
-    return (void *)((GLubyte *)dest + vtx->vertex_size * (end - start));
+    vtx->emit(ctx, end - start, static_cast<GLubyte*>(dest));
+    return static_cast<GLubyte *>(dest) + vtx->vertex_size * (end - start);
 }
 
 

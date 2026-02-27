@@ -202,9 +202,9 @@ _mesa_polygon_stipple(GLcontext *ctx, const GLubyte *pattern)
 			"glPolygonStipple(bad PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						ctx->Unpack.BufferObj);
+						ctx->Unpack.BufferObj));
 	if (!buf) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glPolygonStipple(PBO mapped)");
@@ -266,9 +266,9 @@ _mesa_GetPolygonStipple(GLubyte *dest)
 			"glGetPolygonStipple(bad PBO access)");
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
 						GL_WRITE_ONLY_ARB,
-						ctx->Pack.BufferObj);
+						ctx->Pack.BufferObj));
 	if (!buf) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glGetPolygonStipple(PBO mapped)");

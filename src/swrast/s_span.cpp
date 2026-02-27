@@ -1354,7 +1354,7 @@ void
 _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 {
     const SWcontext *swrast = SWRAST_CONTEXT(ctx);
-    const GLuint colorMask = *((GLuint *) ctx->Color.ColorMask);
+    const GLuint colorMask = *(reinterpret_cast<GLuint *>(ctx->Color.ColorMask));
     const GLbitfield origInterpMask = span->interpMask;
     const GLbitfield origArrayMask = span->arrayMask;
     const GLenum chanType = span->array->ChanType;
@@ -1591,8 +1591,8 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
 		const void *colorData =
 		    (rb->DataType == GL_FLOAT &&
 		     span->array->ChanType == GL_FLOAT)
-		    ? (const void *) span->array->attribs[FRAG_ATTRIB_COL0]
-		    : (const void *) span->array->rgba;
+		    ? static_cast<const void *>(span->array->attribs[FRAG_ATTRIB_COL0])
+		    : static_cast<const void *>(span->array->rgba);
 
 		if (span->arrayMask & SPAN_XY) {
 		    /* array of pixel coords */
@@ -1676,12 +1676,12 @@ _swrast_read_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 
 	if (rb->DataType == dstType) {
 	    rb->GetRow(ctx, length, x + skip, y,
-		       (GLubyte *) rgba + skip * RGBA_PIXEL_SIZE(rb->DataType));
+		       static_cast<GLubyte *>(rgba) + skip * RGBA_PIXEL_SIZE(rb->DataType));
 	} else {
 	    GLuint temp[MAX_WIDTH * 4];
 	    rb->GetRow(ctx, length, x + skip, y, temp);
 	    _mesa_convert_colors(rb->DataType, temp,
-				 dstType, (GLubyte *) rgba + skip * RGBA_PIXEL_SIZE(dstType),
+				 dstType, static_cast<GLubyte *>(rgba) + skip * RGBA_PIXEL_SIZE(dstType),
 				 length, nullptr);
 	}
     }
@@ -1776,7 +1776,7 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    if (inCount > 0) {
 		/* read [inStart, inStart + inCount) */
 		rb->GetValues(ctx, inCount, x + inStart, y + inStart,
-			      (GLubyte *) values + inStart * valueSize);
+			      static_cast<GLubyte *>(values) + inStart * valueSize);
 		inCount = 0;
 	    }
 	}
@@ -1784,7 +1784,7 @@ _swrast_get_values(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (inCount > 0) {
 	/* read last values */
 	rb->GetValues(ctx, inCount, x + inStart, y + inStart,
-		      (GLubyte *) values + inStart * valueSize);
+		      static_cast<GLubyte *>(values) + inStart * valueSize);
     }
 }
 
@@ -1820,7 +1820,7 @@ _swrast_put_row(GLcontext *ctx, struct gl_renderbuffer *rb,
     }
 
     rb->PutRow(ctx, count, x, y,
-	       (const GLubyte *) values + skip * valueSize, nullptr);
+	       static_cast<const GLubyte *>(values) + skip * valueSize, nullptr);
 }
 
 
@@ -1854,7 +1854,7 @@ _swrast_get_row(GLcontext *ctx, struct gl_renderbuffer *rb,
 	count -= skip;
     }
 
-    rb->GetRow(ctx, count, x, y, (GLubyte *) values + skip * valueSize);
+    rb->GetRow(ctx, count, x, y, static_cast<GLubyte *>(values) + skip * valueSize);
 }
 
 

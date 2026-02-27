@@ -482,10 +482,10 @@ depth_test_span(GLcontext *ctx, SWspan *span)
     if (rb->GetPointer(ctx, 0, 0)) {
 	/* Directly access buffer */
 	if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    GLushort *zbuffer = (GLushort *) rb->GetPointer(ctx, x, y);
+	    GLushort *zbuffer = static_cast<GLushort *>(rb->GetPointer(ctx, x, y));
 	    passed = depth_test_span16(ctx, count, zbuffer, zValues, mask);
 	} else {
-	    GLuint *zbuffer = (GLuint *) rb->GetPointer(ctx, x, y);
+	    GLuint *zbuffer = reinterpret_cast<GLuint *>(rb->GetPointer(ctx, x, y));
 	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	    passed = depth_test_span32(ctx, count, zbuffer, zValues, mask);
 	}
@@ -985,11 +985,11 @@ depth_test_pixels(GLcontext *ctx, SWspan *span)
     if (rb->GetPointer(ctx, 0, 0)) {
 	/* Directly access values */
 	if (rb->DataType == GL_UNSIGNED_SHORT) {
-	    GLushort *zStart = (GLushort *) rb->Data;
+	    GLushort *zStart = static_cast<GLushort *>(rb->Data);
 	    GLuint stride = rb->Width;
 	    direct_depth_test_pixels16(ctx, zStart, stride, count, x, y, z, mask);
 	} else {
-	    GLuint *zStart = (GLuint *) rb->Data;
+	    GLuint *zStart = static_cast<GLuint *>(rb->Data);
 	    GLuint stride = rb->Width;
 	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	    direct_depth_test_pixels32(ctx, zStart, stride, count, x, y, z, mask);
@@ -1055,7 +1055,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 			       zbuffer16, sizeof(GLushort));
 	    zbuffer = zbuffer16;
 	} else {
-	    zbuffer = (GLushort*) rb->GetPointer(ctx, span->x, span->y);
+	    zbuffer = static_cast<GLushort*>(rb->GetPointer(ctx, span->x, span->y));
 	    if (!zbuffer) {
 		rb->GetRow(ctx, count, span->x, span->y, zbuffer16);
 		zbuffer = zbuffer16;
@@ -1081,7 +1081,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 			       zbuffer32, sizeof(GLuint));
 	    zbuffer = zbuffer32;
 	} else {
-	    zbuffer = (GLuint*) rb->GetPointer(ctx, span->x, span->y);
+	    zbuffer = static_cast<GLuint*>(rb->GetPointer(ctx, span->x, span->y));
 	    if (!zbuffer) {
 		rb->GetRow(ctx, count, span->x, span->y, zbuffer32);
 		zbuffer = zbuffer32;
@@ -1288,17 +1288,17 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	 */
 	if (rb->DataType == GL_UNSIGNED_SHORT) {
 	    if ((clearValue & 0xff) == ((clearValue >> 8) & 0xff) &&
-		((GLushort *) rb->GetPointer(ctx, 0, 0) + width ==
-		 (GLushort *) rb->GetPointer(ctx, 0, 1))) {
+		(static_cast<GLushort *>(rb->GetPointer(ctx, 0, 0)) + width ==
+		 static_cast<GLushort *>(rb->GetPointer(ctx, 0, 1)))) {
 		/* optimized case */
-		GLushort *dst = (GLushort *) rb->GetPointer(ctx, x, y);
+		GLushort *dst = static_cast<GLushort *>(rb->GetPointer(ctx, x, y));
 		GLuint len = width * height * sizeof(GLushort);
 		memset(dst, (clearValue & 0xff), len);
 	    } else {
 		/* general case */
 		GLint i, j;
 		for (i = 0; i < height; i++) {
-		    GLushort *dst = (GLushort *) rb->GetPointer(ctx, x, y + i);
+		    GLushort *dst = static_cast<GLushort *>(rb->GetPointer(ctx, x, y + i));
 		    for (j = 0; j < width; j++) {
 			dst[j] = clearValue;
 		    }
@@ -1308,7 +1308,7 @@ _swrast_clear_depth_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
 	    GLint i, j;
 	    ASSERT(rb->DataType == GL_UNSIGNED_INT);
 	    for (i = 0; i < height; i++) {
-		GLuint *dst = (GLuint *) rb->GetPointer(ctx, x, y + i);
+		GLuint *dst = reinterpret_cast<GLuint *>(rb->GetPointer(ctx, x, y + i));
 		for (j = 0; j < width; j++) {
 		    dst[j] = clearValue;
 		}

@@ -266,7 +266,7 @@ _glapi_set_dispatch(struct _glapi_table *dispatch)
     }
 
 #if   defined(THREADS)
-    _glthread_SetTSD(&_gl_DispatchTSD, (void *) dispatch);
+    _glthread_SetTSD(&_gl_DispatchTSD, static_cast<void *>(dispatch));
     _glapi_Dispatch = (ThreadSafe) ? nullptr : dispatch;
 #else /*THREADS*/
     _glapi_Dispatch = dispatch;

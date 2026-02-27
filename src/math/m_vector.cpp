@@ -182,7 +182,7 @@ void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, GLboolean culling)
     };
 
     const char *t = templates[v->size];
-    GLfloat *d = (GLfloat *)v->data;
+    GLfloat *d = reinterpret_cast<GLfloat *>(v->data);
     GLuint j, i = 0, count;
 
     _mesa_printf("data-start\n");
@@ -206,7 +206,7 @@ void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, GLboolean culling)
 
 	    _mesa_printf("checking col %u is clean as advertised ", j);
 
-	    for (i = 0, d = (GLfloat *) v->data ;
+	    for (i = 0, d = reinterpret_cast<GLfloat *>(v->data) ;
 		 i < count && d[j] == c[j] ;
 		 i++, STRIDE_F(d, v->stride)) {};
 

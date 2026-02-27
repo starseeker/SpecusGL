@@ -119,9 +119,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_Z32: {
 	    GLuint i, j, k;
-	    const GLuint *rowA = (const GLuint *) srcRowA;
-	    const GLuint *rowB = (const GLuint *) srcRowB;
-	    GLfloat *dst = (GLfloat *) dstRow;
+	    const GLuint *rowA = static_cast<const GLuint *>(srcRowA);
+	    const GLuint *rowB = static_cast<const GLuint *>(srcRowB);
+	    GLfloat *dst = static_cast<GLfloat *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		dst[i] = rowA[j] / 4 + rowA[k] / 4 + rowB[j] / 4 + rowB[k] / 4;
@@ -130,9 +130,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_Z16: {
 	    GLuint i, j, k;
-	    const GLushort *rowA = (const GLushort *) srcRowA;
-	    const GLushort *rowB = (const GLushort *) srcRowB;
-	    GLushort *dst = (GLushort *) dstRow;
+	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
+	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
+	    GLushort *dst = static_cast<GLushort *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) / 4;
@@ -189,9 +189,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_RGB565:
 	case MESA_FORMAT_RGB565_REV: {
 	    GLuint i, j, k;
-	    const GLushort *rowA = (const GLushort *) srcRowA;
-	    const GLushort *rowB = (const GLushort *) srcRowB;
-	    GLushort *dst = (GLushort *) dstRow;
+	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
+	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
+	    GLushort *dst = static_cast<GLushort *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x1f;
@@ -216,9 +216,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_ARGB4444:
 	case MESA_FORMAT_ARGB4444_REV: {
 	    GLuint i, j, k;
-	    const GLushort *rowA = (const GLushort *) srcRowA;
-	    const GLushort *rowB = (const GLushort *) srcRowB;
-	    GLushort *dst = (GLushort *) dstRow;
+	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
+	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
+	    GLushort *dst = static_cast<GLushort *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0xf;
@@ -248,9 +248,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_ARGB1555:
 	case MESA_FORMAT_ARGB1555_REV: { /* XXX broken? */
 	    GLuint i, j, k;
-	    const GLushort *rowA = (const GLushort *) srcRowA;
-	    const GLushort *rowB = (const GLushort *) srcRowB;
-	    GLushort *dst = (GLushort *) dstRow;
+	    const GLushort *rowA = static_cast<const GLushort *>(srcRowA);
+	    const GLushort *rowB = static_cast<const GLushort *>(srcRowB);
+	    GLushort *dst = static_cast<GLushort *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x1f;
@@ -298,9 +298,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGB332: {
 	    GLuint i, j, k;
-	    const GLubyte *rowA = (const GLubyte *) srcRowA;
-	    const GLubyte *rowB = (const GLubyte *) srcRowB;
-	    GLubyte *dst = (GLubyte *) dstRow;
+	    const GLubyte *rowA = static_cast<const GLubyte *>(srcRowA);
+	    const GLubyte *rowB = static_cast<const GLubyte *>(srcRowB);
+	    GLubyte *dst = static_cast<GLubyte *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		const GLint rowAr0 = rowA[j] & 0x3;
@@ -331,9 +331,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 #endif
 	{
 	    GLuint i, j, k;
-	    const GLubyte *rowA = (const GLubyte *) srcRowA;
-	    const GLubyte *rowB = (const GLubyte *) srcRowB;
-	    GLubyte *dst = (GLubyte *) dstRow;
+	    const GLubyte *rowA = static_cast<const GLubyte *>(srcRowA);
+	    const GLubyte *rowB = static_cast<const GLubyte *>(srcRowB);
+	    GLubyte *dst = static_cast<GLubyte *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) >> 2;
@@ -446,9 +446,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_LUMINANCE_FLOAT32:
 	case MESA_FORMAT_INTENSITY_FLOAT32: {
 	    GLuint i, j, k;
-	    const GLfloat *rowA = (const GLfloat *) srcRowA;
-	    const GLfloat *rowB = (const GLfloat *) srcRowB;
-	    GLfloat *dst = (GLfloat *) dstRow;
+	    const GLfloat *rowA = static_cast<const GLfloat *>(srcRowA);
+	    const GLfloat *rowB = static_cast<const GLfloat *>(srcRowB);
+	    GLfloat *dst = static_cast<GLfloat *>(dstRow);
 	    for (i = j = 0, k = k0; i < (GLuint) dstWidth;
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) * 0.25F;
@@ -949,8 +949,8 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 		return;
 	    }
 
-	    srcData = (GLubyte *) srcImage->Data;
-	    dstData = (GLubyte *) dstImage->Data;
+	    srcData = static_cast<GLubyte *>(srcImage->Data);
+	    dstData = static_cast<GLubyte *>(dstImage->Data);
 	}
 
 	/*
@@ -1003,7 +1003,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 					    dstData, /* src data, actually */
 					    &ctx->DefaultPacking);
 	    /* swap src and dest pointers */
-	    temp = (GLubyte *) srcData;
+	    temp = static_cast<GLubyte *>(srcData);
 	    srcData = dstData;
 	    dstData = temp;
 	}
@@ -1039,7 +1039,7 @@ _mesa_rescale_teximage2d(GLuint bytesPerPixel,
 	 GLint srcCol = col WOP wScale;					\
 	 dst[col] = src[srcRow * srcStrideInPixels + srcCol];		\
       }									\
-      dst = (TYPE *) ((GLubyte *) dst + dstRowStride);			\
+      dst = reinterpret_cast<TYPE *>(reinterpret_cast<GLubyte *>(dst) + dstRowStride);			\
    }									\
 
 #define RESCALE_IMAGE( TYPE )						\

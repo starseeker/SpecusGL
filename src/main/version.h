@@ -28,9 +28,9 @@
 
 
 /* Mesa version */
-#define MESA_MAJOR 7
-#define MESA_MINOR 0
-#define MESA_PATCH 4
+constexpr int MESA_MAJOR = 7;
+constexpr int MESA_MINOR = 0;
+constexpr int MESA_PATCH = 4;
 #define MESA_VERSION_STRING "7.0.4"
 
 /* To make version comparison easy */
@@ -39,9 +39,9 @@
 
 
 /* OpenGL API version */
-#define OPENGL_MAJOR 2
-#define OPENGL_MINOR 1
-#define OPENGL_PATCH 0
+constexpr int OPENGL_MAJOR = 2;
+constexpr int OPENGL_MINOR = 1;
+constexpr int OPENGL_PATCH = 0;
 #define OPENGL_VERSION_STRING "2.1"
 
 /* To make version comparison easy */

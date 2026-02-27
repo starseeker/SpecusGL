@@ -176,7 +176,7 @@ run_fog_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	    /* Full eye coords weren't required, just calculate the
 	     * eye Z values.
 	     */
-	    _mesa_dotprod_tab[VB->ObjPtr->size]((GLfloat *) input->data,
+	    _mesa_dotprod_tab[VB->ObjPtr->size](reinterpret_cast<GLfloat *>(input->data),
 						4 * sizeof(GLfloat),
 						VB->ObjPtr, plane);
 

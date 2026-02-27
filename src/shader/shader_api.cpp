@@ -1160,7 +1160,7 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
 	    return;
 	}
 	/* check that the sampler (tex unit index) is legal */
-	unit = ((GLint *) values)[0];
+	unit = (static_cast<const GLint *>(values))[0];
 	if (unit >= ctx->Const.MaxTextureImageUnits) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glUniform1(invalid sampler/tex unit index)");
@@ -1231,12 +1231,12 @@ _mesa_uniform(GLcontext *ctx, GLint location, GLsizei count,
 	    type == GL_INT_VEC2 ||
 	    type == GL_INT_VEC3 ||
 	    type == GL_INT_VEC4) {
-	    const GLint *iValues = ((const GLint *) values) + k * elems;
+	    const GLint *iValues = (static_cast<const GLint *>(values)) + k * elems;
 	    for (i = 0; i < elems; i++) {
 		uniformVal[i] = (GLfloat) iValues[i];
 	    }
 	} else {
-	    const GLfloat *fValues = ((const GLfloat *) values) + k * elems;
+	    const GLfloat *fValues = (static_cast<const GLfloat *>(values)) + k * elems;
 	    for (i = 0; i < elems; i++) {
 		uniformVal[i] = fValues[i];
 	    }

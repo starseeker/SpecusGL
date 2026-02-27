@@ -139,13 +139,13 @@ static void ref_transform(GLvector4f *dst,
 			  const GLvector4f *src)
 {
     GLuint i;
-    GLfloat *s = (GLfloat *)src->start;
+    GLfloat *s = static_cast<GLfloat *>(src->start);
     GLfloat(*d)[4] = (GLfloat(*)[4])dst->start;
     const GLfloat *m = mat->m;
 
     for (i = 0 ; i < src->count ; i++) {
 	TRANSFORM_POINT(d[i], m, s);
-	s = (GLfloat *)((char *)s + src->stride);
+	s = static_cast<GLfloat *>((char *)s + src->stride);
     }
 }
 
@@ -233,21 +233,21 @@ static int test_transform_function(transform_func func, int psize,
     }
 
     source->data = (GLfloat(*)[4])s;
-    source->start = (GLfloat *)s;
+    source->start = static_cast<GLfloat *>(s);
     source->count = TEST_COUNT;
     source->stride = sizeof(s[0]);
     source->size = 4;
     source->flags = 0;
 
     dest->data = (GLfloat(*)[4])d;
-    dest->start = (GLfloat *)d;
+    dest->start = static_cast<GLfloat *>(d);
     dest->count = TEST_COUNT;
     dest->stride = sizeof(float[4]);
     dest->size = 0;
     dest->flags = 0;
 
     ref->data = (GLfloat(*)[4])r;
-    ref->start = (GLfloat *)r;
+    ref->start = static_cast<GLfloat *>(r);
     ref->count = TEST_COUNT;
     ref->stride = sizeof(float[4]);
     ref->size = 0;

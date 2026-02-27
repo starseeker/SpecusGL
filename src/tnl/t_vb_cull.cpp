@@ -52,7 +52,7 @@ static GLboolean run_cull_stage(GLcontext *ctx,
     const GLfloat a = ctx->Transform.CullObjPos[0];
     const GLfloat b = ctx->Transform.CullObjPos[1];
     const GLfloat c = ctx->Transform.CullObjPos[2];
-    GLfloat *norm = (GLfloat *)VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data;
+    GLfloat *norm = reinterpret_cast<GLfloat *>(VB->AttribPtr[_TNL_ATTRIB_NORMAL]->data);
     GLuint stride = VB->AttribPtr[_TNL_ATTRIB_NORMAL]->stride;
     GLuint count = VB->Count;
     GLuint i;

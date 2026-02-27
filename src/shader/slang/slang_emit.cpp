@@ -274,7 +274,7 @@ static struct prog_instruction *
     inst->Opcode = opcode;
     inst->BranchTarget = -1; /* invalid */
     /*
-    printf("New inst %d: %p %s\n", static_cast<GLuint>(prog->Instructions.size())-1,(void*)inst,
+    printf("New inst %d: %p %s\n", static_cast<GLuint>(prog->Instructions.size())-1,static_cast<void*>(inst),
            _mesa_opcode_string(inst->Opcode));
     */
     return inst;
@@ -1502,7 +1502,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		}
 		/*
 		printf("IR_VAR_DECL %s %d store %p\n",
-		       (char*) n->Var->a_name, n->Store->Index, (void*) n->Store);
+		       static_cast<char*>(n->Var->a_name), n->Store->Index, static_cast<void*>(n->Store));
 		*/
 		assert(n->Var->aux == n->Store);
 	    }
@@ -1512,7 +1512,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		sprintf(s, "TEMP[%d]%s = variable %s (size %d)",
 			n->Store->Index,
 			_mesa_swizzle_string(n->Store->Swizzle, 0, GL_FALSE),
-			(n->Var ? (char *) n->Var->a_name : "anonymous"),
+			(n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "anonymous"),
 			n->Store->Size);
 		inst = emit_comment(emitInfo, s);
 		return inst;

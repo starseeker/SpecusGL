@@ -580,7 +580,7 @@ var_cache_find(struct var_cache *va, const GLubyte * name)
     /*struct var_cache *first = va;*/
 
     while (va) {
-	if (!strcmp((const char*) name, (const char*) va->name)) {
+	if (!strcmp(reinterpret_cast<const char *>(name), reinterpret_cast<const char *>(va->name))) {
 	    if (va->type == vt_alias)
 		return va->alias_binding;
 	    return va;
@@ -673,7 +673,7 @@ parse_string(const GLubyte ** inst, struct var_cache **vc_head,
 
     *found = 0;
     var_cache_create(&va);
-    va->name = (const GLubyte *) i;
+    va->name = static_cast<const GLubyte *>(i);
 
     var_cache_append(vc_head, va);
 
@@ -688,7 +688,7 @@ parse_string_without_adding(const GLubyte ** inst, struct arb_program *Program)
 
     *inst += strlen((char *) i) + 1;
 
-    return (char *) i;
+    return const_cast<char *>(reinterpret_cast<const char *>(i));
 }
 
 /**
@@ -1275,7 +1275,7 @@ parse_state_single_item(GLcontext * ctx, const GLubyte ** inst,
 	case STATE_CLIP_PLANE:
 	    state_tokens[0] = STATE_CLIPPLANE;
 	    if (parse_clipplane_num(ctx, inst, Program,
-				    (GLint *) &state_tokens[1]))
+				    reinterpret_cast<GLint *>(state_tokens) + 1))
 		return 1;
 	    break;
 
@@ -1294,9 +1294,9 @@ parse_state_single_item(GLcontext * ctx, const GLubyte ** inst,
 	/* XXX: I think this is the correct format for a matrix row */
 	case STATE_MATRIX_ROWS:
 	    if (parse_matrix(ctx, inst, Program,
-			     (GLint *) &state_tokens[0],
-			     (GLint *) &state_tokens[1],
-			     (GLint *) &state_tokens[4]))
+			     reinterpret_cast<GLint *>(state_tokens) + 0,
+			     reinterpret_cast<GLint *>(state_tokens) + 1,
+			     reinterpret_cast<GLint *>(state_tokens) + 4))
 		return 1;
 
 	    state_tokens[2] = static_cast<gl_state_index>(parse_integer(inst, Program));        /* The first row to grab */
@@ -1683,7 +1683,7 @@ parse_attrib(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
     if (found) {
 	program_error2(ctx, Program->Position,
 		       "Duplicate variable declaration",
-		       (char *) attrib_var->name);
+		       const_cast<char *>(reinterpret_cast<const char *>(attrib_var->name)));
 	return 1;
     }
 
@@ -1811,7 +1811,7 @@ parse_param_elements(GLcontext * ctx, const GLubyte ** inst,
 	case PARAM_CONSTANT:
 	    parse_constant(inst, const_values, Program, use);
 	    idx = _mesa_add_named_constant(Program->Base.Parameters,
-					   (char *) param_var->name,
+					   const_cast<char *>(reinterpret_cast<const char *>(param_var->name)),
 					   const_values, 4);
 	    if (param_var->param_binding_begin == ~0U)
 		param_var->param_binding_begin = idx;
@@ -1861,7 +1861,7 @@ parse_param(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
     if (found) {
 	program_error2(ctx, Program->Position,
 		       "Duplicate variable declaration",
-		       (char *) param_var->name);
+		       const_cast<char *>(reinterpret_cast<const char *>(param_var->name)));
 	return 1;
     }
 
@@ -1958,7 +1958,7 @@ parse_temp(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
 	if (found) {
 	    program_error2(ctx, Program->Position,
 			   "Duplicate variable declaration",
-			   (char *) temp_var->name);
+			   const_cast<char *>(reinterpret_cast<const char *>(temp_var->name)));
 	    return 1;
 	}
 
@@ -2001,7 +2001,7 @@ parse_output(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
     if (found) {
 	program_error2(ctx, Program->Position,
 		       "Duplicate variable declaration",
-		       (char *) output_var->name);
+		       const_cast<char *>(reinterpret_cast<const char *>(output_var->name)));
 	return 1;
     }
 
@@ -2029,7 +2029,7 @@ parse_alias(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
     if (found) {
 	program_error2(ctx, Program->Position,
 		       "Duplicate variable declaration",
-		       (char *) temp_var->name);
+		       const_cast<char *>(reinterpret_cast<const char *>(temp_var->name)));
 	return 1;
     }
 
@@ -2040,7 +2040,7 @@ parse_alias(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
     if (!found) {
 	program_error2(ctx, Program->Position,
 		       "Undefined alias value",
-		       (char *) temp_var->alias_binding->name);
+		       const_cast<char *>(reinterpret_cast<const char *>(temp_var->alias_binding->name)));
 	return 1;
     }
 
@@ -2065,7 +2065,7 @@ parse_address(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head
 	if (found) {
 	    program_error2(ctx, Program->Position,
 			   "Duplicate variable declaration",
-			   (char *) temp_var->name);
+			   const_cast<char *>(reinterpret_cast<const char *>(temp_var->name)));
 	    return 1;
 	}
 
@@ -2423,7 +2423,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 		    if (!found) {
 			program_error2(ctx, Program->Position,
 				       "Undefined variable",
-				       (char *) src->name);
+				       const_cast<char *>(reinterpret_cast<const char *>(src->name)));
 			return 1;
 		    }
 
@@ -3325,12 +3325,12 @@ debug_variables(GLcontext * ctx, struct var_cache *vc_head,
     struct var_cache *vc;
     GLint a, b;
 
-    fprintf(stderr, "debug_variables, vc_head: %p\n", (void*) vc_head);
+    fprintf(stderr, "debug_variables, vc_head: %p\n", static_cast<void*>(vc_head));
 
     /* First of all, print out the contents of the var_cache */
     vc = vc_head;
     while (vc) {
-	fprintf(stderr, "[%p]\n", (void*) vc);
+	fprintf(stderr, "[%p]\n", static_cast<void*>(vc));
 	switch (vc->type) {
 	    case vt_none:
 		fprintf(stderr, "UNDEFINED %s\n", vc->name);
@@ -3369,7 +3369,7 @@ debug_variables(GLcontext * ctx, struct var_cache *vc_head,
 	    case vt_alias:
 		fprintf(stderr, "ALIAS     %s\n", vc->name);
 		fprintf(stderr, "          binding: 0x%p (%s)\n",
-			(void*) vc->alias_binding, vc->alias_binding->name);
+			static_cast<void*>(vc->alias_binding), vc->alias_binding->name);
 		break;
 	    default:
 		/* nothing */
@@ -3668,7 +3668,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
     arbprogram_syn_id = grammar_load_from_text((byte *) arb_grammar_text);
     if (arbprogram_syn_id == 0) {
 	/* XXX this is not a GL error - it's an implementation bug! - FIX */
-	grammar_get_last_error((GLubyte *) error_msg, 300, &error_pos);
+	grammar_get_last_error(reinterpret_cast<GLubyte *>(error_msg), 300, &error_pos);
 	_mesa_set_program_error(ctx, error_pos, error_msg);
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glProgramString(Error loading grammer rule set)");
@@ -3710,7 +3710,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 
     /* Syntax parse error */
     if (err) {
-	grammar_get_last_error((GLubyte *) error_msg, 300, &error_pos);
+	grammar_get_last_error(reinterpret_cast<GLubyte *>(error_msg), 300, &error_pos);
 	program_error(ctx, error_pos, error_msg);
 
 #if DEBUG_PARSING
@@ -3718,10 +3718,10 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	do {
 	    int line, col;
 	    char *s;
-	    fprintf(stderr, "program: %s\n", (char *) strz);
+	    fprintf(stderr, "program: %s\n", const_cast<char *>(reinterpret_cast<const char *>(strz)));
 	    fprintf(stderr, "Error Pos: %d\n", ctx->program.ErrorPos);
-	    s = (char *) _mesa_find_line_column(strz, strz+ctx->program.ErrorPos,
-						&line, &col);
+	    s = const_cast<char *>(reinterpret_cast<const char *>(_mesa_find_line_column(strz, strz+ctx->program.ErrorPos,
+						&line, &col)));
 	    fprintf(stderr, "line %d col %d: %s\n", line, col, s);
 	} while (0)
 #endif
@@ -3797,7 +3797,7 @@ _mesa_parse_arb_fragment_program(GLcontext* ctx, GLenum target,
     GLuint i;
 
     ASSERT(target == GL_FRAGMENT_PROGRAM_ARB);
-    if (!_mesa_parse_arb_program(ctx, target, (const GLubyte*) str, len, &ap)) {
+    if (!_mesa_parse_arb_program(ctx, target, static_cast<const GLubyte*>(str), len, &ap)) {
 	/* Error in the program. Just return. */
 	return;
     }
@@ -3856,7 +3856,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
 
     ASSERT(target == GL_VERTEX_PROGRAM_ARB);
 
-    if (!_mesa_parse_arb_program(ctx, target, (const GLubyte*) str, len, &ap)) {
+    if (!_mesa_parse_arb_program(ctx, target, static_cast<const GLubyte*>(str), len, &ap)) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glProgramString(bad program)");
 	return;
     }

@@ -90,8 +90,8 @@ static GLboolean
 is_valid_address(const slang_mempool *pool, void *addr)
 {
     while (pool) {
-	if (static_cast<const char *>(addr) >= pool->data.data() &&
-	    static_cast<const char *>(addr) < pool->data.data() + pool->used)
+	if (reinterpret_cast<const char *>(addr) >= pool->data.data() &&
+	    reinterpret_cast<const char *>(addr) < pool->data.data() + pool->used)
 	    return GL_TRUE;
 	pool = pool->next.get();
     }
@@ -121,7 +121,7 @@ _slang_alloc(GLuint bytes)
 	    /* found room in this block */
 	    void *addr = static_cast<void *>(pool->data.data() + pool->used);
 #ifdef DEBUG
-	    check_zero(static_cast<char *>(addr), bytes);
+	    check_zero(reinterpret_cast<char *>(addr), bytes);
 #endif
 	    pool->used += ROUND_UP(bytes);
 	    pool->largest = MAX2(pool->largest, bytes);
@@ -182,7 +182,7 @@ _slang_strdup(const char *s)
 {
     if (s) {
 	const std::size_t len = std::strlen(s);
-	char *s2 = static_cast<char *>(_slang_alloc(static_cast<GLuint>(len + 1)));
+	char *s2 = reinterpret_cast<char *>(_slang_alloc(static_cast<GLuint>(len + 1)));
 	if (s2)
 	    std::memcpy(s2, s, len + 1);
 	return s2;

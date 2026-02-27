@@ -228,13 +228,13 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
     if (span->array->ChanType == GL_UNSIGNED_BYTE) {
 	/* treat 4*GLubyte as GLuint */
 	logicop_uint1(ctx, span->end,
-		      (GLuint *) span->array->color.sz1.rgba,
-		      (const GLuint *) rbPixels, span->array->mask);
+		      reinterpret_cast<GLuint *>(span->array->color.sz1.rgba),
+		      reinterpret_cast<const GLuint *>(rbPixels), span->array->mask);
     } else if (span->array->ChanType == GL_UNSIGNED_SHORT) {
 	/* treat 2*GLushort as GLuint */
 	logicop_uint2(ctx, 2 * span->end,
-		      (GLuint *) span->array->color.sz2.rgba,
-		      (const GLuint *) rbPixels, span->array->mask);
+		      reinterpret_cast<GLuint *>(span->array->color.sz2.rgba),
+		      reinterpret_cast<const GLuint *>(rbPixels), span->array->mask);
     } else {
 	GLuint crgba[MAX_WIDTH][4];
 	int i, j;
@@ -244,8 +244,8 @@ _swrast_logicop_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	    }
 	}
 	logicop_uint4(ctx, 4 * span->end,
-		      (GLuint *)crgba,
-		      (const GLuint *) rbPixels, span->array->mask);
+		      reinterpret_cast<GLuint *>(crgba),
+		      reinterpret_cast<const GLuint *>(rbPixels), span->array->mask);
     }
 }
 

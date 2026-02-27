@@ -42,12 +42,12 @@
  * These are handy for the viewport mapping, which is expressed as a matrix.
  */
 /*@{*/
-#define MAT_SX 0
-#define MAT_SY 5
-#define MAT_SZ 10
-#define MAT_TX 12
-#define MAT_TY 13
-#define MAT_TZ 14
+constexpr int MAT_SX = 0;
+constexpr int MAT_SY = 5;
+constexpr int MAT_SZ = 10;
+constexpr int MAT_TX = 12;
+constexpr int MAT_TY = 13;
+constexpr int MAT_TZ = 14;
 /*@}*/
 
 

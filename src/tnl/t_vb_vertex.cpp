@@ -78,7 +78,7 @@ static void NAME( GLcontext *ctx,				\
 	 const GLfloat b = ctx->Transform._ClipUserPlane[p][1];	\
 	 const GLfloat c = ctx->Transform._ClipUserPlane[p][2];	\
 	 const GLfloat d = ctx->Transform._ClipUserPlane[p][3];	\
-         GLfloat *coord = (GLfloat *)clip->data;		\
+         GLfloat *coord = reinterpret_cast<GLfloat *>(clip->data);		\
          GLuint stride = clip->stride;				\
          GLuint count = clip->count;				\
 								\

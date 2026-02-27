@@ -113,8 +113,8 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 
     if (format == GL_RGBA && type == rbType) {
 	const GLubyte *src
-	    = (const GLubyte *) _mesa_image_address2d(&unpack, pixels, width,
-		    height, format, type, 0, 0);
+	    = static_cast<const GLubyte *>(_mesa_image_address2d(&unpack, pixels, width,
+		    height, format, type, 0, 0));
 	const GLint srcStride = _mesa_image_row_stride(&unpack, width,
 				format, type);
 	if (simpleZoom) {
@@ -142,8 +142,8 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 
     if (format == GL_RGB && type == rbType) {
 	const GLubyte *src
-	    = (const GLubyte *) _mesa_image_address2d(&unpack, pixels, width,
-		    height, format, type, 0, 0);
+	    = static_cast<const GLubyte *>(_mesa_image_address2d(&unpack, pixels, width,
+		    height, format, type, 0, 0));
 	const GLint srcStride = _mesa_image_row_stride(&unpack, width,
 				format, type);
 	if (simpleZoom) {
@@ -262,7 +262,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
     }
 
     if (format == GL_COLOR_INDEX && type == GL_UNSIGNED_BYTE) {
-	const GLubyte *src = (const GLubyte *) pixels
+	const GLubyte *src = static_cast<const GLubyte *>(pixels)
 			     + unpack.SkipRows * unpack.RowLength + unpack.SkipPixels;
 	if (ctx->Visual.rgbMode && rbType == GL_UNSIGNED_BYTE) {
 	    /* convert ubyte/CI data to ubyte/RGBA */
@@ -575,7 +575,7 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	for (row = 0; row < height; row++) {
 	    const GLvoid *source = _mesa_image_address2d(unpack,
 				   pixels, width, height, format, type, row, 0);
-	    _mesa_unpack_color_span_float(ctx, width, GL_RGBA, (GLfloat *) dest,
+	    _mesa_unpack_color_span_float(ctx, width, GL_RGBA, reinterpret_cast<GLfloat *>(dest),
 					  format, type, source, unpack,
 					  transferOps & IMAGE_PRE_CONVOLUTION_BITS);
 	    dest += width * 4;
@@ -620,15 +620,15 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	    = _mesa_image_row_stride(unpack, width, format, type);
 	GLint skipPixels = 0;
 	/* use span array for temp color storage */
-	GLfloat *rgba = (GLfloat *) span.array->attribs[FRAG_ATTRIB_COL0];
+	GLfloat *rgba = reinterpret_cast<GLfloat *>(span.array->attribs[FRAG_ATTRIB_COL0]);
 
 	/* if the span is wider than MAX_WIDTH we have to do it in chunks */
 	while (skipPixels < width) {
 	    const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
 	    const GLubyte *source
-		= (const GLubyte *) _mesa_image_address2d(unpack, pixels,
+		= static_cast<const GLubyte *>(_mesa_image_address2d(unpack, pixels,
 			width, height, format,
-			type, 0, skipPixels);
+			type, 0, skipPixels));
 	    GLint row;
 
 	    for (row = 0; row < height; row++) {
@@ -830,9 +830,9 @@ _swrast_DrawPixels(GLcontext *ctx,
 	    RENDER_FINISH(swrast, ctx);
 	    return;
 	}
-	buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
+	buf = static_cast<GLubyte *>(ctx->Driver.MapBuffer(ctx, GL_PIXEL_UNPACK_BUFFER_EXT,
 						GL_READ_ONLY_ARB,
-						unpack->BufferObj);
+						unpack->BufferObj));
 	if (!buf) {
 	    /* buffer is already mapped - that's an error */
 	    _mesa_error(ctx, GL_INVALID_OPERATION, "glDrawPixels(PBO is mapped)");

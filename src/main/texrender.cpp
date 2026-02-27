@@ -40,19 +40,19 @@ if (DataType == CHAN_TYPE) {
 TexImage->FetchTexelc(TexImage, x + i, y, z, rgbaOut + 4 * i);
     }
 } else if (DataType == GL_FLOAT) {
-    GLfloat *rgbaOut = (GLfloat *) values;
+    GLfloat *rgbaOut = static_cast<GLfloat *>(values);
     for (i = 0; i < count; i++) {
 TexImage->FetchTexelf(TexImage, x + i, y, z, rgbaOut + 4 * i);
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    GLuint *zValues = (GLuint *) values;
+    GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
 zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    GLuint *zValues = (GLuint *) values;
+    GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x + i, y, z, &flt);
@@ -73,19 +73,19 @@ if (DataType == CHAN_TYPE) {
 TexImage->FetchTexelc(TexImage, x[i], y[i], z, rgbaOut + 4 * i);
     }
 } else if (DataType == GL_FLOAT) {
-    GLfloat *rgbaOut = (GLfloat *) values;
+    GLfloat *rgbaOut = static_cast<GLfloat *>(values);
     for (i = 0; i < count; i++) {
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, rgbaOut + 4 * i);
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    GLuint *zValues = (GLuint *) values;
+    GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
 zValues[i] = ((GLuint)(flt * 0xffffff)) << 8;
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    GLuint *zValues = (GLuint *) values;
+    GLuint *zValues = static_cast<GLuint *>(values);
     for (i = 0; i < count; i++) {
 GLfloat flt;
 TexImage->FetchTexelf(TexImage, x[i], y[i], z, &flt);
@@ -110,7 +110,7 @@ if (!mask || mask[i]) {
 rgba += 4;
     }
 } else if (DataType == GL_FLOAT) {
-    const GLfloat *rgba = (const GLfloat *) values;
+    const GLfloat *rgba = static_cast<const GLfloat *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, rgba);
@@ -118,14 +118,14 @@ if (!mask || mask[i]) {
 rgba += 4;
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    const GLuint *zValues = (const GLuint *) values;
+    const GLuint *zValues = static_cast<const GLuint *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, zValues + i);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    const GLuint *zValues = (const GLuint *) values;
+    const GLuint *zValues = static_cast<const GLuint *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     GLfloat flt = (zValues[i] >> 8) * (1.0 / 0xffffff);
@@ -150,21 +150,21 @@ if (!mask || mask[i]) {
 }
     }
 } else if (DataType == GL_FLOAT) {
-    const GLfloat *rgba = (const GLfloat *) value;
+    const GLfloat *rgba = static_cast<const GLfloat *>(value);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, rgba);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    const GLuint zValue = *((const GLuint *) value);
+    const GLuint zValue = *(static_cast<const GLuint *>(value));
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, &zValue);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    const GLuint zValue = *((const GLuint *) value);
+    const GLuint zValue = *(static_cast<const GLuint *>(value));
     const GLfloat flt = (zValue >> 8) * (1.0 / 0xffffff);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
@@ -190,7 +190,7 @@ if (!mask || mask[i]) {
 rgba += 4;
     }
 } else if (DataType == GL_FLOAT) {
-    const GLfloat *rgba = (const GLfloat *) values;
+    const GLfloat *rgba = static_cast<const GLfloat *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, rgba);
@@ -198,14 +198,14 @@ if (!mask || mask[i]) {
 rgba += 4;
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    const GLuint *zValues = (const GLuint *) values;
+    const GLuint *zValues = static_cast<const GLuint *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, zValues + i);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    const GLuint *zValues = (const GLuint *) values;
+    const GLuint *zValues = static_cast<const GLuint *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     GLfloat flt = (zValues[i] >> 8) * (1.0 / 0xffffff);
@@ -230,21 +230,21 @@ if (!mask || mask[i]) {
 }
     }
 } else if (DataType == GL_FLOAT) {
-    const GLfloat *rgba = (const GLfloat *) value;
+    const GLfloat *rgba = static_cast<const GLfloat *>(value);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, rgba);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT) {
-    const GLuint zValue = *((const GLuint *) value);
+    const GLuint zValue = *(static_cast<const GLuint *>(value));
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, &zValue);
 }
     }
 } else if (DataType == GL_UNSIGNED_INT_24_8_EXT) {
-    const GLuint zValue = *((const GLuint *) value);
+    const GLuint zValue = *(static_cast<const GLuint *>(value));
     const GLfloat flt = (zValue >> 8) * (1.0 / 0xffffff);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {

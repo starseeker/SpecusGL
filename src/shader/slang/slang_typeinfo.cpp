@@ -465,7 +465,7 @@ _slang_typeof_operation_(slang_operation * op,
 	    var = _slang_locate_variable(op->locals, op->a_id, GL_TRUE);
 	    if (!var) {
 		slang_info_log_error(log, "undefined variable '%s'",
-				     (char *) op->a_id);
+				     reinterpret_cast<char *>(op->a_id));
 		return GL_FALSE;
 	    }
 	    if (!slang_type_specifier_copy(&ti->spec, &var->type.specifier)) {

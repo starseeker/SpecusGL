@@ -732,7 +732,7 @@ _mesa_print_parameter_list(const struct gl_program_parameter_list *list)
     const gl_prog_print_mode mode = PROG_PRINT_DEBUG;
     GLuint i;
 
-    _mesa_printf("param list %p\n", (void *) list);
+    _mesa_printf("param list %p\n", static_cast<const void *>(list));
     for (i = 0; i < list->NumParameters(); i++) {
 	const struct gl_program_parameter *param = &list->Parameters[i];
 	const GLfloat *v = list->ParameterValues[i].data();

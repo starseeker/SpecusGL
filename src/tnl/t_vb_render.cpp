@@ -240,7 +240,7 @@ void _tnl_RenderClippedPolygon(GLcontext *ctx, const GLuint *elts, GLuint n)
     struct vertex_buffer *VB = &tnl->vb;
     GLuint *tmp = VB->Elts;
 
-    VB->Elts = (GLuint *)elts;
+    VB->Elts = const_cast<GLuint *>(elts);
     tnl->Driver.Render.PrimTabElts[GL_POLYGON](ctx, 0, n, PRIM_BEGIN|PRIM_END);
     VB->Elts = tmp;
 }

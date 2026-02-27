@@ -292,7 +292,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + 4 * (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = VALUE[RCOMP];  \
@@ -317,7 +317,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + 4 * (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = VALUE[RCOMP];  \
@@ -342,7 +342,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLfloat *P = (GLfloat *) osmesa->rowaddr[Y] + 4 * (X)
+   GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = MAX2((VALUE[RCOMP]), 0.0F); \
@@ -368,7 +368,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + 4 * (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -393,7 +393,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + 4 * (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -418,7 +418,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLfloat *P = (GLfloat *) osmesa->rowaddr[Y] + 4 * (X)
+   GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -444,7 +444,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + 4 * (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[1] = VALUE[RCOMP];  \
@@ -469,7 +469,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + 4 * (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[1] = VALUE[RCOMP];  \
@@ -494,7 +494,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLfloat *P = (GLfloat *) osmesa->rowaddr[Y] + 4 * (X)
+   GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[1] = VALUE[RCOMP];  \
@@ -520,7 +520,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + 3 * (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = VALUE[RCOMP];  \
@@ -539,7 +539,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + 3 * (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = VALUE[RCOMP];  \
@@ -558,7 +558,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLfloat *P = (GLfloat *) osmesa->rowaddr[Y] + 3 * (X)
+   GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[0] = VALUE[RCOMP];  \
@@ -578,7 +578,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + 3 * (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -597,7 +597,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + 3 * (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -616,7 +616,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLfloat *P = (GLfloat *) osmesa->rowaddr[Y] + 3 * (X)
+   GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 3 * (X)
 #define INC_PIXEL_PTR(P) P += 3
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    DST[2] = VALUE[RCOMP];  \
@@ -636,7 +636,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLushort *P = (GLushort *) osmesa->rowaddr[Y] + (X)
+   GLushort *P = static_cast<GLushort *>(osmesa->rowaddr[Y]) + (X)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    *DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | (((VALUE[GCOMP]) & 0xfc) << 3) | ((VALUE[BCOMP]) >> 3) )
@@ -655,7 +655,7 @@ osmesa_context::apply_fxaa()
 #define SPAN_VARS \
    const OSMesaContext osmesa = OSMESA_CONTEXT(ctx);
 #define INIT_PIXEL_PTR(P, X, Y) \
-   GLubyte *P = (GLubyte *) osmesa->rowaddr[Y] + (X)
+   GLubyte *P = static_cast<GLubyte *>(osmesa->rowaddr[Y]) + (X)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
    *DST = VALUE[0]
@@ -830,7 +830,7 @@ osmesa_context::choose_line_func(GLcontext *ctx)
 
 #define RENDER_SPAN( span ) {				\
    GLuint i;						\
-   GLuint *img = (GLuint *) PIXELADDR4(span.x, span.y);	\
+   GLuint *img = reinterpret_cast<GLuint *>(PIXELADDR4(span.x, span.y));	\
    if (zRow) {						\
       for (i = 0; i < span.end; i++) {			\
          const GLuint z = FixedToDepth(span.z);		\
@@ -919,7 +919,7 @@ void
 osmesa_context::compute_row_addresses()
 {
     GLint bytesPerPixel, bytesPerRow, i;
-    GLubyte *origin = (GLubyte *) rb->Data;
+    GLubyte *origin = static_cast<GLubyte *>(rb->Data);
     GLint bpc; /* bytes per channel */
     GLint rowlength; /* in pixels */
     GLint height = rb->Height;
@@ -961,13 +961,13 @@ osmesa_context::compute_row_addresses()
     if (yup) {
 	/* Y=0 is bottom line of window */
 	for (i = 0; i < height; i++) {
-	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + i * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)(static_cast<GLubyte *>(origin) + i * bytesPerRow);
 	}
     } else {
 	/* Y=0 is top line of window */
 	for (i = 0; i < height; i++) {
 	    GLint j = height - i - 1;
-	    rowaddr[i] = (GLvoid *)((GLubyte *) origin + j * bytesPerRow);
+	    rowaddr[i] = (GLvoid *)(static_cast<GLubyte *>(origin) + j * bytesPerRow);
 	}
     }
 }

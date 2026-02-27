@@ -67,7 +67,7 @@
 #include <unordered_map>
 #include <vector>
 
-#define MAX_PIPELINE_STAGES     30
+constexpr GLint MAX_PIPELINE_STAGES = 30;
 
 /*
  * Note: The first attributes match the VERT_ATTRIB_* definitions
@@ -155,33 +155,33 @@ enum {
 #define _TNL_ATTRIB_GENERIC(n) (_TNL_ATTRIB_GENERIC0 + (n))
 
 /* special index used for handing invalid glVertexAttribute() indices */
-#define _TNL_ATTRIB_ERROR    (_TNL_ATTRIB_GENERIC15 + 1)
+constexpr auto _TNL_ATTRIB_ERROR = _TNL_ATTRIB_GENERIC15 + 1;
 
 /**
  * Handy attribute ranges:
  */
-#define _TNL_FIRST_PROG      _TNL_ATTRIB_WEIGHT
-#define _TNL_LAST_PROG       _TNL_ATTRIB_TEX7
+constexpr auto _TNL_FIRST_PROG = _TNL_ATTRIB_WEIGHT;
+constexpr auto _TNL_LAST_PROG = _TNL_ATTRIB_TEX7;
 
-#define _TNL_FIRST_TEX       _TNL_ATTRIB_TEX0
-#define _TNL_LAST_TEX        _TNL_ATTRIB_TEX7
+constexpr auto _TNL_FIRST_TEX = _TNL_ATTRIB_TEX0;
+constexpr auto _TNL_LAST_TEX = _TNL_ATTRIB_TEX7;
 
-#define _TNL_FIRST_GENERIC _TNL_ATTRIB_GENERIC0
-#define _TNL_LAST_GENERIC  _TNL_ATTRIB_GENERIC15
+constexpr auto _TNL_FIRST_GENERIC = _TNL_ATTRIB_GENERIC0;
+constexpr auto _TNL_LAST_GENERIC = _TNL_ATTRIB_GENERIC15;
 
-#define _TNL_FIRST_MAT       _TNL_ATTRIB_MAT_FRONT_AMBIENT /* GENERIC0 */
-#define _TNL_LAST_MAT        _TNL_ATTRIB_MAT_BACK_INDEXES  /* GENERIC11 */
+constexpr auto _TNL_FIRST_MAT = _TNL_ATTRIB_MAT_FRONT_AMBIENT;  /* GENERIC0 */
+constexpr auto _TNL_LAST_MAT = _TNL_ATTRIB_MAT_BACK_INDEXES;  /* GENERIC11 */
 
 /* Number of available generic attributes */
-#define _TNL_NUM_GENERIC 16
+constexpr GLint _TNL_NUM_GENERIC = 16;
 
 /* Number of attributes used for evaluators */
-#define _TNL_NUM_EVAL 16
+constexpr GLint _TNL_NUM_EVAL = 16;
 
 
-#define PRIM_BEGIN     0x10
-#define PRIM_END       0x20
-#define PRIM_MODE_MASK 0x0f
+constexpr GLuint PRIM_BEGIN = 0x10;
+constexpr GLuint PRIM_END = 0x20;
+constexpr GLuint PRIM_MODE_MASK = 0x0f;
 
 static inline GLuint _tnl_translate_prim(const struct _mesa_prim *prim)
 {
@@ -283,17 +283,17 @@ struct tnl_pipeline {
 struct tnl_clipspace;
 struct tnl_clipspace_attr;
 
-typedef void (*tnl_extract_func)(const struct tnl_clipspace_attr *a,
-				 GLfloat *out,
-				 const GLubyte *v);
+using tnl_extract_func = void (*)(const struct tnl_clipspace_attr *a,
+                                   GLfloat *out,
+                                   const GLubyte *v);
 
-typedef void (*tnl_insert_func)(const struct tnl_clipspace_attr *a,
-				GLubyte *v,
-				const GLfloat *in);
+using tnl_insert_func = void (*)(const struct tnl_clipspace_attr *a,
+                                  GLubyte *v,
+                                  const GLfloat *in);
 
-typedef void (*tnl_emit_func)(GLcontext *ctx,
-			      GLuint count,
-			      GLubyte *dest);
+using tnl_emit_func = void (*)(GLcontext *ctx,
+                                GLuint count,
+                                GLubyte *dest);
 
 
 /**
@@ -317,21 +317,21 @@ struct tnl_clipspace_attr {
 
 
 
-typedef void (*tnl_points_func)(GLcontext *ctx, GLuint first, GLuint last);
-typedef void (*tnl_line_func)(GLcontext *ctx, GLuint v1, GLuint v2);
-typedef void (*tnl_triangle_func)(GLcontext *ctx,
-				  GLuint v1, GLuint v2, GLuint v3);
-typedef void (*tnl_quad_func)(GLcontext *ctx, GLuint v1, GLuint v2,
-			      GLuint v3, GLuint v4);
-typedef void (*tnl_render_func)(GLcontext *ctx, GLuint start, GLuint count,
-				GLuint flags);
-typedef void (*tnl_interp_func)(GLcontext *ctx,
-				GLfloat t, GLuint dst, GLuint out, GLuint in,
-				GLboolean force_boundary);
-typedef void (*tnl_copy_pv_func)(GLcontext *ctx, GLuint dst, GLuint src);
-typedef void (*tnl_setup_func)(GLcontext *ctx,
-			       GLuint start, GLuint end,
-			       GLuint new_inputs);
+using tnl_points_func   = void (*)(GLcontext *ctx, GLuint first, GLuint last);
+using tnl_line_func     = void (*)(GLcontext *ctx, GLuint v1, GLuint v2);
+using tnl_triangle_func = void (*)(GLcontext *ctx,
+                                    GLuint v1, GLuint v2, GLuint v3);
+using tnl_quad_func     = void (*)(GLcontext *ctx, GLuint v1, GLuint v2,
+                                    GLuint v3, GLuint v4);
+using tnl_render_func   = void (*)(GLcontext *ctx, GLuint start, GLuint count,
+                                    GLuint flags);
+using tnl_interp_func   = void (*)(GLcontext *ctx,
+                                    GLfloat t, GLuint dst, GLuint out, GLuint in,
+                                    GLboolean force_boundary);
+using tnl_copy_pv_func  = void (*)(GLcontext *ctx, GLuint dst, GLuint src);
+using tnl_setup_func    = void (*)(GLcontext *ctx,
+                                    GLuint start, GLuint end,
+                                    GLuint new_inputs);
 
 
 struct tnl_attr_type {

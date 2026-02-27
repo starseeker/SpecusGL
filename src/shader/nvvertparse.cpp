@@ -228,7 +228,7 @@ Peek_Token(struct parse_state *parseState, GLubyte *token)
 	parseState->pos += (-i);
 	return GL_FALSE;
     }
-    len = (GLint)strlen((const char *) token);
+    len = (GLint)strlen(reinterpret_cast<const char *>(token));
     parseState->pos += (i - len);
     return GL_TRUE;
 }
@@ -304,7 +304,7 @@ Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR1("Expected R##");
 
     if (IsDigit(token[1])) {
-	GLint reg = atoi((char *)(token + 1));
+	GLint reg = atoi(reinterpret_cast<char *>(token + 1));
 	if (reg >= MAX_NV_VERTEX_PROGRAM_TEMPS)
 	    RETURN_ERROR1("Bad temporary register name");
 	*tempRegNum = reg;
@@ -357,7 +357,7 @@ Parse_AbsParamReg(struct parse_state *parseState, GLint *regNum)
 
     if (IsDigit(token[0])) {
 	/* a numbered program parameter register */
-	GLint reg = atoi((char *) token);
+	GLint reg = atoi(reinterpret_cast<char *>(token));
 	if (reg >= MAX_NV_VERTEX_PROGRAM_PARAMS)
 	    RETURN_ERROR1("Bad program parameter number");
 	*regNum = reg;
@@ -390,12 +390,12 @@ Parse_ParamReg(struct parse_state *parseState, struct prog_src_register *srcReg)
 	/* a numbered program parameter register */
 	GLint reg;
 	(void) Parse_Token(parseState, token);
-	reg = atoi((char *) token);
+	reg = atoi(reinterpret_cast<char *>(token));
 	if (reg >= MAX_NV_VERTEX_PROGRAM_PARAMS)
 	    RETURN_ERROR1("Bad program parameter number");
 	srcReg->File = PROGRAM_ENV_PARAM;
 	srcReg->Index = reg;
-    } else if (strcmp((const char *) token, "A0") == 0) {
+    } else if (strcmp(reinterpret_cast<const char *>(token), "A0") == 0) {
 	/* address register "A0.x" */
 	if (!Parse_AddrReg(parseState))
 	    RETURN_ERROR;
@@ -415,7 +415,7 @@ Parse_ParamReg(struct parse_state *parseState, struct prog_src_register *srcReg)
 		RETURN_ERROR;
 
 	    if (IsDigit(token[0])) {
-		const GLint k = atoi((char *) token);
+		const GLint k = atoi(reinterpret_cast<char *>(token));
 		if (sign == '-') {
 		    if (k > 64)
 			RETURN_ERROR1("Bad address offset");
@@ -468,13 +468,13 @@ Parse_AttribReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR1("Only v[0] accessible in vertex state programs");
 
     if (IsDigit(token[0])) {
-	GLint reg = atoi((char *) token);
+	GLint reg = atoi(reinterpret_cast<char *>(token));
 	if (reg >= MAX_NV_VERTEX_PROGRAM_INPUTS)
 	    RETURN_ERROR1("Bad vertex attribute register name");
 	*tempRegNum = reg;
     } else {
 	for (j = 0; InputRegisters[j]; j++) {
-	    if (strcmp((const char *) token, InputRegisters[j]) == 0) {
+	    if (strcmp(reinterpret_cast<const char *>(token), InputRegisters[j]) == 0) {
 		*tempRegNum = j;
 		break;
 	    }
@@ -518,7 +518,7 @@ Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
 
     /* try to match an output register name */
     for (j = start; OutputRegisters[j]; j++) {
-	if (strcmp((const char *) token, OutputRegisters[j]) == 0) {
+	if (strcmp(reinterpret_cast<const char *>(token), OutputRegisters[j]) == 0) {
 	    *outputRegNum = j;
 	    break;
 	}

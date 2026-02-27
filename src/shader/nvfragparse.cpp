@@ -215,7 +215,7 @@ static struct instruction_pattern
     struct instruction_pattern result = {nullptr, (enum prog_opcode) -1, 0, 0, 0};
 
     for (inst = Instructions; inst->name; inst++) {
-	if (strncmp((const char *) token, inst->name, 3) == 0) {
+	if (strncmp(reinterpret_cast<const char *>(token), inst->name, 3) == 0) {
 	    /* matched! */
 	    int i = 3;
 	    result = *inst;
@@ -366,7 +366,7 @@ Peek_Token(struct parse_state *parseState, GLubyte *token)
 	parseState->pos += (-i);
 	return GL_FALSE;
     }
-    len = (GLint)strlen((const char *) token);
+    len = (GLint)strlen(reinterpret_cast<const char *>(token));
     parseState->pos += (i - len);
     return GL_TRUE;
 }
@@ -455,9 +455,9 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 
     *number = (GLfloat) strtod((const char *) parseState->pos, &end);
 
-    if (end && end > (char *) parseState->pos) {
+    if (end && end > const_cast<char *>(reinterpret_cast<const char *>(parseState->pos))) {
 	/* got a number */
-	parseState->pos = (GLubyte *) end;
+	parseState->pos = reinterpret_cast<GLubyte *>(end);
 	number[1] = *number;
 	number[2] = *number;
 	number[3] = *number;
@@ -469,7 +469,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 	if (!Parse_Identifier(parseState, ident))
 	    RETURN_ERROR1("Expected an identifier");
 	constant = _mesa_lookup_parameter_value(parseState->parameters,
-						-1, (const char *) ident);
+						-1, reinterpret_cast<const char *>(ident));
 	/* XXX Check that it's a constant and not a parameter */
 	if (!constant) {
 	    RETURN_ERROR1("Undefined symbol");
@@ -583,7 +583,7 @@ Parse_TextureImageId(struct parse_state *parseState,
 	imageSrc[2] != 'X') {
 	RETURN_ERROR1("Expected TEX# source");
     }
-    unit = atoi((const char *) imageSrc + 3);
+    unit = atoi(reinterpret_cast<const char *>(imageSrc) + 3);
     if ((unit < 0 || unit > MAX_TEXTURE_IMAGE_UNITS) ||
 	(unit == 0 && (imageSrc[3] != '0' || imageSrc[4] != 0))) {
 	RETURN_ERROR1("Invalied TEX# source index");
@@ -714,7 +714,7 @@ Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR1("Expected R## or H##");
 
     if (IsDigit(token[1])) {
-	GLint reg = atoi((const char *)(token + 1));
+	GLint reg = atoi(reinterpret_cast<const char *>(token + 1));
 	if (token[0] == 'H')
 	    reg += 32;
 	if (reg >= MAX_NV_FRAGMENT_PROGRAM_TEMPS)
@@ -762,7 +762,7 @@ Parse_ProgramParamReg(struct parse_state *parseState, GLint *regNum)
 
     if (IsDigit(token[0])) {
 	/* a numbered program parameter register */
-	GLint reg = atoi((const char *) token);
+	GLint reg = atoi(reinterpret_cast<const char *>(token));
 	if (reg >= MAX_NV_FRAGMENT_PROGRAM_PARAMS)
 	    RETURN_ERROR1("Invalid constant program number");
 	*regNum = reg;
@@ -795,7 +795,7 @@ Parse_FragReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR;
     }
     for (j = 0; InputRegisters[j]; j++) {
-	if (strcmp((const char *) token, InputRegisters[j]) == 0) {
+	if (strcmp(reinterpret_cast<const char *>(token), InputRegisters[j]) == 0) {
 	    *tempRegNum = j;
 	    parseState->inputsRead |= (1 << j);
 	    break;
@@ -830,7 +830,7 @@ Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
 
     /* try to match an output register name */
     for (j = 0; OutputRegisters[j]; j++) {
-	if (strcmp((const char *) token, OutputRegisters[j]) == 0) {
+	if (strcmp(reinterpret_cast<const char *>(token), OutputRegisters[j]) == 0) {
 	    static GLuint bothColors = (1 << FRAG_RESULT_COLR) | (1 << FRAG_RESULT_COLH);
 	    *outputRegNum = j;
 	    parseState->outputsWritten |= (1 << j);
@@ -862,8 +862,8 @@ Parse_MaskedDstReg(struct parse_state *parseState,
     if (!Peek_Token(parseState, token))
 	RETURN_ERROR;
 
-    if (strcmp((const char *) token, "RC") == 0 ||
-	strcmp((const char *) token, "HC") == 0) {
+    if (strcmp(reinterpret_cast<const char *>(token), "RC") == 0 ||
+	strcmp(reinterpret_cast<const char *>(token), "HC") == 0) {
 	/* a write-only register */
 	dstReg->File = PROGRAM_WRITE_ONLY;
 	if (!Parse_DummyReg(parseState, &idx))
@@ -1007,7 +1007,7 @@ Parse_VectorSrc(struct parse_state *parseState,
 	if (!Parse_Identifier(parseState, ident))
 	    RETURN_ERROR;
 	paramIndex = _mesa_lookup_parameter_index(parseState->parameters,
-		     -1, (const char *) ident);
+		     -1, reinterpret_cast<const char *>(ident));
 	if (paramIndex < 0) {
 	    RETURN_ERROR2("Undefined constant or parameter: ", ident);
 	}
@@ -1128,7 +1128,7 @@ Parse_ScalarSrcReg(struct parse_state *parseState,
 	if (!Parse_Identifier(parseState, ident))
 	    RETURN_ERROR;
 	paramIndex = _mesa_lookup_parameter_index(parseState->parameters,
-		     -1, (const char *) ident);
+		     -1, reinterpret_cast<const char *>(ident));
 	if (paramIndex < 0) {
 	    RETURN_ERROR2("Undefined constant or parameter: ", ident);
 	}
@@ -1252,11 +1252,11 @@ Parse_InstructionSequence(struct parse_state *parseState,
 	    if (!Parse_String(parseState, ";"))
 		RETURN_ERROR1("Expected ;");
 	    if (_mesa_lookup_parameter_index(parseState->parameters,
-					     -1, (const char *) id) >= 0) {
+					     -1, reinterpret_cast<const char *>(id)) >= 0) {
 		RETURN_ERROR2(id, "already defined");
 	    }
 	    _mesa_add_named_parameter(parseState->parameters,
-				      (const char *) id, value);
+				      reinterpret_cast<const char *>(id), value);
 	} else if (Parse_String(parseState, "DECLARE")) {
 	    GLubyte id[100];
 	    GLfloat value[7] = {0, 0, 0, 0, 0, 0, 0};  /* yes, to be safe */
@@ -1270,11 +1270,11 @@ Parse_InstructionSequence(struct parse_state *parseState,
 	    if (!Parse_String(parseState, ";"))
 		RETURN_ERROR1("Expected ;");
 	    if (_mesa_lookup_parameter_index(parseState->parameters,
-					     -1, (const char *) id) >= 0) {
+					     -1, reinterpret_cast<const char *>(id)) >= 0) {
 		RETURN_ERROR2(id, "already declared");
 	    }
 	    _mesa_add_named_parameter(parseState->parameters,
-				      (const char *) id, value);
+				      reinterpret_cast<const char *>(id), value);
 	} else if (Parse_String(parseState, "END")) {
 	    inst->Opcode = OPCODE_END;
 	    inst->StringPos = parseState->curLine - parseState->start;
