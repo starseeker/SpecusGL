@@ -1353,7 +1353,7 @@ _mesa_IsEnabled(GLenum cap)
 	    return ctx->ATIFragmentShader.Enabled;
 #endif /* FEATURE_ATI_fragment_shader */
 	default:
-	    _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled(0x%x)", (int) cap);
+	    _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled(0x%x)", static_cast<int>(cap));
 	    return GL_FALSE;
     }
 }

@@ -91,7 +91,7 @@ _mesa_PushAttrib(GLbitfield mask)
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
     if (MESA_VERBOSE & VERBOSE_API)
-	_mesa_debug(ctx, "glPushAttrib %x\n", (int) mask);
+	_mesa_debug(ctx, "glPushAttrib %x\n", static_cast<int>(mask));
 
     if (ctx->AttribStack.size() >= MAX_ATTRIB_STACK_DEPTH) {
 	_mesa_error(ctx, GL_STACK_OVERFLOW, "glPushAttrib");

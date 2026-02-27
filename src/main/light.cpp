@@ -1159,7 +1159,7 @@ compute_light_positions(GLcontext *ctx)
 
 		if (PV_dot_dir > light->_CosCutoff) {
 		    double x = PV_dot_dir * (EXP_TABLE_SIZE-1);
-		    int k = (int) x;
+		    int k = static_cast<int>(x);
 		    light->_VP_inf_spot_attenuation =
 			static_cast<GLfloat>((light->_SpotExpTable[k][0] +
 				  (x-k)*light->_SpotExpTable[k][1]));

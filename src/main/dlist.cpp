@@ -5453,7 +5453,7 @@ execute_list(GLcontext *ctx, GLuint list)
     done = GL_FALSE;
     while (!done) {
 	OpCode opcode = n[0].opcode;
-	int i = (int) n[0].opcode - (int) OPCODE_EXT_0;
+	int i = static_cast<int>(n[0].opcode) - static_cast<int>(OPCODE_EXT_0);
 
 	if (i >= 0 && i < static_cast<GLint>(ctx->ListExt.NumOpcodes)) {
 	    /* this is a driver-extended opcode */
@@ -6280,7 +6280,7 @@ execute_list(GLcontext *ctx, GLuint list)
 		default: {
 		    char msg[1000];
 		    std::snprintf(msg, sizeof(msg), "Error in execute_list: opcode=%d",
-				  (int) opcode);
+				  static_cast<int>(opcode));
 		    _mesa_problem(ctx, msg);
 		}
 		done = GL_TRUE;

@@ -172,7 +172,7 @@ shade_rastpos(GLcontext *ctx,
 		    continue;
 		} else {
 		    double x = PV_dot_dir * (EXP_TABLE_SIZE-1);
-		    int k = (int) x;
+		    int k = static_cast<int>(x);
 		    GLfloat spot = static_cast<GLfloat>((light->_SpotExpTable[k][0]
 					     + (x-k)*light->_SpotExpTable[k][1]));
 		    attenuation *= spot;
@@ -936,11 +936,11 @@ void glWindowPos4fMESA(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     glLoadIdentity();
 
     glDepthRange(z, z);
-    glViewport((int) x - 1, (int) y - 1, 2, 2);
+    glViewport(static_cast<int>(x) - 1, static_cast<int>(y) - 1, 2, 2);
 
     /* set the raster (window) position */
-    fx = x - (int) x;
-    fy = y - (int) y;
+    fx = x - static_cast<int>(x);
+    fy = y - static_cast<int>(y);
     glRasterPos4f(fx, fy, 0.0, w);
 
     /* restore matrices, viewport and matrix mode */
