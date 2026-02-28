@@ -494,7 +494,7 @@ _mesa_GetVertexAttribPointervNV(GLuint index, GLenum pname, GLvoid **pointer)
 	return;
     }
 
-    *pointer = (GLvoid *) ctx->Array.ArrayObj->VertexAttrib[index].Ptr;
+    *pointer = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->VertexAttrib[index].Ptr));
 }
 
 

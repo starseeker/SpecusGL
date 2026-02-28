@@ -671,12 +671,12 @@ __GLcontextRec::init_constants()
     Const.MaxPointSize = MAX_POINT_SIZE;
     Const.MinPointSizeAA = MIN_POINT_SIZE;
     Const.MaxPointSizeAA = MAX_POINT_SIZE;
-    Const.PointSizeGranularity = (GLfloat) POINT_SIZE_GRANULARITY;
+    Const.PointSizeGranularity = static_cast<GLfloat>(POINT_SIZE_GRANULARITY);
     Const.MinLineWidth = MIN_LINE_WIDTH;
     Const.MaxLineWidth = MAX_LINE_WIDTH;
     Const.MinLineWidthAA = MIN_LINE_WIDTH;
     Const.MaxLineWidthAA = MAX_LINE_WIDTH;
-    Const.LineWidthGranularity = (GLfloat) LINE_WIDTH_GRANULARITY;
+    Const.LineWidthGranularity = static_cast<GLfloat>(LINE_WIDTH_GRANULARITY);
     Const.MaxColorTableSize = MAX_COLOR_TABLE_SIZE;
     Const.MaxConvolutionWidth = MAX_CONVOLUTION_WIDTH;
     Const.MaxConvolutionHeight = MAX_CONVOLUTION_HEIGHT;
