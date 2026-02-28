@@ -35,7 +35,7 @@ GLuint i;
 assert(TexImage->Width == Width);
 assert(TexImage->Height == Height);
 if (DataType == CHAN_TYPE) {
-    GLchan *rgbaOut = (GLchan *) values;
+    GLchan *rgbaOut = static_cast<GLchan *>(values);
     for (i = 0; i < count; i++) {
 TexImage->FetchTexelc(TexImage, x + i, y, z, rgbaOut + 4 * i);
     }
@@ -68,7 +68,7 @@ zValues[i] = (static_cast<GLuint>((flt * 0xffffff))) << 8;
 const GLint z = Zoffset;
 GLuint i;
 if (DataType == CHAN_TYPE) {
-    GLchan *rgbaOut = (GLchan *) values;
+    GLchan *rgbaOut = static_cast<GLchan *>(values);
     for (i = 0; i < count; i++) {
 TexImage->FetchTexelc(TexImage, x[i], y[i], z, rgbaOut + 4 * i);
     }
@@ -102,7 +102,7 @@ const void *values, const GLubyte *mask) override {
 const GLint z = Zoffset;
 GLuint i;
 if (DataType == CHAN_TYPE) {
-    const GLchan *rgba = (const GLchan *) values;
+    const GLchan *rgba = static_cast<const GLchan *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, rgba);
@@ -143,7 +143,7 @@ if (!mask || mask[i]) {
 const GLint z = Zoffset;
 GLuint i;
 if (DataType == CHAN_TYPE) {
-    const GLchan *rgba = (const GLchan *) value;
+    const GLchan *rgba = static_cast<const GLchan *>(value);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x + i, y, z, rgba);
@@ -182,7 +182,7 @@ if (!mask || mask[i]) {
 const GLint z = Zoffset;
 GLuint i;
 if (DataType == CHAN_TYPE) {
-    const GLchan *rgba = (const GLchan *) values;
+    const GLchan *rgba = static_cast<const GLchan *>(values);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, rgba);
@@ -223,7 +223,7 @@ if (!mask || mask[i]) {
 const GLint z = Zoffset;
 GLuint i;
 if (DataType == CHAN_TYPE) {
-    const GLchan *rgba = (const GLchan *) value;
+    const GLchan *rgba = static_cast<const GLchan *>(value);
     for (i = 0; i < count; i++) {
 if (!mask || mask[i]) {
     Store(TexImage, x[i], y[i], z, rgba);

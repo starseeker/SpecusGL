@@ -97,7 +97,7 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }
@@ -153,7 +153,7 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }
@@ -208,7 +208,7 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }
@@ -263,7 +263,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	_mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }

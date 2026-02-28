@@ -1703,7 +1703,7 @@ _mesa_pack_rgba_span_float(GLcontext *ctx, GLuint n, GLfloat rgba[][4],
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dstAddr;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dstAddr);
 	    switch (dstFormat) {
 		case GL_RED:
 		    for (i=0; i<n; i++)
@@ -2209,7 +2209,7 @@ extract_uint_indexes(GLuint n, GLuint indexes[],
 	break;
 	case GL_HALF_FLOAT_ARB: {
 	    GLuint i;
-	    const GLhalfARB *s = (const GLhalfARB *) src;
+	    const GLhalfARB *s = static_cast<const GLhalfARB *>(src);
 	    if (unpack->SwapBytes) {
 		for (i = 0; i < n; i++) {
 		    GLhalfARB value = s[i];
@@ -2917,7 +2917,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 		    return;
 		} else if (srcFormat == GL_RGB) {
 		    GLuint i;
-		    const GLchan *src = (const GLchan *) source;
+		    const GLchan *src = static_cast<const GLchan *>(source);
 		    GLchan *dst = dest;
 		    for (i = 0; i < n; i++) {
 			dst[0] = src[0];
@@ -2935,7 +2935,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 		    return;
 		} else if (srcFormat == GL_RGBA) {
 		    GLuint i;
-		    const GLchan *src = (const GLchan *) source;
+		    const GLchan *src = static_cast<const GLchan *>(source);
 		    GLchan *dst = dest;
 		    for (i = 0; i < n; i++) {
 			dst[0] = src[0];
@@ -3572,7 +3572,7 @@ _mesa_pack_index_span(const GLcontext *ctx, GLuint n,
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dest;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dest);
 	    GLuint i;
 	    for (i = 0; i < n; i++) {
 		dst[i] = _mesa_float_to_half(static_cast<GLfloat>(source[i]));
@@ -3966,7 +3966,7 @@ _mesa_unpack_depth_span(const GLcontext *ctx, GLuint n,
 	    break;
 	case GL_HALF_FLOAT_ARB: {
 	    GLuint i;
-	    const GLhalfARB *src = (const GLhalfARB *) source;
+	    const GLhalfARB *src = static_cast<const GLhalfARB *>(source);
 	    for (i = 0; i < n; i++) {
 		GLhalfARB value = src[i];
 		if (srcPacking->SwapBytes) {
@@ -4129,7 +4129,7 @@ _mesa_pack_depth_span(const GLcontext *ctx, GLuint n, GLvoid *dest,
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dest;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dest);
 	    GLuint i;
 	    for (i = 0; i < n; i++) {
 		dst[i] = _mesa_float_to_half(depthSpan[i]);

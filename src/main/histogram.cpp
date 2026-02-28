@@ -243,7 +243,7 @@ pack_histogram(GLcontext *ctx,
 	case GL_HALF_FLOAT_ARB: {
 	    /* temporarily store as GLuints */
 	    GLuint temp[4*HISTOGRAM_TABLE_SIZE] = {0};
-	    GLhalfARB *dst = (GLhalfARB *) destination;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(destination);
 	    GLuint i;
 	    /* get GLuint values */
 	    PACK_MACRO(GLuint);

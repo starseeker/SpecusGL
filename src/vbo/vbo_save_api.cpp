@@ -1088,7 +1088,7 @@ static void vbo_destroy_vertex_list(GLcontext *ctx, void *data)
 
 static void vbo_print_vertex_list(GLcontext *ctx, void *data)
 {
-    struct vbo_save_vertex_list *node = (struct vbo_save_vertex_list *)data;
+    auto *node = static_cast<vbo_save_vertex_list *>(data);
     GLuint i;
     (void) ctx;
 
