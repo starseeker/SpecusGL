@@ -24,107 +24,56 @@
 
 /**
  * \file bitset.h
- * \brief Bitset of arbitrary size definitions.
- * \author Michal Krol
+ * \brief Type-safe C++17 bitset utilities.
+ * \author Michal Krol (original C macro implementation)
+ *
+ * C++17 modernisation: the original C-macro bitsets (BITSET_DECLARE /
+ * BITSET64_DECLARE and friends) have been superseded by std::bitset<N>.
+ * See src/tnl/t_context.h for the canonical usage pattern.
+ *
+ * This header retains the file for include-compatibility and pulls in
+ * <bitset> so that every translation unit that was relying on bitset.h
+ * to provide the standard header continues to compile.
  */
 
-/****************************************************************************
- * generic bitset implementation
+#ifndef MESA_BITSET_H
+#define MESA_BITSET_H
+
+#include <bitset>
+#include <cstddef>
+
+/**
+ * Type alias for a bitset of exactly N bits.
+ *
+ * Use this in new code instead of the old BITSET_DECLARE / BITSET64_DECLARE
+ * macros.  std::bitset<N> is zero-initialised by its default constructor,
+ * supports all the bit-manipulation operations the old macros provided, and
+ * does so in a type-safe, bounds-checked (in debug builds) manner.
+ *
+ * Example – replacing the old BITSET_DECLARE pattern:
+ * \code
+ *   // Old (C macro style):
+ *   BITSET_DECLARE(my_flags, 32);
+ *   BITSET_SET(my_flags, 5);
+ *   if (BITSET_TEST(my_flags, 5)) { ... }
+ *
+ *   // New (C++17):
+ *   mesa::Bitset<32> my_flags;
+ *   my_flags.set(5);
+ *   if (my_flags.test(5)) { ... }
+ * \endcode
  */
+namespace mesa {
+    template <std::size_t N>
+    using Bitset = std::bitset<N>;
+} /* namespace mesa */
 
-#define BITSET_WORD GLuint
-#define BITSET_WORDBITS (sizeof (BITSET_WORD) * 8)
-
-/* bitset declarations
- */
-#define BITSET_DECLARE(name, size) \
-   BITSET_WORD name[((size) + BITSET_WORDBITS - 1) / BITSET_WORDBITS]
-
-/* bitset operations
- */
-#define BITSET_COPY(x, y) memcpy( (x), (y), sizeof (x) )
-#define BITSET_EQUAL(x, y) (memcmp( (x), (y), sizeof (x) ) == 0)
-#define BITSET_ZERO(x) memset( (x), 0, sizeof (x) )
-#define BITSET_ONES(x) memset( (x), 0xff, sizeof (x) )
-
-#define BITSET_BITWORD(b) ((b) / BITSET_WORDBITS)
-#define BITSET_BIT(b) (1 << ((b) % BITSET_WORDBITS))
-
-/* single bit operations
- */
-#define BITSET_TEST(x, b) ((x)[BITSET_BITWORD(b)] & BITSET_BIT(b))
-#define BITSET_SET(x, b) ((x)[BITSET_BITWORD(b)] |= BITSET_BIT(b))
-#define BITSET_CLEAR(x, b) ((x)[BITSET_BITWORD(b)] &= ~BITSET_BIT(b))
-
-#define BITSET_MASK(b) ((b) == BITSET_WORDBITS ? ~0 : BITSET_BIT(b) - 1)
-#define BITSET_RANGE(b, e) (BITSET_MASK((e) + 1) & ~BITSET_MASK(b))
-
-/* bit range operations
- */
-#define BITSET_TEST_RANGE(x, b, e) \
-   (BITSET_BITWORD(b) == BITSET_BITWORD(e) ? \
-   ((x)[BITSET_BITWORD(b)] & BITSET_RANGE(b, e)) : \
-   (assert (!"BITSET_TEST_RANGE: bit range crosses word boundary"), 0))
-#define BITSET_SET_RANGE(x, b, e) \
-   (BITSET_BITWORD(b) == BITSET_BITWORD(e) ? \
-   ((x)[BITSET_BITWORD(b)] |= BITSET_RANGE(b, e)) : \
-   (assert (!"BITSET_SET_RANGE: bit range crosses word boundary"), 0))
-#define BITSET_CLEAR_RANGE(x, b, e) \
-   (BITSET_BITWORD(b) == BITSET_BITWORD(e) ? \
-   ((x)[BITSET_BITWORD(b)] &= ~BITSET_RANGE(b, e)) : \
-   (assert (!"BITSET_CLEAR_RANGE: bit range crosses word boundary"), 0))
-
-/****************************************************************************
- * 64-bit bitset implementation
- */
-
-#define BITSET64_WORD GLuint
-#define BITSET64_WORDBITS (sizeof (BITSET64_WORD) * 8)
-
-/* bitset declarations
- */
-#define BITSET64_DECLARE(name, size) \
-   GLuint name[2]
-
-/* bitset operations
- */
-#define BITSET64_COPY(x, y) do { (x)[0] = (y)[0]; (x)[1] = (y)[1]; } while (0)
-#define BITSET64_EQUAL(x, y) ( (x)[0] == (y)[0] && (x)[1] == (y)[1] )
-#define BITSET64_ZERO(x) do { (x)[0] = 0; (x)[1] = 0; } while (0)
-#define BITSET64_ONES(x) do { (x)[0] = 0xFF; (x)[1] = 0xFF; } while (0)
-
-#define BITSET64_BITWORD(b) ((b) / BITSET64_WORDBITS)
-#define BITSET64_BIT(b) (1 << ((b) % BITSET64_WORDBITS))
-
-/* single bit operations
- */
-#define BITSET64_TEST(x, b) ((x)[BITSET64_BITWORD(b)] & BITSET64_BIT(b))
-#define BITSET64_SET(x, b) ((x)[BITSET64_BITWORD(b)] |= BITSET64_BIT(b))
-#define BITSET64_CLEAR(x, b) ((x)[BITSET64_BITWORD(b)] &= ~BITSET64_BIT(b))
-
-#define BITSET64_MASK(b) ((b) == BITSET64_WORDBITS ? ~0 : BITSET64_BIT(b) - 1)
-#define BITSET64_RANGE(b, e) (BITSET64_MASK((e) + 1) & ~BITSET64_MASK(b))
-
-/* bit range operations
- */
-#define BITSET64_TEST_RANGE(x, b, e) \
-   (BITSET64_BITWORD(b) == BITSET64_BITWORD(e) ? \
-   ((x)[BITSET64_BITWORD(b)] & BITSET64_RANGE(b, e)) : \
-   (assert (!"BITSET64_TEST_RANGE: bit range crosses word boundary"), 0))
-#define BITSET64_SET_RANGE(x, b, e) \
-   (BITSET64_BITWORD(b) == BITSET64_BITWORD(e) ? \
-   ((x)[BITSET64_BITWORD(b)] |= BITSET64_RANGE(b, e)) : \
-   (assert (!"BITSET64_SET_RANGE: bit range crosses word boundary"), 0))
-#define BITSET64_CLEAR_RANGE(x, b, e) \
-   (BITSET64_BITWORD(b) == BITSET64_BITWORD(e) ? \
-   ((x)[BITSET64_BITWORD(b)] &= ~BITSET64_RANGE(b, e)) : \
-   (assert (!"BITSET64_CLEAR_RANGE: bit range crosses word boundary"), 0))
-
+#endif /* MESA_BITSET_H */
 
 /*
  * Local Variables:
  * tab-width: 8
- * mode: C
+ * mode: c++
  * indent-tabs-mode: t
  * c-file-style: "stroustrup"
  * End:
