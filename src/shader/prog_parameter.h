@@ -92,7 +92,7 @@ struct gl_program_parameter_list {
 
     GLfloat *lookup_parameter_value(GLsizei nameLen, const char *name);
     GLint lookup_parameter_index(GLsizei nameLen, const char *name) const;
-    GLboolean lookup_parameter_constant(const GLfloat v[], GLuint vSize,
+    bool lookup_parameter_constant(const GLfloat v[], GLuint vSize,
                                         GLint *posOut, GLuint *swizzleOut) const;
     GLuint longest_parameter_name(enum register_file type) const;
     GLuint num_parameters_of_type(enum register_file type) const;
@@ -157,10 +157,10 @@ inline GLint _mesa_lookup_parameter_index(
     const gl_program_parameter_list *p, GLsizei nameLen, const char *name)
 { return p ? p->lookup_parameter_index(nameLen, name) : -1; }
 
-inline GLboolean _mesa_lookup_parameter_constant(
+inline bool _mesa_lookup_parameter_constant(
     const gl_program_parameter_list *l, const GLfloat v[], GLuint vSize,
     GLint *posOut, GLuint *swizzleOut)
-{ return l ? l->lookup_parameter_constant(v, vSize, posOut, swizzleOut) : GL_FALSE; }
+{ return l ? l->lookup_parameter_constant(v, vSize, posOut, swizzleOut) : false; }
 
 inline GLuint _mesa_longest_parameter_name(
     const gl_program_parameter_list *l, enum register_file type)

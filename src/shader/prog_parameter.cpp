@@ -406,9 +406,9 @@ gl_program_parameter_list::lookup_parameter_index(GLsizei nameLen, const char *n
  * \param posOut  returns the position of the constant, if found
  * \param swizzleOut  returns a swizzle mask describing location of the
  *                    vector elements if found.
- * \return GL_TRUE if found, GL_FALSE if not found
+ * \return true if found, false if not found
  */
-GLboolean
+bool
 gl_program_parameter_list::lookup_parameter_constant(const GLfloat v[], GLuint vSize, GLint *posOut, GLuint *swizzleOut) const
 {
     GLuint i;
@@ -427,7 +427,7 @@ gl_program_parameter_list::lookup_parameter_constant(const GLfloat v[], GLuint v
 		}
 		if (match == vSize) {
 		    *posOut = i;
-		    return GL_TRUE;
+		    return true;
 		}
 	    } else {
 		/* try matching w/ swizzle */
@@ -439,7 +439,7 @@ gl_program_parameter_list::lookup_parameter_constant(const GLfloat v[], GLuint v
 			    /* found it */
 			    *posOut = i;
 			    *swizzleOut = MAKE_SWIZZLE4(j, j, j, j);
-			    return GL_TRUE;
+			    return true;
 			}
 		    }
 		} else if (vSize <= Parameters[i].Size) {
@@ -467,7 +467,7 @@ gl_program_parameter_list::lookup_parameter_constant(const GLfloat v[], GLuint v
 		    if (match == vSize) {
 			*posOut = i;
 			*swizzleOut = MAKE_SWIZZLE4(swz[0], swz[1], swz[2], swz[3]);
-			return GL_TRUE;
+			return true;
 		    }
 		}
 	    }
@@ -475,7 +475,7 @@ gl_program_parameter_list::lookup_parameter_constant(const GLfloat v[], GLuint v
     }
 
     *posOut = -1;
-    return GL_FALSE;
+    return false;
 }
 
 

@@ -170,7 +170,7 @@ void GLvector4f::free()
 /*
  * For debugging
  */
-void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, GLboolean culling)
+void _mesa_vector4f_print(GLvector4f *v, GLubyte *cullmask, bool culling)
 {
     GLfloat c[4] = { 0, 0, 0, 1 };
     const char *templates[5] = {

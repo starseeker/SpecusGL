@@ -73,9 +73,9 @@ struct osmesa_context {
     GLenum format = OSMESA_RGBA;    /**< User-specified context format */
     GLint userRowLength = 0;        /**< user-specified pixels per row (0 = width) */
     GLint rInd = 0, gInd = 0, bInd = 0, aInd = 0; /**< RGBA component offsets */
-    std::vector<GLvoid *> rowaddr;  /**< address of first pixel in each image row */
-    GLboolean yup = GL_TRUE;        /**< GL_TRUE  → Y increases upward */
-    GLboolean enable_fxaa = GL_FALSE; /**< GL_TRUE to enable FXAA */
+    std::vector<void *> rowaddr;  /**< address of first pixel in each image row */
+    bool yup{true};        /**< GL_TRUE  → Y increases upward */
+    bool enable_fxaa{false}; /**< GL_TRUE to enable FXAA */
 
     /* ------------------------------------------------------------------ */
     /* Destructor                                                          */
@@ -109,7 +109,7 @@ struct osmesa_context {
      * Bind a pixel buffer to this context and make it current.
      * Replaces the body of OSMesaMakeCurrent().
      */
-    GLboolean make_current(void *buffer, GLenum type,
+    bool make_current(void *buffer, GLenum type,
                            GLsizei width, GLsizei height);
 
     /**
@@ -161,24 +161,24 @@ struct osmesa_context {
 
     /**
      * Get the depth buffer for this context.
-     * Returns GL_TRUE on success.
+     * Returns true on success.
      */
-    [[nodiscard]] GLboolean get_depth_buffer(GLint *width, GLint *height,
+    [[nodiscard]] bool get_depth_buffer(GLint *width, GLint *height,
                                               GLint *bytesPerValue,
                                               void **buf) const;
 
     /**
      * Get the color buffer for this context.
-     * Returns GL_TRUE on success.
+     * Returns true on success.
      */
-    [[nodiscard]] GLboolean get_color_buffer(GLint *width, GLint *height,
+    [[nodiscard]] bool get_color_buffer(GLint *width, GLint *height,
                                               GLint *fmt, void **buf) const;
 
     /** Enable or disable fragment colour clamping. */
-    void color_clamp(GLboolean enable);
+    void color_clamp(bool enable);
 
     /** Enable or disable FXAA post-processing. */
-    void set_fxaa_enable(GLboolean enable) { enable_fxaa = enable; }
+    void set_fxaa_enable(bool enable) { enable_fxaa = enable; }
 };
 
 
@@ -961,13 +961,13 @@ osmesa_context::compute_row_addresses()
     if (yup) {
 	/* Y=0 is bottom line of window */
 	for (i = 0; i < height; i++) {
-	    rowaddr[i] = (GLvoid *)(static_cast<GLubyte *>(origin) + i * bytesPerRow);
+	    rowaddr[i] = static_cast<void *>(static_cast<GLubyte *>(origin) + i * bytesPerRow);
 	}
     } else {
 	/* Y=0 is top line of window */
 	for (i = 0; i < height; i++) {
 	    GLint j = height - i - 1;
-	    rowaddr[i] = (GLvoid *)(static_cast<GLubyte *>(origin) + j * bytesPerRow);
+	    rowaddr[i] = static_cast<void *>(static_cast<GLubyte *>(origin) + j * bytesPerRow);
 	}
     }
 }
@@ -1119,7 +1119,7 @@ public:
 
 	osmesa->compute_row_addresses();
 
-	return GL_TRUE;
+	return true;
     }
 
     void GetRow(GLcontext *ctx, GLuint count, GLint x, GLint y,
@@ -1236,48 +1236,48 @@ osmesa_context::create(GLenum fmt,
     struct dd_function_table functions;
     GLint rind = 0, gind = 0, bind = 0, aind = 0;
     GLint indexBits = 0, redBits = 0, greenBits = 0, blueBits = 0, alphaBits = 0;
-    GLboolean rgbmode;
+    bool rgbmode;
     GLenum type = CHAN_TYPE;
 
     if (fmt == OSMESA_COLOR_INDEX) {
 	indexBits = 8;
-	rgbmode = GL_FALSE;
+	rgbmode = false;
     } else if (fmt == OSMESA_RGBA) {
 	indexBits = 0;
 	redBits = CHAN_BITS; greenBits = CHAN_BITS;
 	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
 	rind = 0; gind = 1; bind = 2; aind = 3;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     } else if (fmt == OSMESA_BGRA) {
 	indexBits = 0;
 	redBits = CHAN_BITS; greenBits = CHAN_BITS;
 	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
 	bind = 0; gind = 1; rind = 2; aind = 3;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     } else if (fmt == OSMESA_ARGB) {
 	indexBits = 0;
 	redBits = CHAN_BITS; greenBits = CHAN_BITS;
 	blueBits = CHAN_BITS; alphaBits = CHAN_BITS;
 	aind = 0; rind = 1; gind = 2; bind = 3;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     } else if (fmt == OSMESA_RGB) {
 	indexBits = 0;
 	redBits = CHAN_BITS; greenBits = CHAN_BITS;
 	blueBits = CHAN_BITS; alphaBits = 0;
 	rind = 0; gind = 1; bind = 2;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     } else if (fmt == OSMESA_BGR) {
 	indexBits = 0;
 	redBits = CHAN_BITS; greenBits = CHAN_BITS;
 	blueBits = CHAN_BITS; alphaBits = 0;
 	rind = 2; gind = 1; bind = 0;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     }
 #if CHAN_TYPE == GL_UNSIGNED_BYTE
     else if (fmt == OSMESA_RGB_565) {
 	indexBits = 0;
 	redBits = 5; greenBits = 6; blueBits = 5; alphaBits = 0;
-	rgbmode = GL_TRUE;
+	rgbmode = true;
     }
 #endif
     else {
@@ -1342,12 +1342,12 @@ osmesa_context::create(GLenum fmt,
 
     osmesa->format       = fmt;
     osmesa->userRowLength = 0;
-    osmesa->yup          = GL_TRUE;
+    osmesa->yup          = true;
     osmesa->rInd         = rind;
     osmesa->gInd         = gind;
     osmesa->bInd         = bind;
     osmesa->aInd         = aind;
-    osmesa->enable_fxaa  = GL_FALSE;
+    osmesa->enable_fxaa  = false;
 
     /* Initialize software rasterizer and helper modules */
     {
@@ -1377,18 +1377,18 @@ osmesa_context::create(GLenum fmt,
 /**
  * Bind a pixel buffer to this context and make it the current context.
  */
-GLboolean
+bool
 osmesa_context::make_current(void *buffer, GLenum type,
                               GLsizei width, GLsizei height)
 {
     if (!buffer ||
 	width < 1 || height < 1 ||
 	width > MAX_WIDTH || height > MAX_HEIGHT) {
-	return GL_FALSE;
+	return false;
     }
 
     if (format == OSMESA_RGB_565 && type != GL_UNSIGNED_SHORT_5_6_5)
-	return GL_FALSE;
+	return false;
 
     update_state_cb(&mesa, 0);
 
@@ -1417,7 +1417,7 @@ osmesa_context::make_current(void *buffer, GLenum type,
     _mesa_update_framebuffer_visual(gl_buffer);
     _mesa_resize_framebuffer(&mesa, gl_buffer, width, height);
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1436,7 +1436,7 @@ osmesa_context::pixel_store(GLint pname, GLint value)
 	    userRowLength = value;
 	    break;
 	case OSMESA_Y_UP:
-	    yup = value ? GL_TRUE : GL_FALSE;
+	    yup = (value != 0);
 	    break;
 	default:
 	    _mesa_error(&mesa, GL_INVALID_ENUM, "OSMesaPixelStore(pname)");
@@ -1480,7 +1480,7 @@ osmesa_context::get_integer(GLint pname, GLint *value)
 /**
  * Return the depth buffer associated with this context.
  */
-GLboolean
+bool
 osmesa_context::get_depth_buffer(GLint *width, GLint *height,
                                   GLint *bytesPerValue, void **buf) const
 {
@@ -1491,7 +1491,7 @@ osmesa_context::get_depth_buffer(GLint *width, GLint *height,
     if (!drb || !drb->Data) {
 	*width = *height = *bytesPerValue = 0;
 	*buf = nullptr;
-	return GL_FALSE;
+	return false;
     }
 
     *width  = static_cast<GLint>(drb->Width);
@@ -1500,14 +1500,14 @@ osmesa_context::get_depth_buffer(GLint *width, GLint *height,
                      ? static_cast<GLint>(sizeof(GLushort))
                      : static_cast<GLint>(sizeof(GLuint));
     *buf = drb->Data;
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Return the color buffer associated with this context.
  */
-GLboolean
+bool
 osmesa_context::get_color_buffer(GLint *width, GLint *height,
                                   GLint *fmt, void **buf) const
 {
@@ -1516,11 +1516,11 @@ osmesa_context::get_color_buffer(GLint *width, GLint *height,
 	*height = static_cast<GLint>(rb->Height);
 	*fmt    = static_cast<GLint>(format);
 	*buf    = rb->Data;
-	return GL_TRUE;
+	return true;
     }
     *width = *height = *fmt = 0;
     *buf = nullptr;
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -1528,9 +1528,9 @@ osmesa_context::get_color_buffer(GLint *width, GLint *height,
  * Enable or disable fragment colour clamping.
  */
 void
-osmesa_context::color_clamp(GLboolean enable)
+osmesa_context::color_clamp(bool enable)
 {
-    mesa.Color.ClampFragmentColor = enable ? GL_TRUE
+    mesa.Color.ClampFragmentColor = enable ? static_cast<GLboolean>(GL_TRUE)
                                            : static_cast<GLboolean>(GL_FIXED_ONLY_ARB);
 }
 
@@ -1591,7 +1591,7 @@ OSMesaMakeCurrent(OSMesaContext osmesa, void *buffer, GLenum type,
 		  GLsizei width, GLsizei height)
 {
     if (!osmesa)
-	return GL_FALSE;
+	return false;
     return osmesa->make_current(buffer, type, width, height);
 }
 
