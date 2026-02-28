@@ -274,7 +274,7 @@ static inline void insert_null(const struct tnl_clipspace_attr *a, GLubyte *v, c
 static inline void insert_4chan_4f_rgba_4(const struct tnl_clipspace_attr *a, GLubyte *v,
 	const GLfloat *in)
 {
-    GLchan *c = (GLchan *)v;
+    GLchan *c = static_cast<GLchan *>(v);
     (void) a;
     UNCLAMPED_FLOAT_TO_CHAN(c[0], in[0]);
     UNCLAMPED_FLOAT_TO_CHAN(c[1], in[1]);
@@ -285,7 +285,7 @@ static inline void insert_4chan_4f_rgba_4(const struct tnl_clipspace_attr *a, GL
 static inline void insert_4chan_4f_rgba_3(const struct tnl_clipspace_attr *a, GLubyte *v,
 	const GLfloat *in)
 {
-    GLchan *c = (GLchan *)v;
+    GLchan *c = static_cast<GLchan *>(v);
     (void) a;
     UNCLAMPED_FLOAT_TO_CHAN(c[0], in[0]);
     UNCLAMPED_FLOAT_TO_CHAN(c[1], in[1]);
@@ -296,7 +296,7 @@ static inline void insert_4chan_4f_rgba_3(const struct tnl_clipspace_attr *a, GL
 static inline void insert_4chan_4f_rgba_2(const struct tnl_clipspace_attr *a, GLubyte *v,
 	const GLfloat *in)
 {
-    GLchan *c = (GLchan *)v;
+    GLchan *c = static_cast<GLchan *>(v);
     (void) a;
     UNCLAMPED_FLOAT_TO_CHAN(c[0], in[0]);
     UNCLAMPED_FLOAT_TO_CHAN(c[1], in[1]);
@@ -307,7 +307,7 @@ static inline void insert_4chan_4f_rgba_2(const struct tnl_clipspace_attr *a, GL
 static inline void insert_4chan_4f_rgba_1(const struct tnl_clipspace_attr *a, GLubyte *v,
 	const GLfloat *in)
 {
-    GLchan *c = (GLchan *)v;
+    GLchan *c = static_cast<GLchan *>(v);
     (void) a;
     UNCLAMPED_FLOAT_TO_CHAN(c[0], in[0]);
     c[1] = 0;
@@ -646,7 +646,7 @@ static void extract_1f(const struct tnl_clipspace_attr *a, GLfloat *out, const G
 static void extract_4chan_4f_rgba(const struct tnl_clipspace_attr *a, GLfloat *out,
 				  const GLubyte *v)
 {
-    GLchan *c = (GLchan *)v;
+    const GLchan *c = reinterpret_cast<const GLchan *>(v);
     (void) a;
 
     out[0] = CHAN_TO_FLOAT(c[0]);

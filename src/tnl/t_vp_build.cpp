@@ -1449,8 +1449,8 @@ void _tnl_UpdateFixedFunctionProgram(GLcontext *ctx)
 	    ctx->VertexProgram._TnlProgram = it->second;
 	} else {
 	    /* Build a new one: */
-	    ctx->VertexProgram._TnlProgram = (struct gl_vertex_program *)
-					     ctx->Driver.NewProgram(ctx, GL_VERTEX_PROGRAM_ARB, 0);
+	    ctx->VertexProgram._TnlProgram = static_cast<struct gl_vertex_program *>(
+					     ctx->Driver.NewProgram(ctx, GL_VERTEX_PROGRAM_ARB, 0));
 
 	    create_new_program(&key, ctx->VertexProgram._TnlProgram,
 			       ctx->Const.VertexProgram.MaxTemps);
