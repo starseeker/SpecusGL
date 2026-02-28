@@ -185,13 +185,13 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 #define RETURN_ERROR							\
 do {									\
    record_error(parseState, "Unexpected end of input.", __LINE__);	\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 #define RETURN_ERROR1(msg)						\
 do {									\
    record_error(parseState, msg, __LINE__);				\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 #define RETURN_ERROR2(msg1, msg2)					\
@@ -199,7 +199,7 @@ do {									\
    char err[1000];							\
    std::snprintf(err, sizeof(err), "%s %s", msg1, msg2);				\
    record_error(parseState, err, __LINE__);				\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 
@@ -252,7 +252,7 @@ static struct instruction_pattern
 /**********************************************************************/
 
 
-static GLboolean IsLetter(GLubyte b)
+static bool IsLetter(GLubyte b)
 {
     return (b >= 'a' && b <= 'z') ||
 	   (b >= 'A' && b <= 'Z') ||
@@ -261,13 +261,13 @@ static GLboolean IsLetter(GLubyte b)
 }
 
 
-static GLboolean IsDigit(GLubyte b)
+static bool IsDigit(GLubyte b)
 {
     return b >= '0' && b <= '9';
 }
 
 
-static GLboolean IsWhitespace(GLubyte b)
+static bool IsWhitespace(GLubyte b)
 {
     return b == ' ' || b == '\t' || b == '\n' || b == '\r';
 }
@@ -340,35 +340,35 @@ GetToken(struct parse_state *parseState, GLubyte *token)
 /**
  * Get next token from input stream and increment stream pointer past token.
  */
-static GLboolean
+static bool
 Parse_Token(struct parse_state *parseState, GLubyte *token)
 {
     GLint i;
     i = GetToken(parseState, token);
     if (i <= 0) {
 	parseState->pos += (-i);
-	return GL_FALSE;
+	return false;
     }
     parseState->pos += i;
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Get next token from input stream but don't increment stream pointer.
  */
-static GLboolean
+static bool
 Peek_Token(struct parse_state *parseState, GLubyte *token)
 {
     GLint i, len;
     i = GetToken(parseState, token);
     if (i <= 0) {
 	parseState->pos += (-i);
-	return GL_FALSE;
+	return false;
     }
     len = static_cast<GLint>(strlen(reinterpret_cast<const char *>(token)));
     parseState->pos += (i - len);
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -396,7 +396,7 @@ static const char *OutputRegisters[MAX_NV_FRAGMENT_PROGRAM_OUTPUTS + 1] = {
 /**
  * Try to match 'pattern' as the next token after any whitespace/comments.
  */
-static GLboolean
+static bool
 Parse_String(struct parse_state *parseState, const char *pattern)
 {
     const GLubyte *m;
@@ -422,22 +422,22 @@ Parse_String(struct parse_state *parseState, const char *pattern)
     m = parseState->pos;
     for (i = 0; pattern[i]; i++) {
 	if (*m != static_cast<GLubyte>(pattern[i]))
-	    return GL_FALSE;
+	    return false;
 	m += 1;
     }
     parseState->pos = m;
 
-    return GL_TRUE; /* success */
+    return true; /* success */
 }
 
 
-static GLboolean
+static bool
 Parse_Identifier(struct parse_state *parseState, GLubyte *ident)
 {
     if (!Parse_Token(parseState, ident))
 	RETURN_ERROR;
     if (IsLetter(ident[0]))
-	return GL_TRUE;
+	return true;
     else
 	RETURN_ERROR1("Expected an identfier");
 }
@@ -448,7 +448,7 @@ Parse_Identifier(struct parse_state *parseState, GLubyte *ident)
  * [+/-]N[.N[eN]]
  * Output:  number[0 .. 3] will get the value.
  */
-static GLboolean
+static bool
 Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 {
     char *end = nullptr;
@@ -461,7 +461,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 	number[1] = *number;
 	number[2] = *number;
 	number[3] = *number;
-	return GL_TRUE;
+	return true;
     } else {
 	/* should be an identifier */
 	GLubyte ident[100];
@@ -475,7 +475,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 	    RETURN_ERROR1("Undefined symbol");
 	} else {
 	    COPY_4V(number, constant);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 }
@@ -489,7 +489,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
  *   { float, float, float }
  *   { float, float, float, float }
  */
-static GLboolean
+static bool
 Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
 {
     GLfloat values[4];
@@ -499,11 +499,11 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
     ASSIGN_4V(values, 0.0, 0.0, 0.0, 1.0);
 
     if (!Parse_ScalarConstant(parseState, values))  /* X */
-	return GL_FALSE;
+	return false;
     vec[0] = values[0];
 
     if (Parse_String(parseState, "}")) {
-	return GL_TRUE;
+	return true;
     }
 
     if (!Parse_String(parseState, ","))
@@ -511,11 +511,11 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
 
     values[0] = vec[1];
     if (!Parse_ScalarConstant(parseState, values))  /* Y */
-	return GL_FALSE;
+	return false;
     vec[1] = values[0];
 
     if (Parse_String(parseState, "}")) {
-	return GL_TRUE;
+	return true;
     }
 
     if (!Parse_String(parseState, ","))
@@ -523,11 +523,11 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
 
     values[0] = vec[2];
     if (!Parse_ScalarConstant(parseState, values))  /* Z */
-	return GL_FALSE;
+	return false;
     vec[2] = values[0];
 
     if (Parse_String(parseState, "}")) {
-	return GL_TRUE;
+	return true;
     }
 
     if (!Parse_String(parseState, ","))
@@ -535,13 +535,13 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
 
     values[0] = vec[3];
     if (!Parse_ScalarConstant(parseState, values))  /* W */
-	return GL_FALSE;
+	return false;
     vec[3] = values[0];
 
     if (!Parse_String(parseState, "}"))
 	RETURN_ERROR1("Expected closing brace in vector constant");
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -555,7 +555,7 @@ Parse_VectorOrScalarConstant(struct parse_state *parseState, GLfloat *vec)
     if (Parse_String(parseState, "{")) {
 	return Parse_VectorConstant(parseState, vec);
     } else {
-	GLboolean b = Parse_ScalarConstant(parseState, vec);
+	bool b = Parse_ScalarConstant(parseState, vec);
 	if (b) {
 	    vec[1] = vec[2] = vec[3] = vec[0];
 	}
@@ -568,7 +568,7 @@ Parse_VectorOrScalarConstant(struct parse_state *parseState, GLfloat *vec)
  * Parse a texture image source:
  *    [TEX0 | TEX1 | .. | TEX15] , [1D | 2D | 3D | CUBE | RECT]
  */
-static GLboolean
+static bool
 Parse_TextureImageId(struct parse_state *parseState,
 		     GLubyte *texUnit, GLubyte *texTargetBit)
 {
@@ -613,7 +613,7 @@ Parse_TextureImageId(struct parse_state *parseState,
 	RETURN_ERROR1("Only one texture target can be used per texture unit.");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -621,7 +621,7 @@ Parse_TextureImageId(struct parse_state *parseState,
  * Parse a scalar suffix like .x, .y, .z or .w or parse a swizzle suffix
  * like .wxyz, .xxyy, etc and return the swizzle indexes.
  */
-static GLboolean
+static bool
 Parse_SwizzleSuffix(const GLubyte *token, GLuint swizzle[4])
 {
     if (token[1] == 0) {
@@ -635,7 +635,7 @@ Parse_SwizzleSuffix(const GLubyte *token, GLuint swizzle[4])
 	else if (token[0] == 'w')
 	    ASSIGN_4V(swizzle, 3, 3, 3, 3);
 	else
-	    return GL_FALSE;
+	    return false;
     } else {
 	/* 4-component swizzle (vector) */
 	GLint k;
@@ -649,16 +649,16 @@ Parse_SwizzleSuffix(const GLubyte *token, GLuint swizzle[4])
 	    else if (token[k] == 'w')
 		swizzle[k] = 3;
 	    else
-		return GL_FALSE;
+		return false;
 	}
 	if (k != 4)
-	    return GL_FALSE;
+	    return false;
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_CondCodeMask(struct parse_state *parseState,
 		   struct prog_dst_register *dstReg)
 {
@@ -695,14 +695,14 @@ Parse_CondCodeMask(struct parse_state *parseState,
 	dstReg->CondSwizzle = MAKE_SWIZZLE4(swz[0], swz[1], swz[2], swz[3]);
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse a temporary register: Rnn or Hnn
  */
-static GLboolean
+static bool
 Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 {
     GLubyte token[100];
@@ -724,14 +724,14 @@ Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR1("Invalid temporary register name");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse a write-only dummy register: RC or HC.
  */
-static GLboolean
+static bool
 Parse_DummyReg(struct parse_state *parseState, GLint *regNum)
 {
     if (Parse_String(parseState, "RC")) {
@@ -742,14 +742,14 @@ Parse_DummyReg(struct parse_state *parseState, GLint *regNum)
 	RETURN_ERROR1("Invalid write-only register name");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse a program local parameter register "p[##]"
  */
-static GLboolean
+static bool
 Parse_ProgramParamReg(struct parse_state *parseState, GLint *regNum)
 {
     GLubyte token[100];
@@ -773,14 +773,14 @@ Parse_ProgramParamReg(struct parse_state *parseState, GLint *regNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR1("Expected ]");
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse f[name]  - fragment input register
  */
-static GLboolean
+static bool
 Parse_FragReg(struct parse_state *parseState, GLint *tempRegNum)
 {
     GLubyte token[100];
@@ -810,11 +810,11 @@ Parse_FragReg(struct parse_state *parseState, GLint *tempRegNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR1("Expected ]");
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
 {
     GLubyte token[100];
@@ -847,11 +847,11 @@ Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR1("Expected ]");
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_MaskedDstReg(struct parse_state *parseState,
 		   struct prog_dst_register *dstReg)
 {
@@ -929,12 +929,12 @@ Parse_MaskedDstReg(struct parse_state *parseState,
 	if (!Parse_String(parseState, ")"))  /* consume ")" */
 	    RETURN_ERROR1("Expected )");
 
-	return GL_TRUE;
+	return true;
     } else {
 	/* no cond code mask */
 	dstReg->CondMask = COND_TR;
 	dstReg->CondSwizzle = SWIZZLE_NOOP;
-	return GL_TRUE;
+	return true;
     }
 }
 
@@ -945,7 +945,7 @@ Parse_MaskedDstReg(struct parse_state *parseState,
  *                    | <baseVectorSrc>
  *   <absVectorSrc> ::= <negate> "|" <baseVectorSrc> "|"
  */
-static GLboolean
+static bool
 Parse_VectorSrc(struct parse_state *parseState,
 		struct prog_src_register *srcReg)
 {
@@ -1059,17 +1059,17 @@ Parse_VectorSrc(struct parse_state *parseState,
 	RETURN_ERROR1("Expected |");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_ScalarSrcReg(struct parse_state *parseState,
 		   struct prog_src_register *srcReg)
 {
     GLubyte token[100];
     GLfloat sign = 1.0F;
-    GLboolean needSuffix = GL_TRUE;
+    bool needSuffix = true;
     GLint idx;
 
     /*
@@ -1176,11 +1176,11 @@ Parse_ScalarSrcReg(struct parse_state *parseState,
 	RETURN_ERROR1("Expected |");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_PrintInstruction(struct parse_state *parseState,
 		       struct prog_instruction *inst)
 {
@@ -1222,11 +1222,11 @@ Parse_PrintInstruction(struct parse_state *parseState,
     inst->SrcReg[0].Abs = GL_FALSE;
     inst->SrcReg[0].NegateAbs = GL_FALSE;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_InstructionSequence(struct parse_state *parseState,
 			  struct prog_instruction program[])
 {
@@ -1403,7 +1403,7 @@ Parse_InstructionSequence(struct parse_state *parseState,
 		RETURN_ERROR1("Program too long");
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 

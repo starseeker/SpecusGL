@@ -382,16 +382,16 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
  * to some extent (see GL_ARB_fragment_program spec).
  * This function does the compatibility check.
  */
-static GLboolean
+static bool
 compatible_program_targets(GLenum t1, GLenum t2)
 {
     if (t1 == t2)
-	return GL_TRUE;
+	return true;
     if (t1 == GL_FRAGMENT_PROGRAM_ARB && t2 == GL_FRAGMENT_PROGRAM_NV)
-	return GL_TRUE;
+	return true;
     if (t1 == GL_FRAGMENT_PROGRAM_NV && t2 == GL_FRAGMENT_PROGRAM_ARB)
-	return GL_TRUE;
-    return GL_FALSE;
+	return true;
+    return false;
 }
 
 

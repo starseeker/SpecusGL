@@ -308,7 +308,7 @@ generate_cc(float value)
  * Test if the ccMaskRule is satisfied by the given condition code.
  * Used to mask destination writes according to the current condition code.
  */
-static inline GLboolean
+static inline bool
 test_cc(GLuint condCode, GLuint ccMaskRule)
 {
     switch (ccMaskRule) {
@@ -325,20 +325,20 @@ test_cc(GLuint condCode, GLuint ccMaskRule)
 	case COND_GT:
 	    return (condCode == COND_GT);
 	case COND_TR:
-	    return GL_TRUE;
+	    return true;
 	case COND_FL:
-	    return GL_FALSE;
+	    return false;
 	default:
-	    return GL_TRUE;
+	    return true;
     }
 }
 
 
 /**
- * Evaluate the 4 condition codes against a predicate and return GL_TRUE
- * or GL_FALSE to indicate result.
+ * Evaluate the 4 condition codes against a predicate and return true
+ * or false to indicate result.
  */
-static inline GLboolean
+static inline bool
 eval_condition(const struct gl_program_machine *machine,
 	       const struct prog_instruction *inst)
 {
@@ -348,9 +348,9 @@ eval_condition(const struct gl_program_machine *machine,
 	test_cc(machine->CondCodes[GET_SWZ(swizzle, 1)], condMask) ||
 	test_cc(machine->CondCodes[GET_SWZ(swizzle, 2)], condMask) ||
 	test_cc(machine->CondCodes[GET_SWZ(swizzle, 3)], condMask)) {
-	return GL_TRUE;
+	return true;
     } else {
-	return GL_FALSE;
+	return false;
     }
 }
 
@@ -365,7 +365,7 @@ store_vector4(const struct prog_instruction *inst,
 	      struct gl_program_machine *machine, const GLfloat value[4])
 {
     const struct prog_dst_register *dest = &(inst->DstReg);
-    const GLboolean clamp = inst->SaturateMode == SATURATE_ZERO_ONE;
+    const bool clamp = inst->SaturateMode == SATURATE_ZERO_ONE;
     GLfloat *dstReg;
     GLfloat clampedValue[4];
     GLuint writeMask = dest->WriteMask;
@@ -461,9 +461,9 @@ store_vector4(const struct prog_instruction *inst,
  * \param ctx  rendering context
  * \param program  the program to execute
  * \param machine  machine state (must be initialized)
- * \return GL_TRUE if program completed or GL_FALSE if program executed KIL.
+ * \return true if program completed or false if program executed KIL.
  */
-GLboolean
+bool
 _mesa_execute_program(GLcontext * ctx,
 		      const struct gl_program *program,
 		      struct gl_program_machine *machine)
@@ -550,7 +550,7 @@ _mesa_execute_program(GLcontext * ctx,
 		if (eval_condition(machine, inst)) {
 		    /* call the subroutine */
 		    if (machine->StackDepth >= MAX_PROGRAM_CALL_DEPTH) {
-			return GL_TRUE;  /* Per GL_NV_vertex_program2 spec */
+			return true;  /* Per GL_NV_vertex_program2 spec */
 		    }
 		    machine->CallStack[machine->StackDepth++] = pc + 1; /* next inst */
 		    /* Subtract 1 here since we'll do pc++ at end of for-loop */
@@ -688,7 +688,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    }
 	    break;
 	    case OPCODE_IF: {
-		GLboolean cond;
+		bool cond;
 		/* eval condition */
 		if (inst->SrcReg[0].File != PROGRAM_UNDEFINED) {
 		    GLfloat a[4];
@@ -730,14 +730,14 @@ _mesa_execute_program(GLcontext * ctx,
 	    break;
 	    case OPCODE_KIL_NV:      /* NV_f_p only (conditional) */
 		if (eval_condition(machine, inst)) {
-		    return GL_FALSE;
+		    return false;
 		}
 		break;
 	    case OPCODE_KIL: {       /* ARB_f_p only */
 		GLfloat a[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		if (a[0] < 0.0F || a[1] < 0.0F || a[2] < 0.0F || a[3] < 0.0F) {
-		    return GL_FALSE;
+		    return false;
 		}
 	    }
 	    break;
@@ -1019,7 +1019,7 @@ _mesa_execute_program(GLcontext * ctx,
 	    case OPCODE_RET:         /* return from subroutine (conditional) */
 		if (eval_condition(machine, inst)) {
 		    if (machine->StackDepth == 0) {
-			return GL_TRUE;  /* Per GL_NV_vertex_program2 spec */
+			return true;  /* Per GL_NV_vertex_program2 spec */
 		    }
 		    /* subtract one because of pc++ in the for loop */
 		    pc = machine->CallStack[--machine->StackDepth] - 1;
@@ -1390,24 +1390,24 @@ _mesa_execute_program(GLcontext * ctx,
 	    }
 	    break;
 	    case OPCODE_END:
-		return GL_TRUE;
+		return true;
 	    default:
 		_mesa_problem(ctx, "Bad opcode %d in _mesa_execute_program",
 			      inst->Opcode);
 		assert(0);
-		return GL_TRUE;        /* return value doesn't matter */
+		return true;        /* return value doesn't matter */
 
 	}
 
 	numExec++;
 	if (numExec > maxExec) {
 	    _mesa_problem(ctx, "Infinite loop detected in fragment program");
-	    return GL_TRUE;
+	    return true;
 	}
 
     } /* for pc */
 
-    return GL_TRUE;
+    return true;
 }
 
 /*

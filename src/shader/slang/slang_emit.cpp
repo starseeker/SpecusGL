@@ -1511,7 +1511,7 @@ emit(slang_emit_info *emitInfo, slang_ir_node *n)
 		char s[1000];
 		snprintf(s, sizeof(s), "TEMP[%d]%s = variable %s (size %d)",
 			n->Store->Index,
-			_mesa_swizzle_string(n->Store->Swizzle, 0, GL_FALSE),
+			_mesa_swizzle_string(n->Store->Swizzle, 0, false),
 			(n->Var ? n->Var->a_name : "anonymous"),
 			n->Store->Size);
 		inst = emit_comment(emitInfo, s);

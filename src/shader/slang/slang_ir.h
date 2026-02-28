@@ -178,6 +178,11 @@ struct slang_ir_node {
         for (auto *c : Children)
             delete c;
     }
+
+    /* Nodes are exclusively heap-allocated and tree-owned; prevent accidental copies. */
+    slang_ir_node() = default;
+    slang_ir_node(const slang_ir_node &) = delete;
+    slang_ir_node &operator=(const slang_ir_node &) = delete;
 };
 
 

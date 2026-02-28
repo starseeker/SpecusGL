@@ -92,18 +92,16 @@ void
 _slang_pop_var_table(slang_var_table *vt)
 {
     table *t = vt->Top.get();
-    int i;
 
     if (dbg) printf("Popping level %d\n", t->Level);
 
     /* free the storage allocated for each variable */
-    for (i = 0; i < static_cast<int>(t->Vars.size()); i++) {
-	slang_ir_storage *store = static_cast<slang_ir_storage *>(t->Vars[i]->aux);
+    for (slang_variable *v : t->Vars) {
+	slang_ir_storage *store = static_cast<slang_ir_storage *>(v->aux);
 	GLint j;
 	GLuint comp;
 	if (dbg) printf("  Free var %s, size %d at %d\n",
-			    t->Vars[i]->a_name, store->Size,
-			    store->Index);
+			    v->a_name, store->Size, store->Index);
 
 	if (store->Size == 1)
 	    comp = GET_SWZ(store->Swizzle, 0);
@@ -121,7 +119,7 @@ _slang_pop_var_table(slang_var_table *vt)
 	/* just verify that any remaining allocations in this scope
 	 * were for temps
 	 */
-	for (i = 0; i < static_cast<int>(vt->MaxRegisters) * 4; i++) {
+	for (int i = 0; i < static_cast<int>(vt->MaxRegisters) * 4; i++) {
 	    if (t->Temps[i] != FREE && t->Parent->Temps[i] == FREE) {
 		if (dbg) printf("  Free reg %d\n", i/4);
 		assert(t->Temps[i] == TEMP);
@@ -129,10 +127,8 @@ _slang_pop_var_table(slang_var_table *vt)
 	}
     }
 
-    /* Pop: move ownership of Top to a local, then restore Top to parent */
-    std::unique_ptr<table> top = std::move(vt->Top);
-    vt->Top = std::move(top->Parent);
-    /* top destructs here, freeing t */
+    /* Pop: transfer Top ownership to parent in one move; old Top destructs */
+    vt->Top = std::move(vt->Top->Parent);
     vt->CurLevel--;
 }
 
