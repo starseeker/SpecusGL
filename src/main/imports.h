@@ -400,7 +400,7 @@ do {									\
 /**
  * Return 1 if this is a little endian machine, 0 if big endian.
  */
-[[nodiscard]] static inline GLboolean
+[[nodiscard]] static inline bool
 _mesa_little_endian(void)
 {
     const GLuint ui = 1;

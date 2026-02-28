@@ -4897,7 +4897,7 @@ save_Begin(GLenum mode)
 {
     GET_CURRENT_CONTEXT(ctx);
     Node *n;
-    GLboolean error = GL_FALSE;
+    bool error = false;
 
     if (/*mode < GL_POINTS || */ mode > GL_POLYGON) {
 	_mesa_compile_error(ctx, GL_INVALID_ENUM, "Begin (mode)");

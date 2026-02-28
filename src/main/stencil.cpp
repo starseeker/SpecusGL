@@ -387,7 +387,7 @@ _mesa_ActiveStencilFaceEXT(GLenum face)
 void GLAPIENTRY
 _mesa_StencilOpSeparate(GLenum face, GLenum sfail, GLenum zfail, GLenum zpass)
 {
-    GLboolean set = GL_FALSE;
+    bool set = false;
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 

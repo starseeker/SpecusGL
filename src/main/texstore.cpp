@@ -1302,7 +1302,7 @@ _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_rgba8888 ||
 	   dstFormat == &_mesa_texformat_rgba8888_rev);
@@ -1419,7 +1419,7 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_argb8888 ||
 	   dstFormat == &_mesa_texformat_argb8888_rev);
@@ -1629,7 +1629,7 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_rgb888);
     assert(dstFormat->TexelBytes == 3);
@@ -1749,7 +1749,7 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_bgr888);
     assert(dstFormat->TexelBytes == 3);
@@ -1982,7 +1982,7 @@ _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_al88(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_al88 ||
 	   dstFormat == &_mesa_texformat_al88_rev);
@@ -2254,7 +2254,7 @@ _mesa_texstore_ci8(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     (void) ctx;
     (void) dims;
     (void) baseInternalFormat;
@@ -2504,7 +2504,7 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_srgb8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     StoreTexImageFunc store;
     GLboolean k;
@@ -2534,7 +2534,7 @@ _mesa_texstore_srgb8(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_srgba8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
@@ -2582,7 +2582,7 @@ _mesa_texstore_sl8(TEXSTORE_PARAMS)
 bool
 _mesa_texstore_sla8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 

@@ -409,7 +409,7 @@ struct dd_function_table {
     /**
      * Called by glAreTextureResident().
      */
-    std::function<GLboolean(GLcontext *ctx, struct gl_texture_object *t)> IsTextureResident;
+    std::function<bool(GLcontext *ctx, struct gl_texture_object *t)> IsTextureResident;
 
     /**
      * Called by glPrioritizeTextures().
@@ -461,7 +461,7 @@ struct dd_function_table {
     std::function<void(GLcontext *ctx, enum register_file file, GLuint index, GLfloat val[4])> GetProgramRegister;
 
     /** Query if program can be loaded onto hardware */
-    std::function<GLboolean(GLcontext *ctx, GLenum target, struct gl_program *prog)> IsProgramNative;
+    std::function<bool(GLcontext *ctx, GLenum target, struct gl_program *prog)> IsProgramNative;
 
     /*@}*/
 
@@ -595,15 +595,15 @@ struct dd_function_table {
      */
     /*@{*/
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLboolean *result)> GetBooleanv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLboolean *result)> GetBooleanv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLdouble *result)> GetDoublev;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLdouble *result)> GetDoublev;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLfloat *result)> GetFloatv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLfloat *result)> GetFloatv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLint *result)> GetIntegerv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLint *result)> GetIntegerv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLvoid **result)> GetPointerv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLvoid **result)> GetPointerv;
     /*@}*/
 
 

@@ -1168,7 +1168,7 @@ framebuffer_texture(GLcontext *ctx, const char *caller, GLenum target,
      * texture is non-zero.
      */
     if (texture) {
-	GLboolean err = GL_TRUE;
+	bool err = true;
 
 	texObj = _mesa_lookup_texture(ctx, texture);
 	if (texObj != nullptr) {

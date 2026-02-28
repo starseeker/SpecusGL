@@ -819,7 +819,7 @@ _mesa_UnmapBufferARB(GLenum target)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_buffer_object *bufObj;
-    GLboolean status = GL_TRUE;
+    bool status = true;
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
     bufObj = get_buffer(ctx, target);

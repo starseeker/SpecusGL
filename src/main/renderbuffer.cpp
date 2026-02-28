@@ -2036,7 +2036,7 @@ _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
 			     GLboolean alpha,
 			     bool aux)
 {
-    bool frontLeft = GL_TRUE;
+    bool frontLeft = true;
     bool backLeft = fb->Visual.doubleBufferMode;
     bool frontRight = fb->Visual.stereoMode;
     bool backRight = fb->Visual.stereoMode && fb->Visual.doubleBufferMode;

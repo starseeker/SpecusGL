@@ -1332,8 +1332,8 @@ texture_error_check(GLcontext *ctx, GLenum target,
 		    GLint width, GLint height,
 		    GLint depth, GLint border)
 {
-    const GLboolean isProxy = _mesa_is_proxy_texture(target);
-    GLboolean sizeOK = GL_TRUE;
+    const bool isProxy = _mesa_is_proxy_texture(target);
+    bool sizeOK = true;
     GLboolean colorFormat, indexFormat;
     GLenum proxy_target;
 

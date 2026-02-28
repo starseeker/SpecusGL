@@ -297,7 +297,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[ctx->Texture.CurrentUnit];
     struct gl_texture_object *texObj = nullptr;
     struct gl_color_table *table = nullptr;
-    GLboolean proxy = GL_FALSE;
+    bool proxy = false;
     GLint baseFormat;
     const GLfloat *scale = one, *bias = zero;
     GLint comps;
@@ -328,17 +328,17 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	case GL_PROXY_TEXTURE_1D:
 	    texObj = ctx->Texture.Proxy1D;
 	    table = &texObj->Palette;
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_PROXY_TEXTURE_2D:
 	    texObj = ctx->Texture.Proxy2D;
 	    table = &texObj->Palette;
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_PROXY_TEXTURE_3D:
 	    texObj = ctx->Texture.Proxy3D;
 	    table = &texObj->Palette;
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_PROXY_TEXTURE_CUBE_MAP_ARB:
 	    if (!ctx->Extensions.ARB_texture_cube_map) {
@@ -358,7 +358,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	    break;
 	case GL_PROXY_COLOR_TABLE:
 	    table = &ctx->ProxyColorTable[COLORTABLE_PRECONVOLUTION];
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_TEXTURE_COLOR_TABLE_SGI:
 	    if (!ctx->Extensions.SGI_texture_color_table) {
@@ -375,7 +375,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 		return;
 	    }
 	    table = &(texUnit->ProxyColorTable);
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_POST_CONVOLUTION_COLOR_TABLE:
 	    table = &ctx->ColorTable[COLORTABLE_POSTCONVOLUTION];
@@ -384,7 +384,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	    break;
 	case GL_PROXY_POST_CONVOLUTION_COLOR_TABLE:
 	    table = &ctx->ProxyColorTable[COLORTABLE_POSTCONVOLUTION];
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	case GL_POST_COLOR_MATRIX_COLOR_TABLE:
 	    table = &ctx->ColorTable[COLORTABLE_POSTCOLORMATRIX];
@@ -393,7 +393,7 @@ _mesa_ColorTable(GLenum target, GLenum internalFormat,
 	    break;
 	case GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE:
 	    table = &ctx->ProxyColorTable[COLORTABLE_POSTCOLORMATRIX];
-	    proxy = GL_TRUE;
+	    proxy = true;
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glColorTable(target)");
