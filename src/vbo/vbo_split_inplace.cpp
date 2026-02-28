@@ -140,7 +140,7 @@ static void split_prims(struct split_context *split)
     for (i = 0; i < split->nr_prims; i++) {
 	const struct _mesa_prim *prim = &split->prim[i];
 	GLuint first, incr;
-	GLboolean split_inplace = split_prim_inplace(prim->mode, &first, &incr);
+	bool split_inplace = split_prim_inplace(prim->mode, &first, &incr);
 	GLuint count;
 
 	/* Always wrap on an even numbered vertex to avoid problems with

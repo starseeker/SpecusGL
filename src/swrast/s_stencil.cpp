@@ -217,7 +217,7 @@ apply_stencil_op(const GLcontext *ctx, GLenum oper, GLuint face,
  *          stencil - updated stencil values (where the test passed)
  * Return:  GL_FALSE = all pixels failed, GL_TRUE = zero or more pixels passed.
  */
-static GLboolean
+static bool
 do_stencil_test(GLcontext *ctx, GLuint face, GLuint n, GLstencil stencil[],
 		GLubyte mask[])
 {
@@ -385,7 +385,7 @@ do_stencil_test(GLcontext *ctx, GLuint face, GLuint n, GLstencil stencil[],
  *         GL_TRUE - one or more fragments passed the testing
  *
  */
-static GLboolean
+static bool
 stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
 {
     struct gl_framebuffer *fb = ctx->DrawBuffer;
@@ -423,7 +423,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
 	    /* put updated stencil values into buffer */
 	    rb->PutRow(ctx, n, x, y, stencil, nullptr);
 	}
-	return GL_FALSE;
+	return false;
     }
 
     /*
@@ -484,7 +484,7 @@ stencil_and_ztest_span(GLcontext *ctx, SWspan *span, GLuint face)
 
     span->writeAll = GL_FALSE;
 
-    return GL_TRUE;  /* one or more fragments passed both tests */
+    return true;  /* one or more fragments passed both tests */
 }
 
 
@@ -672,7 +672,7 @@ apply_stencil_op_to_pixels(GLcontext *ctx,
  *                 mask flag set to 0.
  * \return  GL_FALSE = all pixels failed, GL_TRUE = zero or more pixels passed.
  */
-static GLboolean
+static bool
 stencil_test_pixels(GLcontext *ctx, GLuint face, GLuint n,
 		    const GLint x[], const GLint y[], GLubyte mask[])
 {
@@ -858,7 +858,7 @@ stencil_test_pixels(GLcontext *ctx, GLuint face, GLuint n,
  * Return: GL_FALSE - all fragments failed the testing
  *         GL_TRUE - one or more fragments passed the testing
  */
-static GLboolean
+static bool
 stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 {
     struct gl_framebuffer *fb = ctx->DrawBuffer;
@@ -915,13 +915,13 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 	/* Write updated stencil values into hardware stencil buffer */
 	rb->PutValues(ctx, n, x, y, stencil, origMask);
 
-	return GL_TRUE;
+	return true;
     } else {
 	/* Direct access to stencil buffer */
 
 	if (stencil_test_pixels(ctx, face, n, x, y, mask) == GL_FALSE) {
 	    /* all fragments failed the stencil test, we're done. */
-	    return GL_FALSE;
+	    return false;
 	}
 
 	if (ctx->Depth.Test==GL_FALSE) {
@@ -953,16 +953,16 @@ stencil_and_ztest_pixels(GLcontext *ctx, SWspan *span, GLuint face)
 	    }
 	}
 
-	return GL_TRUE;  /* one or more fragments passed both tests */
+	return true;  /* one or more fragments passed both tests */
     }
 }
 
 
 /**
- * /return GL_TRUE = one or more fragments passed,
+ * /return true = one or more fragments passed,
  * GL_FALSE = all fragments failed.
  */
-GLboolean
+bool
 _swrast_stencil_and_ztest_span(GLcontext *ctx, SWspan *span)
 {
     if (span->arrayMask & SPAN_XY)

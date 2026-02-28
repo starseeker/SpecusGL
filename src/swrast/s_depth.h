@@ -37,7 +37,7 @@ extern GLuint
 _swrast_depth_test_span(GLcontext *ctx, SWspan *span);
 
 
-extern GLboolean
+extern bool
 _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span);
 
 

@@ -48,7 +48,7 @@
     const SWvertex *vMin, *vMid, *vMax;
     GLint iyMin, iyMax;
     GLfloat yMin, yMax;
-    GLboolean ltor;
+    bool ltor;
     GLfloat majDx, majDy;  /* major (i.e. long) edge dx and dy */
 
     SWspan span;
@@ -142,7 +142,7 @@
 	/* Do backface culling */
 	if (area * bf < 0 || area == 0 || IS_INF_OR_NAN(area))
 	    return;
-	ltor = static_cast<GLboolean>((area < 0.0F));
+	ltor = (area < 0.0F);
 
 	span.facing = area * swrast->_BackfaceSign > 0.0F;
     }

@@ -523,7 +523,7 @@ static void _save_upgrade_vertex(GLcontext *ctx,
 	 */
 	if (attr != VBO_ATTRIB_POS && save->currentsz[attr][0] == 0) {
 	    assert(oldsz == 0);
-	    save->dangling_attr_ref = GL_TRUE;
+	    save->dangling_attr_ref = true;
 	}
 
 	for (i = 0 ; i < save->copied.nr ; i++) {
@@ -715,7 +715,7 @@ static void GLAPIENTRY _save_CallLists(GLsizei n, GLenum type, const GLvoid *v)
 /* This begin is hooked into ...  Updating of
  * ctx->Driver.CurrentSavePrimitive is already taken care of.
  */
-GLboolean vbo_save_NotifyBegin(GLcontext *ctx, GLenum mode)
+bool vbo_save_NotifyBegin(GLcontext *ctx, GLenum mode)
 {
     struct vbo_save_context *save = &vbo_context(ctx)->save;
 
@@ -732,7 +732,7 @@ GLboolean vbo_save_NotifyBegin(GLcontext *ctx, GLenum mode)
 
     _mesa_install_save_vtxfmt(ctx, &save->vtxfmt);
     ctx->Driver.SaveNeedFlush = 1;
-    return GL_TRUE;
+    return true;
 }
 
 

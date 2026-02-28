@@ -54,7 +54,7 @@ struct texmat_stage_data {
 
 
 
-static GLboolean run_texmat_stage(GLcontext *ctx,
+static bool run_texmat_stage(GLcontext *ctx,
 				  struct tnl_pipeline_stage *stage)
 {
     struct texmat_stage_data *store = TEXMAT_STAGE_DATA(stage);
@@ -62,7 +62,7 @@ static GLboolean run_texmat_stage(GLcontext *ctx,
     GLuint i;
 
     if (!ctx->Texture._TexMatEnabled || ctx->VertexProgram._Current)
-	return GL_TRUE;
+	return true;
 
     /* ENABLE_TEXMAT implies that the texture matrix is not the
      * identity, so we don't have to check that here.
@@ -78,13 +78,13 @@ static GLboolean run_texmat_stage(GLcontext *ctx,
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /* Called the first time stage->run() is invoked.
  */
-static GLboolean alloc_texmat_data(GLcontext *ctx,
+static bool alloc_texmat_data(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
@@ -94,12 +94,12 @@ static GLboolean alloc_texmat_data(GLcontext *ctx,
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<texmat_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
 	store->texcoord[i].alloc(0, VB->Size, 32);
 
-    return GL_TRUE;
+    return true;
 }
 
 

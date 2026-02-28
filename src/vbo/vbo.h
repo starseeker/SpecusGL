@@ -61,7 +61,7 @@ struct _mesa_index_buffer {
 
 
 
-GLboolean _vbo_CreateContext(GLcontext *ctx);
+bool _vbo_CreateContext(GLcontext *ctx);
 void _vbo_DestroyContext(GLcontext *ctx);
 void _vbo_InvalidateState(GLcontext *ctx, GLuint new_state);
 

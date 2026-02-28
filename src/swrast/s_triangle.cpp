@@ -46,7 +46,7 @@
 /*
  * Just used for feedback mode.
  */
-GLboolean
+bool
 _swrast_culltriangle(GLcontext *ctx,
 		     const SWvertex *v0,
 		     const SWvertex *v1,

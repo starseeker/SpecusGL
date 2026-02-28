@@ -126,8 +126,8 @@ struct SWcontext {
     /** Configuration mechanisms to make software rasterizer match
      * characteristics of the hardware rasterizer (if present):
      */
-    GLboolean AllowVertexFog;
-    GLboolean AllowPixelFog;
+    bool AllowVertexFog;
+    bool AllowPixelFog;
 
     /** Derived values, invalidated on statechanges, updated from
      * _swrast_validate_derived():
@@ -135,9 +135,9 @@ struct SWcontext {
     GLbitfield _RasterMask;
     GLfloat _BackfaceSign;      /** +1 or -1 */
     GLfloat _BackfaceCullSign;  /** +1, 0, or -1 */
-    GLboolean _PreferPixelFog;    /* Compute fog blend factor per fragment? */
-    GLboolean _AnyTextureCombine;
-    GLboolean _FogEnabled;
+    bool _PreferPixelFog;    /* Compute fog blend factor per fragment? */
+    bool _AnyTextureCombine;
+    bool _FogEnabled;
     GLenum _FogMode;  /* either GL_FOG_MODE or fragment program's fog mode */
 
     /** Multiple render targets */
@@ -151,7 +151,7 @@ struct SWcontext {
 
     /* Accum buffer temporaries.
      */
-    GLboolean _IntegerAccumMode;	/**< Storing unscaled integers? */
+    bool _IntegerAccumMode;	/**< Storing unscaled integers? */
     GLfloat _IntegerAccumScaler;	/**< Implicit scale factor */
 
     /* Working values:

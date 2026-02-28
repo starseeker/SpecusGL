@@ -47,7 +47,7 @@
  * Try to do a fast and simple RGB(a) glDrawPixels.
  * Return:  GL_TRUE if success, GL_FALSE if slow path must be used instead
  */
-static GLboolean
+static bool
 fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		      GLsizei width, GLsizei height,
 		      GLenum format, GLenum type,
@@ -59,7 +59,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
     const GLenum rbType = rb->DataType;
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     SWspan span;
-    GLboolean simpleZoom;
+    bool simpleZoom;
     GLint yStep;  /* +1 or -1 */
     struct gl_pixelstore_attrib unpack;
     GLint destX, destY, drawWidth, drawHeight; /* post clipping */
@@ -69,7 +69,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	userUnpack->SwapBytes ||
 	ctx->_ImageTransferState) {
 	/* can't handle any of those conditions */
-	return GL_FALSE;
+	return false;
     }
 
     INIT_SPAN(span, GL_BITMAP, 0, 0, SPAN_RGBA);
@@ -94,14 +94,14 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	if (!_mesa_clip_drawpixels(ctx, &destX, &destY,
 				   &drawWidth, &drawHeight, &unpack)) {
 	    /* image was completely clipped: no-op, all done */
-	    return GL_TRUE;
+	    return true;
 	}
-	simpleZoom = GL_TRUE;
+	simpleZoom = true;
 	yStep = static_cast<GLint>(ctx->Pixel.ZoomY);
 	assert(yStep == 1 || yStep == -1);
     } else {
 	/* non-simple zooming */
-	simpleZoom = GL_FALSE;
+	simpleZoom = false;
 	yStep = 1;
 	if (unpack.RowLength == 0)
 	    unpack.RowLength = width;
@@ -137,7 +137,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	    }
 	    span.array->ChanType = CHAN_TYPE;
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (format == GL_RGB && type == rbType) {
@@ -167,12 +167,12 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	    }
 	    span.array->ChanType = CHAN_TYPE;
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* Remaining cases haven't been tested with alignment != 1 */
     if (userUnpack->Alignment != 1)
-	return GL_FALSE;
+	return false;
 
     if (format == GL_LUMINANCE && type == CHAN_TYPE && rbType == CHAN_TYPE) {
 	const GLchan *src = (const GLchan *) pixels
@@ -213,7 +213,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		destY++;
 	    }
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (format == GL_LUMINANCE_ALPHA && type == CHAN_TYPE && rbType == CHAN_TYPE) {
@@ -258,7 +258,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		destY++;
 	    }
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (format == GL_COLOR_INDEX && type == GL_UNSIGNED_BYTE) {
@@ -293,7 +293,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    destY++;
 		}
 	    }
-	    return GL_TRUE;
+	    return true;
 	} else if (!ctx->Visual.rgbMode && rbType == GL_UNSIGNED_INT) {
 	    /* write CI data to CI frame buffer */
 	    GLint row;
@@ -307,13 +307,13 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 		    src += unpack.RowLength;
 		    destY += yStep;
 		}
-		return GL_TRUE;
+		return true;
 	    }
 	}
     }
 
     /* can't handle this pixel format and/or data type */
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -425,7 +425,7 @@ draw_depth_pixels(GLcontext *ctx, GLint x, GLint y,
 		  const struct gl_pixelstore_attrib *unpack,
 		  const GLvoid *pixels)
 {
-    const GLboolean scaleOrBias
+    const bool scaleOrBias
 	= ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0;
     const GLboolean zoom = ctx->Pixel.ZoomX != 1.0 || ctx->Pixel.ZoomY != 1.0;
     SWspan span;
@@ -683,7 +683,7 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 			  const GLvoid *pixels)
 {
     const GLint imgX = x, imgY = y;
-    const GLboolean scaleOrBias
+    const bool scaleOrBias
 	= ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0;
     const GLfloat depthScale = ctx->DrawBuffer->_DepthMaxF;
     const GLuint stencilMask = ctx->Stencil.WriteMask[0];

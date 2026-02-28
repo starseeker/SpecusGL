@@ -46,9 +46,9 @@
  * This test also compensates for the fact that copies are done from
  * bottom to top and overlaps can sometimes be handled correctly
  * without making a temporary image copy.
- * \return GL_TRUE if the regions overlap, GL_FALSE otherwise.
+ * \return true if the regions overlap, false otherwise.
  */
-static GLboolean
+static bool
 regions_overlap(GLint srcx, GLint srcy,
 		GLint dstx, GLint dsty,
 		GLint width, GLint height,
@@ -57,30 +57,30 @@ regions_overlap(GLint srcx, GLint srcy,
     if (zoomX == 1.0 && zoomY == 1.0) {
 	/* no zoom */
 	if (srcx >= dstx + width || (srcx + width <= dstx)) {
-	    return GL_FALSE;
+	    return false;
 	} else if (srcy < dsty) { /* this is OK */
-	    return GL_FALSE;
+	    return false;
 	} else if (srcy > dsty + height) {
-	    return GL_FALSE;
+	    return false;
 	} else {
-	    return GL_TRUE;
+	    return true;
 	}
     } else {
 	/* add one pixel of slop when zooming, just to be safe */
 	if (srcx > (dstx + ((zoomX > 0.0F) ? (width * zoomX + 1.0F) : 0.0F))) {
 	    /* src is completely right of dest */
-	    return GL_FALSE;
+	    return false;
 	} else if (srcx + width + 1.0F < dstx + ((zoomX > 0.0F) ? 0.0F : (width * zoomX))) {
 	    /* src is completely left of dest */
-	    return GL_FALSE;
+	    return false;
 	} else if ((srcy < dsty) && (srcy + height < dsty + (height * zoomY))) {
 	    /* src is completely below dest */
-	    return GL_FALSE;
+	    return false;
 	} else if ((srcy > dsty) && (srcy + height > dsty + (height * zoomY))) {
 	    /* src is completely above dest */
-	    return GL_FALSE;
+	    return false;
 	} else {
-	    return GL_TRUE;
+	    return true;
 	}
     }
 }
@@ -754,7 +754,7 @@ copy_depth_stencil_pixels(GLcontext *ctx,
 /**
  * Try to do a fast copy pixels.
  */
-static GLboolean
+static bool
 fast_copy_pixels(GLcontext *ctx,
 		 GLint srcX, GLint srcY, GLsizei width, GLsizei height,
 		 GLint dstX, GLint dstY, GLenum type)
@@ -769,12 +769,12 @@ fast_copy_pixels(GLcontext *ctx,
 	ctx->Pixel.ZoomY != 1.0F ||
 	ctx->_ImageTransferState) {
 	/* can't handle these */
-	return GL_FALSE;
+	return false;
     }
 
     if (type == GL_COLOR) {
 	if (dstFb->_NumColorDrawBuffers[0] != 1)
-	    return GL_FALSE;
+	    return false;
 	srcRb = srcFb->_ColorReadBuffer;
 	dstRb = dstFb->_ColorDrawBuffers[0][0];
     } else if (type == GL_STENCIL) {
@@ -794,7 +794,7 @@ fast_copy_pixels(GLcontext *ctx,
     if (!srcRb || !dstRb ||
 	srcRb->DataType != dstRb->DataType ||
 	srcRb->_BaseFormat != dstRb->_BaseFormat) {
-	return GL_FALSE;
+	return false;
     }
 
     /* clipping not supported */
@@ -802,7 +802,7 @@ fast_copy_pixels(GLcontext *ctx,
 	srcY < 0 || srcY + height > static_cast<GLint>(srcFb->Height) ||
 	dstX < dstFb->_Xmin || dstX + width > dstFb->_Xmax ||
 	dstY < dstFb->_Ymin || dstY + height > dstFb->_Ymax) {
-	return GL_FALSE;
+	return false;
     }
 
     /* overlapping src/dst doesn't matter, just determine Y direction */
@@ -824,7 +824,7 @@ fast_copy_pixels(GLcontext *ctx,
 	dstY += yStep;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 

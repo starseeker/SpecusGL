@@ -252,7 +252,7 @@ struct tnl_pipeline_stage {
     std::function<void(void *)> privateDeleter;
 
     /** Allocate private data (called once when the pipeline is installed). */
-    std::function<GLboolean(GLcontext *ctx, struct tnl_pipeline_stage *)> create;
+    std::function<bool(GLcontext *ctx, struct tnl_pipeline_stage *)> create;
 
     /** Called on any statechange, input array size change, or stride change. */
     std::function<void(GLcontext *ctx, struct tnl_pipeline_stage *)> validate;
@@ -261,7 +261,7 @@ struct tnl_pipeline_stage {
      * Called from _tnl_run_pipeline().
      * Return value: GL_TRUE - keep going, GL_FALSE - finished pipeline.
      */
-    std::function<GLboolean(GLcontext *ctx, struct tnl_pipeline_stage *)> run;
+    std::function<bool(GLcontext *ctx, struct tnl_pipeline_stage *)> run;
 };
 
 
@@ -344,7 +344,7 @@ struct tnl_attr_type {
 struct tnl_clipspace_fastpath {
     GLuint vertex_size;
     GLuint attr_count;
-    GLboolean match_strides;
+    bool match_strides;
 
     struct tnl_attr_type *attr;
 
@@ -357,7 +357,7 @@ struct tnl_clipspace_fastpath {
  * I.e. Structure of arrays to arrays of structs.
  */
 struct tnl_clipspace {
-    GLboolean need_extras;
+    bool need_extras;
 
     GLuint new_inputs;
 
@@ -375,7 +375,7 @@ struct tnl_clipspace {
 
     /* Parameters and constants for codegen:
      */
-    GLboolean need_viewport;
+    bool need_viewport;
     GLfloat vp_scale[4];
     GLfloat vp_xlate[4];
     GLfloat chan_scale[4];
@@ -476,7 +476,7 @@ struct tnl_device_driver {
 	 */
 
 
-	std::function<GLboolean(GLcontext *ctx, GLuint passno)> Multipass;
+	std::function<bool(GLcontext *ctx, GLuint passno)> Multipass;
 	/* Driver may request additional render passes by returning GL_TRUE
 	 * when this function is called.  This function will be called
 	 * after the first pass, and passes will be made until the function
@@ -539,10 +539,10 @@ struct TNLcontext {
 
     /* Probably need a better configuration mechanism:
      */
-    GLboolean NeedNdcCoords;
-    GLboolean AllowVertexFog;
-    GLboolean AllowPixelFog;
-    GLboolean _DoVertexFog;  /* eval fog function at each vertex? */
+    bool NeedNdcCoords;
+    bool AllowVertexFog;
+    bool AllowPixelFog;
+    bool _DoVertexFog;  /* eval fog function at each vertex? */
 
     DECLARE_RENDERINPUTS(render_inputs_bitset);
 

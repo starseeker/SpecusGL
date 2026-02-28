@@ -183,9 +183,9 @@ static void TAG(render_tri_strip)(GLcontext *ctx,
 	    GLuint ej2 = ELT(j-2+parity);
 	    GLuint ej1 = ELT(j-1-parity);
 	    GLuint ej = ELT(j);
-	    GLboolean ef2 = EDGEFLAG_GET(ej2);
-	    GLboolean ef1 = EDGEFLAG_GET(ej1);
-	    GLboolean ef = EDGEFLAG_GET(ej);
+	    bool ef2 = EDGEFLAG_GET(ej2);
+	    bool ef1 = EDGEFLAG_GET(ej1);
+	    bool ef = EDGEFLAG_GET(ej);
 	    if (TEST_PRIM_BEGIN(flags)) {
 		RESET_STIPPLE;
 	    }
@@ -223,9 +223,9 @@ static void TAG(render_tri_fan)(GLcontext *ctx,
 	    GLuint ejs = ELT(start);
 	    GLuint ej1 = ELT(j-1);
 	    GLuint ej = ELT(j);
-	    GLboolean efs = EDGEFLAG_GET(ejs);
-	    GLboolean ef1 = EDGEFLAG_GET(ej1);
-	    GLboolean ef = EDGEFLAG_GET(ej);
+	    bool efs = EDGEFLAG_GET(ejs);
+	    bool ef1 = EDGEFLAG_GET(ej1);
+	    bool ef = EDGEFLAG_GET(ej);
 	    if (TEST_PRIM_BEGIN(flags)) {
 		RESET_STIPPLE;
 	    }
@@ -258,8 +258,8 @@ static void TAG(render_poly)(GLcontext *ctx,
 
     INIT(GL_POLYGON);
     if (NEED_EDGEFLAG_SETUP) {
-	GLboolean efstart = EDGEFLAG_GET(ELT(start));
-	GLboolean efcount = EDGEFLAG_GET(ELT(count-1));
+	bool efstart = EDGEFLAG_GET(ELT(start));
+	bool efcount = EDGEFLAG_GET(ELT(count-1));
 
 	/* If the primitive does not begin here, the first edge
 	 * is non-boundary.
@@ -279,7 +279,7 @@ static void TAG(render_poly)(GLcontext *ctx,
 	/* Draw the first triangles (possibly zero)
 	 */
 	if (j+1<count) {
-	    GLboolean ef = EDGEFLAG_GET(ELT(j));
+	    bool ef = EDGEFLAG_GET(ELT(j));
 	    EDGEFLAG_SET(ELT(j), GL_FALSE);
 	    RENDER_TRI(ELT(j-1), ELT(j), ELT(start));
 	    EDGEFLAG_SET(ELT(j), ef);
@@ -290,7 +290,7 @@ static void TAG(render_poly)(GLcontext *ctx,
 	    EDGEFLAG_SET(ELT(start), GL_FALSE);
 
 	    for (; j+1<count; j++) {
-		GLboolean efj = EDGEFLAG_GET(ELT(j));
+		bool efj = EDGEFLAG_GET(ELT(j));
 		EDGEFLAG_SET(ELT(j), GL_FALSE);
 		RENDER_TRI(ELT(j-1), ELT(j), ELT(start));
 		EDGEFLAG_SET(ELT(j), efj);
@@ -355,10 +355,10 @@ static void TAG(render_quad_strip)(GLcontext *ctx,
 	    /* All edges are boundary.  Set edgeflags to 1, draw the
 	     * quad, and restore them to the original values.
 	     */
-	    GLboolean ef3 = EDGEFLAG_GET(ELT(j-3));
-	    GLboolean ef2 = EDGEFLAG_GET(ELT(j-2));
-	    GLboolean ef1 = EDGEFLAG_GET(ELT(j-1));
-	    GLboolean ef = EDGEFLAG_GET(ELT(j));
+	    bool ef3 = EDGEFLAG_GET(ELT(j-3));
+	    bool ef2 = EDGEFLAG_GET(ELT(j-2));
+	    bool ef1 = EDGEFLAG_GET(ELT(j-1));
+	    bool ef = EDGEFLAG_GET(ELT(j));
 	    if (TEST_PRIM_BEGIN(flags)) {
 		RESET_STIPPLE;
 	    }

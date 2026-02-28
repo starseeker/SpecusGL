@@ -258,7 +258,7 @@ void _tnl_RenderClippedLine(GLcontext *ctx, GLuint ii, GLuint jj)
 /**********************************************************************/
 
 
-static GLboolean run_render(GLcontext *ctx,
+static bool run_render(GLcontext *ctx,
 			    struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -321,7 +321,7 @@ static GLboolean run_render(GLcontext *ctx,
 
     tnl->Driver.Render.Finish(ctx);
 
-    return GL_FALSE;		/* finished the pipe */
+    return false;		/* finished the pipe */
 }
 
 

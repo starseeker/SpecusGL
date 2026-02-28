@@ -237,7 +237,7 @@ _swsetup_Wakeup(GLcontext *ctx)
     tnl->Driver.Render.Multipass = 0;
 
     _tnl_invalidate_vertices(ctx, ~0);
-    _tnl_need_projected_coords(ctx, GL_TRUE);
+    _tnl_need_projected_coords(ctx, true);
     _swsetup_InvalidateState(ctx, ~0);
 
     swsetup->verts = reinterpret_cast<SWvertex *>(tnl->clipspace.vertex_buf.get());

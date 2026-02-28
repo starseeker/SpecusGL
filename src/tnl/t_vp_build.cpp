@@ -385,7 +385,7 @@ static struct ureg register_const4f(struct tnl_program *p,
 #define register_const2f(p, s0, s1)     register_const4f(p, s0, s1, 0, 1)
 #define register_const3f(p, s0, s1, s2) register_const4f(p, s0, s1, s2, 1)
 
-static GLboolean is_undef(struct ureg reg)
+static bool is_undef(struct ureg reg)
 {
     return reg.file == PROGRAM_UNDEFINED;
 }
@@ -850,8 +850,8 @@ static struct ureg calculate_light_attenuation(struct tnl_program *p,
  */
 static void build_lighting(struct tnl_program *p)
 {
-    const GLboolean twoside = p->state->light_twoside;
-    const GLboolean separate = p->state->separate_specular;
+    const bool twoside = p->state->light_twoside;
+    const bool separate = p->state->separate_specular;
     GLuint nr_lights = 0, count = 0;
     struct ureg normal = get_eye_normal(p);
     struct ureg lit = get_temp(p);
@@ -1109,7 +1109,7 @@ static void build_fog(struct tnl_program *p)
 	struct ureg params = register_param2(p, STATE_INTERNAL,
 					     STATE_FOG_PARAMS_OPTIMIZED);
 	struct ureg tmp = get_temp(p);
-	GLboolean useabs = (p->state->fog_mode != FOG_EXP2);
+	bool useabs = (p->state->fog_mode != FOG_EXP2);
 
 	if (useabs) {
 	    emit_op1(p, OPCODE_ABS, tmp, 0, input);
@@ -1144,7 +1144,7 @@ static void build_fog(struct tnl_program *p)
 	 * BP: Yes, we always need to compute the absolute value, unless
 	 * we want to push that down into the fragment program...
 	 */
-	GLboolean useabs = GL_TRUE;
+	bool useabs = true;
 	emit_op1(p, useabs ? OPCODE_ABS : OPCODE_MOV, fog, WRITEMASK_X, input);
     }
 }

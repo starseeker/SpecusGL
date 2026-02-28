@@ -479,17 +479,17 @@ static void GLAPIENTRY vbo_exec_EvalPoint2(GLint i, GLint j)
 /**
  * Check if programs/shaders are enabled and valid at glBegin time.
  */
-GLboolean
+bool
 vbo_validate_shaders(GLcontext *ctx)
 {
     if ((ctx->VertexProgram.Enabled && !ctx->VertexProgram._Enabled) ||
 	(ctx->FragmentProgram.Enabled && !ctx->FragmentProgram._Enabled)) {
-	return GL_FALSE;
+	return false;
     }
     if (ctx->Shader.CurrentProgram && !ctx->Shader.CurrentProgram->LinkStatus) {
-	return GL_FALSE;
+	return false;
     }
-    return GL_TRUE;
+    return true;
 }
 
 

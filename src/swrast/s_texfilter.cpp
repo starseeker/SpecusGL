@@ -1376,7 +1376,7 @@ sample_lambda_2d(GLcontext *ctx,
     GLuint minStart, minEnd;  /* texels with minification */
     GLuint magStart, magEnd;  /* texels with magnification */
 
-    const GLboolean repeatNoBorderPOT = (tObj->WrapS == GL_REPEAT)
+    const bool repeatNoBorderPOT = (tObj->WrapS == GL_REPEAT)
 					&& (tObj->WrapT == GL_REPEAT)
 					&& (tImg->Border == 0 && (tImg->Width == tImg->RowStride))
 					&& (tImg->TexFormat->BaseFormat != GL_COLOR_INDEX)
@@ -1659,7 +1659,7 @@ _swrast_choose_texture_sample_func_f(GLcontext *ctx,
 	return &null_sample_func_f;
     }
     if (t->Target == GL_TEXTURE_2D) {
-	const GLboolean needLambda = (t->MinFilter != t->MagFilter);
+	const bool needLambda = (t->MinFilter != t->MagFilter);
 	const GLenum format = t->Image[0][t->BaseLevel]->TexFormat->BaseFormat;
 	if (format == GL_DEPTH_COMPONENT || format == GL_DEPTH_STENCIL_EXT)
 	    return &null_sample_func_f;
@@ -2810,7 +2810,7 @@ sample_depth_texture2(const GLcontext *ctx,
     const GLuint width = texImage->Width;
     const GLuint height = texImage->Height;
     GLchan ambient;
-    GLboolean lequal, gequal;
+    bool lequal, gequal;
 
     if (texObj->Target != GL_TEXTURE_2D) {
 	_mesa_problem(ctx, "only 2-D depth textures supported at this time");
@@ -2834,11 +2834,11 @@ sample_depth_texture2(const GLcontext *ctx,
     UNCLAMPED_FLOAT_TO_CHAN(ambient, tObj->ShadowAmbient);
 
     if (texObj->CompareOperator == GL_TEXTURE_LEQUAL_R_SGIX) {
-	lequal = GL_TRUE;
-	gequal = GL_FALSE;
+	lequal = true;
+	gequal = false;
     } else {
-	lequal = GL_FALSE;
-	gequal = GL_TRUE;
+	lequal = false;
+	gequal = true;
     }
 
     {
@@ -2926,7 +2926,7 @@ _swrast_choose_texture_sample_func(GLcontext *ctx,
     if (!t || !t->Complete) {
 	return &null_sample_func;
     } else {
-	const GLboolean needLambda = static_cast<GLboolean>((t->MinFilter != t->MagFilter));
+	const bool needLambda = (t->MinFilter != t->MagFilter);
 	const GLenum format = t->Image[0][t->BaseLevel]->TexFormat->BaseFormat;
 
 	switch (t->Target) {

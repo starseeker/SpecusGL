@@ -49,7 +49,7 @@
 /* True if a primitive can be split without copying of vertices, false
  * otherwise.
  */
-GLboolean split_prim_inplace(GLenum mode, GLuint *first, GLuint *incr);
+bool split_prim_inplace(GLenum mode, GLuint *first, GLuint *incr);
 
 void vbo_split_inplace(GLcontext *ctx,
 		       const struct gl_client_array *arrays[],

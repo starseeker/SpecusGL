@@ -116,7 +116,7 @@ rescale_accum(GLcontext *ctx)
 	}
     }
 
-    swrast->_IntegerAccumMode = GL_FALSE;
+    swrast->_IntegerAccumMode = false;
 }
 
 
@@ -169,13 +169,13 @@ _swrast_clear_accum_buffer(GLcontext *ctx, struct gl_renderbuffer *rb)
     if (ctx->Accum.ClearColor[0] == 0.0 && ctx->Accum.ClearColor[1] == 0.0 &&
 	ctx->Accum.ClearColor[2] == 0.0 && ctx->Accum.ClearColor[3] == 0.0) {
 #if USE_OPTIMIZED_ACCUM
-	swrast->_IntegerAccumMode = GL_TRUE;
+	swrast->_IntegerAccumMode = true;
 #else
-	swrast->_IntegerAccumMode = GL_FALSE;
+	swrast->_IntegerAccumMode = false;
 #endif
 	swrast->_IntegerAccumScaler = 0.0;  /* denotes empty accum buffer */
     } else {
-	swrast->_IntegerAccumMode = GL_FALSE;
+	swrast->_IntegerAccumMode = false;
     }
 }
 
@@ -269,7 +269,7 @@ accum_accum(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
+    const bool directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
 
     assert(rb);
 
@@ -342,7 +342,7 @@ accum_load(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_renderbuffer *rb
 	    = ctx->DrawBuffer->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
+    const bool directAccess = (rb->GetPointer(ctx, 0, 0) != nullptr);
 
     assert(rb);
 
@@ -354,13 +354,13 @@ accum_load(GLcontext *ctx, GLfloat value,
     /* This is a change to go into optimized accum buffer mode */
     if (value > 0.0 && value <= 1.0) {
 #if USE_OPTIMIZED_ACCUM
-	swrast->_IntegerAccumMode = GL_TRUE;
+	swrast->_IntegerAccumMode = true;
 #else
-	swrast->_IntegerAccumMode = GL_FALSE;
+	swrast->_IntegerAccumMode = false;
 #endif
 	swrast->_IntegerAccumScaler = value;
     } else {
-	swrast->_IntegerAccumMode = GL_FALSE;
+	swrast->_IntegerAccumMode = false;
 	swrast->_IntegerAccumScaler = 0.0;
     }
 
@@ -421,9 +421,9 @@ accum_return(GLcontext *ctx, GLfloat value,
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     struct gl_framebuffer *fb = ctx->DrawBuffer;
     struct gl_renderbuffer *accumRb = fb->Attachment[BUFFER_ACCUM].Renderbuffer;
-    const GLboolean directAccess
+    const bool directAccess
 	= (accumRb->GetPointer(ctx, 0, 0) != nullptr);
-    const GLboolean masking = (!ctx->Color.ColorMask[RCOMP] ||
+    const bool masking = (!ctx->Color.ColorMask[RCOMP] ||
 			       !ctx->Color.ColorMask[GCOMP] ||
 			       !ctx->Color.ColorMask[BCOMP] ||
 			       !ctx->Color.ColorMask[ACOMP]);

@@ -85,8 +85,8 @@ do {									\
    if (mask & PLANE_BIT) {						\
       const GLfloat dp0 = CLIP_DOTPROD( v0, A, B, C, D );		\
       const GLfloat dp1 = CLIP_DOTPROD( v1, A, B, C, D );		\
-      const GLboolean neg_dp0 = IS_NEGATIVE(dp0);			\
-      const GLboolean neg_dp1 = IS_NEGATIVE(dp1);			\
+      const bool neg_dp0 = IS_NEGATIVE(dp0);			\
+      const bool neg_dp1 = IS_NEGATIVE(dp1);			\
       									\
       /* For regular clipping, we know from the clipmask that one	\
        * (or both) of these must be negative (otherwise we wouldn't	\

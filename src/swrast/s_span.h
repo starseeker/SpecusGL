@@ -136,7 +136,7 @@ struct SWspan {
     GLuint end;
 
     /** This flag indicates that mask[] array is effectively filled with ones */
-    GLboolean writeAll;
+    bool writeAll;
 
     /** either GL_POLYGON, GL_LINE, GL_POLYGON, GL_BITMAP */
     GLenum primitive;

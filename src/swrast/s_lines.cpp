@@ -60,7 +60,7 @@ compute_stipple_mask(GLcontext *ctx, GLuint len, GLubyte mask[])
  * To draw a wide line we can simply redraw the span N times, side by side.
  */
 static void
-draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
+draw_wide_line(GLcontext *ctx, SWspan *span, bool xMajor)
 {
     GLint width, start;
 
@@ -140,7 +140,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);    \
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
+      draw_wide_line(ctx, &span, static_cast<bool>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_index_span(ctx, &span);			\
@@ -159,7 +159,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
+      draw_wide_line(ctx, &span, static_cast<bool>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\
@@ -180,7 +180,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, GLboolean xMajor)
       compute_stipple_mask(ctx, span.end, span.array->mask);	\
    }								\
    if (ctx->Line._Width > 1.0) {					\
-      draw_wide_line(ctx, &span, static_cast<GLboolean>((dx > dy)));		\
+      draw_wide_line(ctx, &span, static_cast<bool>((dx > dy)));		\
    }								\
    else {							\
       _swrast_write_rgba_span(ctx, &span);			\

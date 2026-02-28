@@ -122,7 +122,7 @@ static void (*(usercliptab[5]))(GLcontext *,
 
 
 
-static GLboolean run_vertex_stage(GLcontext *ctx,
+static bool run_vertex_stage(GLcontext *ctx,
 				  struct tnl_pipeline_stage *stage)
 {
     struct vertex_stage_data *store = (struct vertex_stage_data *)stage->privatePtr;
@@ -130,7 +130,7 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
     struct vertex_buffer *VB = &tnl->vb;
 
     if (ctx->VertexProgram._Current)
-	return GL_TRUE;
+	return true;
 
     if (ctx->_NeedEyeCoords) {
 	/* Separate modelview transformation:
@@ -187,7 +187,7 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
     }
 
     if (store->andmask)
-	return GL_FALSE;
+	return false;
 
 
     /* Test userclip planes.  This contributes to VB->ClipMask, so
@@ -201,18 +201,18 @@ static GLboolean run_vertex_stage(GLcontext *ctx,
 				       &store->andmask);
 
 	if (store->andmask)
-	    return GL_FALSE;
+	    return false;
     }
 
     VB->ClipAndMask = store->andmask;
     VB->ClipOrMask = store->ormask;
     VB->ClipMask = store->clipmask.get();
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean init_vertex_stage(GLcontext *ctx,
+static bool init_vertex_stage(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
@@ -222,7 +222,7 @@ static GLboolean init_vertex_stage(GLcontext *ctx,
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<vertex_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     store->eye.alloc(0, size, 32);
     store->clip.alloc(0, size, 32);
@@ -234,9 +234,9 @@ static GLboolean init_vertex_stage(GLcontext *ctx,
 	!store->eye.data ||
 	!store->clip.data ||
 	!store->proj.data)
-	return GL_FALSE;
+	return false;
 
-    return GL_TRUE;
+    return true;
 }
 
 

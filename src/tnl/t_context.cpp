@@ -40,7 +40,7 @@
 
 #include "vbo/vbo.h"
 
-GLboolean
+bool
 _tnl_CreateContext(GLcontext *ctx)
 {
     TNLcontext *tnl;
@@ -63,9 +63,9 @@ _tnl_CreateContext(GLcontext *ctx)
 	_tnl_install_pipeline(ctx, _tnl_default_pipeline);
     }
 
-    tnl->NeedNdcCoords = GL_TRUE;
-    tnl->AllowVertexFog = GL_TRUE;
-    tnl->AllowPixelFog = GL_TRUE;
+    tnl->NeedNdcCoords = true;
+    tnl->AllowVertexFog = true;
+    tnl->AllowPixelFog = true;
 
     /* Set a few default values in the driver struct.
      */
@@ -75,7 +75,7 @@ _tnl_CreateContext(GLcontext *ctx)
 
     /* blocks vector is default-constructed (empty); no init needed. */
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -187,14 +187,14 @@ _tnl_wakeup(GLcontext *ctx)
  * we should "Divide-by-W".  Software renders will want that.
  */
 void
-_tnl_need_projected_coords(GLcontext *ctx, GLboolean mode)
+_tnl_need_projected_coords(GLcontext *ctx, bool mode)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     tnl->NeedNdcCoords = mode;
 }
 
 void
-_tnl_allow_vertex_fog(GLcontext *ctx, GLboolean value)
+_tnl_allow_vertex_fog(GLcontext *ctx, bool value)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     tnl->AllowVertexFog = value;
@@ -204,7 +204,7 @@ _tnl_allow_vertex_fog(GLcontext *ctx, GLboolean value)
 }
 
 void
-_tnl_allow_pixel_fog(GLcontext *ctx, GLboolean value)
+_tnl_allow_pixel_fog(GLcontext *ctx, bool value)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     tnl->AllowPixelFog = value;

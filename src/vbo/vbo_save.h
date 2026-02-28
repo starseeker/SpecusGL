@@ -69,7 +69,7 @@ struct vbo_save_vertex_list {
     GLuint buffer_offset;
     GLuint count;
     GLuint wrap_count;		/* number of copied vertices at start */
-    GLboolean dangling_attr_ref;	/* current attr implicitly referenced
+    bool dangling_attr_ref;	/* current attr implicitly referenced
 				   outside the list */
 
     struct _mesa_prim *prim;
@@ -136,8 +136,8 @@ struct vbo_save_context {
     GLfloat *attrptr[VBO_ATTRIB_MAX];
     GLuint vert_count;
     GLuint max_vert;
-    GLboolean dangling_attr_ref;
-    GLboolean have_materials;
+    bool dangling_attr_ref;
+    bool have_materials;
 
     GLuint opcode_vertex_list;
 
@@ -168,7 +168,7 @@ void vbo_save_NewList(GLcontext *ctx, GLuint list, GLenum mode);
 void vbo_save_EndCallList(GLcontext *ctx);
 void vbo_save_BeginCallList(GLcontext *ctx, struct mesa_display_list *list);
 void vbo_save_SaveFlushVertices(GLcontext *ctx);
-GLboolean vbo_save_NotifyBegin(GLcontext *ctx, GLenum mode);
+bool vbo_save_NotifyBegin(GLcontext *ctx, GLenum mode);
 
 void vbo_save_playback_vertex_list(GLcontext *ctx, void *data);
 
