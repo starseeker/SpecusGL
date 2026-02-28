@@ -135,33 +135,6 @@ _slang_refcount_storage(slang_ir_node *n)
 #endif
 
 
-static void
-_slang_free_ir(slang_ir_node *n)
-{
-    GLuint i;
-    if (!n)
-	return;
-
-    for (i = 0; i < 3; i++)
-	_slang_free_ir(n->Children[i]);
-    /* Do not free n->List since it's a child elsewhere */
-    delete n;
-}
-
-
-/**
- * Recursively free an IR tree.
- */
-void
-_slang_free_ir_tree(slang_ir_node *n)
-{
-#if 0
-    _slang_refcount_storage(n);
-#endif
-    _slang_free_ir(n);
-}
-
-
 
 static const char *
 swizzle_string(GLuint swizzle)

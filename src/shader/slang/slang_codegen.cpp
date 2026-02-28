@@ -461,8 +461,6 @@ new_node3(slang_ir_opcode op,
     n->Children[0] = c0;
     n->Children[1] = c1;
     n->Children[2] = c2;
-    n->Writemask = WRITEMASK_XYZW;
-    n->InstLocation = -1;
     return n;
 }
 
@@ -2398,11 +2396,11 @@ _slang_gen_subscript(slang_assemble_ctx * A, slang_operation *oper)
 	if (array && index) {
 	    /* bounds check */
 	    if (index->Opcode == IR_FLOAT &&
-		((int) index->Value[0] < 0 ||
-		 (int) index->Value[0] >= arrayLen)) {
+		(static_cast<int>(index->Value[0]) < 0 ||
+		 static_cast<int>(index->Value[0]) >= arrayLen)) {
 		slang_info_log_error(A->log,
 				     "Array index out of bounds (index=%d size=%d)",
-				     (int) index->Value[0], arrayLen);
+				     static_cast<int>(index->Value[0]), arrayLen);
 		_slang_free_ir_tree(array);
 		_slang_free_ir_tree(index);
 		return nullptr;

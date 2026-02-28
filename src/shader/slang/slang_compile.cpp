@@ -160,16 +160,16 @@ parse_identifier(slang_parse_ctx * C)
 static bool
 parse_number(slang_parse_ctx * C, int *number)
 {
-    const int radix = (int)(*C->I++);
+    const int radix = static_cast<int>(*C->I++);
     *number = 0;
     while (*C->I != '\0') {
 	int digit;
 	if (*C->I >= '0' && *C->I <= '9')
-	    digit = (int)(*C->I - '0');
+	    digit = static_cast<int>(*C->I - '0');
 	else if (*C->I >= 'A' && *C->I <= 'Z')
-	    digit = (int)(*C->I - 'A') + 10;
+	    digit = static_cast<int>(*C->I - 'A') + 10;
 	else
-	    digit = (int)(*C->I - 'a') + 10;
+	    digit = static_cast<int>(*C->I - 'a') + 10;
 	*number = *number * radix + digit;
 	C->I++;
     }
