@@ -124,7 +124,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     /* do the image transfer ops which preceed convolution */
     for (row = 0; row < height; row++) {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4])(tmpVec.data() + row * width * 4);
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(tmpVec.data() + row * width * 4);
 	_mesa_apply_rgba_transfer_ops(ctx,
 				      transferOps & IMAGE_PRE_CONVOLUTION_BITS,
 				      width, rgba);
@@ -142,7 +142,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
     /* do remaining post-convolution image transfer ops */
     for (row = 0; row < height; row++) {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4])(convVec.data() + row * width * 4);
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(convVec.data() + row * width * 4);
 	_mesa_apply_rgba_transfer_ops(ctx,
 				      transferOps & IMAGE_POST_CONVOLUTION_BITS,
 				      width, rgba);
@@ -152,7 +152,7 @@ copy_conv_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 	/* write the new image */
 	for (row = 0; row < height; row++) {
 	    const GLfloat *src = convVec.data() + row * width * 4;
-	    GLvoid *rgba = (GLvoid *) span.array->attribs[FRAG_ATTRIB_COL0];
+	    GLvoid *rgba = static_cast<GLvoid *>(span.array->attribs[FRAG_ATTRIB_COL0]);
 
 	    /* copy convolved colors into span array */
 	    memcpy(rgba, src, width * 4 * sizeof(GLfloat));
@@ -274,7 +274,7 @@ copy_rgba_pixels(GLcontext *ctx, GLint srcx, GLint srcy,
 
 	if (transferOps) {
 	    _mesa_apply_rgba_transfer_ops(ctx, transferOps, width,
-					  (GLfloat(*)[4]) rgba);
+					  reinterpret_cast<GLfloat(*)[4]>(rgba));
 	}
 
 	/* Write color span */

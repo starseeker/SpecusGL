@@ -4336,7 +4336,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
     switch (srcType) {
 	case GL_UNSIGNED_BYTE:
 	    if (dstType == GL_UNSIGNED_SHORT) {
-		const GLubyte(*src1)[4] = (const GLubyte(*)[4]) src;
+		const GLubyte(*src1)[4] = reinterpret_cast<const GLubyte(*)[4]>(src);
 		GLushort(*dst2)[4] = (GLushort(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4350,7 +4350,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLushort));
 	    } else {
-		const GLubyte(*src1)[4] = (const GLubyte(*)[4]) src;
+		const GLubyte(*src1)[4] = reinterpret_cast<const GLubyte(*)[4]>(src);
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_FLOAT);
@@ -4368,7 +4368,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 	    break;
 	case GL_UNSIGNED_SHORT:
 	    if (dstType == GL_UNSIGNED_BYTE) {
-		const GLushort(*src2)[4] = (const GLushort(*)[4]) src;
+		const GLushort(*src2)[4] = reinterpret_cast<const GLushort(*)[4]>(src);
 		GLubyte(*dst1)[4] = (GLubyte(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4382,7 +4382,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLubyte));
 	    } else {
-		const GLushort(*src2)[4] = (const GLushort(*)[4]) src;
+		const GLushort(*src2)[4] = reinterpret_cast<const GLushort(*)[4]>(src);
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_FLOAT);
@@ -4400,7 +4400,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 	    break;
 	case GL_FLOAT:
 	    if (dstType == GL_UNSIGNED_BYTE) {
-		const GLfloat(*src4)[4] = (const GLfloat(*)[4]) src;
+		const GLfloat(*src4)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
 		GLubyte(*dst1)[4] = (GLubyte(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4414,7 +4414,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLubyte));
 	    } else {
-		const GLfloat(*src4)[4] = (const GLfloat(*)[4]) src;
+		const GLfloat(*src4)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
 		GLushort(*dst2)[4] = (GLushort(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_UNSIGNED_SHORT);

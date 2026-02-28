@@ -138,7 +138,7 @@ _swrast_culltriangle(GLcontext *ctx,
    const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
    const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
    const GLint twidth_log2 = obj->Image[0][b]->WidthLog2;		\
-   const GLchan *texture = (const GLchan *) obj->Image[0][b]->Data;	\
+   const GLchan *texture = static_cast<const GLchan *>(obj->Image[0][b]->Data);	\
    const GLint smask = obj->Image[0][b]->Width - 1;			\
    const GLint tmask = obj->Image[0][b]->Height - 1;			\
    if (!texture) {							\
@@ -190,7 +190,7 @@ _swrast_culltriangle(GLcontext *ctx,
    const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
    const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
    const GLint twidth_log2 = obj->Image[0][b]->WidthLog2;		\
-   const GLchan *texture = (const GLchan *) obj->Image[0][b]->Data;	\
+   const GLchan *texture = static_cast<const GLchan *>(obj->Image[0][b]->Data);	\
    const GLint smask = obj->Image[0][b]->Width - 1;			\
    const GLint tmask = obj->Image[0][b]->Height - 1;			\
    if (!texture) {							\
@@ -527,7 +527,7 @@ affine_span(GLcontext *ctx, SWspan *span,
    const GLint b = obj->BaseLevel;					\
    const GLfloat twidth = static_cast<GLfloat>(obj->Image[0][b]->Width);		\
    const GLfloat theight = static_cast<GLfloat>(obj->Image[0][b]->Height);		\
-   info.texture = (const GLchan *) obj->Image[0][b]->Data;		\
+   info.texture = static_cast<const GLchan *>(obj->Image[0][b]->Data);		\
    info.twidth_log2 = obj->Image[0][b]->WidthLog2;			\
    info.smask = obj->Image[0][b]->Width - 1;				\
    info.tmask = obj->Image[0][b]->Height - 1;				\
@@ -796,7 +796,7 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
    const struct gl_texture_unit *unit = ctx->Texture.Unit+0;		\
    const struct gl_texture_object *obj = unit->Current2D;		\
    const GLint b = obj->BaseLevel;					\
-   info.texture = (const GLchan *) obj->Image[0][b]->Data;		\
+   info.texture = static_cast<const GLchan *>(obj->Image[0][b]->Data);		\
    info.twidth_log2 = obj->Image[0][b]->WidthLog2;			\
    info.smask = obj->Image[0][b]->Width - 1;				\
    info.tmask = obj->Image[0][b]->Height - 1;				\
@@ -884,8 +884,8 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
 #define RENDER_SPAN( span )						\
    if (rb->DepthBits <= 16) {						\
       GLuint i;								\
-      const GLushort *zRow = (const GLushort *)				\
-         rb->GetPointer(ctx, span.x, span.y);			\
+      const GLushort *zRow = static_cast<const GLushort *>(		\
+         rb->GetPointer(ctx, span.x, span.y));			\
       if (zRow) {							\
          for (i = 0; i < span.end; i++) {				\
             GLuint z = FixedToDepth(span.z);				\
@@ -898,8 +898,8 @@ fast_persp_span(GLcontext *ctx, SWspan *span,
    }									\
    else {								\
       GLuint i;								\
-      const GLuint *zRow = (const GLuint *)				\
-         rb->GetPointer(ctx, span.x, span.y);			\
+      const GLuint *zRow = static_cast<const GLuint *>(			\
+         rb->GetPointer(ctx, span.x, span.y));			\
       if (zRow) {							\
          for (i = 0; i < span.end; i++) {				\
             if (static_cast<GLuint>(span.z) < zRow[i]) {				\

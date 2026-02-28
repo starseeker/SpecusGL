@@ -175,7 +175,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 	return false;
 
     if (format == GL_LUMINANCE && type == CHAN_TYPE && rbType == CHAN_TYPE) {
-	const GLchan *src = (const GLchan *) pixels
+	const GLchan *src = reinterpret_cast<const GLchan *>(pixels)
 			    + (unpack.SkipRows * unpack.RowLength + unpack.SkipPixels);
 	if (simpleZoom) {
 	    /* no zooming */
@@ -217,7 +217,7 @@ fast_draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
     }
 
     if (format == GL_LUMINANCE_ALPHA && type == CHAN_TYPE && rbType == CHAN_TYPE) {
-	const GLchan *src = (const GLchan *) pixels
+	const GLchan *src = reinterpret_cast<const GLchan *>(pixels)
 			    + (unpack.SkipRows * unpack.RowLength + unpack.SkipPixels)*2;
 	if (simpleZoom) {
 	    GLint row;
@@ -449,9 +449,9 @@ draw_depth_pixels(GLcontext *ctx, GLint x, GLint y,
 	/* Special case: directly write 16-bit depth values */
 	GLint row;
 	for (row = 0; row < height; row++) {
-	    const GLushort *zSrc = (const GLushort *)
+	    const GLushort *zSrc = static_cast<const GLushort *>(
 				   _mesa_image_address2d(unpack, pixels, width, height,
-					   GL_DEPTH_COMPONENT, type, row, 0);
+					   GL_DEPTH_COMPONENT, type, row, 0));
 	    GLint i;
 	    for (i = 0; i < width; i++)
 		span.array->z[i] = zSrc[i];
@@ -470,9 +470,9 @@ draw_depth_pixels(GLcontext *ctx, GLint x, GLint y,
 	const GLint shift = 32 - ctx->DrawBuffer->Visual.depthBits;
 	GLint row;
 	for (row = 0; row < height; row++) {
-	    const GLuint *zSrc = (const GLuint *)
+	    const GLuint *zSrc = static_cast<const GLuint *>(
 				 _mesa_image_address2d(unpack, pixels, width, height,
-					 GL_DEPTH_COMPONENT, type, row, 0);
+					 GL_DEPTH_COMPONENT, type, row, 0));
 	    if (shift == 0) {
 		memcpy(span.array->z, zSrc, width * sizeof(GLuint));
 	    } else {
@@ -719,9 +719,9 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 	 */
 	GLint i;
 	for (i = 0; i < height; i++) {
-	    const GLuint *src = (const GLuint *)
+	    const GLuint *src = static_cast<const GLuint *>(
 				_mesa_image_address2d(&clippedUnpack, pixels, width, height,
-					GL_DEPTH_STENCIL_EXT, type, i, 0);
+					GL_DEPTH_STENCIL_EXT, type, i, 0));
 	    depthRb->PutRow(ctx, width, x, y + i, src, nullptr);
 	}
     } else {
@@ -734,9 +734,9 @@ draw_depth_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
 	depthRb = ctx->DrawBuffer->_DepthBuffer;
 
 	for (i = 0; i < height; i++) {
-	    const GLuint *depthStencilSrc = (const GLuint *)
+	    const GLuint *depthStencilSrc = static_cast<const GLuint *>(
 					    _mesa_image_address2d(&clippedUnpack, pixels, width, height,
-						    GL_DEPTH_STENCIL_EXT, type, i, 0);
+						    GL_DEPTH_STENCIL_EXT, type, i, 0));
 
 	    if (ctx->Depth.Mask) {
 		if (!scaleOrBias && ctx->DrawBuffer->Visual.depthBits == 24) {

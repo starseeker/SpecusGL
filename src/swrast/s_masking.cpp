@@ -73,7 +73,7 @@ _swrast_mask_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	const GLushort gMask = ctx->Color.ColorMask[GCOMP] ? 0xffff : 0x0;
 	const GLushort bMask = ctx->Color.ColorMask[BCOMP] ? 0xffff : 0x0;
 	const GLushort aMask = ctx->Color.ColorMask[ACOMP] ? 0xffff : 0x0;
-	const GLushort(*dst)[4] = (const GLushort(*)[4]) rbPixels;
+	const GLushort(*dst)[4] = reinterpret_cast<const GLushort(*)[4]>(rbPixels);
 	GLushort(*src)[4] = span->array->color.sz2.rgba;
 	GLuint i;
 	for (i = 0; i < n; i++) {
@@ -88,8 +88,8 @@ _swrast_mask_rgba_span(GLcontext *ctx, struct gl_renderbuffer *rb,
 	const GLuint gMask = ctx->Color.ColorMask[GCOMP] ? ~0x0 : 0x0;
 	const GLuint bMask = ctx->Color.ColorMask[BCOMP] ? ~0x0 : 0x0;
 	const GLuint aMask = ctx->Color.ColorMask[ACOMP] ? ~0x0 : 0x0;
-	const GLuint(*dst)[4] = (const GLuint(*)[4]) rbPixels;
-	GLuint(*src)[4] = (GLuint(*)[4]) span->array->attribs[FRAG_ATTRIB_COL0];
+	const GLuint(*dst)[4] = reinterpret_cast<const GLuint(*)[4]>(rbPixels);
+	GLuint(*src)[4] = reinterpret_cast<GLuint(*)[4]>(span->array->attribs[FRAG_ATTRIB_COL0]);
 	GLuint i;
 	for (i = 0; i < n; i++) {
 	    src[i][RCOMP] = (src[i][RCOMP] & rMask) | (dst[i][RCOMP] & ~rMask);

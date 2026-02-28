@@ -133,8 +133,8 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine,
     /* Setup pointer to input attributes */
     machine->Attribs = span->array->attribs;
 
-    machine->DerivX = (GLfloat(*)[4]) span->attrStepX;
-    machine->DerivY = (GLfloat(*)[4]) span->attrStepY;
+    machine->DerivX = span->attrStepX;
+    machine->DerivY = span->attrStepY;
     machine->NumDeriv = FRAG_ATTRIB_MAX;
 
     if (ctx->Shader.CurrentProgram) {

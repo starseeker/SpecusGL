@@ -113,8 +113,8 @@ static void _BLENDAPI
 blend_transparency_ubyte(GLcontext *ctx, GLuint n, const GLubyte mask[],
 			 GLvoid *src, const GLvoid *dst, GLenum chanType)
 {
-    GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-    const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+    GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+    const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
     GLuint i;
 
     assert(ctx->Color.BlendEquationRGB == GL_FUNC_ADD);
@@ -157,8 +157,8 @@ static void _BLENDAPI
 blend_transparency_ushort(GLcontext *ctx, GLuint n, const GLubyte mask[],
 			  GLvoid *src, const GLvoid *dst, GLenum chanType)
 {
-    GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-    const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+    GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+    const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
     GLuint i;
 
     assert(ctx->Color.BlendEquationRGB == GL_FUNC_ADD);
@@ -194,8 +194,8 @@ static void _BLENDAPI
 blend_transparency_float(GLcontext *ctx, GLuint n, const GLubyte mask[],
 			 GLvoid *src, const GLvoid *dst, GLenum chanType)
 {
-    GLfloat(*rgba)[4] = (GLfloat(*)[4]) src;
-    const GLfloat(*dest)[4] = (const GLfloat(*)[4]) dst;
+    GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(src);
+    const GLfloat(*dest)[4] = reinterpret_cast<const GLfloat(*)[4]>(dst);
     GLuint i;
 
     assert(ctx->Color.BlendEquationRGB == GL_FUNC_ADD);
@@ -244,8 +244,8 @@ blend_add(GLcontext *ctx, GLuint n, const GLubyte mask[],
     (void) ctx;
 
     if (chanType == GL_UNSIGNED_BYTE) {
-	GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-	const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+	GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		GLint r = rgba[i][RCOMP] + dest[i][RCOMP];
@@ -259,8 +259,8 @@ blend_add(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
-	GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-	const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+	GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		GLint r = rgba[i][RCOMP] + dest[i][RCOMP];
@@ -274,8 +274,8 @@ blend_add(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4]) src;
-	const GLfloat(*dest)[4] = (const GLfloat(*)[4]) dst;
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(src);
+	const GLfloat(*dest)[4] = reinterpret_cast<const GLfloat(*)[4]>(dst);
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
@@ -305,8 +305,8 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
     (void) ctx;
 
     if (chanType == GL_UNSIGNED_BYTE) {
-	GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-	const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+	GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		rgba[i][RCOMP] = MIN2(rgba[i][RCOMP], dest[i][RCOMP]);
@@ -316,8 +316,8 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
-	GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-	const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+	GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		rgba[i][RCOMP] = MIN2(rgba[i][RCOMP], dest[i][RCOMP]);
@@ -327,8 +327,8 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4]) src;
-	const GLfloat(*dest)[4] = (const GLfloat(*)[4]) dst;
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(src);
+	const GLfloat(*dest)[4] = reinterpret_cast<const GLfloat(*)[4]>(dst);
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
@@ -356,8 +356,8 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
     (void) ctx;
 
     if (chanType == GL_UNSIGNED_BYTE) {
-	GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-	const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+	GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		rgba[i][RCOMP] = MAX2(rgba[i][RCOMP], dest[i][RCOMP]);
@@ -367,8 +367,8 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
-	GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-	const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+	GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		rgba[i][RCOMP] = MAX2(rgba[i][RCOMP], dest[i][RCOMP]);
@@ -378,8 +378,8 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4]) src;
-	const GLfloat(*dest)[4] = (const GLfloat(*)[4]) dst;
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(src);
+	const GLfloat(*dest)[4] = reinterpret_cast<const GLfloat(*)[4]>(dst);
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
@@ -406,8 +406,8 @@ blend_modulate(GLcontext *ctx, GLuint n, const GLubyte mask[],
     (void) ctx;
 
     if (chanType == GL_UNSIGNED_BYTE) {
-	GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-	const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+	GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		GLint divtemp;
@@ -418,8 +418,8 @@ blend_modulate(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
-	GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-	const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+	GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
 		rgba[i][RCOMP] = (rgba[i][RCOMP] * dest[i][RCOMP] + 65535) >> 16;
@@ -429,8 +429,8 @@ blend_modulate(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else {
-	GLfloat(*rgba)[4] = (GLfloat(*)[4]) src;
-	const GLfloat(*dest)[4] = (const GLfloat(*)[4]) dst;
+	GLfloat(*rgba)[4] = reinterpret_cast<GLfloat(*)[4]>(src);
+	const GLfloat(*dest)[4] = reinterpret_cast<const GLfloat(*)[4]>(dst);
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
@@ -794,8 +794,8 @@ blend_general(GLcontext *ctx, GLuint n, const GLubyte mask[],
     GLfloat rgbaF[MAX_WIDTH][4] = {{0.0}}, destF[MAX_WIDTH][4] = {{0.0}};
 
     if (chanType == GL_UNSIGNED_BYTE) {
-	GLubyte(*rgba)[4] = (GLubyte(*)[4]) src;
-	const GLubyte(*dest)[4] = (const GLubyte(*)[4]) dst;
+	GLubyte(*rgba)[4] = reinterpret_cast<GLubyte(*)[4]>(src);
+	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	GLuint i;
 	/* convert ubytes to floats */
 	for (i = 0; i < n; i++) {
@@ -822,8 +822,8 @@ blend_general(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
-	GLushort(*rgba)[4] = (GLushort(*)[4]) src;
-	const GLushort(*dest)[4] = (const GLushort(*)[4]) dst;
+	GLushort(*rgba)[4] = reinterpret_cast<GLushort(*)[4]>(src);
+	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	GLuint i;
 	/* convert ushorts to floats */
 	for (i = 0; i < n; i++) {

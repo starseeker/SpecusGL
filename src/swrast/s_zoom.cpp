@@ -217,7 +217,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
     /* zoom the span horizontally */
     if (format == GL_RGBA) {
 	if (zoomed.array->ChanType == GL_UNSIGNED_BYTE) {
-	    const GLubyte(*rgba)[4] = (const GLubyte(*)[4]) src;
+	    const GLubyte(*rgba)[4] = reinterpret_cast<const GLubyte(*)[4]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -226,7 +226,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		COPY_4UBV(zoomed.array->color.sz1.rgba[i], rgba[j]);
 	    }
 	} else if (zoomed.array->ChanType == GL_UNSIGNED_SHORT) {
-	    const GLushort(*rgba)[4] = (const GLushort(*)[4]) src;
+	    const GLushort(*rgba)[4] = reinterpret_cast<const GLushort(*)[4]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -235,7 +235,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		COPY_4V(zoomed.array->color.sz2.rgba[i], rgba[j]);
 	    }
 	} else {
-	    const GLfloat(*rgba)[4] = (const GLfloat(*)[4]) src;
+	    const GLfloat(*rgba)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -246,7 +246,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 	}
     } else if (format == GL_RGB) {
 	if (zoomed.array->ChanType == GL_UNSIGNED_BYTE) {
-	    const GLubyte(*rgb)[3] = (const GLubyte(*)[3]) src;
+	    const GLubyte(*rgb)[3] = reinterpret_cast<const GLubyte(*)[3]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -258,7 +258,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		zoomed.array->color.sz1.rgba[i][3] = 0xff;
 	    }
 	} else if (zoomed.array->ChanType == GL_UNSIGNED_SHORT) {
-	    const GLushort(*rgb)[3] = (const GLushort(*)[3]) src;
+	    const GLushort(*rgb)[3] = reinterpret_cast<const GLushort(*)[3]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
@@ -270,7 +270,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		zoomed.array->color.sz2.rgba[i][3] = 0xffff;
 	    }
 	} else {
-	    const GLfloat(*rgb)[3] = (const GLfloat(*)[3]) src;
+	    const GLfloat(*rgb)[3] = reinterpret_cast<const GLfloat(*)[3]>(src);
 	    GLint i;
 	    for (i = 0; i < zoomedWidth; i++) {
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;

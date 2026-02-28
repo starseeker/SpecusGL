@@ -115,14 +115,14 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 
 	switch (srcRGB) {
 	    case GL_TEXTURE:
-		argRGB[j] = (const GLchan(*)[4])
-			    (texelBuffer + unit * (n * 4 * sizeof(GLchan)));
+		argRGB[j] = reinterpret_cast<const GLchan(*)[4]>(
+			    texelBuffer + unit * (n * 4 * sizeof(GLchan)));
 		break;
 	    case GL_PRIMARY_COLOR:
 		argRGB[j] = primary_rgba;
 		break;
 	    case GL_PREVIOUS:
-		argRGB[j] = (const GLchan(*)[4]) rgba;
+		argRGB[j] = reinterpret_cast<const GLchan(*)[4]>(rgba);
 		break;
 	    case GL_CONSTANT: {
 		GLchan(*c)[4] = ccolor[j];
@@ -137,7 +137,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		    c[i][BCOMP] = blue;
 		    c[i][ACOMP] = alpha;
 		}
-		argRGB[j] = (const GLchan(*)[4]) ccolor[j];
+		argRGB[j] = reinterpret_cast<const GLchan(*)[4]>(ccolor[j]);
 	    }
 	    break;
 	    /* GL_ATI_texture_env_combine3 allows GL_ZERO & GL_ONE as sources.
@@ -155,8 +155,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		assert(srcUnit < ctx->Const.MaxTextureUnits);
 		if (!ctx->Texture.Unit[srcUnit]._ReallyEnabled)
 		    return;
-		argRGB[j] = (const GLchan(*)[4])
-			    (texelBuffer + srcUnit * (n * 4 * sizeof(GLchan)));
+		argRGB[j] = reinterpret_cast<const GLchan(*)[4]>(
+			    texelBuffer + srcUnit * (n * 4 * sizeof(GLchan)));
 	    }
 	}
 
@@ -165,7 +165,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	    GLchan(*dst)[4] = ccolor[j];
 
 	    /* point to new arg[j] storage */
-	    argRGB[j] = (const GLchan(*)[4]) ccolor[j];
+	    argRGB[j] = reinterpret_cast<const GLchan(*)[4]>(ccolor[j]);
 
 	    if (textureUnit->_CurrentCombine->OperandRGB[j] == GL_ONE_MINUS_SRC_COLOR) {
 		for (i = 0; i < n; i++) {
@@ -198,21 +198,21 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 
 	switch (srcA) {
 	    case GL_TEXTURE:
-		argA[j] = (const GLchan(*)[4])
-			  (texelBuffer + unit * (n * 4 * sizeof(GLchan)));
+		argA[j] = reinterpret_cast<const GLchan(*)[4]>(
+			  texelBuffer + unit * (n * 4 * sizeof(GLchan)));
 		break;
 	    case GL_PRIMARY_COLOR:
 		argA[j] = primary_rgba;
 		break;
 	    case GL_PREVIOUS:
-		argA[j] = (const GLchan(*)[4]) rgba;
+		argA[j] = reinterpret_cast<const GLchan(*)[4]>(rgba);
 		break;
 	    case GL_CONSTANT: {
 		GLchan alpha, (*c)[4] = ccolor[j];
 		UNCLAMPED_FLOAT_TO_CHAN(alpha, textureUnit->EnvColor[3]);
 		for (i = 0; i < n; i++)
 		    c[i][ACOMP] = alpha;
-		argA[j] = (const GLchan(*)[4]) ccolor[j];
+		argA[j] = reinterpret_cast<const GLchan(*)[4]>(ccolor[j]);
 	    }
 	    break;
 	    /* GL_ATI_texture_env_combine3 allows GL_ZERO & GL_ONE as sources.
@@ -230,15 +230,15 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 		assert(srcUnit < ctx->Const.MaxTextureUnits);
 		if (!ctx->Texture.Unit[srcUnit]._ReallyEnabled)
 		    return;
-		argA[j] = (const GLchan(*)[4])
-			  (texelBuffer + srcUnit * (n * 4 * sizeof(GLchan)));
+		argA[j] = reinterpret_cast<const GLchan(*)[4]>(
+			  texelBuffer + srcUnit * (n * 4 * sizeof(GLchan)));
 	    }
 	}
 
 	if (textureUnit->_CurrentCombine->OperandA[j] == GL_ONE_MINUS_SRC_ALPHA) {
 	    const GLchan(*src)[4] = argA[j];
 	    GLchan(*dst)[4] = ccolor[j];
-	    argA[j] = (const GLchan(*)[4]) ccolor[j];
+	    argA[j] = reinterpret_cast<const GLchan(*)[4]>(ccolor[j]);
 	    for (i = 0; i < n; i++) {
 		dst[i][ACOMP] = CHAN_MAX - src[i][ACOMP];
 	    }
@@ -250,7 +250,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
      */
     switch (textureUnit->_CurrentCombine->ModeRGB) {
 	case GL_REPLACE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
 	    if (RGBshift) {
 		for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
@@ -285,8 +285,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - RGBshift;
 #endif
@@ -310,8 +310,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_ADD: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][RCOMP] = (arg0[i][RCOMP] + arg1[i][RCOMP]) * RGBmult;
@@ -332,8 +332,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_ADD_SIGNED: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][RCOMP] = (arg0[i][RCOMP] + arg1[i][RCOMP] - 0.5) * RGBmult;
@@ -357,9 +357,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_INTERPOLATE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argRGB[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - RGBshift;
 #endif
@@ -395,8 +395,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_SUBTRACT: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][RCOMP] = (arg0[i][RCOMP] - arg1[i][RCOMP]) * RGBmult;
@@ -419,8 +419,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	case GL_DOT3_RGB_EXT:
 	case GL_DOT3_RGBA_EXT: {
 	    /* Do not scale the result by 1 2 or 4 */
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		GLchan dot = ((arg0[i][RCOMP]-0.5F) * (arg1[i][RCOMP]-0.5F) +
@@ -449,8 +449,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	case GL_DOT3_RGB:
 	case GL_DOT3_RGBA: {
 	    /* DO scale the result by 1 2 or 4 */
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		GLchan dot = ((arg0[i][RCOMP]-0.5F) * (arg1[i][RCOMP]-0.5F) +
@@ -479,9 +479,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_ADD_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argRGB[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - RGBshift;
 #endif
@@ -516,9 +516,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_SIGNED_ADD_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argRGB[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - RGBshift;
 #endif
@@ -554,9 +554,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_SUBTRACT_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argRGB[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argRGB[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argRGB[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argRGB[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - RGBshift;
 #endif
@@ -596,7 +596,7 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 
     switch (textureUnit->_CurrentCombine->ModeA) {
 	case GL_REPLACE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
 	    if (Ashift) {
 		for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
@@ -616,8 +616,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - Ashift;
 #endif
@@ -635,8 +635,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_ADD: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][ACOMP] = (arg0[i][ACOMP] + arg1[i][ACOMP]) * Amult;
@@ -651,8 +651,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_ADD_SIGNED: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][ACOMP] = (arg0[i][ACOMP] + arg1[i][ACOMP] - 0.5F) * Amult;
@@ -668,9 +668,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_INTERPOLATE: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argA[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - Ashift;
 #endif
@@ -692,8 +692,8 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_SUBTRACT: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
 	    for (i = 0; i < n; i++) {
 #if CHAN_TYPE == GL_FLOAT
 		rgba[i][ACOMP] = (arg0[i][ACOMP] - arg1[i][ACOMP]) * Amult;
@@ -708,9 +708,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_ADD_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argA[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - Ashift;
 #endif
@@ -730,9 +730,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_SIGNED_ADD_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argA[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - Ashift;
 #endif
@@ -752,9 +752,9 @@ texture_combine(const GLcontext *ctx, GLuint unit, GLuint n,
 	}
 	break;
 	case GL_MODULATE_SUBTRACT_ATI: {
-	    const GLchan(*arg0)[4] = (const GLchan(*)[4]) argA[0];
-	    const GLchan(*arg1)[4] = (const GLchan(*)[4]) argA[1];
-	    const GLchan(*arg2)[4] = (const GLchan(*)[4]) argA[2];
+	    const GLchan(*arg0)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[0]);
+	    const GLchan(*arg1)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[1]);
+	    const GLchan(*arg2)[4] = reinterpret_cast<const GLchan(*)[4]>(argA[2]);
 #if CHAN_TYPE != GL_FLOAT
 	    const GLint shift = CHAN_BITS - Ashift;
 #endif
@@ -1170,13 +1170,13 @@ _swrast_texture_span(GLcontext *ctx, SWspan *span)
     for (unit = 0; unit < ctx->Const.MaxTextureUnits; unit++) {
 	if (ctx->Texture.Unit[unit]._ReallyEnabled) {
 	    const GLfloat(*texcoords)[4]
-		= (const GLfloat(*)[4])
-		  span->array->attribs[FRAG_ATTRIB_TEX0 + unit];
+		= reinterpret_cast<const GLfloat(*)[4]>(
+		  span->array->attribs[FRAG_ATTRIB_TEX0 + unit]);
 	    const struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
 	    const struct gl_texture_object *curObj = texUnit->_Current;
 	    GLfloat *lambda = span->array->lambda[unit];
-	    GLchan(*texels)[4] = (GLchan(*)[4])
-				 (swrast->TexelBuffer.get() + unit * (span->end * 4 * sizeof(GLchan)));
+	    GLchan(*texels)[4] = reinterpret_cast<GLchan(*)[4]>(
+				 swrast->TexelBuffer.get() + unit * (span->end * 4 * sizeof(GLchan)));
 
 	    /* adjust texture lod (lambda) */
 	    if (span->arrayMask & SPAN_LAMBDA) {
@@ -1234,11 +1234,11 @@ _swrast_texture_span(GLcontext *ctx, SWspan *span)
 				span->array->rgba);
 	    } else {
 		/* conventional texture blend */
-		const GLchan(*texels)[4] = (const GLchan(*)[4])
-					   (swrast->TexelBuffer.get() + unit *
+		const GLchan(*texels)[4] = reinterpret_cast<const GLchan(*)[4]>(
+					   swrast->TexelBuffer.get() + unit *
 					    (span->end * 4 * sizeof(GLchan)));
 		texture_apply(ctx, texUnit, span->end,
-			      (CONST GLchan(*)[4]) primary_rgba, texels,
+			      reinterpret_cast<const GLchan(*)[4]>(primary_rgba), texels,
 			      span->array->rgba);
 	    }
 	}
