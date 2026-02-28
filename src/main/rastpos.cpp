@@ -131,10 +131,10 @@ shade_rastpos(GLcontext *ctx,
 
     _mesa_validate_all_lighting_tables(ctx);
 
-    COPY_3V(diffuseColor, base[0]);
-    diffuseColor[3] = CLAMP(
+    mesa_copy3v(diffuseColor, base[0]);
+    diffuseColor[3] = mesa_clamp(
 			  ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3], 0.0F, 1.0F);
-    ASSIGN_4V(specularColor, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(specularColor, 0.0, 0.0, 0.0, 1.0);
 
     for (const auto *light : ctx->Light.EnabledList) {
 	GLfloat attenuation = 1.0;
@@ -144,16 +144,16 @@ shade_rastpos(GLcontext *ctx,
 
 	if (!(light->_Flags & LIGHT_POSITIONAL)) {
 	    /* light at infinity */
-	    COPY_3V(VP, light->_VP_inf_norm);
+	    mesa_copy3v(VP, light->_VP_inf_norm);
 	    attenuation = light->_VP_inf_spot_attenuation;
 	} else {
 	    /* local/positional light */
 	    GLfloat d;
 
 	    /* VP = vector from vertex pos to light[i].pos */
-	    SUB_3V(VP, light->_Position, vertex);
+	    mesa_sub3v(VP, light->_Position, vertex);
 	    /* d = length(VP) */
-	    d = static_cast<GLfloat>(LEN_3FV(VP));
+	    d = static_cast<GLfloat>(mesa_len3fv(VP));
 	    if (d > 1.0e-6) {
 		/* normalize VP */
 		GLfloat invd = 1.0F / d;
@@ -166,7 +166,7 @@ shade_rastpos(GLcontext *ctx,
 				   light->QuadraticAttenuation));
 
 	    if (light->_Flags & LIGHT_SPOT) {
-		GLfloat PV_dot_dir = - DOT3(VP, light->_NormDirection);
+		GLfloat PV_dot_dir = - mesa_dot3(VP, light->_NormDirection);
 
 		if (PV_dot_dir<light->_CosCutoff) {
 		    continue;
@@ -183,7 +183,7 @@ shade_rastpos(GLcontext *ctx,
 	if (attenuation < 1e-3)
 	    continue;
 
-	n_dot_VP = DOT3(normal, VP);
+	n_dot_VP = mesa_dot3(normal, VP);
 
 	if (n_dot_VP < 0.0F) {
 	    ACC_SCALE_SCALAR_3V(diffuseColor, attenuation, light->_MatAmbient[0]);
@@ -191,7 +191,7 @@ shade_rastpos(GLcontext *ctx,
 	}
 
 	/* Ambient + diffuse */
-	COPY_3V(diffuseContrib, light->_MatAmbient[0]);
+	mesa_copy3v(diffuseContrib, light->_MatAmbient[0]);
 	ACC_SCALE_SCALAR_3V(diffuseContrib, n_dot_VP, light->_MatDiffuse[0]);
 	diffuseCI += n_dot_VP * light->_dli * attenuation;
 
@@ -200,24 +200,24 @@ shade_rastpos(GLcontext *ctx,
 	    const GLfloat *h;
 	    GLfloat n_dot_h;
 
-	    ASSIGN_3V(specularContrib, 0.0, 0.0, 0.0);
+	    mesa_assign3v(specularContrib, 0.0, 0.0, 0.0);
 
 	    if (ctx->Light.Model.LocalViewer) {
 		GLfloat v[3];
-		COPY_3V(v, vertex);
-		NORMALIZE_3FV(v);
-		SUB_3V(VP, VP, v);
-		NORMALIZE_3FV(VP);
+		mesa_copy3v(v, vertex);
+		mesa_normalize3fv(v);
+		mesa_sub3v(VP, VP, v);
+		mesa_normalize3fv(VP);
 		h = VP;
 	    } else if (light->_Flags & LIGHT_POSITIONAL) {
 		ACC_3V(VP, ctx->_EyeZDir);
-		NORMALIZE_3FV(VP);
+		mesa_normalize3fv(VP);
 		h = VP;
 	    } else {
 		h = light->_h_inf_norm;
 	    }
 
-	    n_dot_h = DOT3(normal, h);
+	    n_dot_h = mesa_dot3(normal, h);
 
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec_coef;
@@ -242,14 +242,14 @@ shade_rastpos(GLcontext *ctx,
     }
 
     if (ctx->Visual.rgbMode) {
-	Rcolor[0] = CLAMP(diffuseColor[0], 0.0F, 1.0F);
-	Rcolor[1] = CLAMP(diffuseColor[1], 0.0F, 1.0F);
-	Rcolor[2] = CLAMP(diffuseColor[2], 0.0F, 1.0F);
-	Rcolor[3] = CLAMP(diffuseColor[3], 0.0F, 1.0F);
-	Rspec[0] = CLAMP(specularColor[0], 0.0F, 1.0F);
-	Rspec[1] = CLAMP(specularColor[1], 0.0F, 1.0F);
-	Rspec[2] = CLAMP(specularColor[2], 0.0F, 1.0F);
-	Rspec[3] = CLAMP(specularColor[3], 0.0F, 1.0F);
+	Rcolor[0] = mesa_clamp(diffuseColor[0], 0.0F, 1.0F);
+	Rcolor[1] = mesa_clamp(diffuseColor[1], 0.0F, 1.0F);
+	Rcolor[2] = mesa_clamp(diffuseColor[2], 0.0F, 1.0F);
+	Rcolor[3] = mesa_clamp(diffuseColor[3], 0.0F, 1.0F);
+	Rspec[0] = mesa_clamp(specularColor[0], 0.0F, 1.0F);
+	Rspec[1] = mesa_clamp(specularColor[1], 0.0F, 1.0F);
+	Rspec[2] = mesa_clamp(specularColor[2], 0.0F, 1.0F);
+	Rspec[3] = mesa_clamp(specularColor[3], 0.0F, 1.0F);
     } else {
 	GLfloat *ind = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_INDEXES];
 	GLfloat d_a = ind[MAT_INDEX_DIFFUSE] - ind[MAT_INDEX_AMBIENT];
@@ -282,9 +282,9 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
 
     /* always compute sphere map terms, just in case */
     GLfloat u[3], two_nu, rx, ry, rz, m, mInv;
-    COPY_3V(u, vEye);
-    NORMALIZE_3FV(u);
-    two_nu = 2.0F * DOT3(normal, u);
+    mesa_copy3v(u, vEye);
+    mesa_normalize3fv(u);
+    two_nu = 2.0F * mesa_dot3(normal, u);
     rx = u[0] - normal[0] * two_nu;
     ry = u[1] - normal[1] * two_nu;
     rz = u[2] - normal[2] * two_nu;
@@ -297,10 +297,10 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     if (texUnit->TexGenEnabled & S_BIT) {
 	switch (texUnit->GenModeS) {
 	    case GL_OBJECT_LINEAR:
-		texcoord[0] = DOT4(vObj, texUnit->ObjectPlaneS);
+		texcoord[0] = mesa_dot4(vObj, texUnit->ObjectPlaneS);
 		break;
 	    case GL_EYE_LINEAR:
-		texcoord[0] = DOT4(vEye, texUnit->EyePlaneS);
+		texcoord[0] = mesa_dot4(vEye, texUnit->EyePlaneS);
 		break;
 	    case GL_SPHERE_MAP:
 		texcoord[0] = rx * mInv + 0.5F;
@@ -320,10 +320,10 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     if (texUnit->TexGenEnabled & T_BIT) {
 	switch (texUnit->GenModeT) {
 	    case GL_OBJECT_LINEAR:
-		texcoord[1] = DOT4(vObj, texUnit->ObjectPlaneT);
+		texcoord[1] = mesa_dot4(vObj, texUnit->ObjectPlaneT);
 		break;
 	    case GL_EYE_LINEAR:
-		texcoord[1] = DOT4(vEye, texUnit->EyePlaneT);
+		texcoord[1] = mesa_dot4(vEye, texUnit->EyePlaneT);
 		break;
 	    case GL_SPHERE_MAP:
 		texcoord[1] = ry * mInv + 0.5F;
@@ -343,10 +343,10 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     if (texUnit->TexGenEnabled & R_BIT) {
 	switch (texUnit->GenModeR) {
 	    case GL_OBJECT_LINEAR:
-		texcoord[2] = DOT4(vObj, texUnit->ObjectPlaneR);
+		texcoord[2] = mesa_dot4(vObj, texUnit->ObjectPlaneR);
 		break;
 	    case GL_EYE_LINEAR:
-		texcoord[2] = DOT4(vEye, texUnit->EyePlaneR);
+		texcoord[2] = mesa_dot4(vEye, texUnit->EyePlaneR);
 		break;
 	    case GL_REFLECTION_MAP:
 		texcoord[2] = rz;
@@ -363,10 +363,10 @@ compute_texgen(GLcontext *ctx, const GLfloat vObj[4], const GLfloat vEye[4],
     if (texUnit->TexGenEnabled & Q_BIT) {
 	switch (texUnit->GenModeQ) {
 	    case GL_OBJECT_LINEAR:
-		texcoord[3] = DOT4(vObj, texUnit->ObjectPlaneQ);
+		texcoord[3] = mesa_dot4(vObj, texUnit->ObjectPlaneQ);
 		break;
 	    case GL_EYE_LINEAR:
-		texcoord[3] = DOT4(vEye, texUnit->EyePlaneQ);
+		texcoord[3] = mesa_dot4(vEye, texUnit->EyePlaneQ);
 		break;
 	    default:
 		_mesa_problem(ctx, "Bad Q texgen in compute_texgen()");
@@ -414,7 +414,7 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 	GLfloat *norm, eyenorm[3];
 	GLfloat *objnorm = ctx->Current.Attrib[VERT_ATTRIB_NORMAL];
 
-	ASSIGN_4V(obj, x, y, z, w);
+	mesa_assign4v(obj, x, y, z, w);
 	/* apply modelview matrix:  eye = MV * obj */
 	TRANSFORM_POINT(eye, ctx->ModelviewMatrixStack.Top->m, obj);
 	/* apply projection matrix:  clip = Proj * eye */
@@ -480,9 +480,9 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 	} else {
 	    /* use current color or index */
 	    if (ctx->Visual.rgbMode) {
-		COPY_4FV(ctx->Current.RasterColor,
+		mesa_copy4fv(ctx->Current.RasterColor,
 			 ctx->Current.Attrib[VERT_ATTRIB_COLOR0]);
-		COPY_4FV(ctx->Current.RasterSecondaryColor,
+		mesa_copy4fv(ctx->Current.RasterSecondaryColor,
 			 ctx->Current.Attrib[VERT_ATTRIB_COLOR1]);
 	    } else {
 		ctx->Current.RasterIndex
@@ -495,7 +495,7 @@ raster_pos4f(GLcontext *ctx, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 	    GLuint u;
 	    for (u = 0; u < ctx->Const.MaxTextureCoordUnits; u++) {
 		GLfloat tc[4];
-		COPY_4V(tc, ctx->Current.Attrib[VERT_ATTRIB_TEX0 + u]);
+		mesa_copy4v(tc, ctx->Current.Attrib[VERT_ATTRIB_TEX0 + u]);
 		if (ctx->Texture.Unit[u].TexGenEnabled) {
 		    compute_texgen(ctx, obj, eye, norm, u, tc);
 		}
@@ -703,7 +703,7 @@ window_pos3f(GLfloat x, GLfloat y, GLfloat z)
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
     FLUSH_CURRENT(ctx, 0);
 
-    z2 = CLAMP(z, 0.0F, 1.0F) * (ctx->Viewport.Far - ctx->Viewport.Near)
+    z2 = mesa_clamp(z, 0.0F, 1.0F) * (ctx->Viewport.Far - ctx->Viewport.Near)
 	 + ctx->Viewport.Near;
 
     /* set raster position */
@@ -722,21 +722,21 @@ window_pos3f(GLfloat x, GLfloat y, GLfloat z)
     /* raster color = current color or index */
     if (ctx->Visual.rgbMode) {
 	ctx->Current.RasterColor[0]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0], 0.0F, 1.0F);
 	ctx->Current.RasterColor[1]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1], 0.0F, 1.0F);
 	ctx->Current.RasterColor[2]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2], 0.0F, 1.0F);
 	ctx->Current.RasterColor[3]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3], 0.0F, 1.0F);
 	ctx->Current.RasterSecondaryColor[0]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0], 0.0F, 1.0F);
 	ctx->Current.RasterSecondaryColor[1]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1], 0.0F, 1.0F);
 	ctx->Current.RasterSecondaryColor[2]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2], 0.0F, 1.0F);
 	ctx->Current.RasterSecondaryColor[3]
-	    = CLAMP(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3], 0.0F, 1.0F);
+	    = mesa_clamp(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3], 0.0F, 1.0F);
     } else {
 	ctx->Current.RasterIndex
 	    = ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX][0];
@@ -746,7 +746,7 @@ window_pos3f(GLfloat x, GLfloat y, GLfloat z)
     {
 	GLuint texSet;
 	for (texSet = 0; texSet < ctx->Const.MaxTextureCoordUnits; texSet++) {
-	    COPY_4FV(ctx->Current.RasterTexCoords[texSet],
+	    mesa_copy4fv(ctx->Current.RasterTexCoords[texSet],
 		     ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texSet]);
 	}
     }
@@ -979,7 +979,7 @@ void _mesa_init_rastpos(GLcontext * ctx)
     int i;
 
     for (i = 0; i < MAX_TEXTURE_UNITS; i++)
-	ASSIGN_4V(ctx->Current.RasterTexCoords[i], 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(ctx->Current.RasterTexCoords[i], 0.0, 0.0, 0.0, 1.0);
 }
 
 /*@}*/

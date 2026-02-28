@@ -3734,10 +3734,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ctx->DrawBuffer->Visual.accumAlphaBits;
 	    break;
 	case GL_ACCUM_CLEAR_VALUE:
-	    params[0] = FLOAT_TO_INT(ctx->Accum.ClearColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Accum.ClearColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Accum.ClearColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Accum.ClearColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Accum.ClearColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Accum.ClearColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Accum.ClearColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Accum.ClearColor[3]);
 	    break;
 	case GL_ALPHA_BIAS:
 	    params[0] = iround(ctx->Pixel.AlphaBias);
@@ -3755,7 +3755,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Color.AlphaFunc);
 	    break;
 	case GL_ALPHA_TEST_REF:
-	    params[0] = FLOAT_TO_INT(ctx->Color.AlphaRef);
+	    params[0] = mesa_float_to_int(ctx->Color.AlphaRef);
 	    break;
 	case GL_ATTRIB_STACK_DEPTH:
 	    params[0] = static_cast<GLuint>(ctx->AttribStack.size());
@@ -3794,10 +3794,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Color.BlendEquationA);
 	    break;
 	case GL_BLEND_COLOR_EXT:
-	    params[0] = FLOAT_TO_INT(ctx->Color.BlendColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Color.BlendColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Color.BlendColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Color.BlendColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Color.BlendColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Color.BlendColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Color.BlendColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Color.BlendColor[3]);
 	    break;
 	case GL_BLUE_BIAS:
 	    params[0] = iround(ctx->Pixel.BlueBias);
@@ -3830,10 +3830,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT((ctx->Transform.ClipPlanesEnabled >> 5) & 1);
 	    break;
 	case GL_COLOR_CLEAR_VALUE:
-	    params[0] = FLOAT_TO_INT(ctx->Color.ClearColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Color.ClearColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Color.ClearColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Color.ClearColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Color.ClearColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Color.ClearColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Color.ClearColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Color.ClearColor[3]);
 	    break;
 	case GL_COLOR_MATERIAL:
 	    params[0] = BOOLEAN_TO_INT(ctx->Light.ColorMaterialEnabled);
@@ -3858,10 +3858,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_CURRENT_COLOR: {
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3]);
+	    params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0]);
+	    params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1]);
+	    params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2]);
+	    params[3] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3]);
 	}
 	break;
 	case GL_CURRENT_INDEX: {
@@ -3871,16 +3871,16 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	break;
 	case GL_CURRENT_NORMAL: {
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][2]);
+	    params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][0]);
+	    params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][1]);
+	    params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][2]);
 	}
 	break;
 	case GL_CURRENT_RASTER_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Current.RasterColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.RasterColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.RasterColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.RasterColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Current.RasterColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Current.RasterColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Current.RasterColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Current.RasterColor[3]);
 	    break;
 	case GL_CURRENT_RASTER_DISTANCE:
 	    params[0] = iround(ctx->Current.RasterDistance);
@@ -3895,10 +3895,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[3] = iround(ctx->Current.RasterPos[3]);
 	    break;
 	case GL_CURRENT_RASTER_SECONDARY_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[3]);
 	    break;
 	case GL_CURRENT_RASTER_TEXTURE_COORDS: {
 	    const GLuint texUnit = ctx->Texture.CurrentUnit;
@@ -3932,8 +3932,8 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Depth.Func);
 	    break;
 	case GL_DEPTH_RANGE:
-	    params[0] = FLOAT_TO_INT(ctx->Viewport.Near);
-	    params[1] = FLOAT_TO_INT(ctx->Viewport.Far);
+	    params[0] = mesa_float_to_int(ctx->Viewport.Near);
+	    params[1] = mesa_float_to_int(ctx->Viewport.Far);
 	    break;
 	case GL_DEPTH_SCALE:
 	    params[0] = iround(ctx->Pixel.DepthScale);
@@ -3968,10 +3968,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Fog.Enabled);
 	    break;
 	case GL_FOG_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Fog.Color[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Fog.Color[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Fog.Color[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Fog.Color[3]);
+	    params[0] = mesa_float_to_int(ctx->Fog.Color[0]);
+	    params[1] = mesa_float_to_int(ctx->Fog.Color[1]);
+	    params[2] = mesa_float_to_int(ctx->Fog.Color[2]);
+	    params[3] = mesa_float_to_int(ctx->Fog.Color[3]);
 	    break;
 	case GL_FOG_DENSITY:
 	    params[0] = iround(ctx->Fog.Density);
@@ -4049,10 +4049,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Light.Enabled);
 	    break;
 	case GL_LIGHT_MODEL_AMBIENT:
-	    params[0] = FLOAT_TO_INT(ctx->Light.Model.Ambient[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Light.Model.Ambient[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Light.Model.Ambient[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Light.Model.Ambient[3]);
+	    params[0] = mesa_float_to_int(ctx->Light.Model.Ambient[0]);
+	    params[1] = mesa_float_to_int(ctx->Light.Model.Ambient[1]);
+	    params[2] = mesa_float_to_int(ctx->Light.Model.Ambient[2]);
+	    params[3] = mesa_float_to_int(ctx->Light.Model.Ambient[3]);
 	    break;
 	case GL_LIGHT_MODEL_COLOR_CONTROL:
 	    params[0] = ENUM_TO_INT(ctx->Light.Model.ColorControl);
@@ -4925,10 +4925,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    CHECK_EXT1(EXT_secondary_color, "GetIntegerv");
 	    {
 		FLUSH_CURRENT(ctx, 0);
-		params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0]);
-		params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1]);
-		params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2]);
-		params[3] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3]);
+		params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0]);
+		params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1]);
+		params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2]);
+		params[3] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3]);
 	    }
 	    break;
 	case GL_SECONDARY_COLOR_ARRAY_EXT:

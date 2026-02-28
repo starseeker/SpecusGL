@@ -177,7 +177,7 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     const GLfloat z = (plane[3] + plane[0] * x + plane[1] * y) / -plane[2];
 #if CHAN_TYPE == GL_FLOAT
-    return CLAMP(z, 0.0F, CHAN_MAXF);
+    return mesa_clamp(z, 0.0F, CHAN_MAXF);
 #else
     if (z < 0)
 	return 0;

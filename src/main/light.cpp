@@ -79,29 +79,29 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 
     switch (pname) {
 	case GL_AMBIENT:
-	    if (TEST_EQ_4V(light->Ambient, params))
+	    if (mesa_test_eq_4v(light->Ambient, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_4V(light->Ambient, params);
+	    mesa_copy4v(light->Ambient, params);
 	    break;
 	case GL_DIFFUSE:
-	    if (TEST_EQ_4V(light->Diffuse, params))
+	    if (mesa_test_eq_4v(light->Diffuse, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_4V(light->Diffuse, params);
+	    mesa_copy4v(light->Diffuse, params);
 	    break;
 	case GL_SPECULAR:
-	    if (TEST_EQ_4V(light->Specular, params))
+	    if (mesa_test_eq_4v(light->Specular, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_4V(light->Specular, params);
+	    mesa_copy4v(light->Specular, params);
 	    break;
 	case GL_POSITION:
 	    /* NOTE: position has already been transformed by ModelView! */
-	    if (TEST_EQ_4V(light->EyePosition, params))
+	    if (mesa_test_eq_4v(light->EyePosition, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_4V(light->EyePosition, params);
+	    mesa_copy4v(light->EyePosition, params);
 	    if (light->EyePosition[3] != 0.0F)
 		light->_Flags |= LIGHT_POSITIONAL;
 	    else
@@ -109,10 +109,10 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params)
 	    break;
 	case GL_SPOT_DIRECTION:
 	    /* NOTE: Direction already transformed by inverse ModelView! */
-	    if (TEST_EQ_3V(light->EyeDirection, params))
+	    if (mesa_test_eq_3v(light->EyeDirection, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_3V(light->EyeDirection, params);
+	    mesa_copy3v(light->EyeDirection, params);
 	    break;
 	case GL_SPOT_EXPONENT:
 	    assert(params[0] >= 0.0);
@@ -268,10 +268,10 @@ _mesa_Lightiv(GLenum light, GLenum pname, const GLint *params)
 	case GL_AMBIENT:
 	case GL_DIFFUSE:
 	case GL_SPECULAR:
-	    fparam[0] = INT_TO_FLOAT(params[0]);
-	    fparam[1] = INT_TO_FLOAT(params[1]);
-	    fparam[2] = INT_TO_FLOAT(params[2]);
-	    fparam[3] = INT_TO_FLOAT(params[3]);
+	    fparam[0] = mesa_int_to_float(params[0]);
+	    fparam[1] = mesa_int_to_float(params[1]);
+	    fparam[2] = mesa_int_to_float(params[2]);
+	    fparam[3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_POSITION:
 	    fparam[0] = static_cast<GLfloat>(params[0]);
@@ -315,19 +315,19 @@ _mesa_GetLightfv(GLenum light, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_AMBIENT:
-	    COPY_4V(params, ctx->Light.Light[l].Ambient);
+	    mesa_copy4v(params, ctx->Light.Light[l].Ambient);
 	    break;
 	case GL_DIFFUSE:
-	    COPY_4V(params, ctx->Light.Light[l].Diffuse);
+	    mesa_copy4v(params, ctx->Light.Light[l].Diffuse);
 	    break;
 	case GL_SPECULAR:
-	    COPY_4V(params, ctx->Light.Light[l].Specular);
+	    mesa_copy4v(params, ctx->Light.Light[l].Specular);
 	    break;
 	case GL_POSITION:
-	    COPY_4V(params, ctx->Light.Light[l].EyePosition);
+	    mesa_copy4v(params, ctx->Light.Light[l].EyePosition);
 	    break;
 	case GL_SPOT_DIRECTION:
-	    COPY_3V(params, ctx->Light.Light[l].EyeDirection);
+	    mesa_copy3v(params, ctx->Light.Light[l].EyeDirection);
 	    break;
 	case GL_SPOT_EXPONENT:
 	    params[0] = ctx->Light.Light[l].SpotExponent;
@@ -365,22 +365,22 @@ _mesa_GetLightiv(GLenum light, GLenum pname, GLint *params)
 
     switch (pname) {
 	case GL_AMBIENT:
-	    params[0] = FLOAT_TO_INT(ctx->Light.Light[l].Ambient[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Light.Light[l].Ambient[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Light.Light[l].Ambient[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Light.Light[l].Ambient[3]);
+	    params[0] = mesa_float_to_int(ctx->Light.Light[l].Ambient[0]);
+	    params[1] = mesa_float_to_int(ctx->Light.Light[l].Ambient[1]);
+	    params[2] = mesa_float_to_int(ctx->Light.Light[l].Ambient[2]);
+	    params[3] = mesa_float_to_int(ctx->Light.Light[l].Ambient[3]);
 	    break;
 	case GL_DIFFUSE:
-	    params[0] = FLOAT_TO_INT(ctx->Light.Light[l].Diffuse[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Light.Light[l].Diffuse[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Light.Light[l].Diffuse[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Light.Light[l].Diffuse[3]);
+	    params[0] = mesa_float_to_int(ctx->Light.Light[l].Diffuse[0]);
+	    params[1] = mesa_float_to_int(ctx->Light.Light[l].Diffuse[1]);
+	    params[2] = mesa_float_to_int(ctx->Light.Light[l].Diffuse[2]);
+	    params[3] = mesa_float_to_int(ctx->Light.Light[l].Diffuse[3]);
 	    break;
 	case GL_SPECULAR:
-	    params[0] = FLOAT_TO_INT(ctx->Light.Light[l].Specular[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Light.Light[l].Specular[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Light.Light[l].Specular[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Light.Light[l].Specular[3]);
+	    params[0] = mesa_float_to_int(ctx->Light.Light[l].Specular[0]);
+	    params[1] = mesa_float_to_int(ctx->Light.Light[l].Specular[1]);
+	    params[2] = mesa_float_to_int(ctx->Light.Light[l].Specular[2]);
+	    params[3] = mesa_float_to_int(ctx->Light.Light[l].Specular[3]);
 	    break;
 	case GL_POSITION:
 	    params[0] = static_cast<GLint>(ctx->Light.Light[l].EyePosition[0]);
@@ -431,10 +431,10 @@ _mesa_LightModelfv(GLenum pname, const GLfloat *params)
 
     switch (pname) {
 	case GL_LIGHT_MODEL_AMBIENT:
-	    if (TEST_EQ_4V(ctx->Light.Model.Ambient, params))
+	    if (mesa_test_eq_4v(ctx->Light.Model.Ambient, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_LIGHT);
-	    COPY_4V(ctx->Light.Model.Ambient, params);
+	    mesa_copy4v(ctx->Light.Model.Ambient, params);
 	    break;
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	    newbool = (params[0]!=0.0);
@@ -486,10 +486,10 @@ _mesa_LightModeliv(GLenum pname, const GLint *params)
 
     switch (pname) {
 	case GL_LIGHT_MODEL_AMBIENT:
-	    fparam[0] = INT_TO_FLOAT(params[0]);
-	    fparam[1] = INT_TO_FLOAT(params[1]);
-	    fparam[2] = INT_TO_FLOAT(params[2]);
-	    fparam[3] = INT_TO_FLOAT(params[3]);
+	    fparam[0] = mesa_int_to_float(params[0]);
+	    fparam[1] = mesa_int_to_float(params[1]);
+	    fparam[2] = mesa_int_to_float(params[2]);
+	    fparam[3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	case GL_LIGHT_MODEL_TWO_SIDE:
@@ -595,7 +595,7 @@ _mesa_copy_materials(struct gl_material *dst,
 
     for (i = 0 ; i < MAT_ATTRIB_MAX ; i++)
 	if (bitmask & (1<<i))
-	    COPY_4FV(dst->Attrib[i], src->Attrib[i]);
+	    mesa_copy4fv(dst->Attrib[i], src->Attrib[i]);
 }
 
 
@@ -616,27 +616,27 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
     /* update material ambience */
     if (bitmask & MAT_BIT_FRONT_AMBIENT) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatAmbient[0], light->Ambient,
+	    mesa_scale3v(light->_MatAmbient[0], light->Ambient,
 		     mat[MAT_ATTRIB_FRONT_AMBIENT]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_AMBIENT) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatAmbient[1], light->Ambient,
+	    mesa_scale3v(light->_MatAmbient[1], light->Ambient,
 		     mat[MAT_ATTRIB_BACK_AMBIENT]);
 	}
     }
 
     /* update BaseColor = emission + scene's ambience * material's ambience */
     if (bitmask & (MAT_BIT_FRONT_EMISSION | MAT_BIT_FRONT_AMBIENT)) {
-	COPY_3V(ctx->Light._BaseColor[0], mat[MAT_ATTRIB_FRONT_EMISSION]);
+	mesa_copy3v(ctx->Light._BaseColor[0], mat[MAT_ATTRIB_FRONT_EMISSION]);
 	ACC_SCALE_3V(ctx->Light._BaseColor[0], mat[MAT_ATTRIB_FRONT_AMBIENT],
 		     ctx->Light.Model.Ambient);
     }
 
     if (bitmask & (MAT_BIT_BACK_EMISSION | MAT_BIT_BACK_AMBIENT)) {
-	COPY_3V(ctx->Light._BaseColor[1], mat[MAT_ATTRIB_BACK_EMISSION]);
+	mesa_copy3v(ctx->Light._BaseColor[1], mat[MAT_ATTRIB_BACK_EMISSION]);
 	ACC_SCALE_3V(ctx->Light._BaseColor[1], mat[MAT_ATTRIB_BACK_AMBIENT],
 		     ctx->Light.Model.Ambient);
     }
@@ -644,14 +644,14 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
     /* update material diffuse values */
     if (bitmask & MAT_BIT_FRONT_DIFFUSE) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatDiffuse[0], light->Diffuse,
+	    mesa_scale3v(light->_MatDiffuse[0], light->Diffuse,
 		     mat[MAT_ATTRIB_FRONT_DIFFUSE]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_DIFFUSE) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatDiffuse[1], light->Diffuse,
+	    mesa_scale3v(light->_MatDiffuse[1], light->Diffuse,
 		     mat[MAT_ATTRIB_BACK_DIFFUSE]);
 	}
     }
@@ -659,14 +659,14 @@ _mesa_update_material(GLcontext *ctx, GLuint bitmask)
     /* update material specular values */
     if (bitmask & MAT_BIT_FRONT_SPECULAR) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatSpecular[0], light->Specular,
+	    mesa_scale3v(light->_MatSpecular[0], light->Specular,
 		     mat[MAT_ATTRIB_FRONT_SPECULAR]);
 	}
     }
 
     if (bitmask & MAT_BIT_BACK_SPECULAR) {
 	for (auto *light : ctx->Light.EnabledList) {
-	    SCALE_3V(light->_MatSpecular[1], light->Specular,
+	    mesa_scale3v(light->_MatSpecular[1], light->Specular,
 		     mat[MAT_ATTRIB_BACK_SPECULAR]);
 	}
     }
@@ -695,7 +695,7 @@ _mesa_update_color_material(GLcontext *ctx, const GLfloat color[4])
 
     for (i = 0 ; i < MAT_ATTRIB_MAX ; i++)
 	if (bitmask & (1<<i))
-	    COPY_4FV(mat->Attrib[i], color);
+	    mesa_copy4fv(mat->Attrib[i], color);
 
     _mesa_update_material(ctx, bitmask);
 }
@@ -760,16 +760,16 @@ _mesa_GetMaterialfv(GLenum face, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_AMBIENT:
-	    COPY_4FV(params, mat[MAT_ATTRIB_AMBIENT(f)]);
+	    mesa_copy4fv(params, mat[MAT_ATTRIB_AMBIENT(f)]);
 	    break;
 	case GL_DIFFUSE:
-	    COPY_4FV(params, mat[MAT_ATTRIB_DIFFUSE(f)]);
+	    mesa_copy4fv(params, mat[MAT_ATTRIB_DIFFUSE(f)]);
 	    break;
 	case GL_SPECULAR:
-	    COPY_4FV(params, mat[MAT_ATTRIB_SPECULAR(f)]);
+	    mesa_copy4fv(params, mat[MAT_ATTRIB_SPECULAR(f)]);
 	    break;
 	case GL_EMISSION:
-	    COPY_4FV(params, mat[MAT_ATTRIB_EMISSION(f)]);
+	    mesa_copy4fv(params, mat[MAT_ATTRIB_EMISSION(f)]);
 	    break;
 	case GL_SHININESS:
 	    *params = mat[MAT_ATTRIB_SHININESS(f)][0];
@@ -805,28 +805,28 @@ _mesa_GetMaterialiv(GLenum face, GLenum pname, GLint *params)
     }
     switch (pname) {
 	case GL_AMBIENT:
-	    params[0] = FLOAT_TO_INT(mat[MAT_ATTRIB_AMBIENT(f)][0]);
-	    params[1] = FLOAT_TO_INT(mat[MAT_ATTRIB_AMBIENT(f)][1]);
-	    params[2] = FLOAT_TO_INT(mat[MAT_ATTRIB_AMBIENT(f)][2]);
-	    params[3] = FLOAT_TO_INT(mat[MAT_ATTRIB_AMBIENT(f)][3]);
+	    params[0] = mesa_float_to_int(mat[MAT_ATTRIB_AMBIENT(f)][0]);
+	    params[1] = mesa_float_to_int(mat[MAT_ATTRIB_AMBIENT(f)][1]);
+	    params[2] = mesa_float_to_int(mat[MAT_ATTRIB_AMBIENT(f)][2]);
+	    params[3] = mesa_float_to_int(mat[MAT_ATTRIB_AMBIENT(f)][3]);
 	    break;
 	case GL_DIFFUSE:
-	    params[0] = FLOAT_TO_INT(mat[MAT_ATTRIB_DIFFUSE(f)][0]);
-	    params[1] = FLOAT_TO_INT(mat[MAT_ATTRIB_DIFFUSE(f)][1]);
-	    params[2] = FLOAT_TO_INT(mat[MAT_ATTRIB_DIFFUSE(f)][2]);
-	    params[3] = FLOAT_TO_INT(mat[MAT_ATTRIB_DIFFUSE(f)][3]);
+	    params[0] = mesa_float_to_int(mat[MAT_ATTRIB_DIFFUSE(f)][0]);
+	    params[1] = mesa_float_to_int(mat[MAT_ATTRIB_DIFFUSE(f)][1]);
+	    params[2] = mesa_float_to_int(mat[MAT_ATTRIB_DIFFUSE(f)][2]);
+	    params[3] = mesa_float_to_int(mat[MAT_ATTRIB_DIFFUSE(f)][3]);
 	    break;
 	case GL_SPECULAR:
-	    params[0] = FLOAT_TO_INT(mat[MAT_ATTRIB_SPECULAR(f)][0]);
-	    params[1] = FLOAT_TO_INT(mat[MAT_ATTRIB_SPECULAR(f)][1]);
-	    params[2] = FLOAT_TO_INT(mat[MAT_ATTRIB_SPECULAR(f)][2]);
-	    params[3] = FLOAT_TO_INT(mat[MAT_ATTRIB_SPECULAR(f)][3]);
+	    params[0] = mesa_float_to_int(mat[MAT_ATTRIB_SPECULAR(f)][0]);
+	    params[1] = mesa_float_to_int(mat[MAT_ATTRIB_SPECULAR(f)][1]);
+	    params[2] = mesa_float_to_int(mat[MAT_ATTRIB_SPECULAR(f)][2]);
+	    params[3] = mesa_float_to_int(mat[MAT_ATTRIB_SPECULAR(f)][3]);
 	    break;
 	case GL_EMISSION:
-	    params[0] = FLOAT_TO_INT(mat[MAT_ATTRIB_EMISSION(f)][0]);
-	    params[1] = FLOAT_TO_INT(mat[MAT_ATTRIB_EMISSION(f)][1]);
-	    params[2] = FLOAT_TO_INT(mat[MAT_ATTRIB_EMISSION(f)][2]);
-	    params[3] = FLOAT_TO_INT(mat[MAT_ATTRIB_EMISSION(f)][3]);
+	    params[0] = mesa_float_to_int(mat[MAT_ATTRIB_EMISSION(f)][0]);
+	    params[1] = mesa_float_to_int(mat[MAT_ATTRIB_EMISSION(f)][1]);
+	    params[2] = mesa_float_to_int(mat[MAT_ATTRIB_EMISSION(f)][2]);
+	    params[3] = mesa_float_to_int(mat[MAT_ATTRIB_EMISSION(f)][3]);
 	    break;
 	case GL_SHININESS:
 	    *params = iround(mat[MAT_ATTRIB_SHININESS(f)][0]);
@@ -1081,8 +1081,8 @@ _mesa_update_lighting(GLcontext *ctx)
     } else {
 	static const GLfloat ci[3] = { .30F, .59F, .11F };
 	for (auto *light : ctx->Light.EnabledList) {
-	    light->_dli = DOT3(ci, light->Diffuse);
-	    light->_sli = DOT3(ci, light->Specular);
+	    light->_dli = mesa_dot3(ci, light->Diffuse);
+	    light->_sli = mesa_dot3(ci, light->Specular);
 	}
     }
 }
@@ -1107,7 +1107,7 @@ compute_light_positions(GLcontext *ctx)
 	return;
 
     if (ctx->_NeedEyeCoords) {
-	COPY_3V(ctx->_EyeZDir, eye_z);
+	mesa_copy3v(ctx->_EyeZDir, eye_z);
     } else {
 	TRANSFORM_NORMAL(ctx->_EyeZDir, eye_z, ctx->ModelviewMatrixStack.Top->m);
     }
@@ -1116,7 +1116,7 @@ compute_light_positions(GLcontext *ctx)
 
 	if (ctx->_NeedEyeCoords) {
 	    /* _Position is in eye coordinate space */
-	    COPY_4FV(light->_Position, light->EyePosition);
+	    mesa_copy4fv(light->_Position, light->EyePosition);
 	} else {
 	    /* _Position is in object coordinate space */
 	    TRANSFORM_POINT(light->_Position, ctx->ModelviewMatrixStack.Top->inv,
@@ -1125,13 +1125,13 @@ compute_light_positions(GLcontext *ctx)
 
 	if (!(light->_Flags & LIGHT_POSITIONAL)) {
 	    /* VP (VP) = Normalize( Position ) */
-	    COPY_3V(light->_VP_inf_norm, light->_Position);
-	    NORMALIZE_3FV(light->_VP_inf_norm);
+	    mesa_copy3v(light->_VP_inf_norm, light->_Position);
+	    mesa_normalize3fv(light->_VP_inf_norm);
 
 	    if (!ctx->Light.Model.LocalViewer) {
 		/* _h_inf_norm = Normalize( V_to_P + <0,0,1> ) */
-		ADD_3V(light->_h_inf_norm, light->_VP_inf_norm, ctx->_EyeZDir);
-		NORMALIZE_3FV(light->_h_inf_norm);
+		mesa_add3v(light->_h_inf_norm, light->_VP_inf_norm, ctx->_EyeZDir);
+		mesa_normalize3fv(light->_h_inf_norm);
 	    }
 	    light->_VP_inf_spot_attenuation = 1.0;
 	} else {
@@ -1144,17 +1144,17 @@ compute_light_positions(GLcontext *ctx)
 
 	if (light->_Flags & LIGHT_SPOT) {
 	    if (ctx->_NeedEyeCoords) {
-		COPY_3V(light->_NormDirection, light->EyeDirection);
+		mesa_copy3v(light->_NormDirection, light->EyeDirection);
 	    } else {
 		TRANSFORM_NORMAL(light->_NormDirection,
 				 light->EyeDirection,
 				 ctx->ModelviewMatrixStack.Top->m);
 	    }
 
-	    NORMALIZE_3FV(light->_NormDirection);
+	    mesa_normalize3fv(light->_NormDirection);
 
 	    if (!(light->_Flags & LIGHT_POSITIONAL)) {
-		GLfloat PV_dot_dir = - DOT3(light->_VP_inf_norm,
+		GLfloat PV_dot_dir = - mesa_dot3(light->_VP_inf_norm,
 					    light->_NormDirection);
 
 		if (PV_dot_dir > light->_CosCutoff) {
@@ -1265,16 +1265,16 @@ _mesa_allow_light_in_model(GLcontext *ctx, GLboolean flag)
 static void
 init_light(struct gl_light *l, GLuint n)
 {
-    ASSIGN_4V(l->Ambient, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(l->Ambient, 0.0, 0.0, 0.0, 1.0);
     if (n==0) {
-	ASSIGN_4V(l->Diffuse, 1.0, 1.0, 1.0, 1.0);
-	ASSIGN_4V(l->Specular, 1.0, 1.0, 1.0, 1.0);
+	mesa_assign4v(l->Diffuse, 1.0, 1.0, 1.0, 1.0);
+	mesa_assign4v(l->Specular, 1.0, 1.0, 1.0, 1.0);
     } else {
-	ASSIGN_4V(l->Diffuse, 0.0, 0.0, 0.0, 1.0);
-	ASSIGN_4V(l->Specular, 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(l->Diffuse, 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(l->Specular, 0.0, 0.0, 0.0, 1.0);
     }
-    ASSIGN_4V(l->EyePosition, 0.0, 0.0, 1.0, 0.0);
-    ASSIGN_3V(l->EyeDirection, 0.0, 0.0, -1.0);
+    mesa_assign4v(l->EyePosition, 0.0, 0.0, 1.0, 0.0);
+    mesa_assign3v(l->EyeDirection, 0.0, 0.0, -1.0);
     l->SpotExponent = 0.0;
     l->invalidate_spot_exp_table();
     l->SpotCutoff = 180.0;
@@ -1295,7 +1295,7 @@ init_light(struct gl_light *l, GLuint n)
 static void
 init_lightmodel(struct gl_lightmodel *lm)
 {
-    ASSIGN_4V(lm->Ambient, 0.2F, 0.2F, 0.2F, 1.0F);
+    mesa_assign4v(lm->Ambient, 0.2F, 0.2F, 0.2F, 1.0F);
     lm->LocalViewer = GL_FALSE;
     lm->TwoSide = GL_FALSE;
     lm->ColorControl = GL_SINGLE_COLOR;
@@ -1310,19 +1310,19 @@ init_lightmodel(struct gl_lightmodel *lm)
 static void
 init_material(struct gl_material *m)
 {
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_AMBIENT],  0.2F, 0.2F, 0.2F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_DIFFUSE],  0.8F, 0.8F, 0.8F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_SPECULAR], 0.0F, 0.0F, 0.0F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_EMISSION], 0.0F, 0.0F, 0.0F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_SHININESS], 0.0F, 0.0F, 0.0F, 0.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_FRONT_INDEXES], 0.0F, 1.0F, 1.0F, 0.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_AMBIENT],  0.2F, 0.2F, 0.2F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_DIFFUSE],  0.8F, 0.8F, 0.8F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_SPECULAR], 0.0F, 0.0F, 0.0F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_EMISSION], 0.0F, 0.0F, 0.0F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_SHININESS], 0.0F, 0.0F, 0.0F, 0.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_FRONT_INDEXES], 0.0F, 1.0F, 1.0F, 0.0F);
 
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_AMBIENT],  0.2F, 0.2F, 0.2F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_DIFFUSE],  0.8F, 0.8F, 0.8F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_SPECULAR], 0.0F, 0.0F, 0.0F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_EMISSION], 0.0F, 0.0F, 0.0F, 1.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_SHININESS], 0.0F, 0.0F, 0.0F, 0.0F);
-    ASSIGN_4V(m->Attrib[MAT_ATTRIB_BACK_INDEXES], 0.0F, 1.0F, 1.0F, 0.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_AMBIENT],  0.2F, 0.2F, 0.2F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_DIFFUSE],  0.8F, 0.8F, 0.8F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_SPECULAR], 0.0F, 0.0F, 0.0F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_EMISSION], 0.0F, 0.0F, 0.0F, 1.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_SHININESS], 0.0F, 0.0F, 0.0F, 0.0F);
+    mesa_assign4v(m->Attrib[MAT_ATTRIB_BACK_INDEXES], 0.0F, 1.0F, 1.0F, 0.0F);
 }
 
 

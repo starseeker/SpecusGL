@@ -1066,10 +1066,10 @@ void _tnl_generic_interp(GLcontext *ctx,
 	a[j].extract(&a[j], fin, vin + a[j].vertoffset);
 	a[j].extract(&a[j], fout, vout + a[j].vertoffset);
 
-	INTERP_F(t, fdst[3], fout[3], fin[3]);
-	INTERP_F(t, fdst[2], fout[2], fin[2]);
-	INTERP_F(t, fdst[1], fout[1], fin[1]);
-	INTERP_F(t, fdst[0], fout[0], fin[0]);
+	mesa_interp_f(t, fdst[3], fout[3], fin[3]);
+	mesa_interp_f(t, fdst[2], fout[2], fin[2]);
+	mesa_interp_f(t, fdst[1], fout[1], fin[1]);
+	mesa_interp_f(t, fdst[0], fout[0], fin[0]);
 
 	a[j].insert[4-1](&a[j], vdst + a[j].vertoffset, fdst);
     }
@@ -1118,7 +1118,7 @@ void _tnl_generic_interp_extras(GLcontext *ctx,
     if (VB->ColorPtr[1] && VB->ColorPtr[1]->stride) {
 	assert(VB->ColorPtr[1]->stride == 4 * sizeof(GLfloat));
 
-	INTERP_4F(t,
+	mesa_interp_4f(t,
 		  VB->ColorPtr[1]->data[dst],
 		  VB->ColorPtr[1]->data[out],
 		  VB->ColorPtr[1]->data[in]);
@@ -1127,14 +1127,14 @@ void _tnl_generic_interp_extras(GLcontext *ctx,
     if (VB->SecondaryColorPtr[1]) {
 	assert(VB->SecondaryColorPtr[1]->stride == 4 * sizeof(GLfloat));
 
-	INTERP_3F(t,
+	mesa_interp_3f(t,
 		  VB->SecondaryColorPtr[1]->data[dst],
 		  VB->SecondaryColorPtr[1]->data[out],
 		  VB->SecondaryColorPtr[1]->data[in]);
     }
 
     if (VB->IndexPtr[1]) {
-	VB->IndexPtr[1]->data[dst][0] = LINTERP(t,
+	VB->IndexPtr[1]->data[dst][0] = mesa_linterp(t,
 						VB->IndexPtr[1]->data[out][0],
 						VB->IndexPtr[1]->data[in][0]);
     }
@@ -1154,12 +1154,12 @@ void _tnl_generic_copy_pv_extras(GLcontext *ctx,
     /* See above comment:
      */
     if (VB->ColorPtr[1] && VB->ColorPtr[1]->stride) {
-	COPY_4FV(VB->ColorPtr[1]->data[dst],
+	mesa_copy4fv(VB->ColorPtr[1]->data[dst],
 		 VB->ColorPtr[1]->data[src]);
     }
 
     if (VB->SecondaryColorPtr[1]) {
-	COPY_4FV(VB->SecondaryColorPtr[1]->data[dst],
+	mesa_copy4fv(VB->SecondaryColorPtr[1]->data[dst],
 		 VB->SecondaryColorPtr[1]->data[src]);
     }
 

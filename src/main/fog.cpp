@@ -63,10 +63,10 @@ _mesa_Fogiv(GLenum pname, const GLint *params)
 	    p[0] = static_cast<GLfloat>(*params);
 	    break;
 	case GL_FOG_COLOR:
-	    p[0] = INT_TO_FLOAT(params[0]);
-	    p[1] = INT_TO_FLOAT(params[1]);
-	    p[2] = INT_TO_FLOAT(params[2]);
-	    p[3] = INT_TO_FLOAT(params[3]);
+	    p[0] = mesa_int_to_float(params[0]);
+	    p[1] = mesa_int_to_float(params[1]);
+	    p[2] = mesa_int_to_float(params[2]);
+	    p[3] = mesa_int_to_float(params[3]);
 	    break;
 	default:
 	    /* Error will be caught later in _mesa_Fogfv */
@@ -139,13 +139,13 @@ _mesa_Fogfv(GLenum pname, const GLfloat *params)
 	    ctx->Fog.Index = *params;
 	    break;
 	case GL_FOG_COLOR:
-	    if (TEST_EQ_4V(ctx->Fog.Color, params))
+	    if (mesa_test_eq_4v(ctx->Fog.Color, params))
 		return;
 	    FLUSH_VERTICES(ctx, _NEW_FOG);
-	    ctx->Fog.Color[0] = CLAMP(params[0], 0.0F, 1.0F);
-	    ctx->Fog.Color[1] = CLAMP(params[1], 0.0F, 1.0F);
-	    ctx->Fog.Color[2] = CLAMP(params[2], 0.0F, 1.0F);
-	    ctx->Fog.Color[3] = CLAMP(params[3], 0.0F, 1.0F);
+	    ctx->Fog.Color[0] = mesa_clamp(params[0], 0.0F, 1.0F);
+	    ctx->Fog.Color[1] = mesa_clamp(params[1], 0.0F, 1.0F);
+	    ctx->Fog.Color[2] = mesa_clamp(params[2], 0.0F, 1.0F);
+	    ctx->Fog.Color[3] = mesa_clamp(params[3], 0.0F, 1.0F);
 	    break;
 	case GL_FOG_COORDINATE_SOURCE_EXT: {
 	    GLenum p = static_cast<GLenum>(static_cast<GLint>(*params));

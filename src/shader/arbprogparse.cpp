@@ -47,7 +47,7 @@ constexpr int DEBUG_PARSING = 0;
 
 
 /* For ARB programs, use the NV instruction limits */
-#define MAX_INSTRUCTIONS MAX2(MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS, \
+#define MAX_INSTRUCTIONS mesa_max2(MAX_NV_FRAGMENT_PROGRAM_INSTRUCTIONS, \
                               MAX_NV_VERTEX_PROGRAM_INSTRUCTIONS)
 
 

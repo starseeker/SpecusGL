@@ -176,14 +176,14 @@ blend_transparency_ushort(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    const GLint t = rgba[i][ACOMP];
 	    if (t == 0) {
 		/* 0% alpha */
-		COPY_4V(rgba[i], dest[i]);
+		mesa_copy4v(rgba[i], dest[i]);
 	    } else if (t != 65535) {
 		const GLfloat tt = static_cast<GLfloat>(t) / 65535.0F;
 		GLushort r = static_cast<GLushort>(((rgba[i][RCOMP] - dest[i][RCOMP]) * tt + dest[i][RCOMP]));
 		GLushort g = static_cast<GLushort>(((rgba[i][GCOMP] - dest[i][GCOMP]) * tt + dest[i][GCOMP]));
 		GLushort b = static_cast<GLushort>(((rgba[i][BCOMP] - dest[i][BCOMP]) * tt + dest[i][BCOMP]));
 		GLushort a = static_cast<GLushort>(((rgba[i][ACOMP] - dest[i][ACOMP]) * tt + dest[i][ACOMP]));
-		ASSIGN_4V(rgba[i], r, g, b, a);
+		mesa_assign4v(rgba[i], r, g, b, a);
 	    }
 	}
     }
@@ -213,13 +213,13 @@ blend_transparency_float(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	    const GLfloat t = rgba[i][ACOMP];  /* t in [0, 1] */
 	    if (t == 0.0F) {
 		/* 0% alpha */
-		COPY_4V(rgba[i], dest[i]);
+		mesa_copy4v(rgba[i], dest[i]);
 	    } else if (t != 1.0F) {
 		GLfloat r = (rgba[i][RCOMP] - dest[i][RCOMP]) * t + dest[i][RCOMP];
 		GLfloat g = (rgba[i][GCOMP] - dest[i][GCOMP]) * t + dest[i][GCOMP];
 		GLfloat b = (rgba[i][BCOMP] - dest[i][BCOMP]) * t + dest[i][BCOMP];
 		GLfloat a = (rgba[i][ACOMP] - dest[i][ACOMP]) * t + dest[i][ACOMP];
-		ASSIGN_4V(rgba[i], r, g, b, a);
+		mesa_assign4v(rgba[i], r, g, b, a);
 	    }
 	}
     }
@@ -252,10 +252,10 @@ blend_add(GLcontext *ctx, GLuint n, const GLubyte mask[],
 		GLint g = rgba[i][GCOMP] + dest[i][GCOMP];
 		GLint b = rgba[i][BCOMP] + dest[i][BCOMP];
 		GLint a = rgba[i][ACOMP] + dest[i][ACOMP];
-		rgba[i][RCOMP] = static_cast<GLubyte>(MIN2(r, 255));
-		rgba[i][GCOMP] = static_cast<GLubyte>(MIN2(g, 255));
-		rgba[i][BCOMP] = static_cast<GLubyte>(MIN2(b, 255));
-		rgba[i][ACOMP] = static_cast<GLubyte>(MIN2(a, 255));
+		rgba[i][RCOMP] = static_cast<GLubyte>(mesa_min2(r, 255));
+		rgba[i][GCOMP] = static_cast<GLubyte>(mesa_min2(g, 255));
+		rgba[i][BCOMP] = static_cast<GLubyte>(mesa_min2(b, 255));
+		rgba[i][ACOMP] = static_cast<GLubyte>(mesa_min2(a, 255));
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
@@ -267,10 +267,10 @@ blend_add(GLcontext *ctx, GLuint n, const GLubyte mask[],
 		GLint g = rgba[i][GCOMP] + dest[i][GCOMP];
 		GLint b = rgba[i][BCOMP] + dest[i][BCOMP];
 		GLint a = rgba[i][ACOMP] + dest[i][ACOMP];
-		rgba[i][RCOMP] = static_cast<GLshort>(MIN2(r, 255));
-		rgba[i][GCOMP] = static_cast<GLshort>(MIN2(g, 255));
-		rgba[i][BCOMP] = static_cast<GLshort>(MIN2(b, 255));
-		rgba[i][ACOMP] = static_cast<GLshort>(MIN2(a, 255));
+		rgba[i][RCOMP] = static_cast<GLshort>(mesa_min2(r, 255));
+		rgba[i][GCOMP] = static_cast<GLshort>(mesa_min2(g, 255));
+		rgba[i][BCOMP] = static_cast<GLshort>(mesa_min2(b, 255));
+		rgba[i][ACOMP] = static_cast<GLshort>(mesa_min2(a, 255));
 	    }
 	}
     } else {
@@ -309,10 +309,10 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MIN2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MIN2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MIN2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MIN2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_min2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_min2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_min2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_min2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
@@ -320,10 +320,10 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MIN2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MIN2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MIN2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MIN2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_min2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_min2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_min2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_min2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     } else {
@@ -332,10 +332,10 @@ blend_min(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MIN2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MIN2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MIN2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MIN2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_min2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_min2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_min2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_min2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     }
@@ -360,10 +360,10 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	const GLubyte(*dest)[4] = reinterpret_cast<const GLubyte(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MAX2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MAX2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MAX2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MAX2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_max2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_max2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_max2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_max2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     } else if (chanType == GL_UNSIGNED_SHORT) {
@@ -371,10 +371,10 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	const GLushort(*dest)[4] = reinterpret_cast<const GLushort(*)[4]>(dst);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MAX2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MAX2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MAX2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MAX2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_max2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_max2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_max2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_max2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     } else {
@@ -383,10 +383,10 @@ blend_max(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	assert(chanType == GL_FLOAT);
 	for (i=0; i<n; i++) {
 	    if (mask[i]) {
-		rgba[i][RCOMP] = MAX2(rgba[i][RCOMP], dest[i][RCOMP]);
-		rgba[i][GCOMP] = MAX2(rgba[i][GCOMP], dest[i][GCOMP]);
-		rgba[i][BCOMP] = MAX2(rgba[i][BCOMP], dest[i][BCOMP]);
-		rgba[i][ACOMP] = MAX2(rgba[i][ACOMP], dest[i][ACOMP]);
+		rgba[i][RCOMP] = mesa_max2(rgba[i][RCOMP], dest[i][RCOMP]);
+		rgba[i][GCOMP] = mesa_max2(rgba[i][GCOMP], dest[i][GCOMP]);
+		rgba[i][BCOMP] = mesa_max2(rgba[i][BCOMP], dest[i][BCOMP]);
+		rgba[i][ACOMP] = mesa_max2(rgba[i][ACOMP], dest[i][ACOMP]);
 	    }
 	}
     }
@@ -732,14 +732,14 @@ blend_general_float(GLcontext *ctx, GLuint n, const GLubyte mask[],
 		    b = Bd * dB - Bs * sB;
 		    break;
 		case GL_MIN:
-		    r = MIN2(Rd, Rs);
-		    g = MIN2(Gd, Gs);
-		    b = MIN2(Bd, Bs);
+		    r = mesa_min2(Rd, Rs);
+		    g = mesa_min2(Gd, Gs);
+		    b = mesa_min2(Bd, Bs);
 		    break;
 		case GL_MAX:
-		    r = MAX2(Rd, Rs);
-		    g = MAX2(Gd, Gs);
-		    b = MAX2(Bd, Bs);
+		    r = mesa_max2(Rd, Rs);
+		    g = mesa_max2(Gd, Gs);
+		    b = mesa_max2(Bd, Bs);
 		    break;
 		default:
 		    /* should never get here */
@@ -759,10 +759,10 @@ blend_general_float(GLcontext *ctx, GLuint n, const GLubyte mask[],
 		    a = Ad * dA - As * sA;
 		    break;
 		case GL_MIN:
-		    a = MIN2(Ad, As);
+		    a = mesa_min2(Ad, As);
 		    break;
 		case GL_MAX:
-		    a = MAX2(Ad, As);
+		    a = mesa_max2(Ad, As);
 		    break;
 		default:
 		    /* should never get here */
@@ -772,12 +772,12 @@ blend_general_float(GLcontext *ctx, GLuint n, const GLubyte mask[],
 
 	    /* final clamping */
 #if 0
-	    rgba[i][RCOMP] = MAX2(r, 0.0F);
-	    rgba[i][GCOMP] = MAX2(g, 0.0F);
-	    rgba[i][BCOMP] = MAX2(b, 0.0F);
-	    rgba[i][ACOMP] = CLAMP(a, 0.0F, 1.0F);
+	    rgba[i][RCOMP] = mesa_max2(r, 0.0F);
+	    rgba[i][GCOMP] = mesa_max2(g, 0.0F);
+	    rgba[i][BCOMP] = mesa_max2(b, 0.0F);
+	    rgba[i][ACOMP] = mesa_clamp(a, 0.0F, 1.0F);
 #else
-	    ASSIGN_4V(rgba[i], r, g, b, a);
+	    mesa_assign4v(rgba[i], r, g, b, a);
 #endif
 	}
     }
@@ -828,14 +828,14 @@ blend_general(GLcontext *ctx, GLuint n, const GLubyte mask[],
 	/* convert ushorts to floats */
 	for (i = 0; i < n; i++) {
 	    if (mask[i]) {
-		rgbaF[i][RCOMP] = USHORT_TO_FLOAT(rgba[i][RCOMP]);
-		rgbaF[i][GCOMP] = USHORT_TO_FLOAT(rgba[i][GCOMP]);
-		rgbaF[i][BCOMP] = USHORT_TO_FLOAT(rgba[i][BCOMP]);
-		rgbaF[i][ACOMP] = USHORT_TO_FLOAT(rgba[i][ACOMP]);
-		destF[i][RCOMP] = USHORT_TO_FLOAT(dest[i][RCOMP]);
-		destF[i][GCOMP] = USHORT_TO_FLOAT(dest[i][GCOMP]);
-		destF[i][BCOMP] = USHORT_TO_FLOAT(dest[i][BCOMP]);
-		destF[i][ACOMP] = USHORT_TO_FLOAT(dest[i][ACOMP]);
+		rgbaF[i][RCOMP] = mesa_ushort_to_float(rgba[i][RCOMP]);
+		rgbaF[i][GCOMP] = mesa_ushort_to_float(rgba[i][GCOMP]);
+		rgbaF[i][BCOMP] = mesa_ushort_to_float(rgba[i][BCOMP]);
+		rgbaF[i][ACOMP] = mesa_ushort_to_float(rgba[i][ACOMP]);
+		destF[i][RCOMP] = mesa_ushort_to_float(dest[i][RCOMP]);
+		destF[i][GCOMP] = mesa_ushort_to_float(dest[i][GCOMP]);
+		destF[i][BCOMP] = mesa_ushort_to_float(dest[i][BCOMP]);
+		destF[i][ACOMP] = mesa_ushort_to_float(dest[i][ACOMP]);
 	    }
 	}
 	/* do blend */

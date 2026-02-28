@@ -234,7 +234,7 @@ finish_pass(struct atifs_machine *machine)
     GLint i;
 
     for (i = 0; i < 6; i++) {
-	COPY_4V(machine->PrevPassRegisters[i], machine->Registers[i]);
+	mesa_copy4v(machine->PrevPassRegisters[i], machine->Registers[i]);
     }
 }
 
@@ -263,11 +263,11 @@ handle_pass_op(struct atifs_machine *machine, const struct atifs_setupinst *texi
 
     if (pass_tex >= GL_TEXTURE0_ARB && pass_tex <= GL_TEXTURE7_ARB) {
 	pass_tex -= GL_TEXTURE0_ARB;
-	COPY_4V(machine->Registers[idx],
+	mesa_copy4v(machine->Registers[idx],
 		span->array->attribs[FRAG_ATTRIB_TEX0 + pass_tex][column]);
     } else if (pass_tex >= GL_REG_0_ATI && pass_tex <= GL_REG_5_ATI) {
 	pass_tex -= GL_REG_0_ATI;
-	COPY_4V(machine->Registers[idx], machine->PrevPassRegisters[pass_tex]);
+	mesa_copy4v(machine->Registers[idx], machine->PrevPassRegisters[pass_tex]);
     }
     apply_swizzle(machine->Registers[idx], swizzle);
 
@@ -285,11 +285,11 @@ handle_sample_op(GLcontext * ctx, struct atifs_machine *machine,
 
     if (coord_source >= GL_TEXTURE0_ARB && coord_source <= GL_TEXTURE7_ARB) {
 	coord_source -= GL_TEXTURE0_ARB;
-	COPY_4V(tex_coords,
+	mesa_copy4v(tex_coords,
 		span->array->attribs[FRAG_ATTRIB_TEX0 + coord_source][column]);
     } else if (coord_source >= GL_REG_0_ATI && coord_source <= GL_REG_5_ATI) {
 	coord_source -= GL_REG_0_ATI;
-	COPY_4V(tex_coords, machine->PrevPassRegisters[coord_source]);
+	mesa_copy4v(tex_coords, machine->PrevPassRegisters[coord_source]);
     }
     apply_swizzle(tex_coords, swizzle);
     fetch_texel(ctx, tex_coords, 0.0F, idx, machine->Registers[idx]);
@@ -297,7 +297,7 @@ handle_sample_op(GLcontext * ctx, struct atifs_machine *machine,
 
 #define SETUP_SRC_REG(optype, i, x)		\
 do {						\
-   COPY_4V(src[optype][i], x); 			\
+   mesa_copy4v(src[optype][i], x); 			\
 } while (0)
 
 
@@ -553,8 +553,8 @@ init_machine(GLcontext * ctx, struct atifs_machine *machine,
 	    machine->Registers[i][j] = 0.0;
     }
 
-    COPY_4V(inputs[ATI_FS_INPUT_PRIMARY], span->array->attribs[FRAG_ATTRIB_COL0][col]);
-    COPY_4V(inputs[ATI_FS_INPUT_SECONDARY], span->array->attribs[FRAG_ATTRIB_COL1][col]);
+    mesa_copy4v(inputs[ATI_FS_INPUT_PRIMARY], span->array->attribs[FRAG_ATTRIB_COL0][col]);
+    mesa_copy4v(inputs[ATI_FS_INPUT_SECONDARY], span->array->attribs[FRAG_ATTRIB_COL1][col]);
 }
 
 
@@ -585,7 +585,7 @@ _swrast_exec_fragment_shader(GLcontext * ctx, SWspan *span)
 		const GLfloat *colOut = machine.Registers[0];
 		/*fprintf(stderr,"outputs %f %f %f %f\n",
 		  colOut[0], colOut[1], colOut[2], colOut[3]); */
-		COPY_4V(span->array->attribs[FRAG_ATTRIB_COL0][i], colOut);
+		mesa_copy4v(span->array->attribs[FRAG_ATTRIB_COL0][i], colOut);
 	    }
 	}
     }

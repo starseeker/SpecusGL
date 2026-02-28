@@ -941,7 +941,7 @@ sample_2d_nearest_f(GLcontext *ctx,
     i += img->Border;
     j += img->Border;
     if (i < 0 || i >= static_cast<GLint>(img->Width) || j < 0 || j >= static_cast<GLint>(img->Height)) {
-	COPY_4V(rgba, tObj->BorderColor);
+	mesa_copy4v(rgba, tObj->BorderColor);
     } else {
 	img->FetchTexelf(img, i, j, 0, rgba);
     }
@@ -974,13 +974,13 @@ sample_2d_linear_f(GLcontext *ctx,
 	if (j1 < 0 || j1 >= height) useBorderColor |= J1BIT;
     }
 
-    if (useBorderColor & (I0BIT | J0BIT)) COPY_4V(t00, tObj->BorderColor);
+    if (useBorderColor & (I0BIT | J0BIT)) mesa_copy4v(t00, tObj->BorderColor);
     else img->FetchTexelf(img, i0, j0, 0, t00);
-    if (useBorderColor & (I1BIT | J0BIT)) COPY_4V(t10, tObj->BorderColor);
+    if (useBorderColor & (I1BIT | J0BIT)) mesa_copy4v(t10, tObj->BorderColor);
     else img->FetchTexelf(img, i1, j0, 0, t10);
-    if (useBorderColor & (I0BIT | J1BIT)) COPY_4V(t01, tObj->BorderColor);
+    if (useBorderColor & (I0BIT | J1BIT)) mesa_copy4v(t01, tObj->BorderColor);
     else img->FetchTexelf(img, i0, j1, 0, t01);
-    if (useBorderColor & (I1BIT | J1BIT)) COPY_4V(t11, tObj->BorderColor);
+    if (useBorderColor & (I1BIT | J1BIT)) mesa_copy4v(t11, tObj->BorderColor);
     else img->FetchTexelf(img, i1, j1, 0, t11);
 
     a = FRAC(u);
@@ -2272,11 +2272,11 @@ static inline GLint
 clamp_rect_coord_nearest(GLenum wrapMode, GLfloat coord, GLint max)
 {
     if (wrapMode == GL_CLAMP) {
-	return ifloor(CLAMP(coord, 0.0F, max - 1));
+	return ifloor(mesa_clamp(coord, 0.0F, max - 1));
     } else if (wrapMode == GL_CLAMP_TO_EDGE) {
-	return ifloor(CLAMP(coord, 0.5F, max - 0.5F));
+	return ifloor(mesa_clamp(coord, 0.5F, max - 0.5F));
     } else {
-	return ifloor(CLAMP(coord, -0.5F, max + 0.5F));
+	return ifloor(mesa_clamp(coord, -0.5F, max + 0.5F));
     }
 }
 
@@ -2292,11 +2292,11 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
     GLint i0, i1;
     if (wrapMode == GL_CLAMP) {
 	/* Not exactly what the spec says, but it matches NVIDIA output */
-	fcol = CLAMP(coord - 0.5F, 0.0, max-1);
+	fcol = mesa_clamp(coord - 0.5F, 0.0, max-1);
 	i0 = ifloor(fcol);
 	i1 = i0 + 1;
     } else if (wrapMode == GL_CLAMP_TO_EDGE) {
-	fcol = CLAMP(coord, 0.5F, max - 0.5F);
+	fcol = mesa_clamp(coord, 0.5F, max - 0.5F);
 	fcol -= 0.5F;
 	i0 = ifloor(fcol);
 	i1 = i0 + 1;
@@ -2304,7 +2304,7 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
 	    i1 = max - 1;
     } else {
 	assert(wrapMode == GL_CLAMP_TO_BORDER);
-	fcol = CLAMP(coord, -0.5F, max + 0.5F);
+	fcol = mesa_clamp(coord, -0.5F, max + 0.5F);
 	fcol -= 0.5F;
 	i0 = ifloor(fcol);
 	i1 = i0 + 1;
@@ -2385,11 +2385,11 @@ sample_linear_rect(GLcontext *ctx,
 	/* NOTE: we DO NOT use [0, 1] texture coordinates! */
 	if (tObj->WrapS == GL_CLAMP) {
 	    /* Not exactly what the spec says, but it matches NVIDIA output */
-	    fcol = CLAMP(texcoords[i][0] - 0.5F, 0.0, width_minus_1);
+	    fcol = mesa_clamp(texcoords[i][0] - 0.5F, 0.0, width_minus_1);
 	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
 	} else if (tObj->WrapS == GL_CLAMP_TO_EDGE) {
-	    fcol = CLAMP(texcoords[i][0], 0.5F, width - 0.5F);
+	    fcol = mesa_clamp(texcoords[i][0], 0.5F, width - 0.5F);
 	    fcol -= 0.5F;
 	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
@@ -2397,7 +2397,7 @@ sample_linear_rect(GLcontext *ctx,
 		i1 = width_minus_1;
 	} else {
 	    assert(tObj->WrapS == GL_CLAMP_TO_BORDER);
-	    fcol = CLAMP(texcoords[i][0], -0.5F, width + 0.5F);
+	    fcol = mesa_clamp(texcoords[i][0], -0.5F, width + 0.5F);
 	    fcol -= 0.5F;
 	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
@@ -2405,11 +2405,11 @@ sample_linear_rect(GLcontext *ctx,
 
 	if (tObj->WrapT == GL_CLAMP) {
 	    /* Not exactly what the spec says, but it matches NVIDIA output */
-	    frow = CLAMP(texcoords[i][1] - 0.5F, 0.0, width_minus_1);
+	    frow = mesa_clamp(texcoords[i][1] - 0.5F, 0.0, width_minus_1);
 	    j0 = ifloor(frow);
 	    j1 = j0 + 1;
 	} else if (tObj->WrapT == GL_CLAMP_TO_EDGE) {
-	    frow = CLAMP(texcoords[i][1], 0.5F, height - 0.5F);
+	    frow = mesa_clamp(texcoords[i][1], 0.5F, height - 0.5F);
 	    frow -= 0.5F;
 	    j0 = ifloor(frow);
 	    j1 = j0 + 1;
@@ -2417,7 +2417,7 @@ sample_linear_rect(GLcontext *ctx,
 		j1 = height_minus_1;
 	} else {
 	    assert(tObj->WrapT == GL_CLAMP_TO_BORDER);
-	    frow = CLAMP(texcoords[i][1], -0.5F, height + 0.5F);
+	    frow = mesa_clamp(texcoords[i][1], -0.5F, height + 0.5F);
 	    frow -= 0.5F;
 	    j0 = ifloor(frow);
 	    j1 = j0 + 1;

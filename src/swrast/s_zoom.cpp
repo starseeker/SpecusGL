@@ -66,8 +66,8 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
 	c1 = c0;
 	c0 = tmp;
     }
-    c0 = CLAMP(c0, fb->_Xmin, fb->_Xmax);
-    c1 = CLAMP(c1, fb->_Xmin, fb->_Xmax);
+    c0 = mesa_clamp(c0, fb->_Xmin, fb->_Xmax);
+    c1 = mesa_clamp(c1, fb->_Xmin, fb->_Xmax);
     if (c0 == c1) {
 	return false; /* no width */
     }
@@ -83,8 +83,8 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
 	r1 = r0;
 	r0 = tmp;
     }
-    r0 = CLAMP(r0, fb->_Ymin, fb->_Ymax);
-    r1 = CLAMP(r1, fb->_Ymin, fb->_Ymax);
+    r0 = mesa_clamp(r0, fb->_Ymin, fb->_Ymax);
+    r1 = mesa_clamp(r1, fb->_Ymin, fb->_Ymax);
     if (r0 == r1) {
 	return false; /* no height */
     }
@@ -170,9 +170,9 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
     zoomed.array->spec = zoomed.array->attribs[FRAG_ATTRIB_COL1];
 #endif
 
-    COPY_4V(zoomed.attrStart[FRAG_ATTRIB_WPOS], span->attrStart[FRAG_ATTRIB_WPOS]);
-    COPY_4V(zoomed.attrStepX[FRAG_ATTRIB_WPOS], span->attrStepX[FRAG_ATTRIB_WPOS]);
-    COPY_4V(zoomed.attrStepY[FRAG_ATTRIB_WPOS], span->attrStepY[FRAG_ATTRIB_WPOS]);
+    mesa_copy4v(zoomed.attrStart[FRAG_ATTRIB_WPOS], span->attrStart[FRAG_ATTRIB_WPOS]);
+    mesa_copy4v(zoomed.attrStepX[FRAG_ATTRIB_WPOS], span->attrStepX[FRAG_ATTRIB_WPOS]);
+    mesa_copy4v(zoomed.attrStepY[FRAG_ATTRIB_WPOS], span->attrStepY[FRAG_ATTRIB_WPOS]);
 
     zoomed.attrStart[FRAG_ATTRIB_FOGC][0] = span->attrStart[FRAG_ATTRIB_FOGC][0];
     zoomed.attrStepX[FRAG_ATTRIB_FOGC][0] = span->attrStepX[FRAG_ATTRIB_FOGC][0];
@@ -232,7 +232,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
 		assert(j >= 0);
 		assert(j < static_cast<GLint>(span->end));
-		COPY_4V(zoomed.array->color.sz2.rgba[i], rgba[j]);
+		mesa_copy4v(zoomed.array->color.sz2.rgba[i], rgba[j]);
 	    }
 	} else {
 	    const GLfloat(*rgba)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
@@ -241,7 +241,7 @@ zoom_span(GLcontext *ctx, GLint imgX, GLint imgY, const SWspan *span,
 		GLint j = unzoom_x(ctx->Pixel.ZoomX, imgX, x0 + i) - span->x;
 		assert(j >= 0);
 		assert(j < span->end);
-		COPY_4V(zoomed.array->attribs[FRAG_ATTRIB_COL0][i], rgba[j]);
+		mesa_copy4v(zoomed.array->attribs[FRAG_ATTRIB_COL0][i], rgba[j]);
 	    }
 	}
     } else if (format == GL_RGB) {

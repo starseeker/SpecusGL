@@ -331,9 +331,9 @@ affine_span(GLcontext *ctx, SWspan *span,
       GLint rSum = FixedToInt(span->red)   + static_cast<GLint>(sample[RCOMP]);	\
       GLint gSum = FixedToInt(span->green) + static_cast<GLint>(sample[GCOMP]);	\
       GLint bSum = FixedToInt(span->blue)  + static_cast<GLint>(sample[BCOMP]);	\
-      dest[RCOMP] = MIN2(rSum, CHAN_MAX);				\
-      dest[GCOMP] = MIN2(gSum, CHAN_MAX);				\
-      dest[BCOMP] = MIN2(bSum, CHAN_MAX);				\
+      dest[RCOMP] = mesa_min2(rSum, CHAN_MAX);				\
+      dest[GCOMP] = mesa_min2(gSum, CHAN_MAX);				\
+      dest[BCOMP] = mesa_min2(bSum, CHAN_MAX);				\
       dest[ACOMP] = span->alpha * (sample[ACOMP] + 1) >> (FIXED_SHIFT + 8); \
   }
 
@@ -951,23 +951,23 @@ void _swrast_add_spec_terms_triangle(GLcontext *ctx,
     rSum = ncv0->color[0] + ncv0->specular[0];
     gSum = ncv0->color[1] + ncv0->specular[1];
     bSum = ncv0->color[2] + ncv0->specular[2];
-    ncv0->color[0] = MIN2(rSum, CHAN_MAX);
-    ncv0->color[1] = MIN2(gSum, CHAN_MAX);
-    ncv0->color[2] = MIN2(bSum, CHAN_MAX);
+    ncv0->color[0] = mesa_min2(rSum, CHAN_MAX);
+    ncv0->color[1] = mesa_min2(gSum, CHAN_MAX);
+    ncv0->color[2] = mesa_min2(bSum, CHAN_MAX);
     /* sum v1 */
     rSum = ncv1->color[0] + ncv1->specular[0];
     gSum = ncv1->color[1] + ncv1->specular[1];
     bSum = ncv1->color[2] + ncv1->specular[2];
-    ncv1->color[0] = MIN2(rSum, CHAN_MAX);
-    ncv1->color[1] = MIN2(gSum, CHAN_MAX);
-    ncv1->color[2] = MIN2(bSum, CHAN_MAX);
+    ncv1->color[0] = mesa_min2(rSum, CHAN_MAX);
+    ncv1->color[1] = mesa_min2(gSum, CHAN_MAX);
+    ncv1->color[2] = mesa_min2(bSum, CHAN_MAX);
     /* sum v2 */
     rSum = ncv2->color[0] + ncv2->specular[0];
     gSum = ncv2->color[1] + ncv2->specular[1];
     bSum = ncv2->color[2] + ncv2->specular[2];
-    ncv2->color[0] = MIN2(rSum, CHAN_MAX);
-    ncv2->color[1] = MIN2(gSum, CHAN_MAX);
-    ncv2->color[2] = MIN2(bSum, CHAN_MAX);
+    ncv2->color[0] = mesa_min2(rSum, CHAN_MAX);
+    ncv2->color[1] = mesa_min2(gSum, CHAN_MAX);
+    ncv2->color[2] = mesa_min2(bSum, CHAN_MAX);
     /* draw */
     SWRAST_CONTEXT(ctx)->SpecTriangle(ctx, ncv0, ncv1, ncv2);
     /* restore original colors */

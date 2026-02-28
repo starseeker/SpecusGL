@@ -429,7 +429,7 @@ accum_return(GLcontext *ctx, GLfloat value,
     static GLchan multTable[32768];
     static GLfloat prevMult = 0.0;
     const GLfloat mult = swrast->_IntegerAccumScaler;
-    const GLint max = MIN2(static_cast<GLint>((256 / mult)), 32767);
+    const GLint max = mesa_min2(static_cast<GLint>((256 / mult)), 32767);
 
     /* May have to leave optimized accum buffer mode */
     if (swrast->_IntegerAccumMode && value != 1.0)
@@ -498,10 +498,10 @@ accum_return(GLcontext *ctx, GLfloat value,
 		    GLint b = iround(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
 		    GLint a = iround(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
 #endif
-		    span.array->rgba[j][RCOMP] = CLAMP(r, 0, CHAN_MAX);
-		    span.array->rgba[j][GCOMP] = CLAMP(g, 0, CHAN_MAX);
-		    span.array->rgba[j][BCOMP] = CLAMP(b, 0, CHAN_MAX);
-		    span.array->rgba[j][ACOMP] = CLAMP(a, 0, CHAN_MAX);
+		    span.array->rgba[j][RCOMP] = mesa_clamp(r, 0, CHAN_MAX);
+		    span.array->rgba[j][GCOMP] = mesa_clamp(g, 0, CHAN_MAX);
+		    span.array->rgba[j][BCOMP] = mesa_clamp(b, 0, CHAN_MAX);
+		    span.array->rgba[j][ACOMP] = mesa_clamp(a, 0, CHAN_MAX);
 		}
 	    }
 

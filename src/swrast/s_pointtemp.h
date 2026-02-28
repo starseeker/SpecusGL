@@ -123,7 +123,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
     if (ctx->FragmentProgram._Active) {
 	/* Don't divide texture s,t,r by q (use TXP to do that) */
 	ATTRIB_LOOP_BEGIN
-	COPY_4V(attrib[attr], vert->attrib[attr]);
+	mesa_copy4v(attrib[attr], vert->attrib[attr]);
 	ATTRIB_LOOP_END
     } else {
 	/* Divide texture s,t,r by q here */
@@ -151,7 +151,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
     /* Compute point size if not known to be one */
 #if FLAGS & ATTENUATE
     /* first, clamp attenuated size to the user-specifed range */
-    size = CLAMP(vert->pointSize, ctx->Point.MinSize, ctx->Point.MaxSize);
+    size = mesa_clamp(vert->pointSize, ctx->Point.MinSize, ctx->Point.MaxSize);
 #if (FLAGS & RGBA) && (FLAGS & SMOOTH)
     /* only if multisampling, compute the fade factor */
     if (ctx->Multisample.Enabled) {
@@ -178,9 +178,9 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 
     /* do final clamping now */
     if (ctx->Point.SmoothFlag) {
-	size = CLAMP(size, ctx->Const.MinPointSizeAA, ctx->Const.MaxPointSizeAA);
+	size = mesa_clamp(size, ctx->Const.MinPointSizeAA, ctx->Const.MaxPointSizeAA);
     } else {
-	size = CLAMP(size, ctx->Const.MinPointSize, ctx->Const.MaxPointSize);
+	size = mesa_clamp(size, ctx->Const.MinPointSize, ctx->Const.MaxPointSize);
     }
 
     {{
@@ -191,7 +191,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 #if FLAGS & SMOOTH
 	    const GLfloat rmin = radius - 0.7071F;  /* 0.7071 = sqrt(2)/2 */
 	    const GLfloat rmax = radius + 0.7071F;
-	    const GLfloat rmin2 = MAX2(0.0F, rmin * rmin);
+	    const GLfloat rmin2 = mesa_max2(0.0F, rmin * rmin);
 	    const GLfloat rmax2 = rmax * rmax;
 	    const GLfloat cscale = 1.0F / (rmax2 - rmin2);
 	    const GLint xmin = static_cast<GLint>((vert->win[0] - radius));
@@ -203,7 +203,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 	    GLint xmin, xmax, ymin, ymax;
 	    GLint iSize = static_cast<GLint>((size + 0.5F));
 	    GLint iRadius;
-	    iSize = MAX2(1, iSize);
+	    iSize = mesa_max2(1, iSize);
 	    iRadius = iSize / 2;
 	    if (iSize & 1) {
 		/* odd size */
@@ -270,7 +270,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 #endif
 #if FLAGS & ATTRIBS
 		    ATTRIB_LOOP_BEGIN
-		    COPY_4V(span->array->attribs[attr][count], attrib[attr]);
+		    mesa_copy4v(span->array->attribs[attr][count], attrib[attr]);
 		    if (attr < FRAG_ATTRIB_VAR0 && attr >= FRAG_ATTRIB_TEX0) {
 			const GLuint u = attr - FRAG_ATTRIB_TEX0;
 			span->array->lambda[u][count] = 0.0;
@@ -341,7 +341,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 				span->array->attribs[attr][count][3] = 1.0F;
 				span->array->lambda[u][count] = 0.0; /* XXX fix? */
 			    } else {
-				COPY_4V(span->array->attribs[attr][count],
+				mesa_copy4v(span->array->attribs[attr][count],
 					vert->attrib[attr]);
 			    }
 			}
@@ -395,7 +395,7 @@ NAME(GLcontext *ctx, const SWvertex *vert)
 #endif
 #if FLAGS & ATTRIBS
 	    ATTRIB_LOOP_BEGIN
-	    COPY_4V(span->array->attribs[attr][count], attribs[attr]);
+	    mesa_copy4v(span->array->attribs[attr][count], attribs[attr]);
 	    ATTRIB_LOOP_END
 #endif
 

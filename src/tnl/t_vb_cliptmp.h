@@ -51,13 +51,13 @@ do {									\
 		* know dp != dpPrev from different_signs, above.	\
 		*/							\
 	       GLfloat t = dp / (dp - dpPrev);				\
-               INTERP_4F( t, coord[newvert], coord[idx], coord[idxPrev]); \
+               mesa_interp_4f( t, coord[newvert], coord[idx], coord[idxPrev]); \
       	       interp( ctx, t, newvert, idx, idxPrev, GL_TRUE );	\
 	    } else {							\
 	       /* Coming back in.					\
 		*/							\
 	       GLfloat t = dpPrev / (dpPrev - dp);			\
-               INTERP_4F( t, coord[newvert], coord[idxPrev], coord[idx]); \
+               mesa_interp_4f( t, coord[newvert], coord[idxPrev], coord[idx]); \
 	       interp( ctx, t, newvert, idxPrev, idx, GL_FALSE );	\
 	    }								\
             outlist[outcount++] = newvert++;				\
@@ -149,7 +149,7 @@ TAG(clip_line)(GLcontext *ctx, GLuint v0, GLuint v1, GLubyte mask)
     }
 
     if (VB->ClipMask[v0]) {
-	INTERP_4F(t0, coord[newvert], coord[v0], coord[v1]);
+	mesa_interp_4f(t0, coord[newvert], coord[v0], coord[v1]);
 	interp(ctx, t0, newvert, v0, v1, GL_FALSE);
 	v0 = newvert;
 	newvert++;
@@ -162,7 +162,7 @@ TAG(clip_line)(GLcontext *ctx, GLuint v0, GLuint v1, GLubyte mask)
      * may have got set when we clipped the other end of the line!
      */
     if (VB->ClipMask[v1]) {
-	INTERP_4F(t1, coord[newvert], coord[v1], coord[v0_orig]);
+	mesa_interp_4f(t1, coord[newvert], coord[v1], coord[v0_orig]);
 	interp(ctx, t1, newvert, v1, v0_orig, GL_FALSE);
 
 	if (ctx->Light.ShadeModel == GL_FLAT)
@@ -195,7 +195,7 @@ TAG(clip_tri)(GLcontext *ctx, GLuint v0, GLuint v1, GLuint v2, GLubyte mask)
     GLuint p;
     GLuint n = 3;
 
-    ASSIGN_3V(inlist, v2, v0, v1);  /* pv rotated to slot zero */
+    mesa_assign3v(inlist, v2, v0, v1);  /* pv rotated to slot zero */
 
     if (mask & 0x3f) {
 	POLY_CLIP(CLIP_RIGHT_BIT,  -1,  0,  0, 1);
@@ -246,7 +246,7 @@ TAG(clip_quad)(GLcontext *ctx, GLuint v0, GLuint v1, GLuint v2, GLuint v3,
     GLuint p;
     GLuint n = 4;
 
-    ASSIGN_4V(inlist, v3, v0, v1, v2);  /* pv rotated to slot zero */
+    mesa_assign4v(inlist, v3, v0, v1, v2);  /* pv rotated to slot zero */
 
     if (mask & 0x3f) {
 	POLY_CLIP(CLIP_RIGHT_BIT,  -1,  0,  0, 1);

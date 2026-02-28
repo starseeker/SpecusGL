@@ -91,7 +91,7 @@ _mesa_copy_texture_state(const GLcontext *src, GLcontext *dst)
     for (i = 0; i < src->Const.MaxTextureUnits; i++) {
 	dst->Texture.Unit[i].Enabled = src->Texture.Unit[i].Enabled;
 	dst->Texture.Unit[i].EnvMode = src->Texture.Unit[i].EnvMode;
-	COPY_4V(dst->Texture.Unit[i].EnvColor, src->Texture.Unit[i].EnvColor);
+	mesa_copy4v(dst->Texture.Unit[i].EnvColor, src->Texture.Unit[i].EnvColor);
 	dst->Texture.Unit[i].TexGenEnabled = src->Texture.Unit[i].TexGenEnabled;
 	dst->Texture.Unit[i].GenModeS = src->Texture.Unit[i].GenModeS;
 	dst->Texture.Unit[i].GenModeT = src->Texture.Unit[i].GenModeT;
@@ -102,23 +102,23 @@ _mesa_copy_texture_state(const GLcontext *src, GLcontext *dst)
 	dst->Texture.Unit[i]._GenBitR = src->Texture.Unit[i]._GenBitR;
 	dst->Texture.Unit[i]._GenBitQ = src->Texture.Unit[i]._GenBitQ;
 	dst->Texture.Unit[i]._GenFlags = src->Texture.Unit[i]._GenFlags;
-	COPY_4V(dst->Texture.Unit[i].ObjectPlaneS, src->Texture.Unit[i].ObjectPlaneS);
-	COPY_4V(dst->Texture.Unit[i].ObjectPlaneT, src->Texture.Unit[i].ObjectPlaneT);
-	COPY_4V(dst->Texture.Unit[i].ObjectPlaneR, src->Texture.Unit[i].ObjectPlaneR);
-	COPY_4V(dst->Texture.Unit[i].ObjectPlaneQ, src->Texture.Unit[i].ObjectPlaneQ);
-	COPY_4V(dst->Texture.Unit[i].EyePlaneS, src->Texture.Unit[i].EyePlaneS);
-	COPY_4V(dst->Texture.Unit[i].EyePlaneT, src->Texture.Unit[i].EyePlaneT);
-	COPY_4V(dst->Texture.Unit[i].EyePlaneR, src->Texture.Unit[i].EyePlaneR);
-	COPY_4V(dst->Texture.Unit[i].EyePlaneQ, src->Texture.Unit[i].EyePlaneQ);
+	mesa_copy4v(dst->Texture.Unit[i].ObjectPlaneS, src->Texture.Unit[i].ObjectPlaneS);
+	mesa_copy4v(dst->Texture.Unit[i].ObjectPlaneT, src->Texture.Unit[i].ObjectPlaneT);
+	mesa_copy4v(dst->Texture.Unit[i].ObjectPlaneR, src->Texture.Unit[i].ObjectPlaneR);
+	mesa_copy4v(dst->Texture.Unit[i].ObjectPlaneQ, src->Texture.Unit[i].ObjectPlaneQ);
+	mesa_copy4v(dst->Texture.Unit[i].EyePlaneS, src->Texture.Unit[i].EyePlaneS);
+	mesa_copy4v(dst->Texture.Unit[i].EyePlaneT, src->Texture.Unit[i].EyePlaneT);
+	mesa_copy4v(dst->Texture.Unit[i].EyePlaneR, src->Texture.Unit[i].EyePlaneR);
+	mesa_copy4v(dst->Texture.Unit[i].EyePlaneQ, src->Texture.Unit[i].EyePlaneQ);
 	dst->Texture.Unit[i].LodBias = src->Texture.Unit[i].LodBias;
 
 	/* GL_EXT_texture_env_combine */
 	dst->Texture.Unit[i].Combine.ModeRGB = src->Texture.Unit[i].Combine.ModeRGB;
 	dst->Texture.Unit[i].Combine.ModeA = src->Texture.Unit[i].Combine.ModeA;
-	COPY_3V(dst->Texture.Unit[i].Combine.SourceRGB, src->Texture.Unit[i].Combine.SourceRGB);
-	COPY_3V(dst->Texture.Unit[i].Combine.SourceA, src->Texture.Unit[i].Combine.SourceA);
-	COPY_3V(dst->Texture.Unit[i].Combine.OperandRGB, src->Texture.Unit[i].Combine.OperandRGB);
-	COPY_3V(dst->Texture.Unit[i].Combine.OperandA, src->Texture.Unit[i].Combine.OperandA);
+	mesa_copy3v(dst->Texture.Unit[i].Combine.SourceRGB, src->Texture.Unit[i].Combine.SourceRGB);
+	mesa_copy3v(dst->Texture.Unit[i].Combine.SourceA, src->Texture.Unit[i].Combine.SourceA);
+	mesa_copy3v(dst->Texture.Unit[i].Combine.OperandRGB, src->Texture.Unit[i].Combine.OperandRGB);
+	mesa_copy3v(dst->Texture.Unit[i].Combine.OperandA, src->Texture.Unit[i].Combine.OperandA);
 	dst->Texture.Unit[i].Combine.ScaleShiftRGB = src->Texture.Unit[i].Combine.ScaleShiftRGB;
 	dst->Texture.Unit[i].Combine.ScaleShiftA = src->Texture.Unit[i].Combine.ScaleShiftA;
 
@@ -343,14 +343,14 @@ _mesa_TexEnvfv(GLenum target, GLenum pname, const GLfloat *param)
 	    break;
 	    case GL_TEXTURE_ENV_COLOR: {
 		GLfloat tmp[4];
-		tmp[0] = CLAMP(param[0], 0.0F, 1.0F);
-		tmp[1] = CLAMP(param[1], 0.0F, 1.0F);
-		tmp[2] = CLAMP(param[2], 0.0F, 1.0F);
-		tmp[3] = CLAMP(param[3], 0.0F, 1.0F);
-		if (TEST_EQ_4V(tmp, texUnit->EnvColor))
+		tmp[0] = mesa_clamp(param[0], 0.0F, 1.0F);
+		tmp[1] = mesa_clamp(param[1], 0.0F, 1.0F);
+		tmp[2] = mesa_clamp(param[2], 0.0F, 1.0F);
+		tmp[3] = mesa_clamp(param[3], 0.0F, 1.0F);
+		if (mesa_test_eq_4v(tmp, texUnit->EnvColor))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->EnvColor, tmp);
+		mesa_copy4fv(texUnit->EnvColor, tmp);
 	    }
 	    break;
 	    case GL_COMBINE_RGB:
@@ -750,10 +750,10 @@ _mesa_TexEnviv(GLenum target, GLenum pname, const GLint *param)
 {
     GLfloat p[4];
     if (pname == GL_TEXTURE_ENV_COLOR) {
-	p[0] = INT_TO_FLOAT(param[0]);
-	p[1] = INT_TO_FLOAT(param[1]);
-	p[2] = INT_TO_FLOAT(param[2]);
-	p[3] = INT_TO_FLOAT(param[3]);
+	p[0] = mesa_int_to_float(param[0]);
+	p[1] = mesa_int_to_float(param[1]);
+	p[2] = mesa_int_to_float(param[2]);
+	p[3] = mesa_int_to_float(param[3]);
     } else {
 	p[0] = static_cast<GLfloat>(param[0]);
 	p[1] = p[2] = p[3] = 0;  /* init to zero, just to be safe */
@@ -785,7 +785,7 @@ _mesa_GetTexEnvfv(GLenum target, GLenum pname, GLfloat *params)
 		*params = enum_to_float(texUnit->EnvMode);
 		break;
 	    case GL_TEXTURE_ENV_COLOR:
-		COPY_4FV(params, texUnit->EnvColor);
+		mesa_copy4fv(params, texUnit->EnvColor);
 		break;
 	    case GL_COMBINE_RGB:
 		if (ctx->Extensions.EXT_texture_env_combine ||
@@ -933,10 +933,10 @@ _mesa_GetTexEnviv(GLenum target, GLenum pname, GLint *params)
 		*params = static_cast<GLint>(texUnit->EnvMode);
 		break;
 	    case GL_TEXTURE_ENV_COLOR:
-		params[0] = FLOAT_TO_INT(texUnit->EnvColor[0]);
-		params[1] = FLOAT_TO_INT(texUnit->EnvColor[1]);
-		params[2] = FLOAT_TO_INT(texUnit->EnvColor[2]);
-		params[3] = FLOAT_TO_INT(texUnit->EnvColor[3]);
+		params[0] = mesa_float_to_int(texUnit->EnvColor[0]);
+		params[1] = mesa_float_to_int(texUnit->EnvColor[1]);
+		params[2] = mesa_float_to_int(texUnit->EnvColor[2]);
+		params[3] = mesa_float_to_int(texUnit->EnvColor[3]);
 		break;
 	    case GL_COMBINE_RGB:
 		if (ctx->Extensions.EXT_texture_env_combine ||
@@ -1270,7 +1270,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 	    break;
 	case GL_TEXTURE_PRIORITY:
 	    FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-	    texObj->Priority = CLAMP(params[0], 0.0F, 1.0F);
+	    texObj->Priority = mesa_clamp(params[0], 0.0F, 1.0F);
 	    break;
 	case GL_TEXTURE_MAX_ANISOTROPY_EXT:
 	    if (ctx->Extensions.EXT_texture_filter_anisotropic) {
@@ -1280,7 +1280,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 		}
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
 		/* clamp to max, that's what NVIDIA does */
-		texObj->MaxAnisotropy = MIN2(params[0],
+		texObj->MaxAnisotropy = mesa_min2(params[0],
 					     ctx->Const.MaxTextureMaxAnisotropy);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM,
@@ -1317,7 +1317,7 @@ _mesa_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 	case GL_SHADOW_AMBIENT_SGIX: /* aka GL_TEXTURE_COMPARE_FAIL_VALUE_ARB */
 	    if (ctx->Extensions.SGIX_shadow_ambient) {
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		texObj->ShadowAmbient = CLAMP(params[0], 0.0F, 1.0F);
+		texObj->ShadowAmbient = mesa_clamp(params[0], 0.0F, 1.0F);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM,
 			    "glTexParameter(pname=GL_SHADOW_AMBIENT_SGIX)");
@@ -1423,7 +1423,7 @@ _mesa_TexParameteri(GLenum target, GLenum pname, GLint param)
 {
     GLfloat fparam[4];
     if (pname == GL_TEXTURE_PRIORITY)
-	fparam[0] = INT_TO_FLOAT(param);
+	fparam[0] = mesa_int_to_float(param);
     else
 	fparam[0] = static_cast<GLfloat>(param);
     fparam[1] = fparam[2] = fparam[3] = 0.0;
@@ -1436,13 +1436,13 @@ _mesa_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
 {
     GLfloat fparam[4];
     if (pname == GL_TEXTURE_BORDER_COLOR) {
-	fparam[0] = INT_TO_FLOAT(params[0]);
-	fparam[1] = INT_TO_FLOAT(params[1]);
-	fparam[2] = INT_TO_FLOAT(params[2]);
-	fparam[3] = INT_TO_FLOAT(params[3]);
+	fparam[0] = mesa_int_to_float(params[0]);
+	fparam[1] = mesa_int_to_float(params[1]);
+	fparam[2] = mesa_int_to_float(params[2]);
+	fparam[3] = mesa_int_to_float(params[3]);
     } else {
 	if (pname == GL_TEXTURE_PRIORITY)
-	    fparam[0] = INT_TO_FLOAT(params[0]);
+	    fparam[0] = mesa_int_to_float(params[0]);
 	else
 	    fparam[0] = static_cast<GLfloat>(params[0]);
 	fparam[1] = fparam[2] = fparam[3] = 0.0F;
@@ -1597,7 +1597,7 @@ _mesa_GetTexLevelParameteriv(GLenum target, GLint level,
 	    else if (img->TexFormat->IntensityBits > 0)
 		*params = img->TexFormat->IntensityBits;
 	    else /* intensity probably stored as rgb texture */
-		*params = MIN2(img->TexFormat->RedBits, img->TexFormat->GreenBits);
+		*params = mesa_min2(img->TexFormat->RedBits, img->TexFormat->GreenBits);
 	    break;
 	case GL_TEXTURE_LUMINANCE_SIZE:
 	    if (img->_BaseFormat != GL_LUMINANCE &&
@@ -1606,7 +1606,7 @@ _mesa_GetTexLevelParameteriv(GLenum target, GLint level,
 	    else if (img->TexFormat->LuminanceBits > 0)
 		*params = img->TexFormat->LuminanceBits;
 	    else /* luminance probably stored as rgb texture */
-		*params = MIN2(img->TexFormat->RedBits, img->TexFormat->GreenBits);
+		*params = mesa_min2(img->TexFormat->RedBits, img->TexFormat->GreenBits);
 	    break;
 	case GL_TEXTURE_INDEX_SIZE_EXT:
 	    if (img->_BaseFormat == GL_COLOR_INDEX)
@@ -1768,10 +1768,10 @@ _mesa_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
 	    *params = enum_to_float(obj->WrapR);
 	    break;
 	case GL_TEXTURE_BORDER_COLOR:
-	    params[0] = CLAMP(obj->BorderColor[0], 0.0F, 1.0F);
-	    params[1] = CLAMP(obj->BorderColor[1], 0.0F, 1.0F);
-	    params[2] = CLAMP(obj->BorderColor[2], 0.0F, 1.0F);
-	    params[3] = CLAMP(obj->BorderColor[3], 0.0F, 1.0F);
+	    params[0] = mesa_clamp(obj->BorderColor[0], 0.0F, 1.0F);
+	    params[1] = mesa_clamp(obj->BorderColor[1], 0.0F, 1.0F);
+	    params[2] = mesa_clamp(obj->BorderColor[2], 0.0F, 1.0F);
+	    params[3] = mesa_clamp(obj->BorderColor[3], 0.0F, 1.0F);
 	    break;
 	case GL_TEXTURE_RESIDENT: {
 	    GLboolean resident;
@@ -1903,14 +1903,14 @@ _mesa_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
 	    return;
 	case GL_TEXTURE_BORDER_COLOR: {
 	    GLfloat b[4];
-	    b[0] = CLAMP(obj->BorderColor[0], 0.0F, 1.0F);
-	    b[1] = CLAMP(obj->BorderColor[1], 0.0F, 1.0F);
-	    b[2] = CLAMP(obj->BorderColor[2], 0.0F, 1.0F);
-	    b[3] = CLAMP(obj->BorderColor[3], 0.0F, 1.0F);
-	    params[0] = FLOAT_TO_INT(b[0]);
-	    params[1] = FLOAT_TO_INT(b[1]);
-	    params[2] = FLOAT_TO_INT(b[2]);
-	    params[3] = FLOAT_TO_INT(b[3]);
+	    b[0] = mesa_clamp(obj->BorderColor[0], 0.0F, 1.0F);
+	    b[1] = mesa_clamp(obj->BorderColor[1], 0.0F, 1.0F);
+	    b[2] = mesa_clamp(obj->BorderColor[2], 0.0F, 1.0F);
+	    b[3] = mesa_clamp(obj->BorderColor[3], 0.0F, 1.0F);
+	    params[0] = mesa_float_to_int(b[0]);
+	    params[1] = mesa_float_to_int(b[1]);
+	    params[2] = mesa_float_to_int(b[2]);
+	    params[3] = mesa_float_to_int(b[3]);
 	}
 	return;
 	case GL_TEXTURE_RESIDENT: {
@@ -1923,7 +1923,7 @@ _mesa_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
 	}
 	return;
 	case GL_TEXTURE_PRIORITY:
-	    *params = FLOAT_TO_INT(obj->Priority);
+	    *params = mesa_float_to_int(obj->Priority);
 	    return;
 	case GL_TEXTURE_MIN_LOD:
 	    *params = static_cast<GLint>(obj->MinLod);
@@ -1957,7 +1957,7 @@ _mesa_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
 	    break;
 	case GL_SHADOW_AMBIENT_SGIX: /* aka GL_TEXTURE_COMPARE_FAIL_VALUE_ARB */
 	    if (ctx->Extensions.SGIX_shadow_ambient) {
-		*params = static_cast<GLint>(FLOAT_TO_INT(obj->ShadowAmbient));
+		*params = static_cast<GLint>(mesa_float_to_int(obj->ShadowAmbient));
 		return;
 	    }
 	    break;
@@ -2058,10 +2058,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		texUnit->GenModeS = mode;
 		texUnit->_GenBitS = bits;
 	    } else if (pname==GL_OBJECT_PLANE) {
-		if (TEST_EQ_4V(texUnit->ObjectPlaneS, params))
+		if (mesa_test_eq_4v(texUnit->ObjectPlaneS, params))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->ObjectPlaneS, params);
+		mesa_copy4fv(texUnit->ObjectPlaneS, params);
 	    } else if (pname==GL_EYE_PLANE) {
 		GLfloat tmp[4];
 		/* Transform plane equation by the inverse modelview matrix */
@@ -2069,10 +2069,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		    ctx->ModelviewMatrixStack.Top->analyse();
 		}
 		_mesa_transform_vector(tmp, params, ctx->ModelviewMatrixStack.Top->inv);
-		if (TEST_EQ_4V(texUnit->EyePlaneS, tmp))
+		if (mesa_test_eq_4v(texUnit->EyePlaneS, tmp))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->EyePlaneS, tmp);
+		mesa_copy4fv(texUnit->EyePlaneS, tmp);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexGenfv(pname)");
 		return;
@@ -2108,10 +2108,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		texUnit->GenModeT = mode;
 		texUnit->_GenBitT = bitt;
 	    } else if (pname==GL_OBJECT_PLANE) {
-		if (TEST_EQ_4V(texUnit->ObjectPlaneT, params))
+		if (mesa_test_eq_4v(texUnit->ObjectPlaneT, params))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->ObjectPlaneT, params);
+		mesa_copy4fv(texUnit->ObjectPlaneT, params);
 	    } else if (pname==GL_EYE_PLANE) {
 		GLfloat tmp[4];
 		/* Transform plane equation by the inverse modelview matrix */
@@ -2119,10 +2119,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		    ctx->ModelviewMatrixStack.Top->analyse();
 		}
 		_mesa_transform_vector(tmp, params, ctx->ModelviewMatrixStack.Top->inv);
-		if (TEST_EQ_4V(texUnit->EyePlaneT, tmp))
+		if (mesa_test_eq_4v(texUnit->EyePlaneT, tmp))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->EyePlaneT, tmp);
+		mesa_copy4fv(texUnit->EyePlaneT, tmp);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexGenfv(pname)");
 		return;
@@ -2155,10 +2155,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		texUnit->GenModeR = mode;
 		texUnit->_GenBitR = bitr;
 	    } else if (pname==GL_OBJECT_PLANE) {
-		if (TEST_EQ_4V(texUnit->ObjectPlaneR, params))
+		if (mesa_test_eq_4v(texUnit->ObjectPlaneR, params))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->ObjectPlaneR, params);
+		mesa_copy4fv(texUnit->ObjectPlaneR, params);
 	    } else if (pname==GL_EYE_PLANE) {
 		GLfloat tmp[4];
 		/* Transform plane equation by the inverse modelview matrix */
@@ -2166,10 +2166,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		    ctx->ModelviewMatrixStack.Top->analyse();
 		}
 		_mesa_transform_vector(tmp, params, ctx->ModelviewMatrixStack.Top->inv);
-		if (TEST_EQ_4V(texUnit->EyePlaneR, tmp))
+		if (mesa_test_eq_4v(texUnit->EyePlaneR, tmp))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->EyePlaneR, tmp);
+		mesa_copy4fv(texUnit->EyePlaneR, tmp);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexGenfv(pname)");
 		return;
@@ -2196,10 +2196,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		texUnit->GenModeQ = mode;
 		texUnit->_GenBitQ = bitq;
 	    } else if (pname==GL_OBJECT_PLANE) {
-		if (TEST_EQ_4V(texUnit->ObjectPlaneQ, params))
+		if (mesa_test_eq_4v(texUnit->ObjectPlaneQ, params))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->ObjectPlaneQ, params);
+		mesa_copy4fv(texUnit->ObjectPlaneQ, params);
 	    } else if (pname==GL_EYE_PLANE) {
 		GLfloat tmp[4];
 		/* Transform plane equation by the inverse modelview matrix */
@@ -2207,10 +2207,10 @@ _mesa_TexGenfv(GLenum coord, GLenum pname, const GLfloat *params)
 		    ctx->ModelviewMatrixStack.Top->analyse();
 		}
 		_mesa_transform_vector(tmp, params, ctx->ModelviewMatrixStack.Top->inv);
-		if (TEST_EQ_4V(texUnit->EyePlaneQ, tmp))
+		if (mesa_test_eq_4v(texUnit->EyePlaneQ, tmp))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_TEXTURE);
-		COPY_4FV(texUnit->EyePlaneQ, tmp);
+		mesa_copy4fv(texUnit->EyePlaneQ, tmp);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexGenfv(pname)");
 		return;
@@ -2305,9 +2305,9 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_double(texUnit->GenModeS);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneS);
+		mesa_copy4v(params, texUnit->ObjectPlaneS);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneS);
+		mesa_copy4v(params, texUnit->EyePlaneS);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGendv(pname)");
 		return;
@@ -2317,9 +2317,9 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_double(texUnit->GenModeT);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneT);
+		mesa_copy4v(params, texUnit->ObjectPlaneT);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneT);
+		mesa_copy4v(params, texUnit->EyePlaneT);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGendv(pname)");
 		return;
@@ -2329,9 +2329,9 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_double(texUnit->GenModeR);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneR);
+		mesa_copy4v(params, texUnit->ObjectPlaneR);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneR);
+		mesa_copy4v(params, texUnit->EyePlaneR);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGendv(pname)");
 		return;
@@ -2341,9 +2341,9 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_double(texUnit->GenModeQ);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneQ);
+		mesa_copy4v(params, texUnit->ObjectPlaneQ);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneQ);
+		mesa_copy4v(params, texUnit->EyePlaneQ);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGendv(pname)");
 		return;
@@ -2376,9 +2376,9 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_float(texUnit->GenModeS);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneS);
+		mesa_copy4v(params, texUnit->ObjectPlaneS);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneS);
+		mesa_copy4v(params, texUnit->EyePlaneS);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGenfv(pname)");
 		return;
@@ -2388,9 +2388,9 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_float(texUnit->GenModeT);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneT);
+		mesa_copy4v(params, texUnit->ObjectPlaneT);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneT);
+		mesa_copy4v(params, texUnit->EyePlaneT);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGenfv(pname)");
 		return;
@@ -2400,9 +2400,9 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_float(texUnit->GenModeR);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneR);
+		mesa_copy4v(params, texUnit->ObjectPlaneR);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneR);
+		mesa_copy4v(params, texUnit->EyePlaneR);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGenfv(pname)");
 		return;
@@ -2412,9 +2412,9 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    if (pname==GL_TEXTURE_GEN_MODE) {
 		params[0] = enum_to_float(texUnit->GenModeQ);
 	    } else if (pname==GL_OBJECT_PLANE) {
-		COPY_4V(params, texUnit->ObjectPlaneQ);
+		mesa_copy4v(params, texUnit->ObjectPlaneQ);
 	    } else if (pname==GL_EYE_PLANE) {
-		COPY_4V(params, texUnit->EyePlaneQ);
+		mesa_copy4v(params, texUnit->EyePlaneQ);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glGetTexGenfv(pname)");
 		return;
@@ -2897,7 +2897,7 @@ init_texture_unit(GLcontext *ctx, GLuint unit)
     struct gl_texture_unit *texUnit = &ctx->Texture.Unit[unit];
 
     texUnit->EnvMode = GL_MODULATE;
-    ASSIGN_4V(texUnit->EnvColor, 0.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->EnvColor, 0.0, 0.0, 0.0, 0.0);
 
     texUnit->Combine = default_combine_state;
     texUnit->_EnvMode = default_combine_state;
@@ -2914,14 +2914,14 @@ init_texture_unit(GLcontext *ctx, GLuint unit)
     texUnit->_GenBitQ = TEXGEN_EYE_LINEAR;
 
     /* Yes, these plane coefficients are correct! */
-    ASSIGN_4V(texUnit->ObjectPlaneS, 1.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->ObjectPlaneT, 0.0, 1.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->ObjectPlaneR, 0.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->ObjectPlaneQ, 0.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->EyePlaneS, 1.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->EyePlaneT, 0.0, 1.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->EyePlaneR, 0.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(texUnit->EyePlaneQ, 0.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->ObjectPlaneS, 1.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->ObjectPlaneT, 0.0, 1.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->ObjectPlaneR, 0.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->ObjectPlaneQ, 0.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->EyePlaneS, 1.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->EyePlaneT, 0.0, 1.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->EyePlaneR, 0.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(texUnit->EyePlaneQ, 0.0, 0.0, 0.0, 0.0);
 
     /* initialize current texture object ptrs to the shared default objects */
     _mesa_reference_texobj(&texUnit->Current1D, ctx->Shared->Default1D);

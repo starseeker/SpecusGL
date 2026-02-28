@@ -116,7 +116,7 @@ _slang_simplify(slang_operation *oper,
     }
 
     /* examine children */
-    n = MIN2(static_cast<GLuint>(oper->children.size()), 4);
+    n = mesa_min2(static_cast<GLuint>(oper->children.size()), 4);
     for (i = 0; i < n; i++) {
 	isFloat[i] = (oper->children[i].type == SLANG_OPER_LITERAL_FLOAT ||
 		      oper->children[i].type == SLANG_OPER_LITERAL_INT);
@@ -178,7 +178,7 @@ _slang_simplify(slang_operation *oper,
 		oper->type = SLANG_OPER_LITERAL_FLOAT;
 		return;
 	    case SLANG_OPER_PLUS:
-		COPY_4V(oper->literal, oper->children[0].literal);
+		mesa_copy4v(oper->literal, oper->children[0].literal);
 		oper->literal_size = oper->children[0].literal_size;
 		slang_operation_destruct(oper);
 		oper->type = SLANG_OPER_LITERAL_FLOAT;

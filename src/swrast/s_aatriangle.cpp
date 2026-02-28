@@ -133,7 +133,7 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     const GLfloat z = (plane[3] + plane[0] * x + plane[1] * y) / -plane[2];
 #if CHAN_TYPE == GL_FLOAT
-    return CLAMP(z, 0.0F, CHAN_MAXF);
+    return mesa_clamp(z, 0.0F, CHAN_MAXF);
 #else
     if (z < 0)
 	return 0;
@@ -401,9 +401,9 @@ compute_lambda(GLcontext *ctx,
     dsdy = FABSF(dsdy);
     dtdx = FABSF(dtdx);
     dtdy = FABSF(dtdy);
-    maxU = MAX2(dsdx, dsdy) * texWidth;
-    maxV = MAX2(dtdx, dtdy) * texHeight;
-    rho = MAX2(maxU, maxV);
+    maxU = mesa_max2(dsdx, dsdy) * texWidth;
+    maxV = mesa_max2(dtdx, dtdy) * texHeight;
+    rho = mesa_max2(maxU, maxV);
     lambda = LOG2(rho);
     return lambda;
 }

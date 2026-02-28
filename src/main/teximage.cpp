@@ -1133,7 +1133,7 @@ gl_texture_image::init_fields(GLcontext *ctx, GLenum target,
 	DepthLog2 = 0;
     else
 	DepthLog2 = logbase2(Depth2);
-    MaxLog2 = MAX2(WidthLog2, HeightLog2);
+    MaxLog2 = mesa_max2(WidthLog2, HeightLog2);
     IsCompressed = GL_FALSE;
     CompressedSize = 0;
 

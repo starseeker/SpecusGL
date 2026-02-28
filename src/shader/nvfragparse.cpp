@@ -473,7 +473,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 	if (!constant) {
 	    RETURN_ERROR1("Undefined symbol");
 	} else {
-	    COPY_4V(number, constant);
+	    mesa_copy4v(number, constant);
 	    return true;
 	}
     }
@@ -494,8 +494,8 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
     GLfloat values[4];
     /* "{" was already consumed */
 
-    ASSIGN_4V(vec, 0.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(values, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(vec, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(values, 0.0, 0.0, 0.0, 1.0);
 
     if (!Parse_ScalarConstant(parseState, values))  /* X */
 	return false;
@@ -626,13 +626,13 @@ Parse_SwizzleSuffix(const GLubyte *token, GLuint swizzle[4])
     if (token[1] == 0) {
 	/* single letter swizzle (scalar) */
 	if (token[0] == 'x')
-	    ASSIGN_4V(swizzle, 0, 0, 0, 0);
+	    mesa_assign4v(swizzle, 0, 0, 0, 0);
 	else if (token[0] == 'y')
-	    ASSIGN_4V(swizzle, 1, 1, 1, 1);
+	    mesa_assign4v(swizzle, 1, 1, 1, 1);
 	else if (token[0] == 'z')
-	    ASSIGN_4V(swizzle, 2, 2, 2, 2);
+	    mesa_assign4v(swizzle, 2, 2, 2, 2);
 	else if (token[0] == 'w')
-	    ASSIGN_4V(swizzle, 3, 3, 3, 3);
+	    mesa_assign4v(swizzle, 3, 3, 3, 3);
 	else
 	    return false;
     } else {

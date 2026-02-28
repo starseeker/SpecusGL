@@ -345,7 +345,7 @@ draw_index_pixels(GLcontext *ctx, GLint x, GLint y,
      */
     skipPixels = 0;
     while (skipPixels < width) {
-	const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
+	const GLint spanWidth = mesa_min2(width - skipPixels, MAX_WIDTH);
 	assert(spanWidth <= MAX_WIDTH);
 	for (row = 0; row < height; row++) {
 	    const GLvoid *source = _mesa_image_address2d(unpack, pixels,
@@ -389,7 +389,7 @@ draw_stencil_pixels(GLcontext *ctx, GLint x, GLint y,
     skipPixels = 0;
     while (skipPixels < width) {
 	const GLint spanX = x + skipPixels;
-	const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
+	const GLint spanWidth = mesa_min2(width - skipPixels, MAX_WIDTH);
 	GLint row;
 	for (row = 0; row < height; row++) {
 	    const GLint spanY = y + row;
@@ -492,7 +492,7 @@ draw_depth_pixels(GLcontext *ctx, GLint x, GLint y,
 
 	/* in case width > MAX_WIDTH do the copy in chunks */
 	while (skipPixels < width) {
-	    const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
+	    const GLint spanWidth = mesa_min2(width - skipPixels, MAX_WIDTH);
 	    GLint row;
 	    assert(span.end <= MAX_WIDTH);
 	    for (row = 0; row < height; row++) {
@@ -624,7 +624,7 @@ draw_rgba_pixels(GLcontext *ctx, GLint x, GLint y,
 
 	/* if the span is wider than MAX_WIDTH we have to do it in chunks */
 	while (skipPixels < width) {
-	    const GLint spanWidth = MIN2(width - skipPixels, MAX_WIDTH);
+	    const GLint spanWidth = mesa_min2(width - skipPixels, MAX_WIDTH);
 	    const GLubyte *source
 		= static_cast<const GLubyte *>(_mesa_image_address2d(unpack, pixels,
 			width, height, format,

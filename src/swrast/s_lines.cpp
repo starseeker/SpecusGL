@@ -66,7 +66,7 @@ draw_wide_line(GLcontext *ctx, SWspan *span, bool xMajor)
 
     assert(span->end < MAX_WIDTH);
 
-    width = static_cast<GLint>(CLAMP(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH));
+    width = static_cast<GLint>(mesa_clamp(ctx->Line._Width, MIN_LINE_WIDTH, MAX_LINE_WIDTH));
 
     if (width & 1)
 	start = width / 2;

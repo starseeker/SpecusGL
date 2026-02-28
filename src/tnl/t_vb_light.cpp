@@ -91,7 +91,7 @@ update_materials(GLcontext *ctx, struct light_stage_data *store)
 
     for (i = 0 ; i < store->mat_count ; i++) {
 	/* update the material */
-	COPY_CLEAN_4V(store->mat[i].current, store->mat[i].size, store->mat[i].ptr);
+	mesa_copy_clean_4v(store->mat[i].current, store->mat[i].size, store->mat[i].ptr);
 	/* increment src vertex color pointer */
 	STRIDE_F(store->mat[i].ptr, store->mat[i].stride);
     }

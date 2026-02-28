@@ -610,10 +610,10 @@ pop_texture_group(GLcontext *ctx, struct texture_state *texstate)
 	/* Eye plane done differently to avoid re-transformation */
 	{
 	    struct gl_texture_unit *destUnit = &ctx->Texture.Unit[u];
-	    COPY_4FV(destUnit->EyePlaneS, unit->EyePlaneS);
-	    COPY_4FV(destUnit->EyePlaneT, unit->EyePlaneT);
-	    COPY_4FV(destUnit->EyePlaneR, unit->EyePlaneR);
-	    COPY_4FV(destUnit->EyePlaneQ, unit->EyePlaneQ);
+	    mesa_copy4fv(destUnit->EyePlaneS, unit->EyePlaneS);
+	    mesa_copy4fv(destUnit->EyePlaneT, unit->EyePlaneT);
+	    mesa_copy4fv(destUnit->EyePlaneR, unit->EyePlaneR);
+	    mesa_copy4fv(destUnit->EyePlaneQ, unit->EyePlaneQ);
 	    if (ctx->Driver.TexGen) {
 		ctx->Driver.TexGen(ctx, GL_S, GL_EYE_PLANE, unit->EyePlaneS);
 		ctx->Driver.TexGen(ctx, GL_T, GL_EYE_PLANE, unit->EyePlaneT);
@@ -1096,7 +1096,7 @@ _mesa_PopAttrib(void)
 		for (i = 0; i < MAX_CLIP_PLANES; i++) {
 		    const GLuint mask = 1 << 1;
 		    const GLfloat *eyePlane = xform->EyeUserPlane[i];
-		    COPY_4V(ctx->Transform.EyeUserPlane[i], eyePlane);
+		    mesa_copy4v(ctx->Transform.EyeUserPlane[i], eyePlane);
 		    if (xform->ClipPlanesEnabled & mask) {
 			_mesa_set_enable(ctx, GL_CLIP_PLANE0 + i, GL_TRUE);
 		    } else {

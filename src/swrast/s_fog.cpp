@@ -47,16 +47,16 @@ _swrast_z_to_fogfactor(GLcontext *ctx, GLfloat z)
 	    else
 		d = 1.0F / (ctx->Fog.End - ctx->Fog.Start);
 	    f = (ctx->Fog.End - z) * d;
-	    return CLAMP(f, 0.0F, 1.0F);
+	    return mesa_clamp(f, 0.0F, 1.0F);
 	case GL_EXP:
 	    d = ctx->Fog.Density;
 	    f = EXPF(-d * z);
-	    f = CLAMP(f, 0.0F, 1.0F);
+	    f = mesa_clamp(f, 0.0F, 1.0F);
 	    return f;
 	case GL_EXP2:
 	    d = ctx->Fog.Density;
 	    f = EXPF(-(d * d * z * z));
-	    f = CLAMP(f, 0.0F, 1.0F);
+	    f = mesa_clamp(f, 0.0F, 1.0F);
 	    return f;
 	default:
 	    _mesa_problem(ctx, "Bad fog mode in _swrast_z_to_fogfactor");
@@ -80,7 +80,7 @@ do {									\
    for (i = 0; i < span->end; i++) {					\
       GLfloat f, oneMinusF;						\
       COMPUTE_F;							\
-      f = CLAMP(f, 0.0F, 1.0F);						\
+      f = mesa_clamp(f, 0.0F, 1.0F);						\
       oneMinusF = 1.0F - f;						\
       rgba[i][RCOMP] = (TYPE) (f * rgba[i][RCOMP] + oneMinusF * rFog);	\
       rgba[i][GCOMP] = (TYPE) (f * rgba[i][GCOMP] + oneMinusF * gFog);	\
@@ -285,7 +285,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 		GLuint i;
 		for (i = 0; i < span->end; i++) {
 		    GLfloat f = (fogEnd - fogCoord / w) * fogScale;
-		    f = CLAMP(f, 0.0F, 1.0F);
+		    f = mesa_clamp(f, 0.0F, 1.0F);
 		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;
@@ -301,7 +301,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 		GLuint i;
 		for (i = 0; i < span->end; i++) {
 		    GLfloat f = EXPF(density * fogCoord / w);
-		    f = CLAMP(f, 0.0F, 1.0F);
+		    f = mesa_clamp(f, 0.0F, 1.0F);
 		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;
@@ -325,7 +325,7 @@ _swrast_fog_ci_span(const GLcontext *ctx, SWspan *span)
 			tmp = FLT_MIN_10_EXP;
 #endif
 		    f = EXPF(tmp);
-		    f = CLAMP(f, 0.0F, 1.0F);
+		    f = mesa_clamp(f, 0.0F, 1.0F);
 		    index[i] = static_cast<GLuint>((static_cast<GLfloat>(index[i]) + (1.0F - f) * fogIndex));
 		    fogCoord += fogStep;
 		    w += wStep;

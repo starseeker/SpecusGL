@@ -1620,10 +1620,10 @@ save_Fogiv(GLenum pname, const GLint *params)
 	    p[0] = static_cast<GLfloat>(*params);
 	    break;
 	case GL_FOG_COLOR:
-	    p[0] = INT_TO_FLOAT(params[0]);
-	    p[1] = INT_TO_FLOAT(params[1]);
-	    p[2] = INT_TO_FLOAT(params[2]);
-	    p[3] = INT_TO_FLOAT(params[3]);
+	    p[0] = mesa_int_to_float(params[0]);
+	    p[1] = mesa_int_to_float(params[1]);
+	    p[2] = mesa_int_to_float(params[2]);
+	    p[3] = mesa_int_to_float(params[3]);
 	    break;
 	default:
 	    /* Error will be caught later in gl_Fogfv */
@@ -1818,10 +1818,10 @@ save_Lightiv(GLenum light, GLenum pname, const GLint *params)
 	case GL_AMBIENT:
 	case GL_DIFFUSE:
 	case GL_SPECULAR:
-	    fparam[0] = INT_TO_FLOAT(params[0]);
-	    fparam[1] = INT_TO_FLOAT(params[1]);
-	    fparam[2] = INT_TO_FLOAT(params[2]);
-	    fparam[3] = INT_TO_FLOAT(params[3]);
+	    fparam[0] = mesa_int_to_float(params[0]);
+	    fparam[1] = mesa_int_to_float(params[1]);
+	    fparam[2] = mesa_int_to_float(params[2]);
+	    fparam[3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_POSITION:
 	    fparam[0] = static_cast<GLfloat>(params[0]);
@@ -1893,10 +1893,10 @@ save_LightModeliv(GLenum pname, const GLint *params)
     GLfloat fparam[4] = {0.0};
     switch (pname) {
 	case GL_LIGHT_MODEL_AMBIENT:
-	    fparam[0] = INT_TO_FLOAT(params[0]);
-	    fparam[1] = INT_TO_FLOAT(params[1]);
-	    fparam[2] = INT_TO_FLOAT(params[2]);
-	    fparam[3] = INT_TO_FLOAT(params[3]);
+	    fparam[0] = mesa_int_to_float(params[0]);
+	    fparam[1] = mesa_int_to_float(params[1]);
+	    fparam[2] = mesa_int_to_float(params[2]);
+	    fparam[3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	case GL_LIGHT_MODEL_TWO_SIDE:
@@ -2349,7 +2349,7 @@ save_PixelMapuiv(GLenum map, GLint mapsize, const GLuint *values)
 	}
     } else {
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = UINT_TO_FLOAT(values[i]);
+	    fvalues[i] = mesa_uint_to_float(values[i]);
 	}
     }
     save_PixelMapfv(map, mapsize, fvalues);
@@ -2367,7 +2367,7 @@ save_PixelMapusv(GLenum map, GLint mapsize, const GLushort *values)
 	}
     } else {
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = USHORT_TO_FLOAT(values[i]);
+	    fvalues[i] = mesa_ushort_to_float(values[i]);
 	}
     }
     save_PixelMapfv(map, mapsize, fvalues);
@@ -3132,10 +3132,10 @@ save_TexEnviv(GLenum target, GLenum pname, const GLint * param)
 {
     GLfloat p[4];
     if (pname == GL_TEXTURE_ENV_COLOR) {
-	p[0] = INT_TO_FLOAT(param[0]);
-	p[1] = INT_TO_FLOAT(param[1]);
-	p[2] = INT_TO_FLOAT(param[2]);
-	p[3] = INT_TO_FLOAT(param[3]);
+	p[0] = mesa_int_to_float(param[0]);
+	p[1] = mesa_int_to_float(param[1]);
+	p[2] = mesa_int_to_float(param[2]);
+	p[3] = mesa_int_to_float(param[3]);
     } else {
 	p[0] = static_cast<GLfloat>(param[0]);
 	p[1] = p[2] = p[3] = 0.0F;
@@ -4571,7 +4571,7 @@ save_Attr1fNV(GLenum attr, GLfloat x)
 
     assert(attr < MAX_VERTEX_PROGRAM_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 1;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, 0, 0, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, 0, 0, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib1fNV(ctx->Exec, (attr, x));
@@ -4593,7 +4593,7 @@ save_Attr2fNV(GLenum attr, GLfloat x, GLfloat y)
 
     assert(attr < MAX_VERTEX_PROGRAM_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 2;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, 0, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, 0, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib2fNV(ctx->Exec, (attr, x, y));
@@ -4616,7 +4616,7 @@ save_Attr3fNV(GLenum attr, GLfloat x, GLfloat y, GLfloat z)
 
     assert(attr < MAX_VERTEX_PROGRAM_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 3;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, z, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, z, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib3fNV(ctx->Exec, (attr, x, y, z));
@@ -4640,7 +4640,7 @@ save_Attr4fNV(GLenum attr, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 
     assert(attr < MAX_VERTEX_PROGRAM_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 4;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, z, w);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, z, w);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib4fNV(ctx->Exec, (attr, x, y, z, w));
@@ -4662,7 +4662,7 @@ save_Attr1fARB(GLenum attr, GLfloat x)
 
     assert(attr < MAX_VERTEX_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 1;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, 0, 0, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, 0, 0, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib1fARB(ctx->Exec, (attr, x));
@@ -4684,7 +4684,7 @@ save_Attr2fARB(GLenum attr, GLfloat x, GLfloat y)
 
     assert(attr < MAX_VERTEX_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 2;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, 0, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, 0, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib2fARB(ctx->Exec, (attr, x, y));
@@ -4707,7 +4707,7 @@ save_Attr3fARB(GLenum attr, GLfloat x, GLfloat y, GLfloat z)
 
     assert(attr < MAX_VERTEX_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 3;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, z, 1);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, z, 1);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib3fARB(ctx->Exec, (attr, x, y, z));
@@ -4731,7 +4731,7 @@ save_Attr4fARB(GLenum attr, GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 
     assert(attr < MAX_VERTEX_ATTRIBS);
     ctx->ListState.ActiveAttribSize[attr] = 4;
-    ASSIGN_4V(ctx->ListState.CurrentAttrib[attr], x, y, z, w);
+    mesa_assign4v(ctx->ListState.CurrentAttrib[attr], x, y, z, w);
 
     if (ctx->ExecuteFlag) {
 	CALL_VertexAttrib4fARB(ctx->Exec, (attr, x, y, z, w));
@@ -4883,7 +4883,7 @@ save_Materialfv(GLenum face, GLenum pname, const GLfloat * param)
 	for (i = 0; i < MAT_ATTRIB_MAX; i++)
 	    if (bitmask & (1 << i)) {
 		ctx->ListState.ActiveMaterialSize[i] = args;
-		COPY_SZ_4V(ctx->ListState.CurrentMaterial[i], args, param);
+		mesa_copy_sz_4v(ctx->ListState.CurrentMaterial[i], args, param);
 	    }
     }
 
@@ -6152,7 +6152,7 @@ execute_list(GLcontext *ctx, GLuint list)
 #endif
 		case OPCODE_DRAW_BUFFERS_ARB: {
 		    GLenum buffers[MAX_DRAW_BUFFERS];
-		    GLint i, count = MIN2(n[1].i, MAX_DRAW_BUFFERS);
+		    GLint i, count = mesa_min2(n[1].i, MAX_DRAW_BUFFERS);
 		    for (i = 0; i < count; i++)
 			buffers[i] = n[2 + i].e;
 		    CALL_DrawBuffersARB(ctx->Exec, (n[1].i, buffers));

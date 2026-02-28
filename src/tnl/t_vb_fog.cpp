@@ -116,7 +116,7 @@ compute_fog_blend_factors(GLcontext *ctx, GLvector4f *out, const GLvector4f *in)
 	    for (i = 0 ; i < n ; i++, STRIDE_F(v, stride)) {
 		const GLfloat z = *v;
 		GLfloat f = (end - z) * d;
-		data[i][0] = CLAMP(f, 0.0F, 1.0F);
+		data[i][0] = mesa_clamp(f, 0.0F, 1.0F);
 	    }
 	    break;
 	case GL_EXP:

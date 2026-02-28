@@ -345,14 +345,14 @@ osmesa_context::apply_fxaa()
    GLfloat *P = static_cast<GLfloat *>(osmesa->rowaddr[Y]) + 4 * (X)
 #define INC_PIXEL_PTR(P) P += 4
 #define STORE_PIXEL(DST, X, Y, VALUE) \
-   DST[0] = MAX2((VALUE[RCOMP]), 0.0F); \
-   DST[1] = MAX2((VALUE[GCOMP]), 0.0F); \
-   DST[2] = MAX2((VALUE[BCOMP]), 0.0F); \
-   DST[3] = CLAMP((VALUE[ACOMP]), 0.0F, 1.0F)
+   DST[0] = mesa_max2((VALUE[RCOMP]), 0.0F); \
+   DST[1] = mesa_max2((VALUE[GCOMP]), 0.0F); \
+   DST[2] = mesa_max2((VALUE[BCOMP]), 0.0F); \
+   DST[3] = mesa_clamp((VALUE[ACOMP]), 0.0F, 1.0F)
 #define STORE_PIXEL_RGB(DST, X, Y, VALUE) \
-   DST[0] = MAX2((VALUE[RCOMP]), 0.0F); \
-   DST[1] = MAX2((VALUE[GCOMP]), 0.0F); \
-   DST[2] = MAX2((VALUE[BCOMP]), 0.0F); \
+   DST[0] = mesa_max2((VALUE[RCOMP]), 0.0F); \
+   DST[1] = mesa_max2((VALUE[GCOMP]), 0.0F); \
+   DST[2] = mesa_max2((VALUE[BCOMP]), 0.0F); \
    DST[3] = 1.0F
 #define FETCH_PIXEL(DST, SRC) \
    DST[RCOMP] = SRC[0];  \

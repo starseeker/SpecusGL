@@ -58,7 +58,7 @@ _mesa_PointSize(GLfloat size)
     FLUSH_VERTICES(ctx, _NEW_POINT);
     ctx->Point.Size = size;
     /* _Size is only used for non-attenuated path */
-    ctx->Point._Size = CLAMP(ctx->Point.Size,
+    ctx->Point._Size = mesa_clamp(ctx->Point.Size,
 			     ctx->Point.MinSize,
 			     ctx->Point.MaxSize);
 
@@ -123,10 +123,10 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
     switch (pname) {
 	case GL_DISTANCE_ATTENUATION_EXT:
 	    if (ctx->Extensions.EXT_point_parameters) {
-		if (TEST_EQ_3V(ctx->Point.Params, params))
+		if (mesa_test_eq_3v(ctx->Point.Params, params))
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_POINT);
-		COPY_3V(ctx->Point.Params, params);
+		mesa_copy3v(ctx->Point.Params, params);
 
 		ctx->Point._Attenuated = (ctx->Point.Params[0] != 1.0 ||
 					  ctx->Point.Params[1] != 0.0 ||
@@ -154,7 +154,7 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
 		FLUSH_VERTICES(ctx, _NEW_POINT);
 		ctx->Point.MinSize = params[0];
 		/* re-clamp _Size */
-		ctx->Point._Size = CLAMP(ctx->Point.Size,
+		ctx->Point._Size = mesa_clamp(ctx->Point.Size,
 					 ctx->Point.MinSize,
 					 ctx->Point.MaxSize);
 	    } else {
@@ -175,7 +175,7 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
 		FLUSH_VERTICES(ctx, _NEW_POINT);
 		ctx->Point.MaxSize = params[0];
 		/* re-clamp _Size */
-		ctx->Point._Size = CLAMP(ctx->Point.Size,
+		ctx->Point._Size = mesa_clamp(ctx->Point.Size,
 					 ctx->Point.MinSize,
 					 ctx->Point.MaxSize);
 	    } else {
@@ -272,7 +272,7 @@ _mesa_PointParameterfvEXT(GLenum pname, const GLfloat *params)
 void
 _mesa_init_point(GLcontext *ctx)
 {
-    ctx->Point.MaxSize = MAX2(ctx->Const.MaxPointSize, ctx->Const.MaxPointSizeAA);
+    ctx->Point.MaxSize = mesa_max2(ctx->Const.MaxPointSize, ctx->Const.MaxPointSizeAA);
 }
 
 /*

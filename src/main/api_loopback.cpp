@@ -81,9 +81,9 @@
 static void GLAPIENTRY
 loopback_Color3b_f(GLbyte red, GLbyte green, GLbyte blue)
 {
-    COLORF(BYTE_TO_FLOAT(red),
-	   BYTE_TO_FLOAT(green),
-	   BYTE_TO_FLOAT(blue),
+    COLORF(mesa_byte_to_float(red),
+	   mesa_byte_to_float(green),
+	   mesa_byte_to_float(blue),
 	   1.0);
 }
 
@@ -96,29 +96,29 @@ loopback_Color3d_f(GLdouble red, GLdouble green, GLdouble blue)
 static void GLAPIENTRY
 loopback_Color3i_f(GLint red, GLint green, GLint blue)
 {
-    COLORF(INT_TO_FLOAT(red), INT_TO_FLOAT(green),
-	   INT_TO_FLOAT(blue), 1.0);
+    COLORF(mesa_int_to_float(red), mesa_int_to_float(green),
+	   mesa_int_to_float(blue), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3s_f(GLshort red, GLshort green, GLshort blue)
 {
-    COLORF(SHORT_TO_FLOAT(red), SHORT_TO_FLOAT(green),
-	   SHORT_TO_FLOAT(blue), 1.0);
+    COLORF(mesa_short_to_float(red), mesa_short_to_float(green),
+	   mesa_short_to_float(blue), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3ui_f(GLuint red, GLuint green, GLuint blue)
 {
-    COLORF(UINT_TO_FLOAT(red), UINT_TO_FLOAT(green),
-	   UINT_TO_FLOAT(blue), 1.0);
+    COLORF(mesa_uint_to_float(red), mesa_uint_to_float(green),
+	   mesa_uint_to_float(blue), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3us_f(GLushort red, GLushort green, GLushort blue)
 {
-    COLORF(USHORT_TO_FLOAT(red), USHORT_TO_FLOAT(green),
-	   USHORT_TO_FLOAT(blue), 1.0);
+    COLORF(mesa_ushort_to_float(red), mesa_ushort_to_float(green),
+	   mesa_ushort_to_float(blue), 1.0);
 }
 
 static void GLAPIENTRY
@@ -132,8 +132,8 @@ loopback_Color3ub_f(GLubyte red, GLubyte green, GLubyte blue)
 static void GLAPIENTRY
 loopback_Color3bv_f(const GLbyte *v)
 {
-    COLORF(BYTE_TO_FLOAT(v[0]), BYTE_TO_FLOAT(v[1]),
-	   BYTE_TO_FLOAT(v[2]), 1.0);
+    COLORF(mesa_byte_to_float(v[0]), mesa_byte_to_float(v[1]),
+	   mesa_byte_to_float(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
@@ -145,29 +145,29 @@ loopback_Color3dv_f(const GLdouble *v)
 static void GLAPIENTRY
 loopback_Color3iv_f(const GLint *v)
 {
-    COLORF(INT_TO_FLOAT(v[0]), INT_TO_FLOAT(v[1]),
-	   INT_TO_FLOAT(v[2]), 1.0);
+    COLORF(mesa_int_to_float(v[0]), mesa_int_to_float(v[1]),
+	   mesa_int_to_float(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3sv_f(const GLshort *v)
 {
-    COLORF(SHORT_TO_FLOAT(v[0]), SHORT_TO_FLOAT(v[1]),
-	   SHORT_TO_FLOAT(v[2]), 1.0);
+    COLORF(mesa_short_to_float(v[0]), mesa_short_to_float(v[1]),
+	   mesa_short_to_float(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3uiv_f(const GLuint *v)
 {
-    COLORF(UINT_TO_FLOAT(v[0]), UINT_TO_FLOAT(v[1]),
-	   UINT_TO_FLOAT(v[2]), 1.0);
+    COLORF(mesa_uint_to_float(v[0]), mesa_uint_to_float(v[1]),
+	   mesa_uint_to_float(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
 loopback_Color3usv_f(const GLushort *v)
 {
-    COLORF(USHORT_TO_FLOAT(v[0]), USHORT_TO_FLOAT(v[1]),
-	   USHORT_TO_FLOAT(v[2]), 1.0);
+    COLORF(mesa_ushort_to_float(v[0]), mesa_ushort_to_float(v[1]),
+	   mesa_ushort_to_float(v[2]), 1.0);
 }
 
 static void GLAPIENTRY
@@ -182,8 +182,8 @@ static void GLAPIENTRY
 loopback_Color4b_f(GLbyte red, GLbyte green, GLbyte blue,
 		   GLbyte alpha)
 {
-    COLORF(BYTE_TO_FLOAT(red), BYTE_TO_FLOAT(green),
-	   BYTE_TO_FLOAT(blue), BYTE_TO_FLOAT(alpha));
+    COLORF(mesa_byte_to_float(red), mesa_byte_to_float(green),
+	   mesa_byte_to_float(blue), mesa_byte_to_float(alpha));
 }
 
 static void GLAPIENTRY
@@ -196,30 +196,30 @@ loopback_Color4d_f(GLdouble red, GLdouble green, GLdouble blue,
 static void GLAPIENTRY
 loopback_Color4i_f(GLint red, GLint green, GLint blue, GLint alpha)
 {
-    COLORF(INT_TO_FLOAT(red), INT_TO_FLOAT(green),
-	   INT_TO_FLOAT(blue), INT_TO_FLOAT(alpha));
+    COLORF(mesa_int_to_float(red), mesa_int_to_float(green),
+	   mesa_int_to_float(blue), mesa_int_to_float(alpha));
 }
 
 static void GLAPIENTRY
 loopback_Color4s_f(GLshort red, GLshort green, GLshort blue,
 		   GLshort alpha)
 {
-    COLORF(SHORT_TO_FLOAT(red), SHORT_TO_FLOAT(green),
-	   SHORT_TO_FLOAT(blue), SHORT_TO_FLOAT(alpha));
+    COLORF(mesa_short_to_float(red), mesa_short_to_float(green),
+	   mesa_short_to_float(blue), mesa_short_to_float(alpha));
 }
 
 static void GLAPIENTRY
 loopback_Color4ui_f(GLuint red, GLuint green, GLuint blue, GLuint alpha)
 {
-    COLORF(UINT_TO_FLOAT(red), UINT_TO_FLOAT(green),
-	   UINT_TO_FLOAT(blue), UINT_TO_FLOAT(alpha));
+    COLORF(mesa_uint_to_float(red), mesa_uint_to_float(green),
+	   mesa_uint_to_float(blue), mesa_uint_to_float(alpha));
 }
 
 static void GLAPIENTRY
 loopback_Color4us_f(GLushort red, GLushort green, GLushort blue, GLushort alpha)
 {
-    COLORF(USHORT_TO_FLOAT(red), USHORT_TO_FLOAT(green),
-	   USHORT_TO_FLOAT(blue), USHORT_TO_FLOAT(alpha));
+    COLORF(mesa_ushort_to_float(red), mesa_ushort_to_float(green),
+	   mesa_ushort_to_float(blue), mesa_ushort_to_float(alpha));
 }
 
 static void GLAPIENTRY
@@ -233,16 +233,16 @@ loopback_Color4ub_f(GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha)
 static void GLAPIENTRY
 loopback_Color4iv_f(const GLint *v)
 {
-    COLORF(INT_TO_FLOAT(v[0]), INT_TO_FLOAT(v[1]),
-	   INT_TO_FLOAT(v[2]), INT_TO_FLOAT(v[3]));
+    COLORF(mesa_int_to_float(v[0]), mesa_int_to_float(v[1]),
+	   mesa_int_to_float(v[2]), mesa_int_to_float(v[3]));
 }
 
 
 static void GLAPIENTRY
 loopback_Color4bv_f(const GLbyte *v)
 {
-    COLORF(BYTE_TO_FLOAT(v[0]), BYTE_TO_FLOAT(v[1]),
-	   BYTE_TO_FLOAT(v[2]), BYTE_TO_FLOAT(v[3]));
+    COLORF(mesa_byte_to_float(v[0]), mesa_byte_to_float(v[1]),
+	   mesa_byte_to_float(v[2]), mesa_byte_to_float(v[3]));
 }
 
 static void GLAPIENTRY
@@ -255,23 +255,23 @@ loopback_Color4dv_f(const GLdouble *v)
 static void GLAPIENTRY
 loopback_Color4sv_f(const GLshort *v)
 {
-    COLORF(SHORT_TO_FLOAT(v[0]), SHORT_TO_FLOAT(v[1]),
-	   SHORT_TO_FLOAT(v[2]), SHORT_TO_FLOAT(v[3]));
+    COLORF(mesa_short_to_float(v[0]), mesa_short_to_float(v[1]),
+	   mesa_short_to_float(v[2]), mesa_short_to_float(v[3]));
 }
 
 
 static void GLAPIENTRY
 loopback_Color4uiv_f(const GLuint *v)
 {
-    COLORF(UINT_TO_FLOAT(v[0]), UINT_TO_FLOAT(v[1]),
-	   UINT_TO_FLOAT(v[2]), UINT_TO_FLOAT(v[3]));
+    COLORF(mesa_uint_to_float(v[0]), mesa_uint_to_float(v[1]),
+	   mesa_uint_to_float(v[2]), mesa_uint_to_float(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_Color4usv_f(const GLushort *v)
 {
-    COLORF(USHORT_TO_FLOAT(v[0]), USHORT_TO_FLOAT(v[1]),
-	   USHORT_TO_FLOAT(v[2]), USHORT_TO_FLOAT(v[3]));
+    COLORF(mesa_ushort_to_float(v[0]), mesa_ushort_to_float(v[1]),
+	   mesa_ushort_to_float(v[2]), mesa_ushort_to_float(v[3]));
 }
 
 static void GLAPIENTRY
@@ -354,7 +354,7 @@ loopback_EdgeFlagv(const GLboolean *flag)
 static void GLAPIENTRY
 loopback_Normal3b(GLbyte nx, GLbyte ny, GLbyte nz)
 {
-    NORMAL(BYTE_TO_FLOAT(nx), BYTE_TO_FLOAT(ny), BYTE_TO_FLOAT(nz));
+    NORMAL(mesa_byte_to_float(nx), mesa_byte_to_float(ny), mesa_byte_to_float(nz));
 }
 
 static void GLAPIENTRY
@@ -366,19 +366,19 @@ loopback_Normal3d(GLdouble nx, GLdouble ny, GLdouble nz)
 static void GLAPIENTRY
 loopback_Normal3i(GLint nx, GLint ny, GLint nz)
 {
-    NORMAL(INT_TO_FLOAT(nx), INT_TO_FLOAT(ny), INT_TO_FLOAT(nz));
+    NORMAL(mesa_int_to_float(nx), mesa_int_to_float(ny), mesa_int_to_float(nz));
 }
 
 static void GLAPIENTRY
 loopback_Normal3s(GLshort nx, GLshort ny, GLshort nz)
 {
-    NORMAL(SHORT_TO_FLOAT(nx), SHORT_TO_FLOAT(ny), SHORT_TO_FLOAT(nz));
+    NORMAL(mesa_short_to_float(nx), mesa_short_to_float(ny), mesa_short_to_float(nz));
 }
 
 static void GLAPIENTRY
 loopback_Normal3bv(const GLbyte *v)
 {
-    NORMAL(BYTE_TO_FLOAT(v[0]), BYTE_TO_FLOAT(v[1]), BYTE_TO_FLOAT(v[2]));
+    NORMAL(mesa_byte_to_float(v[0]), mesa_byte_to_float(v[1]), mesa_byte_to_float(v[2]));
 }
 
 static void GLAPIENTRY
@@ -390,13 +390,13 @@ loopback_Normal3dv(const GLdouble *v)
 static void GLAPIENTRY
 loopback_Normal3iv(const GLint *v)
 {
-    NORMAL(INT_TO_FLOAT(v[0]), INT_TO_FLOAT(v[1]), INT_TO_FLOAT(v[2]));
+    NORMAL(mesa_int_to_float(v[0]), mesa_int_to_float(v[1]), mesa_int_to_float(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_Normal3sv(const GLshort *v)
 {
-    NORMAL(SHORT_TO_FLOAT(v[0]), SHORT_TO_FLOAT(v[1]), SHORT_TO_FLOAT(v[2]));
+    NORMAL(mesa_short_to_float(v[0]), mesa_short_to_float(v[1]), mesa_short_to_float(v[2]));
 }
 
 static void GLAPIENTRY
@@ -865,10 +865,10 @@ loopback_Materialiv(GLenum face, GLenum pname, const GLint *params)
 	case GL_SPECULAR:
 	case GL_EMISSION:
 	case GL_AMBIENT_AND_DIFFUSE:
-	    fparam[0] = INT_TO_FLOAT(params[0]);
-	    fparam[1] = INT_TO_FLOAT(params[1]);
-	    fparam[2] = INT_TO_FLOAT(params[2]);
-	    fparam[3] = INT_TO_FLOAT(params[3]);
+	    fparam[0] = mesa_int_to_float(params[0]);
+	    fparam[1] = mesa_int_to_float(params[1]);
+	    fparam[2] = mesa_int_to_float(params[2]);
+	    fparam[3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_SHININESS:
 	    fparam[0] = static_cast<GLfloat>(params[0]);
@@ -930,9 +930,9 @@ loopback_Rectsv(const GLshort *v1, const GLshort *v2)
 static void GLAPIENTRY
 loopback_SecondaryColor3bEXT_f(GLbyte red, GLbyte green, GLbyte blue)
 {
-    SECONDARYCOLORF(BYTE_TO_FLOAT(red),
-		    BYTE_TO_FLOAT(green),
-		    BYTE_TO_FLOAT(blue));
+    SECONDARYCOLORF(mesa_byte_to_float(red),
+		    mesa_byte_to_float(green),
+		    mesa_byte_to_float(blue));
 }
 
 static void GLAPIENTRY
@@ -944,33 +944,33 @@ loopback_SecondaryColor3dEXT_f(GLdouble red, GLdouble green, GLdouble blue)
 static void GLAPIENTRY
 loopback_SecondaryColor3iEXT_f(GLint red, GLint green, GLint blue)
 {
-    SECONDARYCOLORF(INT_TO_FLOAT(red),
-		    INT_TO_FLOAT(green),
-		    INT_TO_FLOAT(blue));
+    SECONDARYCOLORF(mesa_int_to_float(red),
+		    mesa_int_to_float(green),
+		    mesa_int_to_float(blue));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3sEXT_f(GLshort red, GLshort green, GLshort blue)
 {
-    SECONDARYCOLORF(SHORT_TO_FLOAT(red),
-		    SHORT_TO_FLOAT(green),
-		    SHORT_TO_FLOAT(blue));
+    SECONDARYCOLORF(mesa_short_to_float(red),
+		    mesa_short_to_float(green),
+		    mesa_short_to_float(blue));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3uiEXT_f(GLuint red, GLuint green, GLuint blue)
 {
-    SECONDARYCOLORF(UINT_TO_FLOAT(red),
-		    UINT_TO_FLOAT(green),
-		    UINT_TO_FLOAT(blue));
+    SECONDARYCOLORF(mesa_uint_to_float(red),
+		    mesa_uint_to_float(green),
+		    mesa_uint_to_float(blue));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3usEXT_f(GLushort red, GLushort green, GLushort blue)
 {
-    SECONDARYCOLORF(USHORT_TO_FLOAT(red),
-		    USHORT_TO_FLOAT(green),
-		    USHORT_TO_FLOAT(blue));
+    SECONDARYCOLORF(mesa_ushort_to_float(red),
+		    mesa_ushort_to_float(green),
+		    mesa_ushort_to_float(blue));
 }
 
 static void GLAPIENTRY
@@ -984,9 +984,9 @@ loopback_SecondaryColor3ubEXT_f(GLubyte red, GLubyte green, GLubyte blue)
 static void GLAPIENTRY
 loopback_SecondaryColor3bvEXT_f(const GLbyte *v)
 {
-    SECONDARYCOLORF(BYTE_TO_FLOAT(v[0]),
-		    BYTE_TO_FLOAT(v[1]),
-		    BYTE_TO_FLOAT(v[2]));
+    SECONDARYCOLORF(mesa_byte_to_float(v[0]),
+		    mesa_byte_to_float(v[1]),
+		    mesa_byte_to_float(v[2]));
 }
 
 static void GLAPIENTRY
@@ -997,33 +997,33 @@ loopback_SecondaryColor3dvEXT_f(const GLdouble *v)
 static void GLAPIENTRY
 loopback_SecondaryColor3ivEXT_f(const GLint *v)
 {
-    SECONDARYCOLORF(INT_TO_FLOAT(v[0]),
-		    INT_TO_FLOAT(v[1]),
-		    INT_TO_FLOAT(v[2]));
+    SECONDARYCOLORF(mesa_int_to_float(v[0]),
+		    mesa_int_to_float(v[1]),
+		    mesa_int_to_float(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3svEXT_f(const GLshort *v)
 {
-    SECONDARYCOLORF(SHORT_TO_FLOAT(v[0]),
-		    SHORT_TO_FLOAT(v[1]),
-		    SHORT_TO_FLOAT(v[2]));
+    SECONDARYCOLORF(mesa_short_to_float(v[0]),
+		    mesa_short_to_float(v[1]),
+		    mesa_short_to_float(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3uivEXT_f(const GLuint *v)
 {
-    SECONDARYCOLORF(UINT_TO_FLOAT(v[0]),
-		    UINT_TO_FLOAT(v[1]),
-		    UINT_TO_FLOAT(v[2]));
+    SECONDARYCOLORF(mesa_uint_to_float(v[0]),
+		    mesa_uint_to_float(v[1]),
+		    mesa_uint_to_float(v[2]));
 }
 
 static void GLAPIENTRY
 loopback_SecondaryColor3usvEXT_f(const GLushort *v)
 {
-    SECONDARYCOLORF(USHORT_TO_FLOAT(v[0]),
-		    USHORT_TO_FLOAT(v[1]),
-		    USHORT_TO_FLOAT(v[2]));
+    SECONDARYCOLORF(mesa_ushort_to_float(v[0]),
+		    mesa_ushort_to_float(v[1]),
+		    mesa_ushort_to_float(v[2]));
 }
 
 static void GLAPIENTRY
@@ -1392,22 +1392,22 @@ loopback_VertexAttrib4uivARB(GLuint index, const GLuint * v)
 static void GLAPIENTRY
 loopback_VertexAttrib4NbvARB(GLuint index, const GLbyte * v)
 {
-    ATTRIB4ARB(index, BYTE_TO_FLOAT(v[0]), BYTE_TO_FLOAT(v[1]),
-	       BYTE_TO_FLOAT(v[2]), BYTE_TO_FLOAT(v[3]));
+    ATTRIB4ARB(index, mesa_byte_to_float(v[0]), mesa_byte_to_float(v[1]),
+	       mesa_byte_to_float(v[2]), mesa_byte_to_float(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4NsvARB(GLuint index, const GLshort * v)
 {
-    ATTRIB4ARB(index, SHORT_TO_FLOAT(v[0]), SHORT_TO_FLOAT(v[1]),
-	       SHORT_TO_FLOAT(v[2]), SHORT_TO_FLOAT(v[3]));
+    ATTRIB4ARB(index, mesa_short_to_float(v[0]), mesa_short_to_float(v[1]),
+	       mesa_short_to_float(v[2]), mesa_short_to_float(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4NivARB(GLuint index, const GLint * v)
 {
-    ATTRIB4ARB(index, INT_TO_FLOAT(v[0]), INT_TO_FLOAT(v[1]),
-	       INT_TO_FLOAT(v[2]), INT_TO_FLOAT(v[3]));
+    ATTRIB4ARB(index, mesa_int_to_float(v[0]), mesa_int_to_float(v[1]),
+	       mesa_int_to_float(v[2]), mesa_int_to_float(v[3]));
 }
 
 static void GLAPIENTRY
@@ -1427,15 +1427,15 @@ loopback_VertexAttrib4NubvARB(GLuint index, const GLubyte * v)
 static void GLAPIENTRY
 loopback_VertexAttrib4NusvARB(GLuint index, const GLushort * v)
 {
-    ATTRIB4ARB(index, USHORT_TO_FLOAT(v[0]), USHORT_TO_FLOAT(v[1]),
-	       USHORT_TO_FLOAT(v[2]), USHORT_TO_FLOAT(v[3]));
+    ATTRIB4ARB(index, mesa_ushort_to_float(v[0]), mesa_ushort_to_float(v[1]),
+	       mesa_ushort_to_float(v[2]), mesa_ushort_to_float(v[3]));
 }
 
 static void GLAPIENTRY
 loopback_VertexAttrib4NuivARB(GLuint index, const GLuint * v)
 {
-    ATTRIB4ARB(index, UINT_TO_FLOAT(v[0]), UINT_TO_FLOAT(v[1]),
-	       UINT_TO_FLOAT(v[2]), UINT_TO_FLOAT(v[3]));
+    ATTRIB4ARB(index, mesa_uint_to_float(v[0]), mesa_uint_to_float(v[1]),
+	       mesa_uint_to_float(v[2]), mesa_uint_to_float(v[3]));
 }
 
 

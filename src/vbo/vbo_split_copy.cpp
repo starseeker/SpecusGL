@@ -482,9 +482,9 @@ static void replay_init(struct copy_context *copy)
 
     /* Allocate an output element list:
      */
-    copy->dstelt_size = MIN2(65536,
+    copy->dstelt_size = mesa_min2(65536,
 			     copy->ib->count * 2 + 3);
-    copy->dstelt_size = MIN2(copy->dstelt_size,
+    copy->dstelt_size = mesa_min2(copy->dstelt_size,
 			     copy->limits->max_indices);
     copy->dstelt.resize(copy->dstelt_size);
     copy->dstelt_nr = 0;

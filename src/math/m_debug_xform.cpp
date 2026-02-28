@@ -226,8 +226,8 @@ static int test_transform_function(transform_func func, int psize,
     }
 
     for (i = 0 ; i < TEST_COUNT ; i++) {
-	ASSIGN_4V(d[i], 0.0, 0.0, 0.0, 1.0);
-	ASSIGN_4V(s[i], 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(d[i], 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(s[i], 0.0, 0.0, 0.0, 1.0);
 	for (j = 0 ; j < psize ; j++)
 	    s[i][j] = rnd();
     }

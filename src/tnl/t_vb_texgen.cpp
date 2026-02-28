@@ -117,9 +117,9 @@ static void build_m3(GLfloat f[][3], GLfloat m[],
 
     for (i=0; i<count; i++,STRIDE_F(coord,stride),STRIDE_F(norm,normal->stride)) {
 	GLfloat u[3], two_nu, fx, fy, fz;
-	COPY_3V(u, coord);
-	NORMALIZE_3FV(u);
-	two_nu = 2.0F * DOT3(norm,u);
+	mesa_copy3v(u, coord);
+	mesa_normalize3fv(u);
+	two_nu = 2.0F * mesa_dot3(norm,u);
 	fx = f[i][0] = u[0] - norm[0] * two_nu;
 	fy = f[i][1] = u[1] - norm[1] * two_nu;
 	fz = f[i][2] = u[2] - norm[2] * two_nu;
@@ -145,10 +145,10 @@ static void build_m2(GLfloat f[][3], GLfloat m[],
 
     for (i=0; i<count; i++,STRIDE_F(coord,stride),STRIDE_F(norm,normal->stride)) {
 	GLfloat u[3], two_nu, fx, fy, fz;
-	COPY_2V(u, coord);
+	mesa_copy2v(u, coord);
 	u[2] = 0;
-	NORMALIZE_3FV(u);
-	two_nu = 2.0F * DOT3(norm,u);
+	mesa_normalize3fv(u);
+	two_nu = 2.0F * mesa_dot3(norm,u);
 	fx = f[i][0] = u[0] - norm[0] * two_nu;
 	fy = f[i][1] = u[1] - norm[1] * two_nu;
 	fz = f[i][2] = u[2] - norm[2] * two_nu;
@@ -194,9 +194,9 @@ static void build_f3(GLfloat *f,
 
     for (i=0; i<count; i++) {
 	GLfloat u[3], two_nu;
-	COPY_3V(u, coord);
-	NORMALIZE_3FV(u);
-	two_nu = 2.0F * DOT3(norm,u);
+	mesa_copy3v(u, coord);
+	mesa_normalize3fv(u);
+	two_nu = 2.0F * mesa_dot3(norm,u);
 	f[0] = u[0] - norm[0] * two_nu;
 	f[1] = u[1] - norm[1] * two_nu;
 	f[2] = u[2] - norm[2] * two_nu;
@@ -221,10 +221,10 @@ static void build_f2(GLfloat *f,
     for (i=0; i<count; i++) {
 
 	GLfloat u[3], two_nu;
-	COPY_2V(u, coord);
+	mesa_copy2v(u, coord);
 	u[2] = 0;
-	NORMALIZE_3FV(u);
-	two_nu = 2.0F * DOT3(norm,u);
+	mesa_normalize3fv(u);
+	two_nu = 2.0F * mesa_dot3(norm,u);
 	f[0] = u[0] - norm[0] * two_nu;
 	f[1] = u[1] - norm[1] * two_nu;
 	f[2] = u[2] - norm[2] * two_nu;
@@ -271,7 +271,7 @@ static void texgen_reflection_map_nv(GLcontext *ctx,
 
     out->flags |= (in->flags & VEC_SIZE_FLAGS) | VEC_SIZE_3;
     out->count = VB->Count;
-    out->size = MAX2(in->size, 3);
+    out->size = mesa_max2(in->size, 3);
     if (in->size == 4)
 	_mesa_copy_tab[0x8](out, in);
 }
@@ -300,7 +300,7 @@ static void texgen_normal_map_nv(GLcontext *ctx,
 
     out->flags |= (in->flags & VEC_SIZE_FLAGS) | VEC_SIZE_3;
     out->count = count;
-    out->size = MAX2(in->size, 3);
+    out->size = mesa_max2(in->size, 3);
     if (in->size == 4)
 	_mesa_copy_tab[0x8](out, in);
 }
@@ -324,7 +324,7 @@ static void texgen_sphere_map(GLcontext *ctx,
 				    VB->AttribPtr[_TNL_ATTRIB_NORMAL],
 				    VB->EyePtr);
 
-    out->size = MAX2(in->size,2);
+    out->size = mesa_max2(in->size,2);
 
     for (i=0; i<count; i++) {
 	texcoord[i][0] = f[i][0] * m[i] + 0.5F;
@@ -364,7 +364,7 @@ static void texgen(GLcontext *ctx,
     }
 
 
-    out->size = MAX2(in->size, store->TexgenSize[unit]);
+    out->size = mesa_max2(in->size, store->TexgenSize[unit]);
     out->flags |= (in->flags & VEC_SIZE_FLAGS) | texUnit->TexGenEnabled;
     out->count = count;
 

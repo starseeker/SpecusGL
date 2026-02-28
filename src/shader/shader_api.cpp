@@ -800,7 +800,7 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 		  + _mesa_num_parameters_of_type(shProg->Uniforms, PROGRAM_SAMPLER);
 	    break;
 	case GL_ACTIVE_UNIFORM_MAX_LENGTH:
-	    *params = MAX2(
+	    *params = mesa_max2(
 			  _mesa_longest_parameter_name(shProg->Uniforms, PROGRAM_UNIFORM),
 			  _mesa_longest_parameter_name(shProg->Uniforms, PROGRAM_SAMPLER));
 	    if (*params > 0)

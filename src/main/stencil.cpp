@@ -156,7 +156,7 @@ _mesa_StencilFuncSeparateATI(GLenum frontfunc, GLenum backfunc, GLint ref, GLuin
 	return;
     }
 
-    ref = CLAMP(ref, 0, stencilMax);
+    ref = mesa_clamp(ref, 0, stencilMax);
 
     /* set both front and back state */
     if (ctx->Stencil.Function[0] == frontfunc &&
@@ -205,7 +205,7 @@ _mesa_StencilFunc(GLenum func, GLint ref, GLuint mask)
 	return;
     }
 
-    ref = CLAMP(ref, 0, stencilMax);
+    ref = mesa_clamp(ref, 0, stencilMax);
 
     if (ctx->Extensions.EXT_stencil_two_side) {
 	/* only set active face state */
@@ -455,7 +455,7 @@ _mesa_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
 	return;
     }
 
-    ref = CLAMP(ref, 0, stencilMax);
+    ref = mesa_clamp(ref, 0, stencilMax);
 
     FLUSH_VERTICES(ctx, _NEW_STENCIL);
 

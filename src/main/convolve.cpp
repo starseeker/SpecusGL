@@ -360,7 +360,7 @@ _mesa_ConvolutionParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_COLOR:
-	    COPY_4V(ctx->Pixel.ConvolutionBorderColor[c], params);
+	    mesa_copy4v(ctx->Pixel.ConvolutionBorderColor[c], params);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
 	    if (params[0] == static_cast<GLfloat>(GL_REDUCE) ||
@@ -373,10 +373,10 @@ _mesa_ConvolutionParameterfv(GLenum target, GLenum pname, const GLfloat *params)
 	    }
 	    break;
 	case GL_CONVOLUTION_FILTER_SCALE:
-	    COPY_4V(ctx->Pixel.ConvolutionFilterScale[c], params);
+	    mesa_copy4v(ctx->Pixel.ConvolutionFilterScale[c], params);
 	    break;
 	case GL_CONVOLUTION_FILTER_BIAS:
-	    COPY_4V(ctx->Pixel.ConvolutionFilterBias[c], params);
+	    mesa_copy4v(ctx->Pixel.ConvolutionFilterBias[c], params);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glConvolutionParameterfv(pname)");
@@ -453,10 +453,10 @@ _mesa_ConvolutionParameteriv(GLenum target, GLenum pname, const GLint *params)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_COLOR:
-	    ctx->Pixel.ConvolutionBorderColor[c][0] = INT_TO_FLOAT(params[0]);
-	    ctx->Pixel.ConvolutionBorderColor[c][1] = INT_TO_FLOAT(params[1]);
-	    ctx->Pixel.ConvolutionBorderColor[c][2] = INT_TO_FLOAT(params[2]);
-	    ctx->Pixel.ConvolutionBorderColor[c][3] = INT_TO_FLOAT(params[3]);
+	    ctx->Pixel.ConvolutionBorderColor[c][0] = mesa_int_to_float(params[0]);
+	    ctx->Pixel.ConvolutionBorderColor[c][1] = mesa_int_to_float(params[1]);
+	    ctx->Pixel.ConvolutionBorderColor[c][2] = mesa_int_to_float(params[2]);
+	    ctx->Pixel.ConvolutionBorderColor[c][3] = mesa_int_to_float(params[3]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
 	    if (params[0] == static_cast<GLint>(GL_REDUCE) ||
@@ -469,7 +469,7 @@ _mesa_ConvolutionParameteriv(GLenum target, GLenum pname, const GLint *params)
 	    }
 	    break;
 	case GL_CONVOLUTION_FILTER_SCALE:
-	    /* COPY_4V(ctx->Pixel.ConvolutionFilterScale[c], params); */
+	    /* mesa_copy4v(ctx->Pixel.ConvolutionFilterScale[c], params); */
 	    /* need cast to prevent compiler warnings */
 	    ctx->Pixel.ConvolutionFilterScale[c][0] = static_cast<GLfloat>(params[0]);
 	    ctx->Pixel.ConvolutionFilterScale[c][1] = static_cast<GLfloat>(params[1]);
@@ -477,7 +477,7 @@ _mesa_ConvolutionParameteriv(GLenum target, GLenum pname, const GLint *params)
 	    ctx->Pixel.ConvolutionFilterScale[c][3] = static_cast<GLfloat>(params[3]);
 	    break;
 	case GL_CONVOLUTION_FILTER_BIAS:
-	    /* COPY_4V(ctx->Pixel.ConvolutionFilterBias[c], params); */
+	    /* mesa_copy4v(ctx->Pixel.ConvolutionFilterBias[c], params); */
 	    /* need cast to prevent compiler warnings */
 	    ctx->Pixel.ConvolutionFilterBias[c][0] = static_cast<GLfloat>(params[0]);
 	    ctx->Pixel.ConvolutionFilterBias[c][1] = static_cast<GLfloat>(params[1]);
@@ -658,16 +658,16 @@ _mesa_GetConvolutionParameterfv(GLenum target, GLenum pname, GLfloat *params)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_COLOR:
-	    COPY_4V(params, ctx->Pixel.ConvolutionBorderColor[c]);
+	    mesa_copy4v(params, ctx->Pixel.ConvolutionBorderColor[c]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
 	    *params = static_cast<GLfloat>(ctx->Pixel.ConvolutionBorderMode[c]);
 	    break;
 	case GL_CONVOLUTION_FILTER_SCALE:
-	    COPY_4V(params, ctx->Pixel.ConvolutionFilterScale[c]);
+	    mesa_copy4v(params, ctx->Pixel.ConvolutionFilterScale[c]);
 	    break;
 	case GL_CONVOLUTION_FILTER_BIAS:
-	    COPY_4V(params, ctx->Pixel.ConvolutionFilterBias[c]);
+	    mesa_copy4v(params, ctx->Pixel.ConvolutionFilterBias[c]);
 	    break;
 	case GL_CONVOLUTION_FORMAT:
 	    *params = static_cast<GLfloat>(conv->Format);
@@ -719,10 +719,10 @@ _mesa_GetConvolutionParameteriv(GLenum target, GLenum pname, GLint *params)
 
     switch (pname) {
 	case GL_CONVOLUTION_BORDER_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Pixel.ConvolutionBorderColor[c][0]);
-	    params[1] = FLOAT_TO_INT(ctx->Pixel.ConvolutionBorderColor[c][1]);
-	    params[2] = FLOAT_TO_INT(ctx->Pixel.ConvolutionBorderColor[c][2]);
-	    params[3] = FLOAT_TO_INT(ctx->Pixel.ConvolutionBorderColor[c][3]);
+	    params[0] = mesa_float_to_int(ctx->Pixel.ConvolutionBorderColor[c][0]);
+	    params[1] = mesa_float_to_int(ctx->Pixel.ConvolutionBorderColor[c][1]);
+	    params[2] = mesa_float_to_int(ctx->Pixel.ConvolutionBorderColor[c][2]);
+	    params[3] = mesa_float_to_int(ctx->Pixel.ConvolutionBorderColor[c][3]);
 	    break;
 	case GL_CONVOLUTION_BORDER_MODE:
 	    *params = static_cast<GLint>(ctx->Pixel.ConvolutionBorderMode[c]);
@@ -1383,7 +1383,7 @@ _mesa_convolve_1d_image(const GLcontext *ctx, GLsizei *width,
 			       ctx->Convolution1D.Width,
 			       (const GLfloat(*)[4]) ctx->Convolution1D.Filter,
 			       (GLfloat(*)[4]) dstImage);
-	    *width = *width - (MAX2(ctx->Convolution1D.Width, 1) - 1);
+	    *width = *width - (mesa_max2(ctx->Convolution1D.Width, 1) - 1);
 	    break;
 	case GL_CONSTANT_BORDER:
 	    convolve_1d_constant(*width, (const GLfloat(*)[4]) srcImage,
@@ -1416,8 +1416,8 @@ _mesa_convolve_2d_image(const GLcontext *ctx, GLsizei *width, GLsizei *height,
 			       ctx->Convolution2D.Height,
 			       (const GLfloat(*)[4]) ctx->Convolution2D.Filter,
 			       (GLfloat(*)[4]) dstImage);
-	    *width = *width - (MAX2(ctx->Convolution2D.Width, 1) - 1);
-	    *height = *height - (MAX2(ctx->Convolution2D.Height, 1) - 1);
+	    *width = *width - (mesa_max2(ctx->Convolution2D.Width, 1) - 1);
+	    *height = *height - (mesa_max2(ctx->Convolution2D.Height, 1) - 1);
 	    break;
 	case GL_CONSTANT_BORDER:
 	    convolve_2d_constant(*width, *height,
@@ -1459,8 +1459,8 @@ _mesa_convolve_sep_image(const GLcontext *ctx,
 				(const GLfloat(*)[4]) rowFilter,
 				(const GLfloat(*)[4]) colFilter,
 				(GLfloat(*)[4]) dstImage);
-	    *width = *width - (MAX2(ctx->Separable2D.Width, 1) - 1);
-	    *height = *height - (MAX2(ctx->Separable2D.Height, 1) - 1);
+	    *width = *width - (mesa_max2(ctx->Separable2D.Width, 1) - 1);
+	    *height = *height - (mesa_max2(ctx->Separable2D.Height, 1) - 1);
 	    break;
 	case GL_CONSTANT_BORDER:
 	    convolve_sep_constant(*width, *height,
@@ -1500,17 +1500,17 @@ _mesa_adjust_image_for_convolution(const GLcontext *ctx, GLuint dimensions,
     if (ctx->Pixel.Convolution1DEnabled
 	&& dimensions == 1
 	&& ctx->Pixel.ConvolutionBorderMode[0] == GL_REDUCE) {
-	*width = *width - (MAX2(ctx->Convolution1D.Width, 1) - 1);
+	*width = *width - (mesa_max2(ctx->Convolution1D.Width, 1) - 1);
     } else if (ctx->Pixel.Convolution2DEnabled
 	       && dimensions > 1
 	       && ctx->Pixel.ConvolutionBorderMode[1] == GL_REDUCE) {
-	*width = *width - (MAX2(ctx->Convolution2D.Width, 1) - 1);
-	*height = *height - (MAX2(ctx->Convolution2D.Height, 1) - 1);
+	*width = *width - (mesa_max2(ctx->Convolution2D.Width, 1) - 1);
+	*height = *height - (mesa_max2(ctx->Convolution2D.Height, 1) - 1);
     } else if (ctx->Pixel.Separable2DEnabled
 	       && dimensions > 1
 	       && ctx->Pixel.ConvolutionBorderMode[2] == GL_REDUCE) {
-	*width = *width - (MAX2(ctx->Separable2D.Width, 1) - 1);
-	*height = *height - (MAX2(ctx->Separable2D.Height, 1) - 1);
+	*width = *width - (mesa_max2(ctx->Separable2D.Width, 1) - 1);
+	*height = *height - (mesa_max2(ctx->Separable2D.Height, 1) - 1);
     }
 }
 

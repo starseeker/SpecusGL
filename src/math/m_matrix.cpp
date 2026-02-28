@@ -1299,9 +1299,9 @@ void GLmatrix::analyse_from_scratch()
 	if ((mask & MASK_NO_2D_SCALE) != MASK_NO_2D_SCALE)
 	    flags |= MAT_FLAG_GENERAL_SCALE;
     } else if ((mask & MASK_2D) == static_cast<GLuint>(MASK_2D)) {
-	GLfloat mm = DOT2(m, m);
-	GLfloat m4m4 = DOT2(m+4,m+4);
-	GLfloat mm4 = DOT2(m,m+4);
+	GLfloat mm = mesa_dot2(m, m);
+	GLfloat m4m4 = mesa_dot2(m+4,m+4);
+	GLfloat mm4 = mesa_dot2(m,m+4);
 
 	type = MATRIX_2D;
 
@@ -1329,10 +1329,10 @@ void GLmatrix::analyse_from_scratch()
 	    flags |= MAT_FLAG_GENERAL_SCALE;
 	}
     } else if ((mask & MASK_3D) == static_cast<GLuint>(MASK_3D)) {
-	GLfloat c1 = DOT3(m,m);
-	GLfloat c2 = DOT3(m+4,m+4);
-	GLfloat c3 = DOT3(m+8,m+8);
-	GLfloat d1 = DOT3(m, m+4);
+	GLfloat c1 = mesa_dot3(m,m);
+	GLfloat c2 = mesa_dot3(m+4,m+4);
+	GLfloat c3 = mesa_dot3(m+8,m+8);
+	GLfloat d1 = mesa_dot3(m, m+4);
 	GLfloat cp[3];
 
 	type = MATRIX_3D;
@@ -1348,9 +1348,9 @@ void GLmatrix::analyse_from_scratch()
 
 	/* Check for rotation */
 	if (SQ(d1) < SQ(1e-6)) {
-	    CROSS3(cp, m, m+4);
-	    SUB_3V(cp, cp, (m+8));
-	    if (LEN_SQUARED_3FV(cp) < SQ(1e-6))
+	    mesa_cross3(cp, m, m+4);
+	    mesa_sub3v(cp, cp, (m+8));
+	    if (mesa_len_sq3fv(cp) < SQ(1e-6))
 		flags |= MAT_FLAG_ROTATION;
 	    else
 		flags |= MAT_FLAG_GENERAL_3D;

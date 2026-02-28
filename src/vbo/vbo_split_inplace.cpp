@@ -173,7 +173,7 @@ static void split_prims(struct split_context *split)
 		GLuint remaining = count - j;
 		struct _mesa_prim *outprim = next_outprim(split);
 
-		nr = MIN2(available, remaining);
+		nr = mesa_min2(available, remaining);
 
 		nr -= (nr - first) % incr;
 

@@ -313,11 +313,11 @@ constexpr int IND = 0;
 		   n->Value[0], n->Value[1], n->Value[2], n->Value[3]);
 	    break;
 	case IR_I_TO_F:
-	    printf("INT_TO_FLOAT\n");
+	    printf("mesa_int_to_float\n");
 	    _slang_print_ir_tree(n->Children[0], indent+3);
 	    break;
 	case IR_F_TO_I:
-	    printf("FLOAT_TO_INT\n");
+	    printf("mesa_float_to_int\n");
 	    _slang_print_ir_tree(n->Children[0], indent+3);
 	    break;
 	case IR_SWIZZLE:

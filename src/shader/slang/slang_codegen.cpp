@@ -508,7 +508,7 @@ new_float_literal(const float v[4], GLuint size)
 {
     slang_ir_node *n = new_node0(IR_FLOAT);
     assert(size <= 4);
-    COPY_4V(n->Value, v);
+    mesa_copy4v(n->Value, v);
     /* allocate a storage object, but compute actual location (Index) later */
     n->Store = _slang_new_ir_storage(PROGRAM_CONSTANT, -1, size);
     return n;
@@ -1848,7 +1848,7 @@ _slang_gen_logical_and(slang_assemble_ctx *A, slang_operation *oper)
     slang_operation_copy(&select->children[0], &oper->children[0]);
     slang_operation_copy(&select->children[1], &oper->children[1]);
     select->children[2].type = SLANG_OPER_LITERAL_BOOL;
-    ASSIGN_4V(select->children[2].literal, 0, 0, 0, 0); /* false */
+    mesa_assign4v(select->children[2].literal, 0, 0, 0, 0); /* false */
     select->children[2].literal_size = 1;
 
     n = _slang_gen_select(A, select);
@@ -1872,7 +1872,7 @@ _slang_gen_logical_or(slang_assemble_ctx *A, slang_operation *oper)
 
     slang_operation_copy(&select->children[0], &oper->children[0]);
     select->children[1].type = SLANG_OPER_LITERAL_BOOL;
-    ASSIGN_4V(select->children[1].literal, 1, 1, 1, 1); /* true */
+    mesa_assign4v(select->children[1].literal, 1, 1, 1, 1); /* true */
     select->children[1].literal_size = 1;
     slang_operation_copy(&select->children[2], &oper->children[1]);
 
@@ -2785,7 +2785,7 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
     } else if (var->type.qualifier == SLANG_QUAL_UNIFORM) {
 	/* Uniform variable */
 	const GLint size = _slang_sizeof_type_specifier(&var->type.specifier)
-			   * MAX2(var->array_len, 1);
+			   * mesa_max2(var->array_len, 1);
 	if (prog) {
 	    /* user-defined uniform */
 	    if (datatype == GL_NONE) {

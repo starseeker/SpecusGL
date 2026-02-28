@@ -139,7 +139,7 @@ fetch_vector4(const struct prog_src_register *source,
 
     if (source->Swizzle == SWIZZLE_NOOP) {
 	/* no swizzling */
-	COPY_4V(result, src);
+	mesa_copy4v(result, src);
     } else {
 	assert(GET_SWZ(source->Swizzle, 0) <= 3);
 	assert(GET_SWZ(source->Swizzle, 1) <= 3);
@@ -224,7 +224,7 @@ fetch_vector4_deriv(GLcontext * ctx,
 	    result[3] = -result[3];
 	}
     } else {
-	ASSIGN_4V(result, 0.0, 0.0, 0.0, 0.0);
+	mesa_assign4v(result, 0.0, 0.0, 0.0, 0.0);
     }
 }
 
@@ -389,10 +389,10 @@ store_vector4(const struct prog_instruction *inst,
 #endif
 
     if (clamp) {
-	clampedValue[0] = CLAMP(value[0], 0.0F, 1.0F);
-	clampedValue[1] = CLAMP(value[1], 0.0F, 1.0F);
-	clampedValue[2] = CLAMP(value[2], 0.0F, 1.0F);
-	clampedValue[3] = CLAMP(value[3], 0.0F, 1.0F);
+	clampedValue[0] = mesa_clamp(value[0], 0.0F, 1.0F);
+	clampedValue[1] = mesa_clamp(value[1], 0.0F, 1.0F);
+	clampedValue[2] = mesa_clamp(value[2], 0.0F, 1.0F);
+	clampedValue[3] = mesa_clamp(value[3], 0.0F, 1.0F);
 	value = clampedValue;
     }
 
@@ -589,7 +589,7 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], b[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		fetch_vector4(&inst->SrcReg[1], machine, b);
-		result[0] = result[1] = result[2] = result[3] = DOT3(a, b);
+		result[0] = result[1] = result[2] = result[3] = mesa_dot3(a, b);
 		store_vector4(inst, machine, result);
 		if (DEBUG_PROG) {
 		    printf("DP3 %g = (%g %g %g) . (%g %g %g)\n",
@@ -601,7 +601,7 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], b[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		fetch_vector4(&inst->SrcReg[1], machine, b);
-		result[0] = result[1] = result[2] = result[3] = DOT4(a, b);
+		result[0] = result[1] = result[2] = result[3] = mesa_dot4(a, b);
 		store_vector4(inst, machine, result);
 		if (DEBUG_PROG) {
 		    printf("DP4 %g = (%g, %g %g %g) . (%g, %g %g %g)\n",
@@ -746,10 +746,10 @@ _mesa_execute_program(GLcontext * ctx,
 		const GLfloat epsilon = 1.0F / 256.0F;      /* from NV VP spec */
 		GLfloat a[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
-		a[0] = MAX2(a[0], 0.0F);
-		a[1] = MAX2(a[1], 0.0F);
+		a[0] = mesa_max2(a[0], 0.0F);
+		a[1] = mesa_max2(a[1], 0.0F);
 		/* XXX ARB version clamps a[3], NV version doesn't */
-		a[3] = CLAMP(a[3], -(128.0F - epsilon), (128.0F - epsilon));
+		a[3] = mesa_clamp(a[3], -(128.0F - epsilon), (128.0F - epsilon));
 		result[0] = 1.0F;
 		result[1] = a[0];
 		/* XXX we could probably just use pow() here */
@@ -838,10 +838,10 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], b[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		fetch_vector4(&inst->SrcReg[1], machine, b);
-		result[0] = MAX2(a[0], b[0]);
-		result[1] = MAX2(a[1], b[1]);
-		result[2] = MAX2(a[2], b[2]);
-		result[3] = MAX2(a[3], b[3]);
+		result[0] = mesa_max2(a[0], b[0]);
+		result[1] = mesa_max2(a[1], b[1]);
+		result[2] = mesa_max2(a[2], b[2]);
+		result[3] = mesa_max2(a[3], b[3]);
 		store_vector4(inst, machine, result);
 		if (DEBUG_PROG) {
 		    printf("MAX (%g %g %g %g) = (%g %g %g %g), (%g %g %g %g)\n",
@@ -854,10 +854,10 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], b[4], result[4];
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		fetch_vector4(&inst->SrcReg[1], machine, b);
-		result[0] = MIN2(a[0], b[0]);
-		result[1] = MIN2(a[1], b[1]);
-		result[2] = MIN2(a[2], b[2]);
-		result[3] = MIN2(a[3], b[3]);
+		result[0] = mesa_min2(a[0], b[0]);
+		result[1] = mesa_min2(a[1], b[1]);
+		result[2] = mesa_min2(a[2], b[2]);
+		result[3] = mesa_min2(a[3], b[3]);
 		store_vector4(inst, machine, result);
 	    }
 	    break;
@@ -945,8 +945,8 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		GLuint usx, usy, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
-		a[0] = CLAMP(a[0], 0.0F, 1.0F);
-		a[1] = CLAMP(a[1], 0.0F, 1.0F);
+		a[0] = mesa_clamp(a[0], 0.0F, 1.0F);
+		a[1] = mesa_clamp(a[1], 0.0F, 1.0F);
 		usx = iround(a[0] * 65535.0F);
 		usy = iround(a[1] * 65535.0F);
 		rawResult[0] = rawResult[1] = rawResult[2] = rawResult[3]
@@ -958,10 +958,10 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		GLuint ubx, uby, ubz, ubw, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
-		a[0] = CLAMP(a[0], -128.0F / 127.0F, 1.0F);
-		a[1] = CLAMP(a[1], -128.0F / 127.0F, 1.0F);
-		a[2] = CLAMP(a[2], -128.0F / 127.0F, 1.0F);
-		a[3] = CLAMP(a[3], -128.0F / 127.0F, 1.0F);
+		a[0] = mesa_clamp(a[0], -128.0F / 127.0F, 1.0F);
+		a[1] = mesa_clamp(a[1], -128.0F / 127.0F, 1.0F);
+		a[2] = mesa_clamp(a[2], -128.0F / 127.0F, 1.0F);
+		a[3] = mesa_clamp(a[3], -128.0F / 127.0F, 1.0F);
 		ubx = iround(127.0F * a[0] + 128.0F);
 		uby = iround(127.0F * a[1] + 128.0F);
 		ubz = iround(127.0F * a[2] + 128.0F);
@@ -975,10 +975,10 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat a[4], result[4];
 		GLuint ubx, uby, ubz, ubw, *rawResult = reinterpret_cast<GLuint *>(result);
 		fetch_vector4(&inst->SrcReg[0], machine, a);
-		a[0] = CLAMP(a[0], 0.0F, 1.0F);
-		a[1] = CLAMP(a[1], 0.0F, 1.0F);
-		a[2] = CLAMP(a[2], 0.0F, 1.0F);
-		a[3] = CLAMP(a[3], 0.0F, 1.0F);
+		a[0] = mesa_clamp(a[0], 0.0F, 1.0F);
+		a[1] = mesa_clamp(a[1], 0.0F, 1.0F);
+		a[2] = mesa_clamp(a[2], 0.0F, 1.0F);
+		a[3] = mesa_clamp(a[3], 0.0F, 1.0F);
 		ubx = iround(255.0F * a[0]);
 		uby = iround(255.0F * a[1]);
 		ubz = iround(255.0F * a[2]);
@@ -1023,8 +1023,8 @@ _mesa_execute_program(GLcontext * ctx,
 		GLfloat axis[4], dir[4], result[4], tmpX, tmpW;
 		fetch_vector4(&inst->SrcReg[0], machine, axis);
 		fetch_vector4(&inst->SrcReg[1], machine, dir);
-		tmpW = DOT3(axis, axis);
-		tmpX = (2.0F * DOT3(axis, dir)) / tmpW;
+		tmpW = mesa_dot3(axis, axis);
+		tmpX = (2.0F * mesa_dot3(axis, dir)) / tmpW;
 		result[0] = tmpX * axis[0] - dir[0];
 		result[1] = tmpX * axis[1] - dir[1];
 		result[2] = tmpX * axis[2] - dir[2];

@@ -205,7 +205,7 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
     assert(dx >= 0);
     assert(dy >= 0);
 
-    numPixels = MAX2(dx, dy);
+    numPixels = mesa_max2(dx, dy);
 
     /*
      * Span setup: compute start and step values for all interpolated values.

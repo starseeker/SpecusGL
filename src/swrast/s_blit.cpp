@@ -114,10 +114,10 @@ blit_nearest(GLcontext *ctx,
     const GLint srcHeight = ABS(srcY1 - srcY0);
     const GLint dstHeight = ABS(dstY1 - dstY0);
 
-    const GLint srcXpos = MIN2(srcX0, srcX1);
-    const GLint srcYpos = MIN2(srcY0, srcY1);
-    const GLint dstXpos = MIN2(dstX0, dstX1);
-    const GLint dstYpos = MIN2(dstY0, dstY1);
+    const GLint srcXpos = mesa_min2(srcX0, srcX1);
+    const GLint srcYpos = mesa_min2(srcY0, srcY1);
+    const GLint dstXpos = mesa_min2(dstX0, dstX1);
+    const GLint dstYpos = mesa_min2(dstY0, dstY1);
 
     const GLboolean invertX = (srcX1 < srcX0) ^ (dstX1 < dstX0);
     const GLboolean invertY = (srcY1 < srcY0) ^ (dstY1 < dstY0);
@@ -318,10 +318,10 @@ blit_linear(GLcontext *ctx,
     const GLint dstHeight = ABS(dstY1 - dstY0);
     const GLfloat dstHeightF = static_cast<GLfloat>(dstHeight);
 
-    const GLint srcXpos = MIN2(srcX0, srcX1);
-    const GLint srcYpos = MIN2(srcY0, srcY1);
-    const GLint dstXpos = MIN2(dstX0, dstX1);
-    const GLint dstYpos = MIN2(dstY0, dstY1);
+    const GLint srcXpos = mesa_min2(srcX0, srcX1);
+    const GLint srcYpos = mesa_min2(srcY0, srcY1);
+    const GLint dstXpos = mesa_min2(dstX0, dstX1);
+    const GLint dstYpos = mesa_min2(dstY0, dstY1);
 
     const GLboolean invertX = (srcX1 < srcX0) ^ (dstX1 < dstX0);
     const GLboolean invertY = (srcY1 < srcY0) ^ (dstY1 < dstY0);

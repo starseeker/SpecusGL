@@ -1253,10 +1253,10 @@ static void FETCH(ci8)(const struct gl_texture_image *texImage,
 #if CHAN_TYPE == GL_UNSIGNED_BYTE
 	COPY_4UBV(texel, texelUB);
 #elif CHAN_TYPE == GL_UNSIGNED_SHORT
-	texel[0] = UBYTE_TO_USHORT(texelUB[0]);
-	texel[1] = UBYTE_TO_USHORT(texelUB[1]);
-	texel[2] = UBYTE_TO_USHORT(texelUB[2]);
-	texel[3] = UBYTE_TO_USHORT(texelUB[3]);
+	texel[0] = mesa_ubyte_to_ushort(texelUB[0]);
+	texel[1] = mesa_ubyte_to_ushort(texelUB[1]);
+	texel[2] = mesa_ubyte_to_ushort(texelUB[2]);
+	texel[3] = mesa_ubyte_to_ushort(texelUB[3]);
 #else
 	texel[0] = UBYTE_TO_FLOAT(texelUB[0]);
 	texel[1] = UBYTE_TO_FLOAT(texelUB[1]);
@@ -1400,9 +1400,9 @@ static void FETCH(ycbcr)(const struct gl_texture_image *texImage,
 	g = static_cast<GLint>((1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
 	b = static_cast<GLint>((1.164 * (y0-16) + 2.018 * (cb-128)));
     }
-    texel[RCOMP] = CLAMP(r, 0, CHAN_MAX);
-    texel[GCOMP] = CLAMP(g, 0, CHAN_MAX);
-    texel[BCOMP] = CLAMP(b, 0, CHAN_MAX);
+    texel[RCOMP] = mesa_clamp(r, 0, CHAN_MAX);
+    texel[GCOMP] = mesa_clamp(g, 0, CHAN_MAX);
+    texel[BCOMP] = mesa_clamp(b, 0, CHAN_MAX);
     texel[ACOMP] = CHAN_MAX;
 }
 
@@ -1446,9 +1446,9 @@ static void FETCH(ycbcr_rev)(const struct gl_texture_image *texImage,
 	g = static_cast<GLint>((1.164 * (y0-16) - 0.813 * (cr-128) - 0.391 * (cb-128)));
 	b = static_cast<GLint>((1.164 * (y0-16) + 2.018 * (cb-128)));
     }
-    texel[RCOMP] = CLAMP(r, 0, CHAN_MAX);
-    texel[GCOMP] = CLAMP(g, 0, CHAN_MAX);
-    texel[BCOMP] = CLAMP(b, 0, CHAN_MAX);
+    texel[RCOMP] = mesa_clamp(r, 0, CHAN_MAX);
+    texel[GCOMP] = mesa_clamp(g, 0, CHAN_MAX);
+    texel[BCOMP] = mesa_clamp(b, 0, CHAN_MAX);
     texel[ACOMP] = CHAN_MAX;
 }
 

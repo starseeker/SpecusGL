@@ -179,7 +179,7 @@ _mesa_GetProgramParameterfvNV(GLenum target, GLuint index,
     if (target == GL_VERTEX_PROGRAM_NV) {
 	if (pname == GL_PROGRAM_PARAMETER_NV) {
 	    if (index < MAX_NV_VERTEX_PROGRAM_PARAMS) {
-		COPY_4V(params, ctx->VertexProgram.Parameters[index]);
+		mesa_copy4v(params, ctx->VertexProgram.Parameters[index]);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_VALUE,
 			    "glGetProgramParameterfvNV(index)");
@@ -211,7 +211,7 @@ _mesa_GetProgramParameterdvNV(GLenum target, GLuint index,
     if (target == GL_VERTEX_PROGRAM_NV) {
 	if (pname == GL_PROGRAM_PARAMETER_NV) {
 	    if (index < MAX_NV_VERTEX_PROGRAM_PARAMS) {
-		COPY_4V(params, ctx->VertexProgram.Parameters[index]);
+		mesa_copy4v(params, ctx->VertexProgram.Parameters[index]);
 	    } else {
 		_mesa_error(ctx, GL_INVALID_VALUE,
 			    "glGetProgramParameterdvNV(index)");
@@ -372,7 +372,7 @@ _mesa_GetVertexAttribdvNV(GLuint index, GLenum pname, GLdouble *params)
 		return;
 	    }
 	    FLUSH_CURRENT(ctx, 0);
-	    COPY_4V(params, ctx->Current.Attrib[index]);
+	    mesa_copy4v(params, ctx->Current.Attrib[index]);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetVertexAttribdvNV");
@@ -413,7 +413,7 @@ _mesa_GetVertexAttribfvNV(GLuint index, GLenum pname, GLfloat *params)
 		return;
 	    }
 	    FLUSH_CURRENT(ctx, 0);
-	    COPY_4V(params, ctx->Current.Attrib[index]);
+	    mesa_copy4v(params, ctx->Current.Attrib[index]);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetVertexAttribdvNV");
@@ -603,7 +603,7 @@ _mesa_ProgramParameter4fNV(GLenum target, GLuint index,
     if (target == GL_VERTEX_PROGRAM_NV && ctx->Extensions.NV_vertex_program) {
 	if (index < MAX_NV_VERTEX_PROGRAM_PARAMS) {
 	    FLUSH_VERTICES(ctx, _NEW_PROGRAM);
-	    ASSIGN_4V(ctx->VertexProgram.Parameters[index], x, y, z, w);
+	    mesa_assign4v(ctx->VertexProgram.Parameters[index], x, y, z, w);
 	} else {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glProgramParameterNV(index)");
 	    return;
@@ -678,7 +678,7 @@ _mesa_ProgramParameters4fvNV(GLenum target, GLuint index,
 	    return;
 	}
 	for (i = 0; i < num; i++) {
-	    COPY_4V(ctx->VertexProgram.Parameters[index + i], params);
+	    mesa_copy4v(ctx->VertexProgram.Parameters[index + i], params);
 	    params += 4;
 	}
     } else {
@@ -863,7 +863,7 @@ _mesa_GetProgramNamedParameterdvNV(GLuint id, GLsizei len, const GLubyte *name,
 {
     GLfloat floatParams[4] = {0.0};
     _mesa_GetProgramNamedParameterfvNV(id, len, name, floatParams);
-    COPY_4V(params, floatParams);
+    mesa_copy4v(params, floatParams);
 }
 
 /*
