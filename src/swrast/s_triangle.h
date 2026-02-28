@@ -34,7 +34,7 @@
 #include "swrast.h"
 
 
-extern GLboolean
+extern bool
 _swrast_culltriangle(GLcontext *ctx,
 		     const SWvertex *v0,
 		     const SWvertex *v1,

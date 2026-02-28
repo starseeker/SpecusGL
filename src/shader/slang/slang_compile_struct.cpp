@@ -36,46 +36,50 @@
 #include "slang_compile.h"
 
 
-GLvoid
+void
 _slang_struct_scope_ctr(slang_struct_scope * self)
 {
     self->structs.clear();
     self->outer_scope = nullptr;
 }
 
+
+/* ------------------------------------------------------------------ */
+/* slang_struct_scope destructor                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Destructor: destruct each owned struct.
+ * The vector elements are destroyed automatically; we just need to call
+ * slang_struct_destruct() on each one before the vector is cleared so
+ * that resources held by their fields / structs scopes are freed.
+ * (Actually with RAII slang_struct members this is handled by ~slang_struct,
+ * but we keep the explicit loop for clarity and backward compatibility.)
+ */
+slang_struct_scope::~slang_struct_scope()
+{
+    /* slang_struct destructor handles cleanup via unique_ptr members. */
+    structs.clear();
+}
+
 void
 slang_struct_scope_destruct(slang_struct_scope * scope)
 {
-    for (auto &s : scope->structs)
-	slang_struct_destruct(&s);
+    /* With RAII slang_struct members, simply clearing the vector triggers
+     * ~slang_struct() for each element, which handles cleanup. */
     scope->structs.clear();
     /* do not free scope->outer_scope */
 }
 
-int
+bool
 slang_struct_scope_copy(slang_struct_scope * x, const slang_struct_scope * y)
 {
+    /* Use slang_struct copy constructor for each element */
     slang_struct_scope z;
-    const GLuint n = static_cast<GLuint>(y->structs.size());
-    GLuint i;
-
-    z.structs.resize(n);
-    for (i = 0; i < n; i++) {
-	if (!slang_struct_construct(&z.structs[i])) {
-	    slang_struct_scope_destruct(&z);
-	    return 0;
-	}
-    }
-    for (i = 0; i < n; i++) {
-	if (!slang_struct_copy(&z.structs[i], &y->structs[i])) {
-	    slang_struct_scope_destruct(&z);
-	    return 0;
-	}
-    }
+    z.structs = y->structs;  /* copies each slang_struct via copy assignment */
     z.outer_scope = y->outer_scope;
-    slang_struct_scope_destruct(x);
     *x = std::move(z);
-    return 1;
+    return true;
 }
 
 slang_struct *
@@ -90,72 +94,99 @@ slang_struct_scope_find(slang_struct_scope * stru, slang_atom a_name,
     return nullptr;
 }
 
+/* ------------------------------------------------------------------ */
+/* slang_struct RAII implementation                                    */
+/* ------------------------------------------------------------------ */
+
+/** Destructor – unique_ptr members handle cleanup automatically. */
+slang_struct::~slang_struct() = default;
+
+/** Deep copy constructor. */
+slang_struct::slang_struct(const slang_struct &other)
+    : a_name(other.a_name)
+{
+    /* Build into temporaries first for strong exception safety */
+    if (other.fields) {
+        auto tmp_fields = std::make_unique<slang_variable_scope>();
+        if (slang_variable_scope_copy(tmp_fields.get(), other.fields.get()))
+            fields = std::move(tmp_fields);
+    }
+    if (other.structs) {
+        auto tmp_structs = std::make_unique<slang_struct_scope>();
+        if (slang_struct_scope_copy(tmp_structs.get(), other.structs.get()))
+            structs = std::move(tmp_structs);
+    }
+}
+
+/** Deep copy assignment. */
+slang_struct &slang_struct::operator=(const slang_struct &other)
+{
+    if (this != &other)
+        *this = slang_struct(other);
+    return *this;
+}
+
 /* slang_struct */
 
-int
+bool
 slang_struct_construct(slang_struct * stru)
 {
     stru->a_name = SLANG_ATOM_NULL;
-    stru->fields = new slang_variable_scope;
-    _slang_variable_scope_ctr(stru->fields);
-
-    stru->structs = new slang_struct_scope;
-    _slang_struct_scope_ctr(stru->structs);
-    return 1;
+    stru->fields = std::make_unique<slang_variable_scope>();
+    stru->structs = std::make_unique<slang_struct_scope>();
+    return true;
 }
 
 void
 slang_struct_destruct(slang_struct * stru)
 {
-    slang_variable_scope_destruct(stru->fields);
-    delete stru->fields;
-    stru->fields = nullptr;
-    slang_struct_scope_destruct(stru->structs);
-    delete stru->structs;
-    stru->structs = nullptr;
+    /* unique_ptr members handle cleanup automatically when reset */
+    stru->fields.reset();
+    stru->structs.reset();
+    stru->a_name = SLANG_ATOM_NULL;
 }
 
-int
+bool
 slang_struct_copy(slang_struct * x, const slang_struct * y)
 {
     slang_struct z;
 
     if (!slang_struct_construct(&z))
-	return 0;
+	return false;
     z.a_name = y->a_name;
-    if (!slang_variable_scope_copy(z.fields, y->fields)) {
+    if (!slang_variable_scope_copy(z.fields.get(), y->fields.get())) {
 	slang_struct_destruct(&z);
-	return 0;
+	return false;
     }
-    if (!slang_struct_scope_copy(z.structs, y->structs)) {
+    if (!slang_struct_scope_copy(z.structs.get(), y->structs.get())) {
 	slang_struct_destruct(&z);
-	return 0;
+	return false;
     }
     slang_struct_destruct(x);
-    *x = z;
-    return 1;
+    *x = std::move(z);
+    return true;
 }
 
-int
+bool
 slang_struct_equal(const slang_struct * x, const slang_struct * y)
 {
     if (x->fields->variables.size() != y->fields->variables.size())
-	return 0;
+	return false;
 
     for (GLuint i = 0; i < x->fields->variables.size(); i++) {
 	const slang_variable *varx = x->fields->variables[i];
 	const slang_variable *vary = y->fields->variables[i];
 
 	if (varx->a_name != vary->a_name)
-	    return 0;
+	    return false;
 	if (!slang_type_specifier_equal(&varx->type.specifier,
 					&vary->type.specifier))
-	    return 0;
+	    return false;
 	if (varx->type.specifier.type == SLANG_SPEC_ARRAY)
 	    if (varx->array_len != vary->array_len)
-		return GL_FALSE;
+		return false;
     }
-    return 1;
+    return true;
 }
 
 /*

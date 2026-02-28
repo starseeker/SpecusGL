@@ -86,16 +86,16 @@ check_zero(const char *addr, GLuint n)
 
 
 #ifdef DEBUG
-static GLboolean
+static bool
 is_valid_address(const slang_mempool *pool, void *addr)
 {
     while (pool) {
 	if (reinterpret_cast<const char *>(addr) >= pool->data.data() &&
 	    reinterpret_cast<const char *>(addr) < pool->data.data() + pool->used)
-	    return GL_TRUE;
+	    return true;
 	pool = pool->next.get();
     }
-    return GL_FALSE;
+    return false;
 }
 #endif
 

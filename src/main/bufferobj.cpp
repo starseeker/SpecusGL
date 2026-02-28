@@ -351,7 +351,7 @@ _mesa_buffer_map(GLcontext *ctx, GLenum target, GLenum access,
  *
  * \sa glUnmapBufferARB, dd_function_table::UnmapBuffer
  */
-GLboolean
+bool
 _mesa_buffer_unmap(GLcontext *ctx, GLenum target,
 		   struct gl_buffer_object *bufObj)
 {
@@ -360,7 +360,7 @@ _mesa_buffer_unmap(GLcontext *ctx, GLenum target,
     assert(!bufObj->OnCard);
     /* XXX we might assert here that bufObj->Pointer is non-null */
     bufObj->Pointer = nullptr;
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -397,10 +397,10 @@ _mesa_init_buffer_objects(GLcontext *ctx)
  * \param format  format of image to read/write
  * \param type  datatype of image to read/write
  * \param ptr  the user-provided pointer/offset
- * \return GL_TRUE if the PBO access is OK, GL_FALSE if the access would
+ * \return true if the PBO access is OK, GL_FALSE if the access would
  *         go out of bounds.
  */
-GLboolean
+bool
 _mesa_validate_pbo_access(GLuint dimensions,
 			  const struct gl_pixelstore_attrib *pack,
 			  GLsizei width, GLsizei height, GLsizei depth,
@@ -410,7 +410,7 @@ _mesa_validate_pbo_access(GLuint dimensions,
 
     if (pack->BufferObj->Data.empty())
 	/* no buffer! */
-	return GL_FALSE;
+	return false;
 
     /* get address of first pixel we'll read */
     const GLvoid *start = _mesa_image_address(dimensions, pack, ptr, width, height,
@@ -425,15 +425,15 @@ _mesa_validate_pbo_access(GLuint dimensions,
 
     if (static_cast<const void *>(start) > static_cast<const void *>(sizeAddr)) {
 	/* This will catch negative values / wrap-around */
-	return GL_FALSE;
+	return false;
     }
     if (static_cast<const void *>(end) > static_cast<const void *>(sizeAddr)) {
 	/* Image read goes beyond end of buffer */
-	return GL_FALSE;
+	return false;
     }
 
     /* OK! */
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -819,21 +819,21 @@ _mesa_UnmapBufferARB(GLenum target)
 {
     GET_CURRENT_CONTEXT(ctx);
     struct gl_buffer_object *bufObj;
-    GLboolean status = GL_TRUE;
+    bool status = true;
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
     bufObj = get_buffer(ctx, target);
     if (!bufObj) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glUnmapBufferARB(target)");
-	return GL_FALSE;
+	return false;
     }
     if (bufObj->Name == 0) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUnmapBufferARB");
-	return GL_FALSE;
+	return false;
     }
     if (!bufObj->Pointer) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glUnmapBufferARB");
-	return GL_FALSE;
+	return false;
     }
 
     if (ctx->Driver.UnmapBuffer) {

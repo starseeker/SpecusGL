@@ -42,9 +42,9 @@
  * \param width  number of pixels in span
  * \param x0, x1  returned X bounds of zoomed region [x0, x1)
  * \param y0, y1  returned Y bounds of zoomed region [y0, y1)
- * \return GL_TRUE if any zoomed pixels visible, GL_FALSE if totally clipped
+ * \return true if any zoomed pixels visible, false if totally clipped
  */
-static GLboolean
+static bool
 compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
 		      GLint spanX, GLint spanY, GLint width,
 		      GLint *x0, GLint *x1, GLint *y0, GLint *y1)
@@ -69,7 +69,7 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
     c0 = CLAMP(c0, fb->_Xmin, fb->_Xmax);
     c1 = CLAMP(c1, fb->_Xmin, fb->_Xmax);
     if (c0 == c1) {
-	return GL_FALSE; /* no width */
+	return false; /* no width */
     }
 
     /*
@@ -86,7 +86,7 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
     r0 = CLAMP(r0, fb->_Ymin, fb->_Ymax);
     r1 = CLAMP(r1, fb->_Ymin, fb->_Ymax);
     if (r0 == r1) {
-	return GL_FALSE; /* no height */
+	return false; /* no height */
     }
 
     *x0 = c0;
@@ -94,7 +94,7 @@ compute_zoomed_bounds(GLcontext *ctx, GLint imageX, GLint imageY,
     *y0 = r0;
     *y1 = r1;
 
-    return GL_TRUE;
+    return true;
 }
 
 

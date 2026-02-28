@@ -160,10 +160,10 @@ _mesa_get_uniformiv(GLcontext *ctx, GLuint program, GLint location,
 extern GLint
 _mesa_get_uniform_location(GLcontext *ctx, GLuint program, const GLchar *name);
 
-extern GLboolean
+extern bool
 _mesa_is_program(GLcontext *ctx, GLuint name);
 
-extern GLboolean
+extern bool
 _mesa_is_shader(GLcontext *ctx, GLuint name);
 
 extern void

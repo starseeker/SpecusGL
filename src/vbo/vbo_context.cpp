@@ -164,7 +164,7 @@ static void vbo_exec_current_init(struct vbo_exec_context *exec)
 }
 #endif
 
-GLboolean _vbo_CreateContext(GLcontext *ctx)
+bool _vbo_CreateContext(GLcontext *ctx)
 {
     using VboCtx = struct vbo_context;
     auto *vbo = new VboCtx{};
@@ -175,7 +175,7 @@ GLboolean _vbo_CreateContext(GLcontext *ctx)
      */
     if (!ctx->aelt_context &&
 	!_ae_create_context(ctx)) {
-	return GL_FALSE;
+	return false;
     }
 
     /* TODO: remove these pointers.
@@ -221,7 +221,7 @@ GLboolean _vbo_CreateContext(GLcontext *ctx)
     vbo_save_init(ctx);
 
 
-    return GL_TRUE;
+    return true;
 }
 
 void _vbo_InvalidateState(GLcontext *ctx, GLuint new_state)

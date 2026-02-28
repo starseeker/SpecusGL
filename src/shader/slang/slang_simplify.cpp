@@ -93,13 +93,13 @@ _slang_simplify(slang_operation *oper,
 		const slang_name_space * space,
 		slang_atom_pool * atoms)
 {
-    GLboolean isFloat[4];
-    GLboolean isBool[4];
+    bool isFloat[4];
+    bool isBool[4];
     GLuint i, n;
 
     if (oper->type == SLANG_OPER_IDENTIFIER) {
 	/* see if it's a named constant */
-	GLint value = _slang_lookup_constant(reinterpret_cast<char *>(oper->a_id));
+	GLint value = _slang_lookup_constant(oper->a_id);
 	if (value >= 0) {
 	    oper->literal[0] =
 		oper->literal[1] =
@@ -111,19 +111,19 @@ _slang_simplify(slang_operation *oper,
     }
 
     /* first, simplify children */
-    for (i = 0; i < (GLuint)oper->children.size(); i++) {
+    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 	_slang_simplify(&oper->children[i], space, atoms);
     }
 
     /* examine children */
-    n = MIN2((GLuint)oper->children.size(), 4);
+    n = MIN2(static_cast<GLuint>(oper->children.size()), 4);
     for (i = 0; i < n; i++) {
 	isFloat[i] = (oper->children[i].type == SLANG_OPER_LITERAL_FLOAT ||
 		      oper->children[i].type == SLANG_OPER_LITERAL_INT);
 	isBool[i] = (oper->children[i].type == SLANG_OPER_LITERAL_BOOL);
     }
 
-    if ((GLuint)oper->children.size() == 2 && isFloat[0] && isFloat[1]) {
+    if (static_cast<GLuint>(oper->children.size()) == 2 && isFloat[0] && isFloat[1]) {
 	/* probably simple arithmetic */
 	switch (oper->type) {
 	    case SLANG_OPER_ADD:
@@ -167,7 +167,7 @@ _slang_simplify(slang_operation *oper,
 	}
     }
 
-    if ((GLuint)oper->children.size() == 1 && isFloat[0]) {
+    if (static_cast<GLuint>(oper->children.size()) == 1 && isFloat[0]) {
 	switch (oper->type) {
 	    case SLANG_OPER_MINUS:
 		for (i = 0; i < 4; i++) {
@@ -188,7 +188,7 @@ _slang_simplify(slang_operation *oper,
 	}
     }
 
-    if ((GLuint)oper->children.size() == 2 && isBool[0] && isBool[1]) {
+    if (static_cast<GLuint>(oper->children.size()) == 2 && isBool[0] && isBool[1]) {
 	/* simple boolean expression */
 	switch (oper->type) {
 	    case SLANG_OPER_LOGICALAND:
@@ -226,11 +226,11 @@ _slang_simplify(slang_operation *oper,
 	}
     }
 
-    if ((GLuint)oper->children.size() == 4
+    if (static_cast<GLuint>(oper->children.size()) == 4
 	&& isFloat[0] && isFloat[1] && isFloat[2] && isFloat[3]) {
 	/* vec4(flt, flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec4") == 0) {
+	    if (strcmp(oper->a_id, "vec4") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -243,10 +243,10 @@ _slang_simplify(slang_operation *oper,
 	}
     }
 
-    if ((GLuint)oper->children.size() == 3 && isFloat[0] && isFloat[1] && isFloat[2]) {
+    if (static_cast<GLuint>(oper->children.size()) == 3 && isFloat[0] && isFloat[1] && isFloat[2]) {
 	/* vec3(flt, flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec3") == 0) {
+	    if (strcmp(oper->a_id, "vec3") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->children[2].literal[0];
@@ -259,10 +259,10 @@ _slang_simplify(slang_operation *oper,
 	}
     }
 
-    if ((GLuint)oper->children.size() == 2 && isFloat[0] && isFloat[1]) {
+    if (static_cast<GLuint>(oper->children.size()) == 2 && isFloat[0] && isFloat[1]) {
 	/* vec2(flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
-	    if (strcmp(reinterpret_cast<char *>(oper->a_id), "vec2") == 0) {
+	    if (strcmp(oper->a_id, "vec2") == 0) {
 		oper->literal[0] = oper->children[0].literal[0];
 		oper->literal[1] = oper->children[1].literal[0];
 		oper->literal[2] = oper->literal[1];
@@ -270,13 +270,13 @@ _slang_simplify(slang_operation *oper,
 		oper->literal_size = 2;
 		slang_operation_destruct(oper); /* XXX oper->locals goes nullptr! */
 		oper->type = SLANG_OPER_LITERAL_FLOAT;
-		assert((GLuint)oper->children.size() == 0);
+		assert(static_cast<GLuint>(oper->children.size()) == 0);
 		return;
 	    }
 	}
     }
 
-    if ((GLuint)oper->children.size() == 1 && isFloat[0]) {
+    if (static_cast<GLuint>(oper->children.size()) == 1 && isFloat[0]) {
 	/* vec2/3/4(flt, flt) constructor */
 	if (oper->type == SLANG_OPER_CALL) {
 	    const char *func = reinterpret_cast<const char *>(oper->a_id);
@@ -290,7 +290,7 @@ _slang_simplify(slang_operation *oper,
 		assert(oper->literal_size <= 4);
 		slang_operation_destruct(oper); /* XXX oper->locals goes nullptr! */
 		oper->type = SLANG_OPER_LITERAL_FLOAT;
-		assert((GLuint)oper->children.size() == 0);
+		assert(static_cast<GLuint>(oper->children.size()) == 0);
 		return;
 	    }
 	}
@@ -308,25 +308,25 @@ _slang_simplify(slang_operation *oper,
  *    satisfy constructors.
  */
 #define SLANG_DEBUG 0
-GLboolean
+bool
 _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 		  const slang_name_space * space,
 		  slang_atom_pool * atoms, slang_info_log *log)
 {
-    const GLboolean haveRetValue = _slang_function_has_return_value(fun);
+    const bool haveRetValue = _slang_function_has_return_value(fun);
     const int numParams = fun->param_count - haveRetValue;
     int i;
 
 #ifdef SLANG_DEBUG
     printf("Adapt %d args to %d parameters\n",
-	    (GLuint)callOper->children.size(), numParams);
+	    static_cast<GLuint>(callOper->children.size()), numParams);
 #endif
 
     /* Only try adapting for constructors */
     if (fun->kind != SLANG_FUNC_CONSTRUCTOR)
-	return GL_FALSE;
+	return false;
 
-    if ((GLuint)callOper->children.size() != numParams) {
+    if (static_cast<GLuint>(callOper->children.size()) != numParams) {
 	/* number of arguments doesn't match number of parameters */
 
 	if (fun->kind == SLANG_FUNC_CONSTRUCTOR) {
@@ -339,11 +339,11 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 		/* Get type of arg[i] */
 		if (!slang_typeinfo_construct(&argType))
-		    return GL_FALSE;
+		    return false;
 		if (!_slang_typeof_operation_(&callOper->children[i], space,
 					      &argType, atoms, log)) {
 		    slang_typeinfo_destruct(&argType);
-		    return GL_FALSE;
+		    return false;
 		}
 
 		/*
@@ -382,17 +382,17 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 	    /* non-constructor function: number of args must match number
 	     * of function params.
 	     */
-	    return GL_FALSE; /* caller will record an error msg */
+	    return false; /* caller will record an error msg */
 	}
     }
 
-    if ((GLuint)callOper->children.size() < numParams) {
+    if (static_cast<GLuint>(callOper->children.size()) < numParams) {
 	/* still not enough args for all params */
-	return GL_FALSE;
-    } else if ((GLuint)callOper->children.size() > numParams) {
+	return false;
+    } else if (static_cast<GLuint>(callOper->children.size()) > numParams) {
 	/* now too many arguments */
 	/* XXX this isn't always an error, see spec */
-	return GL_FALSE;
+	return false;
     }
 
     /*
@@ -409,11 +409,11 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 	/* Get type of arg[i] */
 	if (!slang_typeinfo_construct(&argType))
-	    return GL_FALSE;
+	    return false;
 	if (!_slang_typeof_operation_(&callOper->children[i], space,
 				      &argType, atoms, log)) {
 	    slang_typeinfo_destruct(&argType);
-	    return GL_FALSE;
+	    return false;
 	}
 
 	/* see if arg type matches parameter type */
@@ -437,11 +437,11 @@ _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 
 #ifdef SLANG_DEBUG
 	printf("===== New call to %s with adapted arguments ===============\n",
-	       static_cast<char*>(fun->header.a_name));
+	       fun->header.a_name);
 	slang_print_tree(callOper, 5);
 #endif
 
-    return GL_TRUE;
+    return true;
 }
 
 /*

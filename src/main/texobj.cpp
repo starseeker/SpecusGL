@@ -237,7 +237,7 @@ _mesa_copy_texture_object(struct gl_texture_object *dest,
  * Check if the given texture object is valid by examining its Target field.
  * For debugging only.
  */
-static GLboolean
+static bool
 valid_texture_object(const struct gl_texture_object *tex)
 {
     switch (tex->Target) {
@@ -247,13 +247,13 @@ valid_texture_object(const struct gl_texture_object *tex)
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_CUBE_MAP_ARB:
 	case GL_TEXTURE_RECTANGLE_NV:
-	    return GL_TRUE;
+	    return true;
 	case 0x99:
 	    _mesa_problem(nullptr, "invalid reference to a deleted texture object");
-	    return GL_FALSE;
+	    return false;
 	default:
 	    _mesa_problem(nullptr, "invalid texture object Target value");
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -972,7 +972,7 @@ _mesa_PrioritizeTextures(GLsizei n, const GLuint *texName,
  * \param texName array with the texture names.
  * \param residences array which will hold the residence status.
  *
- * \return GL_TRUE if all textures are resident and \p residences is left unchanged,
+ * \return true if all textures are resident and \p residences is left unchanged,
  *
  * \sa glAreTexturesResident().
  *
@@ -990,22 +990,22 @@ _mesa_AreTexturesResident(GLsizei n, const GLuint *texName,
 
     if (n < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glAreTexturesResident(n)");
-	return GL_FALSE;
+	return false;
     }
 
     if (!texName || !residences)
-	return GL_FALSE;
+	return false;
 
     for (i = 0; i < n; i++) {
 	struct gl_texture_object *t;
 	if (texName[i] == 0) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glAreTexturesResident");
-	    return GL_FALSE;
+	    return false;
 	}
 	t = _mesa_lookup_texture(ctx, texName[i]);
 	if (!t) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glAreTexturesResident");
-	    return GL_FALSE;
+	    return false;
 	}
 	if (!ctx->Driver.IsTextureResident ||
 	    ctx->Driver.IsTextureResident(ctx, t)) {
@@ -1031,7 +1031,7 @@ _mesa_AreTexturesResident(GLsizei n, const GLuint *texName,
  *
  * \param texture texture name.
  *
- * \return GL_TRUE if texture name corresponds to a texture, or GL_FALSE
+ * \return true if texture name corresponds to a texture, or GL_FALSE
  * otherwise.
  *
  * \sa glIsTexture().
@@ -1046,7 +1046,7 @@ _mesa_IsTexture(GLuint texture)
     ASSERT_OUTSIDE_BEGIN_END_WITH_RETVAL(ctx, GL_FALSE);
 
     if (!texture)
-	return GL_FALSE;
+	return false;
 
     t = _mesa_lookup_texture(ctx, texture);
 

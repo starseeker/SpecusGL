@@ -136,7 +136,7 @@ inline void _mesa_vector4f_free(GLvector4f *v)
     v->free();
 }
 
-extern void _mesa_vector4f_print(GLvector4f *v, GLubyte *, GLboolean);
+extern void _mesa_vector4f_print(GLvector4f *v, GLubyte *, bool);
 extern void _mesa_vector4f_clean_elem(GLvector4f *vec, GLuint nr, GLuint elt);
 
 

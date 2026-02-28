@@ -30,6 +30,7 @@
 
 #include "imports.h"
 #include "slang_compile.h"
+#include <algorithm>
 #include <memory>
 
 
@@ -39,68 +40,57 @@
 slang_operation::slang_operation()
     : type(SLANG_OPER_NONE), literal{0.0f, 0.0f, 0.0f, 0.0f},
       literal_size(1), a_id(SLANG_ATOM_NULL),
-      locals(std::unique_ptr<slang_variable_scope>(_slang_variable_scope_new(nullptr))),
+      locals(std::make_unique<slang_variable_scope>()),
       fun(nullptr), var(nullptr), label(nullptr)
 {
-    if (locals)
-        _slang_variable_scope_ctr(locals.get());
+    /* locals is default-constructed (empty variables, null outer_scope) */
 }
 
-slang_operation::~slang_operation()
-{
-    if (locals)
-        slang_variable_scope_destruct(locals.get());
-}
-
-GLboolean
+bool
 slang_operation_construct(slang_operation *oper)
 {
-    return oper->locals != nullptr ? GL_TRUE : GL_FALSE;
+    /* slang_operation is fully default-constructible via its constructor;
+     * locals is always initialized, so construction never fails. */
+    return oper->locals != nullptr;
 }
 
 void
 slang_operation_destruct(slang_operation *oper)
 {
+    /* Reset all fields to a clean state, equivalent to re-constructing.
+     * children and locals unique_ptr handle their own cleanup. */
     oper->children.clear();
-    if (oper->locals) {
-        slang_variable_scope_destruct(oper->locals.get());
-        oper->locals.reset();
-    }
+    oper->locals.reset();
 }
 
 /**
  * Recursively copy a slang_operation node.
- * \return GL_TRUE for success, GL_FALSE if failure
+ * \return true for success, false if failure
  */
-GLboolean
+bool
 slang_operation_copy(slang_operation *x, const slang_operation *y)
 {
     slang_operation z;
-    GLuint i;
 
     z.type = y->type;
     z.children.resize(y->children.size());
-    for (i = 0; i < (GLuint)y->children.size(); i++) {
+    for (GLuint i = 0; i < static_cast<GLuint>(y->children.size()); i++) {
         if (!slang_operation_copy(&z.children[i], &y->children[i])) {
-            return GL_FALSE;
+            return false;
         }
     }
-    z.literal[0] = y->literal[0];
-    z.literal[1] = y->literal[1];
-    z.literal[2] = y->literal[2];
-    z.literal[3] = y->literal[3];
+    std::copy(std::begin(y->literal), std::end(y->literal), z.literal);
     z.literal_size = y->literal_size;
     assert(y->literal_size >= 1);
     assert(y->literal_size <= 4);
     z.a_id = y->a_id;
     if (y->locals) {
         if (!slang_variable_scope_copy(z.locals.get(), y->locals.get())) {
-            return GL_FALSE;
+            return false;
         }
     }
-    slang_operation_destruct(x);
-    *x = std::move(z);
-    return GL_TRUE;
+    *x = std::move(z);   /* move assignment destroys x's old state, then transfers z */
+    return true;
 }
 
 

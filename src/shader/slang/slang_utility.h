@@ -37,7 +37,7 @@ inline size_t slang_string_length(const char *str) { return strlen(str); }
 
 char *slang_string_concat(char *, const char *);
 
-using slang_atom = GLvoid *;
+using slang_atom = const char *;
 constexpr slang_atom SLANG_ATOM_NULL = nullptr;
 
 using slang_string = std::string;
@@ -80,8 +80,8 @@ struct slang_atom_pool {
     std::unordered_set<std::string> strings;
 };
 
-GLvoid slang_atom_pool_construct(slang_atom_pool *);
-GLvoid slang_atom_pool_destruct(slang_atom_pool *);
+void slang_atom_pool_construct(slang_atom_pool *);
+void slang_atom_pool_destruct(slang_atom_pool *);
 slang_atom slang_atom_pool_atom(slang_atom_pool *, const char *);
 const char *slang_atom_pool_id(slang_atom_pool *, slang_atom);
 

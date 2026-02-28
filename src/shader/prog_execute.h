@@ -72,7 +72,7 @@ struct gl_program_machine {
     FetchTexelDerivFunc FetchTexelDeriv;
 };
 
-extern GLboolean
+extern bool
 _mesa_execute_program(GLcontext *ctx,
 		      const struct gl_program *program,
 		      struct gl_program_machine *machine);

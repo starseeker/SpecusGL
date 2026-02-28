@@ -43,7 +43,7 @@ extern const char *
 _mesa_condcode_string(GLuint condcode);
 
 extern const char *
-_mesa_swizzle_string(GLuint swizzle, GLuint negateBase, GLboolean extended);
+_mesa_swizzle_string(GLuint swizzle, GLuint negateBase, bool extended);
 
 extern void
 _mesa_print_alu_instruction(const struct prog_instruction *inst,
@@ -62,7 +62,7 @@ _mesa_print_program(const struct gl_program *prog);
 
 extern void
 _mesa_print_program_opt(const struct gl_program *prog, gl_prog_print_mode mode,
-			GLboolean lineNumbers);
+			bool lineNumbers);
 
 extern void
 _mesa_print_program_parameters(GLcontext *ctx, const struct gl_program *prog);

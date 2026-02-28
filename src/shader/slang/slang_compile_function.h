@@ -31,6 +31,7 @@
 struct slang_code_unit;
 
 #include <vector>
+#include <memory>
 
 /**
  * Types of functions.
@@ -54,23 +55,29 @@ struct slang_fixup_table {
 
 inline void slang_fixup_table_init(slang_fixup_table *fix) { fix->table.clear(); }
 inline void slang_fixup_table_free(slang_fixup_table *fix) { fix->table.clear(); }
-extern GLboolean slang_fixup_save(slang_fixup_table *fixups, GLuint address);
+extern bool slang_fixup_save(slang_fixup_table *fixups, GLuint address);
 
 
 /**
  * Description of a compiled shader function.
+ *
+ * C++17 modernisation: parameters and body are now std::unique_ptr so they
+ * are automatically freed when the function is destroyed without needing
+ * explicit slang_variable_scope_destruct + delete or slang_operation_destruct
+ * + delete calls.  POD fields have default member initialisers so that a
+ * default-constructed slang_function is in a valid state.
  */
 struct slang_function {
-    slang_function_kind kind;
+    slang_function_kind kind{SLANG_FUNC_ORDINARY};
     slang_variable header;      /**< The function's name and return type */
-    slang_variable_scope *parameters; /**< formal parameters AND local vars */
-    unsigned int param_count;   /**< number of formal params (no locals) */
-    slang_operation *body;      /**< The instruction tree */
-    unsigned int address;       /**< Address of this func in memory */
+    std::unique_ptr<slang_variable_scope> parameters; /**< formal parameters AND local vars */
+    unsigned int param_count{0};/**< number of formal params (no locals) */
+    std::unique_ptr<slang_operation> body;  /**< The instruction tree */
+    unsigned int address{~0u};  /**< Address of this func in memory */
     slang_fixup_table fixups;   /**< Mem locations which need func's address */
 };
 
-extern int slang_function_construct(slang_function *);
+extern bool slang_function_construct(slang_function *);
 extern void slang_function_destruct(slang_function *);
 
 
@@ -85,20 +92,20 @@ struct slang_function_scope {
 };
 
 
-extern GLvoid
+extern void
 _slang_function_scope_ctr(slang_function_scope *);
 
 extern void
 slang_function_scope_destruct(slang_function_scope *);
 
-extern GLboolean
+extern bool
 _slang_function_has_return_value(const slang_function *fun);
 
-extern int
-slang_function_scope_find_by_name(slang_function_scope *, slang_atom, int);
+extern bool
+slang_function_scope_find_by_name(slang_function_scope *, slang_atom, bool);
 
 extern slang_function *
-slang_function_scope_find(slang_function_scope *, slang_function *, int);
+slang_function_scope_find(slang_function_scope *, slang_function *, bool);
 
 
 

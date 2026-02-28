@@ -1033,9 +1033,9 @@ _swrast_depth_test_span(GLcontext *ctx, SWspan *span)
  * Discard fragments depending on whether the corresponding Z-buffer
  * values are outside the depth bounds test range.
  * Note: we test the Z buffer values, not the fragment Z values!
- * \return GL_TRUE if any fragments pass, GL_FALSE if no fragments pass
+ * \return true if any fragments pass, false if no fragments pass
  */
-GLboolean
+bool
 _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 {
     struct gl_framebuffer *fb = ctx->DrawBuffer;
@@ -1045,7 +1045,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
     GLubyte *mask = span->array->mask;
     const GLuint count = span->end;
     GLuint i;
-    GLboolean anyPass = GL_FALSE;
+    bool anyPass = false;
 
     if (rb->DataType == GL_UNSIGNED_SHORT) {
 	/* get 16-bit values */
@@ -1069,7 +1069,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 		if (zbuffer[i] < zMin || zbuffer[i] > zMax)
 		    mask[i] = GL_FALSE;
 		else
-		    anyPass = GL_TRUE;
+		    anyPass = true;
 	    }
 	}
     } else {
@@ -1095,7 +1095,7 @@ _swrast_depth_bounds_test(GLcontext *ctx, SWspan *span)
 		if (zbuffer[i] < zMin || zbuffer[i] > zMax)
 		    mask[i] = GL_FALSE;
 		else
-		    anyPass = GL_TRUE;
+		    anyPass = true;
 	    }
 	}
     }

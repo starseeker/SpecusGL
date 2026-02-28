@@ -263,7 +263,7 @@ reg_string(enum register_file f, GLint index, gl_prog_print_mode mode,
  * \param extended  if true, also allow 0, 1 values
  */
 const char *
-_mesa_swizzle_string(GLuint swizzle, GLuint negateBase, GLboolean extended)
+_mesa_swizzle_string(GLuint swizzle, GLuint negateBase, bool extended)
 {
     static const char swz[] = "xyzw01?!";
     static char s[20];
@@ -372,7 +372,7 @@ print_dst_reg(const struct prog_dst_register *dstReg, gl_prog_print_mode mode,
     if (dstReg->CondMask != COND_TR) {
 	std::printf(" (%s.%s)",
 		     _mesa_condcode_string(dstReg->CondMask),
-		     _mesa_swizzle_string(dstReg->CondSwizzle, GL_FALSE, GL_FALSE));
+		     _mesa_swizzle_string(dstReg->CondSwizzle, false, false));
     }
 
 #if 0
@@ -554,7 +554,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    std::printf("BRA %d (%s%s)",
 			 inst->BranchTarget,
 			 _mesa_condcode_string(inst->DstReg.CondMask),
-			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, GL_FALSE));
+			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, false));
 	    print_comment(inst);
 	    break;
 	case OPCODE_IF:
@@ -568,7 +568,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 		std::printf("IF (%s%s);",
 			     _mesa_condcode_string(inst->DstReg.CondMask),
 			     _mesa_swizzle_string(inst->DstReg.CondSwizzle,
-						  0, GL_FALSE));
+						  0, false));
 	    }
 	    std::printf(" # (if false, goto %d)", inst->BranchTarget);
 	    print_comment(inst);
@@ -590,7 +590,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	    std::printf("%s (%s%s); # (goto %d)",
 			 _mesa_opcode_string(inst->Opcode),
 			 _mesa_condcode_string(inst->DstReg.CondMask),
-			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, GL_FALSE),
+			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, false),
 			 inst->BranchTarget);
 	    print_comment(inst);
 	    break;
@@ -621,7 +621,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 	case OPCODE_RET:
 	    std::printf("RET (%s%s)",
 			 _mesa_condcode_string(inst->DstReg.CondMask),
-			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, GL_FALSE));
+			 _mesa_swizzle_string(inst->DstReg.CondSwizzle, 0, false));
 	    print_comment(inst);
 	    break;
 
@@ -656,7 +656,7 @@ _mesa_print_instruction_opt(const struct prog_instruction *inst, GLint indent,
 void
 _mesa_print_program(const struct gl_program *prog)
 {
-    _mesa_print_program_opt(prog, PROG_PRINT_DEBUG, GL_TRUE);
+    _mesa_print_program_opt(prog, PROG_PRINT_DEBUG, true);
 }
 
 
@@ -666,7 +666,7 @@ _mesa_print_program(const struct gl_program *prog)
 void
 _mesa_print_program_opt(const struct gl_program *prog,
 			gl_prog_print_mode mode,
-			GLboolean lineNumbers)
+			bool lineNumbers)
 {
     GLuint i, indent = 0;
 

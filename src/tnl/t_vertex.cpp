@@ -37,44 +37,44 @@
 /* Build and manage clipspace/ndc/window vertices.
  */
 
-static GLboolean match_fastpath(struct tnl_clipspace *vtx,
+static bool match_fastpath(struct tnl_clipspace *vtx,
 				const struct tnl_clipspace_fastpath *fp)
 {
     GLuint j;
 
     if (vtx->attr_count != fp->attr_count)
-	return GL_FALSE;
+	return false;
 
     for (j = 0; j < vtx->attr_count; j++)
 	if (vtx->attr[j].format != fp->attr[j].format ||
 	    vtx->attr[j].inputsize != fp->attr[j].size ||
 	    vtx->attr[j].vertoffset != fp->attr[j].offset)
-	    return GL_FALSE;
+	    return false;
 
     if (fp->match_strides) {
 	if (vtx->vertex_size != fp->vertex_size)
-	    return GL_FALSE;
+	    return false;
 
 	for (j = 0; j < vtx->attr_count; j++)
 	    if (vtx->attr[j].inputstride != fp->attr[j].stride)
-		return GL_FALSE;
+		return false;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
-static GLboolean search_fastpath_emit(struct tnl_clipspace *vtx)
+static bool search_fastpath_emit(struct tnl_clipspace *vtx)
 {
     struct tnl_clipspace_fastpath *fp = vtx->fastpath;
 
     for (; fp ; fp = fp->next) {
 	if (match_fastpath(vtx, fp)) {
 	    vtx->emit = fp->func;
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -270,10 +270,10 @@ GLuint _tnl_install_attrs(GLcontext *ctx, const struct tnl_attr_map *map,
     assert(nr == 0 || map[0].attrib == VERT_ATTRIB_POS);
 
     vtx->new_inputs = ~0;
-    vtx->need_viewport = GL_FALSE;
+    vtx->need_viewport = false;
 
     if (vp) {
-	vtx->need_viewport = GL_TRUE;
+	vtx->need_viewport = true;
     }
 
     for (j = 0, i = 0; i < nr; i++) {
@@ -420,7 +420,7 @@ void _tnl_init_vertices(GLcontext *ctx,
 
     _tnl_install_attrs(ctx, nullptr, 0, nullptr, 0);
 
-    vtx->need_extras = GL_TRUE;
+    vtx->need_extras = true;
     if (max_vertex_size > vtx->max_vertex_size) {
 	_tnl_free_vertices(ctx);
 	vtx->max_vertex_size = max_vertex_size;

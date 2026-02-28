@@ -47,7 +47,7 @@ LONGSTRING static const char *slang_pp_version_syn =
 #include "library/slang_pp_version_syn.h"
     ;
 
-static GLvoid
+static void
 grammar_error_to_log(slang_info_log *log)
 {
     char buf[1024];
@@ -57,7 +57,7 @@ grammar_error_to_log(slang_info_log *log)
     slang_info_log_error(log, buf);
 }
 
-GLboolean
+bool
 _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slang_info_log *log)
 {
     grammar id;
@@ -67,13 +67,13 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
     id = grammar_load_from_text((const byte *)(slang_pp_version_syn));
     if (id == 0) {
 	grammar_error_to_log(log);
-	return GL_FALSE;
+	return false;
     }
 
     if (!grammar_fast_check(id, (const byte *)(text), &prod, &size, 8)) {
 	grammar_error_to_log(log);
 	grammar_destroy(id);
-	return GL_FALSE;
+	return false;
     }
 
     /* there can be multiple #version directives - grab the last one */
@@ -83,7 +83,7 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
 
     grammar_destroy(id);
     grammar_alloc_free(prod);
-    return GL_TRUE;
+    return true;
 }
 
 /*
@@ -101,7 +101,7 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
 
 #define PP_ANNOTATE 0
 
-static GLvoid
+static void
 pp_annotate(slang_string *output, const char *fmt, ...)
 {
 #if PP_ANNOTATE
@@ -113,8 +113,8 @@ pp_annotate(slang_string *output, const char *fmt, ...)
     va_end(va);
     slang_string_pushs(output, buffer, strlen(buffer));
 #else
-    (GLvoid)(output);
-    (GLvoid)(fmt);
+    (void)(output);
+    (void)(fmt);
 #endif
 }
 
@@ -132,16 +132,16 @@ pp_annotate(slang_string *output, const char *fmt, ...)
    do {\
       if (sp == 0) {\
          slang_info_log_error (elog, "internal compiler error: preprocessor execution stack overflow.");\
-         return GL_FALSE;\
+         return false;\
       }\
       stack[--sp] = x;\
-   } while (GL_FALSE)
+   } while (false)
 
 #define POP(x)\
    do {\
       assert (sp < EXECUTION_STACK_SIZE);\
       x = stack[sp++];\
-   } while (GL_FALSE)
+   } while (false)
 
 #define BINARY(op)\
    do {\
@@ -149,7 +149,7 @@ pp_annotate(slang_string *output, const char *fmt, ...)
       POP(b);\
       POP(a);\
       PUSH(a op b);\
-   } while (GL_FALSE)
+   } while (false)
 
 #define BINARYDIV(op)\
    do {\
@@ -158,17 +158,17 @@ pp_annotate(slang_string *output, const char *fmt, ...)
       POP(a);\
       if (b == 0) {\
          slang_info_log_error (elog, "division by zero in preprocessor expression.");\
-         return GL_FALSE;\
+         return false;\
       }\
       PUSH(a op b);\
-   } while (GL_FALSE)
+   } while (false)
 
 #define UNARY(op)\
    do {\
       GLint a;\
       POP(a);\
       PUSH(op a);\
-   } while (GL_FALSE)
+   } while (false)
 
 #define OP_END          0
 #define OP_PUSHINT      1
@@ -195,7 +195,7 @@ pp_annotate(slang_string *output, const char *fmt, ...)
 #define OP_NEGATE       22
 #define OP_COMPLEMENT   23
 
-static GLboolean
+static bool
 execute_expression(slang_string *output, const byte *code, GLuint *pi, GLint *result,
 		   slang_info_log *elog)
 {
@@ -288,7 +288,7 @@ execute_expression(slang_string *output, const byte *code, GLuint *pi, GLint *re
     POP(*result);
     pp_annotate(output, "%d ", *result);
     assert(sp == EXECUTION_STACK_SIZE);
-    return GL_TRUE;
+    return true;
 }
 
 /*
@@ -347,13 +347,13 @@ struct pp_symbol {
     pp_symbols parameters;
 };
 
-static GLvoid
+static void
 pp_symbols_init(pp_symbols *self)
 {
     self->clear();
 }
 
-static GLvoid
+static void
 pp_symbols_free(pp_symbols *self)
 {
     self->clear();
@@ -366,7 +366,7 @@ pp_symbols_free(pp_symbols *self)
 static void pp_symbol_init(pp_symbol *) {} /* no-op: std::string/vector self-init */
 static void pp_symbol_free(pp_symbol *) {} /* no-op: members self-destruct */
 
-static GLvoid
+static void
 pp_symbol_reset(pp_symbol *self)
 {
     /* Leave symbol name intact. */
@@ -381,12 +381,12 @@ pp_symbols_push(pp_symbols *self)
     return &self->back();
 }
 
-static GLboolean
+static bool
 pp_symbols_erase(pp_symbols *self, pp_symbol *symbol)
 {
     assert(symbol >= self->data() && symbol < self->data() + self->size());
     self->erase(self->begin() + (symbol - self->data()));
-    return GL_TRUE;
+    return true;
 }
 
 static pp_symbol *
@@ -406,12 +406,12 @@ pp_symbols_find(pp_symbols *self, const char *name)
  */
 
 struct pp_cond_ctx {
-    GLboolean current;         /* The condition value of this level. */
-    GLboolean effective;       /* The effective product of current condition, outer level conditions
+    bool current;         /* The condition value of this level. */
+    bool effective;       /* The effective product of current condition, outer level conditions
                                * and position within #if-#else-#endif sections. */
-    GLboolean else_allowed;    /* TRUE if in #if-#else section, FALSE if in #else-#endif section
+    bool else_allowed;    /* TRUE if in #if-#else section, FALSE if in #else-#endif section
                                * and for global context. */
-    GLboolean endif_required;  /* FALSE for global context only. */
+    bool endif_required;  /* FALSE for global context only. */
 };
 
 /* Should be enuff. */
@@ -422,18 +422,18 @@ struct pp_cond_stack {
     pp_cond_ctx *top;
 };
 
-static GLboolean
+static bool
 pp_cond_stack_push(pp_cond_stack *self, slang_info_log *elog)
 {
     if (self->top == self->stack.data()) {
 	slang_info_log_error(elog, "internal compiler error: preprocessor condition stack overflow.");
-	return GL_FALSE;
+	return false;
     }
     self->top--;
-    return GL_TRUE;
+    return true;
 }
 
-static GLvoid
+static void
 pp_cond_stack_reevaluate(pp_cond_stack *self)
 {
     /* There must be at least 2 conditions on the stack - one global and one being evaluated. */
@@ -448,29 +448,29 @@ pp_cond_stack_reevaluate(pp_cond_stack *self)
  */
 
 struct pp_ext {
-    GLboolean MESA_shader_debug;        /* GL_MESA_shader_debug enable */
-    GLboolean ARB_texture_rectangle; /* GL_ARB_texture_rectangle enable */
+    bool MESA_shader_debug;        /* GL_MESA_shader_debug enable */
+    bool ARB_texture_rectangle; /* GL_ARB_texture_rectangle enable */
 };
 
 /*
  * Disable all extensions. Called at startup and on #extension all: disable.
  */
-static GLvoid
+static void
 pp_ext_disable_all(pp_ext *self)
 {
-    self->MESA_shader_debug = GL_FALSE;
+    self->MESA_shader_debug = false;
 }
 
-static GLvoid
+static void
 pp_ext_init(pp_ext *self)
 {
     pp_ext_disable_all(self);
-    self->ARB_texture_rectangle = GL_TRUE;
+    self->ARB_texture_rectangle = true;
     /* Other initialization code goes here. */
 }
 
-static GLboolean
-pp_ext_set(pp_ext *self, const char *name, GLboolean enable)
+static bool
+pp_ext_set(pp_ext *self, const char *name, bool enable)
 {
     if (strcmp(name, "MESA_shader_debug") == 0)
 	self->MESA_shader_debug = enable;
@@ -478,8 +478,8 @@ pp_ext_set(pp_ext *self, const char *name, GLboolean enable)
 	self->ARB_texture_rectangle = enable;
     /* Next extension name tests go here. */
     else
-	return GL_FALSE;
-    return GL_TRUE;
+	return false;
+    return true;
 }
 
 /*
@@ -497,7 +497,7 @@ struct pp_state {
     pp_cond_stack cond;
 };
 
-static GLvoid
+static void
 pp_state_init(pp_state *self, slang_info_log *elog)
 {
     self->line = 0;
@@ -509,13 +509,13 @@ pp_state_init(pp_state *self, slang_info_log *elog)
 
     /* Initialize condition stack and create the global context. */
     self->cond.top = &self->cond.stack[CONDITION_STACK_SIZE - 1];
-    self->cond.top->current = GL_TRUE;
-    self->cond.top->effective = GL_TRUE;
-    self->cond.top->else_allowed = GL_FALSE;
-    self->cond.top->endif_required = GL_FALSE;
+    self->cond.top->current = true;
+    self->cond.top->effective = true;
+    self->cond.top->else_allowed = false;
+    self->cond.top->endif_required = false;
 }
 
-static GLvoid
+static void
 pp_state_free(pp_state *self)
 {
     pp_symbols_free(&self->symbols);
@@ -526,7 +526,7 @@ pp_state_free(pp_state *self)
 #define IS_WHITE(x) ((x) == ' ' || (x) == '\n')
 #define IS_NULL(x) ((x) == '\0')
 
-#define SKIP_WHITE(x) do { while (IS_WHITE(*(x))) (x)++; } while (GL_FALSE)
+#define SKIP_WHITE(x) do { while (IS_WHITE(*(x))) (x)++; } while (false)
 
 struct expand_state {
     slang_string *output;
@@ -534,17 +534,17 @@ struct expand_state {
     pp_state *state;
 };
 
-static GLboolean
+static bool
 expand_defined(expand_state *e, slang_string *buffer)
 {
-    GLboolean in_paren = GL_FALSE;
+    bool in_paren = false;
     const char *id;
 
     /* Parse the optional opening parenthesis. */
     SKIP_WHITE(e->input);
     if (*e->input == '(') {
 	e->input++;
-	in_paren = GL_TRUE;
+	in_paren = true;
 	SKIP_WHITE(e->input);
     }
 
@@ -552,7 +552,7 @@ expand_defined(expand_state *e, slang_string *buffer)
     if (!IS_FIRST_ID_CHAR(*e->input)) {
 	slang_info_log_error(e->state->elog,
 			     "preprocess error: identifier expected after operator 'defined'.");
-	return GL_FALSE;
+	return false;
     }
     slang_string_reset(buffer);
     slang_string_pushc(buffer, *e->input++);
@@ -571,18 +571,18 @@ expand_defined(expand_state *e, slang_string *buffer)
 	SKIP_WHITE(e->input);
 	if (*e->input != ')') {
 	    slang_info_log_error(e->state->elog, "preprocess error: ')' expected.");
-	    return GL_FALSE;
+	    return false;
 	}
 	e->input++;
 	SKIP_WHITE(e->input);
     }
-    return GL_TRUE;
+    return true;
 }
 
-static GLboolean
+static bool
 expand(expand_state *, pp_symbols *);
 
-static GLboolean
+static bool
 expand_symbol(expand_state *e, pp_symbol *symbol)
 {
     expand_state es;
@@ -595,7 +595,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
 	SKIP_WHITE(e->input);
 	if (*e->input != '(') {
 	    slang_info_log_error(e->state->elog, "preprocess error: '(' expected.");
-	    return GL_FALSE;
+	    return false;
 	}
 	e->input++;
 	SKIP_WHITE(e->input);
@@ -605,7 +605,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
 	for (i = 0; i < symbol->parameters.size(); i++) {
 	    if (*e->input == ')') {
 		slang_info_log_error(e->state->elog, "preprocess error: unexpected ')'.");
-		return GL_FALSE;
+		return false;
 	    }
 
 	    /* Eat all characters up to the comma or closing parentheses. */
@@ -619,7 +619,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
 		/* This is the last paremeter - skip the closing parentheses. */
 		if (*e->input != ')') {
 		    slang_info_log_error(e->state->elog, "preprocess error: ')' expected.");
-		    return GL_FALSE;
+		    return false;
 		}
 		e->input++;
 		SKIP_WHITE(e->input);
@@ -627,7 +627,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
 		/* Skip the separating comma. */
 		if (*e->input != ',') {
 		    slang_info_log_error(e->state->elog, "preprocess error: ',' expected.");
-		    return GL_FALSE;
+		    return false;
 		}
 		e->input++;
 		SKIP_WHITE(e->input);
@@ -642,9 +642,9 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
     es.state = e->state;
     slang_string_pushc(e->output, ' ');
     if (!expand(&es, &symbol->parameters))
-	return GL_FALSE;
+	return false;
     slang_string_pushc(e->output, ' ');
-    return GL_TRUE;
+    return true;
 }
 
 /*
@@ -654,7 +654,7 @@ expand_symbol(expand_state *e, pp_symbol *symbol)
  * call of expand().
  */
 
-static GLboolean
+static bool
 expand(expand_state *e, pp_symbols *symbols)
 {
     while (!IS_NULL(*e->input)) {
@@ -675,7 +675,7 @@ expand(expand_state *e, pp_symbols *symbols)
 	     * taken from the preprocessor state. */
 	    if (strcmp(id, "defined") == 0) {
 		if (!expand_defined(e, &buffer))
-		    return GL_FALSE;
+		    return false;
 	    } else if (strcmp(id, "__LINE__") == 0) {
 		slang_string_pushc(e->output, ' ');
 		slang_string_pushi(e->output, e->state->line);
@@ -701,7 +701,7 @@ expand(expand_state *e, pp_symbols *symbols)
 		if (symbol != nullptr) {
 		    if (!expand_symbol(e, symbol)) {
 			slang_string_free(&buffer);
-			return GL_FALSE;
+			return false;
 		    }
 		} else {
 		    slang_string_push(e->output, &buffer);
@@ -715,10 +715,10 @@ expand(expand_state *e, pp_symbols *symbols)
 		slang_string_pushc(e->output, *e->input++);
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
-static GLboolean
+static bool
 parse_if(slang_string *output, const byte *prod, GLuint *pi, GLint *result, pp_state *state,
 	 grammar eid)
 {
@@ -740,14 +740,14 @@ parse_if(slang_string *output, const byte *prod, GLuint *pi, GLint *result, pp_s
 	es.input = text;
 	es.state = state;
 	if (!expand(&es, &state->symbols))
-	    return GL_FALSE;
+	    return false;
 
 	/* Execute the expression. */
 	count = execute_expressions(output, eid, (const byte *)(slang_string_cstr(&expr)),
 				    results, state->elog);
 	slang_string_free(&expr);
 	if (count != 1)
-	    return GL_FALSE;
+	    return false;
 	*result = results[0];
     } else {
 	/* The directive is dead. */
@@ -755,7 +755,7 @@ parse_if(slang_string *output, const byte *prod, GLuint *pi, GLint *result, pp_s
     }
 
     *pi += len + 1;
-    return GL_TRUE;
+    return true;
 }
 
 #define ESCAPE_TOKEN 0
@@ -780,7 +780,7 @@ parse_if(slang_string *output, const byte *prod, GLuint *pi, GLint *result, pp_s
 #define BEHAVIOR_WARN    3
 #define BEHAVIOR_DISABLE 4
 
-static GLboolean
+static bool
 preprocess_source(slang_string *output, const char *source, grammar pid, grammar eid,
 		  slang_info_log *elog)
 {
@@ -790,7 +790,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
     if (!grammar_fast_check(pid, (const byte *)(source), &prod, &size, 65536)) {
 	grammar_error_to_log(elog);
-	return GL_FALSE;
+	return false;
     }
 
     pp_state_init(&state, elog);
@@ -844,7 +844,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 		       * On condition stack there should be only the global condition context. */
 		    if (state.cond.top->endif_required) {
 			slang_info_log_error(elog, "end of source without matching #endif.");
-			return GL_FALSE;
+			return false;
 		    }
 		    break;
 
@@ -923,9 +923,9 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 		    /* Push new condition on the stack. */
 		    if (!pp_cond_stack_push(&state.cond, state.elog))
 			goto error;
-		    state.cond.top->current = result ? GL_TRUE : GL_FALSE;
-		    state.cond.top->else_allowed = GL_TRUE;
-		    state.cond.top->endif_required = GL_TRUE;
+		    state.cond.top->current = result ? true : false;
+		    state.cond.top->else_allowed = true;
+		    state.cond.top->endif_required = true;
 		    pp_cond_stack_reevaluate(&state.cond);
 		}
 		break;
@@ -939,7 +939,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 		    /* Negate current condition and reevaluate it. */
 		    state.cond.top->current = !state.cond.top->current;
-		    state.cond.top->else_allowed = GL_FALSE;
+		    state.cond.top->else_allowed = false;
 		    pp_cond_stack_reevaluate(&state.cond);
 		    if (state.cond.top->effective)
 			pp_annotate(output, "// #else");
@@ -967,7 +967,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 			    goto error;
 
 			/* Update current condition and reevaluate it. */
-			state.cond.top->current = result ? GL_TRUE : GL_FALSE;
+			state.cond.top->current = result ? true : false;
 			pp_cond_stack_reevaluate(&state.cond);
 		    }
 		    break;
@@ -998,7 +998,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 			    case BEHAVIOR_REQUIRE:
 				pp_annotate(output, "require");
-				if (!pp_ext_set(&state.ext, id, GL_TRUE)) {
+				if (!pp_ext_set(&state.ext, id, true)) {
 				    if (strcmp(id, "all") == 0) {
 					slang_info_log_error(elog, "require: bad behavior for #extension all.");
 					goto error;
@@ -1011,7 +1011,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 			    case BEHAVIOR_ENABLE:
 				pp_annotate(output, "enable");
-				if (!pp_ext_set(&state.ext, id, GL_TRUE)) {
+				if (!pp_ext_set(&state.ext, id, true)) {
 				    if (strcmp(id, "all") == 0) {
 					slang_info_log_error(elog, "enable: bad behavior for #extension all.");
 					goto error;
@@ -1023,7 +1023,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 			    case BEHAVIOR_WARN:
 				pp_annotate(output, "warn");
-				if (!pp_ext_set(&state.ext, id, GL_TRUE)) {
+				if (!pp_ext_set(&state.ext, id, true)) {
 				    if (strcmp(id, "all") != 0) {
 					slang_info_log_warning(elog, "%s: enabled extension is not supported.", id);
 				    }
@@ -1032,7 +1032,7 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
 			    case BEHAVIOR_DISABLE:
 				pp_annotate(output, "disable");
-				if (!pp_ext_set(&state.ext, id, GL_FALSE)) {
+				if (!pp_ext_set(&state.ext, id, false)) {
 				    if (strcmp(id, "all") == 0) {
 					pp_ext_disable_all(&state.ext);
 				    } else {
@@ -1090,30 +1090,30 @@ preprocess_source(slang_string *output, const char *source, grammar pid, grammar
 
     grammar_alloc_free(prod);
     pp_state_free(&state);
-    return GL_TRUE;
+    return true;
 
 error:
     grammar_alloc_free(prod);
     pp_state_free(&state);
-    return GL_FALSE;
+    return false;
 }
 
-GLboolean
+bool
 _slang_preprocess_directives(slang_string *output, const char *input, slang_info_log *elog)
 {
     grammar pid, eid;
-    GLboolean success;
+    bool success;
 
     pid = grammar_load_from_text((const byte *)(slang_pp_directives_syn));
     if (pid == 0) {
 	grammar_error_to_log(elog);
-	return GL_FALSE;
+	return false;
     }
     eid = grammar_load_from_text((const byte *)(slang_pp_expression_syn));
     if (eid == 0) {
 	grammar_error_to_log(elog);
 	grammar_destroy(pid);
-	return GL_FALSE;
+	return false;
     }
     success = preprocess_source(output, input, pid, eid, elog);
     grammar_destroy(eid);

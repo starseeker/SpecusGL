@@ -44,7 +44,7 @@ struct point_stage_data {
  * Only done when point size attenuation is enabled and vertex program is
  * disabled.
  */
-static GLboolean
+static bool
 run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     if (ctx->Point._Attenuated && !ctx->VertexProgram._Current) {
@@ -70,11 +70,11 @@ run_point_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	VB->AttribPtr[_TNL_ATTRIB_POINTSIZE] = &store->PointSize;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 alloc_point_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
@@ -82,10 +82,10 @@ alloc_point_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<point_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     store->PointSize.alloc(0, VB->Size, 32);
-    return GL_TRUE;
+    return true;
 }
 
 

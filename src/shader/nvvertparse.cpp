@@ -57,12 +57,12 @@ struct parse_state {
     const GLubyte *start;
     const GLubyte *pos;
     const GLubyte *curLine;
-    GLboolean isStateProgram;
-    GLboolean isPositionInvariant;
-    GLboolean isVersion1_1;
+    bool isStateProgram;
+    bool isPositionInvariant;
+    bool isVersion1_1;
     GLbitfield inputsRead;
     GLbitfield outputsWritten;
-    GLboolean anyProgRegsWritten;
+    bool anyProgRegsWritten;
     GLuint numInst;                 /* number of instructions parsed */
 };
 
@@ -96,13 +96,13 @@ record_error(struct parse_state *parseState, const char *msg, int lineNo)
 #define RETURN_ERROR							\
 do {									\
    record_error(parseState, "Unexpected end of input.", __LINE__);	\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 #define RETURN_ERROR1(msg)						\
 do {									\
    record_error(parseState, msg, __LINE__);				\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 #define RETURN_ERROR2(msg1, msg2)					\
@@ -110,26 +110,26 @@ do {									\
    char err[1000];							\
    std::snprintf(err, sizeof(err), "%s %s", msg1, msg2);				\
    record_error(parseState, err, __LINE__);				\
-   return GL_FALSE;							\
+   return false;							\
 } while(0)
 
 
 
 
 
-static GLboolean IsLetter(GLubyte b)
+static bool IsLetter(GLubyte b)
 {
     return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z');
 }
 
 
-static GLboolean IsDigit(GLubyte b)
+static bool IsDigit(GLubyte b)
 {
     return b >= '0' && b <= '9';
 }
 
 
-static GLboolean IsWhitespace(GLubyte b)
+static bool IsWhitespace(GLubyte b)
 {
     return b == ' ' || b == '\t' || b == '\n' || b == '\r';
 }
@@ -202,44 +202,44 @@ GetToken(struct parse_state *parseState, GLubyte *token)
 /**
  * Get next token from input stream and increment stream pointer past token.
  */
-static GLboolean
+static bool
 Parse_Token(struct parse_state *parseState, GLubyte *token)
 {
     GLint i;
     i = GetToken(parseState, token);
     if (i <= 0) {
 	parseState->pos += (-i);
-	return GL_FALSE;
+	return false;
     }
     parseState->pos += i;
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Get next token from input stream but don't increment stream pointer.
  */
-static GLboolean
+static bool
 Peek_Token(struct parse_state *parseState, GLubyte *token)
 {
     GLint i, len;
     i = GetToken(parseState, token);
     if (i <= 0) {
 	parseState->pos += (-i);
-	return GL_FALSE;
+	return false;
     }
     len = static_cast<GLint>(strlen(reinterpret_cast<const char *>(token)));
     parseState->pos += (i - len);
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Try to match 'pattern' as the next token after any whitespace/comments.
  * Advance the current parsing position only if we match the pattern.
- * \return GL_TRUE if pattern is matched, GL_FALSE otherwise.
+ * \return true if pattern is matched, false otherwise.
  */
-static GLboolean
+static bool
 Parse_String(struct parse_state *parseState, const char *pattern)
 {
     const GLubyte *m;
@@ -265,12 +265,12 @@ Parse_String(struct parse_state *parseState, const char *pattern)
     m = parseState->pos;
     for (i = 0; pattern[i]; i++) {
 	if (*m != static_cast<GLubyte>(pattern[i]))
-	    return GL_FALSE;
+	    return false;
 	m += 1;
     }
     parseState->pos = m;
 
-    return GL_TRUE; /* success */
+    return true; /* success */
 }
 
 
@@ -292,7 +292,7 @@ static const char *OutputRegisters[MAX_NV_VERTEX_PROGRAM_OUTPUTS + 1] = {
 /**
  * Parse a temporary register: Rnn
  */
-static GLboolean
+static bool
 Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 {
     GLubyte token[100];
@@ -312,14 +312,14 @@ Parse_TempReg(struct parse_state *parseState, GLint *tempRegNum)
 	RETURN_ERROR1("Bad temporary register name");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse address register "A0.x"
  */
-static GLboolean
+static bool
 Parse_AddrReg(struct parse_state *parseState)
 {
     /* match 'A0' */
@@ -334,14 +334,14 @@ Parse_AddrReg(struct parse_state *parseState)
     if (!Parse_String(parseState, "x"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse absolute program parameter register "c[##]"
  */
-static GLboolean
+static bool
 Parse_AbsParamReg(struct parse_state *parseState, GLint *regNum)
 {
     GLubyte token[100];
@@ -368,11 +368,11 @@ Parse_AbsParamReg(struct parse_state *parseState, GLint *regNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_ParamReg(struct parse_state *parseState, struct prog_src_register *srcReg)
 {
     GLubyte token[100];
@@ -439,14 +439,14 @@ Parse_ParamReg(struct parse_state *parseState, struct prog_src_register *srcReg)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Parse v[#] or v[<name>]
  */
-static GLboolean
+static bool
 Parse_AttribReg(struct parse_state *parseState, GLint *tempRegNum)
 {
     GLubyte token[100];
@@ -489,11 +489,11 @@ Parse_AttribReg(struct parse_state *parseState, GLint *tempRegNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
 {
     GLubyte token[100];
@@ -530,11 +530,11 @@ Parse_OutputReg(struct parse_state *parseState, GLint *outputRegNum)
     if (!Parse_String(parseState, "]"))
 	RETURN_ERROR1("Expected ]");
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_MaskedDstReg(struct parse_state *parseState, struct prog_dst_register *dstReg)
 {
     GLubyte token[100];
@@ -603,15 +603,15 @@ Parse_MaskedDstReg(struct parse_state *parseState, struct prog_dst_register *dst
 	if (k == 0) {
 	    RETURN_ERROR1("Bad writemask character");
 	}
-	return GL_TRUE;
+	return true;
     } else {
 	dstReg->WriteMask = WRITEMASK_XYZW;
-	return GL_TRUE;
+	return true;
     }
 }
 
 
-static GLboolean
+static bool
 Parse_SwizzleSrcReg(struct parse_state *parseState, struct prog_src_register *srcReg)
 {
     GLubyte token[100];
@@ -696,11 +696,11 @@ Parse_SwizzleSrcReg(struct parse_state *parseState, struct prog_src_register *sr
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_ScalarSrcReg(struct parse_state *parseState, struct prog_src_register *srcReg)
 {
     GLubyte token[100];
@@ -757,7 +757,7 @@ Parse_ScalarSrcReg(struct parse_state *parseState, struct prog_src_register *src
 	RETURN_ERROR1("Bad scalar source suffix");
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -788,11 +788,11 @@ Parse_UnaryOpInstruction(struct parse_state *parseState,
     if (!Parse_String(parseState, ";"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_BiOpInstruction(struct parse_state *parseState,
 		      struct prog_instruction *inst,
 		      enum prog_opcode opcode)
@@ -841,11 +841,11 @@ Parse_BiOpInstruction(struct parse_state *parseState,
 	inst->SrcReg[0].Index != inst->SrcReg[1].Index)
 	RETURN_ERROR1("Can't reference two vertex attribute registers");
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_TriOpInstruction(struct parse_state *parseState,
 		       struct prog_instruction *inst,
 		       enum prog_opcode opcode)
@@ -909,11 +909,11 @@ Parse_TriOpInstruction(struct parse_state *parseState,
 	 inst->SrcReg[1].Index != inst->SrcReg[2].Index))
 	RETURN_ERROR1("Can only reference one input register");
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_ScalarInstruction(struct parse_state *parseState,
 			struct prog_instruction *inst,
 			enum prog_opcode opcode)
@@ -940,11 +940,11 @@ Parse_ScalarInstruction(struct parse_state *parseState,
     if (!Parse_String(parseState, ";"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_AddressInstruction(struct parse_state *parseState, struct prog_instruction *inst)
 {
     inst->Opcode = OPCODE_ARL;
@@ -971,11 +971,11 @@ Parse_AddressInstruction(struct parse_state *parseState, struct prog_instruction
     if (!Parse_String(parseState, ";"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_EndInstruction(struct parse_state *parseState, struct prog_instruction *inst)
 {
     GLubyte token[100];
@@ -987,7 +987,7 @@ Parse_EndInstruction(struct parse_state *parseState, struct prog_instruction *in
     if (Parse_Token(parseState, token))
 	RETURN_ERROR2("Unexpected token after END:", token);
     else
-	return GL_TRUE;
+	return true;
 }
 
 
@@ -1004,7 +1004,7 @@ Parse_EndInstruction(struct parse_state *parseState, struct prog_instruction *in
  *                         | "PRINT" <string literal> "," <srcReg>
  *                         | "PRINT" <string literal> "," <dstReg>
  */
-static GLboolean
+static bool
 Parse_PrintInstruction(struct parse_state *parseState, struct prog_instruction *inst)
 {
     const GLubyte *str;
@@ -1070,30 +1070,30 @@ Parse_PrintInstruction(struct parse_state *parseState, struct prog_instruction *
     if (!Parse_String(parseState, ";"))
 	RETURN_ERROR;
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 Parse_OptionSequence(struct parse_state *parseState,
 		     struct prog_instruction program[])
 {
     (void) program;
     while (1) {
 	if (!Parse_String(parseState, "OPTION"))
-	    return GL_TRUE;  /* ok, not an OPTION statement */
+	    return true;  /* ok, not an OPTION statement */
 	if (Parse_String(parseState, "NV_position_invariant")) {
-	    parseState->isPositionInvariant = GL_TRUE;
+	    parseState->isPositionInvariant = true;
 	} else {
 	    RETURN_ERROR1("unexpected OPTION statement");
 	}
 	if (!Parse_String(parseState, ";"))
-	    return GL_FALSE;
+	    return false;
     }
 }
 
 
-static GLboolean
+static bool
 Parse_InstructionSequence(struct parse_state *parseState,
 			  struct prog_instruction program[])
 {
@@ -1174,7 +1174,7 @@ Parse_InstructionSequence(struct parse_state *parseState,
 		RETURN_ERROR;
 	    else {
 		parseState->numInst++;
-		return GL_TRUE;  /* all done */
+		return true;  /* all done */
 	    }
 	} else {
 	    /* bad instruction name */
@@ -1185,7 +1185,7 @@ Parse_InstructionSequence(struct parse_state *parseState,
 	if (inst->DstReg.File == PROGRAM_OUTPUT)
 	    parseState->outputsWritten |= (1 << inst->DstReg.Index);
 	else if (inst->DstReg.File == PROGRAM_ENV_PARAM)
-	    parseState->anyProgRegsWritten = GL_TRUE;
+	    parseState->anyProgRegsWritten = true;
 
 	if (inst->SrcReg[0].File == PROGRAM_INPUT)
 	    parseState->inputsRead |= (1 << inst->SrcReg[0].Index);
@@ -1204,13 +1204,13 @@ Parse_InstructionSequence(struct parse_state *parseState,
 }
 
 
-static GLboolean
+static bool
 Parse_Program(struct parse_state *parseState,
 	      struct prog_instruction instBuffer[])
 {
     if (parseState->isVersion1_1) {
 	if (!Parse_OptionSequence(parseState, instBuffer)) {
-	    return GL_FALSE;
+	    return false;
 	}
     }
     return Parse_InstructionSequence(parseState, instBuffer);
@@ -1236,12 +1236,12 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
     /* Get ready to parse */
     parseState.ctx = ctx;
     parseState.start = reinterpret_cast<const GLubyte *>(programString.c_str());
-    parseState.isPositionInvariant = GL_FALSE;
-    parseState.isVersion1_1 = GL_FALSE;
+    parseState.isPositionInvariant = false;
+    parseState.isVersion1_1 = false;
     parseState.numInst = 0;
     parseState.inputsRead = 0;
     parseState.outputsWritten = 0;
-    parseState.anyProgRegsWritten = GL_FALSE;
+    parseState.anyProgRegsWritten = false;
 
     /* Reset error state */
     _mesa_set_program_error(ctx, -1, nullptr);
@@ -1250,16 +1250,16 @@ _mesa_parse_nv_vertex_program(GLcontext *ctx, GLenum dstTarget,
     if (strncmp(programString.c_str(), "!!VP1.0", 7) == 0) {
 	target = GL_VERTEX_PROGRAM_NV;
 	parseState.pos = parseState.start + 7;
-	parseState.isStateProgram = GL_FALSE;
+	parseState.isStateProgram = false;
     } else if (strncmp(programString.c_str(), "!!VP1.1", 7) == 0) {
 	target = GL_VERTEX_PROGRAM_NV;
 	parseState.pos = parseState.start + 7;
-	parseState.isStateProgram = GL_FALSE;
-	parseState.isVersion1_1 = GL_TRUE;
+	parseState.isStateProgram = false;
+	parseState.isVersion1_1 = true;
     } else if (strncmp(programString.c_str(), "!!VSP1.0", 8) == 0) {
 	target = GL_VERTEX_STATE_PROGRAM_NV;
 	parseState.pos = parseState.start + 8;
-	parseState.isStateProgram = GL_TRUE;
+	parseState.isStateProgram = true;
     } else {
 	/* invalid header */
 	ctx->Program.ErrorPos = 0;

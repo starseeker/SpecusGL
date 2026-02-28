@@ -57,41 +57,41 @@
 /* True if a primitive can be split without copying of vertices, false
  * otherwise.
  */
-GLboolean split_prim_inplace(GLenum mode, GLuint *first, GLuint *incr)
+bool split_prim_inplace(GLenum mode, GLuint *first, GLuint *incr)
 {
     switch (mode) {
 	case GL_POINTS:
 	    *first = 1;
 	    *incr = 1;
-	    return GL_TRUE;
+	    return true;
 	case GL_LINES:
 	    *first = 2;
 	    *incr = 2;
-	    return GL_TRUE;
+	    return true;
 	case GL_LINE_STRIP:
 	    *first = 2;
 	    *incr = 1;
-	    return GL_TRUE;
+	    return true;
 	case GL_TRIANGLES:
 	    *first = 3;
 	    *incr = 3;
-	    return GL_TRUE;
+	    return true;
 	case GL_TRIANGLE_STRIP:
 	    *first = 3;
 	    *incr = 1;
-	    return GL_TRUE;
+	    return true;
 	case GL_QUADS:
 	    *first = 4;
 	    *incr = 4;
-	    return GL_TRUE;
+	    return true;
 	case GL_QUAD_STRIP:
 	    *first = 4;
 	    *incr = 2;
-	    return GL_TRUE;
+	    return true;
 	default:
 	    *first = 0;
 	    *incr = 1;		/* so that count % incr works */
-	    return GL_FALSE;
+	    return false;
     }
 }
 

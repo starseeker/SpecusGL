@@ -39,45 +39,33 @@
 /**
  * Add a new fixup address to the table.
  */
-GLboolean
+bool
 slang_fixup_save(slang_fixup_table *fixups, GLuint address)
 {
     fixups->table.push_back(address);
-    return GL_TRUE;
+    return true;
 }
 
 
 
 /* slang_function */
 
-int
+bool
 slang_function_construct(slang_function * func)
 {
-    func->kind = SLANG_FUNC_ORDINARY;
-    if (!slang_variable_construct(&func->header))
-	return 0;
-
-    func->parameters = new slang_variable_scope;
-    _slang_variable_scope_ctr(func->parameters);
-    func->param_count = 0;
-    func->body = nullptr;
-    func->address = ~0;
+    /* POD fields have default initialisers; just set up the parameters scope */
+    func->parameters = std::make_unique<slang_variable_scope>();
     slang_fixup_table_init(&func->fixups);
-    return 1;
+    return true;
 }
 
 void
 slang_function_destruct(slang_function * func)
 {
-    slang_variable_destruct(&func->header);
-    slang_variable_scope_destruct(func->parameters);
-    delete func->parameters;
-    func->parameters = nullptr;
-    if (func->body != nullptr) {
-	slang_operation_destruct(func->body);
-	delete func->body;
-	func->body = nullptr;
-    }
+    /* unique_ptr members + their destructors handle memory cleanup.
+     * slang_fixup_table_free clears the fixup vector. */
+    func->parameters.reset();
+    func->body.reset();
     slang_fixup_table_free(&func->fixups);
 }
 
@@ -85,7 +73,7 @@ slang_function_destruct(slang_function * func)
  * slang_function_scope
  */
 
-GLvoid
+void
 _slang_function_scope_ctr(slang_function_scope * self)
 {
     self->outer_scope = nullptr;
@@ -94,8 +82,8 @@ _slang_function_scope_ctr(slang_function_scope * self)
 void
 slang_function_scope_destruct(slang_function_scope * scope)
 {
-    for (auto &f : scope->functions)
-	slang_function_destruct(&f);
+    /* ~slang_function() handles cleanup of parameters, body, and fixups
+     * via their RAII unique_ptr and vector members. */
     scope->functions.clear();
 }
 
@@ -103,7 +91,7 @@ slang_function_scope_destruct(slang_function_scope * scope)
 /**
  * Does this function have a non-void return value?
  */
-GLboolean
+bool
 _slang_function_has_return_value(const slang_function *fun)
 {
     return fun->header.type.specifier.type != SLANG_SPEC_VOID;
@@ -117,16 +105,16 @@ _slang_function_has_return_value(const slang_function *fun)
  * \param all_scopes  if non-zero, search containing scopes too.
  * \return pointer to found function, or nullptr.
  */
-int
+bool
 slang_function_scope_find_by_name(slang_function_scope * funcs,
-				  slang_atom a_name, int all_scopes)
+				  slang_atom a_name, bool all_scopes)
 {
     for (const auto &f : funcs->functions)
 	if (a_name == f.header.a_name)
-	    return 1;
+	    return true;
     if (all_scopes && funcs->outer_scope != nullptr)
-	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, 1);
-    return 0;
+	return slang_function_scope_find_by_name(funcs->outer_scope, a_name, true);
+    return false;
 }
 
 
@@ -142,7 +130,7 @@ slang_function_scope_find_by_name(slang_function_scope * funcs,
  */
 slang_function *
 slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
-			  int all_scopes)
+			  bool all_scopes)
 {
     for (auto &f : funcs->functions) {
 	const GLuint haveRetValue = 0;
@@ -166,7 +154,7 @@ slang_function_scope_find(slang_function_scope * funcs, slang_function * fun,
 	}
     }
     if (all_scopes && funcs->outer_scope != nullptr)
-	return slang_function_scope_find(funcs->outer_scope, fun, 1);
+	return slang_function_scope_find(funcs->outer_scope, fun, true);
     return nullptr;
 }
 

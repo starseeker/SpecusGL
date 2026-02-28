@@ -47,7 +47,7 @@ struct normal_stage_data {
 #define NORMAL_STAGE_DATA(stage) ((struct normal_stage_data *)stage->privatePtr)
 
 
-static GLboolean
+static bool
 run_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     struct normal_stage_data *store = NORMAL_STAGE_DATA(stage);
@@ -55,7 +55,7 @@ run_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     const GLfloat *lengths;
 
     if (!store->NormalTransform)
-	return GL_TRUE;
+	return true;
 
     /* We can only use the display list's saved normal lengths if we've
      * got a transformation matrix with uniform scaling.
@@ -81,7 +81,7 @@ run_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     VB->NormalPtr = &store->normal;
 
     VB->NormalLengthPtr = nullptr;	/* no longer valid */
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -141,7 +141,7 @@ validate_normal_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 /**
  * Allocate stage's private data (storage for transformed normals).
  */
-static GLboolean
+static bool
 alloc_normal_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -149,10 +149,10 @@ alloc_normal_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<normal_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     store->normal.alloc(0, tnl->vb.Size, 32);
-    return GL_TRUE;
+    return true;
 }
 
 

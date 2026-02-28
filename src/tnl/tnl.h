@@ -38,7 +38,7 @@
  * more are currently hooked into dispatch directly by the module
  * itself.)
  */
-extern GLboolean
+extern bool
 _tnl_CreateContext(GLcontext *ctx);
 
 extern void
@@ -57,16 +57,16 @@ _tnl_wakeup(GLcontext *ctx);
 /* Driver configuration options:
  */
 extern void
-_tnl_need_projected_coords(GLcontext *ctx, GLboolean flag);
+_tnl_need_projected_coords(GLcontext *ctx, bool flag);
 
 
 /* Control whether T&L does per-vertex fog
  */
 extern void
-_tnl_allow_vertex_fog(GLcontext *ctx, GLboolean value);
+_tnl_allow_vertex_fog(GLcontext *ctx, bool value);
 
 extern void
-_tnl_allow_pixel_fog(GLcontext *ctx, GLboolean value);
+_tnl_allow_pixel_fog(GLcontext *ctx, bool value);
 
 extern void
 _tnl_program_string(GLcontext *ctx, GLenum target, struct gl_program *program);

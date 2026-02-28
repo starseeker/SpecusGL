@@ -1003,10 +1003,10 @@ static attrib_func AttribFuncsARB[2][4][8] = {
 /**********************************************************************/
 
 
-GLboolean _ae_create_context(GLcontext *ctx)
+bool _ae_create_context(GLcontext *ctx)
 {
     if (ctx->aelt_context)
-	return GL_TRUE;
+	return true;
 
     /* These _gloffset_* values may not be compile-time constants */
     SecondaryColorFuncs[0] = _gloffset_SecondaryColor3bvEXT;
@@ -1029,7 +1029,7 @@ GLboolean _ae_create_context(GLcontext *ctx)
 
     ctx->aelt_context = new AEcontext{};
     AE_CONTEXT(ctx)->NewState = ~0;
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1195,7 +1195,7 @@ void _ae_map_vbos(GLcontext *ctx)
 			      actx->vbo[i]);
 
     if (actx->nr_vbos)
-	actx->mapped_vbos = GL_TRUE;
+	actx->mapped_vbos = true;
 }
 
 void _ae_unmap_vbos(GLcontext *ctx)
@@ -1213,7 +1213,7 @@ void _ae_unmap_vbos(GLcontext *ctx)
 				GL_ARRAY_BUFFER_ARB,
 				actx->vbo[i]);
 
-    actx->mapped_vbos = GL_FALSE;
+    actx->mapped_vbos = false;
 }
 
 
@@ -1230,7 +1230,7 @@ void GLAPIENTRY _ae_loopback_array_elt(GLint elt)
     const AEarray *aa;
     const AEattrib *at;
     const struct _glapi_table * const disp = GET_DISPATCH();
-    GLboolean do_map;
+    bool do_map;
 
     if (actx->NewState) {
 	assert(!actx->mapped_vbos);

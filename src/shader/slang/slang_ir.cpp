@@ -135,33 +135,6 @@ _slang_refcount_storage(slang_ir_node *n)
 #endif
 
 
-static void
-_slang_free_ir(slang_ir_node *n)
-{
-    GLuint i;
-    if (!n)
-	return;
-
-    for (i = 0; i < 3; i++)
-	_slang_free_ir(n->Children[i]);
-    /* Do not free n->List since it's a child elsewhere */
-    delete n;
-}
-
-
-/**
- * Recursively free an IR tree.
- */
-void
-_slang_free_ir_tree(slang_ir_node *n)
-{
-#if 0
-    _slang_refcount_storage(n);
-#endif
-    _slang_free_ir(n);
-}
-
-
 
 static const char *
 swizzle_string(GLuint swizzle)
@@ -322,13 +295,13 @@ _slang_print_ir_tree(const slang_ir_node *n, int indent)
 
 	case IR_VAR:
 	    printf("VAR %s%s at %s  store %p\n",
-		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
+		   (n->Var ? n->Var->a_name : "TEMP"),
 		   swizzle_string(n->Store->Swizzle),
 		   storage_string(n->Store).c_str(), static_cast<void*>(n->Store));
 	    break;
 	case IR_VAR_DECL:
 	    printf("VAR_DECL %s (%p) at %s  store %p\n",
-		   (n->Var ? reinterpret_cast<char *>(n->Var->a_name) : "TEMP"),
+		   (n->Var ? n->Var->a_name : "TEMP"),
 		   static_cast<void*>(n->Var), storage_string(n->Store).c_str(),
 		   static_cast<void*>(n->Store));
 	    break;

@@ -37,9 +37,9 @@
  * glDrawPixels.
  * \param drawing if GL_TRUE do checking for DrawPixels, else do checking
  *                for ReadPixels.
- * \return GL_TRUE if error detected, GL_FALSE if no errors
+ * \return true if error detected, GL_FALSE if no errors
  */
-static GLboolean
+static bool
 error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
 			GLboolean drawing)
 {
@@ -50,14 +50,14 @@ error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
 	&& format != GL_DEPTH_STENCIL_EXT) {
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "gl%sPixels(format is not GL_DEPTH_STENCIL_EXT)", readDraw);
-	return GL_TRUE;
+	return true;
     }
 
     /* basic combinations test */
     if (!_mesa_is_legal_format_and_type(ctx, format, type)) {
 	_mesa_error(ctx, GL_INVALID_ENUM,
 		    "gl%sPixels(format or type)", readDraw);
-	return GL_TRUE;
+	return true;
     }
 
     /* additional checks */
@@ -76,24 +76,24 @@ error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
 	    if (drawing && !ctx->Visual.rgbMode) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glDrawPixels(drawing RGB pixels into color index buffer)");
-		return GL_TRUE;
+		return true;
 	    }
 	    if (!drawing && !_mesa_dest_buffer_exists(ctx, GL_COLOR)) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glReadPixels(no color buffer)");
-		return GL_TRUE;
+		return true;
 	    }
 	    break;
 	case GL_COLOR_INDEX:
 	    if (!drawing && ctx->Visual.rgbMode) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glReadPixels(reading color index format from RGB buffer)");
-		return GL_TRUE;
+		return true;
 	    }
 	    if (!drawing && !_mesa_dest_buffer_exists(ctx, GL_COLOR)) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glReadPixels(no color buffer)");
-		return GL_TRUE;
+		return true;
 	    }
 	    break;
 	case GL_STENCIL_INDEX:
@@ -101,7 +101,7 @@ error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
 		(!drawing && !_mesa_source_buffer_exists(ctx, format))) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "gl%sPixels(no stencil buffer)", readDraw);
-		return GL_TRUE;
+		return true;
 	    }
 	    break;
 	case GL_DEPTH_COMPONENT:
@@ -109,30 +109,30 @@ error_check_format_type(GLcontext *ctx, GLenum format, GLenum type,
 		(!drawing && !_mesa_source_buffer_exists(ctx, format))) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "gl%sPixels(no depth buffer)", readDraw);
-		return GL_TRUE;
+		return true;
 	    }
 	    break;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (!ctx->Extensions.EXT_packed_depth_stencil ||
 		type != GL_UNSIGNED_INT_24_8_EXT) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "gl%sPixels(type)", readDraw);
-		return GL_TRUE;
+		return true;
 	    }
 	    if ((drawing && !_mesa_dest_buffer_exists(ctx, format)) ||
 		(!drawing && !_mesa_source_buffer_exists(ctx, format))) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "gl%sPixels(no depth or stencil buffer)", readDraw);
-		return GL_TRUE;
+		return true;
 	    }
 	    break;
 	default:
 	    /* this should have been caught in _mesa_is_legal_format_type() */
 	    _mesa_problem(ctx, "unexpected format in _mesa_%sPixels", readDraw);
-	    return GL_TRUE;
+	    return true;
     }
 
     /* no errors */
-    return GL_FALSE;
+    return false;
 }
 
 

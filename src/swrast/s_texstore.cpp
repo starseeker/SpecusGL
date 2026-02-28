@@ -193,7 +193,7 @@ read_depth_stencil_image(GLcontext *ctx, GLint x, GLint y,
 }
 
 
-static GLboolean
+static bool
 is_depth_format(GLenum format)
 {
     switch (format) {
@@ -201,22 +201,22 @@ is_depth_format(GLenum format)
 	case GL_DEPTH_COMPONENT16_SGIX:
 	case GL_DEPTH_COMPONENT24_SGIX:
 	case GL_DEPTH_COMPONENT32_SGIX:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
 
-static GLboolean
+static bool
 is_depth_stencil_format(GLenum format)
 {
     switch (format) {
 	case GL_DEPTH_STENCIL_EXT:
 	case GL_DEPTH24_STENCIL8_EXT:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 

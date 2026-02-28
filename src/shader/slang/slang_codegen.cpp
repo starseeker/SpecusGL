@@ -59,7 +59,7 @@ static slang_ir_node *
 _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper);
 
 
-static GLboolean
+static bool
 is_sampler_type(const slang_fully_specified_type *t)
 {
     switch (t->specifier.type) {
@@ -71,9 +71,9 @@ is_sampler_type(const slang_fully_specified_type *t)
 	case SLANG_SPEC_SAMPLER2DSHADOW:
 	case SLANG_SPEC_SAMPLER2DRECT:
 	case SLANG_SPEC_SAMPLER2DRECTSHADOW:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -201,7 +201,7 @@ _slang_sizeof_type_specifier(const slang_type_specifier *spec)
 	    }
 	    break;
 	case SLANG_SPEC_ARRAY:
-	    sz = _slang_sizeof_type_specifier(spec->_array);
+	    sz = _slang_sizeof_type_specifier(spec->_array.get());
 	    break;
 	default:
 	    _mesa_problem(nullptr, "Unexpected type in _slang_sizeof_type_specifier()");
@@ -461,8 +461,6 @@ new_node3(slang_ir_opcode op,
     n->Children[0] = c0;
     n->Children[1] = c1;
     n->Children[2] = c2;
-    n->Writemask = WRITEMASK_XYZW;
-    n->InstLocation = -1;
     return n;
 }
 
@@ -634,7 +632,7 @@ static slang_ir_node *
 new_var(slang_assemble_ctx *A, slang_operation *oper, slang_atom name)
 {
     slang_ir_node *n;
-    slang_variable *var = _slang_locate_variable(oper->locals.get(), name, GL_TRUE);
+    slang_variable *var = _slang_locate_variable(oper->locals.get(), name, true);
     if (!var)
 	return nullptr;
 
@@ -652,27 +650,27 @@ new_var(slang_assemble_ctx *A, slang_operation *oper, slang_atom name)
  * Check if the given function is really just a wrapper for a
  * basic assembly instruction.
  */
-static GLboolean
+static bool
 slang_is_asm_function(const slang_function *fun)
 {
     if (fun->body->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE &&
 	fun->body->children.size() == 1 &&
 	fun->body->children[0].type == SLANG_OPER_ASM) {
-	return GL_TRUE;
+	return true;
     }
-    return GL_FALSE;
+    return false;
 }
 
 
-static GLboolean
+static bool
 _slang_is_noop(const slang_operation *oper)
 {
     if (!oper ||
 	oper->type == SLANG_OPER_VOID ||
 	(oper->children.size() == 1 && oper->children[0].type == SLANG_OPER_VOID))
-	return GL_TRUE;
+	return true;
     else
-	return GL_FALSE;
+	return false;
 }
 
 
@@ -685,7 +683,7 @@ _slang_find_node_type(slang_operation *oper, slang_operation_type type)
     GLuint i;
     if (oper->type == type)
 	return oper;
-    for (i = 0; i < (GLuint)oper->children.size(); i++) {
+    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 	slang_operation *p = _slang_find_node_type(&oper->children[i], type);
 	if (p)
 	    return p;
@@ -698,7 +696,7 @@ static void
 slang_resolve_variable(slang_operation *oper)
 {
     if (oper->type == SLANG_OPER_IDENTIFIER && !oper->var) {
-	oper->var = _slang_locate_variable(oper->locals.get(), oper->a_id, GL_TRUE);
+	oper->var = _slang_locate_variable(oper->locals.get(), oper->a_id, true);
     }
 }
 
@@ -709,22 +707,22 @@ slang_resolve_variable(slang_operation *oper)
 static void
 slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 		 GLuint substCount, slang_variable **substOld,
-		 slang_operation **substNew, GLboolean isLHS)
+		 slang_operation **substNew, bool isLHS)
 {
     switch (oper->type) {
 	case SLANG_OPER_VARIABLE_DECL: {
 	    slang_variable *v = _slang_locate_variable(oper->locals.get(),
-				oper->a_id, GL_TRUE);
+				oper->a_id, true);
 	    assert(v);
 	    if (v->initializer && oper->children.empty()) {
 		/* set child of oper to copy of initializer */
 		oper->children.resize(1);
-		slang_operation_copy(&oper->children[0], v->initializer);
+		slang_operation_copy(&oper->children[0], v->initializer.get());
 	    }
 	    if (oper->children.size() == 1) {
 		/* the initializer */
 		slang_substitute(A, &oper->children[0], substCount,
-				 substOld, substNew, GL_FALSE);
+				 substOld, substNew, false);
 	    }
 	}
 	break;
@@ -734,9 +732,9 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 		slang_atom id = oper->a_id;
 		slang_variable *v;
 		GLuint i;
-		v = _slang_locate_variable(oper->locals.get(), id, GL_TRUE);
+		v = _slang_locate_variable(oper->locals.get(), id, true);
 		if (!v) {
-		    _mesa_problem(nullptr, "var %s not found!\n", reinterpret_cast<char *>(oper->a_id));
+		    _mesa_problem(nullptr, "var %s not found!\n", oper->a_id);
 		    return;
 		}
 
@@ -749,11 +747,11 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 			    assert(substNew[i]->var);
 			    assert(substNew[i]->var->a_name);
 			    printf("Substitute %s with %s in id node %p\n",
-				   static_cast<char*>(v->a_name), static_cast<char*>(substNew[i]->var)->a_name,
+				   v->a_name, substNew[i]->var->a_name,
 				   static_cast<void*>(oper));
 			} else {
 			    printf("Substitute %s with %f in id node %p\n",
-				   static_cast<char*>(v->a_name), substNew[i]->literal[0],
+				   v->a_name, substNew[i]->literal[0],
 				   static_cast<void*>(oper));
 			}
 #endif
@@ -806,11 +804,11 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 
 		/* do substitutions on the "__retVal = expr" sub-tree */
 		slang_substitute(A, assignOper,
-				 substCount, substOld, substNew, GL_FALSE);
+				 substCount, substOld, substNew, false);
 
 		/* install new code */
 		slang_operation_copy(oper, blockOper);
-		slang_operation_destruct(blockOper);
+		slang_operation_delete(blockOper);  /* free blockOper and its content */
 	    } else {
 		/* check if return value was expected */
 		assert(A->CurFunction);
@@ -827,20 +825,20 @@ slang_substitute(slang_assemble_ctx *A, slang_operation *oper,
 	     * child[0] can't have substitutions but child[1] can.
 	     */
 	    slang_substitute(A, &oper->children[0],
-			     substCount, substOld, substNew, GL_TRUE);
+			     substCount, substOld, substNew, true);
 	    slang_substitute(A, &oper->children[1],
-			     substCount, substOld, substNew, GL_FALSE);
+			     substCount, substOld, substNew, false);
 	    break;
 	case SLANG_OPER_FIELD:
 	    /* XXX NEW - test */
 	    slang_substitute(A, &oper->children[0],
-			     substCount, substOld, substNew, GL_TRUE);
+			     substCount, substOld, substNew, true);
 	    break;
 	default: {
 	    GLuint i;
-	    for (i = 0; i < (GLuint)oper->children.size(); i++)
+	    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++)
 		slang_substitute(A, &oper->children[i],
-				 substCount, substOld, substNew, GL_FALSE);
+				 substCount, substOld, substNew, false);
 	}
     }
 }
@@ -862,27 +860,25 @@ static slang_operation *
 slang_inline_asm_function(slang_assemble_ctx *A,
 			  slang_function *fun, slang_operation *oper)
 {
-    const GLuint numArgs = (GLuint)oper->children.size();
+    const GLuint numArgs = static_cast<GLuint>(oper->children.size());
     GLuint i;
     slang_operation *inlined;
-    const GLboolean haveRetValue = _slang_function_has_return_value(fun);
-    slang_variable **substOld;
-    slang_operation **substNew;
+    const bool haveRetValue = _slang_function_has_return_value(fun);
 
     ASSERT(slang_is_asm_function(fun));
     ASSERT(fun->param_count == numArgs + haveRetValue);
 
     /*
     printf("Inline %s as %s\n",
-           static_cast<char*>(fun->header.a_name),
-           static_cast<char*>(fun->body->children[0].a_id));
+           fun->header.a_name,
+           fun->body->children[0].a_id);
     */
 
     /*
      * We'll substitute formal params with actual args in the asm call.
      */
-    substOld = new slang_variable *[numArgs];
-    substNew = new slang_operation *[numArgs];
+    std::vector<slang_variable *> substOld(numArgs);
+    std::vector<slang_operation *> substNew(numArgs);
     for (i = 0; i < numArgs; i++) {
 	substOld[i] = fun->parameters->variables[i];
 	substNew[i] = &oper->children[i];
@@ -900,10 +896,7 @@ slang_inline_asm_function(slang_assemble_ctx *A,
     }
 
     /* now do formal->actual substitutions */
-    slang_substitute(A, inlined, numArgs, substOld, substNew, GL_FALSE);
-
-    delete[] substOld;
-    delete[] substNew;
+    slang_substitute(A, inlined, numArgs, substOld.data(), substNew.data(), false);
 
     return inlined;
 }
@@ -922,14 +915,11 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	COPY_IN,
 	COPY_OUT
     };
-    ParamMode *paramMode;
-    const GLboolean haveRetValue = _slang_function_has_return_value(fun);
-    const GLuint numArgs = (GLuint)oper->children.size();
+    const bool haveRetValue = _slang_function_has_return_value(fun);
+    const GLuint numArgs = static_cast<GLuint>(oper->children.size());
     const GLuint totalArgs = numArgs + haveRetValue;
     slang_operation *args = oper->children.data();
     slang_operation *inlined, *top;
-    slang_variable **substOld;
-    slang_operation **substNew;
     GLuint substCount, numCopyIn, i;
     slang_function *prevFunction;
 
@@ -940,14 +930,14 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     /*assert(oper->type == SLANG_OPER_CALL); (or (matrix) multiply, etc) */
     assert(fun->param_count == totalArgs);
 
-    /* allocate temporary arrays */
-    paramMode = new ParamMode[totalArgs];
-    substOld = new slang_variable *[totalArgs];
-    substNew = new slang_operation *[totalArgs];
+    /* allocate temporary arrays (RAII: no manual delete[] needed) */
+    std::vector<ParamMode> paramMode(totalArgs);
+    std::vector<slang_variable *> substOld(totalArgs);
+    std::vector<slang_operation *> substNew(totalArgs);
 
 #if 0
     printf("Inline call to %s  (total vars=%d  nparams=%d)\n",
-	   reinterpret_cast<char *>(fun->header.a_name),
+	   fun->header.a_name,
 	   fun->parameters->num_variables, numArgs);
 #endif
 
@@ -970,12 +960,12 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	resultVar = slang_variable_scope_grow(commaSeq->locals.get());
 	/*
 	printf("Alloc __resultTmp in scope %p for retval of calling %s\n",
-	       static_cast<void*>(commaSeq->locals.get()), reinterpret_cast<char *>(fun->header.a_name));
+	       static_cast<void*>(commaSeq->locals.get()), fun->header.a_name);
 	*/
 
 	resultVar->a_name = slang_atom_pool_atom(A->atoms, "__resultTmp");
 	resultVar->type = fun->header.type; /* XXX copy? */
-	resultVar->isTemp = GL_TRUE;
+	resultVar->isTemp = true;
 
 	/* child[0] = __resultTmp declaration */
 	declOper = &commaSeq->children[0];
@@ -1016,7 +1006,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	/*
 	printf("Param %d: %s %s \n", i,
 	       slang_type_qual_string(p->type.qualifier),
-	     reinterpret_cast<char *>(p->a_name));
+	     p->a_name);
 	*/
 	if (p->type.qualifier == SLANG_QUAL_INOUT ||
 	    p->type.qualifier == SLANG_QUAL_OUT) {
@@ -1057,7 +1047,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
     }
 
     /* actual code inlining: */
-    slang_operation_copy(inlined, fun->body);
+    slang_operation_copy(inlined, fun->body.get());
 
     /*** XXX review this */
     assert(inlined->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE);
@@ -1072,7 +1062,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 #endif
 
     /* do parameter substitution in inlined code: */
-    slang_substitute(A, inlined, substCount, substOld, substNew, GL_FALSE);
+    slang_substitute(A, inlined, substCount, substOld.data(), substNew.data(), false);
 
 #if 0
     printf("======================= subst code ==========================\n");
@@ -1090,7 +1080,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	    /* declare parameter 'p' */
 	    slang_operation *decl = slang_operation_insert(inlined, numCopyIn);
 	    /*
-	    printf("COPY_IN %s from expr\n", static_cast<char*>(p->a_name));
+	    printf("COPY_IN %s from expr\n", p->a_name);
 	    */
 	    decl->type = SLANG_OPER_VARIABLE_DECL;
 	    assert(decl->locals);
@@ -1110,7 +1100,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
      * 2. Copy the 'out' parameter vars
      */
     {
-	slang_operation *lab = slang_operation_insert(inlined, (GLuint)inlined->children.size());
+	slang_operation *lab = slang_operation_insert(inlined, static_cast<GLuint>(inlined->children.size()));
 	lab->type = SLANG_OPER_LABEL;
 	lab->label = A->curFuncEndLabel;
     }
@@ -1120,7 +1110,7 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	    const slang_variable *p = fun->parameters->variables[i];
 	    /* actualCallVar = outParam */
 	    /*if (i > 0 || !haveRetValue)*/
-	    slang_operation *ass = slang_operation_insert(inlined, (GLuint)inlined->children.size());
+	    slang_operation *ass = slang_operation_insert(inlined, static_cast<GLuint>(inlined->children.size()));
 	    ass->type = SLANG_OPER_ASSIGN;
 	    ass->locals->outer_scope = inlined->locals.get();
 	    ass->children.resize(2);
@@ -1131,13 +1121,11 @@ slang_inline_function_call(slang_assemble_ctx * A, slang_function *fun,
 	}
     }
 
-    delete[] paramMode;
-    delete[] substOld;
-    delete[] substNew;
+    /* paramMode, substOld, substNew are std::vector - auto-freed here */
 
 #if 0
     printf("Done Inline call to %s  (total vars=%d  nparams=%d)\n",
-	   reinterpret_cast<char *>(fun->header.a_name),
+	   fun->header.a_name,
 	   fun->parameters->num_variables, numArgs);
     slang_print_tree(top, 0);
 #endif
@@ -1159,7 +1147,7 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
     char name[200];
 
     prevFuncEndLabel = A->curFuncEndLabel;
-    snprintf(name, sizeof(name), "__endOfFunc_%s_", reinterpret_cast<char *>(fun->header.a_name));
+    snprintf(name, sizeof(name), "__endOfFunc_%s_", fun->header.a_name);
     A->curFuncEndLabel = _slang_label_new(name);
     assert(A->curFuncEndLabel);
 
@@ -1191,7 +1179,7 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
 	    }
 	    callOper->type = SLANG_OPER_INLINED_CALL;
 	    callOper->fun = fun;
-	    callOper->label = _slang_label_new_unique(static_cast<char*>(fun->header.a_name));
+	    callOper->label = _slang_label_new_unique(fun->header.a_name);
 	}
     }
 
@@ -1199,14 +1187,13 @@ _slang_gen_function_call(slang_assemble_ctx *A, slang_function *fun,
 	return nullptr;
 
     /* Replace the function call with the inlined block */
-    slang_operation_destruct(oper);
-    *oper = std::move(*inlined);
+    *oper = std::move(*inlined);   /* move assignment destroys oper's old state */
     delete inlined;
 
 #if 0
     assert(inlined->locals);
     printf("*** Inlined code for call to %s:\n",
-	   static_cast<char*>(fun->header.a_name));
+	   fun->header.a_name);
     slang_print_tree(oper, 10);
     printf("\n");
 #endif
@@ -1286,15 +1273,15 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
 
     assert(oper->type == SLANG_OPER_ASM);
 
-    info = slang_find_asm_info(reinterpret_cast<char *>(oper->a_id));
+    info = slang_find_asm_info(oper->a_id);
     if (!info) {
 	_mesa_problem(nullptr, "undefined __asm function %s\n",
-		      reinterpret_cast<char *>(oper->a_id));
+		      oper->a_id);
 	assert(info);
     }
     assert(info->NumParams <= 3);
 
-    if (info->NumParams == (GLuint)oper->children.size()) {
+    if (info->NumParams == static_cast<GLuint>(oper->children.size())) {
 	/* Storage for result is not specified.
 	 * Children[0], [1] are the operands.
 	 */
@@ -1327,7 +1314,7 @@ _slang_gen_asm(slang_assemble_ctx *A, slang_operation *oper,
 	dest_oper = &oper->children[0];
 	while (dest_oper->type == SLANG_OPER_FIELD) {
 	    /* writemask */
-	    writemask &= make_writemask(static_cast<char*>(dest_oper->a_id));
+	    writemask &= make_writemask(dest_oper->a_id);
 	    dest_oper = &dest_oper->children[0];
 	}
 
@@ -1357,7 +1344,7 @@ static slang_function *
 _slang_first_function(slang_function_scope *scope, const char *name)
 {
     for (auto &f : scope->functions) {
-	if (strcmp(name, static_cast<char*>(f.header.a_name)) == 0)
+	if (strcmp(name, f.header.a_name) == 0)
 	    return &f;
     }
     if (scope->outer_scope)
@@ -1376,7 +1363,7 @@ _slang_gen_function_call_name(slang_assemble_ctx *A, const char *name,
 			      slang_operation *oper, slang_operation *dest)
 {
     slang_operation *params = oper->children.data();
-    const GLuint param_count = (GLuint)oper->children.size();
+    const GLuint param_count = static_cast<GLuint>(oper->children.size());
     slang_atom atom;
     slang_function *fun;
 
@@ -1405,29 +1392,29 @@ _slang_gen_function_call_name(slang_assemble_ctx *A, const char *name,
 }
 
 
-static GLboolean
-_slang_is_constant_cond(const slang_operation *oper, GLboolean *value)
+static bool
+_slang_is_constant_cond(const slang_operation *oper, bool *value)
 {
     if (oper->type == SLANG_OPER_LITERAL_FLOAT ||
 	oper->type == SLANG_OPER_LITERAL_INT ||
 	oper->type == SLANG_OPER_LITERAL_BOOL) {
 	if (oper->literal[0])
-	    *value = GL_TRUE;
+	    *value = true;
 	else
-	    *value = GL_FALSE;
-	return GL_TRUE;
+	    *value = false;
+	return true;
     } else if (oper->type == SLANG_OPER_EXPRESSION &&
-	       (GLuint)oper->children.size() == 1) {
+	       static_cast<GLuint>(oper->children.size()) == 1) {
 	return _slang_is_constant_cond(&oper->children[0], value);
     }
-    return GL_FALSE;
+    return false;
 }
 
 
 /**
  * Test if an operation is a scalar or boolean.
  */
-static GLboolean
+static bool
 _slang_is_scalar_or_boolean(slang_assemble_ctx *A, slang_operation *oper)
 {
     slang_typeinfo type;
@@ -1453,7 +1440,7 @@ _slang_gen_while(slang_assemble_ctx * A, slang_operation *oper)
      *    body code (child[1])
      */
     slang_ir_node *prevLoop, *loop, *breakIf, *body;
-    GLboolean isConst, constTrue;
+    bool isConst, constTrue;
 
     /* type-check expression */
     if (!_slang_is_scalar_or_boolean(A, &oper->children[0])) {
@@ -1515,7 +1502,7 @@ _slang_gen_do(slang_assemble_ctx * A, slang_operation *oper)
      *       BREAK if !expr (child[1])
      */
     slang_ir_node *prevLoop, *loop;
-    GLboolean isConst, constTrue;
+    bool isConst, constTrue;
 
     /* type-check expression */
     if (!_slang_is_scalar_or_boolean(A, &oper->children[1])) {
@@ -1612,17 +1599,17 @@ _slang_gen_continue(slang_assemble_ctx * A, const slang_operation *oper)
 /**
  * Determine if the given operation is of a specific type.
  */
-static GLboolean
+static bool
 is_operation_type(const slang_operation *oper, slang_operation_type type)
 {
     if (oper->type == type)
-	return GL_TRUE;
+	return true;
     else if ((oper->type == SLANG_OPER_BLOCK_NEW_SCOPE ||
 	      oper->type == SLANG_OPER_BLOCK_NO_NEW_SCOPE) &&
-	     (GLuint)oper->children.size() == 1)
+	     static_cast<GLuint>(oper->children.size()) == 1)
 	return is_operation_type(&oper->children[0], type);
     else
-	return GL_FALSE;
+	return false;
 }
 
 
@@ -1641,9 +1628,9 @@ _slang_gen_if(slang_assemble_ctx * A, slang_operation *oper)
      *    else-body code
      * ENDIF
      */
-    const GLboolean haveElseClause = !_slang_is_noop(&oper->children[2]);
+    const bool haveElseClause = !_slang_is_noop(&oper->children[2]);
     slang_ir_node *ifNode, *cond, *ifBody, *elseBody;
-    GLboolean isConst, constTrue;
+    bool isConst, constTrue;
 
     /* type-check expression */
     if (!_slang_is_scalar_or_boolean(A, &oper->children[0])) {
@@ -1900,8 +1887,8 @@ _slang_gen_logical_or(slang_assemble_ctx *A, slang_operation *oper)
 static slang_ir_node *
 _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 {
-    const GLboolean haveReturnValue
-	= ((GLuint)oper->children.size() == 1 && oper->children[0].type != SLANG_OPER_VOID);
+    const bool haveReturnValue
+	= (static_cast<GLuint>(oper->children.size()) == 1 && oper->children[0].type != SLANG_OPER_VOID);
 
     /* error checking */
     assert(A->CurFunction);
@@ -1935,7 +1922,7 @@ _slang_gen_return(slang_assemble_ctx * A, slang_operation *oper)
 #if 1 /* DEBUG */
 	{
 	    slang_variable *v
-		= _slang_locate_variable(oper->locals.get(), a_retVal, GL_TRUE);
+		= _slang_locate_variable(oper->locals.get(), a_retVal, true);
 	    if (!v) {
 		/* trying to return a value in a void-valued function */
 		return nullptr;
@@ -1973,11 +1960,11 @@ _slang_gen_declaration(slang_assemble_ctx *A, slang_operation *oper)
     slang_ir_node *n;
     slang_ir_node *varDecl;
     slang_variable *v;
-    const char *varName = reinterpret_cast<char *>(oper->a_id);
+    const char *varName = oper->a_id;
 
     assert(oper->children.size() == 0 || oper->children.size() == 1);
 
-    v = _slang_locate_variable(oper->locals.get(), oper->a_id, GL_TRUE);
+    v = _slang_locate_variable(oper->locals.get(), oper->a_id, true);
     assert(v);
 
     varDecl = _slang_gen_var_decl(A, v);
@@ -2010,13 +1997,13 @@ _slang_gen_declaration(slang_assemble_ctx *A, slang_operation *oper)
 	{
 	    slang_operation dup;
 	    slang_operation_construct(&dup);
-	    slang_operation_copy(&dup, v->initializer);
+	    slang_operation_copy(&dup, v->initializer.get());
 	    _slang_simplify(&dup, &A->space, A->atoms);
 	    rhs = _slang_gen_operation(A, &dup);
 	}
 #else
-	_slang_simplify(v->initializer, &A->space, A->atoms);
-	rhs = _slang_gen_operation(A, v->initializer);
+	_slang_simplify(v->initializer.get(), &A->space, A->atoms);
+	rhs = _slang_gen_operation(A, v->initializer.get());
 #endif
 	if (!rhs)
 	    return nullptr;
@@ -2046,7 +2033,7 @@ _slang_gen_variable(slang_assemble_ctx * A, slang_operation *oper)
     slang_atom aVar = oper->var ? oper->var->a_name : oper->a_id;
     slang_ir_node *n = new_var(A, oper, aVar);
     if (!n) {
-	slang_info_log_error(A->log, "undefined variable '%s'", reinterpret_cast<char *>(aVar));
+	slang_info_log_error(A->log, "undefined variable '%s'", aVar);
 	return nullptr;
     }
     return n;
@@ -2065,7 +2052,7 @@ _slang_gen_variable(slang_assemble_ctx * A, slang_operation *oper)
  *    v.zy = vec2(a, b).*yx*         (* = don't care)
  * This function helps to determine simple vs. non-simple.
  */
-static GLboolean
+static bool
 _slang_simple_writemask(GLuint writemask, GLuint swizzle)
 {
     switch (writemask) {
@@ -2087,7 +2074,7 @@ _slang_simple_writemask(GLuint writemask, GLuint swizzle)
 	case WRITEMASK_XYZW:
 	    return swizzle == SWIZZLE_NOOP;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -2099,9 +2086,9 @@ _slang_simple_writemask(GLuint writemask, GLuint swizzle)
  * \param swizzle  the incoming swizzle
  * \param writemaskOut  returns the writemask
  * \param swizzleOut  swizzle to apply to the right-hand-side
- * \return GL_FALSE for simple writemasks, GL_TRUE for non-simple
+ * \return false for simple writemasks, GL_TRUE for non-simple
  */
-static GLboolean
+static bool
 swizzle_to_writemask(GLuint swizzle,
 		     GLuint *writemaskOut, GLuint *swizzleOut)
 {
@@ -2145,9 +2132,9 @@ swizzle_to_writemask(GLuint swizzle,
 	    assert(GET_SWZ(*swizzleOut, 2) == SWIZZLE_Z);
 	if (size >= 4)
 	    assert(GET_SWZ(*swizzleOut, 3) == SWIZZLE_W);
-	return GL_TRUE;
+	return true;
     } else
-	return GL_FALSE;
+	return false;
 }
 
 
@@ -2174,10 +2161,10 @@ _slang_gen_assignment(slang_assemble_ctx * A, slang_operation *oper)
 	/* Check that var is writeable */
 	slang_variable *var
 	    = _slang_locate_variable(oper->children[0].locals.get(),
-				     oper->children[0].a_id, GL_TRUE);
+				     oper->children[0].a_id, true);
 	if (!var) {
 	    slang_info_log_error(A->log, "undefined variable '%s'",
-				 reinterpret_cast<char *>(oper->children[0].a_id));
+				 oper->children[0].a_id);
 	    return nullptr;
 	}
 	if (var->type.qualifier == SLANG_QUAL_CONST ||
@@ -2187,7 +2174,7 @@ _slang_gen_assignment(slang_assemble_ctx * A, slang_operation *oper)
 	     A->program->Target == GL_FRAGMENT_PROGRAM_ARB)) {
 	    slang_info_log_error(A->log,
 				 "illegal assignment to read-only variable '%s'",
-				 reinterpret_cast<char *>(oper->children[0].a_id));
+				 oper->children[0].a_id);
 	    return nullptr;
 	}
     }
@@ -2261,7 +2248,7 @@ _slang_gen_field(slang_assemble_ctx * A, slang_operation *oper)
 	slang_swizzle swz;
 	slang_ir_node *n;
 	GLuint swizzle;
-	if (!_slang_is_swizzle(reinterpret_cast<char *>(oper->a_id), rows, &swz)) {
+	if (!_slang_is_swizzle(oper->a_id, rows, &swz)) {
 	    slang_info_log_error(A->log, "Bad swizzle");
 	}
 	swizzle = MAKE_SWIZZLE4(swz.swizzle[0],
@@ -2281,7 +2268,7 @@ _slang_gen_field(slang_assemble_ctx * A, slang_operation *oper)
 	slang_swizzle swz;
 	slang_ir_node *n;
 	GLuint swizzle;
-	if (!_slang_is_swizzle(reinterpret_cast<char *>(oper->a_id), rows, &swz)) {
+	if (!_slang_is_swizzle(oper->a_id, rows, &swz)) {
 	    slang_info_log_error(A->log, "Bad swizzle");
 	}
 	swizzle = MAKE_SWIZZLE4(swz.swizzle[0],
@@ -2310,8 +2297,8 @@ _slang_gen_field(slang_assemble_ctx * A, slang_operation *oper)
 	if (fieldSize == 0 || fieldOffset < 0) {
 	    slang_info_log_error(A->log,
 				 "\"%s\" is not a member of struct \"%s\"",
-				 reinterpret_cast<char *>(oper->a_id),
-				 reinterpret_cast<char *>(ti.spec._struct->a_name));
+				 oper->a_id,
+				 ti.spec._struct->a_name);
 	    return nullptr;
 	}
 	assert(fieldSize >= 0);
@@ -2324,7 +2311,7 @@ _slang_gen_field(slang_assemble_ctx * A, slang_operation *oper)
 
 	n = new_node1(IR_FIELD, base);
 	if (n) {
-	    n->Field = reinterpret_cast<char *>(oper->a_id);
+	    n->Field = oper->a_id;
 	    n->FieldOffset = fieldOffset;
 	    assert(n->FieldOffset >= 0);
 	    n->Store = _slang_new_ir_storage(base->Store->File,
@@ -2409,11 +2396,11 @@ _slang_gen_subscript(slang_assemble_ctx * A, slang_operation *oper)
 	if (array && index) {
 	    /* bounds check */
 	    if (index->Opcode == IR_FLOAT &&
-		((int) index->Value[0] < 0 ||
-		 (int) index->Value[0] >= arrayLen)) {
+		(static_cast<int>(index->Value[0]) < 0 ||
+		 static_cast<int>(index->Value[0]) >= arrayLen)) {
 		slang_info_log_error(A->log,
 				     "Array index out of bounds (index=%d size=%d)",
-				     (int) index->Value[0], arrayLen);
+				     static_cast<int>(index->Value[0]), arrayLen);
 		_slang_free_ir_tree(array);
 		_slang_free_ir_tree(index);
 		return nullptr;
@@ -2512,7 +2499,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 		slang_ir_node *n, *tree = nullptr;
 		GLuint i;
 
-		for (i = 0; i < (GLuint)oper->children.size(); i++) {
+		for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 		    n = _slang_gen_operation(A, &oper->children[i]);
 		    if (!n) {
 			_slang_free_ir_tree(tree);
@@ -2532,7 +2519,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 			if (v->aux) {
 			    slang_ir_storage *store = (slang_ir_storage *) v->aux;
 			    /*
-			    printf("  Deallocate var %s\n", static_cast<char*>(v->a_name));
+			    printf("  Deallocate var %s\n", v->a_name);
 			    */
 			    assert(store->File == PROGRAM_TEMPORARY);
 			    assert(store->Index >= 0);
@@ -2733,7 +2720,7 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
 	case SLANG_OPER_SEQUENCE: {
 	    slang_ir_node *tree = nullptr;
 	    GLuint i;
-	    for (i = 0; i < (GLuint)oper->children.size(); i++) {
+	    for (i = 0; i < static_cast<GLuint>(oper->children.size()); i++) {
 		slang_ir_node *n = _slang_gen_operation(A, &oper->children[i]);
 		tree = tree ? new_seq(tree, n) : n;
 	    }
@@ -2772,13 +2759,13 @@ _slang_gen_operation(slang_assemble_ctx * A, slang_operation *oper)
  * (PROGRAM_SAMPLER, index) where index is resolved at link-time to an
  * actual texture unit (as specified by the user calling glUniform1i()).
  */
-GLboolean
+bool
 _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
 			       slang_unit_type type)
 {
     struct gl_program *prog = A->program;
-    const char *varName = reinterpret_cast<char *>(var->a_name);
-    GLboolean success = GL_TRUE;
+    const char *varName = var->a_name;
+    bool success = true;
     slang_ir_storage *store = nullptr;
     const GLenum datatype = _slang_gltype_from_specifier(&var->type.specifier);
     const GLint texIndex = sampler_to_texture_index(var->type.specifier.type);
@@ -2820,9 +2807,9 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
 		} else {
 		    slang_info_log_error(A->log,
 					 "invalid datatype for uniform variable %s",
-					 reinterpret_cast<char *>(var->a_name));
+					 var->a_name);
 		}
-		return GL_FALSE;
+		return false;
 	    } else {
 		GLint uniformLoc = _mesa_add_uniform(prog->Parameters, varName,
 						     size, datatype);
@@ -2939,21 +2926,21 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
 	    lhs->Store = n->Store;
 
 	    /* constant folding, etc */
-	    _slang_simplify(var->initializer, &A->space, A->atoms);
+	    _slang_simplify(var->initializer.get(), &A->space, A->atoms);
 
-	    rhs = _slang_gen_operation(A, var->initializer);
+	    rhs = _slang_gen_operation(A, var->initializer.get());
 	    assert(rhs);
 	    init = new_node2(IR_MOVE, lhs, rhs);
 	    n = new_seq(n, init);
 	}
 
-	success = _slang_emit_code(n, A->vartable, A->program, GL_FALSE, A->log);
+	success = _slang_emit_code(n, A->vartable, A->program, false, A->log);
 
 	_slang_free_ir_tree(n);
     }
 
 #ifdef SCGV_DBG
-    printf("GLOBAL VAR %s  idx %d\n", static_cast<char*>(var->a_name), store ? store->Index : -2);
+    printf("GLOBAL VAR %s  idx %d\n", var->a_name, store ? store->Index : -2);
 #endif
 
     if (store)
@@ -2968,13 +2955,13 @@ _slang_codegen_global_variable(slang_assemble_ctx *A, slang_variable *var,
  * Then call the code emitter to convert the IR tree into gl_program
  * instructions.
  */
-GLboolean
+bool
 _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
 {
     slang_ir_node *n;
-    GLboolean success = GL_TRUE;
+    bool success = true;
 
-    if (strcmp(reinterpret_cast<char *>(fun->header.a_name), "main") != 0) {
+    if (strcmp(fun->header.a_name, "main") != 0) {
 	/* we only really generate code for main, all other functions get
 	 * inlined.
 	 */
@@ -2983,23 +2970,23 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
 	if (fun->header.type.specifier.type != SLANG_SPEC_VOID) {
 	    /* check that non-void functions actually return something */
 	    slang_operation *op
-		= _slang_find_node_type(fun->body, SLANG_OPER_RETURN);
+		= _slang_find_node_type(fun->body.get(), SLANG_OPER_RETURN);
 	    if (!op) {
 		slang_info_log_error(A->log,
 				     "function \"%s\" has no return statement",
-				     reinterpret_cast<char *>(fun->header.a_name));
+				     fun->header.a_name);
 		printf(
 		    "function \"%s\" has no return statement\n",
-		    reinterpret_cast<char *>(fun->header.a_name));
-		return GL_FALSE;
+		    fun->header.a_name);
+		return false;
 	    }
 	}
 #endif
-	return GL_TRUE;  /* not an error */
+	return true;  /* not an error */
     }
 
 #if 0
-    printf("\n*********** codegen_function %s\n", reinterpret_cast<char *>(fun->header.a_name));
+    printf("\n*********** codegen_function %s\n", fun->header.a_name);
     slang_print_function(fun, 1);
 #endif
 
@@ -3011,10 +2998,10 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
     A->CurFunction = fun;
 
     /* fold constant expressions, etc. */
-    _slang_simplify(fun->body, &A->space, A->atoms);
+    _slang_simplify(fun->body.get(), &A->space, A->atoms);
 
 #if 0
-    printf("\n*********** simplified %s\n", reinterpret_cast<char *>(fun->header.a_name));
+    printf("\n*********** simplified %s\n", fun->header.a_name);
     slang_print_function(fun, 1);
 #endif
 
@@ -3025,7 +3012,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
     _slang_push_var_table(A->vartable);
 
     /* Generate IR tree for the function body code */
-    n = _slang_gen_operation(A, fun->body);
+    n = _slang_gen_operation(A, fun->body.get());
     if (n)
 	n = new_node1(IR_SCOPE, n);
 
@@ -3034,7 +3021,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
 
     if (!n) {
 	/* XXX record error */
-	return GL_FALSE;
+	return false;
     }
 
     /* append an end-of-function-label to IR tree */
@@ -3044,11 +3031,11 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
     A->curFuncEndLabel = nullptr;
 
 #if 0
-    printf("************* New AST for %s *****\n", static_cast<char*>(fun->header.a_name));
+    printf("************* New AST for %s *****\n", fun->header.a_name);
     slang_print_function(fun, 1);
 #endif
 #if 0
-    printf("************* IR for %s *******\n", static_cast<char*>(fun->header.a_name));
+    printf("************* IR for %s *******\n", fun->header.a_name);
     _slang_print_ir_tree(n, 0);
 #endif
 #if 0
@@ -3056,7 +3043,7 @@ _slang_codegen_function(slang_assemble_ctx * A, slang_function * fun)
 #endif
 
     /* Emit program instructions */
-    success = _slang_emit_code(n, A->vartable, A->program, GL_TRUE, A->log);
+    success = _slang_emit_code(n, A->vartable, A->program, true, A->log);
     _slang_free_ir_tree(n);
 
     /* free codegen context */

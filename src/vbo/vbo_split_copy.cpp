@@ -141,22 +141,22 @@ static GLuint attr_size(const struct gl_client_array *array)
  * that there is sufficient room for any remaining vertices to finish
  * off the prim:
  */
-static GLboolean check_flush(struct copy_context *copy)
+static bool check_flush(struct copy_context *copy)
 {
     GLenum mode = copy->dstprim[copy->dstprim_nr].mode;
 
     if (GL_TRIANGLE_STRIP == mode &&
 	copy->dstelt_nr & 1) { /* see bug9962 */
-	return GL_FALSE;
+	return false;
     }
 
     if (copy->dstbuf_nr + 4 > copy->dstbuf_size)
-	return GL_TRUE;
+	return true;
 
     if (copy->dstelt_nr + 4 > copy->dstelt_size)
-	return GL_TRUE;
+	return true;
 
-    return GL_FALSE;
+    return false;
 }
 
 static void flush(struct copy_context *copy)

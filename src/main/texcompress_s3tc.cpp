@@ -66,7 +66,7 @@ _mesa_init_texture_s3tc(GLcontext *ctx)
 /**
  * Called via TexFormat->StoreImage to store an RGB_DXT1 texture.
  */
-static GLboolean
+static bool
 texstore_rgb_dxt1(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -93,7 +93,7 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
@@ -115,14 +115,14 @@ texstore_rgb_dxt1(TEXSTORE_PARAMS)
     }
 
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Called via TexFormat->StoreImage to store an RGBA_DXT1 texture.
  */
-static GLboolean
+static bool
 texstore_rgba_dxt1(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -149,7 +149,7 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
@@ -170,14 +170,14 @@ texstore_rgba_dxt1(TEXSTORE_PARAMS)
     }
 
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Called via TexFormat->StoreImage to store an RGBA_DXT3 texture.
  */
-static GLboolean
+static bool
 texstore_rgba_dxt3(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -204,7 +204,7 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
@@ -225,14 +225,14 @@ texstore_rgba_dxt3(TEXSTORE_PARAMS)
     }
 
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Called via TexFormat->StoreImage to store an RGBA_DXT5 texture.
  */
-static GLboolean
+static bool
 texstore_rgba_dxt5(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -259,7 +259,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
     } else {
@@ -280,7 +280,7 @@ texstore_rgba_dxt5(TEXSTORE_PARAMS)
     }
 
 
-    return GL_TRUE;
+    return true;
 }
 
 

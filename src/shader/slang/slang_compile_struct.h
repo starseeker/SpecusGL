@@ -26,6 +26,7 @@
 #define SLANG_COMPILE_STRUCT_H
 
 #include <vector>
+#include <memory>
 
 
     struct slang_struct;
@@ -34,29 +35,51 @@
      * A scope containing GLSL struct type definitions.
      *
      * C++17 modernisation: replaced raw array + count with std::vector<slang_struct>.
+     * The destructor calls slang_struct_destruct for each element so that callers
+     * do not need a separate explicit destruct call before deleting the scope.
      */
     struct slang_struct_scope {
 	std::vector<slang_struct> structs; /**< owned struct definitions */
 	slang_struct_scope *outer_scope{nullptr};
+
+	~slang_struct_scope();  /**< Defined in slang_compile_struct.cpp */
     };
 
-    extern GLvoid
-    _slang_struct_scope_ctr(slang_struct_scope *);
+    extern void
+    _slang_struct_scope_ctr(slang_struct_scope *);  /* legacy no-op; members are default-constructed */
 
     void slang_struct_scope_destruct(slang_struct_scope *);
-    int slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
+    bool slang_struct_scope_copy(slang_struct_scope *, const slang_struct_scope *);
     slang_struct *slang_struct_scope_find(slang_struct_scope *, slang_atom, int);
 
     struct slang_struct {
-	slang_atom a_name;
-	slang_variable_scope *fields;
-	slang_struct_scope *structs;
+	slang_atom a_name{SLANG_ATOM_NULL};
+	/** Owned variable scope for struct fields. */
+	std::unique_ptr<slang_variable_scope> fields;
+	/** Owned struct-type scope nested inside this struct. */
+	std::unique_ptr<slang_struct_scope> structs;
+
+	slang_struct() noexcept = default;
+
+	/**
+	 * Destructor – non-inline so that slang_variable_scope and
+	 * slang_struct_scope are complete types when their destructors
+	 * are instantiated.
+	 */
+	~slang_struct();
+	/** Deep copy constructor. */
+	slang_struct(const slang_struct &other);
+	/** Deep copy assignment. */
+	slang_struct &operator=(const slang_struct &other);
+	/** Move constructor/assignment. */
+	slang_struct(slang_struct &&) noexcept = default;
+	slang_struct &operator=(slang_struct &&) noexcept = default;
     };
 
-    int slang_struct_construct(slang_struct *);
+    bool slang_struct_construct(slang_struct *);
     void slang_struct_destruct(slang_struct *);
-    int slang_struct_copy(slang_struct *, const slang_struct *);
-    int slang_struct_equal(const slang_struct *, const slang_struct *);
+    bool slang_struct_copy(slang_struct *, const slang_struct *);
+    bool slang_struct_equal(const slang_struct *, const slang_struct *);
 
 
 

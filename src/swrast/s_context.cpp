@@ -174,11 +174,11 @@ _swrast_update_texture_env(GLcontext *ctx)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     GLuint i;
-    swrast->_AnyTextureCombine = GL_FALSE;
+    swrast->_AnyTextureCombine = false;
     for (i = 0; i < ctx->Const.MaxTextureUnits; i++) {
 	if (ctx->Texture.Unit[i].EnvMode == GL_COMBINE_EXT ||
 	    ctx->Texture.Unit[i].EnvMode == GL_COMBINE4_NV) {
-	    swrast->_AnyTextureCombine = GL_TRUE;
+	    swrast->_AnyTextureCombine = true;
 	    return;
 	}
     }
@@ -195,14 +195,14 @@ _swrast_update_fog_state(GLcontext *ctx)
     const struct gl_fragment_program *fp = ctx->FragmentProgram._Current;
 
     /* determine if fog is needed, and if so, which fog mode */
-    swrast->_FogEnabled = GL_FALSE;
+    swrast->_FogEnabled = false;
     if (fp && fp->Target == GL_FRAGMENT_PROGRAM_ARB) {
 	if (fp->FogOption != GL_NONE) {
-	    swrast->_FogEnabled = GL_TRUE;
+	    swrast->_FogEnabled = true;
 	    swrast->_FogMode = fp->FogOption;
 	}
     } else if (ctx->Fog.Enabled) {
-	swrast->_FogEnabled = GL_TRUE;
+	swrast->_FogEnabled = true;
 	swrast->_FogMode = ctx->Fog.Mode;
     }
 }
@@ -726,7 +726,7 @@ _swrast_SetFacing(GLcontext *ctx, GLuint facing)
 }
 
 void
-_swrast_allow_vertex_fog(GLcontext *ctx, GLboolean value)
+_swrast_allow_vertex_fog(GLcontext *ctx, bool value)
 {
     if (SWRAST_DEBUG) {
 	_mesa_debug(ctx, "_swrast_allow_vertex_fog %d\n", value);
@@ -736,7 +736,7 @@ _swrast_allow_vertex_fog(GLcontext *ctx, GLboolean value)
 }
 
 void
-_swrast_allow_pixel_fog(GLcontext *ctx, GLboolean value)
+_swrast_allow_pixel_fog(GLcontext *ctx, bool value)
 {
     if (SWRAST_DEBUG) {
 	_mesa_debug(ctx, "_swrast_allow_pixel_fog %d\n", value);
@@ -746,7 +746,7 @@ _swrast_allow_pixel_fog(GLcontext *ctx, GLboolean value)
 }
 
 
-GLboolean
+bool
 _swrast_CreateContext(GLcontext *ctx)
 {
     GLuint i;
@@ -757,7 +757,7 @@ _swrast_CreateContext(GLcontext *ctx)
     }
 
     if (!swrast)
-	return GL_FALSE;
+	return false;
 
     swrast->NewState = ~0;
 
@@ -775,11 +775,11 @@ _swrast_CreateContext(GLcontext *ctx)
     swrast->InvalidateState = _swrast_sleep;
     swrast->BlendFunc = _swrast_validate_blend_func;
 
-    swrast->AllowVertexFog = GL_TRUE;
-    swrast->AllowPixelFog = GL_TRUE;
+    swrast->AllowVertexFog = true;
+    swrast->AllowPixelFog = true;
 
     /* Optimized Accum buffer */
-    swrast->_IntegerAccumMode = GL_FALSE;
+    swrast->_IntegerAccumMode = false;
     swrast->_IntegerAccumScaler = 0.0;
 
     for (i = 0; i < MAX_TEXTURE_IMAGE_UNITS; i++) {
@@ -811,7 +811,7 @@ _swrast_CreateContext(GLcontext *ctx)
 
     ctx->swrast_context = swrast;
 
-    return GL_TRUE;
+    return true;
 }
 
 void

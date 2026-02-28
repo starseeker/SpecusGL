@@ -51,11 +51,11 @@ _mesa_components_in_format(GLenum format);
 extern GLint
 _mesa_bytes_per_pixel(GLenum format, GLenum type);
 
-extern GLboolean
+extern bool
 _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type);
 
 
-extern GLvoid *
+extern void *
 _mesa_image_address(GLuint dimensions,
 		    const struct gl_pixelstore_attrib *packing,
 		    const GLvoid *image,
@@ -63,21 +63,21 @@ _mesa_image_address(GLuint dimensions,
 		    GLenum format, GLenum type,
 		    GLint img, GLint row, GLint column);
 
-extern GLvoid *
+extern void *
 _mesa_image_address1d(const struct gl_pixelstore_attrib *packing,
 		      const GLvoid *image,
 		      GLsizei width,
 		      GLenum format, GLenum type,
 		      GLint column);
 
-extern GLvoid *
+extern void *
 _mesa_image_address2d(const struct gl_pixelstore_attrib *packing,
 		      const GLvoid *image,
 		      GLsizei width, GLsizei height,
 		      GLenum format, GLenum type,
 		      GLint row, GLint column);
 
-extern GLvoid *
+extern void *
 _mesa_image_address3d(const struct gl_pixelstore_attrib *packing,
 		      const GLvoid *image,
 		      GLsizei width, GLsizei height,
@@ -105,7 +105,7 @@ _mesa_pack_polygon_stipple(const GLuint pattern[32], GLubyte *dest,
 			   const struct gl_pixelstore_attrib *packing);
 
 
-extern GLvoid *
+extern void *
 _mesa_unpack_bitmap(GLint width, GLint height, const GLubyte *pixels,
 		    const struct gl_pixelstore_attrib *packing);
 
@@ -214,20 +214,20 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		     GLuint count, const GLubyte mask[]);
 
 
-extern GLboolean
+extern bool
 _mesa_clip_drawpixels(const GLcontext *ctx,
 		      GLint *destX, GLint *destY,
 		      GLsizei *width, GLsizei *height,
 		      struct gl_pixelstore_attrib *unpack);
 
 
-extern GLboolean
+extern bool
 _mesa_clip_readpixels(const GLcontext *ctx,
 		      GLint *destX, GLint *destY,
 		      GLsizei *width, GLsizei *height,
 		      struct gl_pixelstore_attrib *pack);
 
-extern GLboolean
+extern bool
 _mesa_clip_to_region(GLint xmin, GLint ymin,
 		     GLint xmax, GLint ymax,
 		     GLint *x, GLint *y,

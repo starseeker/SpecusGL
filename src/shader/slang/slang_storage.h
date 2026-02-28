@@ -30,6 +30,7 @@
 #include "slang_compile.h"
 #include "slang_typeinfo.h"
 
+#include <memory>
 #include <vector>
 
 
@@ -67,12 +68,12 @@ struct slang_storage_aggregate;
  */
 struct slang_storage_array {
     slang_storage_type type{SLANG_STORE_AGGREGATE};
-    slang_storage_aggregate *aggregate{nullptr}; /**< owned; deleted by destruct */
+    std::unique_ptr<slang_storage_aggregate> aggregate; /**< owned sub-aggregate (RAII) */
     GLuint length{0};
 };
 
-GLboolean slang_storage_array_construct(slang_storage_array *);
-GLvoid slang_storage_array_destruct(slang_storage_array *);
+bool slang_storage_array_construct(slang_storage_array *);
+void slang_storage_array_destruct(slang_storage_array *);
 
 
 /**
@@ -85,11 +86,11 @@ struct slang_storage_aggregate {
     std::vector<slang_storage_array> arrays; /**< owned array elements */
 };
 
-GLboolean slang_storage_aggregate_construct(slang_storage_aggregate *);
-GLvoid slang_storage_aggregate_destruct(slang_storage_aggregate *);
+bool slang_storage_aggregate_construct(slang_storage_aggregate *);
+void slang_storage_aggregate_destruct(slang_storage_aggregate *);
 
 
-extern GLboolean
+extern bool
 _slang_aggregate_variable(slang_storage_aggregate *agg,
 			  slang_type_specifier *spec,
 			  GLuint array_len,
@@ -118,10 +119,10 @@ _slang_sizeof_aggregate(const slang_storage_aggregate *);
 #if 0
 /**
  * Converts structured aggregate to a flat one, with arrays of generic
- * type being one-element long.  Returns GL_TRUE on success.  Returns
- * GL_FALSE otherwise.
+ * type being one-element long.  Returns true on success.  Returns
+ * false otherwise.
  */
-extern GLboolean
+extern bool
 _slang_flatten_aggregate(slang_storage_aggregate *,
 			 const slang_storage_aggregate *);
 

@@ -122,7 +122,7 @@ NAME(line)(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
 {
     SWcontext *swrast = SWRAST_CONTEXT(ctx);
     GLfloat tStart, tEnd;   /* segment start, end along line length */
-    GLboolean inSegment;
+    bool inSegment;
     GLint iLen, i;
 
     /* Init the LineInfo struct */

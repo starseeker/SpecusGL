@@ -42,9 +42,9 @@ extern slang_ir_storage *
 _slang_new_ir_storage(enum register_file file, GLint index, GLint size);
 
 
-extern GLboolean
+extern bool
 _slang_emit_code(slang_ir_node *n, slang_var_table *vartable,
-		 struct gl_program *prog, GLboolean withEnd,
+		 struct gl_program *prog, bool withEnd,
 		 slang_info_log *log);
 
 

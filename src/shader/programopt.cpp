@@ -271,7 +271,7 @@ _mesa_append_fog_code(GLcontext *ctx, struct gl_fragment_program *fprog)
 
 
 
-static GLboolean
+static bool
 is_texture_instruction(const struct prog_instruction *inst)
 {
     switch (inst->Opcode) {
@@ -281,9 +281,9 @@ is_texture_instruction(const struct prog_instruction *inst)
 	case OPCODE_TXL:
 	case OPCODE_TXP:
 	case OPCODE_TXP_NV:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 

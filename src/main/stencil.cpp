@@ -53,7 +53,7 @@
 #include "mtypes.h"
 
 
-static GLboolean
+static bool
 validate_stencil_op(GLcontext *ctx, GLenum op)
 {
     switch (op) {
@@ -63,20 +63,20 @@ validate_stencil_op(GLcontext *ctx, GLenum op)
 	case GL_INCR:
 	case GL_DECR:
 	case GL_INVERT:
-	    return GL_TRUE;
+	    return true;
 	case GL_INCR_WRAP_EXT:
 	case GL_DECR_WRAP_EXT:
 	    if (ctx->Extensions.EXT_stencil_wrap) {
-		return GL_TRUE;
+		return true;
 	    }
 	/* FALL-THROUGH */
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
 
-static GLboolean
+static bool
 validate_stencil_func(GLcontext *ctx, GLenum func)
 {
     switch (func) {
@@ -88,9 +88,9 @@ validate_stencil_func(GLcontext *ctx, GLenum func)
 	case GL_EQUAL:
 	case GL_NOTEQUAL:
 	case GL_ALWAYS:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -387,7 +387,7 @@ _mesa_ActiveStencilFaceEXT(GLenum face)
 void GLAPIENTRY
 _mesa_StencilOpSeparate(GLenum face, GLenum sfail, GLenum zfail, GLenum zpass)
 {
-    GLboolean set = GL_FALSE;
+    bool set = false;
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 

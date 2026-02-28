@@ -26,6 +26,7 @@
 #define SLANG_COMPILE_VARIABLE_H
 
 #include <vector>
+#include <memory>
 
 
 
@@ -49,34 +50,57 @@
 
 
 
+    /**
+     * The type of a variable, including qualifier (const, varying, etc.) and
+     * the base type specifier.
+     *
+     * C++17 modernisation: qualifier now has a default initialiser of
+     * SLANG_QUAL_NONE so that a default-constructed value is already valid.
+     * slang_fully_specified_type_construct() is still provided as a no-op
+     * wrapper for existing callers.
+     */
     struct slang_fully_specified_type {
-	slang_type_qualifier qualifier;
+	slang_type_qualifier qualifier{SLANG_QUAL_NONE};
 	slang_type_specifier specifier;
     };
 
-    extern int
-    slang_fully_specified_type_construct(slang_fully_specified_type *);
+    /** Legacy no-op: qualifier has a default initialiser; specifier is RAII. */
+    inline bool slang_fully_specified_type_construct(slang_fully_specified_type *type) {
+        type->qualifier = SLANG_QUAL_NONE;
+        type->specifier = slang_type_specifier{};
+        return true;
+    }
 
-    extern void
-    slang_fully_specified_type_destruct(slang_fully_specified_type *);
+    /** Legacy no-op: specifier unique_ptrs free themselves. */
+    inline void slang_fully_specified_type_destruct(slang_fully_specified_type *type) {
+        type->specifier = slang_type_specifier{};
+    }
 
-    extern int
+    extern bool
     slang_fully_specified_type_copy(slang_fully_specified_type *,
 				    const slang_fully_specified_type *);
 
 
     /**
      * A shading language program variable.
+     *
+     * C++17 modernisation:
+     * - All POD fields have default member initialisers so that a
+     *   default-constructed slang_variable is already in a valid state.
+     * - initializer is a std::unique_ptr that automatically frees the
+     *   associated expression tree.
+     * - slang_variable_construct() is now an inline no-op kept only for
+     *   backward compatibility.
      */
     struct slang_variable {
-	slang_fully_specified_type type; /**< Variable's data type */
-	slang_atom a_name;               /**< The variable's name (char *) */
-	GLuint array_len;                /**< only if type == SLANG_SPEC_ARRAy */
-	struct slang_operation *initializer; /**< Optional initializer code */
-	GLuint address;                  /**< Storage location */
-	GLuint size;                     /**< Variable's size in bytes */
-	GLboolean isTemp;                /**< a named temporary (__resultTmp) */
-	void *aux;                       /**< Used during code gen */
+	slang_fully_specified_type type;          /**< Variable's data type */
+	slang_atom a_name{SLANG_ATOM_NULL};       /**< The variable's name (char *) */
+	GLuint array_len{0};                      /**< only if type == SLANG_SPEC_ARRAy */
+	std::unique_ptr<slang_operation> initializer; /**< Optional initializer code */
+	GLuint address{~0u};                      /**< Storage location */
+	GLuint size{0};                           /**< Variable's size in bytes */
+	bool isTemp{false};                       /**< a named temporary (__resultTmp) */
+	void *aux{nullptr};                       /**< Used during code gen */
     };
 
 
@@ -85,41 +109,56 @@
      *
      * C++17 modernisation: replaced raw pointer array + count with
      * std::vector<slang_variable *>.  Each element is heap-owned by this scope.
+     *
+     * The destructor iterates over owned variables and frees them, mirroring
+     * the old slang_variable_scope_destruct() logic, so callers do not need to
+     * call slang_variable_scope_destruct() before delete.
      */
     struct slang_variable_scope {
 	std::vector<slang_variable *> variables; /**< Owned ptrs to variables */
 	slang_variable_scope *outer_scope{nullptr};
+
+	~slang_variable_scope();  /**< Defined in slang_compile_variable.cpp */
     };
 
 
     extern slang_variable_scope *
     _slang_variable_scope_new(slang_variable_scope *parent);
 
-    extern GLvoid
+    extern void
     _slang_variable_scope_ctr(slang_variable_scope *);
 
     extern void
     slang_variable_scope_destruct(slang_variable_scope *);
 
-    extern int
+    extern bool
     slang_variable_scope_copy(slang_variable_scope *,
 			      const slang_variable_scope *);
 
     extern slang_variable *
     slang_variable_scope_grow(slang_variable_scope *);
 
-    extern int
-    slang_variable_construct(slang_variable *);
+    /**
+     * Legacy no-op: slang_variable is fully default-constructible.
+     * Kept for backward compatibility only.
+     */
+    inline bool slang_variable_construct(slang_variable *) { return true; }
 
-    extern void
-    slang_variable_destruct(slang_variable *);
+    /**
+     * Legacy cleanup: resets RAII members; kept for backward compatibility.
+     * Actual memory is freed by the members' own destructors.
+     */
+    inline void slang_variable_destruct(slang_variable *var) {
+        var->type.specifier = slang_type_specifier{};
+        var->initializer.reset();
+    }
 
-    extern int
+    extern bool
     slang_variable_copy(slang_variable *, const slang_variable *);
 
     extern slang_variable *
     _slang_locate_variable(const slang_variable_scope *, const slang_atom a_name,
-			   GLboolean all);
+			   bool all);
 
 
 

@@ -43,7 +43,7 @@
 /* EXT_vertex_cull.  Not really a big win, but probably depends on
  * your application.  This stage not included in the default pipeline.
  */
-static GLboolean run_cull_stage(GLcontext *ctx,
+static bool run_cull_stage(GLcontext *ctx,
 				struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -59,7 +59,7 @@ static GLboolean run_cull_stage(GLcontext *ctx,
 
     if (ctx->VertexProgram._Current ||
 	!ctx->Transform.CullVertexFlag)
-	return GL_TRUE;
+	return true;
 
     VB->ClipOrMask &= ~CLIP_CULL_BIT;
     VB->ClipAndMask |= CLIP_CULL_BIT;

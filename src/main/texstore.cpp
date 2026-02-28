@@ -79,7 +79,7 @@ enum {
  * Return GL_TRUE if the given image format is one that be converted
  * to another format by swizzling.
  */
-static GLboolean
+static bool
 can_swizzle(GLenum logicalBaseFormat)
 {
     switch (logicalBaseFormat) {
@@ -95,9 +95,9 @@ can_swizzle(GLenum logicalBaseFormat)
 	case GL_BGR:
 	case GL_BGRA:
 	case GL_ABGR_EXT:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -967,7 +967,7 @@ memcpy_texture(GLcontext *ctx,
  *   _mesa_texformat_intensity
  *
  */
-GLboolean
+bool
 _mesa_texstore_rgba(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(baseInternalFormat);
@@ -1059,7 +1059,7 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 	    components = 1;
 	} else {
 	    _mesa_problem(ctx, "Unexpected dstFormat in _mesa_texstore_rgba");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	_mesa_swizzle_ubyte_image(ctx, dims,
@@ -1080,7 +1080,7 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint bytesPerRow;
 	GLint img, row;
@@ -1099,14 +1099,14 @@ _mesa_texstore_rgba(TEXSTORE_PARAMS)
 	}
 
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Store a 32-bit integer depth component texture image.
  */
-GLboolean
+bool
 _mesa_texstore_z32(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = static_cast<GLfloat>(0xffffffff);
@@ -1144,7 +1144,7 @@ _mesa_texstore_z32(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 #define STRIDE_3D 0
@@ -1152,7 +1152,7 @@ _mesa_texstore_z32(TEXSTORE_PARAMS)
 /**
  * Store a 16-bit integer depth component texture image.
  */
-GLboolean
+bool
 _mesa_texstore_z16(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = 65535.0f;
@@ -1191,14 +1191,14 @@ _mesa_texstore_z16(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Store an rgb565 or rgb565_rev texture image.
  */
-GLboolean
+bool
 _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 {
     assert(dstFormat == &_mesa_texformat_rgb565 ||
@@ -1261,7 +1261,7 @@ _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1292,17 +1292,17 @@ _mesa_texstore_rgb565(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Store a texture in MESA_FORMAT_RGBA8888 or MESA_FORMAT_RGBA8888_REV.
  */
-GLboolean
+bool
 _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_rgba8888 ||
 	   dstFormat == &_mesa_texformat_rgba8888_rev);
@@ -1380,7 +1380,7 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1412,14 +1412,14 @@ _mesa_texstore_rgba8888(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_argb8888 ||
 	   dstFormat == &_mesa_texformat_argb8888_rev);
@@ -1590,7 +1590,7 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1622,14 +1622,14 @@ _mesa_texstore_argb8888(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_rgb888);
     assert(dstFormat->TexelBytes == 3);
@@ -1704,7 +1704,7 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1742,14 +1742,14 @@ _mesa_texstore_rgb888(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_bgr888);
     assert(dstFormat->TexelBytes == 3);
@@ -1824,7 +1824,7 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1844,11 +1844,11 @@ _mesa_texstore_bgr888(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 {
     assert(dstFormat == &_mesa_texformat_argb4444 ||
@@ -1877,7 +1877,7 @@ _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1909,12 +1909,12 @@ _mesa_texstore_argb4444(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 
-GLboolean
+bool
 _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 {
     assert(dstFormat == &_mesa_texformat_argb1555 ||
@@ -1943,7 +1943,7 @@ _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -1975,14 +1975,14 @@ _mesa_texstore_argb1555(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_al88(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
 
     assert(dstFormat == &_mesa_texformat_al88 ||
 	   dstFormat == &_mesa_texformat_al88_rev);
@@ -2041,7 +2041,7 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -2071,11 +2071,11 @@ _mesa_texstore_al88(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 {
     assert(dstFormat == &_mesa_texformat_rgb332);
@@ -2101,7 +2101,7 @@ _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -2121,14 +2121,14 @@ _mesa_texstore_rgb332(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Texstore for _mesa_texformat_a8, _mesa_texformat_l8, _mesa_texformat_i8.
  */
-GLboolean
+bool
 _mesa_texstore_a8(TEXSTORE_PARAMS)
 {
     assert(dstFormat == &_mesa_texformat_a8 ||
@@ -2183,7 +2183,7 @@ _mesa_texstore_a8(TEXSTORE_PARAMS)
 				  srcFormat, srcType, srcAddr,
 				  srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE;
+	    return false;
 	const GLchan *src = tempVec.data();
 	GLint img, row, col;
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
@@ -2201,12 +2201,12 @@ _mesa_texstore_a8(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 
-GLboolean
+bool
 _mesa_texstore_ci8(TEXSTORE_PARAMS)
 {
     (void) dims;
@@ -2244,17 +2244,17 @@ _mesa_texstore_ci8(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Texstore for _mesa_texformat_ycbcr or _mesa_texformat_ycbcr_rev.
  */
-GLboolean
+bool
 _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     (void) ctx;
     (void) dims;
     (void) baseInternalFormat;
@@ -2294,7 +2294,7 @@ _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -2302,7 +2302,7 @@ _mesa_texstore_ycbcr(TEXSTORE_PARAMS)
 /**
  * Store a combined depth/stencil texture image.
  */
-GLboolean
+bool
 _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
 {
     const GLfloat depthScale = static_cast<GLfloat>(0xffffff);
@@ -2361,7 +2361,7 @@ _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -2375,7 +2375,7 @@ _mesa_texstore_z24_s8(TEXSTORE_PARAMS)
  *   _mesa_texformat_luminance_alpha_float32
  *   _mesa_texformat_intensity_float32
  */
-GLboolean
+bool
 _mesa_texstore_rgba_float32(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(dstFormat->BaseFormat);
@@ -2431,14 +2431,14 @@ _mesa_texstore_rgba_float32(TEXSTORE_PARAMS)
 	}
 
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * As above, but store 16-bit floats.
  */
-GLboolean
+bool
 _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 {
     const GLint components = _mesa_components_in_format(dstFormat->BaseFormat);
@@ -2496,15 +2496,15 @@ _mesa_texstore_rgba_float16(TEXSTORE_PARAMS)
 	}
 
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 #if FEATURE_EXT_texture_sRGB
-GLboolean
+bool
 _mesa_texstore_srgb8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     StoreTexImageFunc store;
     GLboolean k;
@@ -2531,10 +2531,10 @@ _mesa_texstore_srgb8(TEXSTORE_PARAMS)
 }
 
 
-GLboolean
+bool
 _mesa_texstore_srgba8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
@@ -2557,7 +2557,7 @@ _mesa_texstore_srgba8(TEXSTORE_PARAMS)
 }
 
 
-GLboolean
+bool
 _mesa_texstore_sl8(TEXSTORE_PARAMS)
 {
     const struct gl_texture_format *newDstFormat;
@@ -2579,10 +2579,10 @@ _mesa_texstore_sl8(TEXSTORE_PARAMS)
 }
 
 
-GLboolean
+bool
 _mesa_texstore_sla8(TEXSTORE_PARAMS)
 {
-    const GLboolean littleEndian = _mesa_little_endian();
+    const bool littleEndian = _mesa_little_endian();
     const struct gl_texture_format *newDstFormat;
     GLboolean k;
 
@@ -3447,7 +3447,7 @@ _mesa_store_compressed_texsubimage3d(GLcontext *ctx, GLenum target,
 /**
  * Test if given texture image is an sRGB format.
  */
-static GLboolean
+static bool
 is_srgb_teximage(const struct gl_texture_image *texImage)
 {
     switch (texImage->TexFormat->MesaFormat) {
@@ -3455,9 +3455,9 @@ is_srgb_teximage(const struct gl_texture_image *texImage)
 	case MESA_FORMAT_SRGBA8:
 	case MESA_FORMAT_SL8:
 	case MESA_FORMAT_SLA8:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 

@@ -488,7 +488,7 @@ static void texgen(GLcontext *ctx,
 
 
 
-static GLboolean run_texgen_stage(GLcontext *ctx,
+static bool run_texgen_stage(GLcontext *ctx,
 				  struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
@@ -496,7 +496,7 @@ static GLboolean run_texgen_stage(GLcontext *ctx,
     GLuint i;
 
     if (!ctx->Texture._TexGenEnabled || ctx->VertexProgram._Current)
-	return GL_TRUE;
+	return true;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++) {
 	struct gl_texture_unit *texUnit = &ctx->Texture.Unit[i];
@@ -510,7 +510,7 @@ static GLboolean run_texgen_stage(GLcontext *ctx,
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -562,7 +562,7 @@ static void validate_texgen_stage(GLcontext *ctx,
 
 /* Called the first time stage->run() is invoked.
  */
-static GLboolean alloc_texgen_data(GLcontext *ctx,
+static bool alloc_texgen_data(GLcontext *ctx,
 				   struct tnl_pipeline_stage *stage)
 {
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
@@ -571,7 +571,7 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<texgen_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     for (i = 0 ; i < ctx->Const.MaxTextureCoordUnits ; i++)
 	store->texcoord[i].alloc(0, VB->Size, 32);
@@ -579,7 +579,7 @@ static GLboolean alloc_texgen_data(GLcontext *ctx,
     store->tmp_f = new GLfloat[VB->Size][3];
     store->tmp_m = new GLfloat[VB->Size];
 
-    return GL_TRUE;
+    return true;
 }
 
 

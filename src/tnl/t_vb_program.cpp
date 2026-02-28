@@ -115,7 +115,7 @@ userclip(GLcontext *ctx,
 }
 
 
-static GLboolean
+static bool
 do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -144,7 +144,7 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 
     if (store->andmask) {
 	/* All vertices are outside the frustum */
-	return GL_FALSE;
+	return false;
     }
 
     /* Test userclip planes.  This contributes to VB->ClipMask.
@@ -159,7 +159,7 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
 		 &store->andmask);
 
 	if (store->andmask) {
-	    return GL_FALSE;
+	    return false;
 	}
     }
 
@@ -167,7 +167,7 @@ do_ndc_cliptest(GLcontext *ctx, struct vp_stage_data *store)
     VB->ClipOrMask = store->ormask;
     VB->ClipMask = store->clipmask.get();
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -297,7 +297,7 @@ unmap_textures(GLcontext *ctx, const struct gl_vertex_program *vp)
 /**
  * This function executes vertex programs
  */
-static GLboolean
+static bool
 run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -309,7 +309,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     GLuint i, j;
 
     if (!program)
-	return GL_TRUE;
+	return true;
 
     if (program->IsNVProgram) {
 	_mesa_load_tracked_matrices(ctx);
@@ -466,7 +466,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
  * Called the first time stage->run is called.  In effect, don't
  * allocate data until the first time the stage is run.
  */
-static GLboolean
+static bool
 init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -477,7 +477,7 @@ init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<vp_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     /* Allocate arrays of vertex output values */
     for (i = 0; i < VERT_RESULT_MAX; i++) {
@@ -489,7 +489,7 @@ init_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     store->ndcCoords.alloc(0, size, 32);
     store->clipmask = make_aligned_array<GLubyte>(size, 32);
 
-    return GL_TRUE;
+    return true;
 }
 
 

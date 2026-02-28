@@ -385,9 +385,9 @@ _mesa_base_tex_format(GLcontext *ctx, GLint internalFormat)
  * Test if the given image format is a color/RGBA format (i.e., not color
  * index, depth, stencil, etc).
  * \param format  the image format value (may by an internal texture format)
- * \return GL_TRUE if its a color/RGBA format, GL_FALSE otherwise.
+ * \return true if its a color/RGBA format, GL_FALSE otherwise.
  */
-static GLboolean
+static bool
 is_color_format(GLenum format)
 {
     switch (format) {
@@ -487,10 +487,10 @@ is_color_format(GLenum format)
 	case GL_COMPRESSED_SLUMINANCE_EXT:
 	case GL_COMPRESSED_SLUMINANCE_ALPHA_EXT:
 #endif /* FEATURE_EXT_texture_sRGB */
-	    return GL_TRUE;
+	    return true;
 	case GL_YCBCR_MESA:  /* not considered to be RGB */
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -498,7 +498,7 @@ is_color_format(GLenum format)
 /**
  * Test if the given image format is a color index format.
  */
-static GLboolean
+static bool
 is_index_format(GLenum format)
 {
     switch (format) {
@@ -509,9 +509,9 @@ is_index_format(GLenum format)
 	case GL_COLOR_INDEX8_EXT:
 	case GL_COLOR_INDEX12_EXT:
 	case GL_COLOR_INDEX16_EXT:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -519,7 +519,7 @@ is_index_format(GLenum format)
 /**
  * Test if the given image format is a depth component format.
  */
-static GLboolean
+static bool
 is_depth_format(GLenum format)
 {
     switch (format) {
@@ -527,9 +527,9 @@ is_depth_format(GLenum format)
 	case GL_DEPTH_COMPONENT24_ARB:
 	case GL_DEPTH_COMPONENT32_ARB:
 	case GL_DEPTH_COMPONENT:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -537,14 +537,14 @@ is_depth_format(GLenum format)
 /**
  * Test if the given image format is a YCbCr format.
  */
-static GLboolean
+static bool
 is_ycbcr_format(GLenum format)
 {
     switch (format) {
 	case GL_YCBCR_MESA:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -552,15 +552,15 @@ is_ycbcr_format(GLenum format)
 /**
  * Test if the given image format is a Depth/Stencil format.
  */
-static GLboolean
+static bool
 is_depthstencil_format(GLenum format)
 {
     switch (format) {
 	case GL_DEPTH24_STENCIL8_EXT:
 	case GL_DEPTH_STENCIL_EXT:
-	    return GL_TRUE;
+	    return true;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -577,7 +577,7 @@ is_depthstencil_format(GLenum format)
  * Currently only GL_COMPRESSED_RGB_FXT1_3DFX and GL_COMPRESSED_RGBA_FXT1_3DFX
  * are supported.
  */
-static GLboolean
+static bool
 is_compressed_format(GLcontext *ctx, GLenum internalFormat)
 {
     GLint supported[100]; /* 100 should be plenty */
@@ -587,10 +587,10 @@ is_compressed_format(GLcontext *ctx, GLenum internalFormat)
     assert(n < 100);
     for (i = 0; i < n; i++) {
 	if (static_cast<GLint>(internalFormat) == supported[i]) {
-	    return GL_TRUE;
+	    return true;
 	}
     }
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -697,9 +697,9 @@ _mesa_delete_texture_image(GLcontext *ctx, struct gl_texture_image *texImage)
  *
  * \param target texture target.
  *
- * \return GL_TRUE if the target is a proxy target, GL_FALSE otherwise.
+ * \return true if the target is a proxy target, GL_FALSE otherwise.
  */
-GLboolean
+bool
 _mesa_is_proxy_texture(GLenum target)
 {
     return (target == GL_PROXY_TEXTURE_1D ||
@@ -1208,9 +1208,9 @@ _mesa_init_teximage_fields(GLcontext *ctx, GLenum target,
  * \param height  as passed to glTexImage
  * \param depth  as passed to glTexImage
  * \param border  as passed to glTexImage
- * \return GL_TRUE if the image is acceptable, GL_FALSE if not acceptable.
+ * \return true if the image is acceptable, GL_FALSE if not acceptable.
  */
-GLboolean
+bool
 _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 			  GLint internalFormat, GLenum format, GLenum type,
 			  GLint width, GLint height, GLint depth, GLint border)
@@ -1229,9 +1229,9 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 		 width > 0 && static_cast<GLuint>(__builtin_popcount(width - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxTextureLevels) {
 		/* bad width or level */
-		return GL_FALSE;
+		return false;
 	    }
-	    return GL_TRUE;
+	    return true;
 	case GL_PROXY_TEXTURE_2D:
 	    maxSize = 1 << (ctx->Const.MaxTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
@@ -1242,9 +1242,9 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 		 height > 0 && static_cast<GLuint>(__builtin_popcount(height - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxTextureLevels) {
 		/* bad width or height or level */
-		return GL_FALSE;
+		return false;
 	    }
-	    return GL_TRUE;
+	    return true;
 	case GL_PROXY_TEXTURE_3D:
 	    maxSize = 1 << (ctx->Const.Max3DTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
@@ -1258,17 +1258,17 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 		 depth > 0 && static_cast<GLuint>(__builtin_popcount(depth - 2 * border)) != 1) ||
 		level >= ctx->Const.Max3DTextureLevels) {
 		/* bad width or height or depth or level */
-		return GL_FALSE;
+		return false;
 	    }
-	    return GL_TRUE;
+	    return true;
 	case GL_PROXY_TEXTURE_RECTANGLE_NV:
 	    if (width < 0 || width > ctx->Const.MaxTextureRectSize ||
 		height < 0 || height > ctx->Const.MaxTextureRectSize ||
 		level != 0) {
 		/* bad width or height or level */
-		return GL_FALSE;
+		return false;
 	    }
-	    return GL_TRUE;
+	    return true;
 	case GL_PROXY_TEXTURE_CUBE_MAP_ARB:
 	    maxSize = 1 << (ctx->Const.MaxCubeTextureLevels - 1);
 	    if (width < 2 * border || width > 2 + maxSize ||
@@ -1279,12 +1279,12 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 		 height > 0 && static_cast<GLuint>(__builtin_popcount(height - 2 * border)) != 1) ||
 		level >= ctx->Const.MaxCubeTextureLevels) {
 		/* bad width or height */
-		return GL_FALSE;
+		return false;
 	    }
-	    return GL_TRUE;
+	    return true;
 	default:
 	    _mesa_problem(ctx, "Invalid target in _mesa_test_proxy_teximage");
-	    return GL_FALSE;
+	    return false;
     }
 }
 
@@ -1292,7 +1292,7 @@ _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 /**
  * Helper function to determine whether a target supports compressed textures
  */
-static GLboolean
+static bool
 target_can_be_compressed(GLcontext *ctx, GLenum target)
 {
     return (((target == GL_TEXTURE_2D || target == GL_PROXY_TEXTURE_2D))
@@ -1318,13 +1318,13 @@ target_can_be_compressed(GLcontext *ctx, GLenum target)
  * \param depth image depth given by the user.
  * \param border image border given by the user.
  *
- * \return GL_TRUE if an error was detected, or GL_FALSE if no errors.
+ * \return true if an error was detected, or GL_FALSE if no errors.
  *
  * Verifies each of the parameters against the constants specified in
  * __GLcontextRec::Const and the supported extensions, and according to the
  * OpenGL specification.
  */
-static GLboolean
+static bool
 texture_error_check(GLcontext *ctx, GLenum target,
 		    GLint level, GLint internalFormat,
 		    GLenum format, GLenum type,
@@ -1332,8 +1332,8 @@ texture_error_check(GLcontext *ctx, GLenum target,
 		    GLint width, GLint height,
 		    GLint depth, GLint border)
 {
-    const GLboolean isProxy = _mesa_is_proxy_texture(target);
-    GLboolean sizeOK = GL_TRUE;
+    const bool isProxy = _mesa_is_proxy_texture(target);
+    bool sizeOK = true;
     GLboolean colorFormat, indexFormat;
     GLenum proxy_target;
 
@@ -1343,7 +1343,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glTexImage%dD(level=%d)", dimensions, level);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* Check border */
@@ -1354,7 +1354,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glTexImage%dD(border=%d)", dimensions, border);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (width < 0 || height < 0 || depth < 0) {
@@ -1362,7 +1362,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glTexImage%dD(width, height or depth < 0)", dimensions);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* Check target and call ctx->Driver.TestProxyTexImage() to check the
@@ -1375,7 +1375,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    depth = 1;
 	} else {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage1D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 2) {
 	depth = 1;
@@ -1386,7 +1386,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 		    target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB)) {
 	    if (!ctx->Extensions.ARB_texture_cube_map) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	    proxy_target = GL_PROXY_TEXTURE_CUBE_MAP_ARB;
 	    sizeOK = (width == height);
@@ -1394,23 +1394,23 @@ texture_error_check(GLcontext *ctx, GLenum target,
 		   target == GL_TEXTURE_RECTANGLE_NV) {
 	    if (!ctx->Extensions.NV_texture_rectangle) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	    proxy_target = GL_PROXY_TEXTURE_RECTANGLE_NV;
 	} else {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage2D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 3) {
 	if (target == GL_PROXY_TEXTURE_3D || target == GL_TEXTURE_3D) {
 	    proxy_target = GL_PROXY_TEXTURE_3D;
 	} else {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexImage3D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else {
 	_mesa_problem(ctx, "bad dims in texture_error_check");
-	return GL_TRUE;
+	return true;
     }
 
     sizeOK = sizeOK && ctx->Driver.TestProxyTexImage(ctx, proxy_target, level,
@@ -1423,7 +1423,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 			"glTexImage%dD(level=%d, width=%d, height=%d, depth=%d)",
 			dimensions, level, width, height, depth);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* Check internalFormat */
@@ -1433,7 +1433,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 			"glTexImage%dD(internalFormat=0x%x)",
 			dimensions, internalFormat);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* Check incoming image format and type */
@@ -1445,7 +1445,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexImage%dD(format or type)", dimensions);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* make sure internal format and format basically agree */
@@ -1459,7 +1459,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	if (!isProxy)
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexImage(internalFormat/format)");
-	return GL_TRUE;
+	return true;
     }
 
     /* additional checks for ycbcr textures */
@@ -1471,7 +1471,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    std::snprintf(message, sizeof(message),
 			  "glTexImage%d(format/type YCBCR mismatch", dimensions);
 	    _mesa_error(ctx, GL_INVALID_ENUM, message);
-	    return GL_TRUE; /* error */
+	    return true; /* error */
 	}
 	if (target != GL_TEXTURE_2D &&
 	    target != GL_PROXY_TEXTURE_2D &&
@@ -1479,7 +1479,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    target != GL_PROXY_TEXTURE_RECTANGLE_NV) {
 	    if (!isProxy)
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexImage(target)");
-	    return GL_TRUE;
+	    return true;
 	}
 	if (border != 0) {
 	    if (!isProxy) {
@@ -1489,7 +1489,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 			      dimensions, border);
 		_mesa_error(ctx, GL_INVALID_VALUE, message);
 	    }
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -1505,7 +1505,7 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	    if (!isProxy)
 		_mesa_error(ctx, GL_INVALID_ENUM,
 			    "glTexImage(target/internalFormat)");
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -1514,19 +1514,19 @@ texture_error_check(GLcontext *ctx, GLenum target,
 	if (!target_can_be_compressed(ctx, target) && !isProxy) {
 	    _mesa_error(ctx, GL_INVALID_ENUM,
 			"glTexImage%d(target)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if (border != 0) {
 	    if (!isProxy) {
 		_mesa_error(ctx, GL_INVALID_OPERATION,
 			    "glTexImage%d(border!=0)", dimensions);
 	    }
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
     /* if we get here, the parameters are OK */
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -1546,13 +1546,13 @@ texture_error_check(GLcontext *ctx, GLenum target,
  * \param height image height given by the user.
  * \param depth image depth given by the user.
  *
- * \return GL_TRUE if an error was detected, or GL_FALSE if no errors.
+ * \return true if an error was detected, or GL_FALSE if no errors.
  *
  * Verifies each of the parameters against the constants specified in
  * __GLcontextRec::Const and the supported extensions, and according to the
  * OpenGL specification.
  */
-static GLboolean
+static bool
 subtexture_error_check(GLcontext *ctx, GLuint dimensions,
 		       GLenum target, GLint level,
 		       GLint xoffset, GLint yoffset, GLint zoffset,
@@ -1563,66 +1563,66 @@ subtexture_error_check(GLcontext *ctx, GLuint dimensions,
     if (dimensions == 1) {
 	if (target != GL_TEXTURE_1D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage1D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 2) {
 	if (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB &&
 	    target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB) {
 	    if (!ctx->Extensions.ARB_texture_cube_map) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	} else if (target == GL_TEXTURE_RECTANGLE_NV) {
 	    if (!ctx->Extensions.NV_texture_rectangle) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	} else if (target != GL_TEXTURE_2D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage2D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 3) {
 	if (target != GL_TEXTURE_3D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage3D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else {
 	_mesa_problem(ctx, "invalid dims in texture_error_check");
-	return GL_TRUE;
+	return true;
     }
 
     /* Basic level check */
     if (level < 0 || level >= MAX_TEXTURE_LEVELS) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glTexSubImage2D(level=%d)", level);
-	return GL_TRUE;
+	return true;
     }
 
     if (width < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glTexSubImage%dD(width=%d)", dimensions, width);
-	return GL_TRUE;
+	return true;
     }
     if (height < 0 && dimensions > 1) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glTexSubImage%dD(height=%d)", dimensions, height);
-	return GL_TRUE;
+	return true;
     }
     if (depth < 0 && dimensions > 2) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glTexSubImage%dD(depth=%d)", dimensions, depth);
-	return GL_TRUE;
+	return true;
     }
 
     if (!_mesa_is_legal_format_and_type(ctx, format, type)) {
 	_mesa_error(ctx, GL_INVALID_ENUM,
 		    "glTexSubImage%dD(format or type)", dimensions);
-	return GL_TRUE;
+	return true;
     }
 
-    return GL_FALSE;
+    return false;
 }
 
-static GLboolean
+static bool
 subtexture_error_check2(GLcontext *ctx, GLuint dimensions,
 			GLenum target, GLint level,
 			GLint xoffset, GLint yoffset, GLint zoffset,
@@ -1633,39 +1633,39 @@ subtexture_error_check2(GLcontext *ctx, GLuint dimensions,
     if (!destTex) {
 	/* undefined image level */
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glTexSubImage%dD", dimensions);
-	return GL_TRUE;
+	return true;
     }
 
     if (xoffset < -(static_cast<GLint>(destTex->Border))) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage%dD(xoffset)",
 		    dimensions);
-	return GL_TRUE;
+	return true;
     }
     if (xoffset + width > static_cast<GLint>((destTex->Width + destTex->Border))) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage%dD(xoffset+width)",
 		    dimensions);
-	return GL_TRUE;
+	return true;
     }
     if (dimensions > 1) {
 	if (yoffset < -(static_cast<GLint>(destTex->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage%dD(yoffset)",
 			dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if (yoffset + height > static_cast<GLint>((destTex->Height + destTex->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage%dD(yoffset+height)",
 			dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
     if (dimensions > 2) {
 	if (zoffset < -(static_cast<GLint>(destTex->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage3D(zoffset)");
-	    return GL_TRUE;
+	    return true;
 	}
 	if (zoffset + depth  > static_cast<GLint>((destTex->Depth + destTex->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glTexSubImage3D(zoffset+depth)");
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -1679,7 +1679,7 @@ subtexture_error_check2(GLcontext *ctx, GLuint dimensions,
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexSubImage%dD(size or offset not multiple of 4)",
 			dimensions);
-	return GL_TRUE;
+	return true;
     }
 #endif
 
@@ -1687,28 +1687,28 @@ subtexture_error_check2(GLcontext *ctx, GLuint dimensions,
 	if (!target_can_be_compressed(ctx, target)) {
 	    _mesa_error(ctx, GL_INVALID_ENUM,
 			"glTexSubImage%d(target)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	/* offset must be multiple of 4 */
 	if ((xoffset & 3) || (yoffset & 3)) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexSubImage%d(xoffset or yoffset)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	/* size must be multiple of 4 or equal to whole texture size */
 	if ((width & 3) && static_cast<GLuint>(width) != destTex->Width) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexSubImage%d(width)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if ((height & 3) && static_cast<GLuint>(height) != destTex->Height) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glTexSubImage%d(width)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -1725,13 +1725,13 @@ subtexture_error_check2(GLcontext *ctx, GLuint dimensions,
  * \param depth image depth given by the user.
  * \param border texture border.
  *
- * \return GL_TRUE if an error was detected, or GL_FALSE if no errors.
+ * \return true if an error was detected, or GL_FALSE if no errors.
  *
  * Verifies each of the parameters against the constants specified in
  * __GLcontextRec::Const and the supported extensions, and according to the
  * OpenGL specification.
  */
-static GLboolean
+static bool
 copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 			GLenum target, GLint level, GLint internalFormat,
 			GLint width, GLint height, GLint border)
@@ -1744,7 +1744,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
     if (level < 0 || level >= MAX_TEXTURE_LEVELS) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexImage%dD(level=%d)", dimensions, level);
-	return GL_TRUE;
+	return true;
     }
 
     /* Check that the source buffer is complete */
@@ -1753,7 +1753,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 	if (ctx->ReadBuffer->_Status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 	    _mesa_error(ctx, GL_INVALID_FRAMEBUFFER_OPERATION_EXT,
 			"glCopyTexImage%dD(invalid readbuffer)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -1761,14 +1761,14 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
     if (border < 0 || border > 1 ||
 	((target == GL_TEXTURE_RECTANGLE_NV ||
 	  target == GL_PROXY_TEXTURE_RECTANGLE_NV) && border != 0)) {
-	return GL_TRUE;
+	return true;
     }
 
     format = _mesa_base_tex_format(ctx, internalFormat);
     if (format < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexImage%dD(internalFormat)", dimensions);
-	return GL_TRUE;
+	return true;
     }
 
     /* NOTE: the format and type aren't really significant for
@@ -1776,7 +1776,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
     if (!_mesa_source_buffer_exists(ctx, format)) {
        _mesa_error(ctx, GL_INVALID_OPERATION,
                    "glCopyTexImage%dD(missing readbuffer)", dimensions);
-       return GL_TRUE;
+       return true;
     }
 
      */
@@ -1793,7 +1793,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 						   width, 1, 1, border);
 	} else {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexImage1D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 2) {
 	if (target == GL_TEXTURE_2D) {
@@ -1805,7 +1805,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 		   target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB) {
 	    if (!ctx->Extensions.ARB_texture_cube_map) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	    sizeOK = (width == height) &&
 		     ctx->Driver.TestProxyTexImage(ctx, GL_PROXY_TEXTURE_CUBE_MAP_ARB,
@@ -1814,7 +1814,7 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 	} else if (target == GL_TEXTURE_RECTANGLE_NV) {
 	    if (!ctx->Extensions.NV_texture_rectangle) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	    sizeOK = ctx->Driver.TestProxyTexImage(ctx,
 						   GL_PROXY_TEXTURE_RECTANGLE_NV,
@@ -1823,11 +1823,11 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 						   width, height, 1, border);
 	} else {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexImage2D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else {
 	_mesa_problem(ctx, "invalid dimensions in copytexture_error_check");
-	return GL_TRUE;
+	return true;
     }
 
     if (!sizeOK) {
@@ -1839,38 +1839,38 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexImage2D(width=%d, height=%d)", width, height);
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (is_compressed_format(ctx, internalFormat)) {
 	if (target != GL_TEXTURE_2D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM,
 			"glCopyTexImage%d(target)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if (border != 0) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCopyTexImage%d(border!=0)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (is_depth_format(internalFormat)) {
 	/* make sure we have depth/stencil buffers */
 	if (!ctx->ReadBuffer->_DepthBuffer) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCopyTexImage%d(no depth)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (is_depthstencil_format(internalFormat)) {
 	/* make sure we have depth/stencil buffers */
 	if (!ctx->ReadBuffer->_DepthBuffer || !ctx->ReadBuffer->_StencilBuffer) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCopyTexImage%d(no depth/stencil buffer)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
     /* if we get here, the parameters are OK */
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -1887,13 +1887,13 @@ copytexture_error_check(GLcontext *ctx, GLuint dimensions,
  * \param width image width given by the user.
  * \param height image height given by the user.
  *
- * \return GL_TRUE if an error was detected, or GL_FALSE if no errors.
+ * \return true if an error was detected, or GL_FALSE if no errors.
  *
  * Verifies each of the parameters against the constants specified in
  * __GLcontextRec::Const and the supported extensions, and according to the
  * OpenGL specification.
  */
-static GLboolean
+static bool
 copytexsubimage_error_check(GLcontext *ctx, GLuint dimensions,
 			    GLenum target, GLint level,
 			    GLint xoffset, GLint yoffset, GLint zoffset,
@@ -1906,35 +1906,35 @@ copytexsubimage_error_check(GLcontext *ctx, GLuint dimensions,
 	if (ctx->ReadBuffer->_Status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 	    _mesa_error(ctx, GL_INVALID_FRAMEBUFFER_OPERATION_EXT,
 			"glCopyTexImage%dD(invalid readbuffer)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
     if (dimensions == 1) {
 	if (target != GL_TEXTURE_1D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage1D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 2) {
 	if (target >= GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB &&
 	    target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB) {
 	    if (!ctx->Extensions.ARB_texture_cube_map) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	} else if (target == GL_TEXTURE_RECTANGLE_NV) {
 	    if (!ctx->Extensions.NV_texture_rectangle) {
 		_mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage2D(target)");
-		return GL_TRUE;
+		return true;
 	    }
 	} else if (target != GL_TEXTURE_2D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage2D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (dimensions == 3) {
 	if (target != GL_TEXTURE_3D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glCopyTexSubImage3D(target)");
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -1942,25 +1942,25 @@ copytexsubimage_error_check(GLcontext *ctx, GLuint dimensions,
     if (level < 0 || level >= MAX_TEXTURE_LEVELS) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexSubImage%dD(level=%d)", dimensions, level);
-	return GL_TRUE;
+	return true;
     }
 
     /* Check size */
     if (width < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexSubImage%dD(width=%d)", dimensions, width);
-	return GL_TRUE;
+	return true;
     }
     if (dimensions > 1 && height < 0) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexSubImage%dD(height=%d)", dimensions, height);
-	return GL_TRUE;
+	return true;
     }
 
-    return GL_FALSE;
+    return false;
 }
 
-static GLboolean
+static bool
 copytexsubimage_error_check2(GLcontext *ctx, GLuint dimensions,
 			     GLenum target, GLint level,
 			     GLint xoffset, GLint yoffset, GLint zoffset,
@@ -1971,30 +1971,30 @@ copytexsubimage_error_check2(GLcontext *ctx, GLuint dimensions,
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glCopyTexSubImage%dD(undefined texture level: %d)",
 		    dimensions, level);
-	return GL_TRUE;
+	return true;
     }
 
     if (xoffset < -(static_cast<GLint>(teximage->Border))) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexSubImage%dD(xoffset=%d)", dimensions, xoffset);
-	return GL_TRUE;
+	return true;
     }
     if (xoffset + width > static_cast<GLint>((teximage->Width + teximage->Border))) {
 	_mesa_error(ctx, GL_INVALID_VALUE,
 		    "glCopyTexSubImage%dD(xoffset+width)", dimensions);
-	return GL_TRUE;
+	return true;
     }
     if (dimensions > 1) {
 	if (yoffset < -(static_cast<GLint>(teximage->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%dD(yoffset=%d)", dimensions, yoffset);
-	    return GL_TRUE;
+	    return true;
 	}
 	/* NOTE: we're adding the border here, not subtracting! */
 	if (yoffset + height > static_cast<GLint>((teximage->Height + teximage->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%dD(yoffset+height)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -2002,12 +2002,12 @@ copytexsubimage_error_check2(GLcontext *ctx, GLuint dimensions,
 	if (zoffset < -(static_cast<GLint>(teximage->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%dD(zoffset)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if (zoffset > static_cast<GLint>((teximage->Depth + teximage->Border))) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%dD(zoffset+depth)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
@@ -2015,36 +2015,36 @@ copytexsubimage_error_check2(GLcontext *ctx, GLuint dimensions,
 	if (target != GL_TEXTURE_2D) {
 	    _mesa_error(ctx, GL_INVALID_ENUM,
 			"glCopyTexSubImage%d(target)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	/* offset must be multiple of 4 */
 	if ((xoffset & 3) || (yoffset & 3)) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%d(xoffset or yoffset)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	/* size must be multiple of 4 */
 	if ((width & 3) != 0 && static_cast<GLuint>(width) != teximage->Width) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%d(width)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
 	if ((height & 3) != 0 && static_cast<GLuint>(height) != teximage->Height) {
 	    _mesa_error(ctx, GL_INVALID_VALUE,
 			"glCopyTexSubImage%d(height)", dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
     if (teximage->InternalFormat == GL_YCBCR_MESA) {
 	_mesa_error(ctx, GL_INVALID_OPERATION, "glCopyTexSubImage2D");
-	return GL_TRUE;
+	return true;
     }
 
     if (!_mesa_source_buffer_exists(ctx, teximage->_BaseFormat)) {
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glCopyTexSubImage%dD(missing readbuffer)", dimensions);
-	return GL_TRUE;
+	return true;
     }
 
     if (teximage->_BaseFormat == GL_DEPTH_COMPONENT) {
@@ -2052,19 +2052,19 @@ copytexsubimage_error_check2(GLcontext *ctx, GLuint dimensions,
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCopyTexSubImage%d(no depth buffer)",
 			dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     } else if (teximage->_BaseFormat == GL_DEPTH_STENCIL_EXT) {
 	if (!ctx->ReadBuffer->_DepthBuffer || !ctx->ReadBuffer->_StencilBuffer) {
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glCopyTexSubImage%d(no depth/stencil buffer)",
 			dimensions);
-	    return GL_TRUE;
+	    return true;
 	}
     }
 
     /* if we get here, the parameters are OK */
-    return GL_FALSE;
+    return false;
 }
 
 

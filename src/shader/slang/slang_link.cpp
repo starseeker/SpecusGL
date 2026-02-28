@@ -45,7 +45,7 @@
 
 
 
-static GLboolean
+static bool
 link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 {
     GLuint i, firstVarying, newFile;
@@ -63,7 +63,7 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	    /* already in list, check size */
 	    if (var->Size != shProg->Varying->Parameters[j].Size) {
 		/* error */
-		return GL_FALSE;
+		return false;
 	    }
 	} else {
 	    /* not already in linked list */
@@ -123,11 +123,11 @@ link_varying_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	/*printf("FRAG INPUTS: 0x%x\n", varsRead);*/
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-static GLboolean
+static bool
 is_uniform(GLuint file)
 {
     return (file == PROGRAM_ENV_PARAM ||
@@ -139,7 +139,7 @@ is_uniform(GLuint file)
 }
 
 
-static GLboolean
+static bool
 link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 {
     GLuint i;
@@ -194,20 +194,20 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 		case PROGRAM_UNIFORM:
 		    if (p->Name.empty()) {
 			_mesa_problem(nullptr, "bad p->Name.c_str() in link_uniform_vars()");
-		return GL_FALSE;
+		return false;
 		    }
 		    j = _mesa_add_uniform(shProg->Uniforms, p->Name.c_str(), p->Size, p->DataType);
 		    break;
 		case PROGRAM_SAMPLER:
 		    if (p->Name.empty()) {
 			_mesa_problem(nullptr, "bad p->Name.c_str() in link_uniform_vars()");
-		return GL_FALSE;
+		return false;
 		    }
 		    j = _mesa_add_sampler(shProg->Uniforms, p->Name.c_str(), p->DataType);
 		    break;
 		default:
 		    _mesa_problem(nullptr, "bad parameter type in link_uniform_vars()");
-		return GL_FALSE;
+		return false;
 	    }
 	}
 
@@ -266,7 +266,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -276,7 +276,7 @@ link_uniform_vars(struct gl_shader_program *shProg, struct gl_program *prog)
  * allocate a generic vertex attribute for "foobar" and plug that value into
  * the vertex program instructions.
  */
-static GLboolean
+static bool
 _slang_resolve_attributes(struct gl_shader_program *shProg,
 			  struct gl_program *prog)
 {
@@ -331,7 +331,7 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
 		    }
 		    if (attr == MAX_VERTEX_ATTRIBS) {
 			/* too many!  XXX record error log */
-			return GL_FALSE;
+			return false;
 		    }
 		    _mesa_add_attribute(shProg->Attributes, name.c_str(), size, attr);
 
@@ -343,7 +343,7 @@ _slang_resolve_attributes(struct gl_shader_program *shProg,
 	    }
 	}
     }
-    return GL_TRUE;
+    return true;
 }
 
 

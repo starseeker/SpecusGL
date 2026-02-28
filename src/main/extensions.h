@@ -61,7 +61,7 @@ extern void _mesa_enable_extension(GLcontext *ctx, const char *name);
 
 extern void _mesa_disable_extension(GLcontext *ctx, const char *name);
 
-extern GLboolean _mesa_extension_is_enabled(GLcontext *ctx, const char *name);
+extern bool _mesa_extension_is_enabled(GLcontext *ctx, const char *name);
 
 extern void _mesa_init_extensions(GLcontext *ctx);
 

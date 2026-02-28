@@ -343,7 +343,7 @@ GLmatrix::print() const
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (\p singular matrix).
  *
  * \author
  * Code contributed by Jacques Leroy jle@star.be
@@ -352,7 +352,7 @@ GLmatrix::print() const
  * with partial pivoting followed by back/substitution with the loops manually
  * unrolled.
  */
-static GLboolean invert_matrix_general(GLmatrix *mat)
+static bool invert_matrix_general(GLmatrix *mat)
 {
     const GLfloat *m = mat->m;
     GLfloat *out = mat->inv;
@@ -382,7 +382,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
     if (FABSF(r3[0])>FABSF(r2[0])) SWAP_ROWS(r3, r2);
     if (FABSF(r2[0])>FABSF(r1[0])) SWAP_ROWS(r2, r1);
     if (FABSF(r1[0])>FABSF(r0[0])) SWAP_ROWS(r1, r0);
-    if (0.0 == r0[0])  return GL_FALSE;
+    if (0.0 == r0[0])  return false;
 
     /* eliminate first variable     */
     m1 = r1[0]/r0[0];
@@ -428,7 +428,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
     /* choose pivot - or die */
     if (FABSF(r3[1])>FABSF(r2[1])) SWAP_ROWS(r3, r2);
     if (FABSF(r2[1])>FABSF(r1[1])) SWAP_ROWS(r2, r1);
-    if (0.0 == r1[1])  return GL_FALSE;
+    if (0.0 == r1[1])  return false;
 
     /* eliminate second variable */
     m2 = r2[1]/r1[1];
@@ -460,7 +460,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
 
     /* choose pivot - or die */
     if (FABSF(r3[2])>FABSF(r2[2])) SWAP_ROWS(r3, r2);
-    if (0.0 == r2[2])  return GL_FALSE;
+    if (0.0 == r2[2])  return false;
 
     /* eliminate third variable */
     m3 = r3[2]/r2[2];
@@ -469,7 +469,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
 					   r3[7] -= m3 * r2[7];
 
     /* last check */
-    if (0.0 == r3[3]) return GL_FALSE;
+    if (0.0 == r3[3]) return false;
 
     s = 1.0F/r3[3];             /* now back substitute row 3 */
     r3[4] *= s;
@@ -518,7 +518,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
     MAT(out,3,2) = r3[6];
     MAT(out,3,3) = r3[7];
 
-    return GL_TRUE;
+    return true;
 }
 #undef SWAP_ROWS
 
@@ -528,7 +528,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (\p singular matrix).
  *
  * \author Adapted from graphics gems II.
  *
@@ -537,7 +537,7 @@ static GLboolean invert_matrix_general(GLmatrix *mat)
  * element. Finally deals with the translation part by transforming the
  * original translation vector using by the calculated submatrix inverse.
  */
-static GLboolean invert_matrix_3d_general(GLmatrix *mat)
+static bool invert_matrix_3d_general(GLmatrix *mat)
 {
     const GLfloat *in = mat->m;
     GLfloat *out = mat->inv;
@@ -575,7 +575,7 @@ static GLboolean invert_matrix_3d_general(GLmatrix *mat)
     det = pos + neg;
 
     if (det*det < 1e-25)
-	return GL_FALSE;
+	return false;
 
     det = 1.0F / det;
     MAT(out,0,0) = ((MAT(in,1,1)*MAT(in,2,2) - MAT(in,2,1)*MAT(in,1,2))*det);
@@ -599,7 +599,7 @@ static GLboolean invert_matrix_3d_general(GLmatrix *mat)
 		      MAT(in,1,3) * MAT(out,2,1) +
 		      MAT(in,2,3) * MAT(out,2,2));
 
-    return GL_TRUE;
+    return true;
 }
 
 /**
@@ -608,14 +608,14 @@ static GLboolean invert_matrix_3d_general(GLmatrix *mat)
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (\p singular matrix).
  *
  * If the matrix is not an angle preserving matrix then calls
  * invert_matrix_3d_general for the actual calculation. Otherwise calculates
  * the inverse matrix analyzing and inverting each of the scaling, rotation and
  * translation parts.
  */
-static GLboolean invert_matrix_3d(GLmatrix *mat)
+static bool invert_matrix_3d(GLmatrix *mat)
 {
     const GLfloat *in = mat->m;
     GLfloat *out = mat->inv;
@@ -630,7 +630,7 @@ static GLboolean invert_matrix_3d(GLmatrix *mat)
 			 MAT(in,0,2) * MAT(in,0,2));
 
 	if (scale == 0.0)
-	    return GL_FALSE;
+	    return false;
 
 	scale = 1.0F / scale;
 
@@ -661,7 +661,7 @@ static GLboolean invert_matrix_3d(GLmatrix *mat)
 	MAT(out,0,3) = - MAT(in,0,3);
 	MAT(out,1,3) = - MAT(in,1,3);
 	MAT(out,2,3) = - MAT(in,2,3);
-	return GL_TRUE;
+	return true;
     }
 
     if (mat->flags & MAT_FLAG_TRANSLATION) {
@@ -679,7 +679,7 @@ static GLboolean invert_matrix_3d(GLmatrix *mat)
 	MAT(out,0,3) = MAT(out,1,3) = MAT(out,2,3) = 0.0;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 /**
@@ -688,14 +688,14 @@ static GLboolean invert_matrix_3d(GLmatrix *mat)
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return always GL_TRUE.
+ * \return always true.
  *
  * Simply copies Identity into GLmatrix::inv.
  */
-static GLboolean invert_matrix_identity(GLmatrix *mat)
+static bool invert_matrix_identity(GLmatrix *mat)
 {
     memcpy(mat->inv, Identity, sizeof(Identity));
-    return GL_TRUE;
+    return true;
 }
 
 /**
@@ -704,17 +704,17 @@ static GLboolean invert_matrix_identity(GLmatrix *mat)
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (\p singular matrix).
  *
  * Calculates the
  */
-static GLboolean invert_matrix_3d_no_rot(GLmatrix *mat)
+static bool invert_matrix_3d_no_rot(GLmatrix *mat)
 {
     const GLfloat *in = mat->m;
     GLfloat *out = mat->inv;
 
     if (MAT(in,0,0) == 0 || MAT(in,1,1) == 0 || MAT(in,2,2) == 0)
-	return GL_FALSE;
+	return false;
 
     memcpy(out, Identity, 16 * sizeof(GLfloat));
     MAT(out,0,0) = 1.0F / MAT(in,0,0);
@@ -727,7 +727,7 @@ static GLboolean invert_matrix_3d_no_rot(GLmatrix *mat)
 	MAT(out,2,3) = - (MAT(in,2,3) * MAT(out,2,2));
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 /**
@@ -736,18 +736,18 @@ static GLboolean invert_matrix_3d_no_rot(GLmatrix *mat)
  * \param mat pointer to a GLmatrix structure. The matrix inverse will be
  * stored in the GLmatrix::inv attribute.
  *
- * \return GL_TRUE for success, GL_FALSE for failure (\p singular matrix).
+ * \return true for success, false for failure (\p singular matrix).
  *
  * Calculates the inverse matrix by applying the inverse scaling and
  * translation to the identity matrix.
  */
-static GLboolean invert_matrix_2d_no_rot(GLmatrix *mat)
+static bool invert_matrix_2d_no_rot(GLmatrix *mat)
 {
     const GLfloat *in = mat->m;
     GLfloat *out = mat->inv;
 
     if (MAT(in,0,0) == 0 || MAT(in,1,1) == 0)
-	return GL_FALSE;
+	return false;
 
     memcpy(out, Identity, 16 * sizeof(GLfloat));
     MAT(out,0,0) = 1.0F / MAT(in,0,0);
@@ -758,18 +758,18 @@ static GLboolean invert_matrix_2d_no_rot(GLmatrix *mat)
 	MAT(out,1,3) = - (MAT(in,1,3) * MAT(out,1,1));
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 #if 0
 /* broken */
-static GLboolean invert_matrix_perspective(GLmatrix *mat)
+static bool invert_matrix_perspective(GLmatrix *mat)
 {
     const GLfloat *in = mat->m;
     GLfloat *out = mat->inv;
 
     if (MAT(in,2,3) == 0)
-	return GL_FALSE;
+	return false;
 
     memcpy(out, Identity, 16 * sizeof(GLfloat));
 
@@ -785,14 +785,14 @@ static GLboolean invert_matrix_perspective(GLmatrix *mat)
     MAT(out,3,2) = 1.0F / MAT(in,2,3);
     MAT(out,3,3) = MAT(in,2,2) * MAT(out,3,2);
 
-    return GL_TRUE;
+    return true;
 }
 #endif
 
 /**
  * Matrix inversion function pointer type.
  */
-using inv_mat_func = GLboolean(*)(GLmatrix *mat);
+using inv_mat_func = bool(*)(GLmatrix *mat);
 
 /**
  * Table of the matrix inversion functions according to the matrix type.
@@ -855,20 +855,20 @@ GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 {
     GLfloat xx, yy, zz, xy, yz, zx, xs, ys, zs, one_c, s, c;
     GLfloat rmat[16];  /* local rotation matrix (renamed to avoid clash with member m) */
-    GLboolean optimized;
+    bool optimized;
 
     s = static_cast<GLfloat>(sin(angle * DEG2RAD));
     c = static_cast<GLfloat>(cos(angle * DEG2RAD));
 
     memcpy(rmat, Identity, sizeof(GLfloat)*16);
-    optimized = GL_FALSE;
+    optimized = false;
 
 #define M(row,col)  rmat[col*4+row]
 
     if (x == 0.0F) {
 	if (y == 0.0F) {
 	    if (z != 0.0F) {
-		optimized = GL_TRUE;
+		optimized = true;
 		/* rotate only around z-axis */
 		M(0,0) = c;
 		M(1,1) = c;
@@ -881,7 +881,7 @@ GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 		}
 	    }
 	} else if (z == 0.0F) {
-	    optimized = GL_TRUE;
+	    optimized = true;
 	    /* rotate only around y-axis */
 	    M(0,0) = c;
 	    M(2,2) = c;
@@ -895,7 +895,7 @@ GLmatrix::rotate(GLfloat angle, GLfloat x, GLfloat y, GLfloat z)
 	}
     } else if (y == 0.0F) {
 	if (z == 0.0F) {
-	    optimized = GL_TRUE;
+	    optimized = true;
 	    /* rotate only around x-axis */
 	    M(1,1) = c;
 	    M(2,2) = c;

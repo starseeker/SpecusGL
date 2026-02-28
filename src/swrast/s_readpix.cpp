@@ -89,7 +89,7 @@ read_depth_pixels(GLcontext *ctx,
 {
     struct gl_framebuffer *fb = ctx->ReadBuffer;
     struct gl_renderbuffer *rb = fb->_DepthBuffer;
-    const GLboolean biasOrScale
+    const bool biasOrScale
 	= ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0;
 
     if (!rb)
@@ -196,9 +196,9 @@ read_stencil_pixels(GLcontext *ctx,
 /**
  * Optimized glReadPixels for particular pixel formats when pixel
  * scaling, biasing, mapping, etc. are disabled.
- * \return GL_TRUE if success, GL_FALSE if unable to do the readpixels
+ * \return true if success, false if unable to do the readpixels
  */
-static GLboolean
+static bool
 fast_read_rgba_pixels(GLcontext *ctx,
 		      GLint x, GLint y,
 		      GLsizei width, GLsizei height,
@@ -210,7 +210,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
     struct gl_renderbuffer *rb = ctx->ReadBuffer->_ColorReadBuffer;
 
     if (!rb)
-	return GL_FALSE;
+	return false;
 
     assert(rb->_BaseFormat == GL_RGBA || rb->_BaseFormat == GL_RGB);
 
@@ -222,7 +222,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
     if (transferOps ||
 	packing->SwapBytes ||
 	packing->LsbFirst) {
-	return GL_FALSE;
+	return false;
     }
 
     if (format == GL_RGBA && rb->DataType == type) {
@@ -236,7 +236,7 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    rb->GetRow(ctx, width, x, y + row, dest);
 	    dest += dstStride;
 	}
-	return GL_TRUE;
+	return true;
     }
 
     if (format == GL_RGB &&
@@ -260,11 +260,11 @@ fast_read_rgba_pixels(GLcontext *ctx,
 	    }
 	    dest += dstStride;
 	}
-	return GL_TRUE;
+	return true;
     }
 
     /* not handled */
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -442,9 +442,9 @@ read_depth_stencil_pixels(GLcontext *ctx,
 			  GLenum type, GLvoid *pixels,
 			  const struct gl_pixelstore_attrib *packing)
 {
-    const GLboolean scaleOrBias
+    const bool scaleOrBias
 	= ctx->Pixel.DepthScale != 1.0 || ctx->Pixel.DepthBias != 0.0;
-    const GLboolean stencilTransfer = ctx->Pixel.IndexShift
+    const bool stencilTransfer = ctx->Pixel.IndexShift
 				      || ctx->Pixel.IndexOffset || ctx->Pixel.MapStencilFlag;
     struct gl_renderbuffer *depthRb, *stencilRb;
 

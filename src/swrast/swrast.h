@@ -83,7 +83,7 @@ struct swrast_device_driver;
 /* These are the public-access functions exported from swrast.
  */
 
-extern GLboolean
+extern bool
 _swrast_CreateContext(GLcontext *ctx);
 
 extern void
@@ -189,10 +189,10 @@ _swrast_InvalidateState(GLcontext *ctx, GLbitfield new_state);
 /* Configure software rasterizer to match hardware rasterizer characteristics:
  */
 extern void
-_swrast_allow_vertex_fog(GLcontext *ctx, GLboolean value);
+_swrast_allow_vertex_fog(GLcontext *ctx, bool value);
 
 extern void
-_swrast_allow_pixel_fog(GLcontext *ctx, GLboolean value);
+_swrast_allow_pixel_fog(GLcontext *ctx, bool value);
 
 /* Debug:
  */

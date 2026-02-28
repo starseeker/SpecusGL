@@ -152,22 +152,37 @@ struct slang_ir_storage {
 /**
  * Intermediate Representation (IR) tree node
  * Basically a binary tree, but IR_LRP and IR_CLAMP have three children.
+ *
+ * C++17 modernisation: the destructor recursively frees Children[].
+ * List and Parent are non-owning references and are not deleted.
+ * Store is not owned here (ownership lives in the variable table / emit pass).
  */
 struct slang_ir_node {
     slang_ir_opcode Opcode;
-    slang_ir_node *Children[3];
-    slang_ir_storage *Store;  /**< location of result of this operation */
-    GLint InstLocation;  /**< Location of instruction emitted for this node */
+    slang_ir_node *Children[3]{nullptr, nullptr, nullptr};
+    slang_ir_storage *Store{nullptr};  /**< location of result of this operation */
+    GLint InstLocation{-1};  /**< Location of instruction emitted for this node */
 
     /** special fields depending on Opcode: */
-    const char *Field;  /**< If Opcode == IR_FIELD */
-    int FieldOffset;  /**< If Opcode == IR_FIELD */
-    GLuint Writemask;  /**< If Opcode == IR_MOVE */
-    GLfloat Value[4];    /**< If Opcode == IR_FLOAT */
-    slang_variable *Var;  /**< If Opcode == IR_VAR or IR_VAR_DECL */
-    slang_ir_node *List;  /**< For various linked lists */
-    slang_ir_node *Parent;  /**< Pointer to logical parent (ie. loop) */
-    slang_label *Label;  /**< Used for branches */
+    const char *Field{nullptr};  /**< If Opcode == IR_FIELD */
+    int FieldOffset{0};  /**< If Opcode == IR_FIELD */
+    GLuint Writemask{WRITEMASK_XYZW};  /**< If Opcode == IR_MOVE */
+    GLfloat Value[4]{};    /**< If Opcode == IR_FLOAT */
+    slang_variable *Var{nullptr};  /**< If Opcode == IR_VAR or IR_VAR_DECL */
+    slang_ir_node *List{nullptr};  /**< For various linked lists (non-owning) */
+    slang_ir_node *Parent{nullptr};  /**< Pointer to logical parent (non-owning) */
+    slang_label *Label{nullptr};  /**< Used for branches (non-owning) */
+
+    /** Recursively frees owned Children[]; non-owning pointers are ignored. */
+    ~slang_ir_node() {
+        for (auto *c : Children)
+            delete c;
+    }
+
+    /* Nodes are exclusively heap-allocated and tree-owned; prevent accidental copies. */
+    slang_ir_node() = default;
+    slang_ir_node(const slang_ir_node &) = delete;
+    slang_ir_node &operator=(const slang_ir_node &) = delete;
 };
 
 
@@ -188,8 +203,12 @@ extern const slang_ir_info *
 _slang_ir_info(slang_ir_opcode opcode);
 
 
-extern void
-_slang_free_ir_tree(slang_ir_node *n);
+/** Free an IR tree. The slang_ir_node destructor recurses into Children[]. */
+inline void
+_slang_free_ir_tree(slang_ir_node *n)
+{
+    delete n;
+}
 
 
 extern void

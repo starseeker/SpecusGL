@@ -591,7 +591,7 @@ interpolate_texcoords(GLcontext *ctx, SWspan *span)
 	    const GLuint attr = FRAG_ATTRIB_TEX0 + u;
 	    const struct gl_texture_object *obj = ctx->Texture.Unit[u]._Current;
 	    GLfloat texW, texH;
-	    GLboolean needLambda;
+	    bool needLambda;
 	    GLfloat(*texcoord)[4] = span->array->attribs[attr];
 	    GLfloat *lambda = span->array->lambda[u];
 	    const GLfloat dsdx = span->attrStepX[attr][0];
@@ -616,7 +616,7 @@ interpolate_texcoords(GLcontext *ctx, SWspan *span)
 		/* using a fragment program */
 		texW = 1.0;
 		texH = 1.0;
-		needLambda = GL_FALSE;
+		needLambda = false;
 	    }
 
 	    if (needLambda) {
@@ -1376,7 +1376,7 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
     const GLboolean shaderOrTexture = shader || ctx->Texture._EnabledUnits;
     struct gl_framebuffer *fb = ctx->DrawBuffer;
     GLuint output;
-    GLboolean deferredTexture;
+    bool deferredTexture;
 
     /*
     printf("%s()  interp 0x%x  array 0x%x\n", __func__,
@@ -1397,26 +1397,26 @@ _swrast_write_rgba_span(GLcontext *ctx, SWspan *span)
      */
     if (ctx->Color.AlphaEnabled) {
 	/* alpha test depends on post-texture/shader colors */
-	deferredTexture = GL_FALSE;
+	deferredTexture = false;
     } else if (shaderOrTexture) {
 	if (ctx->FragmentProgram._Current) {
 	    if (ctx->FragmentProgram._Current->OutputsWritten
 		& (1 << FRAG_RESULT_DEPR)) {
 		/* Z comes from fragment program/shader */
-		deferredTexture = GL_FALSE;
+		deferredTexture = false;
 	    } else if (ctx->Query.CurrentOcclusionObject) {
 		/* occlusion query depends on shader discard/kill results */
-		deferredTexture = GL_FALSE;
+		deferredTexture = false;
 	    } else {
-		deferredTexture = GL_TRUE;
+		deferredTexture = true;
 	    }
 	} else {
 	    /* ATI frag shader or conventional texturing */
-	    deferredTexture = GL_TRUE;
+	    deferredTexture = true;
 	}
     } else {
 	/* no texturing or shadering */
-	deferredTexture = GL_FALSE;
+	deferredTexture = false;
     }
 
     /* Fragment write masks */

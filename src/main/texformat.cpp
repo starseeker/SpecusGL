@@ -48,7 +48,7 @@ static inline GLfloat
 nonlinear_to_linear(GLubyte cs8)
 {
     static GLfloat table[256];
-    static GLboolean tableReady = GL_FALSE;
+    static bool tableReady = false;
     if (!tableReady) {
 	/* compute lookup table now */
 	GLuint i;
@@ -60,7 +60,7 @@ nonlinear_to_linear(GLubyte cs8)
 		table[i] = pow((cs + 0.055) / 1.055, 2.4);
 	    }
 	}
-	tableReady = GL_TRUE;
+	tableReady = true;
     }
     return table[cs8];
 }

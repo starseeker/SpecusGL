@@ -77,7 +77,7 @@ max_buffer_index(GLcontext *ctx, GLuint count, GLenum type,
 }
 
 
-GLboolean
+bool
 _mesa_validate_DrawElements(GLcontext *ctx,
 			    GLenum mode, GLsizei count, GLenum type,
 			    const GLvoid *indices)
@@ -87,19 +87,19 @@ _mesa_validate_DrawElements(GLcontext *ctx,
     if (count <= 0) {
 	if (count < 0)
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glDrawElements(count)");
-	return GL_FALSE;
+	return false;
     }
 
     if (mode > GL_POLYGON) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glDrawElements(mode)");
-	return GL_FALSE;
+	return false;
     }
 
     if (type != GL_UNSIGNED_INT &&
 	type != GL_UNSIGNED_BYTE &&
 	type != GL_UNSIGNED_SHORT) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glDrawElements(type)");
-	return GL_FALSE;
+	return false;
     }
 
     if (ctx->NewState)
@@ -109,7 +109,7 @@ _mesa_validate_DrawElements(GLcontext *ctx,
     if (!ctx->Array.ArrayObj->Vertex.Enabled
 	&& !(ctx->VertexProgram._Enabled
 	     && ctx->Array.ArrayObj->VertexAttrib[0].Enabled))
-	return GL_FALSE;
+	return false;
 
     /* Vertex buffer object tests */
     if (ctx->Array.ElementArrayBufferObj->Name) {
@@ -128,12 +128,12 @@ _mesa_validate_DrawElements(GLcontext *ctx,
 	/* make sure count doesn't go outside buffer bounds */
 	if (indexBytes > ctx->Array.ElementArrayBufferObj->Data.size()) {
 	    _mesa_warning(ctx, "glDrawElements index out of buffer bounds");
-	    return GL_FALSE;
+	    return false;
 	}
     } else {
 	/* not using a VBO */
 	if (!indices)
-	    return GL_FALSE;
+	    return false;
     }
 
     if (ctx->Const.CheckArrayBounds) {
@@ -142,15 +142,15 @@ _mesa_validate_DrawElements(GLcontext *ctx,
 				      ctx->Array.ElementArrayBufferObj);
 	if (max >= ctx->Array._MaxElement) {
 	    /* the max element is out of bounds of one or more enabled arrays */
-	    return GL_FALSE;
+	    return false;
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
-GLboolean
+bool
 _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
 				 GLuint start, GLuint end,
 				 GLsizei count, GLenum type,
@@ -161,24 +161,24 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
     if (count <= 0) {
 	if (count < 0)
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glDrawRangeElements(count)");
-	return GL_FALSE;
+	return false;
     }
 
     if (mode > GL_POLYGON) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glDrawRangeElements(mode)");
-	return GL_FALSE;
+	return false;
     }
 
     if (end < start) {
 	_mesa_error(ctx, GL_INVALID_VALUE, "glDrawRangeElements(end<start)");
-	return GL_FALSE;
+	return false;
     }
 
     if (type != GL_UNSIGNED_INT &&
 	type != GL_UNSIGNED_BYTE &&
 	type != GL_UNSIGNED_SHORT) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glDrawRangeElements(type)");
-	return GL_FALSE;
+	return false;
     }
 
     if (ctx->NewState)
@@ -188,7 +188,7 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
     if (!ctx->Array.ArrayObj->Vertex.Enabled
 	&& !(ctx->VertexProgram._Enabled
 	     && ctx->Array.ArrayObj->VertexAttrib[0].Enabled))
-	return GL_FALSE;
+	return false;
 
     /* Vertex buffer object tests */
     if (ctx->Array.ElementArrayBufferObj->Name) {
@@ -207,12 +207,12 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
 	/* make sure count doesn't go outside buffer bounds */
 	if (indexBytes > ctx->Array.ElementArrayBufferObj->Data.size()) {
 	    _mesa_warning(ctx, "glDrawRangeElements index out of buffer bounds");
-	    return GL_FALSE;
+	    return false;
 	}
     } else {
 	/* not using a VBO */
 	if (!indices)
-	    return GL_FALSE;
+	    return false;
     }
 
     if (ctx->Const.CheckArrayBounds) {
@@ -220,11 +220,11 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
 				      ctx->Array.ElementArrayBufferObj);
 	if (max >= ctx->Array._MaxElement) {
 	    /* the max element is out of bounds of one or more enabled arrays */
-	    return GL_FALSE;
+	    return false;
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -232,7 +232,7 @@ _mesa_validate_DrawRangeElements(GLcontext *ctx, GLenum mode,
  * Called from the tnl module to error check the function parameters and
  * verify that we really can draw something.
  */
-GLboolean
+bool
 _mesa_validate_DrawArrays(GLcontext *ctx,
 			  GLenum mode, GLint start, GLsizei count)
 {
@@ -241,12 +241,12 @@ _mesa_validate_DrawArrays(GLcontext *ctx,
     if (count <= 0) {
 	if (count < 0)
 	    _mesa_error(ctx, GL_INVALID_VALUE, "glDrawArrays(count)");
-	return GL_FALSE;
+	return false;
     }
 
     if (mode > GL_POLYGON) {
 	_mesa_error(ctx, GL_INVALID_ENUM, "glDrawArrays(mode)");
-	return GL_FALSE;
+	return false;
     }
 
     if (ctx->NewState)
@@ -255,14 +255,14 @@ _mesa_validate_DrawArrays(GLcontext *ctx,
     /* Always need vertex positions */
     if (!ctx->Array.ArrayObj->Vertex.Enabled
 	&& !ctx->Array.ArrayObj->VertexAttrib[0].Enabled)
-	return GL_FALSE;
+	return false;
 
     if (ctx->Const.CheckArrayBounds) {
 	if (start + count > (GLint) ctx->Array._MaxElement)
-	    return GL_FALSE;
+	    return false;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 /*

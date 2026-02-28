@@ -72,10 +72,10 @@ _mesa_update_stencil_buffer(GLcontext *ctx, struct gl_framebuffer *fb,
 extern void
 _mesa_update_framebuffer(GLcontext *ctx);
 
-extern GLboolean
+extern bool
 _mesa_source_buffer_exists(GLcontext *ctx, GLenum format);
 
-extern GLboolean
+extern bool
 _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format);
 
 

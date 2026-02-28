@@ -60,9 +60,9 @@
 /*@{*/
 
 extern GLvisual *
-_mesa_create_visual(GLboolean rgbFlag,
-		    GLboolean dbFlag,
-		    GLboolean stereoFlag,
+_mesa_create_visual(bool rgbFlag,
+		    bool dbFlag,
+		    bool stereoFlag,
 		    GLint redBits,
 		    GLint greenBits,
 		    GLint blueBits,
@@ -76,11 +76,11 @@ _mesa_create_visual(GLboolean rgbFlag,
 		    GLint accumAlphaBits,
 		    GLint numSamples);
 
-extern GLboolean
+extern bool
 _mesa_initialize_visual(GLvisual *v,
-			GLboolean rgbFlag,
-			GLboolean dbFlag,
-			GLboolean stereoFlag,
+			bool rgbFlag,
+			bool dbFlag,
+			bool stereoFlag,
 			GLint redBits,
 			GLint greenBits,
 			GLint blueBits,
@@ -109,7 +109,7 @@ _mesa_create_context(const GLvisual *visual,
 		     const struct dd_function_table *driverFunctions,
 		     void *driverContext);
 
-extern GLboolean
+extern bool
 _mesa_initialize_context(GLcontext *ctx,
 			 const GLvisual *visual,
 			 GLcontext *share_list,
@@ -131,7 +131,7 @@ extern void
 _mesa_make_current(GLcontext *ctx, GLframebuffer *drawBuffer,
 		   GLframebuffer *readBuffer);
 
-extern GLboolean
+extern bool
 _mesa_share_state(GLcontext *ctx, GLcontext *ctxToShare);
 
 extern GLcontext *

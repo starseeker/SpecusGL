@@ -218,10 +218,10 @@ inline void _math_matrix_set_identity(GLmatrix *dest)                  { dest->s
 inline void _math_matrix_copy(GLmatrix *to, const GLmatrix *from)     { to->copy_from(from); }
 inline void _math_matrix_analyse(GLmatrix *mat)                        { mat->analyse(); }
 inline void _math_matrix_print(const GLmatrix *m)                     { m->print(); }
-inline GLboolean _math_matrix_is_length_preserving(const GLmatrix *m) { return m->is_length_preserving() ? GL_TRUE : GL_FALSE; }
-inline GLboolean _math_matrix_has_rotation(const GLmatrix *m)         { return m->has_rotation() ? GL_TRUE : GL_FALSE; }
-inline GLboolean _math_matrix_is_general_scale(const GLmatrix *m)     { return m->is_general_scale() ? GL_TRUE : GL_FALSE; }
-inline GLboolean _math_matrix_is_dirty(const GLmatrix *m)             { return m->is_dirty() ? GL_TRUE : GL_FALSE; }
+inline bool _math_matrix_is_length_preserving(const GLmatrix *m) { return m->is_length_preserving(); }
+inline bool _math_matrix_has_rotation(const GLmatrix *m)         { return m->has_rotation(); }
+inline bool _math_matrix_is_general_scale(const GLmatrix *m)     { return m->is_general_scale(); }
+inline bool _math_matrix_is_dirty(const GLmatrix *m)             { return m->is_dirty(); }
 /*@}*/
 
 

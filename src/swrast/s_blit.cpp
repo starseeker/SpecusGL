@@ -39,7 +39,7 @@
 static void						\
 NAME(GLint srcWidth, GLint dstWidth,			\
      const GLvoid *srcBuffer, GLvoid *dstBuffer,	\
-     GLboolean flip)					\
+     bool flip)					\
 {							\
    const PIXELTYPE *src = (const PIXELTYPE *) srcBuffer;\
    PIXELTYPE *dst = (PIXELTYPE *) dstBuffer;		\
@@ -129,7 +129,7 @@ blit_nearest(GLcontext *ctx,
 
     using resample_func = void (*)(GLint srcWidth, GLint dstWidth,
 				   const GLvoid *srcBuffer, GLvoid *dstBuffer,
-				   GLboolean flip);
+				   bool flip);
     resample_func resampleRow;
 
     switch (buffer) {
@@ -589,9 +589,9 @@ clip_left_or_bottom(GLint *srcX0, GLint *srcX1,
  * Note that X0 need not be less than X1 (same for Y) for either the source
  * and dest rects.  That makes the clipping a little trickier.
  *
- * \return GL_TRUE if anything is left to draw, GL_FALSE if totally clipped
+ * \return true if anything is left to draw, false if totally clipped
  */
-static GLboolean
+static bool
 clip_blit(GLcontext *ctx,
 	  GLint *srcX0, GLint *srcY0, GLint *srcX1, GLint *srcY1,
 	  GLint *dstX0, GLint *dstY0, GLint *dstX1, GLint *dstY1)
@@ -616,32 +616,32 @@ clip_blit(GLcontext *ctx,
 
     /* trivial rejection tests */
     if (*dstX0 == *dstX1)
-	return GL_FALSE; /* no width */
+	return false; /* no width */
     if (*dstX0 <= dstXmin && *dstX1 <= dstXmin)
-	return GL_FALSE; /* totally out (left) of bounds */
+	return false; /* totally out (left) of bounds */
     if (*dstX0 >= dstXmax && *dstX1 >= dstXmax)
-	return GL_FALSE; /* totally out (right) of bounds */
+	return false; /* totally out (right) of bounds */
 
     if (*dstY0 == *dstY1)
-	return GL_FALSE;
+	return false;
     if (*dstY0 <= dstYmin && *dstY1 <= dstYmin)
-	return GL_FALSE;
+	return false;
     if (*dstY0 >= dstYmax && *dstY1 >= dstYmax)
-	return GL_FALSE;
+	return false;
 
     if (*srcX0 == *srcX1)
-	return GL_FALSE;
+	return false;
     if (*srcX0 <= srcXmin && *srcX1 <= srcXmin)
-	return GL_FALSE;
+	return false;
     if (*srcX0 >= srcXmax && *srcX1 >= srcXmax)
-	return GL_FALSE;
+	return false;
 
     if (*srcY0 == *srcY1)
-	return GL_FALSE;
+	return false;
     if (*srcY0 <= srcYmin && *srcY1 <= srcYmin)
-	return GL_FALSE;
+	return false;
     if (*srcY0 >= srcYmax && *srcY1 >= srcYmax)
-	return GL_FALSE;
+	return false;
 
     /*
      * dest clip
@@ -686,7 +686,7 @@ clip_blit(GLcontext *ctx,
     assert(*srcY1 >= srcYmin);
     assert(*srcY1 <= srcYmax);
 
-    return GL_TRUE;
+    return true;
 }
 
 

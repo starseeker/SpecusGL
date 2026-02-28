@@ -140,7 +140,7 @@ compute_fog_blend_factors(GLcontext *ctx, GLvector4f *out, const GLvector4f *in)
 }
 
 
-static GLboolean
+static bool
 run_fog_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -149,7 +149,7 @@ run_fog_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     GLvector4f *input;
 
     if (!ctx->Fog.Enabled || ctx->VertexProgram._Current)
-	return GL_TRUE;
+	return true;
 
 
     if (ctx->Fog.FogCoordinateSource == GL_FRAGMENT_DEPTH_EXT) {
@@ -225,14 +225,14 @@ run_fog_stage(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     }
 
     VB->FogCoordPtr = VB->AttribPtr[_TNL_ATTRIB_FOG];
-    return GL_TRUE;
+    return true;
 }
 
 
 
 /* Called the first time stage->run() is invoked.
  */
-static GLboolean
+static bool
 alloc_fog_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -240,14 +240,14 @@ alloc_fog_data(GLcontext *ctx, struct tnl_pipeline_stage *stage)
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<fog_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     store->fogcoord.alloc(0, tnl->vb.Size, 32);
 
     if (!inited)
 	init_static_data();
 
-    return GL_TRUE;
+    return true;
 }
 
 

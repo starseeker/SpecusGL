@@ -113,7 +113,7 @@ struct vbo_exec_context {
 
 
     struct {
-	GLboolean recalculate_maps;
+	bool recalculate_maps;
 	struct vbo_exec_eval1_map map1[VERT_ATTRIB_MAX];
 	struct vbo_exec_eval2_map map2[VERT_ATTRIB_MAX];
     } eval;
@@ -166,7 +166,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 void vbo_exec_do_EvalCoord1f(struct vbo_exec_context *exec,
 			     GLfloat u);
 
-extern GLboolean
+extern bool
 vbo_validate_shaders(GLcontext *ctx);
 
 

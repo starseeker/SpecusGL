@@ -272,7 +272,7 @@ struct dd_function_table {
      *
      * \return GL_TRUE if the proxy test passes, or GL_FALSE if the test fails.
      */
-    std::function<GLboolean(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLenum format, GLenum type, GLint width, GLint height, GLint depth, GLint border)> TestProxyTexImage;
+    std::function<bool(GLcontext *ctx, GLenum target, GLint level, GLint internalFormat, GLenum format, GLenum type, GLint width, GLint height, GLint depth, GLint border)> TestProxyTexImage;
     /*@}*/
 
 
@@ -409,7 +409,7 @@ struct dd_function_table {
     /**
      * Called by glAreTextureResident().
      */
-    std::function<GLboolean(GLcontext *ctx, struct gl_texture_object *t)> IsTextureResident;
+    std::function<bool(GLcontext *ctx, struct gl_texture_object *t)> IsTextureResident;
 
     /**
      * Called by glPrioritizeTextures().
@@ -461,7 +461,7 @@ struct dd_function_table {
     std::function<void(GLcontext *ctx, enum register_file file, GLuint index, GLfloat val[4])> GetProgramRegister;
 
     /** Query if program can be loaded onto hardware */
-    std::function<GLboolean(GLcontext *ctx, GLenum target, struct gl_program *prog)> IsProgramNative;
+    std::function<bool(GLcontext *ctx, GLenum target, struct gl_program *prog)> IsProgramNative;
 
     /*@}*/
 
@@ -595,15 +595,15 @@ struct dd_function_table {
      */
     /*@{*/
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLboolean *result)> GetBooleanv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLboolean *result)> GetBooleanv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLdouble *result)> GetDoublev;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLdouble *result)> GetDoublev;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLfloat *result)> GetFloatv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLfloat *result)> GetFloatv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLint *result)> GetIntegerv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLint *result)> GetIntegerv;
     /** Return the value or values of a selected parameter */
-    std::function<GLboolean(GLcontext *ctx, GLenum pname, GLvoid **result)> GetPointerv;
+    std::function<bool(GLcontext *ctx, GLenum pname, GLvoid **result)> GetPointerv;
     /*@}*/
 
 
@@ -626,7 +626,7 @@ struct dd_function_table {
 
     std::function<void *(GLcontext *ctx, GLenum target, GLenum access, struct gl_buffer_object *obj)> MapBuffer;
 
-    std::function<GLboolean(GLcontext *ctx, GLenum target, struct gl_buffer_object *obj)> UnmapBuffer;
+    std::function<bool(GLcontext *ctx, GLenum target, struct gl_buffer_object *obj)> UnmapBuffer;
     /*@}*/
 #endif
 
@@ -691,8 +691,8 @@ struct dd_function_table {
     std::function<void(GLcontext *ctx, GLuint program, GLint location, GLfloat *params)> GetUniformfv;
     std::function<void(GLcontext *ctx, GLuint program, GLint location, GLint *params)> GetUniformiv;
     std::function<GLint(GLcontext *ctx, GLuint program, const GLcharARB *name)> GetUniformLocation;
-    std::function<GLboolean(GLcontext *ctx, GLuint name)> IsProgram;
-    std::function<GLboolean(GLcontext *ctx, GLuint name)> IsShader;
+    std::function<bool(GLcontext *ctx, GLuint name)> IsProgram;
+    std::function<bool(GLcontext *ctx, GLuint name)> IsShader;
     std::function<void(GLcontext *ctx, GLuint program)> LinkProgram;
     std::function<void(GLcontext *ctx, GLuint shader, const GLchar *source)> ShaderSource;
     std::function<void(GLcontext *ctx, GLint location, GLsizei count, const GLvoid *values, GLenum type)> Uniform;
@@ -770,7 +770,7 @@ struct dd_function_table {
      * compiling optimized display lists.  This is called on each valid
      * glBegin() during list compilation.
      */
-    std::function<GLboolean(GLcontext *ctx, GLenum mode)> NotifySaveBegin;
+    std::function<bool(GLcontext *ctx, GLenum mode)> NotifySaveBegin;
 
     /**
      * Notify driver that the special derived value _NeedEyeCoords has

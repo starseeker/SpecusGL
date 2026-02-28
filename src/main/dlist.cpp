@@ -4897,7 +4897,7 @@ save_Begin(GLenum mode)
 {
     GET_CURRENT_CONTEXT(ctx);
     Node *n;
-    GLboolean error = GL_FALSE;
+    bool error = false;
 
     if (/*mode < GL_POINTS || */ mode > GL_POLYGON) {
 	_mesa_compile_error(ctx, GL_INVALID_ENUM, "Begin (mode)");
@@ -5401,13 +5401,13 @@ _mesa_compile_error(GLcontext *ctx, GLenum error, const char *s)
 /**
  * Test if ID names a display list.
  */
-static GLboolean
+static bool
 islist(GLcontext *ctx, GLuint list)
 {
     if (list > 0 && lookup_list(ctx, list)) {
-	return GL_TRUE;
+	return true;
     } else {
-	return GL_FALSE;
+	return false;
     }
 }
 

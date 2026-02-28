@@ -66,7 +66,7 @@ struct arb_program {
     GLuint MinorVersion;
 
     /* ARB_vertex_progmra options */
-    GLboolean HintPositionInvariant;
+    bool HintPositionInvariant;
 
     /* ARB_fragment_progmra options */
     GLenum PrecisionOption; /* GL_DONT_CARE, GL_NICEST or GL_FASTEST */
@@ -78,7 +78,7 @@ struct arb_program {
     GLuint NumTexInstructions;
     GLuint NumTexIndirections;
 
-    GLboolean UsesKill;
+    bool UsesKill;
 };
 
 
@@ -816,14 +816,14 @@ parse_signed_float(const GLubyte ** inst, struct arb_program *Program)
  */
 static GLvoid
 parse_constant(const GLubyte ** inst, GLfloat *values, struct arb_program *Program,
-	       GLboolean use)
+	       bool use)
 {
     GLuint components, i;
 
 
     switch (*(*inst)++) {
 	case CONSTANT_SCALAR:
-	    if (use == GL_TRUE) {
+	    if (use == true) {
 		values[0] =
 		    values[1] =
 			values[2] = values[3] = parse_float(inst, Program);
@@ -1412,21 +1412,21 @@ generic_attrib_check(struct var_cache *vc_head)
 {
     int a;
     struct var_cache *curr;
-    GLboolean explicitAttrib[MAX_VERTEX_PROGRAM_ATTRIBS],
+    bool explicitAttrib[MAX_VERTEX_PROGRAM_ATTRIBS],
 	      genericAttrib[MAX_VERTEX_PROGRAM_ATTRIBS];
 
     for (a=0; a<MAX_VERTEX_PROGRAM_ATTRIBS; a++) {
-	explicitAttrib[a] = GL_FALSE;
-	genericAttrib[a] = GL_FALSE;
+	explicitAttrib[a] = false;
+	genericAttrib[a] = false;
     }
 
     curr = vc_head;
     while (curr) {
 	if (curr->type == vt_attrib) {
 	    if (curr->attrib_is_generic)
-		genericAttrib[ curr->attrib_binding ] = GL_TRUE;
+		genericAttrib[ curr->attrib_binding ] = true;
 	    else
-		explicitAttrib[ curr->attrib_binding ] = GL_TRUE;
+		explicitAttrib[ curr->attrib_binding ] = true;
 	}
 
 	curr = curr->next;
@@ -1710,7 +1710,7 @@ parse_attrib(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
 static GLuint
 parse_param_elements(GLcontext * ctx, const GLubyte ** inst,
 		     struct var_cache *param_var,
-		     struct arb_program *Program, GLboolean use)
+		     struct arb_program *Program, bool use)
 {
     GLint idx;
     GLuint err = 0;
@@ -2268,7 +2268,7 @@ static GLuint
 parse_masked_address_reg(GLcontext * ctx, const GLubyte ** inst,
 			 struct var_cache **vc_head,
 			 struct arb_program *Program, GLint * Index,
-			 GLboolean * WriteMask)
+			 bool * WriteMask)
 {
     if (parse_address_reg(ctx, inst, vc_head, Program, Index))
 	return 1;
@@ -2374,7 +2374,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 	      struct var_cache **vc_head,
 	      struct arb_program *Program,
 	      enum register_file * File, GLint * Index,
-	      GLboolean *IsRelOffset)
+	      bool *IsRelOffset)
 {
     struct var_cache *src = nullptr;
     GLuint binding = 0;
@@ -2538,9 +2538,9 @@ parse_fp_vector_src_reg(GLcontext * ctx, const GLubyte ** inst,
 {
     enum register_file file;
     GLint index;
-    GLboolean negate;
+    bool negate;
     GLubyte swizzle[4];
-    GLboolean isRelOffset;
+    bool isRelOffset;
 
     /* Grab the sign */
     negate = (parse_sign(inst) == -1) ? 0xf : 0x0;
@@ -2597,7 +2597,7 @@ parse_fp_scalar_src_reg(GLcontext * ctx, const GLubyte ** inst,
     GLint Index;
     GLubyte Negate;
     GLubyte Swizzle[4];
-    GLboolean IsRelOffset;
+    bool IsRelOffset;
 
     /* Grab the sign */
     Negate = (parse_sign(inst) == -1) ? 0x1 : 0x0;
@@ -2631,7 +2631,7 @@ parse_fp_instruction(GLcontext * ctx, const GLubyte ** inst,
     GLint a;
     GLuint texcoord;
     GLubyte instClass, type, code;
-    GLboolean rel;
+    bool rel;
 
     _mesa_init_instructions(fp, 1);
 
@@ -3054,7 +3054,7 @@ parse_vp_vector_src_reg(GLcontext * ctx, const GLubyte ** inst,
     GLint index;
     GLubyte negateMask;
     GLubyte swizzle[4];
-    GLboolean isRelOffset;
+    bool isRelOffset;
 
     /* Grab the sign */
     negateMask = (parse_sign(inst) == -1) ? 0xf : 0x0;
@@ -3086,7 +3086,7 @@ parse_vp_scalar_src_reg(GLcontext * ctx, const GLubyte ** inst,
     GLint Index;
     GLubyte Negate;
     GLubyte Swizzle[4];
-    GLboolean IsRelOffset;
+    bool IsRelOffset;
 
     /* Grab the sign */
     Negate = (parse_sign(inst) == -1) ? 0x1 : 0x0;
@@ -3290,7 +3290,7 @@ parse_vp_instruction(GLcontext * ctx, const GLubyte ** inst,
 	    {
 		GLubyte swizzle[4] = {0};
 		GLubyte negateMask = 0;
-		GLboolean relAddr = GL_FALSE;
+		bool relAddr = false;
 		enum register_file file;
 		GLint index = 0;
 
@@ -3427,7 +3427,7 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 
 		    case ARB_POSITION_INVARIANT:
 			if (Program->Base.Target == GL_VERTEX_PROGRAM_ARB)
-			    Program->HintPositionInvariant = GL_TRUE;
+			    Program->HintPositionInvariant = true;
 			break;
 
 		    case ARB_FRAGMENT_PROGRAM_SHADOW:
@@ -3547,9 +3547,9 @@ enable_ext(GLcontext *ctx, grammar id, const char *name)
  * Enable parser extensions based on which OpenGL extensions are supported
  * by this rendering context.
  *
- * \return GL_TRUE if OK, GL_FALSE if error.
+ * \return true if OK, false if error.
  */
-static GLboolean
+static bool
 enable_parser_extensions(GLcontext *ctx, grammar id)
 {
 #if 0
@@ -3557,29 +3557,29 @@ enable_parser_extensions(GLcontext *ctx, grammar id)
     if ((ctx->Extensions.ARB_vertex_blend ||
 	 ctx->Extensions.EXT_vertex_weighting)
 	&& !enable_ext(ctx, id, "vertex_blend"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.ARB_matrix_palette
 	&& !enable_ext(ctx, id, "matrix_palette"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.ARB_fragment_program_shadow
 	&& !enable_ext(ctx, id, "fragment_program_shadow"))
-	return GL_FALSE;
+	return false;
 #endif
     if (ctx->Extensions.EXT_point_parameters
 	&& !enable_ext(ctx, id, "point_parameters"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.EXT_secondary_color
 	&& !enable_ext(ctx, id, "secondary_color"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.EXT_fog_coord
 	&& !enable_ext(ctx, id, "fog_coord"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.NV_texture_rectangle
 	&& !enable_ext(ctx, id, "texture_rectangle"))
-	return GL_FALSE;
+	return false;
     if (ctx->Extensions.ARB_draw_buffers
 	&& !enable_ext(ctx, id, "draw_buffers"))
-	return GL_FALSE;
+	return false;
 
 #if 1
     /* hack for Warcraft (see bug 8060) */
@@ -3587,7 +3587,7 @@ enable_parser_extensions(GLcontext *ctx, grammar id)
 	_mesa_error(ctx, GL_INVALID_OPERATION, "Failed to enable vertex_blend");
 #endif
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -3598,9 +3598,9 @@ enable_parser_extensions(GLcontext *ctx, grammar id)
  * \param str - The program string
  * \param len - The program string length
  * \param program - The arb_program struct to return all the parsed info in
- * \return GL_TRUE on sucess, GL_FALSE on error
+ * \return true on success, false on error
  */
-static GLboolean
+static bool
 _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 			const GLubyte *str, GLsizei len,
 			struct arb_program *program)
@@ -3634,7 +3634,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	    _mesa_set_program_error(ctx, error_pos, error_msg);
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glProgramStringARB(Error loading grammar rule set)");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	err = !grammar_check(grammar_syn_id, (byte *) arb_grammar_text,
@@ -3654,7 +3654,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	    _mesa_error(ctx, GL_INVALID_OPERATION,
 			"glProgramString(Error loading grammar rule set");
 	    grammar_destroy(grammar_syn_id);
-	    return GL_FALSE;
+	    return false;
 	}
 
 	grammar_destroy(grammar_syn_id);
@@ -3670,19 +3670,19 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	_mesa_set_program_error(ctx, error_pos, error_msg);
 	_mesa_error(ctx, GL_INVALID_OPERATION,
 		    "glProgramString(Error loading grammer rule set)");
-	return GL_FALSE;
+	return false;
     }
 
     /* Set program_target register value */
     if (set_reg8(ctx, arbprogram_syn_id, "program_target",
 		 program->Base.Target == GL_FRAGMENT_PROGRAM_ARB ? 0x10 : 0x20)) {
 	grammar_destroy(arbprogram_syn_id);
-	return GL_FALSE;
+	return false;
     }
 
     if (!enable_parser_extensions(ctx, arbprogram_syn_id)) {
 	grammar_destroy(arbprogram_syn_id);
-	return GL_FALSE;
+	return false;
     }
 
     /* check for nullptr character occurences */
@@ -3692,7 +3692,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 	    if (str[i] == '\0') {
 		program_error(ctx, i, "illegal character");
 		grammar_destroy(arbprogram_syn_id);
-		return GL_FALSE;
+		return false;
 	    }
 	}
     }
@@ -3727,7 +3727,7 @@ _mesa_parse_arb_program(GLcontext *ctx, GLenum target,
 		grammar_alloc_free(parsed);
 
 	grammar_destroy(arbprogram_syn_id);
-	return GL_FALSE;
+	return false;
     }
 
     grammar_destroy(arbprogram_syn_id);

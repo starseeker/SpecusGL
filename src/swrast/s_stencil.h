@@ -34,7 +34,7 @@
 
 
 
-extern GLboolean
+extern bool
 _swrast_stencil_and_ztest_span(GLcontext *ctx, SWspan *span);
 
 

@@ -193,7 +193,7 @@ static void init_lighting_tables(void)
 }
 
 
-static GLboolean run_lighting(GLcontext *ctx,
+static bool run_lighting(GLcontext *ctx,
 			      struct tnl_pipeline_stage *stage)
 {
     struct light_stage_data *store = LIGHT_STAGE_DATA(stage);
@@ -203,7 +203,7 @@ static GLboolean run_lighting(GLcontext *ctx,
     GLuint idx;
 
     if (!ctx->Light.Enabled || ctx->VertexProgram._Current)
-	return GL_TRUE;
+	return true;
 
     /* Make sure we can talk about position x,y and z:
      */
@@ -249,7 +249,7 @@ static GLboolean run_lighting(GLcontext *ctx,
     VB->AttribPtr[_TNL_ATTRIB_COLOR1] = VB->SecondaryColorPtr[0];
     VB->AttribPtr[_TNL_ATTRIB_COLOR_INDEX] = VB->IndexPtr[0];
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -291,7 +291,7 @@ static void validate_lighting(GLcontext *ctx,
 /* Called the first time stage->run is called.  In effect, don't
  * allocate data until the first time the stage is run.
  */
-static GLboolean init_lighting(GLcontext *ctx,
+static bool init_lighting(GLcontext *ctx,
 			       struct tnl_pipeline_stage *stage)
 {
     TNLcontext *tnl = TNL_CONTEXT(ctx);
@@ -300,7 +300,7 @@ static GLboolean init_lighting(GLcontext *ctx,
     stage->privatePtr    = store;
     stage->privateDeleter = [](void *p){ delete static_cast<light_stage_data *>(p); };
     if (!store)
-	return GL_FALSE;
+	return false;
 
     /* Do onetime init.
      */
@@ -324,7 +324,7 @@ static GLboolean init_lighting(GLcontext *ctx,
     store->LitIndex[1].size = 1;
     store->LitIndex[1].stride = sizeof(GLfloat);
 
-    return GL_TRUE;
+    return true;
 }
 
 

@@ -5,7 +5,7 @@
 #include "slang_vartable.h"
 #include "slang_ir.h"
 #include "prog_instruction.h"
-#include <new>
+#include <memory>
 #include <vector>
 
 
@@ -21,6 +21,7 @@ enum TempState {
 
 /**
  * Variable/register info for one variable scope.
+ * C++17: Parent is a unique_ptr so the whole push-down stack is auto-freed.
  */
 struct table {
     int Level{0};
@@ -29,7 +30,7 @@ struct table {
     TempState Temps[MAX_PROGRAM_TEMPS * 4]{};  /* per-component state */
     int ValSize[MAX_PROGRAM_TEMPS]{};     /* For debug only */
 
-    struct table *Parent{nullptr};  /** Parent scope table */
+    std::unique_ptr<table> Parent;  /**< Owned: next-lower scope table */
 };
 
 
@@ -39,7 +40,7 @@ struct table {
 struct slang_var_table {
     GLint CurLevel{0};
     GLuint MaxRegisters{0};
-    struct table *Top{nullptr};  /**< Table at top of stack */
+    std::unique_ptr<table> Top;  /**< Table at top of stack (owns the chain) */
 };
 
 
@@ -47,10 +48,8 @@ struct slang_var_table {
 slang_var_table *
 _slang_new_var_table(GLuint maxRegisters)
 {
-    slang_var_table *vt = new (std::nothrow) slang_var_table{};
-    if (vt) {
-	vt->MaxRegisters = maxRegisters;
-    }
+    auto *vt = new slang_var_table{};
+    vt->MaxRegisters = maxRegisters;
     return vt;
 }
 
@@ -68,47 +67,41 @@ _slang_delete_var_table(slang_var_table *vt)
 
 
 /**
- * Create new table, put at head, return ptr to it.
- * XXX we should take a maxTemps parameter to indicate how many temporaries
- * are available for the current shader/program target.
+ * Create new table, push it as the new top of the stack.
  */
 void
 _slang_push_var_table(slang_var_table *vt)
 {
-    struct table *t = new (std::nothrow) table{};
-    if (t) {
-	t->Level = vt->CurLevel++;
-	t->Parent = vt->Top;
-	if (t->Parent) {
-	    /* copy the info indicating which temp regs are in use */
-	    memcpy(t->Temps, t->Parent->Temps, sizeof(t->Temps));
-	    memcpy(t->ValSize, t->Parent->ValSize, sizeof(t->ValSize));
-	}
-	vt->Top = t;
-	if (dbg) printf("Pushing level %d\n", t->Level);
+    auto t = std::make_unique<table>();
+    t->Level = vt->CurLevel++;
+    if (vt->Top) {
+	/* copy the info indicating which temp regs are in use */
+	memcpy(t->Temps, vt->Top->Temps, sizeof(t->Temps));
+	memcpy(t->ValSize, vt->Top->ValSize, sizeof(t->ValSize));
     }
+    if (dbg) printf("Pushing level %d\n", t->Level);
+    t->Parent = std::move(vt->Top);
+    vt->Top = std::move(t);
 }
 
 
 /**
- * Destroy given table, return ptr to Parent
+ * Destroy top table, restore to parent.
  */
 void
 _slang_pop_var_table(slang_var_table *vt)
 {
-    struct table *t = vt->Top;
-    int i;
+    table *t = vt->Top.get();
 
     if (dbg) printf("Popping level %d\n", t->Level);
 
     /* free the storage allocated for each variable */
-    for (i = 0; i < (int)t->Vars.size(); i++) {
-	slang_ir_storage *store = (slang_ir_storage *) t->Vars[i]->aux;
+    for (slang_variable *v : t->Vars) {
+	slang_ir_storage *store = static_cast<slang_ir_storage *>(v->aux);
 	GLint j;
 	GLuint comp;
 	if (dbg) printf("  Free var %s, size %d at %d\n",
-			    static_cast<char*>(t->Vars[i]->a_name), store->Size,
-			    store->Index);
+			    v->a_name, store->Size, store->Index);
 
 	if (store->Size == 1)
 	    comp = GET_SWZ(store->Swizzle, 0);
@@ -126,7 +119,7 @@ _slang_pop_var_table(slang_var_table *vt)
 	/* just verify that any remaining allocations in this scope
 	 * were for temps
 	 */
-	for (i = 0; i < (int)vt->MaxRegisters * 4; i++) {
+	for (int i = 0; i < static_cast<int>(vt->MaxRegisters) * 4; i++) {
 	    if (t->Temps[i] != FREE && t->Parent->Temps[i] == FREE) {
 		if (dbg) printf("  Free reg %d\n", i/4);
 		assert(t->Temps[i] == TEMP);
@@ -134,8 +127,8 @@ _slang_pop_var_table(slang_var_table *vt)
 	}
     }
 
-    vt->Top = t->Parent;
-    delete t;
+    /* Pop: transfer Top ownership to parent in one move; old Top destructs */
+    vt->Top = std::move(vt->Top->Parent);
     vt->CurLevel--;
 }
 
@@ -148,9 +141,9 @@ _slang_add_variable(slang_var_table *vt, slang_variable *v)
 {
     struct table *t;
     assert(vt);
-    t = vt->Top;
+    t = vt->Top.get();
     assert(t);
-    if (dbg) printf("Adding var %s\n", reinterpret_cast<char *>(v->a_name));
+    if (dbg) printf("Adding var %s\n", v->a_name);
     t->Vars.push_back(v);
 }
 
@@ -162,15 +155,15 @@ _slang_add_variable(slang_var_table *vt, slang_variable *v)
 slang_variable *
 _slang_find_variable(const slang_var_table *vt, slang_atom name)
 {
-    struct table *t = vt->Top;
+    struct table *t = vt->Top.get();
     while (1) {
 	int i;
-	for (i = 0; i < (int)t->Vars.size(); i++) {
+	for (i = 0; i < static_cast<int>(t->Vars.size()); i++) {
 	    if (t->Vars[i]->a_name == name)
 		return t->Vars[i];
 	}
 	if (t->Parent)
-	    t = t->Parent;
+	    t = t->Parent.get();
 	else
 	    return nullptr;
     }
@@ -183,9 +176,9 @@ _slang_find_variable(const slang_var_table *vt, slang_atom name)
  * \return  position for var, measured in floats
  */
 static GLint
-alloc_reg(slang_var_table *vt, GLint size, GLboolean isTemp)
+alloc_reg(slang_var_table *vt, GLint size, bool isTemp)
 {
-    struct table *t = vt->Top;
+    struct table *t = vt->Top.get();
     /* if size == 1, allocate anywhere, else, pos must be multiple of 4 */
     const GLuint step = (size == 1) ? 1 : 4;
     GLuint i, j;
@@ -220,13 +213,13 @@ alloc_reg(slang_var_table *vt, GLint size, GLboolean isTemp)
  * \param swizzle  returns swizzle mask for accessing var in register
  * \return  register allocated, or -1
  */
-GLboolean
+bool
 _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 {
-    struct table *t = vt->Top;
-    const int i = alloc_reg(vt, store->Size, GL_FALSE);
+    struct table *t = vt->Top.get();
+    const int i = alloc_reg(vt, store->Size, false);
     if (i < 0)
-	return GL_FALSE;
+	return false;
 
     store->Index = i / 4;
     if (store->Size == 1) {
@@ -239,7 +232,7 @@ _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 	if (dbg) printf("Alloc var sz %d at %d.xyzw (level %d)\n",
 			    store->Size, store->Index, t->Level);
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -247,13 +240,13 @@ _slang_alloc_var(slang_var_table *vt, slang_ir_storage *store)
 /**
  * Allocate temp register(s) for storing an unnamed intermediate value.
  */
-GLboolean
+bool
 _slang_alloc_temp(slang_var_table *vt, slang_ir_storage *store)
 {
-    struct table *t = vt->Top;
-    const int i = alloc_reg(vt, store->Size, GL_TRUE);
+    struct table *t = vt->Top.get();
+    const int i = alloc_reg(vt, store->Size, true);
     if (i < 0)
-	return GL_FALSE;
+	return false;
 
     store->Index = i / 4;
     if (store->Size == 1) {
@@ -266,14 +259,14 @@ _slang_alloc_temp(slang_var_table *vt, slang_ir_storage *store)
 	if (dbg) printf("Alloc temp sz %d at %d.xyzw (level %d)\n",
 			    store->Size, store->Index, t->Level);
     }
-    return GL_TRUE;
+    return true;
 }
 
 
 void
 _slang_free_temp(slang_var_table *vt, slang_ir_storage *store)
 {
-    struct table *t = vt->Top;
+    struct table *t = vt->Top.get();
     GLuint i;
     GLuint r = store->Index;
     assert(store->Size > 0);
@@ -297,10 +290,10 @@ _slang_free_temp(slang_var_table *vt, slang_ir_storage *store)
 }
 
 
-GLboolean
+bool
 _slang_is_temp(const slang_var_table *vt, const slang_ir_storage *store)
 {
-    struct table *t = vt->Top;
+    struct table *t = vt->Top.get();
     GLuint comp;
     assert(store->Index >= 0);
     assert(store->Index < vt->MaxRegisters);
@@ -310,9 +303,9 @@ _slang_is_temp(const slang_var_table *vt, const slang_ir_storage *store)
 	comp = GET_SWZ(store->Swizzle, 0);
 
     if (t->Temps[store->Index * 4 + comp] == TEMP)
-	return GL_TRUE;
+	return true;
     else
-	return GL_FALSE;
+	return false;
 }
 
 /*
