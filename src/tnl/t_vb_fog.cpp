@@ -45,9 +45,9 @@ struct fog_stage_data {
 
 #define FOG_STAGE_DATA(stage) ((struct fog_stage_data *)stage->privatePtr)
 
-#define FOG_EXP_TABLE_SIZE 256
+constexpr int FOG_EXP_TABLE_SIZE = 256;
 #define FOG_MAX (10.0)
-#define EXP_FOG_MAX .0006595
+constexpr int EXP_FOG_MAX = .0006595;
 #define FOG_INCR (FOG_MAX/FOG_EXP_TABLE_SIZE)
 static GLfloat exp_table[FOG_EXP_TABLE_SIZE];
 static GLfloat inited = 0;

@@ -41,8 +41,8 @@
 #include <vector>
 
 
-#define ELT_TABLE_SIZE 16
-
+constexpr int ELT_TABLE_SIZE = 16;
+constexpr int MAX_PRIM = 32;
 /* Used for vertex-level splitting of indexed buffers.  Note that
  * non-indexed primitives may be converted to indexed in some cases
  * (eg loops, fans) in order to use this splitting path.
@@ -100,7 +100,6 @@ struct copy_context {
     GLuint dstelt_nr;
     GLuint dstelt_size;
 
-#define MAX_PRIM 32
     struct _mesa_prim dstprim[MAX_PRIM];
     GLuint dstprim_nr;
 

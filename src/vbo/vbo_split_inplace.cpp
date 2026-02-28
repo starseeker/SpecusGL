@@ -35,8 +35,7 @@
 #include <vector>
 
 
-#define MAX_PRIM 32
-
+constexpr int MAX_PRIM = 32;
 /* Used for splitting without copying.
  */
 struct split_context {
