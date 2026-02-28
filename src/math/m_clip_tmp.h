@@ -50,7 +50,7 @@ static GLvector4f * _XFORMAPI TAG(cliptest_points4)(GLvector4f *clip_vec,
     const GLfloat *from = static_cast<const GLfloat *>(clip_vec->start);
     const GLuint count = clip_vec->count;
     GLuint c = 0;
-    GLfloat(*vProj)[4] = (GLfloat(*)[4])proj_vec->start;
+    GLfloat(*vProj)[4] = reinterpret_cast<GLfloat(*)[4]>(proj_vec->start);
     GLubyte tmpAndMask = *andMask;
     GLubyte tmpOrMask = *orMask;
     GLuint i;

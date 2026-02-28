@@ -73,7 +73,7 @@ static GLvector4f *ref_cliptest_points4(GLvector4f *clip_vec,
     const GLuint count = clip_vec->count;
     const GLfloat *from = static_cast<GLfloat *>(clip_vec->start);
     GLuint c = 0;
-    GLfloat(*vProj)[4] = (GLfloat(*)[4])proj_vec->start;
+    GLfloat(*vProj)[4] = reinterpret_cast<GLfloat(*)[4]>(proj_vec)->start;
     GLubyte tmpAndMask = *andMask;
     GLubyte tmpOrMask = *orMask;
     GLuint i;
@@ -223,21 +223,21 @@ static int test_cliptest_function(clip_func func, int np,
 	    s[i][j] = rnd();
     }
 
-    source->data = (GLfloat(*)[4])s;
+    source->data = reinterpret_cast<GLfloat(*)[4]>(s);
     source->start = static_cast<GLfloat *>(s);
     source->count = TEST_COUNT;
     source->stride = sizeof(s[0]);
     source->size = 4;
     source->flags = 0;
 
-    dest->data = (GLfloat(*)[4])d;
+    dest->data = reinterpret_cast<GLfloat(*)[4]>(d);
     dest->start = static_cast<GLfloat *>(d);
     dest->count = TEST_COUNT;
     dest->stride = sizeof(float[4]);
     dest->size = 0;
     dest->flags = 0;
 
-    ref->data = (GLfloat(*)[4])r;
+    ref->data = reinterpret_cast<GLfloat(*)[4]>(r);
     ref->start = static_cast<GLfloat *>(r);
     ref->count = TEST_COUNT;
     ref->stride = sizeof(float[4]);

@@ -33,7 +33,7 @@ static void DEST_4F(GLfloat(*t)[4],
 		    GLuint stride,
 		    ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
 
@@ -60,7 +60,7 @@ static void DEST_4FN(GLfloat(*t)[4],
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
 
@@ -86,7 +86,7 @@ static void DEST_3FN(GLfloat(*t)[3],
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) first;
@@ -108,7 +108,7 @@ static void DEST_1F(GLfloat *t,
 		    GLuint stride,
 		    ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) first;
@@ -128,7 +128,7 @@ static void DEST_4UB(GLubyte(*t)[4],
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) start;
@@ -153,7 +153,7 @@ static void DEST_4US(GLushort(*t)[4],
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *)((GLubyte *) ptr + SRC_START * stride);
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) start;
@@ -178,7 +178,7 @@ static void DEST_1UB(GLubyte *t,
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) start;
@@ -199,7 +199,7 @@ static void DEST_1UI(GLuint *t,
 		     GLuint stride,
 		     ARGS)
 {
-    const GLubyte *f = (GLubyte *) ptr + SRC_START * stride;
+    const GLubyte *f = static_cast<const GLubyte *>(ptr) + SRC_START * stride;
     const GLubyte *first = f;
     GLuint i;
     (void) start;
