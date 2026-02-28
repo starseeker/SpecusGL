@@ -48,11 +48,7 @@
 
 /* debug predicate */
 constexpr int DEBUG_PROG = 0;
-/**
- * Set x to positive or negative infinity.
- */
-#define SET_POS_INFINITY(x)  ( x = INFINITY )
-#define SET_NEG_INFINITY(x)  ( x = -INFINITY )
+
 
 static const GLfloat ZeroVec[4] = { 0.0F, 0.0F, 0.0F, 0.0F };
 
@@ -639,8 +635,8 @@ _mesa_execute_program(GLcontext * ctx,
 		fetch_vector1(&inst->SrcReg[0], machine, t);
 		floor_t0 = FLOORF(t[0]);
 		if (floor_t0 > FLT_MAX_EXP) {
-		    SET_POS_INFINITY(q[0]);
-		    SET_POS_INFINITY(q[2]);
+		    q[0] = INFINITY;
+		    q[2] = INFINITY;
 		} else if (floor_t0 < FLT_MIN_EXP) {
 		    q[0] = 0.0F;
 		    q[2] = 0.0F;
@@ -781,9 +777,9 @@ _mesa_execute_program(GLcontext * ctx,
 		if (abs_t0 != 0.0F) {
 		    if (IS_INF_OR_NAN(abs_t0))
 		    {
-			SET_POS_INFINITY(q[0]);
+			q[0] = INFINITY;
 			q[1] = 1.0F;
-			SET_POS_INFINITY(q[2]);
+			q[2] = INFINITY;
 		    } else {
 			int exponent;
 			GLfloat mantissa = FREXPF(t[0], &exponent);
@@ -792,9 +788,9 @@ _mesa_execute_program(GLcontext * ctx,
 			q[2] = static_cast<GLfloat>((q[0] + LOG2(q[1])));
 		    }
 		} else {
-		    SET_NEG_INFINITY(q[0]);
+		    q[0] = -INFINITY;
 		    q[1] = 1.0F;
-		    SET_NEG_INFINITY(q[2]);
+		    q[2] = -INFINITY;
 		}
 		q[3] = 1.0;
 		store_vector4(inst, machine, q);
