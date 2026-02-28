@@ -40,12 +40,19 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "vbo.h"
 #include "vbo_attrib.h"
 
+#include <memory>
+
 
 struct vbo_save_copied_vtx {
     GLfloat buffer[VBO_ATTRIB_MAX * 4 * VBO_MAX_COPIED_VERTS];
     GLuint nr;
 };
 
+
+/* Forward declarations so that vbo_save_vertex_list can refer to them
+ * via std::shared_ptr before the full struct definitions below. */
+struct vbo_save_vertex_store;
+struct vbo_save_primitive_store;
 
 /* For display lists, this structure holds a run of vertices of the
  * same format, and a strictly well-formed set of begin/end pairs,
@@ -72,11 +79,18 @@ struct vbo_save_vertex_list {
     bool dangling_attr_ref;	/* current attr implicitly referenced
 				   outside the list */
 
-    struct _mesa_prim *prim;
+    struct _mesa_prim *prim;    /**< raw ptr into prim_store->buffer */
     GLuint prim_count;
 
-    struct vbo_save_vertex_store *vertex_store;
-    struct vbo_save_primitive_store *prim_store;
+    /**
+     * Shared ownership of the storage blocks.
+     *
+     * C++17: These were raw pointers with a manual refcount.  std::shared_ptr
+     * now manages lifetime automatically; vbo_destroy_vertex_list calls the
+     * explicit destructor so that the shared_ptrs are properly released.
+     */
+    std::shared_ptr<vbo_save_vertex_store> vertex_store;
+    std::shared_ptr<vbo_save_primitive_store> prim_store;
 };
 
 /* These buffers should be a reasonable size to support upload to
@@ -95,18 +109,20 @@ constexpr GLuint VBO_SAVE_PRIM_WEAK   = 0x40U;
 constexpr GLuint VBO_SAVE_FALLBACK    = 0x10000000U;
 
 /* Storage to be shared among several vertex_lists.
+ *
+ * C++17: The manual refcount fields have been removed and replaced with
+ * std::shared_ptr ownership in vbo_save_vertex_list and vbo_save_context.
+ * The shared_ptr deleter handles cleanup automatically.
  */
 struct vbo_save_vertex_store {
     struct gl_buffer_object *bufferobj;
     GLfloat *buffer;
     GLuint used;
-    GLuint refcount;
 };
 
 struct vbo_save_primitive_store {
     struct _mesa_prim buffer[VBO_SAVE_PRIM_SIZE];
     GLuint used;
-    GLuint refcount;
 };
 
 
@@ -128,8 +144,13 @@ struct vbo_save_context {
     struct _mesa_prim *prim;
     GLuint prim_count, prim_max;
 
-    struct vbo_save_vertex_store *vertex_store;
-    struct vbo_save_primitive_store *prim_store;
+    /**
+     * Shared storage blocks for the save context's current vertex/prim data.
+     *
+     * C++17: Were raw pointers with a manual refcount.  Now std::shared_ptr.
+     */
+    std::shared_ptr<vbo_save_vertex_store> vertex_store;
+    std::shared_ptr<vbo_save_primitive_store> prim_store;
 
     GLfloat *vbptr;		   /* cursor, points into buffer */
     GLfloat vertex[VBO_ATTRIB_MAX*4];	   /* current values */

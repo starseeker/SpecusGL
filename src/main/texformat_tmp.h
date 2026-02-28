@@ -95,7 +95,7 @@ static void FETCH(f_rgba)(const struct gl_texture_image *texImage,
 static void store_texel_rgba(struct gl_texture_image *texImage,
 			     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 4);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -132,7 +132,7 @@ static void FETCH(f_rgb)(const struct gl_texture_image *texImage,
 static void store_texel_rgb(struct gl_texture_image *texImage,
 			    GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 3);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -157,7 +157,7 @@ static void FETCH(alpha)(const struct gl_texture_image *texImage,
 static void store_texel_alpha(struct gl_texture_image *texImage,
 			      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 1);
     dst[0] = rgba[ACOMP];
 }
@@ -180,7 +180,7 @@ static void FETCH(luminance)(const struct gl_texture_image *texImage,
 static void store_texel_luminance(struct gl_texture_image *texImage,
 				  GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 1);
     dst[0] = rgba[RCOMP];
 }
@@ -203,7 +203,7 @@ static void FETCH(luminance_alpha)(const struct gl_texture_image *texImage,
 static void store_texel_luminance_alpha(struct gl_texture_image *texImage,
 					GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 2);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[ACOMP];
@@ -227,7 +227,7 @@ static void FETCH(intensity)(const struct gl_texture_image *texImage,
 static void store_texel_intensity(struct gl_texture_image *texImage,
 				  GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLchan *rgba = (const GLchan *) texel;
+    const GLchan *rgba = static_cast<const GLchan *>(texel);
     GLchan *dst = TEXEL_ADDR(GLchan, texImage, i, j, k, 1);
     dst[0] = rgba[RCOMP];
 }
@@ -251,7 +251,7 @@ static void FETCH(f_z32)(const struct gl_texture_image *texImage,
 static void store_texel_z32(struct gl_texture_image *texImage,
 			    GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLuint *depth = (const GLuint *) texel;
+    const GLuint *depth = static_cast<const GLuint *>(texel);
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     dst[0] = *depth;
 }
@@ -275,7 +275,7 @@ static void FETCH(f_z16)(const struct gl_texture_image *texImage,
 static void store_texel_z16(struct gl_texture_image *texImage,
 			    GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLushort *depth = (const GLushort *) texel;
+    const GLushort *depth = static_cast<const GLushort *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     dst[0] = *depth;
 }
@@ -753,7 +753,7 @@ static void FETCH(rgba8888)(const struct gl_texture_image *texImage,
 static void store_texel_rgba8888(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     *dst = PACK_COLOR_8888(rgba[RCOMP], rgba[GCOMP], rgba[BCOMP], rgba[ACOMP]);
 }
@@ -777,7 +777,7 @@ static void FETCH(rgba8888_rev)(const struct gl_texture_image *texImage,
 static void store_texel_rgba8888_rev(struct gl_texture_image *texImage,
 				     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     *dst = PACK_COLOR_8888_REV(rgba[RCOMP], rgba[GCOMP], rgba[BCOMP], rgba[ACOMP]);
 }
@@ -801,7 +801,7 @@ static void FETCH(argb8888)(const struct gl_texture_image *texImage,
 static void store_texel_argb8888(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     *dst = PACK_COLOR_8888(rgba[ACOMP], rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -825,7 +825,7 @@ static void FETCH(argb8888_rev)(const struct gl_texture_image *texImage,
 static void store_texel_argb8888_rev(struct gl_texture_image *texImage,
 				     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLuint *dst = TEXEL_ADDR(GLuint, texImage, i, j, k, 1);
     *dst = PACK_COLOR_8888(rgba[ACOMP], rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -849,7 +849,7 @@ static void FETCH(rgb888)(const struct gl_texture_image *texImage,
 static void store_texel_rgb888(struct gl_texture_image *texImage,
 			       GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 3);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -875,7 +875,7 @@ static void FETCH(bgr888)(const struct gl_texture_image *texImage,
 static void store_texel_bgr888(struct gl_texture_image *texImage,
 			       GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 3);
     dst[0] = rgba[BCOMP];
     dst[1] = rgba[GCOMP];
@@ -905,7 +905,7 @@ static void FETCH(rgb565)(const struct gl_texture_image *texImage,
 static void store_texel_rgb565(struct gl_texture_image *texImage,
 			       GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_565(rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -930,7 +930,7 @@ static void FETCH(rgb565_rev)(const struct gl_texture_image *texImage,
 static void store_texel_rgb565_rev(struct gl_texture_image *texImage,
 				   GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_565(rgba[BCOMP], rgba[GCOMP], rgba[RCOMP]);
 }
@@ -955,7 +955,7 @@ static void FETCH(argb4444)(const struct gl_texture_image *texImage,
 static void store_texel_argb4444(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_4444(rgba[RCOMP], rgba[GCOMP], rgba[BCOMP], rgba[ACOMP]);
 }
@@ -979,7 +979,7 @@ static void FETCH(argb4444_rev)(const struct gl_texture_image *texImage,
 static void store_texel_argb4444_rev(struct gl_texture_image *texImage,
 				     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_4444(rgba[ACOMP], rgba[BCOMP], rgba[GCOMP], rgba[RCOMP]);
 }
@@ -1004,7 +1004,7 @@ static void FETCH(argb1555)(const struct gl_texture_image *texImage,
 static void store_texel_argb1555(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_1555(rgba[ACOMP], rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -1029,7 +1029,7 @@ static void FETCH(argb1555_rev)(const struct gl_texture_image *texImage,
 static void store_texel_argb1555_rev(struct gl_texture_image *texImage,
 				     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_1555_REV(rgba[ACOMP], rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -1053,7 +1053,7 @@ static void FETCH(al88)(const struct gl_texture_image *texImage,
 static void store_texel_al88(struct gl_texture_image *texImage,
 			     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_88(rgba[ACOMP], rgba[RCOMP]);
 }
@@ -1077,7 +1077,7 @@ static void FETCH(al88_rev)(const struct gl_texture_image *texImage,
 static void store_texel_al88_rev(struct gl_texture_image *texImage,
 				 GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLushort *dst = TEXEL_ADDR(GLushort, texImage, i, j, k, 1);
     *dst = PACK_COLOR_88(rgba[RCOMP], rgba[ACOMP]);
 }
@@ -1104,7 +1104,7 @@ static void FETCH(rgb332)(const struct gl_texture_image *texImage,
 static void store_texel_rgb332(struct gl_texture_image *texImage,
 			       GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     *dst = PACK_COLOR_332(rgba[RCOMP], rgba[GCOMP], rgba[BCOMP]);
 }
@@ -1128,7 +1128,7 @@ static void FETCH(a8)(const struct gl_texture_image *texImage,
 static void store_texel_a8(struct gl_texture_image *texImage,
 			   GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     *dst = rgba[ACOMP];
 }
@@ -1152,7 +1152,7 @@ static void FETCH(l8)(const struct gl_texture_image *texImage,
 static void store_texel_l8(struct gl_texture_image *texImage,
 			   GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     *dst = rgba[RCOMP];
 }
@@ -1176,7 +1176,7 @@ static void FETCH(i8)(const struct gl_texture_image *texImage,
 static void store_texel_i8(struct gl_texture_image *texImage,
 			   GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     *dst = rgba[RCOMP];
 }
@@ -1270,7 +1270,7 @@ static void FETCH(ci8)(const struct gl_texture_image *texImage,
 static void store_texel_ci8(struct gl_texture_image *texImage,
 			    GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *index = (const GLubyte *) texel;
+    const GLubyte *index = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     *dst = *index;
 }
@@ -1294,7 +1294,7 @@ static void FETCH(srgb8)(const struct gl_texture_image *texImage,
 static void store_texel_srgb8(struct gl_texture_image *texImage,
 			      GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 3);
     dst[0] = rgba[RCOMP]; /* no conversion */
     dst[1] = rgba[GCOMP];
@@ -1317,7 +1317,7 @@ static void FETCH(srgba8)(const struct gl_texture_image *texImage,
 static void store_texel_srgba8(struct gl_texture_image *texImage,
 			       GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 4);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[GCOMP];
@@ -1340,7 +1340,7 @@ static void FETCH(sl8)(const struct gl_texture_image *texImage,
 static void store_texel_sl8(struct gl_texture_image *texImage,
 			    GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 1);
     dst[0] = rgba[RCOMP];
 }
@@ -1361,7 +1361,7 @@ static void FETCH(sla8)(const struct gl_texture_image *texImage,
 static void store_texel_sla8(struct gl_texture_image *texImage,
 			     GLint i, GLint j, GLint k, const void *texel)
 {
-    const GLubyte *rgba = (const GLubyte *) texel;
+    const GLubyte *rgba = static_cast<const GLubyte *>(texel);
     GLubyte *dst = TEXEL_ADDR(GLubyte, texImage, i, j, k, 2);
     dst[0] = rgba[RCOMP];
     dst[1] = rgba[ACOMP];

@@ -71,19 +71,12 @@ void vbo_save_destroy(GLcontext *ctx)
 {
     struct vbo_context *vbo = vbo_context(ctx);
     struct vbo_save_context *save = &vbo->save;
-    if (save->prim_store) {
-	if (--save->prim_store->refcount == 0) {
-	    delete save->prim_store;
-	    save->prim_store = nullptr;
-	}
-	if (--save->vertex_store->refcount == 0) {
-	    if (save->vertex_store->bufferobj)
-		ctx->Driver.DeleteBuffer(ctx, save->vertex_store->bufferobj);
 
-	    delete save->vertex_store;
-	    save->vertex_store = nullptr;
-	}
-    }
+    /* Releasing the shared_ptrs decrements the reference count and frees the
+     * storage if this was the last reference.  The shared_ptr deleter handles
+     * calling ctx->Driver.DeleteBuffer for vertex_store. */
+    save->prim_store.reset();
+    save->vertex_store.reset();
 }
 
 /*

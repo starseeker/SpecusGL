@@ -130,7 +130,7 @@ static void ref_norm_transform_rescale(const GLmatrix *mat,
     GLuint i;
     const GLfloat *s = in->start;
     const GLfloat *m = mat->inv;
-    GLfloat(*out)[4] = (GLfloat(*)[4]) dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
 
     (void) lengths;
 
@@ -153,7 +153,7 @@ static void ref_norm_transform_normalize(const GLmatrix *mat,
     GLuint i;
     const GLfloat *s = in->start;
     const GLfloat *m = mat->inv;
-    GLfloat(*out)[4] = (GLfloat(*)[4]) dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
 
     for (i = 0 ; i < in->count ; i++) {
 	GLfloat t[3];
@@ -262,7 +262,7 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
 	length[i] = 1 / SQRTF(LEN_SQUARED_3FV(s[i]));
     }
 
-    source->data = (GLfloat(*)[4]) s;
+    source->data = reinterpret_cast<GLfloat(*)[4]>(s);
     source->start = static_cast<GLfloat *>(s);
     source->count = TEST_COUNT;
     source->stride = sizeof(s[0]);

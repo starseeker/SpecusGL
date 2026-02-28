@@ -53,7 +53,7 @@ struct vertex_stage_data {
      * clipmask freed by aligned_array_ptr destructor. */
 };
 
-#define VERTEX_STAGE_DATA(stage) ((struct vertex_stage_data *)stage->privatePtr)
+#define VERTEX_STAGE_DATA(stage) (static_cast<struct vertex_stage_data *>(stage->privatePtr))
 
 
 
@@ -125,7 +125,7 @@ static void (*(usercliptab[5]))(GLcontext *,
 static bool run_vertex_stage(GLcontext *ctx,
 				  struct tnl_pipeline_stage *stage)
 {
-    struct vertex_stage_data *store = (struct vertex_stage_data *)stage->privatePtr;
+    struct vertex_stage_data *store = static_cast<struct vertex_stage_data *>(stage->privatePtr);
     TNLcontext *tnl = TNL_CONTEXT(ctx);
     struct vertex_buffer *VB = &tnl->vb;
 

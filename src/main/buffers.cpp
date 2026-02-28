@@ -49,11 +49,11 @@ _mesa_ClearIndex(GLfloat c)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    if (ctx->Color.ClearIndex == (GLuint) c)
+    if (ctx->Color.ClearIndex == static_cast<GLuint>(c))
 	return;
 
     FLUSH_VERTICES(ctx, _NEW_COLOR);
-    ctx->Color.ClearIndex = (GLuint) c;
+    ctx->Color.ClearIndex = static_cast<GLuint>(c);
 
     if (!ctx->Visual.rgbMode && ctx->Driver.ClearIndex) {
 	/* it's OK to call glClearIndex in RGBA mode but it should be a NOP */

@@ -286,7 +286,7 @@ static void texgen_normal_map_nv(GLcontext *ctx,
     GLvector4f *in = VB->AttribPtr[VERT_ATTRIB_TEX0 + unit];
     GLvector4f *out = &store->texcoord[unit];
     GLvector4f *normal = VB->AttribPtr[_TNL_ATTRIB_NORMAL];
-    GLfloat(*texcoord)[4] = (GLfloat(*)[4])out->start;
+    GLfloat(*texcoord)[4] = reinterpret_cast<GLfloat(*)[4]>(out->start);
     GLuint count = VB->Count;
     GLuint i;
     const GLfloat *norm = normal->start;
@@ -313,7 +313,7 @@ static void texgen_sphere_map(GLcontext *ctx,
     struct vertex_buffer *VB = &TNL_CONTEXT(ctx)->vb;
     GLvector4f *in = VB->AttribPtr[VERT_ATTRIB_TEX0 + unit];
     GLvector4f *out = &store->texcoord[unit];
-    GLfloat(*texcoord)[4] = (GLfloat(*)[4]) out->start;
+    GLfloat(*texcoord)[4] = reinterpret_cast<GLfloat(*)[4]>(out->start);
     GLuint count = VB->Count;
     GLuint i;
     GLfloat(*f)[3] = store->tmp_f;
@@ -353,7 +353,7 @@ static void texgen(GLcontext *ctx,
     const GLvector4f *normal = VB->AttribPtr[_TNL_ATTRIB_NORMAL];
     const GLfloat *m = store->tmp_m;
     const GLuint count = VB->Count;
-    GLfloat(*texcoord)[4] = (GLfloat(*)[4])out->data;
+    GLfloat(*texcoord)[4] = reinterpret_cast<GLfloat(*)[4]>(out->data);
     GLfloat(*f)[3] = store->tmp_f;
     GLuint copy;
 

@@ -194,28 +194,28 @@ _mesa_GetPointerv(GLenum pname, GLvoid **params)
 
     switch (pname) {
 	case GL_VERTEX_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->Vertex.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->Vertex.Ptr));
 	    break;
 	case GL_NORMAL_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->Normal.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->Normal.Ptr));
 	    break;
 	case GL_COLOR_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->Color.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->Color.Ptr));
 	    break;
 	case GL_SECONDARY_COLOR_ARRAY_POINTER_EXT:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->SecondaryColor.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->SecondaryColor.Ptr));
 	    break;
 	case GL_FOG_COORDINATE_ARRAY_POINTER_EXT:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->FogCoord.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->FogCoord.Ptr));
 	    break;
 	case GL_INDEX_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->Index.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->Index.Ptr));
 	    break;
 	case GL_TEXTURE_COORD_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->TexCoord[clientUnit].Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->TexCoord[clientUnit].Ptr));
 	    break;
 	case GL_EDGE_FLAG_ARRAY_POINTER:
-	    *params = (GLvoid *) ctx->Array.ArrayObj->EdgeFlag.Ptr;
+	    *params = const_cast<GLvoid *>(static_cast<const GLvoid *>(ctx->Array.ArrayObj->EdgeFlag.Ptr));
 	    break;
 	case GL_FEEDBACK_BUFFER_POINTER:
 	    *params = ctx->Feedback.Buffer;
@@ -276,7 +276,7 @@ _mesa_GetError(void)
     if (MESA_VERBOSE & VERBOSE_API)
 	_mesa_debug(ctx, "glGetError <-- %s\n", _mesa_lookup_enum_by_nr(e));
 
-    ctx->ErrorValue = (GLenum) GL_NO_ERROR;
+    ctx->ErrorValue = static_cast<GLenum>(GL_NO_ERROR);
     return e;
 }
 

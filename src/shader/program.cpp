@@ -97,7 +97,7 @@ _mesa_init_program(GLcontext *ctx)
 #endif
 
 #if FEATURE_ATI_fragment_shader
-    ctx->ATIFragmentShader.Current = (struct ati_fragment_shader *) ctx->Shared->DefaultFragmentShader;
+    ctx->ATIFragmentShader.Current = static_cast<struct ati_fragment_shader *>(ctx->Shared->DefaultFragmentShader);
     assert(ctx->ATIFragmentShader.Current);
     ctx->ATIFragmentShader.Current->ref();
 #endif
@@ -168,7 +168,7 @@ _mesa_find_line_column(const GLubyte *string, const GLubyte *pos,
     *line = 1;
 
     while (p != pos) {
-	if (*p == (GLubyte) '\n') {
+	if (*p == static_cast<GLubyte>('\n')) {
 	    (*line)++;
 	    lineStart = p + 1;
 	}

@@ -825,7 +825,7 @@ emit_kill(slang_emit_info *emitInfo)
     inst->DstReg.CondMask = COND_TR;  /* always branch */
 
     assert(emitInfo->prog->Target == GL_FRAGMENT_PROGRAM_ARB);
-    fp = (struct gl_fragment_program *) emitInfo->prog;
+    fp = static_cast<struct gl_fragment_program *>(emitInfo->prog);
     fp->UsesKill = GL_TRUE;
 
     return inst;

@@ -46,7 +46,7 @@ TAG(transform_normalize_normals)(const GLmatrix *mat,
 				 const GLfloat *lengths,
 				 GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -113,7 +113,7 @@ TAG(transform_normalize_normals_no_rot)(const GLmatrix *mat,
 					const GLfloat *lengths,
 					GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -178,7 +178,7 @@ TAG(transform_rescale_normals_no_rot)(const GLmatrix *mat,
 				      const GLfloat *lengths,
 				      GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -207,7 +207,7 @@ TAG(transform_rescale_normals)(const GLmatrix *mat,
 			       const GLfloat *lengths,
 			       GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -239,7 +239,7 @@ TAG(transform_normals_no_rot)(const GLmatrix *mat,
 			      const GLfloat *lengths,
 			      GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -269,7 +269,7 @@ TAG(transform_normals)(const GLmatrix *mat,
 		       const GLfloat *lengths,
 		       GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -299,7 +299,7 @@ TAG(normalize_normals)(const GLmatrix *mat,
 		       const GLfloat *lengths,
 		       GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;
@@ -345,7 +345,7 @@ TAG(rescale_normals)(const GLmatrix *mat,
 		     const GLfloat *lengths,
 		     GLvector4f *dest)
 {
-    GLfloat(*out)[4] = (GLfloat(*)[4])dest->start;
+    GLfloat(*out)[4] = reinterpret_cast<GLfloat(*)[4]>(dest->start);
     const GLfloat *from = in->start;
     const GLuint stride = in->stride;
     const GLuint count = in->count;

@@ -1915,7 +1915,7 @@ parse_param_use(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_he
 
     /* First, insert a dummy entry into the var_cache */
     var_cache_create(&param_var);
-    param_var->name = (const GLubyte *) " ";
+    param_var->name = reinterpret_cast<const GLubyte *>(" ");
     param_var->type = vt_param;
 
     param_var->param_binding_length = 0;
@@ -2399,7 +2399,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 	     */
 	    var_cache_create(&src);
 	    src->type = vt_attrib;
-	    src->name = (const GLubyte *) "Dummy Attrib Variable";
+	    src->name = reinterpret_cast<const GLubyte *>("Dummy Attrib Variable");
 	    src->attrib_binding = binding;
 	    src->attrib_is_generic = is_generic;
 	    var_cache_append(vc_head, src);
@@ -3397,8 +3397,8 @@ parse_instructions(GLcontext * ctx, const GLubyte * inst,
 
     assert(MAX_INSTRUCTIONS >= maxInst);
 
-    Program->MajorVersion = (GLuint) * inst++;
-    Program->MinorVersion = (GLuint) * inst++;
+    Program->MajorVersion = static_cast<GLuint>(*inst++);
+    Program->MinorVersion = static_cast<GLuint>(*inst++);
 
     while (*inst != END) {
 	switch (*inst++) {

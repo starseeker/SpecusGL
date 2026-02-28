@@ -341,15 +341,23 @@ struct tnl_attr_type {
     GLuint offset;
 };
 
+/**
+ * A cached vertex-emission fastpath.
+ *
+ * C++17: The per-fastpath attribute descriptor list is a std::vector
+ * (was a raw new[]-allocated C array + separate tnl_clipspace_fastpath*
+ * singly-linked list).  The tnl_clipspace::fastpath field is now a
+ * std::vector<tnl_clipspace_fastpath> so no manual delete-traversal is
+ * required.
+ */
 struct tnl_clipspace_fastpath {
-    GLuint vertex_size;
-    GLuint attr_count;
-    bool match_strides;
+    GLuint vertex_size  = 0;
+    GLuint attr_count   = 0;
+    bool   match_strides = false;
 
-    struct tnl_attr_type *attr;
+    std::vector<tnl_attr_type> attr;   /**< attribute descriptors (was raw array) */
 
-    tnl_emit_func func;
-    struct tnl_clipspace_fastpath *next;
+    tnl_emit_func func = nullptr;
 };
 
 /**
@@ -381,7 +389,8 @@ struct tnl_clipspace {
     GLfloat chan_scale[4];
     GLfloat identity[4];
 
-    struct tnl_clipspace_fastpath *fastpath;
+    /** Cached emit-function fastpaths (was a singly-linked list). */
+    std::vector<tnl_clipspace_fastpath> fastpath;
 
     std::function<void(GLcontext *ctx)> codegen_emit;
 };

@@ -136,7 +136,7 @@ static void _tnl_import_array(GLcontext *ctx,
     }
 
     VB->AttribPtr[attrib] = &tnl->tmp_inputs[attrib];
-    VB->AttribPtr[attrib]->data = (GLfloat(*)[4])ptr;
+    VB->AttribPtr[attrib]->data = reinterpret_cast<GLfloat(*)[4]>(const_cast<GLubyte *>(ptr));
     VB->AttribPtr[attrib]->start = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(ptr));
     VB->AttribPtr[attrib]->count = count;
     VB->AttribPtr[attrib]->stride = stride;

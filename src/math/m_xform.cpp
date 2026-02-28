@@ -89,7 +89,7 @@ GLvector4f *_mesa_project_points(GLvector4f *proj_vec,
     const GLuint stride = clip_vec->stride;
     const GLfloat *from = static_cast<GLfloat *>(clip_vec->start);
     const GLuint count = clip_vec->count;
-    GLfloat(*vProj)[4] = (GLfloat(*)[4])proj_vec->start;
+    GLfloat(*vProj)[4] = reinterpret_cast<GLfloat(*)[4]>(proj_vec->start);
     GLuint i;
 
     for (i = 0 ; i < count ; i++, STRIDE_F(from, stride)) {

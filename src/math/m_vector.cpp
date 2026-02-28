@@ -52,7 +52,7 @@ void _mesa_vector4f_clean_elem(GLvector4f *vec, GLuint count, GLuint elt)
     };
     static const GLfloat clean[4] = { 0, 0, 0, 1 };
     const GLfloat v = clean[elt];
-    GLfloat(*data)[4] = (GLfloat(*)[4])vec->start;
+    GLfloat(*data)[4] = reinterpret_cast<GLfloat(*)[4]>(vec->start);
     GLuint i;
 
     for (i = 0 ; i < count ; i++)

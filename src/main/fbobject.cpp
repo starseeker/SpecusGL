@@ -752,8 +752,8 @@ _mesa_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
     FLUSH_VERTICES(ctx, _NEW_BUFFERS);
 
     if (rb->InternalFormat == internalFormat &&
-	rb->Width == (GLuint) width &&
-	rb->Height == (GLuint) height) {
+	rb->Width == static_cast<GLuint>(width) &&
+	rb->Height == static_cast<GLuint>(height)) {
 	/* no change in allocation needed */
 	return;
     }
@@ -772,8 +772,8 @@ _mesa_RenderbufferStorageEXT(GLenum target, GLenum internalFormat,
     if (rb->AllocStorage(ctx, internalFormat, width, height)) {
 	/* No error - check/set fields now */
 	assert(rb->_ActualFormat);
-	assert(rb->Width == (GLuint) width);
-	assert(rb->Height == (GLuint) height);
+	assert(rb->Width == static_cast<GLuint>(width));
+	assert(rb->Height == static_cast<GLuint>(height));
 	assert(rb->RedBits || rb->GreenBits || rb->BlueBits || rb->AlphaBits ||
 	       rb->DepthBits || rb->StencilBits || rb->IndexBits);
 	rb->InternalFormat = internalFormat;

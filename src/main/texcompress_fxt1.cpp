@@ -98,7 +98,7 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 	pixels = tempVec.data();
 	srcRowStride = 3 * srcWidth;
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	srcRowStride = _mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }
@@ -151,7 +151,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 	pixels = tempVec.data();
 	srcRowStride = 4 * srcWidth;
     } else {
-	pixels = (const GLchan *) srcAddr;
+	pixels = static_cast<const GLchan *>(srcAddr);
 	srcRowStride = _mesa_image_row_stride(srcPacking, srcWidth, srcFormat,
 					      srcType) / sizeof(GLchan);
     }
@@ -1364,7 +1364,7 @@ fxt1_encode(GLuint width, GLuint height, GLint comps,
     /* convert from 16/32-bit channels to GLubyte if needed */
     if (CHAN_TYPE != GL_UNSIGNED_BYTE) {
 	const GLuint n = width * height * comps;
-	const GLchan *src = (const GLchan *) source;
+	const GLchan *src = static_cast<const GLchan *>(source);
 	GLubyte *dest = new GLubyte[n];
 	GLuint i;
 	if (!dest) {

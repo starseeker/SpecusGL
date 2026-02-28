@@ -251,9 +251,9 @@ resample_linear_row_ub(GLint srcWidth, GLint dstWidth,
 		       const GLvoid *srcBuffer0, const GLvoid *srcBuffer1,
 		       GLvoid *dstBuffer, GLboolean flip, GLfloat rowWeight)
 {
-    const GLubyte(*srcColor0)[4] = (const GLubyte(*)[4]) srcBuffer0;
-    const GLubyte(*srcColor1)[4] = (const GLubyte(*)[4]) srcBuffer1;
-    GLubyte(*dstColor)[4] = (GLubyte(*)[4]) dstBuffer;
+    const GLubyte(*srcColor0)[4] = reinterpret_cast<const GLubyte(*)[4]>(srcBuffer0);
+    const GLubyte(*srcColor1)[4] = reinterpret_cast<const GLubyte(*)[4]>(srcBuffer1);
+    GLubyte(*dstColor)[4] = reinterpret_cast<GLubyte(*)[4]>(dstBuffer);
     const GLfloat dstWidthF = static_cast<GLfloat>(dstWidth);
     GLint dstCol;
 

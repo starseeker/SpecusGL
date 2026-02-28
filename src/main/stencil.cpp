@@ -112,11 +112,11 @@ _mesa_ClearStencil(GLint s)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    if (ctx->Stencil.Clear == (GLuint) s)
+    if (ctx->Stencil.Clear == static_cast<GLuint>(s))
 	return;
 
     FLUSH_VERTICES(ctx, _NEW_STENCIL);
-    ctx->Stencil.Clear = (GLuint) s;
+    ctx->Stencil.Clear = static_cast<GLuint>(s);
 
     if (ctx->Driver.ClearStencil) {
 	ctx->Driver.ClearStencil(ctx, s);

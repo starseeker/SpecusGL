@@ -1703,7 +1703,7 @@ _mesa_pack_rgba_span_float(GLcontext *ctx, GLuint n, GLfloat rgba[][4],
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dstAddr;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dstAddr);
 	    switch (dstFormat) {
 		case GL_RED:
 		    for (i=0; i<n; i++)
@@ -2209,7 +2209,7 @@ extract_uint_indexes(GLuint n, GLuint indexes[],
 	break;
 	case GL_HALF_FLOAT_ARB: {
 	    GLuint i;
-	    const GLhalfARB *s = (const GLhalfARB *) src;
+	    const GLhalfARB *s = static_cast<const GLhalfARB *>(src);
 	    if (unpack->SwapBytes) {
 		for (i = 0; i < n; i++) {
 		    GLhalfARB value = s[i];
@@ -2917,7 +2917,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 		    return;
 		} else if (srcFormat == GL_RGB) {
 		    GLuint i;
-		    const GLchan *src = (const GLchan *) source;
+		    const GLchan *src = static_cast<const GLchan *>(source);
 		    GLchan *dst = dest;
 		    for (i = 0; i < n; i++) {
 			dst[0] = src[0];
@@ -2935,7 +2935,7 @@ _mesa_unpack_color_span_chan(GLcontext *ctx,
 		    return;
 		} else if (srcFormat == GL_RGBA) {
 		    GLuint i;
-		    const GLchan *src = (const GLchan *) source;
+		    const GLchan *src = static_cast<const GLchan *>(source);
 		    GLchan *dst = dest;
 		    for (i = 0; i < n; i++) {
 			dst[0] = src[0];
@@ -3572,7 +3572,7 @@ _mesa_pack_index_span(const GLcontext *ctx, GLuint n,
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dest;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dest);
 	    GLuint i;
 	    for (i = 0; i < n; i++) {
 		dst[i] = _mesa_float_to_half(static_cast<GLfloat>(source[i]));
@@ -3966,7 +3966,7 @@ _mesa_unpack_depth_span(const GLcontext *ctx, GLuint n,
 	    break;
 	case GL_HALF_FLOAT_ARB: {
 	    GLuint i;
-	    const GLhalfARB *src = (const GLhalfARB *) source;
+	    const GLhalfARB *src = static_cast<const GLhalfARB *>(source);
 	    for (i = 0; i < n; i++) {
 		GLhalfARB value = src[i];
 		if (srcPacking->SwapBytes) {
@@ -4129,7 +4129,7 @@ _mesa_pack_depth_span(const GLcontext *ctx, GLuint n, GLvoid *dest,
 	}
 	break;
 	case GL_HALF_FLOAT_ARB: {
-	    GLhalfARB *dst = (GLhalfARB *) dest;
+	    GLhalfARB *dst = static_cast<GLhalfARB *>(dest);
 	    GLuint i;
 	    for (i = 0; i < n; i++) {
 		dst[i] = _mesa_float_to_half(depthSpan[i]);
@@ -4336,7 +4336,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
     switch (srcType) {
 	case GL_UNSIGNED_BYTE:
 	    if (dstType == GL_UNSIGNED_SHORT) {
-		const GLubyte(*src1)[4] = (const GLubyte(*)[4]) src;
+		const GLubyte(*src1)[4] = reinterpret_cast<const GLubyte(*)[4]>(src);
 		GLushort(*dst2)[4] = (GLushort(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4350,7 +4350,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLushort));
 	    } else {
-		const GLubyte(*src1)[4] = (const GLubyte(*)[4]) src;
+		const GLubyte(*src1)[4] = reinterpret_cast<const GLubyte(*)[4]>(src);
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_FLOAT);
@@ -4368,7 +4368,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 	    break;
 	case GL_UNSIGNED_SHORT:
 	    if (dstType == GL_UNSIGNED_BYTE) {
-		const GLushort(*src2)[4] = (const GLushort(*)[4]) src;
+		const GLushort(*src2)[4] = reinterpret_cast<const GLushort(*)[4]>(src);
 		GLubyte(*dst1)[4] = (GLubyte(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4382,7 +4382,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLubyte));
 	    } else {
-		const GLushort(*src2)[4] = (const GLushort(*)[4]) src;
+		const GLushort(*src2)[4] = reinterpret_cast<const GLushort(*)[4]>(src);
 		GLfloat(*dst4)[4] = (GLfloat(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_FLOAT);
@@ -4400,7 +4400,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 	    break;
 	case GL_FLOAT:
 	    if (dstType == GL_UNSIGNED_BYTE) {
-		const GLfloat(*src4)[4] = (const GLfloat(*)[4]) src;
+		const GLfloat(*src4)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
 		GLubyte(*dst1)[4] = (GLubyte(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		for (i = 0; i < count; i++) {
@@ -4414,7 +4414,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
 		if (useTemp)
 		    memcpy(dst, tempBuffer, count * 4 * sizeof(GLubyte));
 	    } else {
-		const GLfloat(*src4)[4] = (const GLfloat(*)[4]) src;
+		const GLfloat(*src4)[4] = reinterpret_cast<const GLfloat(*)[4]>(src);
 		GLushort(*dst2)[4] = (GLushort(*)[4])(useTemp ? tempBuffer : dst);
 		GLuint i;
 		assert(dstType == GL_UNSIGNED_SHORT);

@@ -77,7 +77,7 @@ TAG(transform_points1_general)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0],  m12 = m[12];
     const GLfloat m1 = m[1],  m13 = m[13];
@@ -104,7 +104,7 @@ TAG(transform_points1_identity)(GLvector4f *to_vec,
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
     GLuint count = from_vec->count;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint i;
     (void) m;
     if (to_vec == from_vec) return;
@@ -123,7 +123,7 @@ TAG(transform_points1_2d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1];
     const GLfloat m12 = m[12], m13 = m[13];
@@ -145,7 +145,7 @@ TAG(transform_points1_2d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m12 = m[12], m13 = m[13];
     GLuint i;
@@ -166,7 +166,7 @@ TAG(transform_points1_3d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m2 = m[2];
     const GLfloat m12 = m[12], m13 = m[13], m14 = m[14];
@@ -190,7 +190,7 @@ TAG(transform_points1_3d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0];
     const GLfloat m12 = m[12], m13 = m[13], m14 = m[14];
@@ -213,7 +213,7 @@ TAG(transform_points1_perspective)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m14 = m[14];
     GLuint i;
@@ -243,7 +243,7 @@ TAG(transform_points2_general)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0],  m4 = m[4],  m12 = m[12];
     const GLfloat m1 = m[1],  m5 = m[5],  m13 = m[13];
@@ -269,7 +269,7 @@ TAG(transform_points2_identity)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     GLuint i;
     (void) m;
@@ -290,7 +290,7 @@ TAG(transform_points2_2d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m4 = m[4], m5 = m[5];
     const GLfloat m12 = m[12], m13 = m[13];
@@ -312,7 +312,7 @@ TAG(transform_points2_2d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m12 = m[12], m13 = m[13];
     GLuint i;
@@ -333,7 +333,7 @@ TAG(transform_points2_3d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m2 = m[2], m4 = m[4], m5 = m[5];
     const GLfloat m6 = m[6], m12 = m[12], m13 = m[13], m14 = m[14];
@@ -360,7 +360,7 @@ TAG(transform_points2_3d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5];
     const GLfloat m12 = m[12], m13 = m[13], m14 = m[14];
@@ -389,7 +389,7 @@ TAG(transform_points2_perspective)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m14 = m[14];
     GLuint i;
@@ -414,7 +414,7 @@ TAG(transform_points3_general)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0],  m4 = m[4],  m8 = m[8],  m12 = m[12];
     const GLfloat m1 = m[1],  m5 = m[5],  m9 = m[9],  m13 = m[13];
@@ -440,7 +440,7 @@ TAG(transform_points3_identity)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     GLuint i;
     (void) m;
@@ -462,7 +462,7 @@ TAG(transform_points3_2d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m4 = m[4], m5 = m[5];
     const GLfloat m12 = m[12], m13 = m[13];
@@ -485,7 +485,7 @@ TAG(transform_points3_2d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m12 = m[12], m13 = m[13];
     GLuint i;
@@ -507,7 +507,7 @@ TAG(transform_points3_3d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m2 = m[2], m4 = m[4], m5 = m[5];
     const GLfloat m6 = m[6], m8 = m[8], m9 = m[9], m10 = m[10];
@@ -533,7 +533,7 @@ TAG(transform_points3_3d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5];
     const GLfloat m10 = m[10], m12 = m[12], m13 = m[13], m14 = m[14];
@@ -556,7 +556,7 @@ TAG(transform_points3_perspective)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m8 = m[8], m9 = m[9];
     const GLfloat m10 = m[10], m14 = m[14];
@@ -582,7 +582,7 @@ TAG(transform_points4_general)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0],  m4 = m[4],  m8 = m[8],  m12 = m[12];
     const GLfloat m1 = m[1],  m5 = m[5],  m9 = m[9],  m13 = m[13];
@@ -608,7 +608,7 @@ TAG(transform_points4_identity)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     GLuint i;
     (void) m;
@@ -631,7 +631,7 @@ TAG(transform_points4_2d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m4 = m[4], m5 = m[5];
     const GLfloat m12 = m[12], m13 = m[13];
@@ -655,7 +655,7 @@ TAG(transform_points4_2d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m12 = m[12], m13 = m[13];
     GLuint i;
@@ -678,7 +678,7 @@ TAG(transform_points4_3d)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m1 = m[1], m2 = m[2], m4 = m[4], m5 = m[5];
     const GLfloat m6 = m[6], m8 = m[8], m9 = m[9], m10 = m[10];
@@ -703,7 +703,7 @@ TAG(transform_points4_3d_no_rot)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5];
     const GLfloat m10 = m[10], m12 = m[12], m13 = m[13], m14 = m[14];
@@ -727,7 +727,7 @@ TAG(transform_points4_perspective)(GLvector4f *to_vec,
 {
     const GLuint stride = from_vec->stride;
     GLfloat *from = from_vec->start;
-    GLfloat(*to)[4] = (GLfloat(*)[4])to_vec->start;
+    GLfloat(*to)[4] = reinterpret_cast<GLfloat(*)[4]>(to_vec->start);
     GLuint count = from_vec->count;
     const GLfloat m0 = m[0], m5 = m[5], m8 = m[8], m9 = m[9];
     const GLfloat m10 = m[10], m14 = m[14];
