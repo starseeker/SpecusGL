@@ -41,14 +41,14 @@ do {									\
 	 GLuint idx = inlist[i];					\
 	 GLfloat dp = CLIP_DOTPROD(idx, A, B, C, D );			\
 									\
-	 if (!IS_NEGATIVE(dpPrev)) {					\
+	 if (!is_negative(dpPrev)) {					\
 	    outlist[outcount++] = idxPrev;				\
 	 }								\
 									\
-	 if (DIFFERENT_SIGNS(dp, dpPrev)) {				\
-	    if (IS_NEGATIVE(dp)) {					\
+	 if (different_signs(dp, dpPrev)) {				\
+	    if (is_negative(dp)) {					\
 	       /* Going out of bounds.  Avoid division by zero as we	\
-		* know dp != dpPrev from DIFFERENT_SIGNS, above.	\
+		* know dp != dpPrev from different_signs, above.	\
 		*/							\
 	       GLfloat t = dp / (dp - dpPrev);				\
                INTERP_4F( t, coord[newvert], coord[idx], coord[idxPrev]); \
@@ -85,15 +85,15 @@ do {									\
    if (mask & PLANE_BIT) {						\
       const GLfloat dp0 = CLIP_DOTPROD( v0, A, B, C, D );		\
       const GLfloat dp1 = CLIP_DOTPROD( v1, A, B, C, D );		\
-      const bool neg_dp0 = IS_NEGATIVE(dp0);			\
-      const bool neg_dp1 = IS_NEGATIVE(dp1);			\
+      const bool neg_dp0 = is_negative(dp0);			\
+      const bool neg_dp1 = is_negative(dp1);			\
       									\
       /* For regular clipping, we know from the clipmask that one	\
        * (or both) of these must be negative (otherwise we wouldn't	\
        * be here).							\
        * For userclip, there is only a single bit for all active	\
        * planes, so we can end up here when there is nothing to do,	\
-       * hence the second IS_NEGATIVE() test:				\
+       * hence the second is_negative() test:				\
        */								\
       if (neg_dp0 && neg_dp1)						\
          return; /* both vertices outside clip plane: discard */	\

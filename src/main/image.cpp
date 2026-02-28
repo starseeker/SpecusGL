@@ -1106,7 +1106,7 @@ _mesa_apply_ci_transfer_ops(const GLcontext *ctx, GLbitfield transferOps,
 	GLuint i;
 	for (i = 0; i < n; i++) {
 	    const GLuint j = indexes[i] & mask;
-	    indexes[i] = IROUND(ctx->PixelMaps.ItoI.Map[j]);
+	    indexes[i] = iround(ctx->PixelMaps.ItoI.Map[j]);
 	}
     }
 }

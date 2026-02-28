@@ -691,7 +691,7 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v)
 	    }
 	    if (data) {
 		for (i=0; i<n; i++) {
-		    v[i] = IROUND(data[i]);
+		    v[i] = iround(data[i]);
 		}
 	    }
 	    break;
@@ -705,13 +705,13 @@ _mesa_GetMapiv(GLenum target, GLenum query, GLint *v)
 	    break;
 	case GL_DOMAIN:
 	    if (map1d) {
-		v[0] = IROUND(map1d->u1);
-		v[1] = IROUND(map1d->u2);
+		v[0] = iround(map1d->u1);
+		v[1] = iround(map1d->u2);
 	    } else {
-		v[0] = IROUND(map2d->u1);
-		v[1] = IROUND(map2d->u2);
-		v[2] = IROUND(map2d->v1);
-		v[3] = IROUND(map2d->v2);
+		v[0] = iround(map2d->u1);
+		v[1] = iround(map2d->u2);
+		v[2] = iround(map2d->v1);
+		v[3] = iround(map2d->v2);
 	    }
 	    break;
 	default:

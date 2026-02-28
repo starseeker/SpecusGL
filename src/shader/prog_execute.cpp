@@ -947,8 +947,8 @@ _mesa_execute_program(GLcontext * ctx,
 		fetch_vector4(&inst->SrcReg[0], machine, a);
 		a[0] = CLAMP(a[0], 0.0F, 1.0F);
 		a[1] = CLAMP(a[1], 0.0F, 1.0F);
-		usx = IROUND(a[0] * 65535.0F);
-		usy = IROUND(a[1] * 65535.0F);
+		usx = iround(a[0] * 65535.0F);
+		usy = iround(a[1] * 65535.0F);
 		rawResult[0] = rawResult[1] = rawResult[2] = rawResult[3]
 					      = usx | (usy << 16);
 		store_vector4(inst, machine, result);
@@ -962,10 +962,10 @@ _mesa_execute_program(GLcontext * ctx,
 		a[1] = CLAMP(a[1], -128.0F / 127.0F, 1.0F);
 		a[2] = CLAMP(a[2], -128.0F / 127.0F, 1.0F);
 		a[3] = CLAMP(a[3], -128.0F / 127.0F, 1.0F);
-		ubx = IROUND(127.0F * a[0] + 128.0F);
-		uby = IROUND(127.0F * a[1] + 128.0F);
-		ubz = IROUND(127.0F * a[2] + 128.0F);
-		ubw = IROUND(127.0F * a[3] + 128.0F);
+		ubx = iround(127.0F * a[0] + 128.0F);
+		uby = iround(127.0F * a[1] + 128.0F);
+		ubz = iround(127.0F * a[2] + 128.0F);
+		ubw = iround(127.0F * a[3] + 128.0F);
 		rawResult[0] = rawResult[1] = rawResult[2] = rawResult[3]
 					      = ubx | (uby << 8) | (ubz << 16) | (ubw << 24);
 		store_vector4(inst, machine, result);
@@ -979,10 +979,10 @@ _mesa_execute_program(GLcontext * ctx,
 		a[1] = CLAMP(a[1], 0.0F, 1.0F);
 		a[2] = CLAMP(a[2], 0.0F, 1.0F);
 		a[3] = CLAMP(a[3], 0.0F, 1.0F);
-		ubx = IROUND(255.0F * a[0]);
-		uby = IROUND(255.0F * a[1]);
-		ubz = IROUND(255.0F * a[2]);
-		ubw = IROUND(255.0F * a[3]);
+		ubx = iround(255.0F * a[0]);
+		uby = iround(255.0F * a[1]);
+		ubz = iround(255.0F * a[2]);
+		ubw = iround(255.0F * a[3]);
 		rawResult[0] = rawResult[1] = rawResult[2] = rawResult[3]
 					      = ubx | (uby << 8) | (ubz << 16) | (ubw << 24);
 		store_vector4(inst, machine, result);
@@ -1269,7 +1269,7 @@ _mesa_execute_program(GLcontext * ctx,
 		fetch_vector4(&inst->SrcReg[0], machine, texcoord);
 		/* Not so sure about this test - if texcoord[3] is
 		 * zero, we'd probably be fine except for an ASSERT in
-		 * IROUND_POS() which gets triggered by the inf values created.
+		 * iround_pos() which gets triggered by the inf values created.
 		 */
 		if (texcoord[3] != 0.0) {
 		    texcoord[0] /= texcoord[3];

@@ -829,12 +829,12 @@ _mesa_GetMaterialiv(GLenum face, GLenum pname, GLint *params)
 	    params[3] = FLOAT_TO_INT(mat[MAT_ATTRIB_EMISSION(f)][3]);
 	    break;
 	case GL_SHININESS:
-	    *params = IROUND(mat[MAT_ATTRIB_SHININESS(f)][0]);
+	    *params = iround(mat[MAT_ATTRIB_SHININESS(f)][0]);
 	    break;
 	case GL_COLOR_INDEXES:
-	    params[0] = IROUND(mat[MAT_ATTRIB_INDEXES(f)][0]);
-	    params[1] = IROUND(mat[MAT_ATTRIB_INDEXES(f)][1]);
-	    params[2] = IROUND(mat[MAT_ATTRIB_INDEXES(f)][2]);
+	    params[0] = iround(mat[MAT_ATTRIB_INDEXES(f)][0]);
+	    params[1] = iround(mat[MAT_ATTRIB_INDEXES(f)][1]);
+	    params[2] = iround(mat[MAT_ATTRIB_INDEXES(f)][2]);
 	    break;
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glGetMaterialfv(pname)");

@@ -202,7 +202,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 		    else if (depth >= 1.0)
 			span->array->z[i] = ctx->DrawBuffer->_DepthMax;
 		    else
-			span->array->z[i] = IROUND(depth * ctx->DrawBuffer->_DepthMaxF);
+			span->array->z[i] = iround(depth * ctx->DrawBuffer->_DepthMaxF);
 		}
 	    } else {
 		/* killed fragment */

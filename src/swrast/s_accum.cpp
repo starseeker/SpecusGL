@@ -441,7 +441,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 	assert(swrast->_IntegerAccumScaler <= 1.0);
 	if (mult != prevMult) {
 	    for (j = 0; j < max; j++)
-		multTable[j] = IROUND(static_cast<GLfloat>(j) * mult);
+		multTable[j] = iround(static_cast<GLfloat>(j) * mult);
 	    prevMult = mult;
 	}
     }
@@ -493,10 +493,10 @@ accum_return(GLcontext *ctx, GLfloat value,
 		    GLchan b = acc[j * 4 + 2] * scale;
 		    GLchan a = acc[j * 4 + 3] * scale;
 #else
-		    GLint r = IROUND(static_cast<GLfloat>((acc[j * 4 + 0])) * scale);
-		    GLint g = IROUND(static_cast<GLfloat>((acc[j * 4 + 1])) * scale);
-		    GLint b = IROUND(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
-		    GLint a = IROUND(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
+		    GLint r = iround(static_cast<GLfloat>((acc[j * 4 + 0])) * scale);
+		    GLint g = iround(static_cast<GLfloat>((acc[j * 4 + 1])) * scale);
+		    GLint b = iround(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
+		    GLint a = iround(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
 #endif
 		    span.array->rgba[j][RCOMP] = CLAMP(r, 0, CHAN_MAX);
 		    span.array->rgba[j][GCOMP] = CLAMP(g, 0, CHAN_MAX);

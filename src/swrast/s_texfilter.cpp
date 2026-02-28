@@ -135,7 +135,7 @@ lerp_rgba(GLchan result[4], GLfloat t, const GLchan a[4], const GLchan b[4])
     result[3] = static_cast<GLchan>((LERP(t, a[3], b[3]) + 0.5));
 #else
     /* fixed point interpolants in [0, ILERP_SCALE] */
-    const GLint it = IROUND_POS(t * ILERP_SCALE);
+    const GLint it = iround_pos(t * ILERP_SCALE);
     assert(CHAN_TYPE == GL_UNSIGNED_BYTE);
     result[0] = ILERP(it, a[0], b[0]);
     result[1] = ILERP(it, a[1], b[1]);
@@ -164,8 +164,8 @@ lerp_rgba_2d(GLchan result[4], GLfloat a, GLfloat b,
     result[2] = static_cast<GLchan>((lerp_2d(a, b, t00[2], t10[2], t01[2], t11[2]) + 0.5));
     result[3] = static_cast<GLchan>((lerp_2d(a, b, t00[3], t10[3], t01[3], t11[3]) + 0.5));
 #else
-    const GLint ia = IROUND_POS(a * ILERP_SCALE);
-    const GLint ib = IROUND_POS(b * ILERP_SCALE);
+    const GLint ia = iround_pos(a * ILERP_SCALE);
+    const GLint ib = iround_pos(b * ILERP_SCALE);
     assert(CHAN_TYPE == GL_UNSIGNED_BYTE);
     result[0] = ilerp_2d(ia, ib, t00[0], t10[0], t01[0], t11[0]);
     result[1] = ilerp_2d(ia, ib, t00[1], t10[1], t01[1], t11[1]);
@@ -220,9 +220,9 @@ lerp_rgba_3d(GLchan result[4], GLfloat a, GLfloat b, GLfloat c,
 				     t001[k], t101[k], t011[k], t111[k]) + 0.5F));
     }
 #else
-    GLint ia = IROUND_POS(a * ILERP_SCALE);
-    GLint ib = IROUND_POS(b * ILERP_SCALE);
-    GLint ic = IROUND_POS(c * ILERP_SCALE);
+    GLint ia = iround_pos(a * ILERP_SCALE);
+    GLint ib = iround_pos(b * ILERP_SCALE);
+    GLint ic = iround_pos(c * ILERP_SCALE);
     for (k = 0; k < 4; k++) {
 	result[k] = ilerp_3d(ia, ib, ic, t000[k], t100[k], t010[k], t110[k],
 			     t001[k], t101[k], t011[k], t111[k]);
@@ -261,11 +261,11 @@ repeat_remainder(GLint a, GLint b)
    case GL_REPEAT:							\
       U = S * SIZE - 0.5F;						\
       if (img->_IsPowerOfTwo) {						\
-         I0 = IFLOOR(U) & (SIZE - 1);					\
+         I0 = ifloor(U) & (SIZE - 1);					\
          I1 = (I0 + 1) & (SIZE - 1);					\
       }									\
       else {								\
-         I0 = repeat_remainder(IFLOOR(U), SIZE);			\
+         I0 = repeat_remainder(ifloor(U), SIZE);			\
          I1 = repeat_remainder(I0 + 1, SIZE);				\
       }									\
       break;								\
@@ -277,7 +277,7 @@ repeat_remainder(GLint a, GLint b)
       else								\
          U = S * SIZE;							\
       U -= 0.5F;							\
-      I0 = IFLOOR(U);							\
+      I0 = ifloor(U);							\
       I1 = I0 + 1;							\
       if (I0 < 0)							\
          I0 = 0;							\
@@ -295,19 +295,19 @@ repeat_remainder(GLint a, GLint b)
          else								\
             U = S * SIZE;						\
          U -= 0.5F;							\
-         I0 = IFLOOR(U);						\
+         I0 = ifloor(U);						\
          I1 = I0 + 1;							\
       }									\
       break;								\
    case GL_MIRRORED_REPEAT:						\
       {									\
-         const GLint flr = IFLOOR(S);					\
+         const GLint flr = ifloor(S);					\
          if (flr & 1)							\
             U = 1.0F - (S - static_cast<GLfloat>(flr));	/* flr is odd */	\
          else								\
             U = S - static_cast<GLfloat>(flr);		/* flr is even */	\
          U = (U * SIZE) - 0.5F;						\
-         I0 = IFLOOR(U);						\
+         I0 = ifloor(U);						\
          I1 = I0 + 1;							\
          if (I0 < 0)							\
             I0 = 0;							\
@@ -322,7 +322,7 @@ repeat_remainder(GLint a, GLint b)
       else								\
          U *= SIZE;							\
       U -= 0.5F;							\
-      I0 = IFLOOR(U);							\
+      I0 = ifloor(U);							\
       I1 = I0 + 1;							\
       break;								\
    case GL_MIRROR_CLAMP_TO_EDGE_EXT:					\
@@ -332,7 +332,7 @@ repeat_remainder(GLint a, GLint b)
       else								\
          U *= SIZE;							\
       U -= 0.5F;							\
-      I0 = IFLOOR(U);							\
+      I0 = ifloor(U);							\
       I1 = I0 + 1;							\
       if (I0 < 0)							\
          I0 = 0;							\
@@ -351,7 +351,7 @@ repeat_remainder(GLint a, GLint b)
          else								\
             U *= SIZE;							\
          U -= 0.5F;							\
-         I0 = IFLOOR(U);						\
+         I0 = ifloor(U);						\
          I1 = I0 + 1;							\
       }									\
       break;								\
@@ -363,7 +363,7 @@ repeat_remainder(GLint a, GLint b)
       else								\
          U = S * SIZE;							\
       U -= 0.5F;							\
-      I0 = IFLOOR(U);							\
+      I0 = ifloor(U);							\
       I1 = I0 + 1;							\
       break;								\
    default:								\
@@ -381,7 +381,7 @@ repeat_remainder(GLint a, GLint b)
    case GL_REPEAT:							\
       /* s limited to [0,1) */						\
       /* i limited to [0,size-1] */					\
-      I = IFLOOR(S * SIZE);						\
+      I = ifloor(S * SIZE);						\
       if (img->_IsPowerOfTwo)						\
          I &= (SIZE - 1);						\
       else								\
@@ -398,7 +398,7 @@ repeat_remainder(GLint a, GLint b)
          else if (S > max)						\
             I = SIZE - 1;						\
          else								\
-            I = IFLOOR(S * SIZE);					\
+            I = ifloor(S * SIZE);					\
       }									\
       break;								\
    case GL_CLAMP_TO_BORDER:						\
@@ -412,14 +412,14 @@ repeat_remainder(GLint a, GLint b)
          else if (S >= max)						\
             I = SIZE;							\
          else								\
-            I = IFLOOR(S * SIZE);					\
+            I = ifloor(S * SIZE);					\
       }									\
       break;								\
    case GL_MIRRORED_REPEAT:						\
       {									\
          const GLfloat min = 1.0F / (2.0F * SIZE);			\
          const GLfloat max = 1.0F - min;				\
-         const GLint flr = IFLOOR(S);					\
+         const GLint flr = ifloor(S);					\
          GLfloat u;							\
          if (flr & 1)							\
             u = 1.0F - (S - static_cast<GLfloat>(flr));	/* flr is odd */	\
@@ -430,7 +430,7 @@ repeat_remainder(GLint a, GLint b)
          else if (u > max)						\
             I = SIZE - 1;						\
          else								\
-            I = IFLOOR(u * SIZE);					\
+            I = ifloor(u * SIZE);					\
       }									\
       break;								\
    case GL_MIRROR_CLAMP_EXT:						\
@@ -443,7 +443,7 @@ repeat_remainder(GLint a, GLint b)
          else if (u >= 1.0F)						\
             I = SIZE - 1;						\
          else								\
-            I = IFLOOR(u * SIZE);					\
+            I = ifloor(u * SIZE);					\
       }									\
       break;								\
    case GL_MIRROR_CLAMP_TO_EDGE_EXT:					\
@@ -458,7 +458,7 @@ repeat_remainder(GLint a, GLint b)
          else if (u > max)						\
             I = SIZE - 1;						\
          else								\
-            I = IFLOOR(u * SIZE);					\
+            I = ifloor(u * SIZE);					\
       }									\
       break;								\
    case GL_MIRROR_CLAMP_TO_BORDER_EXT:					\
@@ -473,7 +473,7 @@ repeat_remainder(GLint a, GLint b)
          else if (u > max)						\
             I = SIZE;							\
          else								\
-            I = IFLOOR(u * SIZE);					\
+            I = ifloor(u * SIZE);					\
       }									\
       break;								\
    case GL_CLAMP:							\
@@ -484,7 +484,7 @@ repeat_remainder(GLint a, GLint b)
       else if (S >= 1.0F)						\
          I = SIZE - 1;							\
       else								\
-         I = IFLOOR(S * SIZE);						\
+         I = ifloor(S * SIZE);						\
       break;								\
    default:								\
       _mesa_problem(ctx, "Bad wrap mode");				\
@@ -496,7 +496,7 @@ repeat_remainder(GLint a, GLint b)
 #define COMPUTE_LINEAR_REPEAT_TEXEL_LOCATION(S, U, SIZE, I0, I1)	\
 {									\
    U = S * SIZE - 0.5F;							\
-   I0 = IFLOOR(U) & (SIZE - 1);						\
+   I0 = ifloor(U) & (SIZE - 1);						\
    I1 = (I0 + 1) & (SIZE - 1);						\
 }
 
@@ -546,7 +546,7 @@ nearest_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
  * Also note, FRAC(x) doesn't truly return the fractional part of x for x < 0.
  * Instead, if x < 0 then FRAC(x) = 1 - true_frac(x).
  */
-#define FRAC(f)  ((f) - IFLOOR(f))
+#define FRAC(f)  ((f) - ifloor(f))
 
 
 
@@ -1306,8 +1306,8 @@ opt_sample_rgb_2d(GLcontext *ctx,
     assert(img->_IsPowerOfTwo);
 
     for (k=0; k<n; k++) {
-	GLint i = IFLOOR(texcoords[k][0] * width) & colMask;
-	GLint j = IFLOOR(texcoords[k][1] * height) & rowMask;
+	GLint i = ifloor(texcoords[k][0] * width) & colMask;
+	GLint j = ifloor(texcoords[k][1] * height) & rowMask;
 	GLint pos = (j << shift) | i;
 	GLchan *texel = ((GLchan *) img->Data) + 3*pos;
 	rgba[k][RCOMP] = texel[0];
@@ -1348,8 +1348,8 @@ opt_sample_rgba_2d(GLcontext *ctx,
     assert(img->_IsPowerOfTwo);
 
     for (i = 0; i < n; i++) {
-	const GLint col = IFLOOR(texcoords[i][0] * width) & colMask;
-	const GLint row = IFLOOR(texcoords[i][1] * height) & rowMask;
+	const GLint col = ifloor(texcoords[i][0] * width) & colMask;
+	const GLint row = ifloor(texcoords[i][1] * height) & rowMask;
 	const GLint pos = (row << shift) | col;
 	const GLchan *texel = ((GLchan *) img->Data) + (pos << 2);    /* pos*4 */
 	COPY_CHAN4(rgba[i], texel);
@@ -2272,11 +2272,11 @@ static inline GLint
 clamp_rect_coord_nearest(GLenum wrapMode, GLfloat coord, GLint max)
 {
     if (wrapMode == GL_CLAMP) {
-	return IFLOOR(CLAMP(coord, 0.0F, max - 1));
+	return ifloor(CLAMP(coord, 0.0F, max - 1));
     } else if (wrapMode == GL_CLAMP_TO_EDGE) {
-	return IFLOOR(CLAMP(coord, 0.5F, max - 0.5F));
+	return ifloor(CLAMP(coord, 0.5F, max - 0.5F));
     } else {
-	return IFLOOR(CLAMP(coord, -0.5F, max + 0.5F));
+	return ifloor(CLAMP(coord, -0.5F, max + 0.5F));
     }
 }
 
@@ -2293,12 +2293,12 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
     if (wrapMode == GL_CLAMP) {
 	/* Not exactly what the spec says, but it matches NVIDIA output */
 	fcol = CLAMP(coord - 0.5F, 0.0, max-1);
-	i0 = IFLOOR(fcol);
+	i0 = ifloor(fcol);
 	i1 = i0 + 1;
     } else if (wrapMode == GL_CLAMP_TO_EDGE) {
 	fcol = CLAMP(coord, 0.5F, max - 0.5F);
 	fcol -= 0.5F;
-	i0 = IFLOOR(fcol);
+	i0 = ifloor(fcol);
 	i1 = i0 + 1;
 	if (i1 > max - 1)
 	    i1 = max - 1;
@@ -2306,7 +2306,7 @@ clamp_rect_coord_linear(GLenum wrapMode, GLfloat coord, GLint max,
 	assert(wrapMode == GL_CLAMP_TO_BORDER);
 	fcol = CLAMP(coord, -0.5F, max + 0.5F);
 	fcol -= 0.5F;
-	i0 = IFLOOR(fcol);
+	i0 = ifloor(fcol);
 	i1 = i0 + 1;
     }
     *i0out = i0;
@@ -2386,12 +2386,12 @@ sample_linear_rect(GLcontext *ctx,
 	if (tObj->WrapS == GL_CLAMP) {
 	    /* Not exactly what the spec says, but it matches NVIDIA output */
 	    fcol = CLAMP(texcoords[i][0] - 0.5F, 0.0, width_minus_1);
-	    i0 = IFLOOR(fcol);
+	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
 	} else if (tObj->WrapS == GL_CLAMP_TO_EDGE) {
 	    fcol = CLAMP(texcoords[i][0], 0.5F, width - 0.5F);
 	    fcol -= 0.5F;
-	    i0 = IFLOOR(fcol);
+	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
 	    if (i1 > width_minus_1)
 		i1 = width_minus_1;
@@ -2399,19 +2399,19 @@ sample_linear_rect(GLcontext *ctx,
 	    assert(tObj->WrapS == GL_CLAMP_TO_BORDER);
 	    fcol = CLAMP(texcoords[i][0], -0.5F, width + 0.5F);
 	    fcol -= 0.5F;
-	    i0 = IFLOOR(fcol);
+	    i0 = ifloor(fcol);
 	    i1 = i0 + 1;
 	}
 
 	if (tObj->WrapT == GL_CLAMP) {
 	    /* Not exactly what the spec says, but it matches NVIDIA output */
 	    frow = CLAMP(texcoords[i][1] - 0.5F, 0.0, width_minus_1);
-	    j0 = IFLOOR(frow);
+	    j0 = ifloor(frow);
 	    j1 = j0 + 1;
 	} else if (tObj->WrapT == GL_CLAMP_TO_EDGE) {
 	    frow = CLAMP(texcoords[i][1], 0.5F, height - 0.5F);
 	    frow -= 0.5F;
-	    j0 = IFLOOR(frow);
+	    j0 = ifloor(frow);
 	    j1 = j0 + 1;
 	    if (j1 > height_minus_1)
 		j1 = height_minus_1;
@@ -2419,7 +2419,7 @@ sample_linear_rect(GLcontext *ctx,
 	    assert(tObj->WrapT == GL_CLAMP_TO_BORDER);
 	    frow = CLAMP(texcoords[i][1], -0.5F, height + 0.5F);
 	    frow -= 0.5F;
-	    j0 = IFLOOR(frow);
+	    j0 = ifloor(frow);
 	    j1 = j0 + 1;
 	}
 

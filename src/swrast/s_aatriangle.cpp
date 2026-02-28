@@ -139,7 +139,7 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 	return 0;
     else if (z > CHAN_MAX)
 	return CHAN_MAX;
-    return static_cast<GLchan>(IROUND_POS(z));
+    return static_cast<GLchan>(iround_pos(z));
 #endif
 }
 

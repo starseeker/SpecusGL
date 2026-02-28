@@ -259,7 +259,7 @@ resample_linear_row_ub(GLint srcWidth, GLint dstWidth,
 
     for (dstCol = 0; dstCol < dstWidth; dstCol++) {
 	const GLfloat srcCol = (dstCol * srcWidth) / dstWidthF;
-	GLint srcCol0 = IFLOOR(srcCol);
+	GLint srcCol0 = ifloor(srcCol);
 	GLint srcCol1 = srcCol0 + 1;
 	GLfloat colWeight = srcCol - srcCol0; /* fractional part of srcCol */
 	GLfloat red, green, blue, alpha;
@@ -292,10 +292,10 @@ resample_linear_row_ub(GLint srcWidth, GLint dstWidth,
 			srcColor0[srcCol0][ACOMP], srcColor0[srcCol1][ACOMP],
 			srcColor1[srcCol0][ACOMP], srcColor1[srcCol1][ACOMP]);
 
-	dstColor[dstCol][RCOMP] = IFLOOR(red);
-	dstColor[dstCol][GCOMP] = IFLOOR(green);
-	dstColor[dstCol][BCOMP] = IFLOOR(blue);
-	dstColor[dstCol][ACOMP] = IFLOOR(alpha);
+	dstColor[dstCol][RCOMP] = ifloor(red);
+	dstColor[dstCol][GCOMP] = ifloor(green);
+	dstColor[dstCol][BCOMP] = ifloor(blue);
+	dstColor[dstCol][ACOMP] = ifloor(alpha);
     }
 }
 
@@ -363,7 +363,7 @@ blit_linear(GLcontext *ctx,
     for (dstRow = 0; dstRow < dstHeight; dstRow++) {
 	const GLint dstY = dstYpos + dstRow;
 	const GLfloat srcRow = (dstRow * srcHeight) / dstHeightF;
-	GLint srcRow0 = IFLOOR(srcRow);
+	GLint srcRow0 = ifloor(srcRow);
 	GLint srcRow1 = srcRow0 + 1;
 	GLfloat rowWeight = srcRow - srcRow0; /* fractional part of srcRow */
 

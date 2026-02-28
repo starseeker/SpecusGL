@@ -181,8 +181,8 @@ _mesa_DrawPixels(GLsizei width, GLsizei height,
 
     if (ctx->RenderMode == GL_RENDER) {
 	/* Round, to satisfy conformance tests (matches SGI's OpenGL) */
-	GLint x = IROUND(ctx->Current.RasterPos[0]);
-	GLint y = IROUND(ctx->Current.RasterPos[1]);
+	GLint x = iround(ctx->Current.RasterPos[0]);
+	GLint y = iround(ctx->Current.RasterPos[1]);
 	ctx->Driver.DrawPixels(ctx, x, y, width, height, format, type,
 			       &ctx->Unpack, pixels);
     } else if (ctx->RenderMode == GL_FEEDBACK) {
@@ -243,8 +243,8 @@ _mesa_CopyPixels(GLint srcx, GLint srcy, GLsizei width, GLsizei height,
 
     if (ctx->RenderMode == GL_RENDER) {
 	/* Round to satisfy conformance tests (matches SGI's OpenGL) */
-	GLint destx = IROUND(ctx->Current.RasterPos[0]);
-	GLint desty = IROUND(ctx->Current.RasterPos[1]);
+	GLint destx = iround(ctx->Current.RasterPos[0]);
+	GLint desty = iround(ctx->Current.RasterPos[1]);
 	ctx->Driver.CopyPixels(ctx, srcx, srcy, width, height, destx, desty,
 			       type);
     } else if (ctx->RenderMode == GL_FEEDBACK) {
@@ -339,8 +339,8 @@ _mesa_Bitmap(GLsizei width, GLsizei height,
     if (ctx->RenderMode == GL_RENDER) {
 	/* Truncate, to satisfy conformance tests (matches SGI's OpenGL). */
 	const GLfloat epsilon = 0.0001;
-	GLint x = IFLOOR(ctx->Current.RasterPos[0] + epsilon - xorig);
-	GLint y = IFLOOR(ctx->Current.RasterPos[1] + epsilon - yorig);
+	GLint x = ifloor(ctx->Current.RasterPos[0] + epsilon - xorig);
+	GLint y = ifloor(ctx->Current.RasterPos[1] + epsilon - yorig);
 	ctx->Driver.Bitmap(ctx, x, y, width, height, &ctx->Unpack, bitmap);
     }
 #if _HAVE_FULL_GL
@@ -404,8 +404,8 @@ _mesa_DrawDepthPixelsMESA(GLsizei width, GLsizei height,
 
     if (ctx->RenderMode == GL_RENDER) {
 	/* Round, to satisfy conformance tests (matches SGI's OpenGL) */
-	GLint x = IROUND(ctx->Current.RasterPos[0]);
-	GLint y = IROUND(ctx->Current.RasterPos[1]);
+	GLint x = iround(ctx->Current.RasterPos[0]);
+	GLint y = iround(ctx->Current.RasterPos[1]);
 	ctx->Driver.DrawDepthPixelsMESA(ctx, x, y, width, height,
 					colorFormat, colorType, colors,
 					depthType, depths, &ctx->Unpack);

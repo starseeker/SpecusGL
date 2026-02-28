@@ -81,10 +81,10 @@ _mesa_update_histogram(GLcontext *ctx, GLuint n, const GLfloat rgba[][4])
 	return;
 
     for (i = 0; i < n; i++) {
-	GLint ri = IROUND(rgba[i][RCOMP] * w);
-	GLint gi = IROUND(rgba[i][GCOMP] * w);
-	GLint bi = IROUND(rgba[i][BCOMP] * w);
-	GLint ai = IROUND(rgba[i][ACOMP] * w);
+	GLint ri = iround(rgba[i][RCOMP] * w);
+	GLint gi = iround(rgba[i][GCOMP] * w);
+	GLint bi = iround(rgba[i][BCOMP] * w);
+	GLint ai = iround(rgba[i][ACOMP] * w);
 	ri = CLAMP(ri, 0, max);
 	gi = CLAMP(gi, 0, max);
 	bi = CLAMP(bi, 0, max);
