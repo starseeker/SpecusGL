@@ -199,8 +199,7 @@ parse_float(slang_parse_ctx * C, float *number)
 }
 
 /* revision number - increment after each change affecting emitted output */
-#define REVISION 3
-
+constexpr int REVISION = 3;
 static bool
 check_revision(slang_parse_ctx * C)
 {
@@ -274,10 +273,9 @@ convert_to_array(slang_parse_ctx * C, slang_variable * var,
 }
 
 /* structure field */
-#define FIELD_NONE 0
-#define FIELD_NEXT 1
-#define FIELD_ARRAY 2
-
+constexpr int FIELD_NONE = 0;
+constexpr int FIELD_NEXT = 1;
+constexpr int FIELD_ARRAY = 2;
 static bool
 parse_struct_field_var(slang_parse_ctx * C, slang_output_ctx * O,
 		       slang_variable * var, const slang_type_specifier * sp)
@@ -387,14 +385,13 @@ parse_struct(slang_parse_ctx * C, slang_output_ctx * O, slang_struct ** st)
 
 
 /* type qualifier */
-#define TYPE_QUALIFIER_NONE 0
-#define TYPE_QUALIFIER_CONST 1
-#define TYPE_QUALIFIER_ATTRIBUTE 2
-#define TYPE_QUALIFIER_VARYING 3
-#define TYPE_QUALIFIER_UNIFORM 4
-#define TYPE_QUALIFIER_FIXEDOUTPUT 5
-#define TYPE_QUALIFIER_FIXEDINPUT 6
-
+constexpr int TYPE_QUALIFIER_NONE = 0;
+constexpr int TYPE_QUALIFIER_CONST = 1;
+constexpr int TYPE_QUALIFIER_ATTRIBUTE = 2;
+constexpr int TYPE_QUALIFIER_VARYING = 3;
+constexpr int TYPE_QUALIFIER_UNIFORM = 4;
+constexpr int TYPE_QUALIFIER_FIXEDOUTPUT = 5;
+constexpr int TYPE_QUALIFIER_FIXEDINPUT = 6;
 static bool
 parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 {
@@ -427,40 +424,38 @@ parse_type_qualifier(slang_parse_ctx * C, slang_type_qualifier * qual)
 }
 
 /* type specifier */
-#define TYPE_SPECIFIER_VOID 0
-#define TYPE_SPECIFIER_BOOL 1
-#define TYPE_SPECIFIER_BVEC2 2
-#define TYPE_SPECIFIER_BVEC3 3
-#define TYPE_SPECIFIER_BVEC4 4
-#define TYPE_SPECIFIER_INT 5
-#define TYPE_SPECIFIER_IVEC2 6
-#define TYPE_SPECIFIER_IVEC3 7
-#define TYPE_SPECIFIER_IVEC4 8
-#define TYPE_SPECIFIER_FLOAT 9
-#define TYPE_SPECIFIER_VEC2 10
-#define TYPE_SPECIFIER_VEC3 11
-#define TYPE_SPECIFIER_VEC4 12
-#define TYPE_SPECIFIER_MAT2 13
-#define TYPE_SPECIFIER_MAT3 14
-#define TYPE_SPECIFIER_MAT4 15
-#define TYPE_SPECIFIER_SAMPLER1D 16
-#define TYPE_SPECIFIER_SAMPLER2D 17
-#define TYPE_SPECIFIER_SAMPLER3D 18
-#define TYPE_SPECIFIER_SAMPLERCUBE 19
-#define TYPE_SPECIFIER_SAMPLER1DSHADOW 20
-#define TYPE_SPECIFIER_SAMPLER2DSHADOW 21
-#define TYPE_SPECIFIER_SAMPLER2DRECT 22
-#define TYPE_SPECIFIER_SAMPLER2DRECTSHADOW 23
-#define TYPE_SPECIFIER_STRUCT 24
-#define TYPE_SPECIFIER_TYPENAME 25
-#define TYPE_SPECIFIER_MAT23 26
-#define TYPE_SPECIFIER_MAT32 27
-#define TYPE_SPECIFIER_MAT24 28
-#define TYPE_SPECIFIER_MAT42 29
-#define TYPE_SPECIFIER_MAT34 30
-#define TYPE_SPECIFIER_MAT43 31
-
-
+constexpr int TYPE_SPECIFIER_VOID = 0;
+constexpr int TYPE_SPECIFIER_BOOL = 1;
+constexpr int TYPE_SPECIFIER_BVEC2 = 2;
+constexpr int TYPE_SPECIFIER_BVEC3 = 3;
+constexpr int TYPE_SPECIFIER_BVEC4 = 4;
+constexpr int TYPE_SPECIFIER_INT = 5;
+constexpr int TYPE_SPECIFIER_IVEC2 = 6;
+constexpr int TYPE_SPECIFIER_IVEC3 = 7;
+constexpr int TYPE_SPECIFIER_IVEC4 = 8;
+constexpr int TYPE_SPECIFIER_FLOAT = 9;
+constexpr int TYPE_SPECIFIER_VEC2 = 10;
+constexpr int TYPE_SPECIFIER_VEC3 = 11;
+constexpr int TYPE_SPECIFIER_VEC4 = 12;
+constexpr int TYPE_SPECIFIER_MAT2 = 13;
+constexpr int TYPE_SPECIFIER_MAT3 = 14;
+constexpr int TYPE_SPECIFIER_MAT4 = 15;
+constexpr int TYPE_SPECIFIER_SAMPLER1D = 16;
+constexpr int TYPE_SPECIFIER_SAMPLER2D = 17;
+constexpr int TYPE_SPECIFIER_SAMPLER3D = 18;
+constexpr int TYPE_SPECIFIER_SAMPLERCUBE = 19;
+constexpr int TYPE_SPECIFIER_SAMPLER1DSHADOW = 20;
+constexpr int TYPE_SPECIFIER_SAMPLER2DSHADOW = 21;
+constexpr int TYPE_SPECIFIER_SAMPLER2DRECT = 22;
+constexpr int TYPE_SPECIFIER_SAMPLER2DRECTSHADOW = 23;
+constexpr int TYPE_SPECIFIER_STRUCT = 24;
+constexpr int TYPE_SPECIFIER_TYPENAME = 25;
+constexpr int TYPE_SPECIFIER_MAT23 = 26;
+constexpr int TYPE_SPECIFIER_MAT32 = 27;
+constexpr int TYPE_SPECIFIER_MAT24 = 28;
+constexpr int TYPE_SPECIFIER_MAT42 = 29;
+constexpr int TYPE_SPECIFIER_MAT34 = 30;
+constexpr int TYPE_SPECIFIER_MAT43 = 31;
 static bool
 parse_type_specifier(slang_parse_ctx * C, slang_output_ctx * O,
 		     slang_type_specifier * spec)
@@ -603,70 +598,68 @@ parse_fully_specified_type(slang_parse_ctx * C, slang_output_ctx * O,
 }
 
 /* operation */
-#define OP_END 0
-#define OP_BLOCK_BEGIN_NO_NEW_SCOPE 1
-#define OP_BLOCK_BEGIN_NEW_SCOPE 2
-#define OP_DECLARE 3
-#define OP_ASM 4
-#define OP_BREAK 5
-#define OP_CONTINUE 6
-#define OP_DISCARD 7
-#define OP_RETURN 8
-#define OP_EXPRESSION 9
-#define OP_IF 10
-#define OP_WHILE 11
-#define OP_DO 12
-#define OP_FOR 13
-#define OP_PUSH_VOID 14
-#define OP_PUSH_BOOL 15
-#define OP_PUSH_INT 16
-#define OP_PUSH_FLOAT 17
-#define OP_PUSH_IDENTIFIER 18
-#define OP_SEQUENCE 19
-#define OP_ASSIGN 20
-#define OP_ADDASSIGN 21
-#define OP_SUBASSIGN 22
-#define OP_MULASSIGN 23
-#define OP_DIVASSIGN 24
+constexpr int OP_END = 0;
+constexpr int OP_BLOCK_BEGIN_NO_NEW_SCOPE = 1;
+constexpr int OP_BLOCK_BEGIN_NEW_SCOPE = 2;
+constexpr int OP_DECLARE = 3;
+constexpr int OP_ASM = 4;
+constexpr int OP_BREAK = 5;
+constexpr int OP_CONTINUE = 6;
+constexpr int OP_DISCARD = 7;
+constexpr int OP_RETURN = 8;
+constexpr int OP_EXPRESSION = 9;
+constexpr int OP_IF = 10;
+constexpr int OP_WHILE = 11;
+constexpr int OP_DO = 12;
+constexpr int OP_FOR = 13;
+constexpr int OP_PUSH_VOID = 14;
+constexpr int OP_PUSH_BOOL = 15;
+constexpr int OP_PUSH_INT = 16;
+constexpr int OP_PUSH_FLOAT = 17;
+constexpr int OP_PUSH_IDENTIFIER = 18;
+constexpr int OP_SEQUENCE = 19;
+constexpr int OP_ASSIGN = 20;
+constexpr int OP_ADDASSIGN = 21;
+constexpr int OP_SUBASSIGN = 22;
+constexpr int OP_MULASSIGN = 23;
+constexpr int OP_DIVASSIGN = 24;
 /*#define OP_MODASSIGN 25*/
 /*#define OP_LSHASSIGN 26*/
 /*#define OP_RSHASSIGN 27*/
 /*#define OP_ORASSIGN 28*/
 /*#define OP_XORASSIGN 29*/
 /*#define OP_ANDASSIGN 30*/
-#define OP_SELECT 31
-#define OP_LOGICALOR 32
-#define OP_LOGICALXOR 33
-#define OP_LOGICALAND 34
+constexpr int OP_SELECT = 31;
+constexpr int OP_LOGICALOR = 32;
+constexpr int OP_LOGICALXOR = 33;
+constexpr int OP_LOGICALAND = 34;
 /*#define OP_BITOR 35*/
 /*#define OP_BITXOR 36*/
 /*#define OP_BITAND 37*/
-#define OP_EQUAL 38
-#define OP_NOTEQUAL 39
-#define OP_LESS 40
-#define OP_GREATER 41
-#define OP_LESSEQUAL 42
-#define OP_GREATEREQUAL 43
+constexpr int OP_EQUAL = 38;
+constexpr int OP_NOTEQUAL = 39;
+constexpr int OP_LESS = 40;
+constexpr int OP_GREATER = 41;
+constexpr int OP_LESSEQUAL = 42;
+constexpr int OP_GREATEREQUAL = 43;
 /*#define OP_LSHIFT 44*/
 /*#define OP_RSHIFT 45*/
-#define OP_ADD 46
-#define OP_SUBTRACT 47
-#define OP_MULTIPLY 48
-#define OP_DIVIDE 49
+constexpr int OP_ADD = 46;
+constexpr int OP_SUBTRACT = 47;
+constexpr int OP_MULTIPLY = 48;
+constexpr int OP_DIVIDE = 49;
 /*#define OP_MODULUS 50*/
-#define OP_PREINCREMENT 51
-#define OP_PREDECREMENT 52
-#define OP_PLUS 53
-#define OP_MINUS 54
+constexpr int OP_PREINCREMENT = 51;
+constexpr int OP_PREDECREMENT = 52;
+constexpr int OP_PLUS = 53;
+constexpr int OP_MINUS = 54;
 /*#define OP_COMPLEMENT 55*/
-#define OP_NOT 56
-#define OP_SUBSCRIPT 57
-#define OP_CALL 58
-#define OP_FIELD 59
-#define OP_POSTINCREMENT 60
-#define OP_POSTDECREMENT 61
-
-
+constexpr int OP_NOT = 56;
+constexpr int OP_SUBSCRIPT = 57;
+constexpr int OP_CALL = 58;
+constexpr int OP_FIELD = 59;
+constexpr int OP_POSTINCREMENT = 60;
+constexpr int OP_POSTDECREMENT = 61;
 /**
  * When parsing a compound production, this function is used to parse the
  * children.
@@ -1110,14 +1103,12 @@ parse_expression(slang_parse_ctx * C, slang_output_ctx * O,
 }
 
 /* parameter qualifier */
-#define PARAM_QUALIFIER_IN 0
-#define PARAM_QUALIFIER_OUT 1
-#define PARAM_QUALIFIER_INOUT 2
-
+constexpr int PARAM_QUALIFIER_IN = 0;
+constexpr int PARAM_QUALIFIER_OUT = 1;
+constexpr int PARAM_QUALIFIER_INOUT = 2;
 /* function parameter array presence */
-#define PARAMETER_ARRAY_NOT_PRESENT 0
-#define PARAMETER_ARRAY_PRESENT 1
-
+constexpr int PARAMETER_ARRAY_NOT_PRESENT = 0;
+constexpr int PARAMETER_ARRAY_PRESENT = 1;
 static bool
 parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 			    slang_variable * param)
@@ -1191,45 +1182,42 @@ parse_parameter_declaration(slang_parse_ctx * C, slang_output_ctx * O,
 }
 
 /* function type */
-#define FUNCTION_ORDINARY 0
-#define FUNCTION_CONSTRUCTOR 1
-#define FUNCTION_OPERATOR 2
-
+constexpr int FUNCTION_ORDINARY = 0;
+constexpr int FUNCTION_CONSTRUCTOR = 1;
+constexpr int FUNCTION_OPERATOR = 2;
 /* function parameter */
-#define PARAMETER_NONE 0
-#define PARAMETER_NEXT 1
-
+constexpr int PARAMETER_NONE = 0;
+constexpr int PARAMETER_NEXT = 1;
 /* operator type */
-#define OPERATOR_ADDASSIGN 1
-#define OPERATOR_SUBASSIGN 2
-#define OPERATOR_MULASSIGN 3
-#define OPERATOR_DIVASSIGN 4
+constexpr int OPERATOR_ADDASSIGN = 1;
+constexpr int OPERATOR_SUBASSIGN = 2;
+constexpr int OPERATOR_MULASSIGN = 3;
+constexpr int OPERATOR_DIVASSIGN = 4;
 /*#define OPERATOR_MODASSIGN 5*/
 /*#define OPERATOR_LSHASSIGN 6*/
 /*#define OPERATOR_RSHASSIGN 7*/
 /*#define OPERATOR_ANDASSIGN 8*/
 /*#define OPERATOR_XORASSIGN 9*/
 /*#define OPERATOR_ORASSIGN 10*/
-#define OPERATOR_LOGICALXOR 11
+constexpr int OPERATOR_LOGICALXOR = 11;
 /*#define OPERATOR_BITOR 12*/
 /*#define OPERATOR_BITXOR 13*/
 /*#define OPERATOR_BITAND 14*/
-#define OPERATOR_LESS 15
-#define OPERATOR_GREATER 16
-#define OPERATOR_LESSEQUAL 17
-#define OPERATOR_GREATEREQUAL 18
+constexpr int OPERATOR_LESS = 15;
+constexpr int OPERATOR_GREATER = 16;
+constexpr int OPERATOR_LESSEQUAL = 17;
+constexpr int OPERATOR_GREATEREQUAL = 18;
 /*#define OPERATOR_LSHIFT 19*/
 /*#define OPERATOR_RSHIFT 20*/
-#define OPERATOR_MULTIPLY 21
-#define OPERATOR_DIVIDE 22
+constexpr int OPERATOR_MULTIPLY = 21;
+constexpr int OPERATOR_DIVIDE = 22;
 /*#define OPERATOR_MODULUS 23*/
-#define OPERATOR_INCREMENT 24
-#define OPERATOR_DECREMENT 25
-#define OPERATOR_PLUS 26
-#define OPERATOR_MINUS 27
+constexpr int OPERATOR_INCREMENT = 24;
+constexpr int OPERATOR_DECREMENT = 25;
+constexpr int OPERATOR_PLUS = 26;
+constexpr int OPERATOR_MINUS = 27;
 /*#define OPERATOR_COMPLEMENT 28*/
-#define OPERATOR_NOT 29
-
+constexpr int OPERATOR_NOT = 29;
 static const struct {
     unsigned int o_code;
     const char *o_name;
@@ -1402,17 +1390,14 @@ initialize_global(slang_assemble_ctx * A, slang_variable * var)
 }
 
 /* init declarator list */
-#define DECLARATOR_NONE 0
-#define DECLARATOR_NEXT 1
-
+constexpr int DECLARATOR_NONE = 0;
+constexpr int DECLARATOR_NEXT = 1;
 /* variable declaration */
-#define VARIABLE_NONE 0
-#define VARIABLE_IDENTIFIER 1
-#define VARIABLE_INITIALIZER 2
-#define VARIABLE_ARRAY_EXPLICIT 3
-#define VARIABLE_ARRAY_UNKNOWN 4
-
-
+constexpr int VARIABLE_NONE = 0;
+constexpr int VARIABLE_IDENTIFIER = 1;
+constexpr int VARIABLE_INITIALIZER = 2;
+constexpr int VARIABLE_ARRAY_EXPLICIT = 3;
+constexpr int VARIABLE_ARRAY_UNKNOWN = 4;
 /**
  * Parse the initializer for a variable declaration.
  */
@@ -1630,9 +1615,8 @@ parse_function(slang_parse_ctx * C, slang_output_ctx * O, int definition,
 }
 
 /* declaration */
-#define DECLARATION_FUNCTION_PROTOTYPE 1
-#define DECLARATION_INIT_DECLARATOR_LIST 2
-
+constexpr int DECLARATION_FUNCTION_PROTOTYPE = 1;
+constexpr int DECLARATION_INIT_DECLARATOR_LIST = 2;
 static bool
 parse_declaration(slang_parse_ctx * C, slang_output_ctx * O)
 {
@@ -1655,10 +1639,9 @@ parse_declaration(slang_parse_ctx * C, slang_output_ctx * O)
 }
 
 /* external declaration */
-#define EXTERNAL_NULL 0
-#define EXTERNAL_FUNCTION_DEFINITION 1
-#define EXTERNAL_DECLARATION 2
-
+constexpr int EXTERNAL_NULL = 0;
+constexpr int EXTERNAL_FUNCTION_DEFINITION = 1;
+constexpr int EXTERNAL_DECLARATION = 2;
 static bool
 parse_code_unit(slang_parse_ctx * C, slang_code_unit * unit,
 		struct gl_program *program)

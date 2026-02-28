@@ -861,65 +861,65 @@ update_arrays(GLcontext *ctx)
     /* 1 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_WEIGHT].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_WEIGHT]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_WEIGHT]._MaxElement);
     }
     /* no conventional vertex weight array */
 
     /* 2 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_NORMAL].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_NORMAL]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_NORMAL]._MaxElement);
     } else if (ctx->Array.ArrayObj->Normal.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->Normal._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->Normal._MaxElement);
     }
 
     /* 3 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR0].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR0]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR0]._MaxElement);
     } else if (ctx->Array.ArrayObj->Color.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->Color._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->Color._MaxElement);
     }
 
     /* 4 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR1].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR1]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR1]._MaxElement);
     } else if (ctx->Array.ArrayObj->SecondaryColor.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->SecondaryColor._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->SecondaryColor._MaxElement);
     }
 
     /* 5 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_FOG].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_FOG]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_FOG]._MaxElement);
     } else if (ctx->Array.ArrayObj->FogCoord.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->FogCoord._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->FogCoord._MaxElement);
     }
 
     /* 6 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR_INDEX].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR_INDEX]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_COLOR_INDEX]._MaxElement);
     } else if (ctx->Array.ArrayObj->Index.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->Index._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->Index._MaxElement);
     }
 
 
     /* 7 */
     if (ctx->VertexProgram._Enabled
 	&& ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_EDGEFLAG].Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_EDGEFLAG]._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[VERT_ATTRIB_EDGEFLAG]._MaxElement);
     }
 
     /* 8..15 */
     for (i = VERT_ATTRIB_TEX0; i <= VERT_ATTRIB_TEX7; i++) {
 	if (ctx->VertexProgram._Enabled
 	    && ctx->Array.ArrayObj->VertexAttrib[i].Enabled) {
-	    min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[i]._MaxElement);
+	    min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[i]._MaxElement);
 	} else if (i - VERT_ATTRIB_TEX0 < ctx->Const.MaxTextureCoordUnits
 		   && ctx->Array.ArrayObj->TexCoord[i - VERT_ATTRIB_TEX0].Enabled) {
-	    min = MIN2(min, ctx->Array.ArrayObj->TexCoord[i - VERT_ATTRIB_TEX0]._MaxElement);
+	    min = mesa_min2(min, ctx->Array.ArrayObj->TexCoord[i - VERT_ATTRIB_TEX0]._MaxElement);
 	}
     }
 
@@ -927,13 +927,13 @@ update_arrays(GLcontext *ctx)
     if (ctx->VertexProgram._Current) {
 	for (i = VERT_ATTRIB_GENERIC0; i < VERT_ATTRIB_MAX; i++) {
 	    if (ctx->Array.ArrayObj->VertexAttrib[i].Enabled) {
-		min = MIN2(min, ctx->Array.ArrayObj->VertexAttrib[i]._MaxElement);
+		min = mesa_min2(min, ctx->Array.ArrayObj->VertexAttrib[i]._MaxElement);
 	    }
 	}
     }
 
     if (ctx->Array.ArrayObj->EdgeFlag.Enabled) {
-	min = MIN2(min, ctx->Array.ArrayObj->EdgeFlag._MaxElement);
+	min = mesa_min2(min, ctx->Array.ArrayObj->EdgeFlag._MaxElement);
     }
 
     /* _MaxElement is one past the last legal array element */

@@ -43,10 +43,9 @@ void _tnl_draw_prims(GLcontext *ctx,
 
 
 
-#define NR_LEGACY_ATTRIBS 16
-#define NR_GENERIC_ATTRIBS 16
-#define NR_MAT_ATTRIBS 12
-
+constexpr int NR_LEGACY_ATTRIBS = 16;
+constexpr int NR_GENERIC_ATTRIBS = 16;
+constexpr int NR_MAT_ATTRIBS = 12;
 static GLuint check_size(const GLfloat *attr)
 {
     if (attr[3] != 1.0) return 4;

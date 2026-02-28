@@ -72,7 +72,7 @@ clear_rgba_buffer_with_masking(GLcontext *ctx, struct gl_renderbuffer *rb)
 	UNCLAMPED_FLOAT_TO_USHORT(clearColor[BCOMP], ctx->Color.ClearColor[2]);
 	UNCLAMPED_FLOAT_TO_USHORT(clearColor[ACOMP], ctx->Color.ClearColor[3]);
 	for (i = 0; i < width; i++) {
-	    COPY_4V(span.array->rgba[i], clearColor);
+	    mesa_copy4v(span.array->rgba[i], clearColor);
 	}
     } else {
 	assert(span.array->ChanType == GL_FLOAT);

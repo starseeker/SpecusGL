@@ -41,8 +41,8 @@
 #include <vector>
 
 
-#define ELT_TABLE_SIZE 16
-
+constexpr int ELT_TABLE_SIZE = 16;
+constexpr int MAX_PRIM = 32;
 /* Used for vertex-level splitting of indexed buffers.  Note that
  * non-indexed primitives may be converted to indexed in some cases
  * (eg loops, fans) in order to use this splitting path.
@@ -100,7 +100,6 @@ struct copy_context {
     GLuint dstelt_nr;
     GLuint dstelt_size;
 
-#define MAX_PRIM 32
     struct _mesa_prim dstprim[MAX_PRIM];
     GLuint dstprim_nr;
 
@@ -483,9 +482,9 @@ static void replay_init(struct copy_context *copy)
 
     /* Allocate an output element list:
      */
-    copy->dstelt_size = MIN2(65536,
+    copy->dstelt_size = mesa_min2(65536,
 			     copy->ib->count * 2 + 3);
-    copy->dstelt_size = MIN2(copy->dstelt_size,
+    copy->dstelt_size = mesa_min2(copy->dstelt_size,
 			     copy->limits->max_indices);
     copy->dstelt.resize(copy->dstelt_size);
     copy->dstelt_nr = 0;

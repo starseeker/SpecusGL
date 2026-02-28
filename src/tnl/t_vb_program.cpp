@@ -223,14 +223,14 @@ init_machine(GLcontext *ctx, struct gl_program_machine *machine)
 	GLuint i;
 	/* Output/result regs are initialized to [0,0,0,1] */
 	for (i = 0; i < MAX_NV_VERTEX_PROGRAM_OUTPUTS; i++) {
-	    ASSIGN_4V(machine->Outputs[i], 0.0F, 0.0F, 0.0F, 1.0F);
+	    mesa_assign4v(machine->Outputs[i], 0.0F, 0.0F, 0.0F, 1.0F);
 	}
 	/* Temp regs are initialized to [0,0,0,0] */
 	for (i = 0; i < MAX_NV_VERTEX_PROGRAM_TEMPS; i++) {
-	    ASSIGN_4V(machine->Temporaries[i], 0.0F, 0.0F, 0.0F, 0.0F);
+	    mesa_assign4v(machine->Temporaries[i], 0.0F, 0.0F, 0.0F, 0.0F);
 	}
 	for (i = 0; i < MAX_VERTEX_PROGRAM_ADDRESS_REGS; i++) {
-	    ASSIGN_4V(machine->AddressReg[i], 0, 0, 0, 0);
+	    mesa_assign4v(machine->AddressReg[i], 0, 0, 0, 0);
 	}
     }
 
@@ -358,7 +358,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 		const GLuint size = VB->AttribPtr[attr]->size;
 		const GLuint stride = VB->AttribPtr[attr]->stride;
 		const GLfloat *data = reinterpret_cast<const GLfloat *>(ptr + stride * i);
-		COPY_CLEAN_4V(machine.VertAttribs[attr], size, data);
+		mesa_copy_clean_4v(machine.VertAttribs[attr], size, data);
 	    }
 	}
 
@@ -368,7 +368,7 @@ run_vp(GLcontext *ctx, struct tnl_pipeline_stage *stage)
 	/* copy the output registers into the VB->attribs arrays */
 	for (j = 0; j < numOutputs; j++) {
 	    const GLuint attr = outputs[j];
-	    COPY_4V(store->results[attr].data[i], machine.Outputs[attr]);
+	    mesa_copy4v(store->results[attr].data[i], machine.Outputs[attr]);
 	}
 #if 0
 	printf("HPOS: %f %f %f %f\n",

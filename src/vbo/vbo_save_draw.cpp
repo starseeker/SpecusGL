@@ -64,7 +64,7 @@ static void _playback_copy_to_current(GLcontext *ctx,
 	if (node->attrsz[i]) {
 	    GLfloat *current = const_cast<GLfloat *>(reinterpret_cast<const GLfloat *>(vbo->currval[i].Ptr));
 
-	    COPY_CLEAN_4V(current,
+	    mesa_copy_clean_4v(current,
 			  node->attrsz[i],
 			  data);
 

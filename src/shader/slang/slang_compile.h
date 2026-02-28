@@ -63,12 +63,12 @@
     extern void
     _slang_code_unit_dtr(slang_code_unit *);
 
-#define SLANG_BUILTIN_CORE   0
-#define SLANG_BUILTIN_120_CORE   1
-#define SLANG_BUILTIN_COMMON 2
-#define SLANG_BUILTIN_TARGET 3
+constexpr int SLANG_BUILTIN_CORE     = 0;
+constexpr int SLANG_BUILTIN_120_CORE = 1;
+constexpr int SLANG_BUILTIN_COMMON   = 2;
+constexpr int SLANG_BUILTIN_TARGET   = 3;
 
-#define SLANG_BUILTIN_TOTAL  4
+constexpr int SLANG_BUILTIN_TOTAL    = 4;
 
     struct slang_code_object {
 	slang_code_unit builtin[SLANG_BUILTIN_TOTAL];

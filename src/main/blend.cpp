@@ -343,16 +343,16 @@ _mesa_BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    tmp[0] = CLAMP(red,   0.0F, 1.0F);
-    tmp[1] = CLAMP(green, 0.0F, 1.0F);
-    tmp[2] = CLAMP(blue,  0.0F, 1.0F);
-    tmp[3] = CLAMP(alpha, 0.0F, 1.0F);
+    tmp[0] = mesa_clamp(red,   0.0F, 1.0F);
+    tmp[1] = mesa_clamp(green, 0.0F, 1.0F);
+    tmp[2] = mesa_clamp(blue,  0.0F, 1.0F);
+    tmp[3] = mesa_clamp(alpha, 0.0F, 1.0F);
 
-    if (TEST_EQ_4V(tmp, ctx->Color.BlendColor))
+    if (mesa_test_eq_4v(tmp, ctx->Color.BlendColor))
 	return;
 
     FLUSH_VERTICES(ctx, _NEW_COLOR);
-    COPY_4FV(ctx->Color.BlendColor, tmp);
+    mesa_copy4fv(ctx->Color.BlendColor, tmp);
 
     if (ctx->Driver.BlendColor)
 	ctx->Driver.BlendColor(ctx, tmp);
@@ -384,7 +384,7 @@ _mesa_AlphaFunc(GLenum func, GLclampf ref)
 	case GL_NOTEQUAL:
 	case GL_GEQUAL:
 	case GL_ALWAYS:
-	    ref = CLAMP(ref, 0.0F, 1.0F);
+	    ref = mesa_clamp(ref, 0.0F, 1.0F);
 
 	    if (ctx->Color.AlphaFunc == func && ctx->Color.AlphaRef == ref)
 		return; /* no change */

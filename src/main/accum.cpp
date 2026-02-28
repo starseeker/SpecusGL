@@ -38,16 +38,16 @@ _mesa_ClearAccum(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    tmp[0] = CLAMP(red,   -1.0F, 1.0F);
-    tmp[1] = CLAMP(green, -1.0F, 1.0F);
-    tmp[2] = CLAMP(blue,  -1.0F, 1.0F);
-    tmp[3] = CLAMP(alpha, -1.0F, 1.0F);
+    tmp[0] = mesa_clamp(red,   -1.0F, 1.0F);
+    tmp[1] = mesa_clamp(green, -1.0F, 1.0F);
+    tmp[2] = mesa_clamp(blue,  -1.0F, 1.0F);
+    tmp[3] = mesa_clamp(alpha, -1.0F, 1.0F);
 
-    if (TEST_EQ_4V(tmp, ctx->Accum.ClearColor))
+    if (mesa_test_eq_4v(tmp, ctx->Accum.ClearColor))
 	return;
 
     FLUSH_VERTICES(ctx, _NEW_ACCUM);
-    COPY_4FV(ctx->Accum.ClearColor, tmp);
+    mesa_copy4fv(ctx->Accum.ClearColor, tmp);
 }
 
 

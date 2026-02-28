@@ -322,8 +322,7 @@ get_static_proc_name(GLuint offset)
 /*
  * Number of extension functions which we can dynamically add at runtime.
  */
-#define MAX_EXTENSION_FUNCS 300
-
+constexpr int MAX_EXTENSION_FUNCS = 300;
 /**
  * Track information about a function added to the GL API.
  */

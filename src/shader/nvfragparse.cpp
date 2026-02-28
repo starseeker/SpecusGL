@@ -47,20 +47,19 @@
 #include "program.h"
 
 
-#define INPUT_1V     1
-#define INPUT_2V     2
-#define INPUT_3V     3
-#define INPUT_1S     4
-#define INPUT_2S     5
-#define INPUT_CC     6
-#define INPUT_1V_T   7  /* one source vector, plus textureId */
-#define INPUT_3V_T   8  /* one source vector, plus textureId */
-#define INPUT_NONE   9
-#define INPUT_1V_S  10  /* a string and a vector register */
-#define OUTPUT_V    20
-#define OUTPUT_S    21
-#define OUTPUT_NONE 22
-
+constexpr int INPUT_1V = 1;
+constexpr int INPUT_2V = 2;
+constexpr int INPUT_3V = 3;
+constexpr int INPUT_1S = 4;
+constexpr int INPUT_2S = 5;
+constexpr int INPUT_CC = 6;
+constexpr int INPUT_1V_T = 7;  /* one source vector, plus textureId */
+constexpr int INPUT_3V_T = 8;  /* three source vectors, plus textureId */
+constexpr int INPUT_NONE = 9;
+constexpr int INPUT_1V_S = 10; /* a string and a vector register */
+constexpr int OUTPUT_V = 20;
+constexpr int OUTPUT_S = 21;
+constexpr int OUTPUT_NONE = 22;
 /* IRIX defines some of these */
 #undef _R
 #undef _H
@@ -474,7 +473,7 @@ Parse_ScalarConstant(struct parse_state *parseState, GLfloat *number)
 	if (!constant) {
 	    RETURN_ERROR1("Undefined symbol");
 	} else {
-	    COPY_4V(number, constant);
+	    mesa_copy4v(number, constant);
 	    return true;
 	}
     }
@@ -495,8 +494,8 @@ Parse_VectorConstant(struct parse_state *parseState, GLfloat *vec)
     GLfloat values[4];
     /* "{" was already consumed */
 
-    ASSIGN_4V(vec, 0.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(values, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(vec, 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(values, 0.0, 0.0, 0.0, 1.0);
 
     if (!Parse_ScalarConstant(parseState, values))  /* X */
 	return false;
@@ -627,13 +626,13 @@ Parse_SwizzleSuffix(const GLubyte *token, GLuint swizzle[4])
     if (token[1] == 0) {
 	/* single letter swizzle (scalar) */
 	if (token[0] == 'x')
-	    ASSIGN_4V(swizzle, 0, 0, 0, 0);
+	    mesa_assign4v(swizzle, 0, 0, 0, 0);
 	else if (token[0] == 'y')
-	    ASSIGN_4V(swizzle, 1, 1, 1, 1);
+	    mesa_assign4v(swizzle, 1, 1, 1, 1);
 	else if (token[0] == 'z')
-	    ASSIGN_4V(swizzle, 2, 2, 2, 2);
+	    mesa_assign4v(swizzle, 2, 2, 2, 2);
 	else if (token[0] == 'w')
-	    ASSIGN_4V(swizzle, 3, 3, 3, 3);
+	    mesa_assign4v(swizzle, 3, 3, 3, 3);
 	else
 	    return false;
     } else {

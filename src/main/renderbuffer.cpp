@@ -49,9 +49,7 @@
 
 
 /* 32-bit color index format.  Not a public format. */
-#define COLOR_INDEX32 0x424243
-
-
+constexpr int COLOR_INDEX32 = 0x424243;
 /*
  * Routines for get/put values in common buffer formats follow.
  * Someday add support for arbitrary row stride to make them more

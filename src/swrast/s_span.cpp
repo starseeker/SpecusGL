@@ -63,7 +63,7 @@ _swrast_span_default_z(GLcontext *ctx, SWspan *span)
 	span->z = FloatToFixed(ctx->Current.RasterPos[2] * depthMax + 0.5F);
     else {
 	GLfloat tmpf = ctx->Current.RasterPos[2] * depthMax;
-	tmpf = MIN2(tmpf, depthMax);
+	tmpf = mesa_min2(tmpf, depthMax);
 	span->z = static_cast<GLint>(tmpf);
     }
     span->zStep = 0;
@@ -177,7 +177,7 @@ _swrast_span_default_texcoords(GLcontext *ctx, SWspan *span)
 	const GLuint attr = FRAG_ATTRIB_TEX0 + i;
 	const GLfloat *tc = ctx->Current.RasterTexCoords[i];
 	if (ctx->FragmentProgram._Current || ctx->ATIFragmentShader._Enabled) {
-	    COPY_4V(span->attrStart[attr], tc);
+	    mesa_copy4v(span->attrStart[attr], tc);
 	} else if (tc[3] > 0.0F) {
 	    /* use (s/q, t/q, r/q, 1) */
 	    span->attrStart[attr][0] = tc[0] / tc[3];
@@ -185,10 +185,10 @@ _swrast_span_default_texcoords(GLcontext *ctx, SWspan *span)
 	    span->attrStart[attr][2] = tc[2] / tc[3];
 	    span->attrStart[attr][3] = 1.0;
 	} else {
-	    ASSIGN_4V(span->attrStart[attr], 0.0F, 0.0F, 0.0F, 1.0F);
+	    mesa_assign4v(span->attrStart[attr], 0.0F, 0.0F, 0.0F, 1.0F);
 	}
-	ASSIGN_4V(span->attrStepX[attr], 0.0F, 0.0F, 0.0F, 0.0F);
-	ASSIGN_4V(span->attrStepY[attr], 0.0F, 0.0F, 0.0F, 0.0F);
+	mesa_assign4v(span->attrStepX[attr], 0.0F, 0.0F, 0.0F, 0.0F);
+	mesa_assign4v(span->attrStepY[attr], 0.0F, 0.0F, 0.0F, 0.0F);
     }
     span->interpMask |= SPAN_TEXTURE;
 }
@@ -236,10 +236,10 @@ interpolate_colors(SWspan *span)
 		GLint db = span->blueStep;
 		GLint da = span->alphaStep;
 		for (i = 0; i < n; i++) {
-		    rgba[i][RCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(r), 0, CHAN_MAX));
-		    rgba[i][GCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(g), 0, CHAN_MAX));
-		    rgba[i][BCOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(b), 0, CHAN_MAX));
-		    rgba[i][ACOMP] = static_cast<GLubyte>(CLAMP(FixedToChan(a), 0, CHAN_MAX));
+		    rgba[i][RCOMP] = static_cast<GLubyte>(mesa_clamp(FixedToChan(r), 0, CHAN_MAX));
+		    rgba[i][GCOMP] = static_cast<GLubyte>(mesa_clamp(FixedToChan(g), 0, CHAN_MAX));
+		    rgba[i][BCOMP] = static_cast<GLubyte>(mesa_clamp(FixedToChan(b), 0, CHAN_MAX));
+		    rgba[i][ACOMP] = static_cast<GLubyte>(mesa_clamp(FixedToChan(a), 0, CHAN_MAX));
 		    r += dr;
 		    g += dg;
 		    b += db;
@@ -257,7 +257,7 @@ interpolate_colors(SWspan *span)
 		color[BCOMP] = FixedToInt(span->blue);
 		color[ACOMP] = FixedToInt(span->alpha);
 		for (i = 0; i < n; i++) {
-		    COPY_4V(rgba[i], color);
+		    mesa_copy4v(rgba[i], color);
 		}
 	    } else {
 		GLushort(*rgba)[4] = span->array->color.sz2.rgba;
@@ -272,10 +272,10 @@ interpolate_colors(SWspan *span)
 		db = span->blueStep;
 		da = span->alphaStep;
 		for (i = 0; i < n; i++) {
-		    rgba[i][RCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(r), 0, CHAN_MAX));
-		    rgba[i][GCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(g), 0, CHAN_MAX));
-		    rgba[i][BCOMP] = static_cast<GLushort>(CLAMP(FixedToChan(b), 0, CHAN_MAX));
-		    rgba[i][ACOMP] = static_cast<GLushort>(CLAMP(FixedToChan(a), 0, CHAN_MAX));
+		    rgba[i][RCOMP] = static_cast<GLushort>(mesa_clamp(FixedToChan(r), 0, CHAN_MAX));
+		    rgba[i][GCOMP] = static_cast<GLushort>(mesa_clamp(FixedToChan(g), 0, CHAN_MAX));
+		    rgba[i][BCOMP] = static_cast<GLushort>(mesa_clamp(FixedToChan(b), 0, CHAN_MAX));
+		    rgba[i][ACOMP] = static_cast<GLushort>(mesa_clamp(FixedToChan(a), 0, CHAN_MAX));
 		    r += dr;
 		    g += dg;
 		    b += db;
@@ -349,9 +349,9 @@ interpolate_specular(SWspan *span)
 		GLint dg = span->specGreenStep;
 		GLint db = span->specBlueStep;
 		for (i = 0; i < n; i++) {
-		    spec[i][RCOMP] = CLAMP(FixedToChan(r), 0, 255);
-		    spec[i][GCOMP] = CLAMP(FixedToChan(g), 0, 255);
-		    spec[i][BCOMP] = CLAMP(FixedToChan(b), 0, 255);
+		    spec[i][RCOMP] = mesa_clamp(FixedToChan(r), 0, 255);
+		    spec[i][GCOMP] = mesa_clamp(FixedToChan(g), 0, 255);
+		    spec[i][BCOMP] = mesa_clamp(FixedToChan(b), 0, 255);
 		    spec[i][ACOMP] = 0;
 		    r += dr;
 		    g += dg;
@@ -369,7 +369,7 @@ interpolate_specular(SWspan *span)
 		color[BCOMP] = FixedToInt(span->specBlue);
 		color[ACOMP] = 0;
 		for (i = 0; i < n; i++) {
-		    COPY_4V(spec[i], color);
+		    mesa_copy4v(spec[i], color);
 		}
 	    } else {
 		GLfixed r = FloatToFixed(span->specRed);
@@ -531,7 +531,7 @@ compute_lambda(GLfloat dsdx, GLfloat dsdy, GLfloat dtdx, GLfloat dtdy,
     GLfloat dvdy = texH * ((t + dtdy) / (q + dqdy) - t * invQ);
     GLfloat x = SQRTF(dudx * dudx + dvdx * dvdx);
     GLfloat y = SQRTF(dudy * dudy + dvdy * dvdy);
-    GLfloat rho = MAX2(x, y);
+    GLfloat rho = mesa_max2(x, y);
     GLfloat lambda = LOG2(rho);
     return lambda;
 }
@@ -555,9 +555,9 @@ _swrast_compute_lambda(GLfloat dsdx, GLfloat dsdy, GLfloat dtdx, GLfloat dtdy,
     dsdy2 = FABSF(dsdy2);
     dtdx2 = FABSF(dtdx2);
     dtdy2 = FABSF(dtdy2);
-    maxU = MAX2(dsdx2, dsdy2) * texW;
-    maxV = MAX2(dtdx2, dtdy2) * texH;
-    rho = MAX2(maxU, maxV);
+    maxU = mesa_max2(dsdx2, dsdy2) * texW;
+    maxV = mesa_max2(dtdx2, dtdy2) * texH;
+    rho = mesa_max2(maxU, maxV);
     lambda = LOG2(rho);
     return lambda;
 }
@@ -1141,10 +1141,10 @@ add_specular(GLcontext *ctx, SWspan *span)
 		GLint g = rgba[i][GCOMP] + spec[i][GCOMP];
 		GLint b = rgba[i][BCOMP] + spec[i][BCOMP];
 		GLint a = rgba[i][ACOMP] + spec[i][ACOMP];
-		rgba[i][RCOMP] = MIN2(r, 255);
-		rgba[i][GCOMP] = MIN2(g, 255);
-		rgba[i][BCOMP] = MIN2(b, 255);
-		rgba[i][ACOMP] = MIN2(a, 255);
+		rgba[i][RCOMP] = mesa_min2(r, 255);
+		rgba[i][GCOMP] = mesa_min2(g, 255);
+		rgba[i][BCOMP] = mesa_min2(b, 255);
+		rgba[i][ACOMP] = mesa_min2(a, 255);
 	    }
 	}
 	break;
@@ -1157,10 +1157,10 @@ add_specular(GLcontext *ctx, SWspan *span)
 		GLint g = rgba[i][GCOMP] + spec[i][GCOMP];
 		GLint b = rgba[i][BCOMP] + spec[i][BCOMP];
 		GLint a = rgba[i][ACOMP] + spec[i][ACOMP];
-		rgba[i][RCOMP] = MIN2(r, 65535);
-		rgba[i][GCOMP] = MIN2(g, 65535);
-		rgba[i][BCOMP] = MIN2(b, 65535);
-		rgba[i][ACOMP] = MIN2(a, 65535);
+		rgba[i][RCOMP] = mesa_min2(r, 65535);
+		rgba[i][GCOMP] = mesa_min2(g, 65535);
+		rgba[i][BCOMP] = mesa_min2(b, 65535);
+		rgba[i][ACOMP] = mesa_min2(a, 65535);
 	    }
 	}
 	break;
@@ -1194,7 +1194,7 @@ apply_aa_coverage(SWspan *span)
 	GLubyte(*rgba)[4] = span->array->color.sz1.rgba;
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat a = rgba[i][ACOMP] * coverage[i];
-	    rgba[i][ACOMP] = static_cast<GLubyte>(CLAMP(a, 0.0, 255.0));
+	    rgba[i][ACOMP] = static_cast<GLubyte>(mesa_clamp(a, 0.0, 255.0));
 	    assert(coverage[i] >= 0.0);
 	    assert(coverage[i] <= 1.0);
 	}
@@ -1202,7 +1202,7 @@ apply_aa_coverage(SWspan *span)
 	GLushort(*rgba)[4] = span->array->color.sz2.rgba;
 	for (i = 0; i < span->end; i++) {
 	    const GLfloat a = rgba[i][ACOMP] * coverage[i];
-	    rgba[i][ACOMP] = static_cast<GLushort>(CLAMP(a, 0.0, 65535.0));
+	    rgba[i][ACOMP] = static_cast<GLushort>(mesa_clamp(a, 0.0, 65535.0));
 	}
     } else {
 	GLfloat(*rgba)[4] = span->array->attribs[FRAG_ATTRIB_COL0];
@@ -1223,10 +1223,10 @@ clamp_colors(SWspan *span)
     GLuint i;
     assert(span->array->ChanType == GL_FLOAT);
     for (i = 0; i < span->end; i++) {
-	rgba[i][RCOMP] = CLAMP(rgba[i][RCOMP], 0.0F, 1.0F);
-	rgba[i][GCOMP] = CLAMP(rgba[i][GCOMP], 0.0F, 1.0F);
-	rgba[i][BCOMP] = CLAMP(rgba[i][BCOMP], 0.0F, 1.0F);
-	rgba[i][ACOMP] = CLAMP(rgba[i][ACOMP], 0.0F, 1.0F);
+	rgba[i][RCOMP] = mesa_clamp(rgba[i][RCOMP], 0.0F, 1.0F);
+	rgba[i][GCOMP] = mesa_clamp(rgba[i][GCOMP], 0.0F, 1.0F);
+	rgba[i][BCOMP] = mesa_clamp(rgba[i][BCOMP], 0.0F, 1.0F);
+	rgba[i][ACOMP] = mesa_clamp(rgba[i][ACOMP], 0.0F, 1.0F);
     }
 }
 

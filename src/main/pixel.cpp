@@ -304,7 +304,7 @@ store_pixelmap(GLcontext *ctx, GLenum map, GLsizei mapsize,
 	    /* special case */
 	    ctx->PixelMaps.StoS.Size = mapsize;
 	    for (i = 0; i < mapsize; i++) {
-		ctx->PixelMaps.StoS.Map[i] = IROUND(values[i]);
+		ctx->PixelMaps.StoS.Map[i] = iround(values[i]);
 	    }
 	    break;
 	case GL_PIXEL_MAP_I_TO_I:
@@ -318,7 +318,7 @@ store_pixelmap(GLcontext *ctx, GLenum map, GLsizei mapsize,
 	    /* general case */
 	    pm->Size = mapsize;
 	    for (i = 0; i < mapsize; i++) {
-		GLfloat val = CLAMP(values[i], 0.0F, 1.0F);
+		GLfloat val = mesa_clamp(values[i], 0.0F, 1.0F);
 		pm->Map[i] = val;
 		pm->Map8[i] = static_cast<GLint>((val * 255.0F));
 	    }
@@ -442,7 +442,7 @@ _mesa_PixelMapuiv(GLenum map, GLsizei mapsize, const GLuint *values)
     } else {
 	GLint i;
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = UINT_TO_FLOAT(values[i]);
+	    fvalues[i] = mesa_uint_to_float(values[i]);
 	}
     }
 
@@ -514,7 +514,7 @@ _mesa_PixelMapusv(GLenum map, GLsizei mapsize, const GLushort *values)
     } else {
 	GLint i;
 	for (i = 0; i < mapsize; i++) {
-	    fvalues[i] = USHORT_TO_FLOAT(values[i]);
+	    fvalues[i] = mesa_ushort_to_float(values[i]);
 	}
     }
 
@@ -635,7 +635,7 @@ _mesa_GetPixelMapuiv(GLenum map, GLuint *values)
 	memcpy(values, ctx->PixelMaps.StoS.Map, mapsize * sizeof(GLint));
     } else {
 	for (i = 0; i < mapsize; i++) {
-	    values[i] = FLOAT_TO_UINT(pm->Map[i]);
+	    values[i] = mesa_float_to_uint(pm->Map[i]);
 	}
     }
 
@@ -694,12 +694,12 @@ _mesa_GetPixelMapusv(GLenum map, GLushort *values)
 	/* special cases */
 	case GL_PIXEL_MAP_I_TO_I:
 	    for (i = 0; i < mapsize; i++) {
-		values[i] = static_cast<GLushort>(CLAMP(ctx->PixelMaps.ItoI.Map[i], 0.0, 65535.));
+		values[i] = static_cast<GLushort>(mesa_clamp(ctx->PixelMaps.ItoI.Map[i], 0.0, 65535.));
 	    }
 	    break;
 	case GL_PIXEL_MAP_S_TO_S:
 	    for (i = 0; i < mapsize; i++) {
-		values[i] = static_cast<GLushort>(CLAMP(ctx->PixelMaps.StoS.Map[i], 0.0, 65535.));
+		values[i] = static_cast<GLushort>(mesa_clamp(ctx->PixelMaps.StoS.Map[i], 0.0, 65535.));
 	    }
 	    break;
 	default:
@@ -984,14 +984,14 @@ _mesa_map_rgba(const GLcontext *ctx, GLuint n, GLfloat rgba[][4])
     const GLfloat *aMap = ctx->PixelMaps.AtoA.Map;
     GLuint i;
     for (i=0; i<n; i++) {
-	GLfloat r = CLAMP(rgba[i][RCOMP], 0.0F, 1.0F);
-	GLfloat g = CLAMP(rgba[i][GCOMP], 0.0F, 1.0F);
-	GLfloat b = CLAMP(rgba[i][BCOMP], 0.0F, 1.0F);
-	GLfloat a = CLAMP(rgba[i][ACOMP], 0.0F, 1.0F);
-	rgba[i][RCOMP] = rMap[IROUND(r * rscale)];
-	rgba[i][GCOMP] = gMap[IROUND(g * gscale)];
-	rgba[i][BCOMP] = bMap[IROUND(b * bscale)];
-	rgba[i][ACOMP] = aMap[IROUND(a * ascale)];
+	GLfloat r = mesa_clamp(rgba[i][RCOMP], 0.0F, 1.0F);
+	GLfloat g = mesa_clamp(rgba[i][GCOMP], 0.0F, 1.0F);
+	GLfloat b = mesa_clamp(rgba[i][BCOMP], 0.0F, 1.0F);
+	GLfloat a = mesa_clamp(rgba[i][ACOMP], 0.0F, 1.0F);
+	rgba[i][RCOMP] = rMap[iround(r * rscale)];
+	rgba[i][GCOMP] = gMap[iround(g * gscale)];
+	rgba[i][BCOMP] = bMap[iround(b * bscale)];
+	rgba[i][ACOMP] = aMap[iround(a * ascale)];
     }
 }
 
@@ -1044,8 +1044,8 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	case GL_INTENSITY:
 	    /* replace RGBA with I */
 	    for (i = 0; i < n; i++) {
-		GLint j = IROUND(rgba[i][RCOMP] * scale);
-		GLfloat c = lut[CLAMP(j, 0, max)];
+		GLint j = iround(rgba[i][RCOMP] * scale);
+		GLfloat c = lut[mesa_clamp(j, 0, max)];
 		rgba[i][RCOMP] =
 		    rgba[i][GCOMP] =
 			rgba[i][BCOMP] =
@@ -1055,8 +1055,8 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	case GL_LUMINANCE:
 	    /* replace RGB with L */
 	    for (i = 0; i < n; i++) {
-		GLint j = IROUND(rgba[i][RCOMP] * scale);
-		GLfloat c = lut[CLAMP(j, 0, max)];
+		GLint j = iround(rgba[i][RCOMP] * scale);
+		GLfloat c = lut[mesa_clamp(j, 0, max)];
 		rgba[i][RCOMP] =
 		    rgba[i][GCOMP] =
 			rgba[i][BCOMP] = c;
@@ -1065,18 +1065,18 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	case GL_ALPHA:
 	    /* replace A with A */
 	    for (i = 0; i < n; i++) {
-		GLint j = IROUND(rgba[i][ACOMP] * scale);
-		rgba[i][ACOMP] = lut[CLAMP(j, 0, max)];
+		GLint j = iround(rgba[i][ACOMP] * scale);
+		rgba[i][ACOMP] = lut[mesa_clamp(j, 0, max)];
 	    }
 	    break;
 	case GL_LUMINANCE_ALPHA:
 	    /* replace RGBA with LLLA */
 	    for (i = 0; i < n; i++) {
-		GLint jL = IROUND(rgba[i][RCOMP] * scale);
-		GLint jA = IROUND(rgba[i][ACOMP] * scale);
+		GLint jL = iround(rgba[i][RCOMP] * scale);
+		GLint jA = iround(rgba[i][ACOMP] * scale);
 		GLfloat luminance, alpha;
-		jL = CLAMP(jL, 0, max);
-		jA = CLAMP(jA, 0, max);
+		jL = mesa_clamp(jL, 0, max);
+		jA = mesa_clamp(jA, 0, max);
 		luminance = lut[jL * 2 + 0];
 		alpha     = lut[jA * 2 + 1];
 		rgba[i][RCOMP] =
@@ -1088,12 +1088,12 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	case GL_RGB:
 	    /* replace RGB with RGB */
 	    for (i = 0; i < n; i++) {
-		GLint jR = IROUND(rgba[i][RCOMP] * scale);
-		GLint jG = IROUND(rgba[i][GCOMP] * scale);
-		GLint jB = IROUND(rgba[i][BCOMP] * scale);
-		jR = CLAMP(jR, 0, max);
-		jG = CLAMP(jG, 0, max);
-		jB = CLAMP(jB, 0, max);
+		GLint jR = iround(rgba[i][RCOMP] * scale);
+		GLint jG = iround(rgba[i][GCOMP] * scale);
+		GLint jB = iround(rgba[i][BCOMP] * scale);
+		jR = mesa_clamp(jR, 0, max);
+		jG = mesa_clamp(jG, 0, max);
+		jB = mesa_clamp(jB, 0, max);
 		rgba[i][RCOMP] = lut[jR * 3 + 0];
 		rgba[i][GCOMP] = lut[jG * 3 + 1];
 		rgba[i][BCOMP] = lut[jB * 3 + 2];
@@ -1102,14 +1102,14 @@ _mesa_lookup_rgba_float(const struct gl_color_table *table,
 	case GL_RGBA:
 	    /* replace RGBA with RGBA */
 	    for (i = 0; i < n; i++) {
-		GLint jR = IROUND(rgba[i][RCOMP] * scale);
-		GLint jG = IROUND(rgba[i][GCOMP] * scale);
-		GLint jB = IROUND(rgba[i][BCOMP] * scale);
-		GLint jA = IROUND(rgba[i][ACOMP] * scale);
-		jR = CLAMP(jR, 0, max);
-		jG = CLAMP(jG, 0, max);
-		jB = CLAMP(jB, 0, max);
-		jA = CLAMP(jA, 0, max);
+		GLint jR = iround(rgba[i][RCOMP] * scale);
+		GLint jG = iround(rgba[i][GCOMP] * scale);
+		GLint jB = iround(rgba[i][BCOMP] * scale);
+		GLint jA = iround(rgba[i][ACOMP] * scale);
+		jR = mesa_clamp(jR, 0, max);
+		jG = mesa_clamp(jG, 0, max);
+		jB = mesa_clamp(jB, 0, max);
+		jA = mesa_clamp(jA, 0, max);
 		rgba[i][RCOMP] = lut[jR * 4 + 0];
 		rgba[i][GCOMP] = lut[jG * 4 + 1];
 		rgba[i][BCOMP] = lut[jB * 4 + 2];
@@ -1151,7 +1151,7 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint j = IROUND(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
+		    GLint j = iround(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
 		    rgba[i][RCOMP] =
 			rgba[i][GCOMP] =
 			    rgba[i][BCOMP] =
@@ -1170,7 +1170,7 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint j = IROUND(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
+		    GLint j = iround(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
 		    rgba[i][RCOMP] =
 			rgba[i][GCOMP] =
 			    rgba[i][BCOMP] = lut[j];
@@ -1185,7 +1185,7 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint j = IROUND(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
+		    GLint j = iround(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
 		    rgba[i][ACOMP] = lut[j];
 		}
 	    }
@@ -1203,8 +1203,8 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint jL = IROUND(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
-		    GLint jA = IROUND(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
+		    GLint jL = iround(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
+		    GLint jA = iround(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
 		    GLubyte luminance = lut[jL * 2 + 0];
 		    GLubyte alpha     = lut[jA * 2 + 1];
 		    rgba[i][RCOMP] =
@@ -1223,9 +1223,9 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint jR = IROUND(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
-		    GLint jG = IROUND(static_cast<GLfloat>(rgba[i][GCOMP]) * scale);
-		    GLint jB = IROUND(static_cast<GLfloat>(rgba[i][BCOMP]) * scale);
+		    GLint jR = iround(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
+		    GLint jG = iround(static_cast<GLfloat>(rgba[i][GCOMP]) * scale);
+		    GLint jB = iround(static_cast<GLfloat>(rgba[i][BCOMP]) * scale);
 		    rgba[i][RCOMP] = lut[jR * 3 + 0];
 		    rgba[i][GCOMP] = lut[jG * 3 + 1];
 		    rgba[i][BCOMP] = lut[jB * 3 + 2];
@@ -1242,10 +1242,10 @@ _mesa_lookup_rgba_ubyte(const struct gl_color_table *table,
 		}
 	    } else {
 		for (i = 0; i < n; i++) {
-		    GLint jR = IROUND(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
-		    GLint jG = IROUND(static_cast<GLfloat>(rgba[i][GCOMP]) * scale);
-		    GLint jB = IROUND(static_cast<GLfloat>(rgba[i][BCOMP]) * scale);
-		    GLint jA = IROUND(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
+		    GLint jR = iround(static_cast<GLfloat>(rgba[i][RCOMP]) * scale);
+		    GLint jG = iround(static_cast<GLfloat>(rgba[i][GCOMP]) * scale);
+		    GLint jB = iround(static_cast<GLfloat>(rgba[i][BCOMP]) * scale);
+		    GLint jA = iround(static_cast<GLfloat>(rgba[i][ACOMP]) * scale);
 		    CLAMPED_FLOAT_TO_CHAN(rgba[i][RCOMP], lut[jR * 4 + 0]);
 		    CLAMPED_FLOAT_TO_CHAN(rgba[i][GCOMP], lut[jG * 4 + 1]);
 		    CLAMPED_FLOAT_TO_CHAN(rgba[i][BCOMP], lut[jB * 4 + 2]);
@@ -1320,7 +1320,7 @@ _mesa_scale_and_bias_depth(const GLcontext *ctx, GLuint n,
     GLuint i;
     for (i = 0; i < n; i++) {
 	GLfloat d = depthValues[i] * scale + bias;
-	depthValues[i] = CLAMP(d, 0.0F, 1.0F);
+	depthValues[i] = mesa_clamp(d, 0.0F, 1.0F);
     }
 }
 
@@ -1438,10 +1438,10 @@ _mesa_init_pixel(GLcontext *ctx)
 
     /* Set Scale 2-D arrays that default to all-1.0 per RGBA component. */
     for (i = 0; i < COLORTABLE_MAX; i++) {
-	ASSIGN_4V(ctx->Pixel.ColorTableScale[i], 1.0, 1.0, 1.0, 1.0);
+	mesa_assign4v(ctx->Pixel.ColorTableScale[i], 1.0, 1.0, 1.0, 1.0);
     }
     for (i = 0; i < 3; i++) {
-	ASSIGN_4V(ctx->Pixel.ConvolutionFilterScale[i], 1.0, 1.0, 1.0, 1.0);
+	mesa_assign4v(ctx->Pixel.ConvolutionFilterScale[i], 1.0, 1.0, 1.0, 1.0);
     }
 
     /* Context-dependent: ReadBuffer, Pack/Unpack/DefaultPacking BufferObj. */

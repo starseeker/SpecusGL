@@ -62,18 +62,18 @@
  */
 #if CHAN_BITS == 8
 using GLchan = GLubyte;
-#define CHAN_MAX 255
-#define CHAN_MAXF 255.0F
+constexpr GLchan  CHAN_MAX  = 255;
+constexpr GLfloat CHAN_MAXF = 255.0F;
 #define CHAN_TYPE GL_UNSIGNED_BYTE
 #elif CHAN_BITS == 16
 using GLchan = GLushort;
-#define CHAN_MAX 65535
-#define CHAN_MAXF 65535.0F
+constexpr GLchan  CHAN_MAX  = 65535;
+constexpr GLfloat CHAN_MAXF = 65535.0F;
 #define CHAN_TYPE GL_UNSIGNED_SHORT
 #elif CHAN_BITS == 32
 using GLchan = GLfloat;
-#define CHAN_MAX 1.0
-#define CHAN_MAXF 1.0F
+constexpr GLchan  CHAN_MAX  = 1.0F;
+constexpr GLfloat CHAN_MAXF = 1.0F;
 #define CHAN_TYPE GL_FLOAT
 #else
 #error "illegal number of color channel bits"
@@ -111,16 +111,18 @@ constexpr GLuint FIXED_INT_MASK = ~FIXED_FRAC_MASK;
 constexpr GLint FIXED_EPSILON = 1;
 constexpr float  FIXED_SCALE     = static_cast<float>(FIXED_ONE);
 constexpr double FIXED_DBL_SCALE = static_cast<double>(FIXED_ONE);
-#define FloatToFixed(X) (IROUND((X) * FIXED_SCALE))
-#define FixedToDouble(X) ((X) * (1.0 / FIXED_DBL_SCALE))
-#define IntToFixed(I)   ((I) << FIXED_SHIFT)
-#define FixedToInt(X)   ((X) >> FIXED_SHIFT)
-#define FixedToUns(X)   (static_cast<GLuint>(X) >> FIXED_SHIFT)
-#define FixedCeil(X)    (((X) + static_cast<GLfixed>(FIXED_ONE) - FIXED_EPSILON) & static_cast<GLfixed>(FIXED_INT_MASK))
-#define FixedFloor(X)   ((X) & static_cast<GLfixed>(FIXED_INT_MASK))
-#define FixedToFloat(X) (static_cast<GLfloat>(X) * (1.0F / FIXED_SCALE))
-#define PosFloatToFixed(X)      FloatToFixed(X)
-#define SignedFloatToFixed(X)   FloatToFixed(X)
+[[nodiscard]] inline GLfixed FloatToFixed(GLfloat x) noexcept { return static_cast<GLfixed>(std::lroundf(x * FIXED_SCALE)); }
+[[nodiscard]] constexpr double FixedToDouble(GLfixed x) noexcept { return x * (1.0 / FIXED_DBL_SCALE); }
+[[nodiscard]] constexpr GLfixed IntToFixed(GLint i) noexcept { return i << static_cast<int>(FIXED_SHIFT); }
+[[nodiscard]] constexpr GLint FixedToInt(GLfixed x) noexcept { return x >> static_cast<int>(FIXED_SHIFT); }
+[[nodiscard]] constexpr GLuint FixedToUns(GLfixed x) noexcept { return static_cast<GLuint>(x) >> FIXED_SHIFT; }
+[[nodiscard]] constexpr GLfixed FixedCeil(GLfixed x) noexcept {
+    return (x + static_cast<GLfixed>(FIXED_ONE) - FIXED_EPSILON) & static_cast<GLfixed>(FIXED_INT_MASK);
+}
+[[nodiscard]] constexpr GLfixed FixedFloor(GLfixed x) noexcept { return x & static_cast<GLfixed>(FIXED_INT_MASK); }
+[[nodiscard]] constexpr GLfloat FixedToFloat(GLfixed x) noexcept { return static_cast<GLfloat>(x) * (1.0F / FIXED_SCALE); }
+[[nodiscard]] inline GLfixed PosFloatToFixed(GLfloat x) noexcept { return FloatToFixed(x); }
+[[nodiscard]] inline GLfixed SignedFloatToFixed(GLfloat x) noexcept { return FloatToFixed(x); }
 
 
 
@@ -237,8 +239,8 @@ constexpr GLuint VERT_BIT_GENERIC13 = 1 << VERT_ATTRIB_GENERIC13;
 constexpr GLuint VERT_BIT_GENERIC14 = 1 << VERT_ATTRIB_GENERIC14;
 constexpr GLuint VERT_BIT_GENERIC15 = 1 << VERT_ATTRIB_GENERIC15;
 
-#define VERT_BIT_TEX(u)  (1 << (VERT_ATTRIB_TEX0 + (u)))
-#define VERT_BIT_GENERIC(g)  (1 << (VERT_ATTRIB_GENERIC0 + (g)))
+[[nodiscard]] constexpr GLuint VERT_BIT_TEX(GLuint u) noexcept { return 1u << (VERT_ATTRIB_TEX0 + u); }
+[[nodiscard]] constexpr GLuint VERT_BIT_GENERIC(GLuint g) noexcept { return 1u << (VERT_ATTRIB_GENERIC0 + g); }
 /*@}*/
 
 
@@ -305,8 +307,8 @@ constexpr GLuint FRAG_BIT_TEX6 = 1 << FRAG_ATTRIB_TEX6;
 constexpr GLuint FRAG_BIT_TEX7 = 1 << FRAG_ATTRIB_TEX7;
 constexpr GLuint FRAG_BIT_VAR0 = 1 << FRAG_ATTRIB_VAR0;
 
-#define FRAG_BIT_TEX(U)  (FRAG_BIT_TEX0 << (U))
-#define FRAG_BIT_VAR(V)  (FRAG_BIT_VAR0 << (V))
+[[nodiscard]] constexpr GLuint FRAG_BIT_TEX(GLuint u) noexcept { return FRAG_BIT_TEX0 << u; }
+[[nodiscard]] constexpr GLuint FRAG_BIT_VAR(GLuint v) noexcept { return FRAG_BIT_VAR0 << v; }
 
 constexpr GLuint FRAG_BITS_TEX_ANY = (FRAG_BIT_TEX0 |
                                        FRAG_BIT_TEX1 |
@@ -457,12 +459,12 @@ constexpr GLint MAT_ATTRIB_FRONT_INDEXES = 10;
 constexpr GLint MAT_ATTRIB_BACK_INDEXES = 11;
 constexpr GLint MAT_ATTRIB_MAX = 12;
 
-#define MAT_ATTRIB_AMBIENT(f)  (MAT_ATTRIB_FRONT_AMBIENT+(f))
-#define MAT_ATTRIB_DIFFUSE(f)  (MAT_ATTRIB_FRONT_DIFFUSE+(f))
-#define MAT_ATTRIB_SPECULAR(f) (MAT_ATTRIB_FRONT_SPECULAR+(f))
-#define MAT_ATTRIB_EMISSION(f) (MAT_ATTRIB_FRONT_EMISSION+(f))
-#define MAT_ATTRIB_SHININESS(f)(MAT_ATTRIB_FRONT_SHININESS+(f))
-#define MAT_ATTRIB_INDEXES(f)  (MAT_ATTRIB_FRONT_INDEXES+(f))
+[[nodiscard]] constexpr GLint MAT_ATTRIB_AMBIENT(GLint f) noexcept { return MAT_ATTRIB_FRONT_AMBIENT + f; }
+[[nodiscard]] constexpr GLint MAT_ATTRIB_DIFFUSE(GLint f) noexcept { return MAT_ATTRIB_FRONT_DIFFUSE + f; }
+[[nodiscard]] constexpr GLint MAT_ATTRIB_SPECULAR(GLint f) noexcept { return MAT_ATTRIB_FRONT_SPECULAR + f; }
+[[nodiscard]] constexpr GLint MAT_ATTRIB_EMISSION(GLint f) noexcept { return MAT_ATTRIB_FRONT_EMISSION + f; }
+[[nodiscard]] constexpr GLint MAT_ATTRIB_SHININESS(GLint f) noexcept { return MAT_ATTRIB_FRONT_SHININESS + f; }
+[[nodiscard]] constexpr GLint MAT_ATTRIB_INDEXES(GLint f) noexcept { return MAT_ATTRIB_FRONT_INDEXES + f; }
 
 constexpr GLint MAT_INDEX_AMBIENT = 0;
 constexpr GLint MAT_INDEX_DIFFUSE = 1;
@@ -1209,8 +1211,8 @@ constexpr GLuint ENABLE_TEXMAT5 = 0x20U;
 constexpr GLuint ENABLE_TEXMAT6 = 0x40U;
 constexpr GLuint ENABLE_TEXMAT7 = 0x80U;
 
-#define ENABLE_TEXGEN(i) (ENABLE_TEXGEN0 << (i))
-#define ENABLE_TEXMAT(i) (ENABLE_TEXMAT0 << (i))
+[[nodiscard]] constexpr GLuint ENABLE_TEXGEN(GLuint i) noexcept { return ENABLE_TEXGEN0 << i; }
+[[nodiscard]] constexpr GLuint ENABLE_TEXMAT(GLuint i) noexcept { return ENABLE_TEXMAT0 << i; }
 
 
 /**
@@ -3133,8 +3135,8 @@ constexpr GLuint _NEW_ARRAY_ATTRIB_0 = VERT_BIT_GENERIC0;  /* start at bit 16 */
 constexpr GLuint _NEW_ARRAY_ALL = 0xffffffff;
 
 
-#define _NEW_ARRAY_TEXCOORD(i) (_NEW_ARRAY_TEXCOORD_0 << (i))
-#define _NEW_ARRAY_ATTRIB(i) (_NEW_ARRAY_ATTRIB_0 << (i))
+[[nodiscard]] constexpr GLuint _NEW_ARRAY_TEXCOORD(GLuint i) noexcept { return _NEW_ARRAY_TEXCOORD_0 << i; }
+[[nodiscard]] constexpr GLuint _NEW_ARRAY_ATTRIB(GLuint i) noexcept { return _NEW_ARRAY_ATTRIB_0 << i; }
 /*@}*/
 
 
@@ -3205,7 +3207,7 @@ constexpr GLuint _IMAGE_NEW_TRANSFER_STATE = (_NEW_PIXEL | _NEW_COLOR_MATRIX);
 #include "dd.h"
 
 
-#define NUM_VERTEX_FORMAT_ENTRIES (sizeof(GLvertexformat) / sizeof(void *))
+constexpr std::size_t NUM_VERTEX_FORMAT_ENTRIES = sizeof(GLvertexformat) / sizeof(void *);
 
 /**
  * Core Mesa's support for tnl modules:

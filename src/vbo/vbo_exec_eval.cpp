@@ -141,13 +141,13 @@ void vbo_exec_do_EvalCoord1f(struct vbo_exec_context *exec, GLfloat u)
 	    GLfloat uu = (u - map->u1) * map->du;
 	    GLfloat data[4];
 
-	    ASSIGN_4V(data, 0, 0, 0, 1);
+	    mesa_assign4v(data, 0, 0, 0, 1);
 
 	    _math_horner_bezier_curve(map->Points.data(), data, uu,
 				      exec->eval.map1[attr].sz,
 				      map->Order);
 
-	    COPY_SZ_4V(exec->vtx.attrptr[attr],
+	    mesa_copy_sz_4v(exec->vtx.attrptr[attr],
 		       exec->vtx.attrsz[attr],
 		       data);
 	}
@@ -160,7 +160,7 @@ void vbo_exec_do_EvalCoord1f(struct vbo_exec_context *exec, GLfloat u)
 	GLfloat uu = (u - map->u1) * map->du;
 	GLfloat vertex[4];
 
-	ASSIGN_4V(vertex, 0, 0, 0, 1);
+	mesa_assign4v(vertex, 0, 0, 0, 1);
 
 	_math_horner_bezier_curve(map->Points.data(), vertex, uu,
 				  exec->eval.map1[0].sz,
@@ -187,7 +187,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 	    GLfloat vv = (v - map->v1) * map->dv;
 	    GLfloat data[4];
 
-	    ASSIGN_4V(data, 0, 0, 0, 1);
+	    mesa_assign4v(data, 0, 0, 0, 1);
 
 	    _math_horner_bezier_surf(map->Points.data(),
 				     data,
@@ -195,7 +195,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 				     exec->eval.map2[attr].sz,
 				     map->Uorder, map->Vorder);
 
-	    COPY_SZ_4V(exec->vtx.attrptr[attr],
+	    mesa_copy_sz_4v(exec->vtx.attrptr[attr],
 		       exec->vtx.attrsz[attr],
 		       data);
 	}
@@ -209,7 +209,7 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 	GLfloat vv = (v - map->v1) * map->dv;
 	GLfloat vertex[4];
 
-	ASSIGN_4V(vertex, 0, 0, 0, 1);
+	mesa_assign4v(vertex, 0, 0, 0, 1);
 
 	if (exec->ctx->Eval.AutoNormal) {
 	    GLfloat normal[4];
@@ -230,11 +230,11 @@ void vbo_exec_do_EvalCoord2f(struct vbo_exec_context *exec,
 	    }
 
 
-	    CROSS3(normal, du, dv);
-	    NORMALIZE_3FV(normal);
+	    mesa_cross3(normal, du, dv);
+	    mesa_normalize3fv(normal);
 	    normal[3] = 1.0;
 
-	    COPY_SZ_4V(exec->vtx.attrptr[VBO_ATTRIB_NORMAL],
+	    mesa_copy_sz_4v(exec->vtx.attrptr[VBO_ATTRIB_NORMAL],
 		       exec->vtx.attrsz[VBO_ATTRIB_NORMAL],
 		       normal);
 

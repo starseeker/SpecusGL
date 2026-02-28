@@ -34,8 +34,10 @@ constexpr int MESA_PATCH = 4;
 #define MESA_VERSION_STRING "7.0.4"
 
 /* To make version comparison easy */
-#define MESA_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-#define MESA_VERSION_CODE MESA_VERSION(MESA_MAJOR, MESA_MINOR, MESA_PATCH)
+[[nodiscard]] constexpr int MESA_VERSION(int a, int b, int c) noexcept {
+    return (a << 16) + (b << 8) + c;
+}
+constexpr int MESA_VERSION_CODE = MESA_VERSION(MESA_MAJOR, MESA_MINOR, MESA_PATCH);
 
 
 /* OpenGL API version */
@@ -45,8 +47,10 @@ constexpr int OPENGL_PATCH = 0;
 #define OPENGL_VERSION_STRING "2.1"
 
 /* To make version comparison easy */
-#define OPENGL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-#define OPENGL_VERSION_CODE OPENGL_VERSION(OPENGL_MAJOR, OPENGL_MINOR, OPENGL_PATCH)
+[[nodiscard]] constexpr int OPENGL_VERSION(int a, int b, int c) noexcept {
+    return (a << 16) + (b << 8) + c;
+}
+constexpr int OPENGL_VERSION_CODE = OPENGL_VERSION(OPENGL_MAJOR, OPENGL_MINOR, OPENGL_PATCH);
 
 
 #endif /* VERSION_H */

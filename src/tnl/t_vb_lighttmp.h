@@ -97,12 +97,12 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 #endif
 #endif
 
-	COPY_3V(sum[0], base[0]);
-	ZERO_3V(spec[0]);
+	mesa_copy3v(sum[0], base[0]);
+	mesa_zero3v(spec[0]);
 
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(sum[1], base[1]);
-	ZERO_3V(spec[1]);
+	mesa_copy3v(sum[1], base[1]);
+	mesa_zero3v(spec[1]);
 #endif
 
 	/* Add contribution from each enabled light source */
@@ -119,14 +119,14 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 	    /* compute VP and attenuation */
 	    if (!(light->_Flags & LIGHT_POSITIONAL)) {
 		/* directional light */
-		COPY_3V(VP, light->_VP_inf_norm);
+		mesa_copy3v(VP, light->_VP_inf_norm);
 		attenuation = light->_VP_inf_spot_attenuation;
 	    } else {
 		GLfloat d;     /* distance from vertex to light */
 
-		SUB_3V(VP, light->_Position, vertex);
+		mesa_sub3v(VP, light->_Position, vertex);
 
-		d = static_cast<GLfloat>(LEN_3FV(VP));
+		d = static_cast<GLfloat>(mesa_len3fv(VP));
 
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
@@ -139,7 +139,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 
 		/* spotlight attenuation */
 		if (light->_Flags & LIGHT_SPOT) {
-		    GLfloat PV_dot_dir = - DOT3(VP, light->_NormDirection);
+		    GLfloat PV_dot_dir = - mesa_dot3(VP, light->_NormDirection);
 
 		    if (PV_dot_dir<light->_CosCutoff) {
 			continue; /* this light makes no contribution */
@@ -157,7 +157,7 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 		continue;		/* this light makes no contribution */
 
 	    /* Compute dot product or normal and vector from V to light pos */
-	    n_dot_VP = DOT3(normal, VP);
+	    n_dot_VP = mesa_dot3(normal, VP);
 
 	    /* Which side gets the diffuse & specular terms? */
 	    if (n_dot_VP < 0.0F) {
@@ -178,27 +178,27 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 	    }
 
 	    /* diffuse term */
-	    COPY_3V(contrib, light->_MatAmbient[side]);
+	    mesa_copy3v(contrib, light->_MatAmbient[side]);
 	    ACC_SCALE_SCALAR_3V(contrib, n_dot_VP, light->_MatDiffuse[side]);
 	    ACC_SCALE_SCALAR_3V(sum[side], attenuation, contrib);
 
 	    /* specular term - cannibalize VP... */
 	    if (ctx->Light.Model.LocalViewer) {
 		GLfloat v[3];
-		COPY_3V(v, vertex);
-		NORMALIZE_3FV(v);
-		SUB_3V(VP, VP, v);                /* h = VP + VPe */
+		mesa_copy3v(v, vertex);
+		mesa_normalize3fv(v);
+		mesa_sub3v(VP, VP, v);                /* h = VP + VPe */
 		h = VP;
-		NORMALIZE_3FV(h);
+		mesa_normalize3fv(h);
 	    } else if (light->_Flags & LIGHT_POSITIONAL) {
 		h = VP;
 		ACC_3V(h, ctx->_EyeZDir);
-		NORMALIZE_3FV(h);
+		mesa_normalize3fv(h);
 	    } else {
 		h = light->_h_inf_norm;
 	    }
 
-	    n_dot_h = correction * DOT3(normal, h);
+	    n_dot_h = correction * mesa_dot3(normal, h);
 
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec_coef;
@@ -213,13 +213,13 @@ static void TAG(light_rgba_spec)(GLcontext *ctx,
 	    }
 	} /*loop over lights*/
 
-	COPY_3V(Fcolor[j], sum[0]);
-	COPY_3V(Fspec[j], spec[0]);
+	mesa_copy3v(Fcolor[j], sum[0]);
+	mesa_copy3v(Fspec[j], spec[0]);
 	Fcolor[j][3] = sumA[0];
 
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(Bcolor[j], sum[1]);
-	COPY_3V(Bspec[j], spec[1]);
+	mesa_copy3v(Bcolor[j], sum[1]);
+	mesa_copy3v(Bspec[j], spec[1]);
 	Bcolor[j][3] = sumA[1];
 #endif
     }
@@ -275,10 +275,10 @@ static void TAG(light_rgba)(GLcontext *ctx,
 #endif
 #endif
 
-	COPY_3V(sum[0], base[0]);
+	mesa_copy3v(sum[0], base[0]);
 
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(sum[1], base[1]);
+	mesa_copy3v(sum[1], base[1]);
 #endif
 
 	/* Add contribution from each enabled light source */
@@ -296,15 +296,15 @@ static void TAG(light_rgba)(GLcontext *ctx,
 	    /* compute VP and attenuation */
 	    if (!(light->_Flags & LIGHT_POSITIONAL)) {
 		/* directional light */
-		COPY_3V(VP, light->_VP_inf_norm);
+		mesa_copy3v(VP, light->_VP_inf_norm);
 		attenuation = light->_VP_inf_spot_attenuation;
 	    } else {
 		GLfloat d;     /* distance from vertex to light */
 
 
-		SUB_3V(VP, light->_Position, vertex);
+		mesa_sub3v(VP, light->_Position, vertex);
 
-		d = static_cast<GLfloat>(LEN_3FV(VP));
+		d = static_cast<GLfloat>(mesa_len3fv(VP));
 
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
@@ -317,7 +317,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 
 		/* spotlight attenuation */
 		if (light->_Flags & LIGHT_SPOT) {
-		    GLfloat PV_dot_dir = - DOT3(VP, light->_NormDirection);
+		    GLfloat PV_dot_dir = - mesa_dot3(VP, light->_NormDirection);
 
 		    if (PV_dot_dir<light->_CosCutoff) {
 			continue; /* this light makes no contribution */
@@ -335,7 +335,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 		continue;		/* this light makes no contribution */
 
 	    /* Compute dot product or normal and vector from V to light pos */
-	    n_dot_VP = DOT3(normal, VP);
+	    n_dot_VP = mesa_dot3(normal, VP);
 
 	    /* which side are we lighting? */
 	    if (n_dot_VP < 0.0F) {
@@ -355,7 +355,7 @@ static void TAG(light_rgba)(GLcontext *ctx,
 		correction = 1;
 	    }
 
-	    COPY_3V(contrib, light->_MatAmbient[side]);
+	    mesa_copy3v(contrib, light->_MatAmbient[side]);
 
 	    /* diffuse term */
 	    ACC_SCALE_SCALAR_3V(contrib, n_dot_VP, light->_MatDiffuse[side]);
@@ -364,20 +364,20 @@ static void TAG(light_rgba)(GLcontext *ctx,
 	    {
 		if (ctx->Light.Model.LocalViewer) {
 		    GLfloat v[3];
-		    COPY_3V(v, vertex);
-		    NORMALIZE_3FV(v);
-		    SUB_3V(VP, VP, v);                /* h = VP + VPe */
+		    mesa_copy3v(v, vertex);
+		    mesa_normalize3fv(v);
+		    mesa_sub3v(VP, VP, v);                /* h = VP + VPe */
 		    h = VP;
-		    NORMALIZE_3FV(h);
+		    mesa_normalize3fv(h);
 		} else if (light->_Flags & LIGHT_POSITIONAL) {
 		    h = VP;
 		    ACC_3V(h, ctx->_EyeZDir);
-		    NORMALIZE_3FV(h);
+		    mesa_normalize3fv(h);
 		} else {
 		    h = light->_h_inf_norm;
 		}
 
-		n_dot_h = correction * DOT3(normal, h);
+		n_dot_h = correction * mesa_dot3(normal, h);
 
 		if (n_dot_h > 0.0F) {
 		    GLfloat spec_coef;
@@ -393,11 +393,11 @@ static void TAG(light_rgba)(GLcontext *ctx,
 	    ACC_SCALE_SCALAR_3V(sum[side], attenuation, contrib);
 	}
 
-	COPY_3V(Fcolor[j], sum[0]);
+	mesa_copy3v(Fcolor[j], sum[0]);
 	Fcolor[j][3] = sumA[0];
 
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(Bcolor[j], sum[1]);
+	mesa_copy3v(Bcolor[j], sum[1]);
 	Bcolor[j][3] = sumA[1];
 #endif
     }
@@ -463,38 +463,38 @@ static void TAG(light_fast_rgba_single)(GLcontext *ctx,
 	if (j == 0)
 #endif
 	{
-	    COPY_3V(base[0], light->_MatAmbient[0]);
+	    mesa_copy3v(base[0], light->_MatAmbient[0]);
 	    ACC_3V(base[0], ctx->Light._BaseColor[0]);
 	    base[0][3] = ctx->Light.Material.Attrib[MAT_ATTRIB_FRONT_DIFFUSE][3];
 
 #if IDX & LIGHT_TWOSIDE
-	    COPY_3V(base[1], light->_MatAmbient[1]);
+	    mesa_copy3v(base[1], light->_MatAmbient[1]);
 	    ACC_3V(base[1], ctx->Light._BaseColor[1]);
 	    base[1][3] = ctx->Light.Material.Attrib[MAT_ATTRIB_BACK_DIFFUSE][3];
 #endif
 	}
 
-	n_dot_VP = DOT3(normal, light->_VP_inf_norm);
+	n_dot_VP = mesa_dot3(normal, light->_VP_inf_norm);
 
 	if (n_dot_VP < 0.0F) {
 #if IDX & LIGHT_TWOSIDE
-	    GLfloat n_dot_h = -DOT3(normal, light->_h_inf_norm);
+	    GLfloat n_dot_h = -mesa_dot3(normal, light->_h_inf_norm);
 	    GLfloat sum[3];
-	    COPY_3V(sum, base[1]);
+	    mesa_copy3v(sum, base[1]);
 	    ACC_SCALE_SCALAR_3V(sum, -n_dot_VP, light->_MatDiffuse[1]);
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec;
 		GET_SHINE_TAB_ENTRY(ctx->_ShineTable[1], n_dot_h, spec);
 		ACC_SCALE_SCALAR_3V(sum, spec, light->_MatSpecular[1]);
 	    }
-	    COPY_3V(Bcolor[j], sum);
+	    mesa_copy3v(Bcolor[j], sum);
 	    Bcolor[j][3] = base[1][3];
 #endif
-	    COPY_4FV(Fcolor[j], base[0]);
+	    mesa_copy4fv(Fcolor[j], base[0]);
 	} else {
-	    GLfloat n_dot_h = DOT3(normal, light->_h_inf_norm);
+	    GLfloat n_dot_h = mesa_dot3(normal, light->_h_inf_norm);
 	    GLfloat sum[3];
-	    COPY_3V(sum, base[0]);
+	    mesa_copy3v(sum, base[0]);
 	    ACC_SCALE_SCALAR_3V(sum, n_dot_VP, light->_MatDiffuse[0]);
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec;
@@ -502,10 +502,10 @@ static void TAG(light_fast_rgba_single)(GLcontext *ctx,
 		ACC_SCALE_SCALAR_3V(sum, spec, light->_MatSpecular[0]);
 
 	    }
-	    COPY_3V(Fcolor[j], sum);
+	    mesa_copy3v(Fcolor[j], sum);
 	    Fcolor[j][3] = base[0][3];
 #if IDX & LIGHT_TWOSIDE
-	    COPY_4FV(Bcolor[j], base[1]);
+	    mesa_copy4fv(Bcolor[j], base[1]);
 #endif
 	}
     }
@@ -570,9 +570,9 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 #endif
 
 
-	COPY_3V(sum[0], ctx->Light._BaseColor[0]);
+	mesa_copy3v(sum[0], ctx->Light._BaseColor[0]);
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(sum[1], ctx->Light._BaseColor[1]);
+	mesa_copy3v(sum[1], ctx->Light._BaseColor[1]);
 #endif
 
 	for (auto *light : ctx->Light.EnabledList) {
@@ -583,11 +583,11 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 	    ACC_3V(sum[1], light->_MatAmbient[1]);
 #endif
 
-	    n_dot_VP = DOT3(normal, light->_VP_inf_norm);
+	    n_dot_VP = mesa_dot3(normal, light->_VP_inf_norm);
 
 	    if (n_dot_VP > 0.0F) {
 		ACC_SCALE_SCALAR_3V(sum[0], n_dot_VP, light->_MatDiffuse[0]);
-		n_dot_h = DOT3(normal, light->_h_inf_norm);
+		n_dot_h = mesa_dot3(normal, light->_h_inf_norm);
 		if (n_dot_h > 0.0F) {
 		    const gl_shine_tab *tab = &*ctx->_ShineTable[0];
 		    GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec);
@@ -597,7 +597,7 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 #if IDX & LIGHT_TWOSIDE
 	    else {
 		ACC_SCALE_SCALAR_3V(sum[1], -n_dot_VP, light->_MatDiffuse[1]);
-		n_dot_h = -DOT3(normal, light->_h_inf_norm);
+		n_dot_h = -mesa_dot3(normal, light->_h_inf_norm);
 		if (n_dot_h > 0.0F) {
 		    const gl_shine_tab *tab = &*ctx->_ShineTable[1];
 		    GET_SHINE_TAB_ENTRY(tab, n_dot_h, spec);
@@ -607,11 +607,11 @@ static void TAG(light_fast_rgba)(GLcontext *ctx,
 #endif
 	}
 
-	COPY_3V(Fcolor[j], sum[0]);
+	mesa_copy3v(Fcolor[j], sum[0]);
 	Fcolor[j][3] = sumA[0];
 
 #if IDX & LIGHT_TWOSIDE
-	COPY_3V(Bcolor[j], sum[1]);
+	mesa_copy3v(Bcolor[j], sum[1]);
 	Bcolor[j][3] = sumA[1];
 #endif
     }
@@ -684,13 +684,13 @@ static void TAG(light_ci)(GLcontext *ctx,
 	    /* compute l and attenuation */
 	    if (!(light->_Flags & LIGHT_POSITIONAL)) {
 		/* directional light */
-		COPY_3V(VP, light->_VP_inf_norm);
+		mesa_copy3v(VP, light->_VP_inf_norm);
 	    } else {
 		GLfloat d;     /* distance from vertex to light */
 
-		SUB_3V(VP, light->_Position, vertex);
+		mesa_sub3v(VP, light->_Position, vertex);
 
-		d = static_cast<GLfloat>(LEN_3FV(VP));
+		d = static_cast<GLfloat>(mesa_len3fv(VP));
 		if (d > 1e-6) {
 		    GLfloat invd = 1.0F / d;
 		    SELF_SCALE_SCALAR_3V(VP, invd);
@@ -702,7 +702,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 
 		/* spotlight attenuation */
 		if (light->_Flags & LIGHT_SPOT) {
-		    GLfloat PV_dot_dir = - DOT3(VP, light->_NormDirection);
+		    GLfloat PV_dot_dir = - mesa_dot3(VP, light->_NormDirection);
 		    if (PV_dot_dir < light->_CosCutoff) {
 			continue; /* this light makes no contribution */
 		    } else {
@@ -718,7 +718,7 @@ static void TAG(light_ci)(GLcontext *ctx,
 	    if (attenuation < 1e-3)
 		continue;		/* this light makes no contribution */
 
-	    n_dot_VP = DOT3(normal, VP);
+	    n_dot_VP = mesa_dot3(normal, VP);
 
 	    /* which side are we lighting? */
 	    if (n_dot_VP < 0.0F) {
@@ -737,23 +737,23 @@ static void TAG(light_ci)(GLcontext *ctx,
 	    /* specular term */
 	    if (ctx->Light.Model.LocalViewer) {
 		GLfloat v[3];
-		COPY_3V(v, vertex);
-		NORMALIZE_3FV(v);
-		SUB_3V(VP, VP, v);                /* h = VP + VPe */
+		mesa_copy3v(v, vertex);
+		mesa_normalize3fv(v);
+		mesa_sub3v(VP, VP, v);                /* h = VP + VPe */
 		h = VP;
-		NORMALIZE_3FV(h);
+		mesa_normalize3fv(h);
 	    } else if (light->_Flags & LIGHT_POSITIONAL) {
 		h = VP;
 		/* Strangely, disabling this addition fixes a conformance
 		 * problem.  If this code is enabled, l_sed.c fails.
 		 */
 		/*ACC_3V(h, ctx->_EyeZDir);*/
-		NORMALIZE_3FV(h);
+		mesa_normalize3fv(h);
 	    } else {
 		h = light->_h_inf_norm;
 	    }
 
-	    n_dot_h = correction * DOT3(normal, h);
+	    n_dot_h = correction * mesa_dot3(normal, h);
 	    if (n_dot_h > 0.0F) {
 		GLfloat spec_coef;
 		const gl_shine_tab *tab = &*ctx->_ShineTable[side];

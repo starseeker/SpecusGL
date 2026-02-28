@@ -1147,8 +1147,7 @@ _mesa_texstore_z32(TEXSTORE_PARAMS)
     return true;
 }
 
-#define STRIDE_3D 0
-
+constexpr int STRIDE_3D = 0;
 /**
  * Store a 16-bit integer depth component texture image.
  */

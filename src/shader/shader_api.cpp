@@ -800,7 +800,7 @@ _mesa_get_programiv(GLcontext *ctx, GLuint program,
 		  + _mesa_num_parameters_of_type(shProg->Uniforms, PROGRAM_SAMPLER);
 	    break;
 	case GL_ACTIVE_UNIFORM_MAX_LENGTH:
-	    *params = MAX2(
+	    *params = mesa_max2(
 			  _mesa_longest_parameter_name(shProg->Uniforms, PROGRAM_UNIFORM),
 			  _mesa_longest_parameter_name(shProg->Uniforms, PROGRAM_SAMPLER));
 	    if (*params > 0)
@@ -894,8 +894,7 @@ _mesa_get_shader_source(GLcontext *ctx, GLuint shader, GLsizei maxLength,
 }
 
 
-#define MAX_UNIFORM_ELEMENTS 16
-
+constexpr int MAX_UNIFORM_ELEMENTS = 16;
 /**
  * Helper for GetUniformfv(), GetUniformiv()
  * Returns number of elements written to 'params' output.

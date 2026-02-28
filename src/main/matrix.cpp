@@ -566,8 +566,8 @@ _mesa_set_viewport(GLcontext *ctx, GLint x, GLint y,
     }
 
     /* clamp width and height to the implementation dependent range */
-    width  = CLAMP(width,  1, static_cast<GLsizei>(ctx->Const.MaxViewportWidth));
-    height = CLAMP(height, 1, static_cast<GLsizei>(ctx->Const.MaxViewportHeight));
+    width  = mesa_clamp(width,  1, static_cast<GLsizei>(ctx->Const.MaxViewportWidth));
+    height = mesa_clamp(height, 1, static_cast<GLsizei>(ctx->Const.MaxViewportHeight));
 
     ctx->Viewport.X = x;
     ctx->Viewport.Width = width;
@@ -613,8 +613,8 @@ _mesa_DepthRange(GLclampd nearval, GLclampd farval)
     if (MESA_VERBOSE&VERBOSE_API)
 	_mesa_debug(ctx, "glDepthRange %f %f\n", nearval, farval);
 
-    ctx->Viewport.Near = static_cast<GLfloat>(CLAMP(nearval, 0.0, 1.0));
-    ctx->Viewport.Far = static_cast<GLfloat>(CLAMP(farval, 0.0, 1.0));
+    ctx->Viewport.Near = static_cast<GLfloat>(mesa_clamp(nearval, 0.0, 1.0));
+    ctx->Viewport.Far = static_cast<GLfloat>(mesa_clamp(farval, 0.0, 1.0));
     ctx->NewState |= _NEW_VIEWPORT;
 
 #if 1

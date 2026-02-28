@@ -30,8 +30,7 @@
 #include "mtypes.h"
 #include "atifragshader.h"
 
-#define MESA_DEBUG_ATI_FS 0
-
+constexpr int MESA_DEBUG_ATI_FS = 0;
 static struct ati_fragment_shader DummyShader;
 
 
@@ -713,11 +712,11 @@ _mesa_SetFragmentShaderConstantATI(GLuint dst, const GLfloat * value)
     dstindex = dst - GL_CON_0_ATI;
     if (ctx->ATIFragmentShader.Compiling) {
 	struct ati_fragment_shader *curProg = ctx->ATIFragmentShader.Current;
-	COPY_4V(curProg->Constants[dstindex], value);
+	mesa_copy4v(curProg->Constants[dstindex], value);
 	curProg->LocalConstDef |= 1 << dstindex;
     } else {
 	FLUSH_VERTICES(ctx, _NEW_PROGRAM);
-	COPY_4V(ctx->ATIFragmentShader.GlobalConstants[dstindex], value);
+	mesa_copy4v(ctx->ATIFragmentShader.GlobalConstants[dstindex], value);
     }
 }
 

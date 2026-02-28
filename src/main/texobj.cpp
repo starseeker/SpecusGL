@@ -376,16 +376,16 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
 	maxLog2 = t->Image[0][baseLevel]->WidthLog2;
 	maxLevels = ctx->Const.MaxTextureLevels;
     } else if (t->Target == GL_TEXTURE_2D) {
-	maxLog2 = MAX2(t->Image[0][baseLevel]->WidthLog2,
+	maxLog2 = mesa_max2(t->Image[0][baseLevel]->WidthLog2,
 		       t->Image[0][baseLevel]->HeightLog2);
 	maxLevels = ctx->Const.MaxTextureLevels;
     } else if (t->Target == GL_TEXTURE_3D) {
-	GLint max = MAX2(t->Image[0][baseLevel]->WidthLog2,
+	GLint max = mesa_max2(t->Image[0][baseLevel]->WidthLog2,
 			 t->Image[0][baseLevel]->HeightLog2);
-	maxLog2 = MAX2(max, static_cast<GLint>((t->Image[0][baseLevel]->DepthLog2)));
+	maxLog2 = mesa_max2(max, static_cast<GLint>((t->Image[0][baseLevel]->DepthLog2)));
 	maxLevels = ctx->Const.Max3DTextureLevels;
     } else if (t->Target == GL_TEXTURE_CUBE_MAP_ARB) {
-	maxLog2 = MAX2(t->Image[0][baseLevel]->WidthLog2,
+	maxLog2 = mesa_max2(t->Image[0][baseLevel]->WidthLog2,
 		       t->Image[0][baseLevel]->HeightLog2);
 	maxLevels = ctx->Const.MaxCubeTextureLevels;
     } else if (t->Target == GL_TEXTURE_RECTANGLE_NV) {
@@ -399,8 +399,8 @@ _mesa_test_texobj_completeness(const GLcontext *ctx,
     assert(maxLevels > 0);
 
     t->_MaxLevel = baseLevel + maxLog2;
-    t->_MaxLevel = MIN2(t->_MaxLevel, t->MaxLevel);
-    t->_MaxLevel = MIN2(t->_MaxLevel, maxLevels - 1);
+    t->_MaxLevel = mesa_min2(t->_MaxLevel, t->MaxLevel);
+    t->_MaxLevel = mesa_min2(t->_MaxLevel, maxLevels - 1);
 
     /* Compute _MaxLambda = q - b (see the 1.2 spec) used during mipmapping */
     t->_MaxLambda = static_cast<GLfloat>((t->_MaxLevel - t->BaseLevel));
@@ -955,7 +955,7 @@ _mesa_PrioritizeTextures(GLsizei n, const GLuint *texName,
 	if (texName[i] > 0) {
 	    struct gl_texture_object *t = _mesa_lookup_texture(ctx, texName[i]);
 	    if (t) {
-		t->Priority = CLAMP(priorities[i], 0.0F, 1.0F);
+		t->Priority = mesa_clamp(priorities[i], 0.0F, 1.0F);
 		if (ctx->Driver.PrioritizeTexture)
 		    ctx->Driver.PrioritizeTexture(ctx, t, t->Priority);
 	    }

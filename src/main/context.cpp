@@ -609,16 +609,16 @@ __GLcontextRec::init_current()
 
     /* Init all to (0,0,0,1) */
     for (i = 0; i < VERT_ATTRIB_MAX; i++) {
-	ASSIGN_4V(Current.Attrib[i], 0.0, 0.0, 0.0, 1.0);
+	mesa_assign4v(Current.Attrib[i], 0.0, 0.0, 0.0, 1.0);
     }
 
     /* redo special cases: */
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 0.0);
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_NORMAL], 0.0, 0.0, 1.0, 1.0);
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR0], 1.0, 1.0, 1.0, 1.0);
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR1], 0.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_COLOR_INDEX], 1.0, 0.0, 0.0, 1.0);
-    ASSIGN_4V(Current.Attrib[VERT_ATTRIB_EDGEFLAG], 1.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 0.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_NORMAL], 0.0, 0.0, 1.0, 1.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_COLOR0], 1.0, 1.0, 1.0, 1.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_COLOR1], 0.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_COLOR_INDEX], 1.0, 0.0, 0.0, 1.0);
+    mesa_assign4v(Current.Attrib[VERT_ATTRIB_EDGEFLAG], 1.0, 0.0, 0.0, 1.0);
 }
 
 
@@ -661,7 +661,7 @@ __GLcontextRec::init_constants()
     Const.MaxTextureRectSize = MAX_TEXTURE_RECT_SIZE;
     Const.MaxTextureCoordUnits = MAX_TEXTURE_COORD_UNITS;
     Const.MaxTextureImageUnits = MAX_TEXTURE_IMAGE_UNITS;
-    Const.MaxTextureUnits = MIN2(Const.MaxTextureCoordUnits,
+    Const.MaxTextureUnits = mesa_min2(Const.MaxTextureCoordUnits,
 				 Const.MaxTextureImageUnits);
     Const.MaxTextureMaxAnisotropy = MAX_TEXTURE_MAX_ANISOTROPY;
     Const.MaxTextureLodBias = MAX_TEXTURE_LOD_BIAS;
@@ -739,7 +739,7 @@ __GLcontextRec::init_constants()
 #endif
 
     /* sanity checks */
-    assert(Const.MaxTextureUnits == MIN2(Const.MaxTextureImageUnits,
+    assert(Const.MaxTextureUnits == mesa_min2(Const.MaxTextureImageUnits,
 	    Const.MaxTextureCoordUnits));
     assert(Const.FragmentProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);
     assert(Const.VertexProgram.MaxLocalParams <= MAX_PROGRAM_LOCAL_PARAMS);

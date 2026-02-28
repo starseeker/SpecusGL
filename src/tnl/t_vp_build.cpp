@@ -40,6 +40,7 @@
 #include "shader/prog_statevars.h"
 #include "t_context.h" /* NOTE: very light dependency on this */
 #include "t_vp_build.h"
+#include <climits>
 
 #include <cstring>
 #include <unordered_map>
@@ -47,11 +48,10 @@
 /* state_key, StateKeyHash, StateKeyEqual, and tnl_vp_cache are now
  * defined in t_vp_build.h (included via t_context.h above). */
 
-#define FOG_NONE   0
-#define FOG_LINEAR 1
-#define FOG_EXP    2
-#define FOG_EXP2   3
-
+constexpr int FOG_NONE = 0;
+constexpr int FOG_LINEAR = 1;
+constexpr int FOG_EXP = 2;
+constexpr int FOG_EXP2 = 3;
 static GLuint translate_fog_mode(GLenum mode)
 {
     switch (mode) {
@@ -66,13 +66,12 @@ static GLuint translate_fog_mode(GLenum mode)
     }
 }
 
-#define TXG_NONE           0
-#define TXG_OBJ_LINEAR     1
-#define TXG_EYE_LINEAR     2
-#define TXG_SPHERE_MAP     3
-#define TXG_REFLECTION_MAP 4
-#define TXG_NORMAL_MAP     5
-
+constexpr int TXG_NONE = 0;
+constexpr int TXG_OBJ_LINEAR = 1;
+constexpr int TXG_EYE_LINEAR = 2;
+constexpr int TXG_SPHERE_MAP = 3;
+constexpr int TXG_REFLECTION_MAP = 4;
+constexpr int TXG_NORMAL_MAP = 5;
 static GLuint translate_texgen(GLboolean enabled, GLenum mode)
 {
     if (!enabled)
@@ -213,10 +212,8 @@ static state_key make_state_key(GLcontext *ctx)
  * multiplications with DP4's or with MUL/MAD's?  SSE works better
  * with the latter, drivers may differ.
  */
-#define PREFER_DP4 0
-
-#define MAX_INSN 256
-
+constexpr int PREFER_DP4 = 0;
+constexpr int MAX_INSN = 256;
 /* Use uregs to represent registers internally, translate to Mesa's
  * expected formats on emit.
  *
@@ -1415,7 +1412,7 @@ create_new_program(const struct state_key *key,
     p.identity = undef;
     p.temp_in_use = 0;
 
-    if (max_temps >= sizeof(int) * 8)
+    if (max_temps >= static_cast<int>(sizeof(int) * CHAR_BIT))
 	p.temp_reserved = 0;
     else
 	p.temp_reserved = ~((1<<max_temps)-1);

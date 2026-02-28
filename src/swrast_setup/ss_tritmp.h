@@ -126,13 +126,13 @@ static void TAG(triangle)(GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2)
 		const GLfloat oneOverArea = 1.0F / cc;
 		const GLfloat dzdx = FABSF((ey * fz - ez * fy) * oneOverArea);
 		const GLfloat dzdy = FABSF((ez * fx - ex * fz) * oneOverArea);
-		offset += MAX2(dzdx, dzdy) * ctx->Polygon.OffsetFactor;
+		offset += mesa_max2(dzdx, dzdy) * ctx->Polygon.OffsetFactor;
 		/* Unfortunately, we need to clamp to prevent negative Zs below.
 		 * Technically, we should do the clamping per-fragment.
 		 */
-		offset = MAX2(offset, -v[0]->win[2]);
-		offset = MAX2(offset, -v[1]->win[2]);
-		offset = MAX2(offset, -v[2]->win[2]);
+		offset = mesa_max2(offset, -v[0]->win[2]);
+		offset = mesa_max2(offset, -v[1]->win[2]);
+		offset = mesa_max2(offset, -v[2]->win[2]);
 	    }
 	}
     }

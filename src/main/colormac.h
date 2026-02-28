@@ -108,7 +108,7 @@
 #define CLAMPED_FLOAT_TO_CHAN(c, f)    CLAMPED_FLOAT_TO_USHORT(c, f)
 #define UNCLAMPED_FLOAT_TO_CHAN(c, f)  UNCLAMPED_FLOAT_TO_USHORT(c, f)
 
-#define COPY_CHAN4(DST, SRC)  COPY_4V(DST, SRC)
+#define COPY_CHAN4(DST, SRC)  mesa_copy4v(DST, SRC)
 
 #define CHAN_PRODUCT(a, b) (static_cast<GLchan>((((static_cast<GLuint>((a))) * (static_cast<GLuint>((b)))) / 65535)))
 
@@ -122,13 +122,13 @@
 #define INT_TO_CHAN(i)    (static_cast<GLfloat>(((i) * (1.0F / 2147483647.0F))))
 #define UINT_TO_CHAN(i)   (static_cast<GLfloat>(((i) * (1.0F / 4294967295.0F))))
 
-#define CHAN_TO_UBYTE(c)  FLOAT_TO_UBYTE(c)
+#define CHAN_TO_UBYTE(c)  mesa_float_to_ubyte(c)
 #define CHAN_TO_FLOAT(c)  (c)
 
 #define CLAMPED_FLOAT_TO_CHAN(c, f)  c = (f)
 #define UNCLAMPED_FLOAT_TO_CHAN(c, f)      c = (f)
 
-#define COPY_CHAN4(DST, SRC)  COPY_4V(DST, SRC)
+#define COPY_CHAN4(DST, SRC)  mesa_copy4v(DST, SRC)
 
 #define CHAN_PRODUCT(a, b)    ((a) * (b))
 
@@ -285,7 +285,7 @@ do {						\
 /**
  * \name GLchan linear interpolation inline functions.
  *
- * INTERP_CHAN and its multi-channel variants are defined here (rather than in
+ * mesa_interp_chan and its multi-channel variants are defined here (rather than in
  * macros.h) because they require CHAN_TO_FLOAT and UNCLAMPED_FLOAT_TO_CHAN,
  * which are defined in this header after macros.h is included.
  *
@@ -300,10 +300,10 @@ template<typename T, typename TChan>
 inline void mesa_interp_chan(T t, TChan& dstc, const TChan& outc, const TChan& inc) noexcept {
     GLfloat inf  = CHAN_TO_FLOAT(inc);
     GLfloat outf = CHAN_TO_FLOAT(outc);
-    GLfloat dstf = LINTERP(t, outf, inf);
+    GLfloat dstf = mesa_linterp(t, outf, inf);
     UNCLAMPED_FLOAT_TO_CHAN(dstc, dstf);
 }
-#define INTERP_CHAN(t, dstc, outc, inc) mesa_interp_chan(t, dstc, outc, inc)
+#define mesa_interp_chan(t, dstc, outc, inc) mesa_interp_chan(t, dstc, outc, inc)
 
 /** 4-channel linear interpolation over a generic channel type. */
 template<typename T, typename TChan>
@@ -313,7 +313,7 @@ inline void mesa_interp_4chan(T t, TChan* dst, const TChan* out, const TChan* in
     mesa_interp_chan(t, dst[2], out[2], in[2]);
     mesa_interp_chan(t, dst[3], out[3], in[3]);
 }
-#define INTERP_4CHAN(t, dst, out, in) mesa_interp_4chan(t, dst, out, in)
+#define mesa_interp_4chan(t, dst, out, in) mesa_interp_4chan(t, dst, out, in)
 
 /** 3-channel linear interpolation over a generic channel type. */
 template<typename T, typename TChan>
@@ -322,7 +322,7 @@ inline void mesa_interp_3chan(T t, TChan* dst, const TChan* out, const TChan* in
     mesa_interp_chan(t, dst[1], out[1], in[1]);
     mesa_interp_chan(t, dst[2], out[2], in[2]);
 }
-#define INTERP_3CHAN(t, dst, out, in) mesa_interp_3chan(t, dst, out, in)
+#define mesa_interp_3chan(t, dst, out, in) mesa_interp_3chan(t, dst, out, in)
 
 /*@}*/
 

@@ -372,7 +372,7 @@ static int str_equal_n(const byte *str1, const byte *str2, unsigned int n)
 static int
 str_length(const byte *str)
 {
-    return (int)(grammar_string_length(str));
+    return static_cast<int>(grammar_string_length(str));
 }
 
 /*
@@ -2883,7 +2883,7 @@ void grammar_get_last_error(byte *text, unsigned int size, int *pos)
 		const byte *r = error_param;
 
 		while (*r) {
-		    append_character(*r++, text, &dots_made, &len, (int) size);
+		    append_character(*r++, text, &dots_made, &len, static_cast<int>(size));
 		}
 
 		p++;

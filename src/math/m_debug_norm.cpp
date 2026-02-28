@@ -161,7 +161,7 @@ static void ref_norm_transform_normalize(const GLmatrix *mat,
 	TRANSFORM_NORMAL(t, s, m);
 
 	if (!lengths) {
-	    GLfloat len = LEN_SQUARED_3FV(t);
+	    GLfloat len = mesa_len_sq3fv(t);
 	    if (len > 1e-20) {
 		/* Hmmm, don't know how we could test the precalculated
 		 * length case...
@@ -254,12 +254,12 @@ static int test_norm_function(normal_func func, int mtype, long *cycles)
     memcpy(mat->inv, mat->m, 16 * sizeof(GLfloat));
 
     for (i = 0 ; i < TEST_COUNT ; i++) {
-	ASSIGN_3V(d[i],  0.0, 0.0, 0.0);
-	ASSIGN_3V(s[i],  0.0, 0.0, 0.0);
-	ASSIGN_3V(d2[i], 0.0, 0.0, 0.0);
+	mesa_assign3v(d[i],  0.0, 0.0, 0.0);
+	mesa_assign3v(s[i],  0.0, 0.0, 0.0);
+	mesa_assign3v(d2[i], 0.0, 0.0, 0.0);
 	for (j = 0 ; j < 3 ; j++)
 	    s[i][j] = rnd();
-	length[i] = 1 / SQRTF(LEN_SQUARED_3FV(s[i]));
+	length[i] = 1 / SQRTF(mesa_len_sq3fv(s[i]));
     }
 
     source->data = reinterpret_cast<GLfloat(*)[4]>(s);

@@ -43,7 +43,7 @@ fetch_texel(GLcontext *ctx, const GLfloat texcoord[4], GLfloat lambda,
     const struct gl_texture_object *texObj = ctx->Texture.Unit[unit]._Current;
 
     if (texObj)
-	lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
+	lambda = mesa_clamp(lambda, texObj->MinLod, texObj->MaxLod);
 
     if (texObj && texObj->Image[0][texObj->BaseLevel] &&
 	texObj->Image[0][texObj->BaseLevel]->TexFormat->DataType == GL_FLOAT &&
@@ -90,7 +90,7 @@ fetch_texel_deriv(GLcontext *ctx, const GLfloat texcoord[4],
 					texcoord[0], texcoord[1], texcoord[3],
 					1.0F / texcoord[3]) + lodBias;
 
-	lambda = CLAMP(lambda, texObj->MinLod, texObj->MaxLod);
+	lambda = mesa_clamp(lambda, texObj->MinLod, texObj->MaxLod);
     }
 
     if (texObj && texObj->Image[0][texObj->BaseLevel] &&
@@ -178,7 +178,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 
 		/* Store result color */
 		if (outputsWritten & (1 << FRAG_RESULT_COLR)) {
-		    COPY_4V(span->array->attribs[FRAG_ATTRIB_COL0][i],
+		    mesa_copy4v(span->array->attribs[FRAG_ATTRIB_COL0][i],
 			    machine->Outputs[FRAG_RESULT_COLR]);
 		} else {
 		    /* Multiple drawbuffers / render targets
@@ -188,7 +188,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 		    GLuint output;
 		    for (output = 0; output < swrast->_NumColorOutputs; output++) {
 			if (outputsWritten & (1 << (FRAG_RESULT_DATA0 + output))) {
-			    COPY_4V(span->array->attribs[FRAG_ATTRIB_COL0+output][i],
+			    mesa_copy4v(span->array->attribs[FRAG_ATTRIB_COL0+output][i],
 				    machine->Outputs[FRAG_RESULT_DATA0 + output]);
 			}
 		    }
@@ -202,7 +202,7 @@ run_program(GLcontext *ctx, SWspan *span, GLuint start, GLuint end)
 		    else if (depth >= 1.0)
 			span->array->z[i] = ctx->DrawBuffer->_DepthMax;
 		    else
-			span->array->z[i] = IROUND(depth * ctx->DrawBuffer->_DepthMaxF);
+			span->array->z[i] = iround(depth * ctx->DrawBuffer->_DepthMaxF);
 		}
 	    } else {
 		/* killed fragment */

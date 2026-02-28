@@ -205,7 +205,7 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
     assert(dx >= 0);
     assert(dy >= 0);
 
-    numPixels = MAX2(dx, dy);
+    numPixels = mesa_max2(dx, dy);
 
     /*
      * Span setup: compute start and step values for all interpolated values.
@@ -340,11 +340,11 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 #endif
 	    x0 += xstep;
 #ifdef DEPTH_TYPE
-	    zPtr = (DEPTH_TYPE *)((GLubyte*) zPtr + zPtrXstep);
+	    zPtr = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zPtr) + zPtrXstep);
 	    span.z += span.zStep;
 #endif
 #ifdef PIXEL_ADDRESS
-	    pixelPtr = (PIXEL_TYPE*)((GLubyte*) pixelPtr + pixelXstep);
+	    pixelPtr = reinterpret_cast<PIXEL_TYPE*>(reinterpret_cast<GLubyte*>(pixelPtr) + pixelXstep);
 #endif
 	    if (error<0) {
 		error += errorInc;
@@ -352,10 +352,10 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 		error += errorDec;
 		y0 += ystep;
 #ifdef DEPTH_TYPE
-		zPtr = (DEPTH_TYPE *)((GLubyte*) zPtr + zPtrYstep);
+		zPtr = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zPtr) + zPtrYstep);
 #endif
 #ifdef PIXEL_ADDRESS
-		pixelPtr = (PIXEL_TYPE*)((GLubyte*) pixelPtr + pixelYstep);
+		pixelPtr = reinterpret_cast<PIXEL_TYPE*>(reinterpret_cast<GLubyte*>(pixelPtr) + pixelYstep);
 #endif
 	    }
 	}
@@ -378,11 +378,11 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 #endif
 	    y0 += ystep;
 #ifdef DEPTH_TYPE
-	    zPtr = (DEPTH_TYPE *)((GLubyte*) zPtr + zPtrYstep);
+	    zPtr = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zPtr) + zPtrYstep);
 	    span.z += span.zStep;
 #endif
 #ifdef PIXEL_ADDRESS
-	    pixelPtr = (PIXEL_TYPE*)((GLubyte*) pixelPtr + pixelYstep);
+	    pixelPtr = reinterpret_cast<PIXEL_TYPE*>(reinterpret_cast<GLubyte*>(pixelPtr) + pixelYstep);
 #endif
 	    if (error<0) {
 		error += errorInc;
@@ -390,10 +390,10 @@ NAME(GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1)
 		error += errorDec;
 		x0 += xstep;
 #ifdef DEPTH_TYPE
-		zPtr = (DEPTH_TYPE *)((GLubyte*) zPtr + zPtrXstep);
+		zPtr = reinterpret_cast<DEPTH_TYPE *>(reinterpret_cast<GLubyte *>(zPtr) + zPtrXstep);
 #endif
 #ifdef PIXEL_ADDRESS
-		pixelPtr = (PIXEL_TYPE*)((GLubyte*) pixelPtr + pixelXstep);
+		pixelPtr = reinterpret_cast<PIXEL_TYPE*>(reinterpret_cast<GLubyte*>(pixelPtr) + pixelXstep);
 #endif
 	    }
 	}

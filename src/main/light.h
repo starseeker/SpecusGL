@@ -94,7 +94,7 @@ _mesa_light(GLcontext *ctx, GLuint lnum, GLenum pname, const GLfloat *params);
 do {									\
    const struct gl_shine_tab *_tab = &*table;				\
    float f = (dp * (SHINE_TABLE_SIZE-1));				\
-   int k = (int) f;							\
+   int k = static_cast<int>(f);						\
    if (k < 0 /* gcc may cast an overflow float value to negative int value*/ \
 	|| k > SHINE_TABLE_SIZE-2)					\
       result = static_cast<GLfloat>(pow( dp, _tab->shininess ));		\

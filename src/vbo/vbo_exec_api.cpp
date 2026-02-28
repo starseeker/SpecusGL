@@ -144,7 +144,7 @@ static void vbo_exec_copy_to_current(struct vbo_exec_context *exec)
 	    /* Note: the exec->vtx.current[i] pointers point into the
 	     * ctx->Current.Attrib and ctx->Light.Material.Attrib arrays.
 	     */
-	    COPY_CLEAN_4V(current,
+	    mesa_copy_clean_4v(current,
 			  exec->vtx.attrsz[i],
 			  exec->vtx.attrptr[i]);
 
@@ -280,17 +280,17 @@ static void vbo_exec_wrap_upgrade_vertex(struct vbo_exec_context *exec,
 		if (exec->vtx.attrsz[j]) {
 		    if (j == attr) {
 			if (oldsz) {
-			    COPY_CLEAN_4V(dest, oldsz, data);
+			    mesa_copy_clean_4v(dest, oldsz, data);
 			    data += oldsz;
 			    dest += newsz;
 			} else {
 			    const GLfloat *current = reinterpret_cast<const GLfloat *>(vbo->currval[j].Ptr);
-			    COPY_SZ_4V(dest, newsz, current);
+			    mesa_copy_sz_4v(dest, newsz, current);
 			    dest += newsz;
 			}
 		    } else {
 			GLuint sz = exec->vtx.attrsz[j];
-			COPY_SZ_4V(dest, sz, data);
+			mesa_copy_sz_4v(dest, sz, data);
 			dest += sz;
 			data += sz;
 		    }

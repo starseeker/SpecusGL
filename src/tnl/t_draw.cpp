@@ -106,22 +106,22 @@ static void _tnl_import_array(GLcontext *ctx,
 
 	switch (input->Type) {
 	    case GL_BYTE:
-		CONVERT(GLbyte, BYTE_TO_FLOAT);
+		CONVERT(GLbyte, mesa_byte_to_float);
 		break;
 	    case GL_UNSIGNED_BYTE:
 		CONVERT(GLubyte, UBYTE_TO_FLOAT);
 		break;
 	    case GL_SHORT:
-		CONVERT(GLshort, SHORT_TO_FLOAT);
+		CONVERT(GLshort, mesa_short_to_float);
 		break;
 	    case GL_UNSIGNED_SHORT:
-		CONVERT(GLushort, USHORT_TO_FLOAT);
+		CONVERT(GLushort, mesa_ushort_to_float);
 		break;
 	    case GL_INT:
-		CONVERT(GLint, INT_TO_FLOAT);
+		CONVERT(GLint, mesa_int_to_float);
 		break;
 	    case GL_UNSIGNED_INT:
-		CONVERT(GLuint, UINT_TO_FLOAT);
+		CONVERT(GLuint, mesa_uint_to_float);
 		break;
 	    case GL_DOUBLE:
 		CONVERT(GLdouble, (GLfloat));

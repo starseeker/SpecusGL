@@ -38,9 +38,7 @@
 /* XXX this would have to change for accum buffers with more or less
  * than 16 bits per color channel.
  */
-#define ACCUM_SCALE16 32767.0
-
-
+constexpr float ACCUM_SCALE16 = 32767.0;
 /*
  * Accumulation buffer notes
  *
@@ -67,9 +65,9 @@
 
 #if CHAN_BITS == 8
 /* enable the optimization */
-#define USE_OPTIMIZED_ACCUM  1
+constexpr int USE_OPTIMIZED_ACCUM = 1;
 #else
-#define USE_OPTIMIZED_ACCUM  0
+constexpr int USE_OPTIMIZED_ACCUM = 0;
 #endif
 
 
@@ -431,7 +429,7 @@ accum_return(GLcontext *ctx, GLfloat value,
     static GLchan multTable[32768];
     static GLfloat prevMult = 0.0;
     const GLfloat mult = swrast->_IntegerAccumScaler;
-    const GLint max = MIN2(static_cast<GLint>((256 / mult)), 32767);
+    const GLint max = mesa_min2(static_cast<GLint>((256 / mult)), 32767);
 
     /* May have to leave optimized accum buffer mode */
     if (swrast->_IntegerAccumMode && value != 1.0)
@@ -443,7 +441,7 @@ accum_return(GLcontext *ctx, GLfloat value,
 	assert(swrast->_IntegerAccumScaler <= 1.0);
 	if (mult != prevMult) {
 	    for (j = 0; j < max; j++)
-		multTable[j] = IROUND(static_cast<GLfloat>(j) * mult);
+		multTable[j] = iround(static_cast<GLfloat>(j) * mult);
 	    prevMult = mult;
 	}
     }
@@ -495,15 +493,15 @@ accum_return(GLcontext *ctx, GLfloat value,
 		    GLchan b = acc[j * 4 + 2] * scale;
 		    GLchan a = acc[j * 4 + 3] * scale;
 #else
-		    GLint r = IROUND(static_cast<GLfloat>((acc[j * 4 + 0])) * scale);
-		    GLint g = IROUND(static_cast<GLfloat>((acc[j * 4 + 1])) * scale);
-		    GLint b = IROUND(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
-		    GLint a = IROUND(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
+		    GLint r = iround(static_cast<GLfloat>((acc[j * 4 + 0])) * scale);
+		    GLint g = iround(static_cast<GLfloat>((acc[j * 4 + 1])) * scale);
+		    GLint b = iround(static_cast<GLfloat>((acc[j * 4 + 2])) * scale);
+		    GLint a = iround(static_cast<GLfloat>((acc[j * 4 + 3])) * scale);
 #endif
-		    span.array->rgba[j][RCOMP] = CLAMP(r, 0, CHAN_MAX);
-		    span.array->rgba[j][GCOMP] = CLAMP(g, 0, CHAN_MAX);
-		    span.array->rgba[j][BCOMP] = CLAMP(b, 0, CHAN_MAX);
-		    span.array->rgba[j][ACOMP] = CLAMP(a, 0, CHAN_MAX);
+		    span.array->rgba[j][RCOMP] = mesa_clamp(r, 0, CHAN_MAX);
+		    span.array->rgba[j][GCOMP] = mesa_clamp(g, 0, CHAN_MAX);
+		    span.array->rgba[j][BCOMP] = mesa_clamp(b, 0, CHAN_MAX);
+		    span.array->rgba[j][ACOMP] = mesa_clamp(a, 0, CHAN_MAX);
 		}
 	    }
 

@@ -45,14 +45,12 @@
 #include <new>
 
 
-#define GRANULARITY 8
+constexpr int GRANULARITY = 8;
 #define ROUND_UP(B)  ( ((B) + (GRANULARITY - 1)) & ~(GRANULARITY - 1) )
 
 
 /** If 1, use conventional malloc/free.  Helpful for debugging */
-#define USE_MALLOC_FREE 0
-
-
+constexpr int USE_MALLOC_FREE = 0;
 slang_mempool *
 _slang_new_mempool(GLuint initialSize)
 {
@@ -124,7 +122,7 @@ _slang_alloc(GLuint bytes)
 	    check_zero(reinterpret_cast<char *>(addr), bytes);
 #endif
 	    pool->used += ROUND_UP(bytes);
-	    pool->largest = MAX2(pool->largest, bytes);
+	    pool->largest = mesa_max2(pool->largest, bytes);
 	    pool->count++;
 	    return addr;
 	} else if (pool->next) {
@@ -132,7 +130,7 @@ _slang_alloc(GLuint bytes)
 	    pool = pool->next.get();
 	} else {
 	    /* allocate a new overflow block */
-	    const GLuint sz = MAX2(bytes, static_cast<GLuint>(pool->data.size()));
+	    const GLuint sz = mesa_max2(bytes, static_cast<GLuint>(pool->data.size()));
 	    try {
 		pool->next.reset(new slang_mempool(sz));
 	    } catch (const std::bad_alloc &) {

@@ -73,11 +73,11 @@ _mesa_ClipPlane(GLenum plane, const GLdouble *eq)
     _mesa_transform_vector(equation, equation,
 			   ctx->ModelviewMatrixStack.Top->inv);
 
-    if (TEST_EQ_4V(ctx->Transform.EyeUserPlane[p], equation))
+    if (mesa_test_eq_4v(ctx->Transform.EyeUserPlane[p], equation))
 	return;
 
     FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
-    COPY_4FV(ctx->Transform.EyeUserPlane[p], equation);
+    mesa_copy4fv(ctx->Transform.EyeUserPlane[p], equation);
 
     /* Update derived state.  This state also depends on the projection
      * matrix, and is recalculated on changes to the projection matrix by
@@ -125,7 +125,7 @@ _mesa_CullParameterfvEXT(GLenum cap, GLfloat *v)
     switch (cap) {
 	case GL_CULL_VERTEX_EYE_POSITION_EXT:
 	    FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
-	    COPY_4FV(ctx->Transform.CullEyePos, v);
+	    mesa_copy4fv(ctx->Transform.CullEyePos, v);
 
 	    _mesa_transform_vector(ctx->Transform.CullObjPos,
 				   ctx->Transform.CullEyePos,
@@ -134,7 +134,7 @@ _mesa_CullParameterfvEXT(GLenum cap, GLfloat *v)
 
 	case GL_CULL_VERTEX_OBJECT_POSITION_EXT:
 	    FLUSH_VERTICES(ctx, _NEW_TRANSFORM);
-	    COPY_4FV(ctx->Transform.CullObjPos, v);
+	    mesa_copy4fv(ctx->Transform.CullObjPos, v);
 
 	    _mesa_transform_vector(ctx->Transform.CullEyePos,
 				   ctx->Transform.CullObjPos,

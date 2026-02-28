@@ -3734,19 +3734,19 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ctx->DrawBuffer->Visual.accumAlphaBits;
 	    break;
 	case GL_ACCUM_CLEAR_VALUE:
-	    params[0] = FLOAT_TO_INT(ctx->Accum.ClearColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Accum.ClearColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Accum.ClearColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Accum.ClearColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Accum.ClearColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Accum.ClearColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Accum.ClearColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Accum.ClearColor[3]);
 	    break;
 	case GL_ALPHA_BIAS:
-	    params[0] = IROUND(ctx->Pixel.AlphaBias);
+	    params[0] = iround(ctx->Pixel.AlphaBias);
 	    break;
 	case GL_ALPHA_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.alphaBits;
 	    break;
 	case GL_ALPHA_SCALE:
-	    params[0] = IROUND(ctx->Pixel.AlphaScale);
+	    params[0] = iround(ctx->Pixel.AlphaScale);
 	    break;
 	case GL_ALPHA_TEST:
 	    params[0] = BOOLEAN_TO_INT(ctx->Color.AlphaEnabled);
@@ -3755,7 +3755,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Color.AlphaFunc);
 	    break;
 	case GL_ALPHA_TEST_REF:
-	    params[0] = FLOAT_TO_INT(ctx->Color.AlphaRef);
+	    params[0] = mesa_float_to_int(ctx->Color.AlphaRef);
 	    break;
 	case GL_ATTRIB_STACK_DEPTH:
 	    params[0] = static_cast<GLuint>(ctx->AttribStack.size());
@@ -3794,19 +3794,19 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Color.BlendEquationA);
 	    break;
 	case GL_BLEND_COLOR_EXT:
-	    params[0] = FLOAT_TO_INT(ctx->Color.BlendColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Color.BlendColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Color.BlendColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Color.BlendColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Color.BlendColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Color.BlendColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Color.BlendColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Color.BlendColor[3]);
 	    break;
 	case GL_BLUE_BIAS:
-	    params[0] = IROUND(ctx->Pixel.BlueBias);
+	    params[0] = iround(ctx->Pixel.BlueBias);
 	    break;
 	case GL_BLUE_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.blueBits;
 	    break;
 	case GL_BLUE_SCALE:
-	    params[0] = IROUND(ctx->Pixel.BlueScale);
+	    params[0] = iround(ctx->Pixel.BlueScale);
 	    break;
 	case GL_CLIENT_ATTRIB_STACK_DEPTH:
 	    params[0] = static_cast<GLuint>(ctx->ClientAttribStack.size());
@@ -3830,10 +3830,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT((ctx->Transform.ClipPlanesEnabled >> 5) & 1);
 	    break;
 	case GL_COLOR_CLEAR_VALUE:
-	    params[0] = FLOAT_TO_INT(ctx->Color.ClearColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Color.ClearColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Color.ClearColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Color.ClearColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Color.ClearColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Color.ClearColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Color.ClearColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Color.ClearColor[3]);
 	    break;
 	case GL_COLOR_MATERIAL:
 	    params[0] = BOOLEAN_TO_INT(ctx->Light.ColorMaterialEnabled);
@@ -3858,54 +3858,54 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_CURRENT_COLOR: {
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3]);
+	    params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][0]);
+	    params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][1]);
+	    params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][2]);
+	    params[3] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR0][3]);
 	}
 	break;
 	case GL_CURRENT_INDEX: {
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX][0]);
+	    params[0] = iround(ctx->Current.Attrib[VERT_ATTRIB_COLOR_INDEX][0]);
 	}
 	break;
 	case GL_CURRENT_NORMAL: {
 	    FLUSH_CURRENT(ctx, 0);
-	    params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][2]);
+	    params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][0]);
+	    params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][1]);
+	    params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_NORMAL][2]);
 	}
 	break;
 	case GL_CURRENT_RASTER_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Current.RasterColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.RasterColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.RasterColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.RasterColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Current.RasterColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Current.RasterColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Current.RasterColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Current.RasterColor[3]);
 	    break;
 	case GL_CURRENT_RASTER_DISTANCE:
-	    params[0] = IROUND(ctx->Current.RasterDistance);
+	    params[0] = iround(ctx->Current.RasterDistance);
 	    break;
 	case GL_CURRENT_RASTER_INDEX:
-	    params[0] = IROUND(ctx->Current.RasterIndex);
+	    params[0] = iround(ctx->Current.RasterIndex);
 	    break;
 	case GL_CURRENT_RASTER_POSITION:
-	    params[0] = IROUND(ctx->Current.RasterPos[0]);
-	    params[1] = IROUND(ctx->Current.RasterPos[1]);
-	    params[2] = IROUND(ctx->Current.RasterPos[2]);
-	    params[3] = IROUND(ctx->Current.RasterPos[3]);
+	    params[0] = iround(ctx->Current.RasterPos[0]);
+	    params[1] = iround(ctx->Current.RasterPos[1]);
+	    params[2] = iround(ctx->Current.RasterPos[2]);
+	    params[3] = iround(ctx->Current.RasterPos[3]);
 	    break;
 	case GL_CURRENT_RASTER_SECONDARY_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Current.RasterSecondaryColor[3]);
+	    params[0] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[0]);
+	    params[1] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[1]);
+	    params[2] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[2]);
+	    params[3] = mesa_float_to_int(ctx->Current.RasterSecondaryColor[3]);
 	    break;
 	case GL_CURRENT_RASTER_TEXTURE_COORDS: {
 	    const GLuint texUnit = ctx->Texture.CurrentUnit;
-	    params[0] = IROUND(ctx->Current.RasterTexCoords[texUnit][0]);
-	    params[1] = IROUND(ctx->Current.RasterTexCoords[texUnit][1]);
-	    params[2] = IROUND(ctx->Current.RasterTexCoords[texUnit][2]);
-	    params[3] = IROUND(ctx->Current.RasterTexCoords[texUnit][3]);
+	    params[0] = iround(ctx->Current.RasterTexCoords[texUnit][0]);
+	    params[1] = iround(ctx->Current.RasterTexCoords[texUnit][1]);
+	    params[2] = iround(ctx->Current.RasterTexCoords[texUnit][2]);
+	    params[3] = iround(ctx->Current.RasterTexCoords[texUnit][3]);
 	}
 	break;
 	case GL_CURRENT_RASTER_POSITION_VALID:
@@ -3913,30 +3913,30 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_CURRENT_TEXTURE_COORDS: {
 	    const GLuint texUnit = ctx->Texture.CurrentUnit;
-	    params[0] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][0]);
-	    params[1] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][1]);
-	    params[2] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][2]);
-	    params[3] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][3]);
+	    params[0] = iround(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][0]);
+	    params[1] = iround(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][1]);
+	    params[2] = iround(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][2]);
+	    params[3] = iround(ctx->Current.Attrib[VERT_ATTRIB_TEX0 + texUnit][3]);
 	}
 	break;
 	case GL_DEPTH_BIAS:
-	    params[0] = IROUND(ctx->Pixel.DepthBias);
+	    params[0] = iround(ctx->Pixel.DepthBias);
 	    break;
 	case GL_DEPTH_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.depthBits;
 	    break;
 	case GL_DEPTH_CLEAR_VALUE:
-	    params[0] = IROUND(ctx->Depth.Clear);
+	    params[0] = iround(ctx->Depth.Clear);
 	    break;
 	case GL_DEPTH_FUNC:
 	    params[0] = ENUM_TO_INT(ctx->Depth.Func);
 	    break;
 	case GL_DEPTH_RANGE:
-	    params[0] = FLOAT_TO_INT(ctx->Viewport.Near);
-	    params[1] = FLOAT_TO_INT(ctx->Viewport.Far);
+	    params[0] = mesa_float_to_int(ctx->Viewport.Near);
+	    params[1] = mesa_float_to_int(ctx->Viewport.Far);
 	    break;
 	case GL_DEPTH_SCALE:
-	    params[0] = IROUND(ctx->Pixel.DepthScale);
+	    params[0] = iround(ctx->Pixel.DepthScale);
 	    break;
 	case GL_DEPTH_TEST:
 	    params[0] = BOOLEAN_TO_INT(ctx->Depth.Test);
@@ -3968,40 +3968,40 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Fog.Enabled);
 	    break;
 	case GL_FOG_COLOR:
-	    params[0] = FLOAT_TO_INT(ctx->Fog.Color[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Fog.Color[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Fog.Color[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Fog.Color[3]);
+	    params[0] = mesa_float_to_int(ctx->Fog.Color[0]);
+	    params[1] = mesa_float_to_int(ctx->Fog.Color[1]);
+	    params[2] = mesa_float_to_int(ctx->Fog.Color[2]);
+	    params[3] = mesa_float_to_int(ctx->Fog.Color[3]);
 	    break;
 	case GL_FOG_DENSITY:
-	    params[0] = IROUND(ctx->Fog.Density);
+	    params[0] = iround(ctx->Fog.Density);
 	    break;
 	case GL_FOG_END:
-	    params[0] = IROUND(ctx->Fog.End);
+	    params[0] = iround(ctx->Fog.End);
 	    break;
 	case GL_FOG_HINT:
 	    params[0] = ENUM_TO_INT(ctx->Hint.Fog);
 	    break;
 	case GL_FOG_INDEX:
-	    params[0] = IROUND(ctx->Fog.Index);
+	    params[0] = iround(ctx->Fog.Index);
 	    break;
 	case GL_FOG_MODE:
 	    params[0] = ENUM_TO_INT(ctx->Fog.Mode);
 	    break;
 	case GL_FOG_START:
-	    params[0] = IROUND(ctx->Fog.Start);
+	    params[0] = iround(ctx->Fog.Start);
 	    break;
 	case GL_FRONT_FACE:
 	    params[0] = ENUM_TO_INT(ctx->Polygon.FrontFace);
 	    break;
 	case GL_GREEN_BIAS:
-	    params[0] = IROUND(ctx->Pixel.GreenBias);
+	    params[0] = iround(ctx->Pixel.GreenBias);
 	    break;
 	case GL_GREEN_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.greenBits;
 	    break;
 	case GL_GREEN_SCALE:
-	    params[0] = IROUND(ctx->Pixel.GreenScale);
+	    params[0] = iround(ctx->Pixel.GreenScale);
 	    break;
 	case GL_INDEX_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.indexBits;
@@ -4049,10 +4049,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Light.Enabled);
 	    break;
 	case GL_LIGHT_MODEL_AMBIENT:
-	    params[0] = FLOAT_TO_INT(ctx->Light.Model.Ambient[0]);
-	    params[1] = FLOAT_TO_INT(ctx->Light.Model.Ambient[1]);
-	    params[2] = FLOAT_TO_INT(ctx->Light.Model.Ambient[2]);
-	    params[3] = FLOAT_TO_INT(ctx->Light.Model.Ambient[3]);
+	    params[0] = mesa_float_to_int(ctx->Light.Model.Ambient[0]);
+	    params[1] = mesa_float_to_int(ctx->Light.Model.Ambient[1]);
+	    params[2] = mesa_float_to_int(ctx->Light.Model.Ambient[2]);
+	    params[3] = mesa_float_to_int(ctx->Light.Model.Ambient[3]);
 	    break;
 	case GL_LIGHT_MODEL_COLOR_CONTROL:
 	    params[0] = ENUM_TO_INT(ctx->Light.Model.ColorControl);
@@ -4079,18 +4079,18 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ctx->Line.StippleFactor;
 	    break;
 	case GL_LINE_WIDTH:
-	    params[0] = IROUND(ctx->Line.Width);
+	    params[0] = iround(ctx->Line.Width);
 	    break;
 	case GL_LINE_WIDTH_GRANULARITY:
-	    params[0] = IROUND(ctx->Const.LineWidthGranularity);
+	    params[0] = iround(ctx->Const.LineWidthGranularity);
 	    break;
 	case GL_LINE_WIDTH_RANGE:
-	    params[0] = IROUND(ctx->Const.MinLineWidthAA);
-	    params[1] = IROUND(ctx->Const.MaxLineWidthAA);
+	    params[0] = iround(ctx->Const.MinLineWidthAA);
+	    params[1] = iround(ctx->Const.MaxLineWidthAA);
 	    break;
 	case GL_ALIASED_LINE_WIDTH_RANGE:
-	    params[0] = IROUND(ctx->Const.MinLineWidth);
-	    params[1] = IROUND(ctx->Const.MaxLineWidth);
+	    params[0] = iround(ctx->Const.MinLineWidth);
+	    params[1] = iround(ctx->Const.MaxLineWidth);
 	    break;
 	case GL_LIST_BASE:
 	    params[0] = ctx->List.ListBase;
@@ -4122,8 +4122,8 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Eval.Map1Color4);
 	    break;
 	case GL_MAP1_GRID_DOMAIN:
-	    params[0] = IROUND(ctx->Eval.MapGrid1u1);
-	    params[1] = IROUND(ctx->Eval.MapGrid1u2);
+	    params[0] = iround(ctx->Eval.MapGrid1u1);
+	    params[1] = iround(ctx->Eval.MapGrid1u2);
 	    break;
 	case GL_MAP1_GRID_SEGMENTS:
 	    params[0] = ctx->Eval.MapGrid1un;
@@ -4156,10 +4156,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = BOOLEAN_TO_INT(ctx->Eval.Map2Color4);
 	    break;
 	case GL_MAP2_GRID_DOMAIN:
-	    params[0] = IROUND(ctx->Eval.MapGrid2u1);
-	    params[1] = IROUND(ctx->Eval.MapGrid2u2);
-	    params[2] = IROUND(ctx->Eval.MapGrid2v1);
-	    params[3] = IROUND(ctx->Eval.MapGrid2v2);
+	    params[0] = iround(ctx->Eval.MapGrid2u1);
+	    params[1] = iround(ctx->Eval.MapGrid2u2);
+	    params[2] = iround(ctx->Eval.MapGrid2v1);
+	    params[3] = iround(ctx->Eval.MapGrid2v2);
 	    break;
 	case GL_MAP2_GRID_SEGMENTS:
 	    params[0] = ctx->Eval.MapGrid2un;
@@ -4249,22 +4249,22 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_MODELVIEW_MATRIX: {
 	    const GLfloat *matrix = ctx->ModelviewMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[1]);
-	    params[2] = IROUND(matrix[2]);
-	    params[3] = IROUND(matrix[3]);
-	    params[4] = IROUND(matrix[4]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[6]);
-	    params[7] = IROUND(matrix[7]);
-	    params[8] = IROUND(matrix[8]);
-	    params[9] = IROUND(matrix[9]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[11]);
-	    params[12] = IROUND(matrix[12]);
-	    params[13] = IROUND(matrix[13]);
-	    params[14] = IROUND(matrix[14]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[1]);
+	    params[2] = iround(matrix[2]);
+	    params[3] = iround(matrix[3]);
+	    params[4] = iround(matrix[4]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[6]);
+	    params[7] = iround(matrix[7]);
+	    params[8] = iround(matrix[8]);
+	    params[9] = iround(matrix[9]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[11]);
+	    params[12] = iround(matrix[12]);
+	    params[13] = iround(matrix[13]);
+	    params[14] = iround(matrix[14]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_MODELVIEW_STACK_DEPTH:
@@ -4337,18 +4337,18 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ctx->PixelMaps.StoS.Size;
 	    break;
 	case GL_POINT_SIZE:
-	    params[0] = IROUND(ctx->Point.Size);
+	    params[0] = iround(ctx->Point.Size);
 	    break;
 	case GL_POINT_SIZE_GRANULARITY:
-	    params[0] = IROUND(ctx->Const.PointSizeGranularity);
+	    params[0] = iround(ctx->Const.PointSizeGranularity);
 	    break;
 	case GL_POINT_SIZE_RANGE:
-	    params[0] = IROUND(ctx->Const.MinPointSizeAA);
-	    params[1] = IROUND(ctx->Const.MaxPointSizeAA);
+	    params[0] = iround(ctx->Const.MinPointSizeAA);
+	    params[1] = iround(ctx->Const.MaxPointSizeAA);
 	    break;
 	case GL_ALIASED_POINT_SIZE_RANGE:
-	    params[0] = IROUND(ctx->Const.MinPointSize);
-	    params[1] = IROUND(ctx->Const.MaxPointSize);
+	    params[0] = iround(ctx->Const.MinPointSize);
+	    params[1] = iround(ctx->Const.MaxPointSize);
 	    break;
 	case GL_POINT_SMOOTH:
 	    params[0] = BOOLEAN_TO_INT(ctx->Point.SmoothFlag);
@@ -4357,31 +4357,31 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->Hint.PointSmooth);
 	    break;
 	case GL_POINT_SIZE_MIN_EXT:
-	    params[0] = IROUND(ctx->Point.MinSize);
+	    params[0] = iround(ctx->Point.MinSize);
 	    break;
 	case GL_POINT_SIZE_MAX_EXT:
-	    params[0] = IROUND(ctx->Point.MaxSize);
+	    params[0] = iround(ctx->Point.MaxSize);
 	    break;
 	case GL_POINT_FADE_THRESHOLD_SIZE_EXT:
-	    params[0] = IROUND(ctx->Point.Threshold);
+	    params[0] = iround(ctx->Point.Threshold);
 	    break;
 	case GL_DISTANCE_ATTENUATION_EXT:
-	    params[0] = IROUND(ctx->Point.Params[0]);
-	    params[1] = IROUND(ctx->Point.Params[1]);
-	    params[2] = IROUND(ctx->Point.Params[2]);
+	    params[0] = iround(ctx->Point.Params[0]);
+	    params[1] = iround(ctx->Point.Params[1]);
+	    params[2] = iround(ctx->Point.Params[2]);
 	    break;
 	case GL_POLYGON_MODE:
 	    params[0] = ENUM_TO_INT(ctx->Polygon.FrontMode);
 	    params[1] = ENUM_TO_INT(ctx->Polygon.BackMode);
 	    break;
 	case GL_POLYGON_OFFSET_BIAS_EXT:
-	    params[0] = IROUND(ctx->Polygon.OffsetUnits);
+	    params[0] = iround(ctx->Polygon.OffsetUnits);
 	    break;
 	case GL_POLYGON_OFFSET_FACTOR:
-	    params[0] = IROUND(ctx->Polygon.OffsetFactor);
+	    params[0] = iround(ctx->Polygon.OffsetFactor);
 	    break;
 	case GL_POLYGON_OFFSET_UNITS:
-	    params[0] = IROUND(ctx->Polygon.OffsetUnits);
+	    params[0] = iround(ctx->Polygon.OffsetUnits);
 	    break;
 	case GL_POLYGON_OFFSET_POINT:
 	    params[0] = BOOLEAN_TO_INT(ctx->Polygon.OffsetPoint);
@@ -4403,22 +4403,22 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_PROJECTION_MATRIX: {
 	    const GLfloat *matrix = ctx->ProjectionMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[1]);
-	    params[2] = IROUND(matrix[2]);
-	    params[3] = IROUND(matrix[3]);
-	    params[4] = IROUND(matrix[4]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[6]);
-	    params[7] = IROUND(matrix[7]);
-	    params[8] = IROUND(matrix[8]);
-	    params[9] = IROUND(matrix[9]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[11]);
-	    params[12] = IROUND(matrix[12]);
-	    params[13] = IROUND(matrix[13]);
-	    params[14] = IROUND(matrix[14]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[1]);
+	    params[2] = iround(matrix[2]);
+	    params[3] = iround(matrix[3]);
+	    params[4] = iround(matrix[4]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[6]);
+	    params[7] = iround(matrix[7]);
+	    params[8] = iround(matrix[8]);
+	    params[9] = iround(matrix[9]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[11]);
+	    params[12] = iround(matrix[12]);
+	    params[13] = iround(matrix[13]);
+	    params[14] = iround(matrix[14]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_PROJECTION_STACK_DEPTH:
@@ -4428,13 +4428,13 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = ENUM_TO_INT(ctx->ReadBuffer->ColorReadBuffer);
 	    break;
 	case GL_RED_BIAS:
-	    params[0] = IROUND(ctx->Pixel.RedBias);
+	    params[0] = iround(ctx->Pixel.RedBias);
 	    break;
 	case GL_RED_BITS:
 	    params[0] = ctx->DrawBuffer->Visual.redBits;
 	    break;
 	case GL_RED_SCALE:
-	    params[0] = IROUND(ctx->Pixel.RedScale);
+	    params[0] = iround(ctx->Pixel.RedScale);
 	    break;
 	case GL_RENDER_MODE:
 	    params[0] = ENUM_TO_INT(ctx->RenderMode);
@@ -4531,22 +4531,22 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_TEXTURE_MATRIX: {
 	    const GLfloat *matrix = ctx->TextureMatrixStack[ctx->Texture.CurrentUnit].Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[1]);
-	    params[2] = IROUND(matrix[2]);
-	    params[3] = IROUND(matrix[3]);
-	    params[4] = IROUND(matrix[4]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[6]);
-	    params[7] = IROUND(matrix[7]);
-	    params[8] = IROUND(matrix[8]);
-	    params[9] = IROUND(matrix[9]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[11]);
-	    params[12] = IROUND(matrix[12]);
-	    params[13] = IROUND(matrix[13]);
-	    params[14] = IROUND(matrix[14]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[1]);
+	    params[2] = iround(matrix[2]);
+	    params[3] = iround(matrix[3]);
+	    params[4] = iround(matrix[4]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[6]);
+	    params[7] = iround(matrix[7]);
+	    params[8] = iround(matrix[8]);
+	    params[9] = iround(matrix[9]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[11]);
+	    params[12] = iround(matrix[12]);
+	    params[13] = iround(matrix[13]);
+	    params[14] = iround(matrix[14]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_TEXTURE_STACK_DEPTH:
@@ -4586,10 +4586,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[3] = ctx->Viewport.Height;
 	    break;
 	case GL_ZOOM_X:
-	    params[0] = IROUND(ctx->Pixel.ZoomX);
+	    params[0] = iround(ctx->Pixel.ZoomX);
 	    break;
 	case GL_ZOOM_Y:
-	    params[0] = IROUND(ctx->Pixel.ZoomY);
+	    params[0] = iround(ctx->Pixel.ZoomY);
 	    break;
 	case GL_VERTEX_ARRAY:
 	    params[0] = BOOLEAN_TO_INT(ctx->Array.ArrayObj->Vertex.Enabled);
@@ -4721,102 +4721,102 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_TRANSPOSE_COLOR_MATRIX_ARB: {
 	    const GLfloat *matrix = ctx->ColorMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[4]);
-	    params[2] = IROUND(matrix[8]);
-	    params[3] = IROUND(matrix[12]);
-	    params[4] = IROUND(matrix[1]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[9]);
-	    params[7] = IROUND(matrix[13]);
-	    params[8] = IROUND(matrix[2]);
-	    params[9] = IROUND(matrix[6]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[14]);
-	    params[12] = IROUND(matrix[3]);
-	    params[13] = IROUND(matrix[7]);
-	    params[14] = IROUND(matrix[11]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[4]);
+	    params[2] = iround(matrix[8]);
+	    params[3] = iround(matrix[12]);
+	    params[4] = iround(matrix[1]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[9]);
+	    params[7] = iround(matrix[13]);
+	    params[8] = iround(matrix[2]);
+	    params[9] = iround(matrix[6]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[14]);
+	    params[12] = iround(matrix[3]);
+	    params[13] = iround(matrix[7]);
+	    params[14] = iround(matrix[11]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_TRANSPOSE_MODELVIEW_MATRIX_ARB: {
 	    const GLfloat *matrix = ctx->ModelviewMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[4]);
-	    params[2] = IROUND(matrix[8]);
-	    params[3] = IROUND(matrix[12]);
-	    params[4] = IROUND(matrix[1]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[9]);
-	    params[7] = IROUND(matrix[13]);
-	    params[8] = IROUND(matrix[2]);
-	    params[9] = IROUND(matrix[6]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[14]);
-	    params[12] = IROUND(matrix[3]);
-	    params[13] = IROUND(matrix[7]);
-	    params[14] = IROUND(matrix[11]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[4]);
+	    params[2] = iround(matrix[8]);
+	    params[3] = iround(matrix[12]);
+	    params[4] = iround(matrix[1]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[9]);
+	    params[7] = iround(matrix[13]);
+	    params[8] = iround(matrix[2]);
+	    params[9] = iround(matrix[6]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[14]);
+	    params[12] = iround(matrix[3]);
+	    params[13] = iround(matrix[7]);
+	    params[14] = iround(matrix[11]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_TRANSPOSE_PROJECTION_MATRIX_ARB: {
 	    const GLfloat *matrix = ctx->ProjectionMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[4]);
-	    params[2] = IROUND(matrix[8]);
-	    params[3] = IROUND(matrix[12]);
-	    params[4] = IROUND(matrix[1]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[9]);
-	    params[7] = IROUND(matrix[13]);
-	    params[8] = IROUND(matrix[2]);
-	    params[9] = IROUND(matrix[6]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[14]);
-	    params[12] = IROUND(matrix[3]);
-	    params[13] = IROUND(matrix[7]);
-	    params[14] = IROUND(matrix[11]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[4]);
+	    params[2] = iround(matrix[8]);
+	    params[3] = iround(matrix[12]);
+	    params[4] = iround(matrix[1]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[9]);
+	    params[7] = iround(matrix[13]);
+	    params[8] = iround(matrix[2]);
+	    params[9] = iround(matrix[6]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[14]);
+	    params[12] = iround(matrix[3]);
+	    params[13] = iround(matrix[7]);
+	    params[14] = iround(matrix[11]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_TRANSPOSE_TEXTURE_MATRIX_ARB: {
 	    const GLfloat *matrix = ctx->TextureMatrixStack[ctx->Texture.CurrentUnit].Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[4]);
-	    params[2] = IROUND(matrix[8]);
-	    params[3] = IROUND(matrix[12]);
-	    params[4] = IROUND(matrix[1]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[9]);
-	    params[7] = IROUND(matrix[13]);
-	    params[8] = IROUND(matrix[2]);
-	    params[9] = IROUND(matrix[6]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[14]);
-	    params[12] = IROUND(matrix[3]);
-	    params[13] = IROUND(matrix[7]);
-	    params[14] = IROUND(matrix[11]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[4]);
+	    params[2] = iround(matrix[8]);
+	    params[3] = iround(matrix[12]);
+	    params[4] = iround(matrix[1]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[9]);
+	    params[7] = iround(matrix[13]);
+	    params[8] = iround(matrix[2]);
+	    params[9] = iround(matrix[6]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[14]);
+	    params[12] = iround(matrix[3]);
+	    params[13] = iround(matrix[7]);
+	    params[14] = iround(matrix[11]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_COLOR_MATRIX_SGI: {
 	    const GLfloat *matrix = ctx->ColorMatrixStack.Top->m;
-	    params[0] = IROUND(matrix[0]);
-	    params[1] = IROUND(matrix[1]);
-	    params[2] = IROUND(matrix[2]);
-	    params[3] = IROUND(matrix[3]);
-	    params[4] = IROUND(matrix[4]);
-	    params[5] = IROUND(matrix[5]);
-	    params[6] = IROUND(matrix[6]);
-	    params[7] = IROUND(matrix[7]);
-	    params[8] = IROUND(matrix[8]);
-	    params[9] = IROUND(matrix[9]);
-	    params[10] = IROUND(matrix[10]);
-	    params[11] = IROUND(matrix[11]);
-	    params[12] = IROUND(matrix[12]);
-	    params[13] = IROUND(matrix[13]);
-	    params[14] = IROUND(matrix[14]);
-	    params[15] = IROUND(matrix[15]);
+	    params[0] = iround(matrix[0]);
+	    params[1] = iround(matrix[1]);
+	    params[2] = iround(matrix[2]);
+	    params[3] = iround(matrix[3]);
+	    params[4] = iround(matrix[4]);
+	    params[5] = iround(matrix[5]);
+	    params[6] = iround(matrix[6]);
+	    params[7] = iround(matrix[7]);
+	    params[8] = iround(matrix[8]);
+	    params[9] = iround(matrix[9]);
+	    params[10] = iround(matrix[10]);
+	    params[11] = iround(matrix[11]);
+	    params[12] = iround(matrix[12]);
+	    params[13] = iround(matrix[13]);
+	    params[14] = iround(matrix[14]);
+	    params[15] = iround(matrix[15]);
 	}
 	break;
 	case GL_COLOR_MATRIX_STACK_DEPTH_SGI:
@@ -4826,28 +4826,28 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    params[0] = MAX_COLOR_STACK_DEPTH;
 	    break;
 	case GL_POST_COLOR_MATRIX_RED_SCALE_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixScale[0]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixScale[0]);
 	    break;
 	case GL_POST_COLOR_MATRIX_GREEN_SCALE_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixScale[1]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixScale[1]);
 	    break;
 	case GL_POST_COLOR_MATRIX_BLUE_SCALE_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixScale[2]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixScale[2]);
 	    break;
 	case GL_POST_COLOR_MATRIX_ALPHA_SCALE_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixScale[3]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixScale[3]);
 	    break;
 	case GL_POST_COLOR_MATRIX_RED_BIAS_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixBias[0]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixBias[0]);
 	    break;
 	case GL_POST_COLOR_MATRIX_GREEN_BIAS_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixBias[1]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixBias[1]);
 	    break;
 	case GL_POST_COLOR_MATRIX_BLUE_BIAS_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixBias[2]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixBias[2]);
 	    break;
 	case GL_POST_COLOR_MATRIX_ALPHA_BIAS_SGI:
-	    params[0] = IROUND(ctx->Pixel.PostColorMatrixBias[3]);
+	    params[0] = iround(ctx->Pixel.PostColorMatrixBias[3]);
 	    break;
 	case GL_CONVOLUTION_1D_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
@@ -4863,35 +4863,35 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_POST_CONVOLUTION_RED_SCALE_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionScale[0]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionScale[0]);
 	    break;
 	case GL_POST_CONVOLUTION_GREEN_SCALE_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionScale[1]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionScale[1]);
 	    break;
 	case GL_POST_CONVOLUTION_BLUE_SCALE_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionScale[2]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionScale[2]);
 	    break;
 	case GL_POST_CONVOLUTION_ALPHA_SCALE_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionScale[3]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionScale[3]);
 	    break;
 	case GL_POST_CONVOLUTION_RED_BIAS_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionBias[0]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionBias[0]);
 	    break;
 	case GL_POST_CONVOLUTION_GREEN_BIAS_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionBias[1]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionBias[1]);
 	    break;
 	case GL_POST_CONVOLUTION_BLUE_BIAS_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionBias[2]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionBias[2]);
 	    break;
 	case GL_POST_CONVOLUTION_ALPHA_BIAS_EXT:
 	    CHECK_EXT1(EXT_convolution, "GetIntegerv");
-	    params[0] = IROUND(ctx->Pixel.PostConvolutionBias[3]);
+	    params[0] = iround(ctx->Pixel.PostConvolutionBias[3]);
 	    break;
 	case GL_HISTOGRAM:
 	    CHECK_EXT1(EXT_histogram, "GetIntegerv");
@@ -4925,10 +4925,10 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    CHECK_EXT1(EXT_secondary_color, "GetIntegerv");
 	    {
 		FLUSH_CURRENT(ctx, 0);
-		params[0] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0]);
-		params[1] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1]);
-		params[2] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2]);
-		params[3] = FLOAT_TO_INT(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3]);
+		params[0] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][0]);
+		params[1] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][1]);
+		params[2] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][2]);
+		params[3] = mesa_float_to_int(ctx->Current.Attrib[VERT_ATTRIB_COLOR1][3]);
 	    }
 	    break;
 	case GL_SECONDARY_COLOR_ARRAY_EXT:
@@ -4951,7 +4951,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    CHECK_EXT1(EXT_fog_coord, "GetIntegerv");
 	    {
 		FLUSH_CURRENT(ctx, 0);
-		params[0] = IROUND(ctx->Current.Attrib[VERT_ATTRIB_FOG][0]);
+		params[0] = iround(ctx->Current.Attrib[VERT_ATTRIB_FOG][0]);
 	    }
 	    break;
 	case GL_FOG_COORDINATE_ARRAY_EXT:
@@ -4972,11 +4972,11 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_MAX_TEXTURE_LOD_BIAS_EXT:
 	    CHECK_EXT1(EXT_texture_lod_bias, "GetIntegerv");
-	    params[0] = IROUND(ctx->Const.MaxTextureLodBias);
+	    params[0] = iround(ctx->Const.MaxTextureLodBias);
 	    break;
 	case GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT:
 	    CHECK_EXT1(EXT_texture_filter_anisotropic, "GetIntegerv");
-	    params[0] = IROUND(ctx->Const.MaxTextureMaxAnisotropy);
+	    params[0] = iround(ctx->Const.MaxTextureMaxAnisotropy);
 	    break;
 	case GL_MULTISAMPLE_ARB:
 	    CHECK_EXT1(ARB_multisample, "GetIntegerv");
@@ -4996,7 +4996,7 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_SAMPLE_COVERAGE_VALUE_ARB:
 	    CHECK_EXT1(ARB_multisample, "GetIntegerv");
-	    params[0] = IROUND(ctx->Multisample.SampleCoverageValue);
+	    params[0] = iround(ctx->Multisample.SampleCoverageValue);
 	    break;
 	case GL_SAMPLE_COVERAGE_INVERT_ARB:
 	    CHECK_EXT1(ARB_multisample, "GetIntegerv");
@@ -5196,11 +5196,11 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_MAX_SHININESS_NV:
 	    CHECK_EXT1(NV_light_max_exponent, "GetIntegerv");
-	    params[0] = IROUND(ctx->Const.MaxShininess);
+	    params[0] = iround(ctx->Const.MaxShininess);
 	    break;
 	case GL_MAX_SPOT_EXPONENT_NV:
 	    CHECK_EXT1(NV_light_max_exponent, "GetIntegerv");
-	    params[0] = IROUND(ctx->Const.MaxSpotExponent);
+	    params[0] = iround(ctx->Const.MaxSpotExponent);
 	    break;
 	case GL_ARRAY_BUFFER_BINDING_ARB:
 	    CHECK_EXT1(ARB_vertex_buffer_object, "GetIntegerv");
@@ -5278,44 +5278,44 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    CHECK_EXT3(ARB_vertex_program, ARB_fragment_program, NV_fragment_program, "GetIntegerv");
 	    {
 		const GLfloat *matrix = ctx->CurrentStack->Top->m;
-		params[0] = IROUND(matrix[0]);
-		params[1] = IROUND(matrix[1]);
-		params[2] = IROUND(matrix[2]);
-		params[3] = IROUND(matrix[3]);
-		params[4] = IROUND(matrix[4]);
-		params[5] = IROUND(matrix[5]);
-		params[6] = IROUND(matrix[6]);
-		params[7] = IROUND(matrix[7]);
-		params[8] = IROUND(matrix[8]);
-		params[9] = IROUND(matrix[9]);
-		params[10] = IROUND(matrix[10]);
-		params[11] = IROUND(matrix[11]);
-		params[12] = IROUND(matrix[12]);
-		params[13] = IROUND(matrix[13]);
-		params[14] = IROUND(matrix[14]);
-		params[15] = IROUND(matrix[15]);
+		params[0] = iround(matrix[0]);
+		params[1] = iround(matrix[1]);
+		params[2] = iround(matrix[2]);
+		params[3] = iround(matrix[3]);
+		params[4] = iround(matrix[4]);
+		params[5] = iround(matrix[5]);
+		params[6] = iround(matrix[6]);
+		params[7] = iround(matrix[7]);
+		params[8] = iround(matrix[8]);
+		params[9] = iround(matrix[9]);
+		params[10] = iround(matrix[10]);
+		params[11] = iround(matrix[11]);
+		params[12] = iround(matrix[12]);
+		params[13] = iround(matrix[13]);
+		params[14] = iround(matrix[14]);
+		params[15] = iround(matrix[15]);
 	    }
 	    break;
 	case GL_TRANSPOSE_CURRENT_MATRIX_ARB:
 	    CHECK_EXT2(ARB_vertex_program, ARB_fragment_program, "GetIntegerv");
 	    {
 		const GLfloat *matrix = ctx->CurrentStack->Top->m;
-		params[0] = IROUND(matrix[0]);
-		params[1] = IROUND(matrix[4]);
-		params[2] = IROUND(matrix[8]);
-		params[3] = IROUND(matrix[12]);
-		params[4] = IROUND(matrix[1]);
-		params[5] = IROUND(matrix[5]);
-		params[6] = IROUND(matrix[9]);
-		params[7] = IROUND(matrix[13]);
-		params[8] = IROUND(matrix[2]);
-		params[9] = IROUND(matrix[6]);
-		params[10] = IROUND(matrix[10]);
-		params[11] = IROUND(matrix[14]);
-		params[12] = IROUND(matrix[3]);
-		params[13] = IROUND(matrix[7]);
-		params[14] = IROUND(matrix[11]);
-		params[15] = IROUND(matrix[15]);
+		params[0] = iround(matrix[0]);
+		params[1] = iround(matrix[4]);
+		params[2] = iround(matrix[8]);
+		params[3] = iround(matrix[12]);
+		params[4] = iround(matrix[1]);
+		params[5] = iround(matrix[5]);
+		params[6] = iround(matrix[9]);
+		params[7] = iround(matrix[13]);
+		params[8] = iround(matrix[2]);
+		params[9] = iround(matrix[6]);
+		params[10] = iround(matrix[10]);
+		params[11] = iround(matrix[14]);
+		params[12] = iround(matrix[3]);
+		params[13] = iround(matrix[7]);
+		params[14] = iround(matrix[11]);
+		params[15] = iround(matrix[15]);
 	    }
 	    break;
 	case GL_MAX_VERTEX_ATTRIBS_ARB:
@@ -5344,8 +5344,8 @@ _mesa_GetIntegerv(GLenum pname, GLint *params)
 	    break;
 	case GL_DEPTH_BOUNDS_EXT:
 	    CHECK_EXT1(EXT_depth_bounds_test, "GetIntegerv");
-	    params[0] = IROUND(ctx->Depth.BoundsMin);
-	    params[1] = IROUND(ctx->Depth.BoundsMax);
+	    params[0] = iround(ctx->Depth.BoundsMin);
+	    params[1] = iround(ctx->Depth.BoundsMax);
 	    break;
 	case GL_FRAGMENT_PROGRAM_CALLBACK_MESA:
 	    CHECK_EXT1(MESA_program_debug, "GetIntegerv");

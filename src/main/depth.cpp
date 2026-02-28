@@ -45,7 +45,7 @@ _mesa_ClearDepth(GLclampd depth)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    depth = CLAMP(depth, 0.0, 1.0);
+    depth = mesa_clamp(depth, 0.0, 1.0);
 
     if (ctx->Depth.Clear == depth)
 	return;
@@ -133,8 +133,8 @@ _mesa_DepthBoundsEXT(GLclampd zmin, GLclampd zmax)
 	return;
     }
 
-    zmin = CLAMP(zmin, 0.0, 1.0);
-    zmax = CLAMP(zmax, 0.0, 1.0);
+    zmin = mesa_clamp(zmin, 0.0, 1.0);
+    zmax = mesa_clamp(zmax, 0.0, 1.0);
 
     if (ctx->Depth.BoundsMin == zmin && ctx->Depth.BoundsMax == zmax)
 	return;

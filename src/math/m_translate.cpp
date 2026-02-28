@@ -119,15 +119,15 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
  */
 #define SRC GLbyte
 #define SRC_IDX TYPE_IDX(GL_BYTE)
-#define TRX_3FN(f,n)   BYTE_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_3FN(f,n)   mesa_byte_to_float( PTR_ELT(f,n) )
 #if 1
-#define TRX_4F(f,n)   BYTE_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_4F(f,n)   mesa_byte_to_float( PTR_ELT(f,n) )
 #else
 #define TRX_4F(f,n)   static_cast<GLfloat>(( PTR_ELT(f,n) ))
 #endif
-#define TRX_4FN(f,n)   BYTE_TO_FLOAT( PTR_ELT(f,n) )
-#define TRX_UB(ub, f,n)  ub = BYTE_TO_UBYTE( PTR_ELT(f,n) )
-#define TRX_US(ch, f,n)  ch = BYTE_TO_USHORT( PTR_ELT(f,n) )
+#define TRX_4FN(f,n)   mesa_byte_to_float( PTR_ELT(f,n) )
+#define TRX_UB(ub, f,n)  ub = mesa_byte_to_ubyte( PTR_ELT(f,n) )
+#define TRX_US(ch, f,n)  ch = mesa_byte_to_ushort( PTR_ELT(f,n) )
 #define TRX_UI(f,n)  (PTR_ELT(f,n) < 0 ? 0 : static_cast<GLuint>(PTR_ELT(f,n)))
 
 
@@ -181,7 +181,7 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
 #define TRX_4F(f,n)	     static_cast<GLfloat>(( PTR_ELT(f,n) ))
 #define TRX_4FN(f,n)	     UBYTE_TO_FLOAT(PTR_ELT(f,n))
 #define TRX_UB(ub, f,n)	     ub = PTR_ELT(f,n)
-#define TRX_US(us, f,n)      us = UBYTE_TO_USHORT(PTR_ELT(f,n))
+#define TRX_US(us, f,n)      us = mesa_ubyte_to_ushort(PTR_ELT(f,n))
 #define TRX_UI(f,n)          static_cast<GLuint>(PTR_ELT(f,n))
 
 /* 4ub->4ub handled in special case below.
@@ -224,11 +224,11 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
  */
 #define SRC GLshort
 #define SRC_IDX TYPE_IDX(GL_SHORT)
-#define TRX_3FN(f,n)   SHORT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_3FN(f,n)   mesa_short_to_float( PTR_ELT(f,n) )
 #define TRX_4F(f,n)   static_cast<GLfloat>(( PTR_ELT(f,n) ))
-#define TRX_4FN(f,n)  SHORT_TO_FLOAT( PTR_ELT(f,n) )
-#define TRX_UB(ub, f,n)  ub = SHORT_TO_UBYTE(PTR_ELT(f,n))
-#define TRX_US(us, f,n)  us = SHORT_TO_USHORT(PTR_ELT(f,n))
+#define TRX_4FN(f,n)  mesa_short_to_float( PTR_ELT(f,n) )
+#define TRX_UB(ub, f,n)  ub = mesa_short_to_ubyte(PTR_ELT(f,n))
+#define TRX_US(us, f,n)  us = mesa_short_to_ushort(PTR_ELT(f,n))
 #define TRX_UI(f,n)  (PTR_ELT(f,n) < 0 ? 0 : static_cast<GLuint>(PTR_ELT(f,n)))
 
 
@@ -278,9 +278,9 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
  */
 #define SRC GLushort
 #define SRC_IDX TYPE_IDX(GL_UNSIGNED_SHORT)
-#define TRX_3FN(f,n)   USHORT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_3FN(f,n)   mesa_ushort_to_float( PTR_ELT(f,n) )
 #define TRX_4F(f,n)   static_cast<GLfloat>(( PTR_ELT(f,n) ))
-#define TRX_4FN(f,n)  USHORT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_4FN(f,n)  mesa_ushort_to_float( PTR_ELT(f,n) )
 #define TRX_UB(ub,f,n)  ub = static_cast<GLubyte>((PTR_ELT(f,n) >> 8))
 #define TRX_US(us,f,n)  us = PTR_ELT(f,n)
 #define TRX_UI(f,n)  static_cast<GLuint>(PTR_ELT(f,n))
@@ -331,11 +331,11 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
  */
 #define SRC GLint
 #define SRC_IDX TYPE_IDX(GL_INT)
-#define TRX_3FN(f,n)   INT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_3FN(f,n)   mesa_int_to_float( PTR_ELT(f,n) )
 #define TRX_4F(f,n)   static_cast<GLfloat>(( PTR_ELT(f,n) ))
-#define TRX_4FN(f,n)  INT_TO_FLOAT( PTR_ELT(f,n) )
-#define TRX_UB(ub, f,n)  ub = INT_TO_UBYTE(PTR_ELT(f,n))
-#define TRX_US(us, f,n)  us = INT_TO_USHORT(PTR_ELT(f,n))
+#define TRX_4FN(f,n)  mesa_int_to_float( PTR_ELT(f,n) )
+#define TRX_UB(ub, f,n)  ub = mesa_int_to_ubyte(PTR_ELT(f,n))
+#define TRX_US(us, f,n)  us = mesa_int_to_ushort(PTR_ELT(f,n))
 #define TRX_UI(f,n)  (PTR_ELT(f,n) < 0 ? 0 : static_cast<GLuint>(PTR_ELT(f,n)))
 
 
@@ -385,9 +385,9 @@ static trans_4f_func  _math_trans_4fn_tab[5][MAX_TYPES];
  */
 #define SRC GLuint
 #define SRC_IDX TYPE_IDX(GL_UNSIGNED_INT)
-#define TRX_3FN(f,n)   INT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_3FN(f,n)   mesa_int_to_float( PTR_ELT(f,n) )
 #define TRX_4F(f,n)   static_cast<GLfloat>(( PTR_ELT(f,n) ))
-#define TRX_4FN(f,n)  UINT_TO_FLOAT( PTR_ELT(f,n) )
+#define TRX_4FN(f,n)  mesa_uint_to_float( PTR_ELT(f,n) )
 #define TRX_UB(ub, f,n)  ub = static_cast<GLubyte>((PTR_ELT(f,n) >> 24))
 #define TRX_US(us, f,n)  us = static_cast<GLshort>((PTR_ELT(f,n) >> 16))
 #define TRX_UI(f,n)		PTR_ELT(f,n)

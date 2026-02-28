@@ -227,41 +227,42 @@ inline float FREXPF(float x, int *e) { return std::frexp(x, e); }
 
 
 /***
- *** IS_NEGATIVE: test if float is negative
+ *** is_negative / IS_NEGATIVE: test if float is negative
  ***/
 [[nodiscard]] static inline int GET_FLOAT_BITS(float x)
 {
     return float_bits(x);
 }
-#define IS_NEGATIVE(x) (GET_FLOAT_BITS(x) < 0)
+[[nodiscard]] inline bool is_negative(float x) noexcept { return GET_FLOAT_BITS(x) < 0; }
 
 
 /***
- *** DIFFERENT_SIGNS: test if two floats have opposite signs
+ *** different_signs / DIFFERENT_SIGNS: test if two floats have opposite signs
  ***/
 [[nodiscard]] inline bool different_signs(float x, float y) noexcept {
     return (GET_FLOAT_BITS(x) ^ GET_FLOAT_BITS(y)) & (1U << 31);
 }
-#define DIFFERENT_SIGNS(x, y) different_signs(x, y)
 
 
 
 /***
- *** IROUND: return (as an integer) float rounded to nearest integer
+ *** iround / IROUND: return (as an integer) float rounded to nearest integer
  ***/
 [[nodiscard]] inline int iround(float f) noexcept {
     return static_cast<int>(f >= 0.0F ? (f + 0.5F) : (f - 0.5F));
 }
-#define IROUND(f) iround(f)
 
 
 /***
- *** IROUND_POS: return (as an integer) positive float rounded to nearest int
+ *** iround_pos / IROUND_POS: return (as an integer) positive float rounded to nearest int
  ***/
 #ifdef DEBUG
-#define IROUND_POS(f) (assert((f) >= 0.0F), IROUND(f))
+[[nodiscard]] inline int iround_pos(float f) noexcept {
+    assert(f >= 0.0F);
+    return iround(f);
+}
 #else
-#define IROUND_POS(f) (IROUND(f))
+[[nodiscard]] inline int iround_pos(float f) noexcept { return iround(f); }
 #endif
 
 
@@ -276,11 +277,10 @@ static inline int ifloor(float f)
     const int bi = float_bits(bf);
     return (ai - bi) >> 1;
 }
-#define IFLOOR(x)  ifloor(x)
 
 
 /***
- *** ICEIL: return (as an integer) ceiling of float – fast IEEE bit-manipulation.
+ *** iceil: return (as an integer) ceiling of float – fast IEEE bit-manipulation.
  ***/
 static inline int iceil(float f)
 {
@@ -290,7 +290,6 @@ static inline int iceil(float f)
     const int bi = float_bits(bf);
     return (ai - bi + 1) >> 1;
 }
-#define ICEIL(x)  iceil(x)
 
 
 /***

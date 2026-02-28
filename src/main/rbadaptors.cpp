@@ -356,7 +356,7 @@ assert(Wrapped->DataType == GL_UNSIGNED_SHORT);
 assert(count <= MAX_WIDTH);
 Wrapped->GetRow(ctx, count, x, y, values16);
 for (i = 0; i < 4 * count; i++) {
-    values32[i] = USHORT_TO_FLOAT(values16[i]);
+    values32[i] = mesa_ushort_to_float(values16[i]);
 }
     }
 
@@ -369,7 +369,7 @@ assert(DataType == GL_FLOAT);
 assert(Wrapped->DataType == GL_UNSIGNED_SHORT);
 Wrapped->GetValues(ctx, count, x, y, values16);
 for (i = 0; i < 4 * count; i++) {
-    values32[i] = USHORT_TO_FLOAT(values16[i]);
+    values32[i] = mesa_ushort_to_float(values16[i]);
 }
     }
 

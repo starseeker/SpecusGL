@@ -65,16 +65,16 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    /* state[2] is the material attribute */
 	    switch (state[2]) {
 		case STATE_AMBIENT:
-		    COPY_4V(value, mat->Attrib[MAT_ATTRIB_FRONT_AMBIENT + face]);
+		    mesa_copy4v(value, mat->Attrib[MAT_ATTRIB_FRONT_AMBIENT + face]);
 		    return;
 		case STATE_DIFFUSE:
-		    COPY_4V(value, mat->Attrib[MAT_ATTRIB_FRONT_DIFFUSE + face]);
+		    mesa_copy4v(value, mat->Attrib[MAT_ATTRIB_FRONT_DIFFUSE + face]);
 		    return;
 		case STATE_SPECULAR:
-		    COPY_4V(value, mat->Attrib[MAT_ATTRIB_FRONT_SPECULAR + face]);
+		    mesa_copy4v(value, mat->Attrib[MAT_ATTRIB_FRONT_SPECULAR + face]);
 		    return;
 		case STATE_EMISSION:
-		    COPY_4V(value, mat->Attrib[MAT_ATTRIB_FRONT_EMISSION + face]);
+		    mesa_copy4v(value, mat->Attrib[MAT_ATTRIB_FRONT_EMISSION + face]);
 		    return;
 		case STATE_SHININESS:
 		    value[0] = mat->Attrib[MAT_ATTRIB_FRONT_SHININESS + face][0];
@@ -93,16 +93,16 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    /* state[2] is the light attribute */
 	    switch (state[2]) {
 		case STATE_AMBIENT:
-		    COPY_4V(value, ctx->Light.Light[ln].Ambient);
+		    mesa_copy4v(value, ctx->Light.Light[ln].Ambient);
 		    return;
 		case STATE_DIFFUSE:
-		    COPY_4V(value, ctx->Light.Light[ln].Diffuse);
+		    mesa_copy4v(value, ctx->Light.Light[ln].Diffuse);
 		    return;
 		case STATE_SPECULAR:
-		    COPY_4V(value, ctx->Light.Light[ln].Specular);
+		    mesa_copy4v(value, ctx->Light.Light[ln].Specular);
 		    return;
 		case STATE_POSITION:
-		    COPY_4V(value, ctx->Light.Light[ln].EyePosition);
+		    mesa_copy4v(value, ctx->Light.Light[ln].EyePosition);
 		    return;
 		case STATE_ATTENUATION:
 		    value[0] = ctx->Light.Light[ln].ConstantAttenuation;
@@ -111,7 +111,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		    value[3] = ctx->Light.Light[ln].SpotExponent;
 		    return;
 		case STATE_SPOT_DIRECTION:
-		    COPY_3V(value, ctx->Light.Light[ln].EyeDirection);
+		    mesa_copy3v(value, ctx->Light.Light[ln].EyeDirection);
 		    value[3] = ctx->Light.Light[ln]._CosCutoff;
 		    return;
 		case STATE_SPOT_CUTOFF:
@@ -124,16 +124,16 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		     *   halfVector = normalize(normalize(lightPos) + (0, 0, 1))
 		    * light.EyePosition.w should be 0 for infinite lights.
 		     */
-		    COPY_3V(p, ctx->Light.Light[ln].EyePosition);
-		    NORMALIZE_3FV(p);
-		    ADD_3V(value, p, eye_z);
-		    NORMALIZE_3FV(value);
+		    mesa_copy3v(p, ctx->Light.Light[ln].EyePosition);
+		    mesa_normalize3fv(p);
+		    mesa_add3v(value, p, eye_z);
+		    mesa_normalize3fv(value);
 		    value[3] = 1.0;
 		}
 		return;
 		case STATE_POSITION_NORMALIZED:
-		    COPY_4V(value, ctx->Light.Light[ln].EyePosition);
-		    NORMALIZE_3FV(value);
+		    mesa_copy4v(value, ctx->Light.Light[ln].EyePosition);
+		    mesa_normalize3fv(value);
 		    return;
 		default:
 		    _mesa_problem(ctx, "Invalid light state in fetch_state");
@@ -141,7 +141,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    }
 	}
 	case STATE_LIGHTMODEL_AMBIENT:
-	    COPY_4V(value, ctx->Light.Model.Ambient);
+	    mesa_copy4v(value, ctx->Light.Model.Ambient);
 	    return;
 	case STATE_LIGHTMODEL_SCENECOLOR:
 	    if (state[1] == 0) {
@@ -205,28 +205,28 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    /* state[2] is the texgen attribute */
 	    switch (state[2]) {
 		case STATE_TEXGEN_EYE_S:
-		    COPY_4V(value, ctx->Texture.Unit[unit].EyePlaneS);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].EyePlaneS);
 		    return;
 		case STATE_TEXGEN_EYE_T:
-		    COPY_4V(value, ctx->Texture.Unit[unit].EyePlaneT);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].EyePlaneT);
 		    return;
 		case STATE_TEXGEN_EYE_R:
-		    COPY_4V(value, ctx->Texture.Unit[unit].EyePlaneR);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].EyePlaneR);
 		    return;
 		case STATE_TEXGEN_EYE_Q:
-		    COPY_4V(value, ctx->Texture.Unit[unit].EyePlaneQ);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].EyePlaneQ);
 		    return;
 		case STATE_TEXGEN_OBJECT_S:
-		    COPY_4V(value, ctx->Texture.Unit[unit].ObjectPlaneS);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].ObjectPlaneS);
 		    return;
 		case STATE_TEXGEN_OBJECT_T:
-		    COPY_4V(value, ctx->Texture.Unit[unit].ObjectPlaneT);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].ObjectPlaneT);
 		    return;
 		case STATE_TEXGEN_OBJECT_R:
-		    COPY_4V(value, ctx->Texture.Unit[unit].ObjectPlaneR);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].ObjectPlaneR);
 		    return;
 		case STATE_TEXGEN_OBJECT_Q:
-		    COPY_4V(value, ctx->Texture.Unit[unit].ObjectPlaneQ);
+		    mesa_copy4v(value, ctx->Texture.Unit[unit].ObjectPlaneQ);
 		    return;
 		default:
 		    _mesa_problem(ctx, "Invalid texgen state in fetch_state");
@@ -236,11 +236,11 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	case STATE_TEXENV_COLOR: {
 	    /* state[1] is the texture unit */
 	    const GLuint unit = static_cast<GLuint>(state[1]);
-	    COPY_4V(value, ctx->Texture.Unit[unit].EnvColor);
+	    mesa_copy4v(value, ctx->Texture.Unit[unit].EnvColor);
 	}
 	return;
 	case STATE_FOG_COLOR:
-	    COPY_4V(value, ctx->Fog.Color);
+	    mesa_copy4v(value, ctx->Fog.Color);
 	    return;
 	case STATE_FOG_PARAMS:
 	    value[0] = ctx->Fog.Density;
@@ -250,7 +250,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	    return;
 	case STATE_CLIPPLANE: {
 	    const GLuint plane = static_cast<GLuint>(state[1]);
-	    COPY_4V(value, ctx->Transform.EyeUserPlane[plane]);
+	    mesa_copy4v(value, ctx->Transform.EyeUserPlane[plane]);
 	}
 	return;
 	case STATE_POINT_SIZE:
@@ -338,13 +338,13 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	case STATE_FRAGMENT_PROGRAM: {
 	    /* state[1] = {STATE_ENV, STATE_LOCAL} */
 	    /* state[2] = parameter index          */
-	    const int idx = (int) state[2];
+	    const int idx = static_cast<int>(state[2]);
 	    switch (state[1]) {
 		case STATE_ENV:
-		    COPY_4V(value, ctx->FragmentProgram.Parameters[idx]);
+		    mesa_copy4v(value, ctx->FragmentProgram.Parameters[idx]);
 		    break;
 		case STATE_LOCAL:
-		    COPY_4V(value, ctx->FragmentProgram.Current->LocalParams[idx]);
+		    mesa_copy4v(value, ctx->FragmentProgram.Current->LocalParams[idx]);
 		    break;
 		default:
 		    _mesa_problem(ctx, "Bad state switch in _mesa_fetch_state()");
@@ -356,13 +356,13 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	case STATE_VERTEX_PROGRAM: {
 	    /* state[1] = {STATE_ENV, STATE_LOCAL} */
 	    /* state[2] = parameter index          */
-	    const int idx = (int) state[2];
+	    const int idx = static_cast<int>(state[2]);
 	    switch (state[1]) {
 		case STATE_ENV:
-		    COPY_4V(value, ctx->VertexProgram.Parameters[idx]);
+		    mesa_copy4v(value, ctx->VertexProgram.Parameters[idx]);
 		    break;
 		case STATE_LOCAL:
-		    COPY_4V(value, ctx->VertexProgram.Current->LocalParams[idx]);
+		    mesa_copy4v(value, ctx->VertexProgram.Current->LocalParams[idx]);
 		    break;
 		default:
 		    _mesa_problem(ctx, "Bad state switch in _mesa_fetch_state()");
@@ -372,21 +372,21 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	return;
 
 	case STATE_NORMAL_SCALE:
-	    ASSIGN_4V(value, ctx->_ModelViewInvScale, 0, 0, 1);
+	    mesa_assign4v(value, ctx->_ModelViewInvScale, 0, 0, 1);
 	    return;
 
 	case STATE_INTERNAL:
 	    switch (state[1]) {
 		case STATE_NORMAL_SCALE:
-		    ASSIGN_4V(value, ctx->_ModelViewInvScale, 0, 0, 1);
+		    mesa_assign4v(value, ctx->_ModelViewInvScale, 0, 0, 1);
 		    return;
 		case STATE_TEXRECT_SCALE: {
-		    const int unit = (int) state[2];
+		    const int unit = static_cast<int>(state[2]);
 		    const struct gl_texture_object *texObj
 			    = ctx->Texture.Unit[unit]._Current;
 		    if (texObj) {
 			struct gl_texture_image *texImage = texObj->Image[0][0];
-			ASSIGN_4V(value, 1.0 / texImage->Width,
+			mesa_assign4v(value, 1.0 / texImage->Width,
 				  1.0 / texImage->Height,
 				  0.0, 1.0);
 		    }
@@ -410,8 +410,8 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		    /* here, state[2] is the light number */
 		    /* pre-normalize spot dir */
 		    const GLuint ln = static_cast<GLuint>(state[2]);
-		    COPY_3V(value, ctx->Light.Light[ln].EyeDirection);
-		    NORMALIZE_3FV(value);
+		    mesa_copy3v(value, ctx->Light.Light[ln].EyeDirection);
+		    mesa_normalize3fv(value);
 		    value[3] = ctx->Light.Light[ln]._CosCutoff;
 		    return;
 		}

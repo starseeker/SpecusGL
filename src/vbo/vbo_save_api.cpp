@@ -414,7 +414,7 @@ static void _save_copy_to_current(GLcontext *ctx)
     for (i = VBO_ATTRIB_POS+1 ; i < VBO_ATTRIB_MAX ; i++) {
 	if (save->attrsz[i]) {
 	    save->currentsz[i][0] = save->attrsz[i];
-	    COPY_CLEAN_4V(save->current[i],
+	    mesa_copy_clean_4v(save->current[i],
 			  save->attrsz[i],
 			  save->attrptr[i]);
 	}
@@ -518,16 +518,16 @@ static void _save_upgrade_vertex(GLcontext *ctx,
 		if (save->attrsz[j]) {
 		    if (j == attr) {
 			if (oldsz) {
-			    COPY_CLEAN_4V(dest, oldsz, data);
+			    mesa_copy_clean_4v(dest, oldsz, data);
 			    data += oldsz;
 			    dest += newsz;
 			} else {
-			    COPY_SZ_4V(dest, newsz, save->current[attr]);
+			    mesa_copy_sz_4v(dest, newsz, save->current[attr]);
 			    dest += newsz;
 			}
 		    } else {
 			GLint sz = save->attrsz[j];
-			COPY_SZ_4V(dest, sz, data);
+			mesa_copy_sz_4v(dest, sz, data);
 			data += sz;
 			dest += sz;
 		    }

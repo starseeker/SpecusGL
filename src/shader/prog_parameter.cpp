@@ -78,7 +78,7 @@ gl_program_parameter_list::add_parameter(enum register_file type, const char *na
 	p.Size = size;
 	p.DataType = datatype;
 	if (values) {
-	    COPY_4V(ParameterValues[oldNum + i].data(), values);
+	    mesa_copy4v(ParameterValues[oldNum + i].data(), values);
 	    values += 4;
 	} else {
 	    ParameterValues[oldNum + i] = {};
@@ -491,7 +491,7 @@ gl_program_parameter_list::clone() const
     /** Not too efficient, but correct */
     for (i = 0; i < NumParameters(); i++) {
 	const struct gl_program_parameter *p = &Parameters[i];
-	GLuint size = MIN2(p->Size, 4);
+	GLuint size = mesa_min2(p->Size, 4);
 	GLint j = clone->add_parameter(p->Type, p->Name.c_str(), size, p->DataType,
 				      ParameterValues[i].data(), nullptr);
 	assert(j >= 0);

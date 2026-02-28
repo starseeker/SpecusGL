@@ -33,9 +33,7 @@
 #include "mtypes.h"
 
 
-#define SUB_PIXEL 4
-
-
+constexpr int SUB_PIXEL = 4;
 /*
  * Info about the AA line we're rendering
  */
@@ -179,13 +177,13 @@ solve_plane_chan(GLfloat x, GLfloat y, const GLfloat plane[4])
 {
     const GLfloat z = (plane[3] + plane[0] * x + plane[1] * y) / -plane[2];
 #if CHAN_TYPE == GL_FLOAT
-    return CLAMP(z, 0.0F, CHAN_MAXF);
+    return mesa_clamp(z, 0.0F, CHAN_MAXF);
 #else
     if (z < 0)
 	return 0;
     else if (z > CHAN_MAX)
 	return CHAN_MAX;
-    return static_cast<GLchan>(IROUND_POS(z));
+    return static_cast<GLchan>(iround_pos(z));
 #endif
 }
 

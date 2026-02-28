@@ -99,8 +99,7 @@ _slang_preprocess_version(const char *text, GLuint *version, GLuint *eaten, slan
  *    two adjacent tokens.
  */
 
-#define PP_ANNOTATE 0
-
+constexpr int PP_ANNOTATE = 0;
 static void
 pp_annotate(slang_string *output, const char *fmt, ...)
 {
@@ -126,8 +125,7 @@ pp_annotate(slang_string *output, const char *fmt, ...)
 * compilation error.
 */
 
-#define EXECUTION_STACK_SIZE 1024
-
+constexpr int EXECUTION_STACK_SIZE = 1024;
 #define PUSH(x)\
    do {\
       if (sp == 0) {\
@@ -170,31 +168,30 @@ pp_annotate(slang_string *output, const char *fmt, ...)
       PUSH(op a);\
    } while (false)
 
-#define OP_END          0
-#define OP_PUSHINT      1
-#define OP_LOGICALOR    2
-#define OP_LOGICALAND   3
-#define OP_OR           4
-#define OP_XOR          5
-#define OP_AND          6
-#define OP_EQUAL        7
-#define OP_NOTEQUAL     8
-#define OP_LESSEQUAL    9
-#define OP_GREATEREQUAL 10
-#define OP_LESS         11
-#define OP_GREATER      12
-#define OP_LEFTSHIFT    13
-#define OP_RIGHTSHIFT   14
-#define OP_ADD          15
-#define OP_SUBTRACT     16
-#define OP_MULTIPLY     17
-#define OP_DIVIDE       18
-#define OP_MODULUS      19
-#define OP_PLUS         20
-#define OP_MINUS        21
-#define OP_NEGATE       22
-#define OP_COMPLEMENT   23
-
+constexpr int OP_END = 0;
+constexpr int OP_PUSHINT = 1;
+constexpr int OP_LOGICALOR = 2;
+constexpr int OP_LOGICALAND = 3;
+constexpr int OP_OR = 4;
+constexpr int OP_XOR = 5;
+constexpr int OP_AND = 6;
+constexpr int OP_EQUAL = 7;
+constexpr int OP_NOTEQUAL = 8;
+constexpr int OP_LESSEQUAL = 9;
+constexpr int OP_GREATEREQUAL = 10;
+constexpr int OP_LESS = 11;
+constexpr int OP_GREATER = 12;
+constexpr int OP_LEFTSHIFT = 13;
+constexpr int OP_RIGHTSHIFT = 14;
+constexpr int OP_ADD = 15;
+constexpr int OP_SUBTRACT = 16;
+constexpr int OP_MULTIPLY = 17;
+constexpr int OP_DIVIDE = 18;
+constexpr int OP_MODULUS = 19;
+constexpr int OP_PLUS = 20;
+constexpr int OP_MINUS = 21;
+constexpr int OP_NEGATE = 22;
+constexpr int OP_COMPLEMENT = 23;
 static bool
 execute_expression(slang_string *output, const byte *code, GLuint *pi, GLint *result,
 		   slang_info_log *elog)
@@ -297,9 +294,8 @@ execute_expression(slang_string *output, const byte *code, GLuint *pi, GLint *re
  * If it fails, it returns 0. If it succeeds, it returns the number of executed expressions.
  */
 
-#define EXP_END        0
-#define EXP_EXPRESSION 1
-
+constexpr int EXP_END = 0;
+constexpr int EXP_EXPRESSION = 1;
 static GLuint
 execute_expressions(slang_string *output, grammar eid, const byte *expr, GLint results[2],
 		    slang_info_log *elog)
@@ -415,8 +411,7 @@ struct pp_cond_ctx {
 };
 
 /* Should be enuff. */
-#define CONDITION_STACK_SIZE 64
-
+constexpr int CONDITION_STACK_SIZE = 64;
 struct pp_cond_stack {
     std::array<pp_cond_ctx, CONDITION_STACK_SIZE> stack;
     pp_cond_ctx *top;
@@ -758,28 +753,24 @@ parse_if(slang_string *output, const byte *prod, GLuint *pi, GLint *result, pp_s
     return true;
 }
 
-#define ESCAPE_TOKEN 0
-
-#define TOKEN_END       0
-#define TOKEN_DEFINE    1
-#define TOKEN_UNDEF     2
-#define TOKEN_IF        3
-#define TOKEN_ELSE      4
-#define TOKEN_ELIF      5
-#define TOKEN_ENDIF     6
-#define TOKEN_ERROR     7
-#define TOKEN_PRAGMA    8
-#define TOKEN_EXTENSION 9
-#define TOKEN_LINE      10
-
-#define PARAM_END       0
-#define PARAM_PARAMETER 1
-
-#define BEHAVIOR_REQUIRE 1
-#define BEHAVIOR_ENABLE  2
-#define BEHAVIOR_WARN    3
-#define BEHAVIOR_DISABLE 4
-
+constexpr int ESCAPE_TOKEN = 0;
+constexpr int TOKEN_END = 0;
+constexpr int TOKEN_DEFINE = 1;
+constexpr int TOKEN_UNDEF = 2;
+constexpr int TOKEN_IF = 3;
+constexpr int TOKEN_ELSE = 4;
+constexpr int TOKEN_ELIF = 5;
+constexpr int TOKEN_ENDIF = 6;
+constexpr int TOKEN_ERROR = 7;
+constexpr int TOKEN_PRAGMA = 8;
+constexpr int TOKEN_EXTENSION = 9;
+constexpr int TOKEN_LINE = 10;
+constexpr int PARAM_END = 0;
+constexpr int PARAM_PARAMETER = 1;
+constexpr int BEHAVIOR_REQUIRE = 1;
+constexpr int BEHAVIOR_ENABLE = 2;
+constexpr int BEHAVIOR_WARN = 3;
+constexpr int BEHAVIOR_DISABLE = 4;
 static bool
 preprocess_source(slang_string *output, const char *source, grammar pid, grammar eid,
 		  slang_info_log *elog)

@@ -55,7 +55,7 @@ _mesa_LineWidth(GLfloat width)
 
     FLUSH_VERTICES(ctx, _NEW_LINE);
     ctx->Line.Width = width;
-    ctx->Line._Width = CLAMP(width,
+    ctx->Line._Width = mesa_clamp(width,
 			     ctx->Const.MinLineWidth,
 			     ctx->Const.MaxLineWidth);
 
@@ -87,7 +87,7 @@ _mesa_LineStipple(GLint factor, GLushort pattern)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    factor = CLAMP(factor, 1, 256);
+    factor = mesa_clamp(factor, 1, 256);
 
     if (ctx->Line.StippleFactor == factor &&
 	ctx->Line.StipplePattern == pattern)

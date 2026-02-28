@@ -81,14 +81,14 @@ _mesa_update_histogram(GLcontext *ctx, GLuint n, const GLfloat rgba[][4])
 	return;
 
     for (i = 0; i < n; i++) {
-	GLint ri = IROUND(rgba[i][RCOMP] * w);
-	GLint gi = IROUND(rgba[i][GCOMP] * w);
-	GLint bi = IROUND(rgba[i][BCOMP] * w);
-	GLint ai = IROUND(rgba[i][ACOMP] * w);
-	ri = CLAMP(ri, 0, max);
-	gi = CLAMP(gi, 0, max);
-	bi = CLAMP(bi, 0, max);
-	ai = CLAMP(ai, 0, max);
+	GLint ri = iround(rgba[i][RCOMP] * w);
+	GLint gi = iround(rgba[i][GCOMP] * w);
+	GLint bi = iround(rgba[i][BCOMP] * w);
+	GLint ai = iround(rgba[i][ACOMP] * w);
+	ri = mesa_clamp(ri, 0, max);
+	gi = mesa_clamp(gi, 0, max);
+	bi = mesa_clamp(bi, 0, max);
+	ai = mesa_clamp(ai, 0, max);
 	ctx->Histogram.Count[ri][RCOMP]++;
 	ctx->Histogram.Count[gi][GCOMP]++;
 	ctx->Histogram.Count[bi][BCOMP]++;
@@ -711,14 +711,14 @@ _mesa_GetMinmax(GLenum target, GLboolean reset, GLenum format, GLenum type, GLvo
 
     {
 	GLfloat minmax[2][4];
-	minmax[0][RCOMP] = CLAMP(ctx->MinMax.Min[RCOMP], 0.0F, 1.0F);
-	minmax[0][GCOMP] = CLAMP(ctx->MinMax.Min[GCOMP], 0.0F, 1.0F);
-	minmax[0][BCOMP] = CLAMP(ctx->MinMax.Min[BCOMP], 0.0F, 1.0F);
-	minmax[0][ACOMP] = CLAMP(ctx->MinMax.Min[ACOMP], 0.0F, 1.0F);
-	minmax[1][RCOMP] = CLAMP(ctx->MinMax.Max[RCOMP], 0.0F, 1.0F);
-	minmax[1][GCOMP] = CLAMP(ctx->MinMax.Max[GCOMP], 0.0F, 1.0F);
-	minmax[1][BCOMP] = CLAMP(ctx->MinMax.Max[BCOMP], 0.0F, 1.0F);
-	minmax[1][ACOMP] = CLAMP(ctx->MinMax.Max[ACOMP], 0.0F, 1.0F);
+	minmax[0][RCOMP] = mesa_clamp(ctx->MinMax.Min[RCOMP], 0.0F, 1.0F);
+	minmax[0][GCOMP] = mesa_clamp(ctx->MinMax.Min[GCOMP], 0.0F, 1.0F);
+	minmax[0][BCOMP] = mesa_clamp(ctx->MinMax.Min[BCOMP], 0.0F, 1.0F);
+	minmax[0][ACOMP] = mesa_clamp(ctx->MinMax.Min[ACOMP], 0.0F, 1.0F);
+	minmax[1][RCOMP] = mesa_clamp(ctx->MinMax.Max[RCOMP], 0.0F, 1.0F);
+	minmax[1][GCOMP] = mesa_clamp(ctx->MinMax.Max[GCOMP], 0.0F, 1.0F);
+	minmax[1][BCOMP] = mesa_clamp(ctx->MinMax.Max[BCOMP], 0.0F, 1.0F);
+	minmax[1][ACOMP] = mesa_clamp(ctx->MinMax.Max[ACOMP], 0.0F, 1.0F);
 	_mesa_pack_rgba_span_float(ctx, 2, minmax,
 				   format, type, values, &ctx->Pack, 0x0);
     }

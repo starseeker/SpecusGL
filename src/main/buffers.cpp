@@ -84,16 +84,16 @@ _mesa_ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
-    tmp[0] = CLAMP(red,   0.0F, 1.0F);
-    tmp[1] = CLAMP(green, 0.0F, 1.0F);
-    tmp[2] = CLAMP(blue,  0.0F, 1.0F);
-    tmp[3] = CLAMP(alpha, 0.0F, 1.0F);
+    tmp[0] = mesa_clamp(red,   0.0F, 1.0F);
+    tmp[1] = mesa_clamp(green, 0.0F, 1.0F);
+    tmp[2] = mesa_clamp(blue,  0.0F, 1.0F);
+    tmp[3] = mesa_clamp(alpha, 0.0F, 1.0F);
 
-    if (TEST_EQ_4V(tmp, ctx->Color.ClearColor))
+    if (mesa_test_eq_4v(tmp, ctx->Color.ClearColor))
 	return; /* no change */
 
     FLUSH_VERTICES(ctx, _NEW_COLOR);
-    COPY_4V(ctx->Color.ClearColor, tmp);
+    mesa_copy4v(ctx->Color.ClearColor, tmp);
 
     if (ctx->Visual.rgbMode && ctx->Driver.ClearColor) {
 	/* it's OK to call glClearColor in CI mode but it should be a NOP */
@@ -681,7 +681,7 @@ _mesa_SampleCoverageARB(GLclampf value, GLboolean invert)
     }
 
     ASSERT_OUTSIDE_BEGIN_END_AND_FLUSH(ctx);
-    ctx->Multisample.SampleCoverageValue = (GLfloat) CLAMP(value, 0.0, 1.0);
+    ctx->Multisample.SampleCoverageValue = (GLfloat) mesa_clamp(value, 0.0, 1.0);
     ctx->Multisample.SampleCoverageInvert = invert;
     ctx->NewState |= _NEW_MULTISAMPLE;
 }

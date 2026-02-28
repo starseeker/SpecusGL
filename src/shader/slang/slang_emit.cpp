@@ -50,10 +50,8 @@
 #include <algorithm>
 
 
-#define PEEPHOLE_OPTIMIZATIONS 1
-#define ANNOTATE 0
-
-
+constexpr int PEEPHOLE_OPTIMIZATIONS = 1;
+constexpr int ANNOTATE = 0;
 struct slang_emit_info {
     slang_info_log *log;
     slang_var_table *vt;
