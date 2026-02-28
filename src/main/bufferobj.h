@@ -75,11 +75,11 @@ extern void *
 _mesa_buffer_map(GLcontext *ctx, GLenum target, GLenum access,
 		 struct gl_buffer_object * bufObj);
 
-extern GLboolean
+extern bool
 _mesa_buffer_unmap(GLcontext *ctx, GLenum target,
 		   struct gl_buffer_object * bufObj);
 
-extern GLboolean
+extern bool
 _mesa_validate_pbo_access(GLuint dimensions,
 			  const struct gl_pixelstore_attrib *pack,
 			  GLsizei width, GLsizei height, GLsizei depth,

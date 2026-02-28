@@ -471,17 +471,17 @@ _mesa_disable_extension(GLcontext *ctx, const char *name)
 /**
  * Test if the named extension is enabled in this context.
  */
-GLboolean
+bool
 _mesa_extension_is_enabled(GLcontext *ctx, const char *name)
 {
     for (const auto &e : default_extensions) {
 	if (e.name == name) {
 	    if (!e.flag)
-		return GL_TRUE;
+		return true;
 	    return ctx->Extensions.*(e.flag);
 	}
     }
-    return GL_FALSE;
+    return false;
 }
 
 

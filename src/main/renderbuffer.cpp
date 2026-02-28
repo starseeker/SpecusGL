@@ -926,7 +926,7 @@ gl_renderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 			      GLuint width, GLuint height)
 {
     (void) ctx; (void) internalFormat; (void) width; (void) height;
-    return GL_FALSE;
+    return false;
 }
 
 void *
@@ -1238,7 +1238,7 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    break;
 	default:
 	    _mesa_problem(ctx, "Bad internalFormat in SoftRenderbuffer::AllocStorage");
-	    return GL_FALSE;
+	    return false;
     }
 
     assert(rb->DataType);
@@ -1262,14 +1262,14 @@ SoftRenderbuffer::AllocStorage(GLcontext *ctx, GLenum internalFormat,
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY,
 			"software renderbuffer allocation (%d x %d x %d)",
 			width, height, pixelSize);
-	    return GL_FALSE;
+	    return false;
 	}
     }
 
     rb->Width = width;
     rb->Height = height;
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1301,7 +1301,7 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
  */
 
 
-static GLboolean
+static bool
 alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 		     GLenum internalFormat, GLuint width, GLuint height)
 {
@@ -1310,7 +1310,7 @@ alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 
     /* first, pass the call to the wrapped RGB buffer */
     if (!arb->Wrapped->AllocStorage(ctx, internalFormat, width, height)) {
-	return GL_FALSE;
+	return false;
     }
 
     /* next, resize my alpha buffer */
@@ -1322,13 +1322,13 @@ alloc_storage_alpha8(GLcontext *ctx, struct gl_renderbuffer *arb,
 	arb->Width = 0;
 	arb->Height = 0;
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "software alpha buffer allocation");
-	return GL_FALSE;
+	return false;
     }
 
     arb->Width = width;
     arb->Height = height;
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1643,18 +1643,18 @@ _mesa_new_soft_renderbuffer(GLcontext *ctx, GLuint name)
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			      GLuint rgbBits, GLuint alphaBits,
-			      GLboolean frontLeft, GLboolean backLeft,
-			      GLboolean frontRight, GLboolean backRight)
+			      bool frontLeft, bool backLeft,
+			      bool frontRight, bool backRight)
 {
     GLuint b;
 
     if (rgbBits > 16 || alphaBits > 16) {
 	_mesa_problem(ctx,
 		      "Unsupported bit depth in _mesa_add_color_renderbuffers");
-	return GL_FALSE;
+	return false;
     }
 
     assert(MAX_COLOR_ATTACHMENTS >= 4);
@@ -1676,7 +1676,7 @@ _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	rb = _mesa_new_renderbuffer(ctx, 0);
 	if (!rb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating color buffer");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	if (rgbBits <= 8) {
@@ -1699,7 +1699,7 @@ _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	_mesa_add_renderbuffer(fb, b, rb);
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1711,18 +1711,18 @@ _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 				    GLuint indexBits,
-				    GLboolean frontLeft, GLboolean backLeft,
-				    GLboolean frontRight, GLboolean backRight)
+				    bool frontLeft, bool backLeft,
+				    bool frontRight, bool backRight)
 {
     GLuint b;
 
     if (indexBits > 8) {
 	_mesa_problem(ctx,
 		      "Unsupported bit depth in _mesa_add_color_index_renderbuffers");
-	return GL_FALSE;
+	return false;
     }
 
     assert(MAX_COLOR_ATTACHMENTS >= 4);
@@ -1744,7 +1744,7 @@ _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	rb = _mesa_new_renderbuffer(ctx, 0);
 	if (!rb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating color buffer");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	/* only support GLuint for now */
@@ -1754,7 +1754,7 @@ _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	_mesa_add_renderbuffer(fb, b, rb);
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1766,11 +1766,11 @@ _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			      GLuint alphaBits,
-			      GLboolean frontLeft, GLboolean backLeft,
-			      GLboolean frontRight, GLboolean backRight)
+			      bool frontLeft, bool backLeft,
+			      bool frontRight, bool backRight)
 {
     GLuint b;
 
@@ -1780,7 +1780,7 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
     if (alphaBits > 8) {
 	_mesa_problem(ctx,
 		      "Unsupported bit depth in _mesa_add_alpha_renderbuffers");
-	return GL_FALSE;
+	return false;
     }
 
     assert(MAX_COLOR_ATTACHMENTS >= 4);
@@ -1808,7 +1808,7 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	auto *arb = new AlphaRenderbuffer{};
 	if (!arb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating alpha buffer");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	/* wrap the alpha renderbuffer around the RGB renderbuffer */
@@ -1827,7 +1827,7 @@ _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 	_mesa_add_renderbuffer(fb, b, arb);
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1860,7 +1860,7 @@ _mesa_copy_soft_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb)
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			     GLuint depthBits)
 {
@@ -1869,7 +1869,7 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     if (depthBits > 32) {
 	_mesa_problem(ctx,
 		      "Unsupported depthBits in _mesa_add_depth_renderbuffer");
-	return GL_FALSE;
+	return false;
     }
 
     assert(fb->Attachment[BUFFER_DEPTH].Renderbuffer == nullptr);
@@ -1877,7 +1877,7 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating depth buffer");
-	return GL_FALSE;
+	return false;
     }
 
     if (depthBits <= 16) {
@@ -1891,7 +1891,7 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 
     _mesa_add_renderbuffer(fb, BUFFER_DEPTH, rb);
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1903,7 +1903,7 @@ _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			       GLuint stencilBits)
 {
@@ -1912,7 +1912,7 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     if (stencilBits > 16) {
 	_mesa_problem(ctx,
 		      "Unsupported stencilBits in _mesa_add_stencil_renderbuffer");
-	return GL_FALSE;
+	return false;
     }
 
     assert(fb->Attachment[BUFFER_STENCIL].Renderbuffer == nullptr);
@@ -1920,7 +1920,7 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating stencil buffer");
-	return GL_FALSE;
+	return false;
     }
 
     if (stencilBits <= 8) {
@@ -1933,7 +1933,7 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 
     _mesa_add_renderbuffer(fb, BUFFER_STENCIL, rb);
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1945,7 +1945,7 @@ _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
  * renderbuffer; core Mesa will handle all the buffer management and
  * rendering!
  */
-GLboolean
+bool
 _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			     GLuint redBits, GLuint greenBits,
 			     GLuint blueBits, GLuint alphaBits)
@@ -1955,7 +1955,7 @@ _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     if (redBits > 16 || greenBits > 16 || blueBits > 16 || alphaBits > 16) {
 	_mesa_problem(ctx,
 		      "Unsupported accumBits in _mesa_add_accum_renderbuffer");
-	return GL_FALSE;
+	return false;
     }
 
     assert(fb->Attachment[BUFFER_ACCUM].Renderbuffer == nullptr);
@@ -1963,14 +1963,14 @@ _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
     rb = _mesa_new_renderbuffer(ctx, 0);
     if (!rb) {
 	_mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating accum buffer");
-	return GL_FALSE;
+	return false;
     }
 
     rb->_ActualFormat = GL_RGBA16;
     rb->InternalFormat = GL_RGBA16;
     _mesa_add_renderbuffer(fb, BUFFER_ACCUM, rb);
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -1985,7 +1985,7 @@ _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
  *
  * NOTE: color-index aux buffers not supported.
  */
-GLboolean
+bool
 _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			    GLuint colorBits, GLuint numBuffers)
 {
@@ -1994,7 +1994,7 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
     if (colorBits > 16) {
 	_mesa_problem(ctx,
 		      "Unsupported accumBits in _mesa_add_aux_renderbuffers");
-	return GL_FALSE;
+	return false;
     }
 
     assert(numBuffers < MAX_AUX_BUFFERS);
@@ -2006,7 +2006,7 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 
 	if (!rb) {
 	    _mesa_error(ctx, GL_OUT_OF_MEMORY, "Allocating accum buffer");
-	    return GL_FALSE;
+	    return false;
 	}
 
 	if (colorBits <= 8) {
@@ -2018,7 +2018,7 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 
 	_mesa_add_renderbuffer(fb, BUFFER_AUX0 + i, rb);
     }
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -2029,17 +2029,17 @@ _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
  */
 void
 _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
-			     GLboolean color,
-			     GLboolean depth,
-			     GLboolean stencil,
-			     GLboolean accum,
+			     bool color,
+			     bool depth,
+			     bool stencil,
+			     bool accum,
 			     GLboolean alpha,
-			     GLboolean aux)
+			     bool aux)
 {
-    GLboolean frontLeft = GL_TRUE;
-    GLboolean backLeft = fb->Visual.doubleBufferMode;
-    GLboolean frontRight = fb->Visual.stereoMode;
-    GLboolean backRight = fb->Visual.stereoMode && fb->Visual.doubleBufferMode;
+    bool frontLeft = GL_TRUE;
+    bool backLeft = fb->Visual.doubleBufferMode;
+    bool frontRight = fb->Visual.stereoMode;
+    bool backRight = fb->Visual.stereoMode && fb->Visual.doubleBufferMode;
 
     if (color) {
 	if (fb->Visual.rgbMode) {

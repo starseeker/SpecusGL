@@ -194,7 +194,7 @@ _mesa_DisableClientState(GLenum cap)
 /**
  * Helper function to enable or disable a texture target.
  */
-static GLboolean
+static bool
 enable_texture(GLcontext *ctx, GLboolean state, GLbitfield bit)
 {
     const GLuint curr = ctx->Texture.CurrentUnit;
@@ -203,11 +203,11 @@ enable_texture(GLcontext *ctx, GLboolean state, GLbitfield bit)
 			      ? (texUnit->Enabled & ~bit) : (texUnit->Enabled | bit);
 
     if (!ctx->DrawBuffer->Visual.rgbMode || texUnit->Enabled == newenabled)
-	return GL_FALSE;
+	return false;
 
     FLUSH_VERTICES(ctx, _NEW_TEXTURE);
     texUnit->Enabled = newenabled;
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -978,21 +978,21 @@ _mesa_Disable(GLenum cap)
 #define CHECK_EXTENSION(EXTNAME)			\
    if (!ctx->Extensions.EXTNAME) {			\
       _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled");	\
-      return GL_FALSE;					\
+      return false;					\
    }
 
 #undef CHECK_EXTENSION2
 #define CHECK_EXTENSION2(EXT1, EXT2)				\
    if (!ctx->Extensions.EXT1 && !ctx->Extensions.EXT2) {	\
       _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled");		\
-      return GL_FALSE;						\
+      return false;						\
    }
 
 
 /**
  * Helper function to determine whether a texture target is enabled.
  */
-static GLboolean
+static bool
 is_texture_enabled(GLcontext *ctx, GLbitfield bit)
 {
     const struct gl_texture_unit *const texUnit =
@@ -1354,7 +1354,7 @@ _mesa_IsEnabled(GLenum cap)
 #endif /* FEATURE_ATI_fragment_shader */
 	default:
 	    _mesa_error(ctx, GL_INVALID_ENUM, "glIsEnabled(0x%x)", static_cast<int>(cap));
-	    return GL_FALSE;
+	    return false;
     }
 }
 

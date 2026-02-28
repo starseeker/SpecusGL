@@ -699,7 +699,7 @@ _mesa_delete_texture_image(GLcontext *ctx, struct gl_texture_image *texImage)
  *
  * \return true if the target is a proxy target, GL_FALSE otherwise.
  */
-GLboolean
+bool
 _mesa_is_proxy_texture(GLenum target)
 {
     return (target == GL_PROXY_TEXTURE_1D ||
@@ -1210,7 +1210,7 @@ _mesa_init_teximage_fields(GLcontext *ctx, GLenum target,
  * \param border  as passed to glTexImage
  * \return true if the image is acceptable, GL_FALSE if not acceptable.
  */
-GLboolean
+bool
 _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 			  GLint internalFormat, GLenum format, GLenum type,
 			  GLint width, GLint height, GLint depth, GLint border)

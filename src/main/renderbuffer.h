@@ -48,53 +48,53 @@ _mesa_soft_renderbuffer_storage(GLcontext *ctx, struct gl_renderbuffer *rb,
 				GLenum internalFormat,
 				GLuint width, GLuint height);
 
-extern GLboolean
+extern bool
 _mesa_add_color_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			      GLuint rgbBits, GLuint alphaBits,
-			      GLboolean frontLeft, GLboolean backLeft,
-			      GLboolean frontRight, GLboolean backRight);
+			      bool frontLeft, bool backLeft,
+			      bool frontRight, bool backRight);
 
-extern GLboolean
+extern bool
 _mesa_add_color_index_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 				    GLuint indexBits,
-				    GLboolean frontLeft, GLboolean backLeft,
-				    GLboolean frontRight, GLboolean backRight);
+				    bool frontLeft, bool backLeft,
+				    bool frontRight, bool backRight);
 
-extern GLboolean
+extern bool
 _mesa_add_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			      GLuint alphaBits,
-			      GLboolean frontLeft, GLboolean backLeft,
-			      GLboolean frontRight, GLboolean backRight);
+			      bool frontLeft, bool backLeft,
+			      bool frontRight, bool backRight);
 
 extern void
 _mesa_copy_soft_alpha_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb);
 
-extern GLboolean
+extern bool
 _mesa_add_depth_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			     GLuint depthBits);
 
-extern GLboolean
+extern bool
 _mesa_add_stencil_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			       GLuint stencilBits);
 
 
-extern GLboolean
+extern bool
 _mesa_add_accum_renderbuffer(GLcontext *ctx, struct gl_framebuffer *fb,
 			     GLuint redBits, GLuint greenBits,
 			     GLuint blueBits, GLuint alphaBits);
 
-extern GLboolean
+extern bool
 _mesa_add_aux_renderbuffers(GLcontext *ctx, struct gl_framebuffer *fb,
 			    GLuint bits, GLuint numBuffers);
 
 extern void
 _mesa_add_soft_renderbuffers(struct gl_framebuffer *fb,
-			     GLboolean color,
-			     GLboolean depth,
-			     GLboolean stencil,
-			     GLboolean accum,
+			     bool color,
+			     bool depth,
+			     bool stencil,
+			     bool accum,
 			     GLboolean alpha,
-			     GLboolean aux);
+			     bool aux);
 
 extern void
 _mesa_add_renderbuffer(struct gl_framebuffer *fb,

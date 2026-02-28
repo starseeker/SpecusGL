@@ -885,7 +885,7 @@ static struct ureg
 emit_texenv(struct texenv_fragment_program *p, GLuint unit)
 {
     struct state_key *key = p->state;
-    GLboolean saturate = (unit < p->last_tex_stage);
+    bool saturate = (unit < p->last_tex_stage);
     GLuint rgb_shift, alpha_shift;
     struct ureg out, shift;
     struct ureg dest;

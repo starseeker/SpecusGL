@@ -52,7 +52,7 @@ extern GLint
 _mesa_base_tex_format(GLcontext *ctx, GLint internalFormat);
 
 
-extern GLboolean
+extern bool
 _mesa_is_proxy_texture(GLenum target);
 
 
@@ -104,7 +104,7 @@ extern GLint
 _mesa_max_texture_levels(GLcontext *ctx, GLenum target);
 
 
-extern GLboolean
+extern bool
 _mesa_test_proxy_teximage(GLcontext *ctx, GLenum target, GLint level,
 			  GLint internalFormat, GLenum format, GLenum type,
 			  GLint width, GLint height, GLint depth, GLint border);

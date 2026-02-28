@@ -60,9 +60,9 @@
 
 
 /**
- * \return GL_TRUE if type is packed pixel type, GL_FALSE otherwise.
+ * \return true if type is packed pixel type, GL_FALSE otherwise.
  */
-static GLboolean
+static bool
 _mesa_type_is_packed(GLenum type)
 {
     switch (type) {
@@ -81,10 +81,10 @@ _mesa_type_is_packed(GLenum type)
 	case GL_UNSIGNED_SHORT_8_8_MESA:
 	case GL_UNSIGNED_SHORT_8_8_REV_MESA:
 	case GL_UNSIGNED_INT_24_8_EXT:
-	    return GL_TRUE;
+	    return true;
     }
 
-    return GL_FALSE;
+    return false;
 }
 
 /**
@@ -382,10 +382,10 @@ _mesa_bytes_per_pixel(GLenum format, GLenum type)
  * \param format pixel format.
  * \param type pixel type.
  *
- * \return GL_TRUE if the given pixel format and type are legal, or GL_FALSE
+ * \return true if the given pixel format and type are legal, or GL_FALSE
  * otherwise.
  */
-GLboolean
+bool
 _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 {
     switch (format) {
@@ -400,11 +400,11 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 		case GL_INT:
 		case GL_UNSIGNED_INT:
 		case GL_FLOAT:
-		    return GL_TRUE;
+		    return true;
 		case GL_HALF_FLOAT_ARB:
 		    return ctx->Extensions.ARB_half_float_pixel;
 		default:
-		    return GL_FALSE;
+		    return false;
 	    }
 	case GL_RED:
 	case GL_GREEN:
@@ -424,11 +424,11 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 		case GL_INT:
 		case GL_UNSIGNED_INT:
 		case GL_FLOAT:
-		    return GL_TRUE;
+		    return true;
 		case GL_HALF_FLOAT_ARB:
 		    return ctx->Extensions.ARB_half_float_pixel;
 		default:
-		    return GL_FALSE;
+		    return false;
 	    }
 	case GL_RGB:
 	    switch (type) {
@@ -443,11 +443,11 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 		case GL_UNSIGNED_BYTE_2_3_3_REV:
 		case GL_UNSIGNED_SHORT_5_6_5:
 		case GL_UNSIGNED_SHORT_5_6_5_REV:
-		    return GL_TRUE;
+		    return true;
 		case GL_HALF_FLOAT_ARB:
 		    return ctx->Extensions.ARB_half_float_pixel;
 		default:
-		    return GL_FALSE;
+		    return false;
 	    }
 	case GL_BGR:
 	    switch (type) {
@@ -461,11 +461,11 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 		case GL_INT:
 		case GL_UNSIGNED_INT:
 		case GL_FLOAT:
-		    return GL_TRUE;
+		    return true;
 		case GL_HALF_FLOAT_ARB:
 		    return ctx->Extensions.ARB_half_float_pixel;
 		default:
-		    return GL_FALSE;
+		    return false;
 	    }
 	case GL_RGBA:
 	case GL_BGRA:
@@ -486,28 +486,28 @@ _mesa_is_legal_format_and_type(GLcontext *ctx, GLenum format, GLenum type)
 		case GL_UNSIGNED_INT_8_8_8_8_REV:
 		case GL_UNSIGNED_INT_10_10_10_2:
 		case GL_UNSIGNED_INT_2_10_10_10_REV:
-		    return GL_TRUE;
+		    return true;
 		case GL_HALF_FLOAT_ARB:
 		    return ctx->Extensions.ARB_half_float_pixel;
 		default:
-		    return GL_FALSE;
+		    return false;
 	    }
 	case GL_YCBCR_MESA:
 	    if (type == GL_UNSIGNED_SHORT_8_8_MESA ||
 		type == GL_UNSIGNED_SHORT_8_8_REV_MESA)
-		return GL_TRUE;
+		return true;
 	    else
-		return GL_FALSE;
+		return false;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (ctx->Extensions.EXT_packed_depth_stencil
 		&& type == GL_UNSIGNED_INT_24_8_EXT)
-		return GL_TRUE;
+		return true;
 	    else
-		return GL_FALSE;
+		return false;
 	default:
 	    ; /* fall-through */
     }
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -4449,7 +4449,7 @@ _mesa_convert_colors(GLenum srcType, const GLvoid *src,
  * \return  GL_TRUE if image is ready for drawing or
  *          GL_FALSE if image was completely clipped away (draw nothing)
  */
-GLboolean
+bool
 _mesa_clip_drawpixels(const GLcontext *ctx,
 		      GLint *destX, GLint *destY,
 		      GLsizei *width, GLsizei *height,
@@ -4475,7 +4475,7 @@ _mesa_clip_drawpixels(const GLcontext *ctx,
 	*width -= (*destX + *width - buffer->_Xmax);
 
     if (*width <= 0)
-	return GL_FALSE;
+	return false;
 
     if (ctx->Pixel.ZoomY == 1.0F) {
 	/* bottom clipping */
@@ -4502,9 +4502,9 @@ _mesa_clip_drawpixels(const GLcontext *ctx,
     }
 
     if (*height <= 0)
-	return GL_TRUE;
+	return true;
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -4519,7 +4519,7 @@ _mesa_clip_drawpixels(const GLcontext *ctx,
  * \return  GL_TRUE if image is ready for drawing or
  *          GL_FALSE if image was completely clipped away (draw nothing)
  */
-GLboolean
+bool
 _mesa_clip_readpixels(const GLcontext *ctx,
 		      GLint *srcX, GLint *srcY,
 		      GLsizei *width, GLsizei *height,
@@ -4542,7 +4542,7 @@ _mesa_clip_readpixels(const GLcontext *ctx,
 	*width -= (*srcX + *width - buffer->Width);
 
     if (*width <= 0)
-	return GL_FALSE;
+	return false;
 
     /* bottom clipping */
     if (*srcY < 0) {
@@ -4555,18 +4555,18 @@ _mesa_clip_readpixels(const GLcontext *ctx,
 	*height -= (*srcY + *height - buffer->Height);
 
     if (*height <= 0)
-	return GL_TRUE;
+	return true;
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Clip the rectangle defined by (x, y, width, height) against the bounds
  * specified by [xmin, xmax) and [ymin, ymax).
- * \return GL_FALSE if rect is totally clipped, GL_TRUE otherwise.
+ * \return false if rect is totally clipped, GL_TRUE otherwise.
  */
-GLboolean
+bool
 _mesa_clip_to_region(GLint xmin, GLint ymin,
 		     GLint xmax, GLint ymax,
 		     GLint *x, GLint *y,
@@ -4583,7 +4583,7 @@ _mesa_clip_to_region(GLint xmin, GLint ymin,
 	*width -= (*x + *width - xmax - 1);
 
     if (*width <= 0)
-	return GL_FALSE;
+	return false;
 
     /* bottom (or top) clipping */
     if (*y < ymin) {
@@ -4596,9 +4596,9 @@ _mesa_clip_to_region(GLint xmin, GLint ymin,
 	*height -= (*y + *height - ymax - 1);
 
     if (*height <= 0)
-	return GL_FALSE;
+	return false;
 
-    return GL_TRUE;
+    return true;
 }
 
 /*

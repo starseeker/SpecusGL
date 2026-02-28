@@ -688,7 +688,7 @@ _mesa_TexEnvfv(GLenum target, GLenum pname, const GLfloat *param)
 		/* It's kind of weird to set point state via glTexEnv,
 		 * but that's what the spec calls for.
 		 */
-		const GLboolean state = static_cast<GLboolean>(value);
+		const bool state = (value != 0);
 		if (ctx->Point.CoordReplace[ctx->Texture.CurrentUnit] == state)
 		    return;
 		FLUSH_VERTICES(ctx, _NEW_POINT);

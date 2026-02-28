@@ -690,16 +690,16 @@ _mesa_update_framebuffer(GLcontext *ctx)
  * glCopyTex[Sub]Image, etc. exists.
  * \param format  a basic image format such as GL_RGB, GL_RGBA, GL_ALPHA,
  *                GL_DEPTH_COMPONENT, etc. or GL_COLOR, GL_DEPTH, GL_STENCIL.
- * \return GL_TRUE if buffer exists, GL_FALSE otherwise
+ * \return true if buffer exists, GL_FALSE otherwise
  */
-GLboolean
+bool
 _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 {
     const struct gl_renderbuffer_attachment *att
 	    = ctx->ReadBuffer->Attachment;
 
     if (ctx->ReadBuffer->_Status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-	return GL_FALSE;
+	return false;
     }
 
     switch (format) {
@@ -718,7 +718,7 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 	case GL_ABGR_EXT:
 	case GL_COLOR_INDEX:
 	    if (ctx->ReadBuffer->_ColorReadBuffer == nullptr) {
-		return GL_FALSE;
+		return false;
 	    }
 	    /* XXX enable this post 6.5 release:
 	    assert(ctx->ReadBuffer->_ColorReadBuffer->RedBits > 0 ||
@@ -728,21 +728,21 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 	case GL_DEPTH:
 	case GL_DEPTH_COMPONENT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    break;
 	case GL_STENCIL:
 	case GL_STENCIL_INDEX:
 	    if (!att[BUFFER_STENCIL].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer ||
 		!att[BUFFER_STENCIL].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
@@ -751,11 +751,11 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
 	    _mesa_problem(ctx,
 			  "Unexpected format 0x%x in _mesa_source_buffer_exists",
 			  format);
-	    return GL_FALSE;
+	    return false;
     }
 
     /* OK */
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -763,14 +763,14 @@ _mesa_source_buffer_exists(GLcontext *ctx, GLenum format)
  * As above, but for drawing operations.
  * XXX code do some code merging w/ above function.
  */
-GLboolean
+bool
 _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format)
 {
     const struct gl_renderbuffer_attachment *att
 	    = ctx->ReadBuffer->Attachment;
 
     if (ctx->DrawBuffer->_Status != GL_FRAMEBUFFER_COMPLETE_EXT) {
-	return GL_FALSE;
+	return false;
     }
 
     switch (format) {
@@ -794,21 +794,21 @@ _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format)
 	case GL_DEPTH:
 	case GL_DEPTH_COMPONENT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    break;
 	case GL_STENCIL:
 	case GL_STENCIL_INDEX:
 	    if (!att[BUFFER_STENCIL].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
 	    break;
 	case GL_DEPTH_STENCIL_EXT:
 	    if (!att[BUFFER_DEPTH].Renderbuffer ||
 		!att[BUFFER_STENCIL].Renderbuffer) {
-		return GL_FALSE;
+		return false;
 	    }
 	    assert(att[BUFFER_DEPTH].Renderbuffer->DepthBits > 0);
 	    assert(att[BUFFER_STENCIL].Renderbuffer->StencilBits > 0);
@@ -817,11 +817,11 @@ _mesa_dest_buffer_exists(GLcontext *ctx, GLenum format)
 	    _mesa_problem(ctx,
 			  "Unexpected format 0x%x in _mesa_source_buffer_exists",
 			  format);
-	    return GL_FALSE;
+	    return false;
     }
 
     /* OK */
-    return GL_TRUE;
+    return true;
 }
 
 /*

@@ -1287,7 +1287,7 @@ osmesa_context::create(GLenum fmt,
     auto *osmesa = new osmesa_context{};
 
     osmesa->gl_visual = _mesa_create_visual(rgbmode,
-					    GL_FALSE, GL_FALSE,
+					    false, false,
 					    redBits, greenBits, blueBits, alphaBits,
 					    indexBits,
 					    depthBits, stencilBits,
@@ -1333,12 +1333,12 @@ osmesa_context::create(GLenum fmt,
     assert(osmesa->rb->RefCount == 2);
 
     _mesa_add_soft_renderbuffers(osmesa->gl_buffer,
-				 GL_FALSE,
+				 false,
 				 osmesa->gl_visual->haveDepthBuffer,
 				 osmesa->gl_visual->haveStencilBuffer,
 				 osmesa->gl_visual->haveAccumBuffer,
-				 GL_FALSE,
-				 GL_FALSE);
+				 false,
+				 false);
 
     osmesa->format       = fmt;
     osmesa->userRowLength = 0;

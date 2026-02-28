@@ -219,9 +219,9 @@ _mesa_notifySwapBuffers(__GLcontext *gc)
  * \note Need to add params for level and numAuxBuffers (at least)
  */
 GLvisual *
-_mesa_create_visual(GLboolean rgbFlag,
-		    GLboolean dbFlag,
-		    GLboolean stereoFlag,
+_mesa_create_visual(bool rgbFlag,
+		    bool dbFlag,
+		    bool stereoFlag,
 		    GLint redBits,
 		    GLint greenBits,
 		    GLint blueBits,
@@ -253,15 +253,15 @@ _mesa_create_visual(GLboolean rgbFlag,
  * GLvisual object with the given parameters.  If the caller needs
  * to set additional fields, he should just probably init the whole GLvisual
  * object himself.
- * \return GL_TRUE on success, or GL_FALSE on failure.
+ * \return true on success, or false on failure.
  *
  * \sa _mesa_create_visual() above for the parameter description.
  */
-GLboolean
+bool
 _mesa_initialize_visual(GLvisual *vis,
-			GLboolean rgbFlag,
-			GLboolean dbFlag,
-			GLboolean stereoFlag,
+			bool rgbFlag,
+			bool dbFlag,
+			bool stereoFlag,
 			GLint redBits,
 			GLint greenBits,
 			GLint blueBits,
@@ -278,10 +278,10 @@ _mesa_initialize_visual(GLvisual *vis,
     assert(vis);
 
     if (depthBits < 0 || depthBits > 32) {
-	return GL_FALSE;
+	return false;
     }
     if (stencilBits < 0 || stencilBits > STENCIL_BITS) {
-	return GL_FALSE;
+	return false;
     }
     assert(accumRedBits >= 0);
     assert(accumGreenBits >= 0);
@@ -317,7 +317,7 @@ _mesa_initialize_visual(GLvisual *vis,
     vis->sampleBuffers = numSamples > 0 ? 1 : 0;
     vis->samples = numSamples;
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -365,7 +365,7 @@ static std::mutex OneTimeLock;
 static void
 one_time_init(GLcontext *ctx)
 {
-    static GLboolean alreadyCalled = GL_FALSE;
+    static bool alreadyCalled = false;
     (void) ctx;
     std::lock_guard<std::mutex> lock(OneTimeLock);
     if (!alreadyCalled) {
@@ -413,7 +413,7 @@ one_time_init(GLcontext *ctx)
  * \return pointer to a gl_shared_state structure on success, or nullptr on
  * failure.
  */
-static GLboolean
+static bool
 alloc_shared_state(GLcontext *ctx)
 {
     struct gl_shared_state *ss = new gl_shared_state{};
@@ -454,36 +454,36 @@ alloc_shared_state(GLcontext *ctx)
 
 #if FEATURE_ARB_vertex_program
     ss->DefaultVertexProgram = ctx->Driver.NewProgram(ctx, GL_VERTEX_PROGRAM_ARB, 0);
-    if (!ss->DefaultVertexProgram) { do_cleanup(); return GL_FALSE; }
+    if (!ss->DefaultVertexProgram) { do_cleanup(); return false; }
 #endif
 #if FEATURE_ARB_fragment_program
     ss->DefaultFragmentProgram = ctx->Driver.NewProgram(ctx, GL_FRAGMENT_PROGRAM_ARB, 0);
-    if (!ss->DefaultFragmentProgram) { do_cleanup(); return GL_FALSE; }
+    if (!ss->DefaultFragmentProgram) { do_cleanup(); return false; }
 #endif
 #if FEATURE_ATI_fragment_shader
     ss->DefaultFragmentShader = _mesa_new_ati_fragment_shader(ctx, 0);
-    if (!ss->DefaultFragmentShader) { do_cleanup(); return GL_FALSE; }
+    if (!ss->DefaultFragmentShader) { do_cleanup(); return false; }
 #endif
 
     ss->Default1D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_1D);
-    if (!ss->Default1D) { do_cleanup(); return GL_FALSE; }
+    if (!ss->Default1D) { do_cleanup(); return false; }
 
     ss->Default2D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_2D);
-    if (!ss->Default2D) { do_cleanup(); return GL_FALSE; }
+    if (!ss->Default2D) { do_cleanup(); return false; }
 
     ss->Default3D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_3D);
-    if (!ss->Default3D) { do_cleanup(); return GL_FALSE; }
+    if (!ss->Default3D) { do_cleanup(); return false; }
 
     ss->DefaultCubeMap = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
-    if (!ss->DefaultCubeMap) { do_cleanup(); return GL_FALSE; }
+    if (!ss->DefaultCubeMap) { do_cleanup(); return false; }
 
     ss->DefaultRect = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
-    if (!ss->DefaultRect) { do_cleanup(); return GL_FALSE; }
+    if (!ss->DefaultRect) { do_cleanup(); return false; }
 
     /* sanity check */
     assert(ss->Default1D->RefCount == 1);
 
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -969,7 +969,7 @@ __GLcontextRec::initialize(const GLvisual *visual,
  * Initialize a GLcontext struct (rendering context).
  * Delegates to __GLcontextRec::initialize().
  */
-GLboolean
+bool
 _mesa_initialize_context(GLcontext *ctx,
 			 const GLvisual *visual,
 			 GLcontext *share_list,
@@ -1417,10 +1417,10 @@ __GLcontextRec::share_state_with(GLcontext *other)
  * Any display lists, textures or programs associated with 'ctx' will
  * be deleted if nobody else is sharing them.
  */
-GLboolean
+bool
 _mesa_share_state(GLcontext *ctx, GLcontext *ctxToShare)
 {
-    return ctx ? static_cast<GLboolean>(ctx->share_state_with(ctxToShare)) : GL_FALSE;
+    return ctx ? ctx->share_state_with(ctxToShare) : false;
 }
 
 

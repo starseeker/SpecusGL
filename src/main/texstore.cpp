@@ -79,7 +79,7 @@ enum {
  * Return GL_TRUE if the given image format is one that be converted
  * to another format by swizzling.
  */
-static GLboolean
+static bool
 can_swizzle(GLenum logicalBaseFormat)
 {
     switch (logicalBaseFormat) {
@@ -3447,7 +3447,7 @@ _mesa_store_compressed_texsubimage3d(GLcontext *ctx, GLenum target,
 /**
  * Test if given texture image is an sRGB format.
  */
-static GLboolean
+static bool
 is_srgb_teximage(const struct gl_texture_image *texImage)
 {
     switch (texImage->TexFormat->MesaFormat) {

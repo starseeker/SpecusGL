@@ -1011,7 +1011,7 @@ _mesa_get_uniform_location(GLcontext *ctx, GLuint program, const GLchar *name)
 }
 
 
-GLboolean
+bool
 _mesa_is_program(GLcontext *ctx, GLuint name)
 {
     struct gl_shader_program *shProg = _mesa_lookup_shader_program(ctx, name);
@@ -1019,7 +1019,7 @@ _mesa_is_program(GLcontext *ctx, GLuint name)
 }
 
 
-GLboolean
+bool
 _mesa_is_shader(GLcontext *ctx, GLuint name)
 {
     struct gl_shader *shader = _mesa_lookup_shader(ctx, name);
