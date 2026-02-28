@@ -38,25 +38,23 @@
  */
 
 static bool match_fastpath(struct tnl_clipspace *vtx,
-				const struct tnl_clipspace_fastpath *fp)
+			   const struct tnl_clipspace_fastpath &fp)
 {
-    GLuint j;
-
-    if (vtx->attr_count != fp->attr_count)
+    if (vtx->attr_count != fp.attr_count)
 	return false;
 
-    for (j = 0; j < vtx->attr_count; j++)
-	if (vtx->attr[j].format != fp->attr[j].format ||
-	    vtx->attr[j].inputsize != fp->attr[j].size ||
-	    vtx->attr[j].vertoffset != fp->attr[j].offset)
+    for (GLuint j = 0; j < vtx->attr_count; j++)
+	if (vtx->attr[j].format     != fp.attr[j].format ||
+	    vtx->attr[j].inputsize  != fp.attr[j].size   ||
+	    vtx->attr[j].vertoffset != fp.attr[j].offset)
 	    return false;
 
-    if (fp->match_strides) {
-	if (vtx->vertex_size != fp->vertex_size)
+    if (fp.match_strides) {
+	if (vtx->vertex_size != fp.vertex_size)
 	    return false;
 
-	for (j = 0; j < vtx->attr_count; j++)
-	    if (vtx->attr[j].inputstride != fp->attr[j].stride)
+	for (GLuint j = 0; j < vtx->attr_count; j++)
+	    if (vtx->attr[j].inputstride != fp.attr[j].stride)
 		return false;
     }
 
@@ -65,11 +63,9 @@ static bool match_fastpath(struct tnl_clipspace *vtx,
 
 static bool search_fastpath_emit(struct tnl_clipspace *vtx)
 {
-    struct tnl_clipspace_fastpath *fp = vtx->fastpath;
-
-    for (; fp ; fp = fp->next) {
+    for (const auto &fp : vtx->fastpath) {
 	if (match_fastpath(vtx, fp)) {
-	    vtx->emit = fp->func;
+	    vtx->emit = fp.func;
 	    return true;
 	}
     }
@@ -466,18 +462,13 @@ void _tnl_init_vertices(GLcontext *ctx,
 void _tnl_free_vertices(GLcontext *ctx)
 {
     struct tnl_clipspace *vtx = GET_VERTEX_STATE(ctx);
-    struct tnl_clipspace_fastpath *fp, *tmp;
 
     /* vertex_buf is an aligned_array_ptr – just reset it. */
     vtx->vertex_buf.reset();
 
-    for (fp = vtx->fastpath ; fp ; fp = tmp) {
-	tmp = fp->next;
-	delete[] fp->attr;
-	delete fp;
-    }
-
-    vtx->fastpath = nullptr;
+    /* fastpath is a std::vector – clearing it frees every entry and its
+     * nested attr vector automatically; no manual traversal required. */
+    vtx->fastpath.clear();
 }
 
 /*

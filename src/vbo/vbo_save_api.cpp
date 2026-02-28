@@ -165,9 +165,9 @@ static GLuint _save_copy_vertices(GLcontext *ctx,
 }
 
 
-static struct vbo_save_vertex_store *alloc_vertex_store(GLcontext *ctx)
+static std::shared_ptr<vbo_save_vertex_store> alloc_vertex_store(GLcontext *ctx)
 {
-    auto *vertex_store = new vbo_save_vertex_store{};
+    auto *vs = new vbo_save_vertex_store{};
 
     /* obj->Name needs to be non-zero, but won't ever be examined more
      * closely than that.  In particular these buffers won't be entered
@@ -175,33 +175,31 @@ static struct vbo_save_vertex_store *alloc_vertex_store(GLcontext *ctx)
      * user.  Perhaps there could be a special number for internal
      * buffers:
      */
-    vertex_store->bufferobj = ctx->Driver.NewBufferObject(ctx, 1, GL_ARRAY_BUFFER_ARB);
+    vs->bufferobj = ctx->Driver.NewBufferObject(ctx, 1, GL_ARRAY_BUFFER_ARB);
 
     ctx->Driver.BufferData(ctx,
 			   GL_ARRAY_BUFFER_ARB,
 			   VBO_SAVE_BUFFER_SIZE * sizeof(GLfloat),
 			   nullptr,
 			   GL_STATIC_DRAW_ARB,
-			   vertex_store->bufferobj);
+			   vs->bufferobj);
 
-    vertex_store->buffer = nullptr;
-    vertex_store->used = 0;
-    vertex_store->refcount = 1;
+    vs->buffer = nullptr;
+    vs->used = 0;
 
-    return vertex_store;
+    /* The custom deleter releases the GL buffer object when the last
+     * reference is dropped.  ctx is always valid at that point because
+     * display lists are deleted while a context is current. */
+    return std::shared_ptr<vbo_save_vertex_store>(vs,
+        [ctx](vbo_save_vertex_store *store) {
+            assert(!store->buffer);
+            if (store->bufferobj)
+                ctx->Driver.DeleteBuffer(ctx, store->bufferobj);
+            delete store;
+        });
 }
 
-static void free_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vertex_store)
-{
-    assert(!vertex_store->buffer);
-
-    if (vertex_store->bufferobj)
-	ctx->Driver.DeleteBuffer(ctx, vertex_store->bufferobj);
-
-    delete vertex_store;
-}
-
-static GLfloat *map_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vertex_store)
+static GLfloat *map_vertex_store(GLcontext *ctx, vbo_save_vertex_store *vertex_store)
 {
     assert(vertex_store->bufferobj);
     assert(!vertex_store->buffer);
@@ -214,20 +212,19 @@ static GLfloat *map_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *v
     return vertex_store->buffer + vertex_store->used;
 }
 
-static void unmap_vertex_store(GLcontext *ctx, struct vbo_save_vertex_store *vertex_store)
+static void unmap_vertex_store(GLcontext *ctx, vbo_save_vertex_store *vertex_store)
 {
     ctx->Driver.UnmapBuffer(ctx, GL_ARRAY_BUFFER_ARB, vertex_store->bufferobj);
     vertex_store->buffer = nullptr;
 }
 
 
-static struct vbo_save_primitive_store *alloc_prim_store(GLcontext *ctx)
+static std::shared_ptr<vbo_save_primitive_store> alloc_prim_store(GLcontext *ctx)
 {
     (void) ctx;
     auto *store = new vbo_save_primitive_store{};
     store->used = 0;
-    store->refcount = 1;
-    return store;
+    return std::shared_ptr<vbo_save_primitive_store>(store);
 }
 
 static void _save_reset_counters(GLcontext *ctx)
@@ -259,19 +256,20 @@ static void _save_reset_counters(GLcontext *ctx)
 static void _save_compile_vertex_list(GLcontext *ctx)
 {
     struct vbo_save_context *save = &vbo_context(ctx)->save;
-    struct vbo_save_vertex_list *node;
 
     /* Allocate space for this structure in the display list currently
      * being compiled.
      */
-    node = (struct vbo_save_vertex_list *)
-	   _mesa_alloc_instruction(ctx, save->opcode_vertex_list, sizeof(*node));
-
-    if (!node)
+    void *raw = _mesa_alloc_instruction(ctx, save->opcode_vertex_list, sizeof(vbo_save_vertex_list));
+    if (!raw)
 	return;
 
-    /* Duplicate our template, increment refcounts to the storage structs:
-     */
+    /* Placement-new to properly initialise the std::shared_ptr members
+     * embedded in vbo_save_vertex_list.  The matching destructor call is in
+     * vbo_destroy_vertex_list(). */
+    auto *node = new(raw) vbo_save_vertex_list{};
+
+    /* Duplicate our template and share ownership of the storage structs: */
     memcpy(node->attrsz, save->attrsz, sizeof(node->attrsz));
     node->vertex_size = save->vertex_size;
     node->buffer_offset = (save->buffer - save->vertex_store->buffer) * sizeof(GLfloat);
@@ -280,11 +278,8 @@ static void _save_compile_vertex_list(GLcontext *ctx)
     node->dangling_attr_ref = save->dangling_attr_ref;
     node->prim = save->prim;
     node->prim_count = save->prim_count;
-    node->vertex_store = save->vertex_store;
-    node->prim_store = save->prim_store;
-
-    node->vertex_store->refcount++;
-    node->prim_store->refcount++;
+    node->vertex_store = save->vertex_store;  /* shared_ptr copy; ref count incremented */
+    node->prim_store   = save->prim_store;    /* shared_ptr copy; ref count incremented */
 
     assert(node->attrsz[VBO_ATTRIB_POS] != 0 ||
 	   node->count == 0);
@@ -327,25 +322,17 @@ static void _save_compile_vertex_list(GLcontext *ctx)
     if (save->vertex_store->used >
 	VBO_SAVE_BUFFER_SIZE - 16 * (save->vertex_size + 4)) {
 
-	/* Unmap old store:
-	 */
-	unmap_vertex_store(ctx, save->vertex_store);
+	/* Unmap old store: */
+	unmap_vertex_store(ctx, save->vertex_store.get());
 
-	/* Release old reference:
-	 */
-	save->vertex_store->refcount--;
-	assert(save->vertex_store->refcount != 0);
-	save->vertex_store = nullptr;
-
-	/* Allocate and map new store:
-	 */
+	/* Release this context's reference and allocate a new store.
+	 * Any nodes that already share the old store keep it alive. */
 	save->vertex_store = alloc_vertex_store(ctx);
-	save->vbptr = map_vertex_store(ctx, save->vertex_store);
+	save->vbptr = map_vertex_store(ctx, save->vertex_store.get());
     }
 
     if (save->prim_store->used > VBO_SAVE_PRIM_SIZE - 6) {
-	save->prim_store->refcount--;
-	assert(save->prim_store->refcount != 0);
+	/* Release this context's reference and allocate a new store. */
 	save->prim_store = alloc_prim_store(ctx);
     }
 
@@ -1052,7 +1039,7 @@ void vbo_save_NewList(GLcontext *ctx, GLuint list, GLenum mode)
     if (!save->vertex_store)
 	save->vertex_store = alloc_vertex_store(ctx);
 
-    save->vbptr = map_vertex_store(ctx, save->vertex_store);
+    save->vbptr = map_vertex_store(ctx, save->vertex_store.get());
 
     _save_reset_vertex(ctx);
     _save_reset_counters(ctx);
@@ -1062,7 +1049,7 @@ void vbo_save_NewList(GLcontext *ctx, GLuint list, GLenum mode)
 void vbo_save_EndList(GLcontext *ctx)
 {
     struct vbo_save_context *save = &vbo_context(ctx)->save;
-    unmap_vertex_store(ctx, save->vertex_store);
+    unmap_vertex_store(ctx, save->vertex_store.get());
 
     assert(save->vertex_size == 0);
 }
@@ -1088,14 +1075,14 @@ void vbo_save_EndCallList(GLcontext *ctx)
 
 static void vbo_destroy_vertex_list(GLcontext *ctx, void *data)
 {
-    struct vbo_save_vertex_list *node = (struct vbo_save_vertex_list *)data;
+    auto *node = static_cast<vbo_save_vertex_list *>(data);
     (void) ctx;
 
-    if (--node->vertex_store->refcount == 0)
-	free_vertex_store(ctx, node->vertex_store);
-
-    if (--node->prim_store->refcount == 0)
-	delete node->prim_store;
+    /* Explicitly call the destructor to release the std::shared_ptr members
+     * (vertex_store and prim_store).  The node was placement-new'd by
+     * _save_compile_vertex_list() into raw Node array memory, so no
+     * delete is issued – the memory itself is owned by the display list. */
+    node->~vbo_save_vertex_list();
 }
 
 
