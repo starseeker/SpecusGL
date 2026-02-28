@@ -707,7 +707,7 @@ _mesa_print_program_parameters(GLcontext *ctx, const struct gl_program *prog)
 {
     std::printf("InputsRead: 0x%x\n", prog->InputsRead);
     std::printf("OutputsWritten: 0x%x\n", prog->OutputsWritten);
-    std::printf("NumInstructions=%d\n", (int)prog->Instructions.size());
+    std::printf("NumInstructions=%d\n", static_cast<int>(prog->Instructions.size()));
     std::printf("NumTemporaries=%d\n", prog->NumTemporaries);
     std::printf("NumParameters=%d\n", prog->NumParameters);
     std::printf("NumAttributes=%d\n", prog->NumAttributes);

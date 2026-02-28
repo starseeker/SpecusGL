@@ -52,7 +52,13 @@
 #include "imports.h"
 #include "slang_library_noise.h"
 
-#define FASTFLOOR(x) ( ((x)>0) ? ((int)x) : (((int)x)-1) )
+/**
+ * Fast floor: returns the largest integer value not greater than x,
+ * without depending on the floating-point rounding mode.
+ */
+[[nodiscard]] static constexpr int fastfloor(float x) noexcept {
+    return (x > 0.0f) ? static_cast<int>(x) : static_cast<int>(x) - 1;
+}
 
 /*
  * ---------------------------------------------------------------------
@@ -171,7 +177,7 @@ static unsigned char simplex[64][4] = {
 /* 1D simplex noise */
 GLfloat _slang_library_noise1(GLfloat x)
 {
-    int i0 = FASTFLOOR(x);
+    int i0 = fastfloor(x);
     int i1 = i0 + 1;
     float x0 = x - i0;
     float x1 = x0 - 1.0f;
@@ -204,10 +210,10 @@ GLfloat _slang_library_noise2(GLfloat x, GLfloat y)
     float s = (x+y)*F2; /* Hairy factor for 2D */
     float xs = x + s;
     float ys = y + s;
-    int i = FASTFLOOR(xs);
-    int j = FASTFLOOR(ys);
+    int i = fastfloor(xs);
+    int j = fastfloor(ys);
 
-    float t = (float)(i+j)*G2;
+    float t = static_cast<float>(i+j)*G2;
     float X0 = i-t; /* Unskew the cell origin back to (x,y) space */
     float Y0 = j-t;
     float x0 = x-X0; /* The x,y distances from the cell origin */
@@ -282,11 +288,11 @@ GLfloat _slang_library_noise3(GLfloat x, GLfloat y, GLfloat z)
     float xs = x+s;
     float ys = y+s;
     float zs = z+s;
-    int i = FASTFLOOR(xs);
-    int j = FASTFLOOR(ys);
-    int k = FASTFLOOR(zs);
+    int i = fastfloor(xs);
+    int j = fastfloor(ys);
+    int k = fastfloor(zs);
 
-    float t = (float)(i+j+k)*G3;
+    float t = static_cast<float>(i+j+k)*G3;
     float X0 = i-t; /* Unskew the cell origin back to (x,y,z) space */
     float Y0 = j-t;
     float Z0 = k-t;
@@ -421,10 +427,10 @@ GLfloat _slang_library_noise4(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
     float ys = y + s;
     float zs = z + s;
     float ws = w + s;
-    int i = FASTFLOOR(xs);
-    int j = FASTFLOOR(ys);
-    int k = FASTFLOOR(zs);
-    int l = FASTFLOOR(ws);
+    int i = fastfloor(xs);
+    int j = fastfloor(ys);
+    int k = fastfloor(zs);
+    int l = fastfloor(ws);
 
     float t = (i + j + k + l) * G4; /* Factor for 4D unskewing */
     float X0 = i - t; /* Unskew the cell origin back to (x,y,z,w) space */

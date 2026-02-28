@@ -647,7 +647,7 @@ _mesa_execute_program(GLcontext * ctx,
 		    q[0] = 0.0F;
 		    q[2] = 0.0F;
 		} else {
-		    q[0] = LDEXPF(1.0, (int) floor_t0);
+		    q[0] = LDEXPF(1.0, static_cast<int>(floor_t0));
 		    /* Note: GL_NV_vertex_program expects
 		     * result.z = result.x * APPX(result.y)
 		     * We do what the ARB extension says.

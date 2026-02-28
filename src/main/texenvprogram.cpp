@@ -33,6 +33,7 @@
 #include "prog_print.h"
 #include "prog_statevars.h"
 #include "texenvprogram.h"
+#include <climits>
 
 /**
  * This MAX is probably a bit generous, but that's OK.  There can be
@@ -449,7 +450,7 @@ static void release_temps(struct texenv_fragment_program *p)
     /* KW: To support tex_env_crossbar, don't release the registers in
      * temps_output.
      */
-    if (max_temp >= sizeof(int) * 8)
+    if (max_temp >= static_cast<int>(sizeof(int) * CHAR_BIT))
 	p->temp_in_use = p->temps_output;
     else
 	p->temp_in_use = ~((1<<max_temp)-1) | p->temps_output;

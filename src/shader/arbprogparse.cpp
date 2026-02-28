@@ -907,7 +907,7 @@ parse_output_color_num(GLcontext * ctx, const GLubyte ** inst,
 {
     GLint i = parse_integer(inst, Program);
 
-    if ((i < 0) || (i >= (int)ctx->Const.MaxDrawBuffers)) {
+    if ((i < 0) || (i >= static_cast<GLint>(ctx->Const.MaxDrawBuffers))) {
 	program_error(ctx, Program->Position, "Invalid draw buffer index");
 	return 1;
     }
@@ -927,7 +927,7 @@ parse_texcoord_num(GLcontext * ctx, const GLubyte ** inst,
 {
     GLint i = parse_integer(inst, Program);
 
-    if ((i < 0) || (i >= (int)ctx->Const.MaxTextureUnits)) {
+    if ((i < 0) || (i >= static_cast<GLint>(ctx->Const.MaxTextureUnits))) {
 	program_error(ctx, Program->Position, "Invalid texture unit index");
 	return 1;
     }
@@ -1893,7 +1893,7 @@ parse_param(GLcontext * ctx, const GLubyte ** inst, struct var_cache **vc_head,
 
     /* Test array length here! */
     if (specified_length) {
-	if (specified_length != (int)param_var->param_binding_length) {
+	if (specified_length != static_cast<int>(param_var->param_binding_length)) {
 	    program_error(ctx, Program->Position,
 			  "Declared parameter array length does not match parameter list");
 	}
@@ -2432,7 +2432,7 @@ parse_src_reg(GLcontext * ctx, const GLubyte ** inst,
 			    offset = parse_integer(inst, Program);
 
 			    if ((offset < 0)
-				|| (offset >= (int)src->param_binding_length)) {
+				|| (offset >= static_cast<GLint>(src->param_binding_length))) {
 				program_error(ctx, Program->Position,
 					      "Index out of range");
 				/* offset, src->name */

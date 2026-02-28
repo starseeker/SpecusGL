@@ -40,6 +40,7 @@
 #include "shader/prog_statevars.h"
 #include "t_context.h" /* NOTE: very light dependency on this */
 #include "t_vp_build.h"
+#include <climits>
 
 #include <cstring>
 #include <unordered_map>
@@ -1415,7 +1416,7 @@ create_new_program(const struct state_key *key,
     p.identity = undef;
     p.temp_in_use = 0;
 
-    if (max_temps >= sizeof(int) * 8)
+    if (max_temps >= static_cast<int>(sizeof(int) * CHAR_BIT))
 	p.temp_reserved = 0;
     else
 	p.temp_reserved = ~((1<<max_temps)-1);

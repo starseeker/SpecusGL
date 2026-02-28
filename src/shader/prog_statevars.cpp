@@ -338,7 +338,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	case STATE_FRAGMENT_PROGRAM: {
 	    /* state[1] = {STATE_ENV, STATE_LOCAL} */
 	    /* state[2] = parameter index          */
-	    const int idx = (int) state[2];
+	    const int idx = static_cast<int>(state[2]);
 	    switch (state[1]) {
 		case STATE_ENV:
 		    COPY_4V(value, ctx->FragmentProgram.Parameters[idx]);
@@ -356,7 +356,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 	case STATE_VERTEX_PROGRAM: {
 	    /* state[1] = {STATE_ENV, STATE_LOCAL} */
 	    /* state[2] = parameter index          */
-	    const int idx = (int) state[2];
+	    const int idx = static_cast<int>(state[2]);
 	    switch (state[1]) {
 		case STATE_ENV:
 		    COPY_4V(value, ctx->VertexProgram.Parameters[idx]);
@@ -381,7 +381,7 @@ _mesa_fetch_state(GLcontext *ctx, const gl_state_index state[],
 		    ASSIGN_4V(value, ctx->_ModelViewInvScale, 0, 0, 1);
 		    return;
 		case STATE_TEXRECT_SCALE: {
-		    const int unit = (int) state[2];
+		    const int unit = static_cast<int>(state[2]);
 		    const struct gl_texture_object *texObj
 			    = ctx->Texture.Unit[unit]._Current;
 		    if (texObj) {

@@ -74,22 +74,22 @@ int grammar_string_compare_n(const byte *str1, const byte *str2, size_t n)
 
 byte *grammar_string_copy(byte *dst, const byte *src)
 {
-    return (byte *) strcpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src));
+    return reinterpret_cast<byte *>(strcpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src)));
 }
 
 byte *grammar_string_copy_n(byte *dst, const byte *src, size_t n)
 {
-    return (byte *) strncpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src), n);
+    return reinterpret_cast<byte *>(strncpy(reinterpret_cast<char *>(dst), reinterpret_cast<const char *>(src), n));
 }
 
 byte *grammar_string_duplicate(const byte *src)
 {
-    return (byte *) strdup(reinterpret_cast<const char *>(src));
+    return reinterpret_cast<byte *>(strdup(reinterpret_cast<const char *>(src)));
 }
 
 unsigned int grammar_string_length(const byte *str)
 {
-    return (unsigned int)strlen(reinterpret_cast<const char *>(str));
+    return static_cast<unsigned int>(strlen(reinterpret_cast<const char *>(str)));
 }
 
 

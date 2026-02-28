@@ -7894,10 +7894,10 @@ print_list(GLcontext *ctx, GLuint list)
 				 n[3].f, n[4].f, n[5].f, n[6].f, static_cast<void *>(n[7].data));
 		    break;
 		case OPCODE_CALL_LIST:
-		    std::printf("CallList %d\n", (int) n[1].ui);
+		    std::printf("CallList %u\n", n[1].ui);
 		    break;
 		case OPCODE_CALL_LIST_OFFSET:
-		    std::printf("CallList %d + offset %u = %u\n", (int) n[1].ui,
+		    std::printf("CallList %u + offset %u = %u\n", n[1].ui,
 				 ctx->List.ListBase, ctx->List.ListBase + n[1].ui);
 		    break;
 		case OPCODE_COLOR_TABLE_PARAMETER_FV:
@@ -7921,7 +7921,7 @@ print_list(GLcontext *ctx, GLuint list)
 				 n[1].f, n[2].f, n[3].f, n[4].f, n[5].f, n[6].f);
 		    break;
 		case OPCODE_LINE_STIPPLE:
-		    std::printf("LineStipple %d %x\n", n[1].i, (int) n[2].us);
+		    std::printf("LineStipple %d %x\n", n[1].i, static_cast<unsigned>(n[2].us));
 		    break;
 		case OPCODE_LOAD_IDENTITY:
 		    std::printf("LoadIdentity\n");
@@ -7968,7 +7968,7 @@ print_list(GLcontext *ctx, GLuint list)
 		    std::printf("PushMatrix\n");
 		    break;
 		case OPCODE_PUSH_NAME:
-		    std::printf("PushName %d\n", (int) n[1].ui);
+		    std::printf("PushName %u\n", n[1].ui);
 		    break;
 		case OPCODE_RASTER_POS:
 		    std::printf("RasterPos %g %g %g %g\n",

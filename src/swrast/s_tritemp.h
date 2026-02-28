@@ -845,7 +845,7 @@ static void NAME(GLcontext *ctx, const SWvertex *v0,
 #ifdef PIXEL_ADDRESS
 		    {
 			pRow = static_cast<PIXEL_TYPE *>(PIXEL_ADDRESS(InterpToInt(fxLeftEdge), span.y));
-			dPRowOuter = -((int)BYTES_PER_ROW) + idxOuter * sizeof(PIXEL_TYPE);
+			dPRowOuter = -static_cast<int>(BYTES_PER_ROW) + idxOuter * sizeof(PIXEL_TYPE);
 			/* negative because Y=0 at bottom and increases upward */
 		    }
 #endif
