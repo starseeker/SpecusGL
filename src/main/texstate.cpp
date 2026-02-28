@@ -1062,7 +1062,7 @@ _mesa_GetTexEnviv(GLenum target, GLenum pname, GLint *params)
 /*                       Texture Parameters                           */
 /**********************************************************************/
 
-static GLboolean
+static bool
 _mesa_validate_texture_wrap_mode(GLcontext * ctx,
 				 GLenum target, GLenum eparam)
 {
@@ -1071,7 +1071,7 @@ _mesa_validate_texture_wrap_mode(GLcontext * ctx,
     if (eparam == GL_CLAMP || eparam == GL_CLAMP_TO_EDGE ||
 	(eparam == GL_CLAMP_TO_BORDER && e->ARB_texture_border_clamp)) {
 	/* any texture target */
-	return GL_TRUE;
+	return true;
     } else if (target != GL_TEXTURE_RECTANGLE_NV &&
 	       (eparam == GL_REPEAT ||
 		(eparam == GL_MIRRORED_REPEAT &&
@@ -1083,11 +1083,11 @@ _mesa_validate_texture_wrap_mode(GLcontext * ctx,
 		(eparam == GL_MIRROR_CLAMP_TO_BORDER_EXT &&
 		 (e->EXT_texture_mirror_clamp)))) {
 	/* non-rectangle texture */
-	return GL_TRUE;
+	return true;
     }
 
     _mesa_error(ctx, GL_INVALID_VALUE, "glTexParameter(param)");
-    return GL_FALSE;
+    return false;
 }
 
 
@@ -1726,7 +1726,7 @@ _mesa_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
 {
     struct gl_texture_unit *texUnit;
     struct gl_texture_object *obj;
-    GLboolean error = GL_FALSE;
+    bool error = false;
     GET_CURRENT_CONTEXT(ctx);
     ASSERT_OUTSIDE_BEGIN_END(ctx);
 
@@ -2837,12 +2837,12 @@ _mesa_update_texture(GLcontext *ctx, GLuint new_state)
  *
  * \param ctx the context to allocate proxies for.
  *
- * \return GL_TRUE on success, or GL_FALSE on failure
+ * \return true on success, or GL_FALSE on failure
  *
  * If run out of memory part way through the allocations, clean up and return
  * GL_FALSE.
  */
-static GLboolean
+static bool
 alloc_proxy_textures(GLcontext *ctx)
 {
     /* Helper: delete all proxy textures that have been allocated so far. */
@@ -2860,22 +2860,22 @@ alloc_proxy_textures(GLcontext *ctx)
     };
 
     ctx->Texture.Proxy1D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_1D);
-    if (!ctx->Texture.Proxy1D) { delete_proxies(); return GL_FALSE; }
+    if (!ctx->Texture.Proxy1D) { delete_proxies(); return false; }
 
     ctx->Texture.Proxy2D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_2D);
-    if (!ctx->Texture.Proxy2D) { delete_proxies(); return GL_FALSE; }
+    if (!ctx->Texture.Proxy2D) { delete_proxies(); return false; }
 
     ctx->Texture.Proxy3D = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_3D);
-    if (!ctx->Texture.Proxy3D) { delete_proxies(); return GL_FALSE; }
+    if (!ctx->Texture.Proxy3D) { delete_proxies(); return false; }
 
     ctx->Texture.ProxyCubeMap = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_CUBE_MAP_ARB);
-    if (!ctx->Texture.ProxyCubeMap) { delete_proxies(); return GL_FALSE; }
+    if (!ctx->Texture.ProxyCubeMap) { delete_proxies(); return false; }
 
     ctx->Texture.ProxyRect = ctx->Driver.NewTextureObject(ctx, 0, GL_TEXTURE_RECTANGLE_NV);
-    if (!ctx->Texture.ProxyRect) { delete_proxies(); return GL_FALSE; }
+    if (!ctx->Texture.ProxyRect) { delete_proxies(); return false; }
 
     assert(ctx->Texture.Proxy1D->RefCount == 1);
-    return GL_TRUE;
+    return true;
 }
 
 
@@ -2929,7 +2929,7 @@ init_texture_unit(GLcontext *ctx, GLuint unit)
 /**
  * Initialize texture state for the given context.
  */
-GLboolean
+bool
 _mesa_init_texture(GLcontext *ctx)
 {
     GLuint i;
@@ -2955,9 +2955,9 @@ _mesa_init_texture(GLcontext *ctx)
 
     /* Allocate proxy textures */
     if (!alloc_proxy_textures(ctx))
-	return GL_FALSE;
+	return false;
 
-    return GL_TRUE;
+    return true;
 }
 
 

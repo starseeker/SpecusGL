@@ -45,7 +45,7 @@
 #define VARYING_EMIT_STYLE  EMIT_4F
 
 
-GLboolean
+bool
 _swsetup_CreateContext(GLcontext *ctx)
 {
     auto *swsetup = new SScontext{};
@@ -59,7 +59,7 @@ _swsetup_CreateContext(GLcontext *ctx)
 		       sizeof(SWvertex));
 
 
-    return GL_TRUE;
+    return true;
 }
 
 void

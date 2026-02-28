@@ -42,7 +42,7 @@
 
 #include "swrast/swrast.h"
 
-extern GLboolean
+extern bool
 _swsetup_CreateContext(GLcontext *ctx);
 
 extern void

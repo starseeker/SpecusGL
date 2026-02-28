@@ -65,7 +65,7 @@ _mesa_init_texture_fxt1(GLcontext *ctx)
 /**
  * Called via TexFormat->StoreImage to store an RGB_FXT1 texture.
  */
-static GLboolean
+static bool
 texstore_rgb_fxt1(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -93,7 +93,7 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
 	srcRowStride = 3 * srcWidth;
@@ -111,14 +111,14 @@ texstore_rgb_fxt1(TEXSTORE_PARAMS)
 		dst, dstRowStride);
 
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Called via TexFormat->StoreImage to store an RGBA_FXT1 texture.
  */
-static GLboolean
+static bool
 texstore_rgba_fxt1(TEXSTORE_PARAMS)
 {
     const GLchan *pixels;
@@ -146,7 +146,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 					       srcFormat, srcType, srcAddr,
 					       srcPacking);
 	if (tempVec.empty())
-	    return GL_FALSE; /* out of memory */
+	    return false; /* out of memory */
 	_mesa_adjust_image_for_convolution(ctx, dims, &srcWidth, &srcHeight);
 	pixels = tempVec.data();
 	srcRowStride = 4 * srcWidth;
@@ -164,7 +164,7 @@ texstore_rgba_fxt1(TEXSTORE_PARAMS)
 		dst, dstRowStride);
 
 
-    return GL_TRUE;
+    return true;
 }
 
 

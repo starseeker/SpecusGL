@@ -5401,13 +5401,13 @@ _mesa_compile_error(GLcontext *ctx, GLenum error, const char *s)
 /**
  * Test if ID names a display list.
  */
-static GLboolean
+static bool
 islist(GLcontext *ctx, GLuint list)
 {
     if (list > 0 && lookup_list(ctx, list)) {
-	return GL_TRUE;
+	return true;
     } else {
-	return GL_FALSE;
+	return false;
     }
 }
 

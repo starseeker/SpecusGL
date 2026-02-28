@@ -1276,7 +1276,7 @@ using StoreTexelFunc = void (*)(struct gl_texture_image *texImage,
 /**
  * Texture image storage function.
  */
-using StoreTexImageFunc = GLboolean (*)(TEXSTORE_PARAMS);
+using StoreTexImageFunc = bool (*)(TEXSTORE_PARAMS);
 
 
 /**

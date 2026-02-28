@@ -144,7 +144,7 @@ _mesa_ClientActiveTextureARB(GLenum target);
 extern void
 _mesa_update_texture(GLcontext *ctx, GLuint new_state);
 
-extern GLboolean
+extern bool
 _mesa_init_texture(GLcontext *ctx);
 
 extern void

@@ -215,7 +215,7 @@ _mesa_BlendFuncSeparateEXT(GLenum sfactorRGB, GLenum dfactorRGB,
 
 #if _HAVE_FULL_GL
 
-static GLboolean
+static bool
 _mesa_validate_blend_equation(GLcontext *ctx,
 			      GLenum mode, GLboolean is_separate)
 {
@@ -226,28 +226,28 @@ _mesa_validate_blend_equation(GLcontext *ctx,
 	case GL_MAX:
 	    if (!ctx->Extensions.EXT_blend_minmax &&
 		!ctx->Extensions.ARB_imaging) {
-		return GL_FALSE;
+		return false;
 	    }
 	    break;
 	/* glBlendEquationSeparate cannot take GL_LOGIC_OP as a parameter.
 	 */
 	case GL_LOGIC_OP:
 	    if (!ctx->Extensions.EXT_blend_logic_op || is_separate) {
-		return GL_FALSE;
+		return false;
 	    }
 	    break;
 	case GL_FUNC_SUBTRACT:
 	case GL_FUNC_REVERSE_SUBTRACT:
 	    if (!ctx->Extensions.EXT_blend_subtract &&
 		!ctx->Extensions.ARB_imaging) {
-		return GL_FALSE;
+		return false;
 	    }
 	    break;
 	default:
-	    return GL_FALSE;
+	    return false;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 

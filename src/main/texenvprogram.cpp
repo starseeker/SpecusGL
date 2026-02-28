@@ -380,7 +380,7 @@ static struct ureg negate(struct ureg reg)
     return reg;
 }
 
-static GLboolean is_undef(struct ureg reg)
+static bool is_undef(struct ureg reg)
 {
     return reg.file == PROGRAM_UNDEFINED;
 }
@@ -750,13 +750,13 @@ static struct ureg emit_combine_source(struct texenv_fragment_program *p,
     }
 }
 
-static GLboolean args_match(struct state_key *key, GLuint unit)
+static bool args_match(struct state_key *key, GLuint unit)
 {
     GLuint i, nr = key->unit[unit].NumArgsRGB;
 
     for (i = 0 ; i < nr ; i++) {
 	if (key->unit[unit].OptA[i].Source != key->unit[unit].OptRGB[i].Source)
-	    return GL_FALSE;
+	    return false;
 
 	switch (key->unit[unit].OptA[i].Operand) {
 	    case OPR_SRC_ALPHA:
@@ -765,7 +765,7 @@ static GLboolean args_match(struct state_key *key, GLuint unit)
 		    case OPR_SRC_ALPHA:
 			break;
 		    default:
-			return GL_FALSE;
+			return false;
 		}
 		break;
 	    case OPR_ONE_MINUS_SRC_ALPHA:
@@ -774,15 +774,15 @@ static GLboolean args_match(struct state_key *key, GLuint unit)
 		    case OPR_ONE_MINUS_SRC_ALPHA:
 			break;
 		    default:
-			return GL_FALSE;
+			return false;
 		}
 		break;
 	    default:
-		return GL_FALSE;	/* impossible */
+		return false;	/* impossible */
 	}
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 static struct ureg emit_combine(struct texenv_fragment_program *p,
@@ -995,7 +995,7 @@ static void load_texture(struct texenv_fragment_program *p, GLuint unit)
     }
 }
 
-static GLboolean load_texenv_source(struct texenv_fragment_program *p,
+static bool load_texenv_source(struct texenv_fragment_program *p,
 				    GLuint src, GLuint unit)
 {
     switch (src) {
@@ -1018,14 +1018,14 @@ static GLboolean load_texenv_source(struct texenv_fragment_program *p,
 	    break;
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
 /**
  * Generate instructions for loading all texture source terms.
  */
-static GLboolean
+static bool
 load_texunit_sources(struct texenv_fragment_program *p, int unit)
 {
     struct state_key *key = p->state;
@@ -1039,7 +1039,7 @@ load_texunit_sources(struct texenv_fragment_program *p, int unit)
 	load_texenv_source(p, key->unit[unit].OptA[i].Source, unit);
     }
 
-    return GL_TRUE;
+    return true;
 }
 
 
