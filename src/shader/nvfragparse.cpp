@@ -53,10 +53,10 @@ constexpr int INPUT_3V = 3;
 constexpr int INPUT_1S = 4;
 constexpr int INPUT_2S = 5;
 constexpr int INPUT_CC = 6;
-#define INPUT_1V_T   7  /* one source vector, plus textureId */
-#define INPUT_3V_T   8  /* one source vector, plus textureId */
+constexpr int INPUT_1V_T = 7;  /* one source vector, plus textureId */
+constexpr int INPUT_3V_T = 8;  /* three source vectors, plus textureId */
 constexpr int INPUT_NONE = 9;
-#define INPUT_1V_S  10  /* a string and a vector register */
+constexpr int INPUT_1V_S = 10; /* a string and a vector register */
 constexpr int OUTPUT_V = 20;
 constexpr int OUTPUT_S = 21;
 constexpr int OUTPUT_NONE = 22;

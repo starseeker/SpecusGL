@@ -38,9 +38,7 @@
 /* XXX this would have to change for accum buffers with more or less
  * than 16 bits per color channel.
  */
-#define ACCUM_SCALE16 32767.0
-
-
+constexpr float ACCUM_SCALE16 = 32767.0;
 /*
  * Accumulation buffer notes
  *
@@ -67,9 +65,9 @@
 
 #if CHAN_BITS == 8
 /* enable the optimization */
-#define USE_OPTIMIZED_ACCUM  1
+constexpr int USE_OPTIMIZED_ACCUM = 1;
 #else
-#define USE_OPTIMIZED_ACCUM  0
+constexpr int USE_OPTIMIZED_ACCUM = 0;
 #endif
 
 

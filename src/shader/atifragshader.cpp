@@ -30,8 +30,7 @@
 #include "mtypes.h"
 #include "atifragshader.h"
 
-#define MESA_DEBUG_ATI_FS 0
-
+constexpr int MESA_DEBUG_ATI_FS = 0;
 static struct ati_fragment_shader DummyShader;
 
 

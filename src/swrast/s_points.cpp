@@ -35,16 +35,14 @@
 
 
 
-#define RGBA       0x1
-#define INDEX      0x2
-#define SMOOTH     0x4
-#define ATTRIBS    0x8
-#define SPECULAR  0x10
-#define LARGE     0x20
-#define ATTENUATE 0x40
-#define SPRITE    0x80
-
-
+constexpr int RGBA = 0x1;
+constexpr int INDEX = 0x2;
+constexpr int SMOOTH = 0x4;
+constexpr int ATTRIBS = 0x8;
+constexpr int SPECULAR = 0x10;
+constexpr int LARGE = 0x20;
+constexpr int ATTENUATE = 0x40;
+constexpr int SPRITE = 0x80;
 /*
  * CI points with size == 1.0
  */

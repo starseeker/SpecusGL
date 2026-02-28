@@ -894,8 +894,7 @@ _mesa_get_shader_source(GLcontext *ctx, GLuint shader, GLsizei maxLength,
 }
 
 
-#define MAX_UNIFORM_ELEMENTS 16
-
+constexpr int MAX_UNIFORM_ELEMENTS = 16;
 /**
  * Helper for GetUniformfv(), GetUniformiv()
  * Returns number of elements written to 'params' output.

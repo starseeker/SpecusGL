@@ -43,8 +43,14 @@
 #include "math/m_xform.h"
 
 
-#define ENUM_TO_FLOAT(X) (static_cast<GLfloat>(static_cast<GLint>((X))))
-#define ENUM_TO_DOUBLE(X) (static_cast<GLdouble>(static_cast<GLint>((X))))
+/// Convert a GLenum value to GLfloat via GLint.
+[[nodiscard]] static constexpr GLfloat enum_to_float(GLenum x) noexcept {
+    return static_cast<GLfloat>(static_cast<GLint>(x));
+}
+/// Convert a GLenum value to GLdouble via GLint.
+[[nodiscard]] static constexpr GLdouble enum_to_double(GLenum x) noexcept {
+    return static_cast<GLdouble>(static_cast<GLint>(x));
+}
 
 
 /**
@@ -776,7 +782,7 @@ _mesa_GetTexEnvfv(GLenum target, GLenum pname, GLfloat *params)
     if (target == GL_TEXTURE_ENV) {
 	switch (pname) {
 	    case GL_TEXTURE_ENV_MODE:
-		*params = ENUM_TO_FLOAT(texUnit->EnvMode);
+		*params = enum_to_float(texUnit->EnvMode);
 		break;
 	    case GL_TEXTURE_ENV_COLOR:
 		COPY_4FV(params, texUnit->EnvColor);
@@ -1747,19 +1753,19 @@ _mesa_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
     _mesa_lock_texture(ctx, obj);
     switch (pname) {
 	case GL_TEXTURE_MAG_FILTER:
-	    *params = ENUM_TO_FLOAT(obj->MagFilter);
+	    *params = enum_to_float(obj->MagFilter);
 	    break;
 	case GL_TEXTURE_MIN_FILTER:
-	    *params = ENUM_TO_FLOAT(obj->MinFilter);
+	    *params = enum_to_float(obj->MinFilter);
 	    break;
 	case GL_TEXTURE_WRAP_S:
-	    *params = ENUM_TO_FLOAT(obj->WrapS);
+	    *params = enum_to_float(obj->WrapS);
 	    break;
 	case GL_TEXTURE_WRAP_T:
-	    *params = ENUM_TO_FLOAT(obj->WrapT);
+	    *params = enum_to_float(obj->WrapT);
 	    break;
 	case GL_TEXTURE_WRAP_R:
-	    *params = ENUM_TO_FLOAT(obj->WrapR);
+	    *params = enum_to_float(obj->WrapR);
 	    break;
 	case GL_TEXTURE_BORDER_COLOR:
 	    params[0] = CLAMP(obj->BorderColor[0], 0.0F, 1.0F);
@@ -1773,7 +1779,7 @@ _mesa_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
 		resident = ctx->Driver.IsTextureResident(ctx, obj);
 	    else
 		resident = GL_TRUE;
-	    *params = ENUM_TO_FLOAT(resident);
+	    *params = enum_to_float(resident);
 	}
 	break;
 	case GL_TEXTURE_PRIORITY:
@@ -2297,7 +2303,7 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
     switch (coord) {
 	case GL_S:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_DOUBLE(texUnit->GenModeS);
+		params[0] = enum_to_double(texUnit->GenModeS);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneS);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2309,7 +2315,7 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    break;
 	case GL_T:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_DOUBLE(texUnit->GenModeT);
+		params[0] = enum_to_double(texUnit->GenModeT);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneT);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2321,7 +2327,7 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    break;
 	case GL_R:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_DOUBLE(texUnit->GenModeR);
+		params[0] = enum_to_double(texUnit->GenModeR);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneR);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2333,7 +2339,7 @@ _mesa_GetTexGendv(GLenum coord, GLenum pname, GLdouble *params)
 	    break;
 	case GL_Q:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_DOUBLE(texUnit->GenModeQ);
+		params[0] = enum_to_double(texUnit->GenModeQ);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneQ);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2368,7 +2374,7 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
     switch (coord) {
 	case GL_S:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_FLOAT(texUnit->GenModeS);
+		params[0] = enum_to_float(texUnit->GenModeS);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneS);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2380,7 +2386,7 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    break;
 	case GL_T:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_FLOAT(texUnit->GenModeT);
+		params[0] = enum_to_float(texUnit->GenModeT);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneT);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2392,7 +2398,7 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    break;
 	case GL_R:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_FLOAT(texUnit->GenModeR);
+		params[0] = enum_to_float(texUnit->GenModeR);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneR);
 	    } else if (pname==GL_EYE_PLANE) {
@@ -2404,7 +2410,7 @@ _mesa_GetTexGenfv(GLenum coord, GLenum pname, GLfloat *params)
 	    break;
 	case GL_Q:
 	    if (pname==GL_TEXTURE_GEN_MODE) {
-		params[0] = ENUM_TO_FLOAT(texUnit->GenModeQ);
+		params[0] = enum_to_float(texUnit->GenModeQ);
 	    } else if (pname==GL_OBJECT_PLANE) {
 		COPY_4V(params, texUnit->ObjectPlaneQ);
 	    } else if (pname==GL_EYE_PLANE) {

@@ -47,9 +47,7 @@
 
 
 /* debug predicate */
-#define DEBUG_PROG 0
-
-
+constexpr int DEBUG_PROG = 0;
 /**
  * Set x to positive or negative infinity.
  */

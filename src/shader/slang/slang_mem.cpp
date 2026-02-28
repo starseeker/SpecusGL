@@ -45,14 +45,12 @@
 #include <new>
 
 
-#define GRANULARITY 8
+constexpr int GRANULARITY = 8;
 #define ROUND_UP(B)  ( ((B) + (GRANULARITY - 1)) & ~(GRANULARITY - 1) )
 
 
 /** If 1, use conventional malloc/free.  Helpful for debugging */
-#define USE_MALLOC_FREE 0
-
-
+constexpr int USE_MALLOC_FREE = 0;
 slang_mempool *
 _slang_new_mempool(GLuint initialSize)
 {

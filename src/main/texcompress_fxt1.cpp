@@ -278,13 +278,13 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
 \***************************************************************************/
 
 
-#define MAX_COMP 4 /* ever needed maximum number of components in texel */
-#define MAX_VECT 4 /* ever needed maximum number of base vectors to find */
-#define N_TEXELS 32 /* number of texels in a block (always 32) */
-#define LL_N_REP 50 /* number of iterations in lloyd's vq */
-#define LL_RMS_D 10 /* fault tolerance (maximum delta) */
-#define LL_RMS_E 255 /* fault tolerance (maximum error) */
-#define ALPHA_TS 2 /* alpha threshold: (255 - ALPHA_TS) deemed opaque */
+constexpr int MAX_COMP = 4;  /* ever needed maximum number of components in texel */
+constexpr int MAX_VECT = 4;  /* ever needed maximum number of base vectors to find */
+constexpr int N_TEXELS = 32; /* number of texels in a block (always 32) */
+constexpr int LL_N_REP = 50; /* number of iterations in lloyd's vq */
+constexpr int LL_RMS_D = 10; /* fault tolerance (maximum delta) */
+constexpr int LL_RMS_E = 255; /* fault tolerance (maximum error) */
+constexpr int ALPHA_TS = 2;  /* alpha threshold: (255 - ALPHA_TS) deemed opaque */
 #define ISTBLACK(v) (*reinterpret_cast<const GLuint *>(v) == 0)
 
 
@@ -330,7 +330,7 @@ struct Fx64 {
 
 
 #define F(i) static_cast<GLfloat>(1) /* can be used to obtain an oblong metric: 0.30 / 0.59 / 0.11 */
-#define SAFECDOT 1 /* for paranoids */
+constexpr int SAFECDOT = 1; /* for paranoids */
 
 #define MAKEIVEC(NV, NC, IV, B, V0, V1)  \
    do {                                  \

@@ -33,9 +33,7 @@
 #include "mtypes.h"
 
 
-#define SUB_PIXEL 4
-
-
+constexpr int SUB_PIXEL = 4;
 /*
  * Info about the AA line we're rendering
  */

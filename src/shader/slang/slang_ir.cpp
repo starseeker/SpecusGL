@@ -200,8 +200,7 @@ spaces(int n)
 void
 _slang_print_ir_tree(const slang_ir_node *n, int indent)
 {
-#define IND 0
-
+constexpr int IND = 0;
     if (!n)
 	return;
 #if !IND

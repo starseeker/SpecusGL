@@ -36,7 +36,7 @@
 /**
  * Constants for integer linear interpolation.
  */
-#define ILERP_SCALE 65536.0F
+constexpr float ILERP_SCALE = 65536.0F;
 constexpr int ILERP_SHIFT = 16;
 /**
  * Linear interpolation macros

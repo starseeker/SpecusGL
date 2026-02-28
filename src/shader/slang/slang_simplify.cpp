@@ -307,7 +307,7 @@ _slang_simplify(slang_operation *oper,
  * 2. breaking up vector/matrix types into individual components to
  *    satisfy constructors.
  */
-#define SLANG_DEBUG 0
+constexpr int SLANG_DEBUG = 0;
 bool
 _slang_adapt_call(slang_operation *callOper, const slang_function *fun,
 		  const slang_name_space * space,

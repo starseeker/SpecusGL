@@ -22,8 +22,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#define DEBUG_PARSING 0
-
+constexpr int DEBUG_PARSING = 0;
 /**
  * \file arbprogparse.c
  * ARB_*_program parser core
@@ -184,54 +183,35 @@ LONGSTRING static char arb_grammar_text[] =
     - changed and merged V_* and F_* opcode values to OP_*.
     - added GL_ARB_fragment_program_shadow specific tokens (michal)
 */
-#define  REVISION                                   0x09
-
-/* program type */
-#define  FRAGMENT_PROGRAM                           0x01
-#define  VERTEX_PROGRAM                             0x02
-
-/* program section */
-#define  OPTION                                     0x01
-#define  INSTRUCTION                                0x02
-#define  DECLARATION                                0x03
-#define  END                                        0x04
-
-/* GL_ARB_fragment_program option */
-#define  ARB_PRECISION_HINT_FASTEST                 0x00
-#define  ARB_PRECISION_HINT_NICEST                  0x01
-#define  ARB_FOG_EXP                                0x02
-#define  ARB_FOG_EXP2                               0x03
-#define  ARB_FOG_LINEAR                             0x04
-
-/* GL_ARB_vertex_program option */
-#define  ARB_POSITION_INVARIANT                     0x05
-
-/* GL_ARB_fragment_program_shadow option */
-#define  ARB_FRAGMENT_PROGRAM_SHADOW                0x06
-
-/* GL_ARB_draw_buffers option */
-#define  ARB_DRAW_BUFFERS                           0x07
-
-/* GL_ARB_fragment_program instruction class */
-#define  OP_ALU_INST                                0x00
-#define  OP_TEX_INST                                0x01
-
-/* GL_ARB_vertex_program instruction class */
+constexpr int REVISION = 0x09;/* program type */
+constexpr int FRAGMENT_PROGRAM = 0x01;
+constexpr int VERTEX_PROGRAM = 0x02;/* program section */
+constexpr int OPTION = 0x01;
+constexpr int INSTRUCTION = 0x02;
+constexpr int DECLARATION = 0x03;
+constexpr int END = 0x04;/* GL_ARB_fragment_program option */
+constexpr int ARB_PRECISION_HINT_FASTEST = 0x00;
+constexpr int ARB_PRECISION_HINT_NICEST = 0x01;
+constexpr int ARB_FOG_EXP = 0x02;
+constexpr int ARB_FOG_EXP2 = 0x03;
+constexpr int ARB_FOG_LINEAR = 0x04;/* GL_ARB_vertex_program option */
+constexpr int ARB_POSITION_INVARIANT = 0x05;/* GL_ARB_fragment_program_shadow option */
+constexpr int ARB_FRAGMENT_PROGRAM_SHADOW = 0x06;/* GL_ARB_draw_buffers option */
+constexpr int ARB_DRAW_BUFFERS = 0x07;/* GL_ARB_fragment_program instruction class */
+constexpr int OP_ALU_INST = 0x00;
+constexpr int OP_TEX_INST = 0x01;/* GL_ARB_vertex_program instruction class */
 /*       OP_ALU_INST */
 
 /* GL_ARB_fragment_program instruction type */
-#define  OP_ALU_VECTOR                               0x00
-#define  OP_ALU_SCALAR                               0x01
-#define  OP_ALU_BINSC                                0x02
-#define  OP_ALU_BIN                                  0x03
-#define  OP_ALU_TRI                                  0x04
-#define  OP_ALU_SWZ                                  0x05
-#define  OP_TEX_SAMPLE                               0x06
-#define  OP_TEX_KIL                                  0x07
-
-/* GL_ARB_vertex_program instruction type */
-#define  OP_ALU_ARL                                  0x08
-/*       OP_ALU_VECTOR */
+constexpr int OP_ALU_VECTOR = 0x00;
+constexpr int OP_ALU_SCALAR = 0x01;
+constexpr int OP_ALU_BINSC = 0x02;
+constexpr int OP_ALU_BIN = 0x03;
+constexpr int OP_ALU_TRI = 0x04;
+constexpr int OP_ALU_SWZ = 0x05;
+constexpr int OP_TEX_SAMPLE = 0x06;
+constexpr int OP_TEX_KIL = 0x07;/* GL_ARB_vertex_program instruction type */
+constexpr int OP_ALU_ARL = 0x08;/*       OP_ALU_VECTOR */
 /*       OP_ALU_SCALAR */
 /*       OP_ALU_BINSC */
 /*       OP_ALU_BIN */
@@ -239,84 +219,79 @@ LONGSTRING static char arb_grammar_text[] =
 /*       OP_ALU_SWZ */
 
 /* GL_ARB_fragment_program instruction code */
-#define  OP_ABS                                     0x00
-#define  OP_ABS_SAT                                 0x1B
-#define  OP_FLR                                     0x09
-#define  OP_FLR_SAT                                 0x26
-#define  OP_FRC                                     0x0A
-#define  OP_FRC_SAT                                 0x27
-#define  OP_LIT                                     0x0C
-#define  OP_LIT_SAT                                 0x2A
-#define  OP_MOV                                     0x11
-#define  OP_MOV_SAT                                 0x30
-#define  OP_COS                                     0x1F
-#define  OP_COS_SAT                                 0x20
-#define  OP_EX2                                     0x07
-#define  OP_EX2_SAT                                 0x25
-#define  OP_LG2                                     0x0B
-#define  OP_LG2_SAT                                 0x29
-#define  OP_RCP                                     0x14
-#define  OP_RCP_SAT                                 0x33
-#define  OP_RSQ                                     0x15
-#define  OP_RSQ_SAT                                 0x34
-#define  OP_SIN                                     0x38
-#define  OP_SIN_SAT                                 0x39
-#define  OP_SCS                                     0x35
-#define  OP_SCS_SAT                                 0x36
-#define  OP_POW                                     0x13
-#define  OP_POW_SAT                                 0x32
-#define  OP_ADD                                     0x01
-#define  OP_ADD_SAT                                 0x1C
-#define  OP_DP3                                     0x03
-#define  OP_DP3_SAT                                 0x21
-#define  OP_DP4                                     0x04
-#define  OP_DP4_SAT                                 0x22
-#define  OP_DPH                                     0x05
-#define  OP_DPH_SAT                                 0x23
-#define  OP_DST                                     0x06
-#define  OP_DST_SAT                                 0x24
-#define  OP_MAX                                     0x0F
-#define  OP_MAX_SAT                                 0x2E
-#define  OP_MIN                                     0x10
-#define  OP_MIN_SAT                                 0x2F
-#define  OP_MUL                                     0x12
-#define  OP_MUL_SAT                                 0x31
-#define  OP_SGE                                     0x16
-#define  OP_SGE_SAT                                 0x37
-#define  OP_SLT                                     0x17
-#define  OP_SLT_SAT                                 0x3A
-#define  OP_SUB                                     0x18
-#define  OP_SUB_SAT                                 0x3B
-#define  OP_XPD                                     0x1A
-#define  OP_XPD_SAT                                 0x43
-#define  OP_CMP                                     0x1D
-#define  OP_CMP_SAT                                 0x1E
-#define  OP_LRP                                     0x2B
-#define  OP_LRP_SAT                                 0x2C
-#define  OP_MAD                                     0x0E
-#define  OP_MAD_SAT                                 0x2D
-#define  OP_SWZ                                     0x19
-#define  OP_SWZ_SAT                                 0x3C
-#define  OP_TEX                                     0x3D
-#define  OP_TEX_SAT                                 0x3E
-#define  OP_TXB                                     0x3F
-#define  OP_TXB_SAT                                 0x40
-#define  OP_TXP                                     0x41
-#define  OP_TXP_SAT                                 0x42
-#define  OP_KIL                                     0x28
-
-/* GL_ARB_vertex_program instruction code */
-#define  OP_ARL                                     0x02
-/*       OP_ABS */
+constexpr int OP_ABS = 0x00;
+constexpr int OP_ABS_SAT = 0x1B;
+constexpr int OP_FLR = 0x09;
+constexpr int OP_FLR_SAT = 0x26;
+constexpr int OP_FRC = 0x0A;
+constexpr int OP_FRC_SAT = 0x27;
+constexpr int OP_LIT = 0x0C;
+constexpr int OP_LIT_SAT = 0x2A;
+constexpr int OP_MOV = 0x11;
+constexpr int OP_MOV_SAT = 0x30;
+constexpr int OP_COS = 0x1F;
+constexpr int OP_COS_SAT = 0x20;
+constexpr int OP_EX2 = 0x07;
+constexpr int OP_EX2_SAT = 0x25;
+constexpr int OP_LG2 = 0x0B;
+constexpr int OP_LG2_SAT = 0x29;
+constexpr int OP_RCP = 0x14;
+constexpr int OP_RCP_SAT = 0x33;
+constexpr int OP_RSQ = 0x15;
+constexpr int OP_RSQ_SAT = 0x34;
+constexpr int OP_SIN = 0x38;
+constexpr int OP_SIN_SAT = 0x39;
+constexpr int OP_SCS = 0x35;
+constexpr int OP_SCS_SAT = 0x36;
+constexpr int OP_POW = 0x13;
+constexpr int OP_POW_SAT = 0x32;
+constexpr int OP_ADD = 0x01;
+constexpr int OP_ADD_SAT = 0x1C;
+constexpr int OP_DP3 = 0x03;
+constexpr int OP_DP3_SAT = 0x21;
+constexpr int OP_DP4 = 0x04;
+constexpr int OP_DP4_SAT = 0x22;
+constexpr int OP_DPH = 0x05;
+constexpr int OP_DPH_SAT = 0x23;
+constexpr int OP_DST = 0x06;
+constexpr int OP_DST_SAT = 0x24;
+constexpr int OP_MAX = 0x0F;
+constexpr int OP_MAX_SAT = 0x2E;
+constexpr int OP_MIN = 0x10;
+constexpr int OP_MIN_SAT = 0x2F;
+constexpr int OP_MUL = 0x12;
+constexpr int OP_MUL_SAT = 0x31;
+constexpr int OP_SGE = 0x16;
+constexpr int OP_SGE_SAT = 0x37;
+constexpr int OP_SLT = 0x17;
+constexpr int OP_SLT_SAT = 0x3A;
+constexpr int OP_SUB = 0x18;
+constexpr int OP_SUB_SAT = 0x3B;
+constexpr int OP_XPD = 0x1A;
+constexpr int OP_XPD_SAT = 0x43;
+constexpr int OP_CMP = 0x1D;
+constexpr int OP_CMP_SAT = 0x1E;
+constexpr int OP_LRP = 0x2B;
+constexpr int OP_LRP_SAT = 0x2C;
+constexpr int OP_MAD = 0x0E;
+constexpr int OP_MAD_SAT = 0x2D;
+constexpr int OP_SWZ = 0x19;
+constexpr int OP_SWZ_SAT = 0x3C;
+constexpr int OP_TEX = 0x3D;
+constexpr int OP_TEX_SAT = 0x3E;
+constexpr int OP_TXB = 0x3F;
+constexpr int OP_TXB_SAT = 0x40;
+constexpr int OP_TXP = 0x41;
+constexpr int OP_TXP_SAT = 0x42;
+constexpr int OP_KIL = 0x28;/* GL_ARB_vertex_program instruction code */
+constexpr int OP_ARL = 0x02;/*       OP_ABS */
 /*       OP_FLR */
 /*       OP_FRC */
 /*       OP_LIT */
 /*       OP_MOV */
 /*       OP_EX2 */
-#define  OP_EXP                                     0x08
-/*       OP_LG2 */
-#define  OP_LOG                                     0x0D
-/*       OP_RCP */
+constexpr int OP_EXP = 0x08;/*       OP_LG2 */
+constexpr int OP_LOG = 0x0D;/*       OP_RCP */
 /*       OP_RSQ */
 /*       OP_POW */
 /*       OP_ADD */
@@ -335,166 +310,111 @@ LONGSTRING static char arb_grammar_text[] =
 /*       OP_SWZ */
 
 /* fragment attribute binding */
-#define  FRAGMENT_ATTRIB_COLOR                      0x01
-#define  FRAGMENT_ATTRIB_TEXCOORD                   0x02
-#define  FRAGMENT_ATTRIB_FOGCOORD                   0x03
-#define  FRAGMENT_ATTRIB_POSITION                   0x04
-
-/* vertex attribute binding */
-#define  VERTEX_ATTRIB_POSITION                     0x01
-#define  VERTEX_ATTRIB_WEIGHT                       0x02
-#define  VERTEX_ATTRIB_NORMAL                       0x03
-#define  VERTEX_ATTRIB_COLOR                        0x04
-#define  VERTEX_ATTRIB_FOGCOORD                     0x05
-#define  VERTEX_ATTRIB_TEXCOORD                     0x06
-#define  VERTEX_ATTRIB_MATRIXINDEX                  0x07
-#define  VERTEX_ATTRIB_GENERIC                      0x08
-
-/* fragment result binding */
-#define  FRAGMENT_RESULT_COLOR                      0x01
-#define  FRAGMENT_RESULT_DEPTH                      0x02
-
-/* vertex result binding */
-#define  VERTEX_RESULT_POSITION                     0x01
-#define  VERTEX_RESULT_COLOR                        0x02
-#define  VERTEX_RESULT_FOGCOORD                     0x03
-#define  VERTEX_RESULT_POINTSIZE                    0x04
-#define  VERTEX_RESULT_TEXCOORD                     0x05
-
-/* texture target */
-#define  TEXTARGET_1D                               0x01
-#define  TEXTARGET_2D                               0x02
-#define  TEXTARGET_3D                               0x03
-#define  TEXTARGET_RECT                             0x04
-#define  TEXTARGET_CUBE                             0x05
-/* GL_ARB_fragment_program_shadow */
-#define  TEXTARGET_SHADOW1D                         0x06
-#define  TEXTARGET_SHADOW2D                         0x07
-#define  TEXTARGET_SHADOWRECT                       0x08
-
-/* face type */
-#define  FACE_FRONT                                 0x00
-#define  FACE_BACK                                  0x01
-
-/* color type */
-#define  COLOR_PRIMARY                              0x00
-#define  COLOR_SECONDARY                            0x01
-
-/* component */
-#define  COMPONENT_X                                0x00
-#define  COMPONENT_Y                                0x01
-#define  COMPONENT_Z                                0x02
-#define  COMPONENT_W                                0x03
-#define  COMPONENT_0                                0x04
-#define  COMPONENT_1                                0x05
-
-/* array index type */
-#define  ARRAY_INDEX_ABSOLUTE                       0x00
-#define  ARRAY_INDEX_RELATIVE                       0x01
-
-/* matrix name */
-#define  MATRIX_MODELVIEW                           0x01
-#define  MATRIX_PROJECTION                          0x02
-#define  MATRIX_MVP                                 0x03
-#define  MATRIX_TEXTURE                             0x04
-#define  MATRIX_PALETTE                             0x05
-#define  MATRIX_PROGRAM                             0x06
-
-/* matrix modifier */
-#define  MATRIX_MODIFIER_IDENTITY                   0x00
-#define  MATRIX_MODIFIER_INVERSE                    0x01
-#define  MATRIX_MODIFIER_TRANSPOSE                  0x02
-#define  MATRIX_MODIFIER_INVTRANS                   0x03
-
-/* constant type */
-#define  CONSTANT_SCALAR                            0x01
-#define  CONSTANT_VECTOR                            0x02
-
-/* program param type */
-#define  PROGRAM_PARAM_ENV                          0x01
-#define  PROGRAM_PARAM_LOCAL                        0x02
-
-/* register type */
-#define  REGISTER_ATTRIB                            0x01
-#define  REGISTER_PARAM                             0x02
-#define  REGISTER_RESULT                            0x03
-#define  REGISTER_ESTABLISHED_NAME                  0x04
-
-/* param binding */
-#define  PARAM_NULL                                 0x00
-#define  PARAM_ARRAY_ELEMENT                        0x01
-#define  PARAM_STATE_ELEMENT                        0x02
-#define  PARAM_PROGRAM_ELEMENT                      0x03
-#define  PARAM_PROGRAM_ELEMENTS                     0x04
-#define  PARAM_CONSTANT                             0x05
-
-/* param state property */
-#define  STATE_MATERIAL_PARSER                      0x01
-#define  STATE_LIGHT_PARSER                         0x02
-#define  STATE_LIGHT_MODEL                          0x03
-#define  STATE_LIGHT_PROD                           0x04
-#define  STATE_FOG                                  0x05
-#define  STATE_MATRIX_ROWS                          0x06
-/* GL_ARB_fragment_program */
-#define  STATE_TEX_ENV                              0x07
-#define  STATE_DEPTH                                0x08
-/* GL_ARB_vertex_program */
-#define  STATE_TEX_GEN                              0x09
-#define  STATE_CLIP_PLANE                           0x0A
-#define  STATE_POINT                                0x0B
-
-/* state material property */
-#define  MATERIAL_AMBIENT                           0x01
-#define  MATERIAL_DIFFUSE                           0x02
-#define  MATERIAL_SPECULAR                          0x03
-#define  MATERIAL_EMISSION                          0x04
-#define  MATERIAL_SHININESS                         0x05
-
-/* state light property */
-#define  LIGHT_AMBIENT                              0x01
-#define  LIGHT_DIFFUSE                              0x02
-#define  LIGHT_SPECULAR                             0x03
-#define  LIGHT_POSITION                             0x04
-#define  LIGHT_ATTENUATION                          0x05
-#define  LIGHT_HALF                                 0x06
-#define  LIGHT_SPOT_DIRECTION                       0x07
-
-/* state light model property */
-#define  LIGHT_MODEL_AMBIENT                        0x01
-#define  LIGHT_MODEL_SCENECOLOR                     0x02
-
-/* state light product property */
-#define  LIGHT_PROD_AMBIENT                         0x01
-#define  LIGHT_PROD_DIFFUSE                         0x02
-#define  LIGHT_PROD_SPECULAR                        0x03
-
-/* state texture environment property */
-#define  TEX_ENV_COLOR                              0x01
-
-/* state texture generation coord property */
-#define  TEX_GEN_EYE                                0x01
-#define  TEX_GEN_OBJECT                             0x02
-
-/* state fog property */
-#define  FOG_COLOR                                  0x01
-#define  FOG_PARAMS                                 0x02
-
-/* state depth property */
-#define  DEPTH_RANGE                                0x01
-
-/* state point parameters property */
-#define  POINT_SIZE                                 0x01
-#define  POINT_ATTENUATION                          0x02
-
-/* declaration */
-#define  ATTRIB                                     0x01
-#define  PARAM                                      0x02
-#define  TEMP                                       0x03
-#define  OUTPUT                                     0x04
-#define  ALIAS                                      0x05
-/* GL_ARB_vertex_program */
-#define  ADDRESS                                    0x06
-
+constexpr int FRAGMENT_ATTRIB_COLOR = 0x01;
+constexpr int FRAGMENT_ATTRIB_TEXCOORD = 0x02;
+constexpr int FRAGMENT_ATTRIB_FOGCOORD = 0x03;
+constexpr int FRAGMENT_ATTRIB_POSITION = 0x04;/* vertex attribute binding */
+constexpr int VERTEX_ATTRIB_POSITION = 0x01;
+constexpr int VERTEX_ATTRIB_WEIGHT = 0x02;
+constexpr int VERTEX_ATTRIB_NORMAL = 0x03;
+constexpr int VERTEX_ATTRIB_COLOR = 0x04;
+constexpr int VERTEX_ATTRIB_FOGCOORD = 0x05;
+constexpr int VERTEX_ATTRIB_TEXCOORD = 0x06;
+constexpr int VERTEX_ATTRIB_MATRIXINDEX = 0x07;
+constexpr int VERTEX_ATTRIB_GENERIC = 0x08;/* fragment result binding */
+constexpr int FRAGMENT_RESULT_COLOR = 0x01;
+constexpr int FRAGMENT_RESULT_DEPTH = 0x02;/* vertex result binding */
+constexpr int VERTEX_RESULT_POSITION = 0x01;
+constexpr int VERTEX_RESULT_COLOR = 0x02;
+constexpr int VERTEX_RESULT_FOGCOORD = 0x03;
+constexpr int VERTEX_RESULT_POINTSIZE = 0x04;
+constexpr int VERTEX_RESULT_TEXCOORD = 0x05;/* texture target */
+constexpr int TEXTARGET_1D = 0x01;
+constexpr int TEXTARGET_2D = 0x02;
+constexpr int TEXTARGET_3D = 0x03;
+constexpr int TEXTARGET_RECT = 0x04;
+constexpr int TEXTARGET_CUBE = 0x05;/* GL_ARB_fragment_program_shadow */
+constexpr int TEXTARGET_SHADOW1D = 0x06;
+constexpr int TEXTARGET_SHADOW2D = 0x07;
+constexpr int TEXTARGET_SHADOWRECT = 0x08;/* face type */
+constexpr int FACE_FRONT = 0x00;
+constexpr int FACE_BACK = 0x01;/* color type */
+constexpr int COLOR_PRIMARY = 0x00;
+constexpr int COLOR_SECONDARY = 0x01;/* component */
+constexpr int COMPONENT_X = 0x00;
+constexpr int COMPONENT_Y = 0x01;
+constexpr int COMPONENT_Z = 0x02;
+constexpr int COMPONENT_W = 0x03;
+constexpr int COMPONENT_0 = 0x04;
+constexpr int COMPONENT_1 = 0x05;/* array index type */
+constexpr int ARRAY_INDEX_ABSOLUTE = 0x00;
+constexpr int ARRAY_INDEX_RELATIVE = 0x01;/* matrix name */
+constexpr int MATRIX_MODELVIEW = 0x01;
+constexpr int MATRIX_PROJECTION = 0x02;
+constexpr int MATRIX_MVP = 0x03;
+constexpr int MATRIX_TEXTURE = 0x04;
+constexpr int MATRIX_PALETTE = 0x05;
+constexpr int MATRIX_PROGRAM = 0x06;/* matrix modifier */
+constexpr int MATRIX_MODIFIER_IDENTITY = 0x00;
+constexpr int MATRIX_MODIFIER_INVERSE = 0x01;
+constexpr int MATRIX_MODIFIER_TRANSPOSE = 0x02;
+constexpr int MATRIX_MODIFIER_INVTRANS = 0x03;/* constant type */
+constexpr int CONSTANT_SCALAR = 0x01;
+constexpr int CONSTANT_VECTOR = 0x02;/* program param type */
+constexpr int PROGRAM_PARAM_ENV = 0x01;
+constexpr int PROGRAM_PARAM_LOCAL = 0x02;/* register type */
+constexpr int REGISTER_ATTRIB = 0x01;
+constexpr int REGISTER_PARAM = 0x02;
+constexpr int REGISTER_RESULT = 0x03;
+constexpr int REGISTER_ESTABLISHED_NAME = 0x04;/* param binding */
+constexpr int PARAM_NULL = 0x00;
+constexpr int PARAM_ARRAY_ELEMENT = 0x01;
+constexpr int PARAM_STATE_ELEMENT = 0x02;
+constexpr int PARAM_PROGRAM_ELEMENT = 0x03;
+constexpr int PARAM_PROGRAM_ELEMENTS = 0x04;
+constexpr int PARAM_CONSTANT = 0x05;/* param state property */
+constexpr int STATE_MATERIAL_PARSER = 0x01;
+constexpr int STATE_LIGHT_PARSER = 0x02;
+constexpr int STATE_LIGHT_MODEL = 0x03;
+constexpr int STATE_LIGHT_PROD = 0x04;
+constexpr int STATE_FOG = 0x05;
+constexpr int STATE_MATRIX_ROWS = 0x06;/* GL_ARB_fragment_program */
+constexpr int STATE_TEX_ENV = 0x07;
+constexpr int STATE_DEPTH = 0x08;/* GL_ARB_vertex_program */
+constexpr int STATE_TEX_GEN = 0x09;
+constexpr int STATE_CLIP_PLANE = 0x0A;
+constexpr int STATE_POINT = 0x0B;/* state material property */
+constexpr int MATERIAL_AMBIENT = 0x01;
+constexpr int MATERIAL_DIFFUSE = 0x02;
+constexpr int MATERIAL_SPECULAR = 0x03;
+constexpr int MATERIAL_EMISSION = 0x04;
+constexpr int MATERIAL_SHININESS = 0x05;/* state light property */
+constexpr int LIGHT_AMBIENT = 0x01;
+constexpr int LIGHT_DIFFUSE = 0x02;
+constexpr int LIGHT_SPECULAR = 0x03;
+constexpr int LIGHT_POSITION = 0x04;
+constexpr int LIGHT_ATTENUATION = 0x05;
+constexpr int LIGHT_HALF = 0x06;
+constexpr int LIGHT_SPOT_DIRECTION = 0x07;/* state light model property */
+constexpr int LIGHT_MODEL_AMBIENT = 0x01;
+constexpr int LIGHT_MODEL_SCENECOLOR = 0x02;/* state light product property */
+constexpr int LIGHT_PROD_AMBIENT = 0x01;
+constexpr int LIGHT_PROD_DIFFUSE = 0x02;
+constexpr int LIGHT_PROD_SPECULAR = 0x03;/* state texture environment property */
+constexpr int TEX_ENV_COLOR = 0x01;/* state texture generation coord property */
+constexpr int TEX_GEN_EYE = 0x01;
+constexpr int TEX_GEN_OBJECT = 0x02;/* state fog property */
+constexpr int FOG_COLOR = 0x01;
+constexpr int FOG_PARAMS = 0x02;/* state depth property */
+constexpr int DEPTH_RANGE = 0x01;/* state point parameters property */
+constexpr int POINT_SIZE = 0x01;
+constexpr int POINT_ATTENUATION = 0x02;/* declaration */
+constexpr int ATTRIB = 0x01;
+constexpr int PARAM = 0x02;
+constexpr int TEMP = 0x03;
+constexpr int OUTPUT = 0x04;
+constexpr int ALIAS = 0x05;/* GL_ARB_vertex_program */
+constexpr int ADDRESS = 0x06;
 /*-----------------------------------------------------------------------
  * From here on down is the semantic checking portion
  *
