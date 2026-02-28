@@ -293,8 +293,7 @@ const struct gl_texture_format _mesa_texformat_rgba_fxt1 = {
  */
 #if defined(__GNUC__) && !defined(__cplusplus)
 
-#define FX64_NATIVE 1
-
+constexpr int FX64_NATIVE = 1;
 #ifdef __MINGW32__
 using Fx64 = unsigned long;
 #else
@@ -308,8 +307,7 @@ using Fx64 = unsigned long long;
 
 #else  /* !__GNUC__ */
 
-#define FX64_NATIVE 0
-
+constexpr int FX64_NATIVE = 0;
 struct Fx64 {
     GLuint lo, hi;
 };

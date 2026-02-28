@@ -76,11 +76,10 @@ struct state_key {
 static_assert(std::is_trivially_copyable<state_key>::value,
 	      "state_key must be trivially copyable for binary map key");
 
-#define FOG_LINEAR  0
-#define FOG_EXP     1
-#define FOG_EXP2    2
-#define FOG_UNKNOWN 3
-
+constexpr int FOG_LINEAR = 0;
+constexpr int FOG_EXP = 1;
+constexpr int FOG_EXP2 = 2;
+constexpr int FOG_UNKNOWN = 3;
 static GLuint translate_fog_mode(GLenum mode)
 {
     switch (mode) {
@@ -95,14 +94,13 @@ static GLuint translate_fog_mode(GLenum mode)
     }
 }
 
-#define OPR_SRC_COLOR           0
-#define OPR_ONE_MINUS_SRC_COLOR 1
-#define OPR_SRC_ALPHA           2
-#define OPR_ONE_MINUS_SRC_ALPHA	3
-#define OPR_ZERO                4
-#define OPR_ONE                 5
-#define OPR_UNKNOWN             7
-
+constexpr int OPR_SRC_COLOR = 0;
+constexpr int OPR_ONE_MINUS_SRC_COLOR = 1;
+constexpr int OPR_SRC_ALPHA = 2;
+constexpr int OPR_ONE_MINUS_SRC_ALPHA = 3;
+constexpr int OPR_ZERO = 4;
+constexpr int OPR_ONE = 5;
+constexpr int OPR_UNKNOWN = 7;
 static GLuint translate_operand(GLenum operand)
 {
     switch (operand) {
@@ -123,20 +121,19 @@ static GLuint translate_operand(GLenum operand)
     }
 }
 
-#define SRC_TEXTURE  0
-#define SRC_TEXTURE0 1
-#define SRC_TEXTURE1 2
-#define SRC_TEXTURE2 3
-#define SRC_TEXTURE3 4
-#define SRC_TEXTURE4 5
-#define SRC_TEXTURE5 6
-#define SRC_TEXTURE6 7
-#define SRC_TEXTURE7 8
-#define SRC_CONSTANT 9
-#define SRC_PRIMARY_COLOR 10
-#define SRC_PREVIOUS 11
-#define SRC_UNKNOWN  15
-
+constexpr int SRC_TEXTURE = 0;
+constexpr int SRC_TEXTURE0 = 1;
+constexpr int SRC_TEXTURE1 = 2;
+constexpr int SRC_TEXTURE2 = 3;
+constexpr int SRC_TEXTURE3 = 4;
+constexpr int SRC_TEXTURE4 = 5;
+constexpr int SRC_TEXTURE5 = 6;
+constexpr int SRC_TEXTURE6 = 7;
+constexpr int SRC_TEXTURE7 = 8;
+constexpr int SRC_CONSTANT = 9;
+constexpr int SRC_PRIMARY_COLOR = 10;
+constexpr int SRC_PREVIOUS = 11;
+constexpr int SRC_UNKNOWN = 15;
 static GLuint translate_source(GLenum src)
 {
     switch (src) {
@@ -162,21 +159,20 @@ static GLuint translate_source(GLenum src)
     }
 }
 
-#define MODE_REPLACE       0
-#define MODE_MODULATE      1
-#define MODE_ADD           2
-#define MODE_ADD_SIGNED    3
-#define MODE_INTERPOLATE   4
-#define MODE_SUBTRACT      5
-#define MODE_DOT3_RGB      6
-#define MODE_DOT3_RGB_EXT  7
-#define MODE_DOT3_RGBA     8
-#define MODE_DOT3_RGBA_EXT 9
-#define MODE_MODULATE_ADD_ATI           10
-#define MODE_MODULATE_SIGNED_ADD_ATI    11
-#define MODE_MODULATE_SUBTRACT_ATI      12
-#define MODE_UNKNOWN       15
-
+constexpr int MODE_REPLACE = 0;
+constexpr int MODE_MODULATE = 1;
+constexpr int MODE_ADD = 2;
+constexpr int MODE_ADD_SIGNED = 3;
+constexpr int MODE_INTERPOLATE = 4;
+constexpr int MODE_SUBTRACT = 5;
+constexpr int MODE_DOT3_RGB = 6;
+constexpr int MODE_DOT3_RGB_EXT = 7;
+constexpr int MODE_DOT3_RGBA = 8;
+constexpr int MODE_DOT3_RGBA_EXT = 9;
+constexpr int MODE_MODULATE_ADD_ATI = 10;
+constexpr int MODE_MODULATE_SIGNED_ADD_ATI = 11;
+constexpr int MODE_MODULATE_SUBTRACT_ATI = 12;
+constexpr int MODE_UNKNOWN = 15;
 static GLuint translate_mode(GLenum mode)
 {
     switch (mode) {
@@ -211,7 +207,7 @@ static GLuint translate_mode(GLenum mode)
     }
 }
 
-#define TEXTURE_UNKNOWN_INDEX 7
+constexpr int TEXTURE_UNKNOWN_INDEX = 7;
 static GLuint translate_tex_src_bit(GLbitfield bit)
 {
     switch (bit) {

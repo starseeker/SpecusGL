@@ -47,20 +47,19 @@
 #include "program.h"
 
 
-#define INPUT_1V     1
-#define INPUT_2V     2
-#define INPUT_3V     3
-#define INPUT_1S     4
-#define INPUT_2S     5
-#define INPUT_CC     6
+constexpr int INPUT_1V = 1;
+constexpr int INPUT_2V = 2;
+constexpr int INPUT_3V = 3;
+constexpr int INPUT_1S = 4;
+constexpr int INPUT_2S = 5;
+constexpr int INPUT_CC = 6;
 #define INPUT_1V_T   7  /* one source vector, plus textureId */
 #define INPUT_3V_T   8  /* one source vector, plus textureId */
-#define INPUT_NONE   9
+constexpr int INPUT_NONE = 9;
 #define INPUT_1V_S  10  /* a string and a vector register */
-#define OUTPUT_V    20
-#define OUTPUT_S    21
-#define OUTPUT_NONE 22
-
+constexpr int OUTPUT_V = 20;
+constexpr int OUTPUT_S = 21;
+constexpr int OUTPUT_NONE = 22;
 /* IRIX defines some of these */
 #undef _R
 #undef _H

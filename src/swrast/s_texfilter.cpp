@@ -37,9 +37,7 @@
  * Constants for integer linear interpolation.
  */
 #define ILERP_SCALE 65536.0F
-#define ILERP_SHIFT 16
-
-
+constexpr int ILERP_SHIFT = 16;
 /**
  * Linear interpolation macros
  */
@@ -555,15 +553,12 @@ nearest_mipmap_level(const struct gl_texture_object *tObj, GLfloat lambda)
 /*
  * Bitflags for texture border color sampling.
  */
-#define I0BIT   1
-#define I1BIT   2
-#define J0BIT   4
-#define J1BIT   8
-#define K0BIT  16
-#define K1BIT  32
-
-
-
+constexpr int I0BIT = 1;
+constexpr int I1BIT = 2;
+constexpr int J0BIT = 4;
+constexpr int J1BIT = 8;
+constexpr int K0BIT = 16;
+constexpr int K1BIT = 32;
 /*
  * The lambda[] array values are always monotonic.  Either the whole span
  * will be minified, magnified, or split between the two.  This function
