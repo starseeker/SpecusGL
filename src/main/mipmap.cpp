@@ -58,9 +58,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
     switch (format->MesaFormat) {
 	case MESA_FORMAT_RGBA: {
 	    GLuint i, j, k;
-	    const GLchan(*rowA)[4] = (const GLchan(*)[4]) srcRowA;
-	    const GLchan(*rowB)[4] = (const GLchan(*)[4]) srcRowB;
-	    GLchan(*dst)[4] = (GLchan(*)[4]) dstRow;
+	    const GLchan(*rowA)[4] = reinterpret_cast<const GLchan(*)[4]>(srcRowA);
+	    const GLchan(*rowB)[4] = reinterpret_cast<const GLchan(*)[4]>(srcRowB);
+	    GLchan(*dst)[4] = reinterpret_cast<GLchan(*)[4]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -76,9 +76,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGB: {
 	    GLuint i, j, k;
-	    const GLchan(*rowA)[3] = (const GLchan(*)[3]) srcRowA;
-	    const GLchan(*rowB)[3] = (const GLchan(*)[3]) srcRowB;
-	    GLchan(*dst)[3] = (GLchan(*)[3]) dstRow;
+	    const GLchan(*rowA)[3] = reinterpret_cast<const GLchan(*)[3]>(srcRowA);
+	    const GLchan(*rowB)[3] = reinterpret_cast<const GLchan(*)[3]>(srcRowB);
+	    GLchan(*dst)[3] = reinterpret_cast<GLchan(*)[3]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -94,9 +94,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_LUMINANCE:
 	case MESA_FORMAT_INTENSITY: {
 	    GLuint i, j, k;
-	    const GLchan *rowA = (const GLchan *) srcRowA;
-	    const GLchan *rowB = (const GLchan *) srcRowB;
-	    GLchan *dst = (GLchan *) dstRow;
+	    const GLchan *rowA = reinterpret_cast<const GLchan *>(srcRowA);
+	    const GLchan *rowB = reinterpret_cast<const GLchan *>(srcRowB);
+	    GLchan *dst = reinterpret_cast<GLchan *>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i] = (rowA[j] + rowA[k] + rowB[j] + rowB[k]) / 4;
@@ -105,9 +105,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_LUMINANCE_ALPHA: {
 	    GLuint i, j, k;
-	    const GLchan(*rowA)[2] = (const GLchan(*)[2]) srcRowA;
-	    const GLchan(*rowB)[2] = (const GLchan(*)[2]) srcRowB;
-	    GLchan(*dst)[2] = (GLchan(*)[2]) dstRow;
+	    const GLchan(*rowA)[2] = reinterpret_cast<const GLchan(*)[2]>(srcRowA);
+	    const GLchan(*rowB)[2] = reinterpret_cast<const GLchan(*)[2]>(srcRowB);
+	    GLchan(*dst)[2] = reinterpret_cast<GLchan(*)[2]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -149,9 +149,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 #endif
 	{
 	    GLuint i, j, k;
-	    const GLubyte(*rowA)[4] = (const GLubyte(*)[4]) srcRowA;
-	    const GLubyte(*rowB)[4] = (const GLubyte(*)[4]) srcRowB;
-	    GLubyte(*dst)[4] = (GLubyte(*)[4]) dstRow;
+	    const GLubyte(*rowA)[4] = reinterpret_cast<const GLubyte(*)[4]>(srcRowA);
+	    const GLubyte(*rowB)[4] = reinterpret_cast<const GLubyte(*)[4]>(srcRowB);
+	    GLubyte(*dst)[4] = reinterpret_cast<GLubyte(*)[4]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -172,9 +172,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 #endif
 	{
 	    GLuint i, j, k;
-	    const GLubyte(*rowA)[3] = (const GLubyte(*)[3]) srcRowA;
-	    const GLubyte(*rowB)[3] = (const GLubyte(*)[3]) srcRowB;
-	    GLubyte(*dst)[3] = (GLubyte(*)[3]) dstRow;
+	    const GLubyte(*rowA)[3] = reinterpret_cast<const GLubyte(*)[3]>(srcRowA);
+	    const GLubyte(*rowB)[3] = reinterpret_cast<const GLubyte(*)[3]>(srcRowB);
+	    GLubyte(*dst)[3] = reinterpret_cast<GLubyte(*)[3]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -284,9 +284,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 #endif
 	{
 	    GLuint i, j, k;
-	    const GLubyte(*rowA)[2] = (const GLubyte(*)[2]) srcRowA;
-	    const GLubyte(*rowB)[2] = (const GLubyte(*)[2]) srcRowB;
-	    GLubyte(*dst)[2] = (GLubyte(*)[2]) dstRow;
+	    const GLubyte(*rowA)[2] = reinterpret_cast<const GLubyte(*)[2]>(srcRowA);
+	    const GLubyte(*rowB)[2] = reinterpret_cast<const GLubyte(*)[2]>(srcRowB);
+	    GLubyte(*dst)[2] = reinterpret_cast<GLubyte(*)[2]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -342,9 +342,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGBA_FLOAT32: {
 	    GLuint i, j, k;
-	    const GLfloat(*rowA)[4] = (const GLfloat(*)[4]) srcRowA;
-	    const GLfloat(*rowB)[4] = (const GLfloat(*)[4]) srcRowB;
-	    GLfloat(*dst)[4] = (GLfloat(*)[4]) dstRow;
+	    const GLfloat(*rowA)[4] = reinterpret_cast<const GLfloat(*)[4]>(srcRowA);
+	    const GLfloat(*rowB)[4] = reinterpret_cast<const GLfloat(*)[4]>(srcRowB);
+	    GLfloat(*dst)[4] = reinterpret_cast<GLfloat(*)[4]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -360,9 +360,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGBA_FLOAT16: {
 	    GLuint i, j, k, comp;
-	    const GLhalfARB(*rowA)[4] = (const GLhalfARB(*)[4]) srcRowA;
-	    const GLhalfARB(*rowB)[4] = (const GLhalfARB(*)[4]) srcRowB;
-	    GLhalfARB(*dst)[4] = (GLhalfARB(*)[4]) dstRow;
+	    const GLhalfARB(*rowA)[4] = reinterpret_cast<const GLhalfARB(*)[4]>(srcRowA);
+	    const GLhalfARB(*rowB)[4] = reinterpret_cast<const GLhalfARB(*)[4]>(srcRowB);
+	    GLhalfARB(*dst)[4] = reinterpret_cast<GLhalfARB(*)[4]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 4; comp++) {
@@ -378,9 +378,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGB_FLOAT32: {
 	    GLuint i, j, k;
-	    const GLfloat(*rowA)[3] = (const GLfloat(*)[3]) srcRowA;
-	    const GLfloat(*rowB)[3] = (const GLfloat(*)[3]) srcRowB;
-	    GLfloat(*dst)[3] = (GLfloat(*)[3]) dstRow;
+	    const GLfloat(*rowA)[3] = reinterpret_cast<const GLfloat(*)[3]>(srcRowA);
+	    const GLfloat(*rowB)[3] = reinterpret_cast<const GLfloat(*)[3]>(srcRowB);
+	    GLfloat(*dst)[3] = reinterpret_cast<GLfloat(*)[3]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -394,9 +394,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_RGB_FLOAT16: {
 	    GLuint i, j, k, comp;
-	    const GLhalfARB(*rowA)[3] = (const GLhalfARB(*)[3]) srcRowA;
-	    const GLhalfARB(*rowB)[3] = (const GLhalfARB(*)[3]) srcRowB;
-	    GLhalfARB(*dst)[3] = (GLhalfARB(*)[3]) dstRow;
+	    const GLhalfARB(*rowA)[3] = reinterpret_cast<const GLhalfARB(*)[3]>(srcRowA);
+	    const GLhalfARB(*rowB)[3] = reinterpret_cast<const GLhalfARB(*)[3]>(srcRowB);
+	    GLhalfARB(*dst)[3] = reinterpret_cast<GLhalfARB(*)[3]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 3; comp++) {
@@ -412,9 +412,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_LUMINANCE_ALPHA_FLOAT32: {
 	    GLuint i, j, k;
-	    const GLfloat(*rowA)[2] = (const GLfloat(*)[2]) srcRowA;
-	    const GLfloat(*rowB)[2] = (const GLfloat(*)[2]) srcRowB;
-	    GLfloat(*dst)[2] = (GLfloat(*)[2]) dstRow;
+	    const GLfloat(*rowA)[2] = reinterpret_cast<const GLfloat(*)[2]>(srcRowA);
+	    const GLfloat(*rowB)[2] = reinterpret_cast<const GLfloat(*)[2]>(srcRowB);
+	    GLfloat(*dst)[2] = reinterpret_cast<GLfloat(*)[2]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		dst[i][0] = (rowA[j][0] + rowA[k][0] +
@@ -426,9 +426,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	return;
 	case MESA_FORMAT_LUMINANCE_ALPHA_FLOAT16: {
 	    GLuint i, j, k, comp;
-	    const GLhalfARB(*rowA)[2] = (const GLhalfARB(*)[2]) srcRowA;
-	    const GLhalfARB(*rowB)[2] = (const GLhalfARB(*)[2]) srcRowB;
-	    GLhalfARB(*dst)[2] = (GLhalfARB(*)[2]) dstRow;
+	    const GLhalfARB(*rowA)[2] = reinterpret_cast<const GLhalfARB(*)[2]>(srcRowA);
+	    const GLhalfARB(*rowB)[2] = reinterpret_cast<const GLhalfARB(*)[2]>(srcRowB);
+	    GLhalfARB(*dst)[2] = reinterpret_cast<GLhalfARB(*)[2]>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		for (comp = 0; comp < 2; comp++) {
@@ -459,9 +459,9 @@ do_row(const struct gl_texture_format *format, GLint srcWidth,
 	case MESA_FORMAT_LUMINANCE_FLOAT16:
 	case MESA_FORMAT_INTENSITY_FLOAT16: {
 	    GLuint i, j, k;
-	    const GLhalfARB *rowA = (const GLhalfARB *) srcRowA;
-	    const GLhalfARB *rowB = (const GLhalfARB *) srcRowB;
-	    GLhalfARB *dst = (GLhalfARB *) dstRow;
+	    const GLhalfARB *rowA = reinterpret_cast<const GLhalfARB *>(srcRowA);
+	    const GLhalfARB *rowB = reinterpret_cast<const GLhalfARB *>(srcRowB);
+	    GLhalfARB *dst = reinterpret_cast<GLhalfARB *>(dstRow);
 	    for (i = j = 0, k = k0; i < static_cast<GLuint>(dstWidth);
 		 i++, j += colStride, k += colStride) {
 		GLfloat aj, ak, bj, bk;
@@ -834,7 +834,7 @@ _mesa_generate_mipmap(GLcontext *ctx, GLenum target,
 	dstData = dstDataVec.data();
 
 	/* decompress base image here */
-	dst = (GLchan *) srcData;
+	dst = reinterpret_cast<GLchan *>(srcData);
 	for (row = 0; row < srcImage->Height; row++) {
 	    GLuint col;
 	    for (col = 0; col < srcImage->Width; col++) {
@@ -1044,8 +1044,8 @@ _mesa_rescale_teximage2d(GLuint bytesPerPixel,
 
 #define RESCALE_IMAGE( TYPE )						\
 do {									\
-   const TYPE *src = (const TYPE *)srcImage;				\
-   TYPE *dst = (TYPE *)dstImage;					\
+   const TYPE *src = reinterpret_cast<const TYPE *>(srcImage);		\
+   TYPE *dst = reinterpret_cast<TYPE *>(dstImage);			\
 									\
    if ( srcHeight < dstHeight ) {					\
       const GLint hScale = dstHeight / srcHeight;			\
