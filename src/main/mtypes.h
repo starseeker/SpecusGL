@@ -62,18 +62,18 @@
  */
 #if CHAN_BITS == 8
 using GLchan = GLubyte;
-#define CHAN_MAX 255
-#define CHAN_MAXF 255.0F
+constexpr GLchan  CHAN_MAX  = 255;
+constexpr GLfloat CHAN_MAXF = 255.0F;
 #define CHAN_TYPE GL_UNSIGNED_BYTE
 #elif CHAN_BITS == 16
 using GLchan = GLushort;
-#define CHAN_MAX 65535
-#define CHAN_MAXF 65535.0F
+constexpr GLchan  CHAN_MAX  = 65535;
+constexpr GLfloat CHAN_MAXF = 65535.0F;
 #define CHAN_TYPE GL_UNSIGNED_SHORT
 #elif CHAN_BITS == 32
 using GLchan = GLfloat;
-#define CHAN_MAX 1.0
-#define CHAN_MAXF 1.0F
+constexpr GLchan  CHAN_MAX  = 1.0F;
+constexpr GLfloat CHAN_MAXF = 1.0F;
 #define CHAN_TYPE GL_FLOAT
 #else
 #error "illegal number of color channel bits"

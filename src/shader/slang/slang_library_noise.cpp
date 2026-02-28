@@ -201,8 +201,8 @@ GLfloat _slang_library_noise1(GLfloat x)
 /* 2D simplex noise */
 GLfloat _slang_library_noise2(GLfloat x, GLfloat y)
 {
-#define F2 0.366025403f /* F2 = 0.5*(sqrt(3.0)-1.0) */
-#define G2 0.211324865f /* G2 = (3.0-Math.sqrt(3.0))/6.0 */
+    constexpr float F2 = 0.366025403f; /* F2 = 0.5*(sqrt(3.0)-1.0) */
+    constexpr float G2 = 0.211324865f; /* G2 = (3.0-Math.sqrt(3.0))/6.0 */
 
     float n0, n1, n2; /* Noise contributions from the three corners */
 
@@ -278,8 +278,8 @@ GLfloat _slang_library_noise2(GLfloat x, GLfloat y)
 GLfloat _slang_library_noise3(GLfloat x, GLfloat y, GLfloat z)
 {
     /* Simple skewing factors for the 3D case */
-#define F3 0.333333333f
-#define G3 0.166666667f
+    constexpr float F3 = 0.333333333f;
+    constexpr float G3 = 0.166666667f;
 
     float n0, n1, n2, n3; /* Noise contributions from the four corners */
 
@@ -416,8 +416,8 @@ GLfloat _slang_library_noise3(GLfloat x, GLfloat y, GLfloat z)
 GLfloat _slang_library_noise4(GLfloat x, GLfloat y, GLfloat z, GLfloat w)
 {
     /* The skewing and unskewing factors are hairy again for the 4D case */
-#define F4 0.309016994f /* F4 = (Math.sqrt(5.0)-1.0)/4.0 */
-#define G4 0.138196601f /* G4 = (5.0-Math.sqrt(5.0))/20.0 */
+    constexpr float F4 = 0.309016994f; /* F4 = (Math.sqrt(5.0)-1.0)/4.0 */
+    constexpr float G4 = 0.138196601f; /* G4 = (5.0-Math.sqrt(5.0))/20.0 */
 
     float n0, n1, n2, n3, n4; /* Noise contributions from the five corners */
 
